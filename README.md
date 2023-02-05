@@ -10,7 +10,7 @@ It uses this process
 ```
 embed docs into vectors -> embed query into vector -> search for top k passages in docs
 
-create summary of each doc relevant to query -> put summary into prompt -> generate answer
+create summary of each passage relevant to query -> put summaries into prompt -> generate answer
 ```
 
 ## Install
