@@ -29,9 +29,11 @@ pip install paper-qa
 
 ## Usage
 
-Make sure you have set your OPENAI_API_KEY environment variable to your [openai api key](https://beta.openai.com/docs/developer-quickstart/your-api-keys)
+Make sure you have set your OPENAI_API_KEY environment variable to your [openai api key](https://platform.openai.com/account/api-keys)
 
-To use the package, you need to have a list of paths (valid extensions include: .pdf, .txt, .jpg, .pptx, .docx, .csv, .epub, .md, .mp4, .mp3) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
+To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt, .jpg, .pptx, .docx, .csv, .epub, .md, .mp4, .mp3) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
+
+*This uses a lot of tokens!! About 20-30k tokens per answer + embedding cost (negligible unless many documents used). That is about $0.50 per answer with current GPT-3 pricing. Use wisely.*
 
 ```python
 
@@ -43,12 +45,20 @@ docs = Docs()
 for d, c in zip(my_docs, my_citations):
     docs.add(d, c)
 
-# takes ~ 1 min
+# takes ~ 1 min and costs $0.50 to execute this line
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
 print(answer.formatted_answer)
 ```
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `questions`, `context` (the summaries of passages found for answer), `refernces` (the docs from which the passages came).
+
+## Adjusting number of sources
+
+You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` controls number of passages to search in each source and `max_sources` controls the number of sources included in the context.
+
+```python
+docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 1, max_sources = 3)
+```
 
 ### How is this different from gpt-index?
 
