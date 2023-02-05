@@ -44,10 +44,24 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `questions`, `context` (the summaries of passages found for answer), `refernces` (the docs from which the passages came).
 
-## How is this different from gpt-index?
+### How is this different from gpt-index?
 
 gpt-index does generate answers, but in a somewhat opinionated way. It doesn't have a great way to track where text comes from and it's not easy to force it to pull from multiple documents. I don't know which way is better, but for writing scholarly text I found it to work better to pull from multiple relevant documents and then generate an answer. I would like to PR to do this to gpt-index but it looks pretty involved right now.
 
-## Where do the documents come from?
+### Where do the documents come from?
 
 I use some of my own code to pull papers from Google Scholar. This code is not included because it may enable people to violate Google's terms of service and publisher's terms of service.
+
+### Saving/loading
+
+The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later.
+
+```python
+import pickle
+
+with open("my_docs.pkl", "wb") as f:
+    pickle.dump(docs, f)
+
+with open("my_docs.pkl", "rb") as f:
+    docs = pickle.load(f)
+```
