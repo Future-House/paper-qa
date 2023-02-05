@@ -25,13 +25,17 @@ pip install git+https://github.com/whitead/paper-qa.git
 
 Make sure you have set your OPENAI_API_KEY environment variable to your [openai api key](https://beta.openai.com/docs/developer-quickstart/your-api-keys)
 
+To use the package, you need to have a list of paths (valid extensions include: .pdf, .txt, .jpg, .pptx, .docx, .csv, .epub, .md, .mp4, .mp3) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
+
 ```python
 
 from paperqa import Docs
 
+# get a list of paths, citations
+
 docs = Docs()
-for d in my_docs:
-    docs.add(d, citation)
+for d, c in zip(my_docs, my_citations):
+    docs.add(d, c)
 
 # takes ~ 1 min
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
