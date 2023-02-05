@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.2.3
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+  - repo: https://github.com/psf/black
+    rev: "22.3.0"
+    hooks:
+    - id: black
+  - repo: https://github.com/tomcatling/black-nb
+    rev: "0.7"
+    hooks:
+      - id: black-nb
+        description: strip output and black source
+        additional_dependencies: ['black[jupyter]']
+        args: ["--clear-output"]
