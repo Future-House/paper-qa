@@ -24,7 +24,7 @@ create summary of each passage relevant to query -> put summaries into prompt ->
 Install from github with pip:
 
 ```bash
-pip install git+https://github.com/whitead/paper-qa.git
+pip install paper-qa
 ```
 
 ## Usage
