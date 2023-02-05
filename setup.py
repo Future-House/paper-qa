@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="paperqa",
+    name="paper-qa",
     version=__version__,
     description="LLM Chain for answering questions from docs ",
     author="Andrew White",
