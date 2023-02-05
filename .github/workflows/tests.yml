@@ -25,7 +25,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest  build
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
     - name: Install
       run: |
         pip install .

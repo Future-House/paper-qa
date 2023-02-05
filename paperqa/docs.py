@@ -108,10 +108,10 @@ class Docs:
                     context.append(c)
                 if len(context) == max_sources:
                     break
-        context_str = "\n".join(
+        context_str = "\n\n".join(
             [f"{k}: {s}" for k, s in context if "Not applicable" not in s]
         )
-        context_str += "\n Valid keys: " + ", ".join([k for k, s in context])
+        context_str += "\n\nValid keys: " + ", ".join([k for k, s in context])
         return context_str
 
     def query(self, query: str, k: int = 3, max_sources: int = 5):
