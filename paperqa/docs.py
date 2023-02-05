@@ -111,7 +111,9 @@ class Docs:
         context_str = "\n\n".join(
             [f"{k}: {s}" for k, s in context if "Not applicable" not in s]
         )
-        context_str += "\n\nValid keys: " + ", ".join([k for k, s in context])
+        valid_keys = [k for k, s in context if "Not applicable" not in s]
+        if len(valid_keys) > 0:
+            context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         return context_str
 
     def query(self, query: str, k: int = 3, max_sources: int = 5):
