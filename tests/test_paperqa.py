@@ -34,12 +34,14 @@ def test_evidence():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about Obama
-        r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    evidence = docs.get_evidence("For which state was he a senator", k=1, max_sources=1)
-    assert "Illinois" in evidence
+    evidence = docs.get_evidence(
+        "For which state was he a governor", k=1, max_sources=1
+    )
+    assert "Missouri" in evidence
     os.remove(doc_path)
 
 
@@ -47,11 +49,11 @@ def test_query():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about Obama
-        r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What is Obama's greatest accomplishment?")
+    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
     print(answer)
     os.remove(doc_path)
 

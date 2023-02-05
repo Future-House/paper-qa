@@ -98,6 +98,8 @@ class Docs:
                     queries[index] = query
                 query = queries[index]
                 nodes = query.get_nodes_and_similarities_for_response(question)
+                if len(nodes) <= i:
+                    continue
                 c = (
                     doc["key"],
                     distill_chain.run(question=question, context_str=nodes[i][0].text),
@@ -109,6 +111,7 @@ class Docs:
         context_str = "\n".join(
             [f"{k}: {s}" for k, s in context if "Not applicable" not in s]
         )
+        context_str += "\n Valid keys: " + ", ".join([k for k, s in context])
         return context_str
 
     def query(self, query: str, k: int = 3, max_sources: int = 5):
