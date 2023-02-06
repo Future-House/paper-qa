@@ -1,6 +1,5 @@
 # Paper QA
 
-
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
@@ -35,7 +34,7 @@ Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics usin
 
 ## Install
 
-Install from github with pip:
+Install with pip:
 
 ```bash
 pip install paper-qa
@@ -47,7 +46,7 @@ Make sure you have set your OPENAI_API_KEY environment variable to your [openai 
 
 To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt, .jpg, .pptx, .docx, .csv, .epub, .md, .mp4, .mp3) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
 
-*This uses a lot of tokens!! About 20-30k tokens per answer + embedding cost (negligible unless many documents used). That is about $0.50 per answer with current GPT-3 pricing. Use wisely.*
+*This uses a lot of tokens!! About 10-30k tokens per answer + embedding cost (negligible unless many documents used). That is up to $0.50 per answer with current GPT-3 pricing. Use wisely.*
 
 ```python
 
@@ -64,7 +63,7 @@ answer = docs.query("What manufacturing challenges are unique to bispecific anti
 print(answer.formatted_answer)
 ```
 
-The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `questions`, `context` (the summaries of passages found for answer), `refernces` (the docs from which the passages came).
+The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came).
 
 ## Adjusting number of sources
 
@@ -74,6 +73,8 @@ You can adjust the numbers of sources/passages to reduce token usage or add more
 docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 1, max_sources = 3)
 ```
 
+## FAQ
+
 ### How is this different from gpt-index?
 
 gpt-index does generate answers, but in a somewhat opinionated way. It doesn't have a great way to track where text comes from and it's not easy to force it to pull from multiple documents. I don't know which way is better, but for writing scholarly text I found it to work better to pull from multiple relevant documents and then generate an answer. I would like to PR to do this to gpt-index but it looks pretty involved right now.
@@ -82,7 +83,7 @@ gpt-index does generate answers, but in a somewhat opinionated way. It doesn't h
 
 I use some of my own code to pull papers from Google Scholar. This code is not included because it may enable people to violate Google's terms of service and publisher's terms of service.
 
-### Saving/loading
+### Can I saving/loading?
 
 The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later.
 
