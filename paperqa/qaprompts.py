@@ -37,7 +37,7 @@ _qa_prompt = prompts.PromptTemplate(
     "If the context is insufficient to "
     'answer, reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
-    "via vaild citation markers at the end of sentences like (Foo2012). "
+    "via valid citation markers at the end of sentences like (Foo2012). "
     "Answer in an unbiased, balanced, and scientific tone. "
     # "To answer, start by writing out the reasoning and then "
     # "write a complete unbiased answer prefixed by \"Answer:\""
