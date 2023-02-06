@@ -39,14 +39,34 @@ class Docs:
     def __init__(self, chunk_size_limit: int = 3000) -> None:
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
+        self.keys = set()
 
     def add(self, path: str, citation: str, key: Optional[str] = None) -> bool:
         """Add a document to the collection."""
+        if path in self.docs:
+            return False
         if key is None:
             # get first name and year from citation
-            author = re.search(r"([A-Z][a-z]+)", citation).group(1)
-            year = re.search(r"(\d{4})", citation).group(1)
+            try:
+                author = re.search(r"([A-Z][a-z]+)", citation).group(1)
+            except AttributeError:
+                # panicking - no word??
+                return False
+            try:
+                year = re.search(r"(\d{4})", citation).group(1)
+            except AttributeError:
+                year = ""
             key = f"{author}{year}"
+        suffix = ""
+        while key + suffix in self.keys:
+            # move suffix to next letter
+            if suffix == "":
+                suffix = "a"
+            else:
+                suffix = chr(ord(suffix) + 1)
+        key += suffix
+        self.keys.add(key)
+
         data = {"citation": citation, "key": key}
         d = gpt_index.SimpleDirectoryReader(input_files=[path]).load_data()
         # loose check to see if document was loaded
@@ -124,7 +144,8 @@ class Docs:
         else:
             answer = qa_chain.run(question=query, context_str=context_str)[1:]
         for data in self.docs.values():
-            if data["key"] in answer:
+            # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
+            if data["key"] + " " in answer or data["key"] + ")" in answer:
                 bib.append(f'{data["key"]}: {data["citation"]}')
         bib_str = "\n\n".join(bib)
         formatted_answer = f"Question: {query}\n\n{answer}\n"
