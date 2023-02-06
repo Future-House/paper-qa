@@ -33,7 +33,7 @@ def test_docs():
 def test_evidence():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about Obama
+        # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
@@ -48,7 +48,7 @@ def test_evidence():
 def test_query():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about Obama
+        # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
@@ -73,3 +73,46 @@ def test_docs_pickle():
         "What is today?", k=1, max_sources=1
     ) == docs2.get_evidence("What is today?", k=1, max_sources=1)
     os.remove(doc_path)
+
+
+def test_bad_context():
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    answer = docs.query("What year was Barack Obama born greatest accomplishment?")
+    assert (
+        answer.answer
+        == "I cannot answer this question due to insufficient information."
+    )
+    os.remove(doc_path)
+
+
+def test_repeat_keys():
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    assert len(docs.docs) == 1
+
+    # now with different paths
+    doc_path2 = "example2.txt"
+    with open(doc_path2, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        f.write(r.text)
+    docs.add(doc_path2, "WikiMedia Foundation, 2023, Accessed now")
+    assert len(docs.docs) == 2
+
+    # check keys
+    assert docs.docs[doc_path]["key"] == "Wiki2023"
+    assert docs.docs[doc_path2]["key"] == "Wiki2023a"
+
+    os.remove(doc_path)
+    os.remove(doc_path2)

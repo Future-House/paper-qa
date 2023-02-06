@@ -32,14 +32,14 @@ query_chain = chains.LLMChain(
 
 _qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str"],
-    template="Generate a comprehensive answer (about 100 words) "
+    template="Write a comprehensive answer (about 100 words) "
     "for the question below solely based on the provided context. "
-    "If the context is insufficient to "
+    "If the context is insufficient "
     'answer, reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
-    "via valid citation markers at the end of sentences like (Foo2012). "
+    "via valid citation markers at the end of sentences, like (Foo2012). "
     "Answer in an unbiased, balanced, and scientific tone. "
-    # "To answer, start by writing out the reasoning and then "
+    "Try to use the direct quotes, if present, from the context. "
     # "write a complete unbiased answer prefixed by \"Answer:\""
     "\n--------------------\n"
     "{context_str}\n"
