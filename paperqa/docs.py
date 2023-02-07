@@ -89,6 +89,7 @@ class Docs:
                 )
             except UnicodeEncodeError:
                 # want to make this a valueerror so we can catch it
+                # Wish I knew why these happen occasionally
                 raise ValueError(f"Failed to load document {path}.")
         data["index"] = i
         self.docs[path] = data

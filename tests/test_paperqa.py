@@ -70,8 +70,8 @@ def test_docs_pickle():
     docs2 = pickle.loads(docs_pickle)
     assert len(docs.docs) == len(docs2.docs)
     assert docs.get_evidence(
-        "What is today?", k=1, max_sources=1
-    ) == docs2.get_evidence("What is today?", k=1, max_sources=1)
+        "What is the date?", k=1, max_sources=1
+    ) == docs2.get_evidence("What is the date?", k=1, max_sources=1)
     os.remove(doc_path)
 
 
