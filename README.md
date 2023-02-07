@@ -65,6 +65,28 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came).
 
+## Where do I get papers?
+
+Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
+
+If you want to do it automatically, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
+like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
+
+```py
+keyword_search = 'bispecific antibody manufacture'
+papers = paperscraper.search_papers(keyword_search)
+docs = paperqa.Docs()
+for path,data in papers.items():
+    try:
+        docs.add(path, data['citation'], data['key'])
+    except ValueError as e:
+        # sometimes this happens if PDFs aren't downloaded or readable
+        print('Could not read', path, e)
+# takes ~ 1 min and costs $0.50 to execute this line
+answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
+print(answer.formatted_answer)       
+```
+
 ## Adjusting number of sources
 
 You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` controls number of passages to search in each source and `max_sources` controls the number of sources included in the context.
@@ -83,7 +105,7 @@ gpt-index does generate answers, but in a somewhat opinionated way. It doesn't h
 
 I use some of my own code to pull papers from Google Scholar. This code is not included because it may enable people to violate Google's terms of service and publisher's terms of service.
 
-### Can I saving/loading?
+### Can I save or load?
 
 The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later.
 
