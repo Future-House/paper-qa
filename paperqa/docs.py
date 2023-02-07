@@ -41,17 +41,25 @@ class Docs:
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
 
-    def add(self, path: str, citation: str, key: Optional[str] = None) -> bool:
+    def add(
+        self,
+        path: str,
+        citation: str,
+        key: Optional[str] = None,
+        disable_check: bool = False,
+    ) -> None:
         """Add a document to the collection."""
         if path in self.docs:
-            return False
+            raise ValueError(f"Document {path} already in collection.")
         if key is None:
             # get first name and year from citation
             try:
                 author = re.search(r"([A-Z][a-z]+)", citation).group(1)
             except AttributeError:
                 # panicking - no word??
-                return False
+                raise ValueError(
+                    f"Could not parse author from citation {citation}. Consider just passing key explicitly"
+                )
             try:
                 year = re.search(r"(\d{4})", citation).group(1)
             except AttributeError:
@@ -70,18 +78,20 @@ class Docs:
         data = {"citation": citation, "key": key}
         d = gpt_index.SimpleDirectoryReader(input_files=[path]).load_data()
         # loose check to see if document was loaded
-        if not maybe_is_text(d[0].text):
-            return False
+        if not disable_check and not maybe_is_text(d[0].text):
+            raise ValueError(
+                f"This does not look like a text document: {path}. Path disable_check to ignore this error."
+            )
         with HiddenPrints():
             try:
                 i = gpt_index.GPTSimpleVectorIndex(
                     d, chunk_size_limit=self.chunk_size_limit
                 )
             except UnicodeEncodeError:
-                return False
+                # want to make this a valueerror so we can catch it
+                raise ValueError(f"Failed to load document {path}.")
         data["index"] = i
         self.docs[path] = data
-        return True
 
     # to pickle, we have to save the index as a file
     def __getstate__(self):

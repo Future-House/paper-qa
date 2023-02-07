@@ -99,7 +99,10 @@ def test_repeat_keys():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    try:
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    except ValueError:
+        pass
     assert len(docs.docs) == 1
 
     # now with different paths
