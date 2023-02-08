@@ -6,8 +6,7 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
 This is a simple and incomplete package for doing question and answering from
-documents. It uses [gpt-index](https://github.com/jerryjliu/gpt_index) to
-embed and search documents and [langchain](https://github.com/hwchase17/langchain) to
+PDFs or text files (open an issue for more formats). It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
 generate answers.
 
 It uses this process
@@ -17,6 +16,13 @@ embed docs into vectors -> embed query into vector -> search for top k passages 
 
 create summary of each passage relevant to query -> put summaries into prompt -> generate answer
 ```
+
+## What's New (v0.0.5)
+
+- Replaced gpt-index since we were doing some custom metadata
+- Now have page numbers directly in references
+- You can now load very large PDFs
+- Focusing now only on txt and PDFs to get better reading capabilities
 
 ## Example
 
