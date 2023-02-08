@@ -1,11 +1,14 @@
 from typing import List, Optional, Tuple, Union
+from functools import reduce
 import re
-import gpt_index
 import string
 import math
 from .utils import HiddenPrints
 from .qaprompts import distill_chain, qa_chain
 from dataclasses import dataclass
+from .readers import read_doc
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
 
 
 @dataclass
@@ -40,6 +43,7 @@ class Docs:
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
+        self._faiss_index = None
 
     def add(
         self,
@@ -58,7 +62,7 @@ class Docs:
             except AttributeError:
                 # panicking - no word??
                 raise ValueError(
-                    f"Could not parse author from citation {citation}. Consider just passing key explicitly"
+                    f"Could not parse key from citation {citation}. Consider just passing key explicitly - e.g. docs.py (path, citation, key='mykey')"
                 )
             try:
                 year = re.search(r"(\d{4})", citation).group(1)
@@ -75,89 +79,81 @@ class Docs:
         key += suffix
         self.keys.add(key)
 
-        data = {"citation": citation, "key": key}
-        d = gpt_index.SimpleDirectoryReader(input_files=[path]).load_data()
+        texts, metadata = read_doc(path, citation, key)
         # loose check to see if document was loaded
-        if not disable_check and not maybe_is_text(d[0].text):
+        if not disable_check and not maybe_is_text("".join(texts)):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
-        with HiddenPrints():
-            try:
-                i = gpt_index.GPTSimpleVectorIndex(
-                    d, chunk_size_limit=self.chunk_size_limit
-                )
-            except UnicodeEncodeError:
-                # want to make this a valueerror so we can catch it
-                # Wish I knew why these happen occasionally
-                raise ValueError(f"Failed to load document {path}.")
-        data["index"] = i
-        self.docs[path] = data
+
+        self.docs[path] = dict(texts=texts, metadata=metadata, key=key)
+        if self._faiss_index is not None:
+            self._faiss_index.add_texts(texts, metadatas=metadata)
 
     # to pickle, we have to save the index as a file
     def __getstate__(self):
+        if self._faiss_index is None:
+            self._build_faiss_index()
         state = self.__dict__.copy()
-        state["docs"] = dict()
-        for path in self.docs:
-            self.docs[path]["index"].save_to_disk(f"{path}.json")
-            # want to have a deeper copy so can delete
-            state["docs"][path] = self.docs[path].copy()
-            del state["docs"][path]["index"]
+        state["_faiss_index"].save_local("faiss_index")
+        del state["_faiss_index"]
         return state
 
     def __setstate__(self, state):
-        for path in state["docs"]:
-            state["docs"][path][
-                "index"
-            ] = gpt_index.GPTSimpleVectorIndex.load_from_disk(f"{path}.json")
         self.__dict__.update(state)
+        self._faiss_index = FAISS.load_local("faiss_index", OpenAIEmbeddings())
+
+    def _build_faiss_index(self):
+        if self._faiss_index is None:
+            texts = reduce(
+                lambda x, y: x + y, [doc["texts"] for doc in self.docs.values()], []
+            )
+            metadatas = reduce(
+                lambda x, y: x + y, [doc["metadata"] for doc in self.docs.values()], []
+            )
+            self._faiss_index = FAISS.from_texts(
+                texts, OpenAIEmbeddings(), metadatas=metadatas
+            )
 
     def get_evidence(self, question: str, k: int = 3, max_sources: int = 5):
         context = []
+        if self._faiss_index is None:
+            self._build_faiss_index()
         # want to work through indices but less k
-        queries = dict()
-        for i in range(k):
-            for doc in self.docs.values():
-                index = doc["index"]
-                if index not in queries:
-                    query = gpt_index.indices.query.vector_store.simple.GPTSimpleVectorIndexQuery(
-                        index.index_struct,
-                        similarity_top_k=k,
-                        embed_model=index.embed_model,
-                        prompt_helper=lambda: None,  # dummy
-                    )
-                    queries[index] = query
-                query = queries[index]
-                nodes = query.get_nodes_and_similarities_for_response(question)
-                if len(nodes) <= i:
-                    continue
-                c = (
-                    doc["key"],
-                    distill_chain.run(question=question, context_str=nodes[i][0].text),
-                )
-                if "Not applicable" not in c[1]:
-                    context.append(c)
-                if len(context) == max_sources:
-                    break
-        context_str = "\n\n".join(
-            [f"{k}: {s}" for k, s in context if "Not applicable" not in s]
+        docs = self._faiss_index.max_marginal_relevance_search(
+            question, k=k, fetch_k=5 * k
         )
-        valid_keys = [k for k, s in context if "Not applicable" not in s]
+        for doc in docs:
+            c = (
+                doc.metadata["key"],
+                doc.metadata["citation"],
+                distill_chain.run(question=question, context_str=doc.page_content),
+            )
+            if "Not applicable" not in c[1]:
+                context.append(c)
+            if len(context) == max_sources:
+                break
+        context_str = "\n\n".join(
+            [f"{k}: {s}" for k, c, s in context if "Not applicable" not in s]
+        )
+        valid_keys = [k for k, c, s in context if "Not applicable" not in s]
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
-        return context_str
+        return context_str, {k: c for k, c, s in context}
 
     def query(self, query: str, k: int = 3, max_sources: int = 5):
-        context_str = self.get_evidence(query, k=k, max_sources=max_sources)
+        context_str, citations = self.get_evidence(query, k=k, max_sources=max_sources)
         bib = []
         if len(context_str) < 10:
             answer = "I cannot answer this question due to insufficient information."
         else:
             answer = qa_chain.run(question=query, context_str=context_str)[1:]
-        for data in self.docs.values():
+        i = 1
+        for key, citation in citations.items():
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
-            if data["key"] + " " in answer or data["key"] + ")" in answer:
-                bib.append(f'{data["key"]}: {data["citation"]}')
+            if key + " " in answer or key + ")" in answer:
+                bib.append(f"{i}. ({key}): {citation}")
+                i += 1
         bib_str = "\n\n".join(bib)
         formatted_answer = f"Question: {query}\n\n{answer}\n"
         if len(bib) > 0:

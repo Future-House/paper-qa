@@ -14,7 +14,7 @@ setup(
     url="https://github.com/whitead/paper-qa",
     license="MIT",
     packages=["paperqa"],
-    install_requires=["gpt_index", "langchain"],
+    install_requires=["pypdf", "langchain>=0.0.80"],
     test_suite="tests",
     long_description=long_description,
     long_description_content_type="text/markdown",

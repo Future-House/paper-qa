@@ -1,4 +1,3 @@
-import langchain.agents as agents
 import langchain.prompts as prompts
 import langchain.chains as chains
 import langchain.llms as llms
@@ -8,13 +7,13 @@ _distill_prompt = prompts.PromptTemplate(
     template="Provide relevant information that will help answer a question from the context below. "
     "Summarize the information in an unbiased tone. Use direct quotes "
     "where possible. Do not directly answer the question. "
-    'State "Not applicable" if the context is irrelevant. '
+    'Reply with "Not applicable" if the context is irrelevant to the question. '
     "Use 35 or less words."
     "\n\n"
     "{context_str}\n"
     "\n"
     "Question: {question}\n"
-    "Relevant Information:",
+    "Relevant Information Summary:",
 )
 distill_chain = chains.LLMChain(
     llm=llms.OpenAI(temperature=0.1), prompt=_distill_prompt

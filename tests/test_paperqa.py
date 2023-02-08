@@ -38,7 +38,7 @@ def test_evidence():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    evidence = docs.get_evidence(
+    evidence, _ = docs.get_evidence(
         "For which state was he a governor", k=1, max_sources=1
     )
     assert "Missouri" in evidence
@@ -119,3 +119,12 @@ def test_repeat_keys():
 
     os.remove(doc_path)
     os.remove(doc_path2)
+
+
+def test_pdf_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = paperqa.Docs()
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
+    answer = docs.query("What is LIME?")
+    assert "Local Interpretable Model-Agnostic Explanations" in answer.answer
