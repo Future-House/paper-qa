@@ -3,7 +3,7 @@ from functools import reduce
 import re
 import string
 import math
-from .utils import HiddenPrints
+from .utils import maybe_is_text
 from .qaprompts import distill_chain, qa_chain
 from dataclasses import dataclass
 from .readers import read_doc
@@ -20,20 +20,6 @@ class Answer:
     context: str
     references: str
     formatted_answer: str
-
-
-def maybe_is_text(s, thresh=2.5):
-    # Calculate the entropy of the string
-    entropy = 0
-    for c in string.printable:
-        p = s.count(c) / len(s)
-        if p > 0:
-            entropy += -p * math.log2(p)
-
-    # Check if the entropy is within a reasonable range for text
-    if entropy > thresh:
-        return True
-    return False
 
 
 class Docs:
