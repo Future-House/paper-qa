@@ -72,8 +72,8 @@ def test_docs_pickle():
     assert len(docs.docs) == len(docs2.docs)
     assert (
         strings_similarity(
-            docs.get_evidence("What is the date?", k=1, max_sources=1),
-            docs2.get_evidence("What is the date?", k=1, max_sources=1),
+            docs.get_evidence("What is the date?", k=1, max_sources=1)[0],
+            docs2.get_evidence("What is the date?", k=1, max_sources=1)[0],
         )
         > 0.9
     )
