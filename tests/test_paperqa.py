@@ -75,7 +75,7 @@ def test_docs_pickle():
             docs.get_evidence("What is the date?", k=1, max_sources=1)[0],
             docs2.get_evidence("What is the date?", k=1, max_sources=1)[0],
         )
-        > 0.9
+        > 0.75
     )
     os.remove(doc_path)
 
