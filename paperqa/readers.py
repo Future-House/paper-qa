@@ -14,20 +14,20 @@ def parse_pdf(path, citation, key, chunk_chars=4000, overlap=50):
     metadatas = []
     for i, page in enumerate(pdfReader.pages):
         split += page.extract_text()
-        pages.append(str(i))
+        pages.append(str(i + 1))
         if len(split) > chunk_chars:
             splits.append(split[:chunk_chars])
             # pretty formatting of pages (e.g. 1-3, 4, 5-7)
             pg = "-".join([pages[0], pages[-1]])
             metadatas.append(
                 dict(
-                    citation=f"Pages {pg} of {citation}",
+                    citation=citation,
                     dockey=key,
                     key=f"{key} pages {pg}",
                 )
             )
             split = str(splits[chunk_chars:overlap])
-            pages = [str(i)]
+            pages = [str(i + 1)]
     pdfFileObj.close()
     return splits, metadatas
 

@@ -127,20 +127,21 @@ class Docs:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         return context_str, {k: c for k, c, s in context}
 
-    def query(self, query: str, k: int = 3, max_sources: int = 5):
+    def query(self, query: str, k: int = 5, max_sources: int = 5):
         context_str, citations = self.get_evidence(query, k=k, max_sources=max_sources)
-        bib = []
+        bib = dict()
         if len(context_str) < 10:
             answer = "I cannot answer this question due to insufficient information."
         else:
             answer = qa_chain.run(question=query, context_str=context_str)[1:]
-        i = 1
         for key, citation in citations.items():
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
-            if key + " " in answer or key + ")" in answer:
-                bib.append(f"{i}. ({key}): {citation}")
-                i += 1
-        bib_str = "\n\n".join(bib)
+            skey = key.split(" ")[0]
+            if skey + " " in answer or skey + ")" in answer:
+                bib[skey] = citation
+        bib_str = "\n\n".join(
+            [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
+        )
         formatted_answer = f"Question: {query}\n\n{answer}\n"
         if len(bib) > 0:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
