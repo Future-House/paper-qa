@@ -30,8 +30,8 @@ query_chain = chains.LLMChain(
 )
 
 _qa_prompt = prompts.PromptTemplate(
-    input_variables=["question", "context_str"],
-    template="Write a comprehensive answer (about 100 words) "
+    input_variables=["question", "context_str", "length"],
+    template="Write a comprehensive answer ({length}) "
     "for the question below solely based on the provided context. "
     "If the context is insufficient "
     'answer, reply "I cannot answer". '

@@ -127,7 +127,13 @@ class Docs:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         return context_str, {k: c for k, c, s in context}
 
-    def query(self, query: str, k: int = 5, max_sources: int = 5):
+    def query(
+        self,
+        query: str,
+        k: int = 5,
+        max_sources: int = 5,
+        length_prompt: str = "about 100 words",
+    ):
         context_str, citations = self.get_evidence(query, k=k, max_sources=max_sources)
         bib = dict()
         if len(context_str) < 10:
