@@ -139,7 +139,9 @@ class Docs:
         if len(context_str) < 10:
             answer = "I cannot answer this question due to insufficient information."
         else:
-            answer = qa_chain.run(question=query, context_str=context_str)[1:]
+            answer = qa_chain.run(
+                question=query, context_str=context_str, length=length_prompt
+            )[1:]
         for key, citation in citations.items():
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
