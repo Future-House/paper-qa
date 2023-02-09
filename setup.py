@@ -14,7 +14,7 @@ setup(
     url="https://github.com/whitead/paper-qa",
     license="MIT",
     packages=["paperqa"],
-    install_requires=["pypdf", "langchain>=0.0.80", "openai", "faiss-cpu"],
+    install_requires=["pypdf", "langchain>=0.0.80", "openai", "faiss-cpu", "PyCryptodome"],
     test_suite="tests",
     long_description=long_description,
     long_description_content_type="text/markdown",
