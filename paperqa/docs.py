@@ -113,7 +113,7 @@ class Docs:
                 doc.metadata["citation"],
                 distill_chain.run(question=question, context_str=doc.page_content),
             )
-            if "Not applicable" not in c[1]:
+            if "Not applicable" not in c[-1]:
                 context.append(c)
             if len(context) == max_sources:
                 break
