@@ -47,3 +47,12 @@ _qa_prompt = prompts.PromptTemplate(
     "Answer: ",
 )
 qa_chain = chains.LLMChain(llm=llms.OpenAI(temperature=0.1), prompt=_qa_prompt)
+
+_edit_prompt = prompts.PromptTemplate(
+    input_variables=["question", "answer"],
+    template="The original question is: {question} "
+    "We have been provided the following answer: {answer} "
+    "Part of it may be truncated, please edit the answer to make it complete. "
+    "If it appears to be complete, repeat it unchanged.\n\n",
+)
+edit_chain = chains.LLMChain(llm=llms.OpenAI(temperature=0.1), prompt=_edit_prompt)

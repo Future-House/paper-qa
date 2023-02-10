@@ -1,10 +1,8 @@
 from typing import List, Optional, Tuple, Union
 from functools import reduce
 import re
-import string
-import math
-from .utils import maybe_is_text
-from .qaprompts import distill_chain, qa_chain
+from .utils import maybe_is_text, maybe_is_truncated
+from .qaprompts import distill_chain, qa_chain, edit_chain
 from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
@@ -142,6 +140,8 @@ class Docs:
             answer = qa_chain.run(
                 question=query, context_str=context_str, length=length_prompt
             )[1:]
+            if maybe_is_truncated(answer):
+                answer = edit_chain.run(question=query, answer=answer)
         for key, citation in citations.items():
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
