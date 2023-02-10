@@ -22,3 +22,10 @@ def strings_similarity(s1, s2):
     s2 = set(s2.split())
     # return the similarity ratio
     return len(s1.intersection(s2)) / len(s1.union(s2))
+
+
+def maybe_is_truncated(s):
+    punct = [".", "!", "?", '"']
+    if s[-1] in punct:
+        return False
+    return True
