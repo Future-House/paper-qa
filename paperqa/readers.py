@@ -26,7 +26,7 @@ def parse_pdf(path, citation, key, chunk_chars=4000, overlap=50):
                     key=f"{key} pages {pg}",
                 )
             )
-            split = str(splits[chunk_chars:overlap])
+            split = split[chunk_chars - overlap:]
             pages = [str(i + 1)]
     pdfFileObj.close()
     return splits, metadatas
