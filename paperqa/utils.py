@@ -17,6 +17,8 @@ def maybe_is_text(s, thresh=2.5):
 
 
 def strings_similarity(s1, s2):
+    if len(s1) == 0 or len(s2) == 0:
+        return 0
     # break the strings into words
     s1 = set(s1.split())
     s2 = set(s2.split())
