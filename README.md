@@ -95,7 +95,7 @@ print(answer.formatted_answer)
 
 ## Adjusting number of sources
 
-You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (different and may from different sources) passages;  `max_sources` is less than `k` with "Not applicable" or irrelevant passages removed.
+You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages;  `max_sources` is less than `k` with "Not applicable" or irrelevant passages removed.
 
 ```python
 docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 1, max_sources = 3)
