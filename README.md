@@ -16,13 +16,15 @@ embed docs into vectors -> embed query into vector -> search for top k passages 
 
 create summary of each passage relevant to query -> put summaries into prompt -> generate answer
 ```
+## Hugging Face Demo
+
+[Huggin Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
 
 ## What's New (v0.0.5)
 
-- Replaced gpt-index since we were doing some custom metadata
-- Now have page numbers directly in references
-- You can now load very large PDFs
-- Focusing now only on txt and PDFs to get better reading capabilities
+- Fixed bug preventing dismissing not applicable sources
+- Fixed missing overlap chunks
+
 
 ## Example
 
