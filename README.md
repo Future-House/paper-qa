@@ -21,7 +21,7 @@ create summary of each passage relevant to query -> put summaries into prompt ->
 
 [Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
 
-## What's New (v0.0.7)
+## What's New
 
 - Made it possible to switch models besides OpenAI.
 - Can access the raw passages and references from the answer object.
