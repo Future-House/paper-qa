@@ -5,8 +5,8 @@
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
-This is a focused package for doing question and answering from
-PDFs or text files (which can be raw HTML). It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
+This is a minimal package for doing question and answering from
+PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations. It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
 generate answers.
 
 It uses this process
@@ -20,6 +20,10 @@ create summary of each passage relevant to query -> put summaries into prompt ->
 ## Hugging Face Demo
 
 [Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
+
+
+![image](https://user-images.githubusercontent.com/908389/218957863-4aa2fa2c-14cf-4b0d-82fd-bf837f5f550b.png)
+
 
 ## What's New
 
