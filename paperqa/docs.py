@@ -160,6 +160,8 @@ class Docs:
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
     ):
+        if k < max_sources:
+            raise ValueError("k should be greater than max_sources")
         context_str, citations = self.get_evidence(query, k=k, max_sources=max_sources)
         bib = dict()
         passages = dict()

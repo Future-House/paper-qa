@@ -75,12 +75,11 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 
 ## Adjusting number of sources
 
-You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages;  `max_sources` is less than `k` with "Not applicable" or irrelevant passages removed.
+You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources`  and `max_sources` is the number of sources used in the final answer.
 
 ```python
-docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 1, max_sources = 3)
+docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 5, max_sources = 2)
 ```
-
 
 ## Where do I get papers?
 
