@@ -39,11 +39,12 @@ class Docs:
     ) -> None:
         """Initialize the collection of documents.
 
+
+
         Args:
             chunk_size_limit: The maximum number of characters to use for a single chunk of text.
             llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
-            summary_llm: The language model to use for summarizing documents. If None, use llm arg.
-
+            summary_llm: The language model to use for summarizing documents. If None, llm is used.
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -140,15 +141,16 @@ class Docs:
                 doc.metadata["key"],
                 doc.metadata["citation"],
                 self.summary_chain.run(question=question, context_str=doc.page_content),
+                doc.page_content,
             )
             if "Not applicable" not in c[-1]:
                 context.append(c)
             if len(context) == max_sources:
                 break
         context_str = "\n\n".join(
-            [f"{k}: {s}" for k, c, s in context if "Not applicable" not in s]
+            [f"{k}: {s}" for k, c, s, t in context if "Not applicable" not in s]
         )
-        valid_keys = [k for k, c, s in context if "Not applicable" not in s]
+        valid_keys = [k for k, c, s, t in context if "Not applicable" not in s]
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         return context_str, context
@@ -173,12 +175,12 @@ class Docs:
             )[1:]
             if maybe_is_truncated(answer):
                 answer = self.edit_chain.run(question=query, answer=answer)
-        for key, passage, citation in citations:
+        for key, citation, summary, text in citations:
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
             if skey + " " in answer or skey + ")" in answer:
                 bib[skey] = citation
-                passages[key] = passage
+                passages[key] = text
         bib_str = "\n\n".join(
             [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )

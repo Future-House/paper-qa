@@ -139,3 +139,14 @@ def test_pdf_reader():
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable (yes/no)?")
     assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_prompt_length():
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.query("What is the name of the politician?", length_prompt="25 words")
