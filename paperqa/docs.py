@@ -1,12 +1,15 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Dict
 from functools import reduce
 import re
 from .utils import maybe_is_text, maybe_is_truncated
-from .qaprompts import distill_chain, qa_chain, edit_chain
+from .qaprompts import summary_prompt, qa_prompt, edit_prompt
 from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.llms import OpenAI
+from langchain.llms.base import LLM
+from langchain.chains import LLMChain
 
 
 @dataclass
@@ -18,16 +21,41 @@ class Answer:
     context: str
     references: str
     formatted_answer: str
+    passages: Dict[str, str]
+
+    def __str__(self) -> str:
+        """Return the answer as a string."""
+        return self.formatted_answer
 
 
 class Docs:
     """A collection of documents to be used for answering questions."""
 
-    def __init__(self, chunk_size_limit: int = 3000) -> None:
+    def __init__(
+        self,
+        chunk_size_limit: int = 3000,
+        llm: Optional[LLM] = None,
+        summary_llm: Optional[LLM] = None,
+    ) -> None:
+        """Initialize the collection of documents.
+
+        Args:
+            chunk_size_limit: The maximum number of characters to use for a single chunk of text.
+            llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
+            summary_llm: The language model to use for summarizing documents. If None, use llm arg.
+
+        """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
+        if llm is None:
+            llm = OpenAI(temperature=0.1)
+        if summary_llm is None:
+            summary_llm = llm
+        self.summary_chain = LLMChain(prompt=summary_prompt, llm=summary_llm)
+        self.qa_chain = LLMChain(prompt=qa_prompt, llm=llm)
+        self.edit_chain = LLMChain(prompt=edit_prompt, llm=llm)
 
     def add(
         self,
@@ -111,7 +139,7 @@ class Docs:
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
-                distill_chain.run(question=question, context_str=doc.page_content),
+                self.summary_chain.run(question=question, context_str=doc.page_content),
             )
             if "Not applicable" not in c[-1]:
                 context.append(c)
@@ -123,7 +151,7 @@ class Docs:
         valid_keys = [k for k, c, s in context if "Not applicable" not in s]
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
-        return context_str, {k: c for k, c, s in context}
+        return context_str, context
 
     def query(
         self,
@@ -134,19 +162,21 @@ class Docs:
     ):
         context_str, citations = self.get_evidence(query, k=k, max_sources=max_sources)
         bib = dict()
+        passages = dict()
         if len(context_str) < 10:
             answer = "I cannot answer this question due to insufficient information."
         else:
-            answer = qa_chain.run(
+            answer = self.qa_chain.run(
                 question=query, context_str=context_str, length=length_prompt
             )[1:]
             if maybe_is_truncated(answer):
-                answer = edit_chain.run(question=query, answer=answer)
-        for key, citation in citations.items():
+                answer = self.edit_chain.run(question=query, answer=answer)
+        for key, passage, citation in citations:
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
             if skey + " " in answer or skey + ")" in answer:
                 bib[skey] = citation
+                passages[key] = passage
         bib_str = "\n\n".join(
             [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
@@ -159,4 +189,5 @@ class Docs:
             formatted_answer=formatted_answer,
             context=context_str,
             references=bib_str,
+            passages=passages,
         )

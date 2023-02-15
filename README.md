@@ -5,26 +5,26 @@
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
-This is a simple and incomplete package for doing question and answering from
-PDFs or text files (open an issue for more formats). It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
+This is a focused package for doing question and answering from
+PDFs or text files (which can be raw HTML). It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
 generate answers.
 
 It uses this process
 
-```
+```text
 embed docs into vectors -> embed query into vector -> search for top k passages in docs
 
 create summary of each passage relevant to query -> put summaries into prompt -> generate answer
 ```
+
 ## Hugging Face Demo
 
-[Huggin Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
+[Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
 
-## What's New (v0.0.5)
+## What's New (v0.0.7)
 
-- Fixed bug preventing dismissing not applicable sources
-- Fixed missing overlap chunks
-
+- Made it possible to switch models besides OpenAI.
+- Can access the raw passages and references from the answer object.
 
 ## Example
 
@@ -71,7 +71,16 @@ answer = docs.query("What manufacturing challenges are unique to bispecific anti
 print(answer.formatted_answer)
 ```
 
-The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came).
+The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
+
+## Adjusting number of sources
+
+You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages;  `max_sources` is less than `k` with "Not applicable" or irrelevant passages removed.
+
+```python
+docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 1, max_sources = 3)
+```
+
 
 ## Where do I get papers?
 
@@ -95,14 +104,6 @@ answer = docs.query("What manufacturing challenges are unique to bispecific anti
 print(answer.formatted_answer)
 ```
 
-## Adjusting number of sources
-
-You can adjust the numbers of sources/passages to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages;  `max_sources` is less than `k` with "Not applicable" or irrelevant passages removed.
-
-```python
-docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 1, max_sources = 3)
-```
-
 ## FAQ
 
 ### How is this different from gpt-index?
@@ -115,7 +116,7 @@ I use some of my own code to pull papers from Google Scholar. This code is not i
 
 ### Can I save or load?
 
-The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later.
+The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later. The database is stored in a file called `faiss_index` in the current directory.
 
 ```python
 import pickle
