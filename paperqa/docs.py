@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple, Dict
 from functools import reduce
-import re
+import re, pickle, os
 from .utils import maybe_is_text, maybe_is_truncated
 from .qaprompts import summary_prompt, qa_prompt, edit_prompt
 from dataclasses import dataclass
@@ -36,6 +36,7 @@ class Docs:
         chunk_size_limit: int = 3000,
         llm: Optional[LLM] = None,
         summary_llm: Optional[LLM] = None,
+        index_path: str = None
     ) -> None:
         """Initialize the collection of documents.
 
@@ -45,6 +46,7 @@ class Docs:
             chunk_size_limit: The maximum number of characters to use for a single chunk of text.
             llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
+            index_path: The path to the index file. If None, a default index file is created.
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -57,6 +59,20 @@ class Docs:
         self.summary_chain = LLMChain(prompt=summary_prompt, llm=summary_llm)
         self.qa_chain = LLMChain(prompt=qa_prompt, llm=llm)
         self.edit_chain = LLMChain(prompt=edit_prompt, llm=llm)
+        if not index_path: 
+            self._faiss_index = None
+            self.index_path = "default_index.pkl"
+            with open(self.index_path, "w") as file:
+                pass
+            print(f"An empty pkl file {self.index_path} is created for later storing `self._faiss_index`")
+        else:
+            self.index_path = index_path
+            if os.stat(index_path).st_size != 0:
+                self._faiss_index = pickle.load(open(index_path, "rb"))
+                print(f'`self._faiss_index` is loaded from {index_path}')
+            else:
+                print(f'Index file {index_path} is empty. Nothing to load here.')
+                self._faiss_index = None        
 
     def add(
         self,
