@@ -19,8 +19,8 @@ qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "length"],
     template="Write a comprehensive answer ({length}) "
     "for the question below solely based on the provided context. "
-    "If the context is insufficient "
-    'answer, reply "I cannot answer". '
+    "If the context is insufficient, "
+    'reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Foo2012). "
     "Answer in an unbiased, balanced, and scientific tone. "
