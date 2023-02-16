@@ -36,7 +36,8 @@ class Docs:
         chunk_size_limit: int = 3000,
         llm: Optional[LLM] = None,
         summary_llm: Optional[LLM] = None,
-        index_path: str = None
+        index_path: str = None,
+        verbose: bool = False
     ) -> None:
         """Initialize the collection of documents.
 
@@ -46,7 +47,6 @@ class Docs:
             chunk_size_limit: The maximum number of characters to use for a single chunk of text.
             llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
-            index_path: The path to the index file. If None, a default index file is created.
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -64,14 +64,15 @@ class Docs:
             self.index_path = "default_index.pkl"
             with open(self.index_path, "w") as file:
                 pass
-            print(f"An empty pkl file {self.index_path} is created for later storing `self._faiss_index`")
+            if verbose:
+                print(f"An empty pkl file {self.index_path} is created for later storing `self._faiss_index`")
         else:
             self.index_path = index_path
             if os.stat(index_path).st_size != 0:
                 self._faiss_index = pickle.load(open(index_path, "rb"))
-                print(f'`self._faiss_index` is loaded from {index_path}')
+                if verbose: print(f'`self._faiss_index` is loaded from {index_path}')
             else:
-                print(f'Index file {index_path} is empty. Nothing to load here.')
+                if verbose: print(f'Index file {index_path} is empty. Nothing to load here.')
                 self._faiss_index = None        
 
     def add(
