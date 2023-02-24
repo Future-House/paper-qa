@@ -40,3 +40,12 @@ edit_prompt = prompts.PromptTemplate(
     "Part of it may be truncated, please edit the answer to make it complete. "
     "If it appears to be complete, repeat it unchanged.\n\n",
 )
+
+
+search_prompt = prompts.PromptTemplate(
+    input_variables=["question"],
+    template="We want to answer the following question: {question} \n"
+    "Provide a list of three different Google scholar searches (one search per line) "
+    "that will find papers that help answer the question. "
+    "Search terms:\n",
+)
