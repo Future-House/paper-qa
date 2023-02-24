@@ -1,8 +1,9 @@
 from typing import List, Optional, Tuple, Dict
 from functools import reduce
+from pathlib import Path
 import re
 from .utils import maybe_is_text, maybe_is_truncated
-from .qaprompts import summary_prompt, qa_prompt, edit_prompt
+from .qaprompts import summary_prompt, qa_prompt, edit_prompt, search_prompt
 from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
@@ -38,6 +39,8 @@ class Docs:
         chunk_size_limit: int = 3000,
         llm: Optional[LLM] = None,
         summary_llm: Optional[LLM] = None,
+        name: str = "default",
+        index_path: Optional[Path] = None,
     ) -> None:
         """Initialize the collection of documents.
 
@@ -46,7 +49,9 @@ class Docs:
         Args:
             chunk_size_limit: The maximum number of characters to use for a single chunk of text.
             llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
-            summary_llm: The language model to use for summarizing documents. If None, llm is used.
+            summary_llm: The lnguage model to use for summarizing documents. If None, llm is used.
+            name: The name of the collection.
+            index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -56,9 +61,17 @@ class Docs:
             llm = OpenAI(temperature=0.1)
         if summary_llm is None:
             summary_llm = llm
+        self.update_llm(llm, summary_llm)
+        if index_path is None:
+            index_path = Path.home() / ".paperqa" / name
+        self.index_path = index_path
+
+    def update_llm(self, llm: LLM, summary_llm: LLM) -> None:
+        """Update the LLM for answering questions."""
         self.summary_chain = LLMChain(prompt=summary_prompt, llm=summary_llm)
         self.qa_chain = LLMChain(prompt=qa_prompt, llm=llm)
         self.edit_chain = LLMChain(prompt=edit_prompt, llm=llm)
+        self.search_chain = LLMChain(prompt=search_prompt, llm=llm)
 
     def add(
         self,
@@ -105,18 +118,26 @@ class Docs:
         if self._faiss_index is not None:
             self._faiss_index.add_texts(texts, metadatas=metadata)
 
+    @property
+    def doc_previews(self) -> List[Tuple[str, str]]:
+        """Return a list of tuples of (key, citation) for each document."""
+        return [
+            (i, doc["metadata"]["key"], doc["metadata"]["citation"])
+            for i, doc in enumerate(self.docs.values())
+        ]
+
     # to pickle, we have to save the index as a file
     def __getstate__(self):
         if self._faiss_index is None:
             self._build_faiss_index()
         state = self.__dict__.copy()
-        state["_faiss_index"].save_local("faiss_index")
+        state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self._faiss_index = FAISS.load_local("faiss_index", OpenAIEmbeddings())
+        self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
@@ -156,6 +177,17 @@ class Docs:
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         return context_str, context
+
+    def generate_search_query(self, query: str) -> List[str]:
+        """Generate a list of search strings that can be used to find
+        relevant papers.
+
+        Args:
+            query (str): The query to generate search strings for.
+        """
+
+        search_query = self.search_chain.run(question=query)
+        return [s for s in search_query.split("\n") if len(s) > 3]
 
     def query(
         self,
