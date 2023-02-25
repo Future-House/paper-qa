@@ -66,8 +66,12 @@ class Docs:
             index_path = Path.home() / ".paperqa" / name
         self.index_path = index_path
 
-    def update_llm(self, llm: LLM, summary_llm: LLM) -> None:
+    def update_llm(self, llm: LLM, summary_llm: Optional[LLM] = None) -> None:
         """Update the LLM for answering questions."""
+        self.llm = llm
+        if summary_llm is None:
+            summary_llm = llm
+        self.summary_llm = summary_llm
         self.summary_chain = LLMChain(prompt=summary_prompt, llm=summary_llm)
         self.qa_chain = LLMChain(prompt=qa_prompt, llm=llm)
         self.edit_chain = LLMChain(prompt=edit_prompt, llm=llm)
@@ -207,15 +211,14 @@ class Docs:
 
         search_query = self.search_chain.run(question=query)
         queries = [s for s in search_query.split("\n") if len(s) > 3]
-        if '"' in queries[0]:
-            # often they're numbered/encased in quotes
-            queries = [q[q.find('"') + 1 : q.rfind('"')] for q in queries]
+        # remove 2., 3. from queries
+        queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
         return queries
 
     def query(
         self,
         query: str,
-        k: int = 5,
+        k: int = 10,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
         progress: Callable[[str], str] = None,

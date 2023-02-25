@@ -45,7 +45,8 @@ edit_prompt = prompts.PromptTemplate(
 search_prompt = prompts.PromptTemplate(
     input_variables=["question"],
     template="We want to answer the following question: {question} \n"
-    "Provide a list of three targeted Google scholar searches (one search per line) "
-    "that will find papers that help answer the question. The current year is 2023."
-    "Search terms:\n",
+    "Provide three different targeted keyword searches (one search per line) "
+    "that will find papers that help answer the question. Do not use boolean operators. "
+    "The current year is 2023.\n\n"
+    "1.",
 )
