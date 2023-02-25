@@ -3,6 +3,8 @@ import string
 
 
 def maybe_is_text(s, thresh=2.5):
+    if len(s) == 0:
+        return False
     # Calculate the entropy of the string
     entropy = 0
     for c in string.printable:

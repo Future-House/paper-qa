@@ -49,7 +49,7 @@ class Docs:
         Args:
             chunk_size_limit: The maximum number of characters to use for a single chunk of text.
             llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
-            summary_llm: The lnguage model to use for summarizing documents. If None, llm is used.
+            summary_llm: The language model to use for summarizing documents. If None, llm is used.
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
         """
@@ -119,26 +119,32 @@ class Docs:
             self._faiss_index.add_texts(texts, metadatas=metadata)
 
     @property
-    def doc_previews(self) -> List[Tuple[str, str]]:
+    def doc_previews(self) -> List[Tuple[int, str, str]]:
         """Return a list of tuples of (key, citation) for each document."""
         return [
-            (i, doc["metadata"]["key"], doc["metadata"]["citation"])
+            (i, doc["metadata"][0]["dockey"], doc["metadata"][0]["citation"])
             for i, doc in enumerate(self.docs.values())
         ]
 
     # to pickle, we have to save the index as a file
     def __getstate__(self):
         if self._faiss_index is None:
-            self._build_faiss_index()
+            self._build_faiss_index()        
         state = self.__dict__.copy()
         state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
+        # remove LLMs (they can have callbacks, which can't be pickled)
+        del state["summary_chain"]
+        del state["qa_chain"]
+        del state["edit_chain"]
+        del state["search_chain"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
         self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
-
+        self.update_llm(OpenAI(temperature=0.1), OpenAI(temperature=0.1))
+        
     def _build_faiss_index(self):
         if self._faiss_index is None:
             texts = reduce(
