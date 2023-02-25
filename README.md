@@ -58,7 +58,7 @@ Make sure you have set your OPENAI_API_KEY environment variable to your [openai 
 
 To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
 
-*This uses a lot of tokens!! About 10-30k tokens per answer + embedding cost (negligible unless many documents used). That is up to $0.50 per answer with current GPT-3 pricing. Use wisely.*
+*This uses a lot of tokens!! About 5-10k tokens per answer + embedding cost (negligible unless many documents used). That is up to $0.20 per answer with current GPT-3 pricing. Use wisely.*
 
 ```python
 
@@ -70,7 +70,7 @@ docs = Docs()
 for d, c in zip(my_docs, my_citations):
     docs.add(d, c)
 
-# takes ~ 1 min and costs $0.50 to execute this line
+# takes ~ 1 min and costs $0.10-$0.20 to execute this line
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
 print(answer.formatted_answer)
 ```
