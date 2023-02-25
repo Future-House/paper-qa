@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional, Tuple, Dict, Callable
 from functools import reduce
 from pathlib import Path
 import re
@@ -129,7 +129,7 @@ class Docs:
     # to pickle, we have to save the index as a file
     def __getstate__(self):
         if self._faiss_index is None:
-            self._build_faiss_index()        
+            self._build_faiss_index()
         state = self.__dict__.copy()
         state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
@@ -144,7 +144,7 @@ class Docs:
         self.__dict__.update(state)
         self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
         self.update_llm(OpenAI(temperature=0.1), OpenAI(temperature=0.1))
-        
+
     def _build_faiss_index(self):
         if self._faiss_index is None:
             texts = reduce(
@@ -157,7 +157,18 @@ class Docs:
                 texts, OpenAIEmbeddings(), metadatas=metadatas
             )
 
-    def get_evidence(self, question: str, k: int = 3, max_sources: int = 5):
+    def get_evidence(
+        self,
+        question: str,
+        k: int = 3,
+        max_sources: int = 5,
+        progress: Callable[[str], str] = None,
+    ) -> str:
+        if progress is None:
+
+            def progress(x):
+                return x
+
         context = []
         if self._faiss_index is None:
             self._build_faiss_index()
@@ -173,6 +184,8 @@ class Docs:
                 doc.page_content,
             )
             if "Not applicable" not in c[-1]:
+                print("Here with ", progress)
+                progress(f"Found evidence in {c[1]}\n\n{c[2]}")
                 context.append(c)
             if len(context) == max_sources:
                 break
@@ -193,7 +206,11 @@ class Docs:
         """
 
         search_query = self.search_chain.run(question=query)
-        return [s for s in search_query.split("\n") if len(s) > 3]
+        queries = [s for s in search_query.split("\n") if len(s) > 3]
+        if '"' in queries[0]:
+            # often they're numbered/encased in quotes
+            queries = [q[q.find('"') + 1 : q.rfind('"')] for q in queries]
+        return queries
 
     def query(
         self,
@@ -201,13 +218,14 @@ class Docs:
         k: int = 5,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
+        progress: Callable[[str], str] = None,
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         tokens = 0
         with get_openai_callback() as cb:
             context_str, citations = self.get_evidence(
-                query, k=k, max_sources=max_sources
+                query, k=k, max_sources=max_sources, progress=progress
             )
             tokens += cb.total_tokens
         bib = dict()
