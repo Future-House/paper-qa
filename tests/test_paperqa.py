@@ -67,10 +67,12 @@ def test_docs_pickle():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
-    docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-babbage-001"))
+    llm = llm = OpenAI(temperature=0.0, model_name="text-babbage-001")
+    docs = paperqa.Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
+    docs2.update_llm(llm)
     assert len(docs.docs) == len(docs2.docs)
     assert (
         strings_similarity(
@@ -150,6 +152,7 @@ def test_prompt_length():
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What is the name of the politician?", length_prompt="25 words")
+
 
 def test_doc_preview():
     doc_path = "example.txt"
