@@ -41,10 +41,11 @@ def test_evidence():
         f.write(r.text)
     docs = paperqa.Docs(llm=OpenAI(temperature=0.1, model_name="text-curie-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    evidence, _ = docs.get_evidence(
-        "For which state was he a governor", k=1, max_sources=1
-    )
-    assert "Missouri" in evidence
+    for evidence in docs.get_evidence(
+        paperqa.Answer("For which state was he a governor"), k=1, max_sources=1
+    ):
+        pass
+    assert "Missouri" in evidence.context
     os.remove(doc_path)
 
 
@@ -57,7 +58,21 @@ def test_query():
     docs = paperqa.Docs(llm=OpenAI(temperature=0.1, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What is Frederick Bates's greatest accomplishment?")
-    print(answer)
+    os.remove(doc_path)
+
+
+def test_query_gen():
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs(llm=OpenAI(temperature=0.1, model_name="text-ada-001"))
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    i = 0
+    for answer in docs.query_gen("What is Frederick Bates's greatest accomplishment?"):
+        i += 1
+    assert i > 2
     os.remove(doc_path)
 
 
@@ -76,12 +91,20 @@ def test_docs_pickle():
     assert len(docs.docs) == len(docs2.docs)
     assert (
         strings_similarity(
-            docs.get_evidence("What date is flag day in Canada?", k=1, max_sources=1)[
-                0
-            ],
-            docs2.get_evidence("What date is flag day in Canada?", k=1, max_sources=1)[
-                0
-            ],
+            list(
+                docs.get_evidence(
+                    paperqa.Answer("What date is flag day in Canada?"),
+                    k=1,
+                    max_sources=1,
+                )
+            )[-1].context,
+            list(
+                docs2.get_evidence(
+                    paperqa.Answer("What date is flag day in Canada?"),
+                    k=1,
+                    max_sources=1,
+                )
+            )[-1].context,
         )
         > 0.75
     )
@@ -163,3 +186,12 @@ def test_doc_preview():
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     assert len(docs.doc_previews) == 1
+
+
+def test_code():
+    # load this script
+    doc_path = os.path.abspath(__file__)
+    docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
+    docs.add(doc_path, "test_paperqa.py", key="test", disable_check=True)
+    assert len(docs.docs) == 1
+    answer = docs.query("What function tests the preview?")
