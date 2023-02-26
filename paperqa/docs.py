@@ -12,6 +12,10 @@ from langchain.llms import OpenAI
 from langchain.llms.base import LLM
 from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
+from langchain.cache import InMemoryCache
+import langchain
+
+langchain.llm_cache = InMemoryCache()
 
 
 @dataclass
@@ -200,14 +204,20 @@ class Docs:
         answer: Answer,
         k: int = 3,
         max_sources: int = 5,
+        marginal_relevance: bool = True,
     ) -> str:
         if self._faiss_index is None:
             self._build_faiss_index()
 
         # want to work through indices but less k
-        docs = self._faiss_index.max_marginal_relevance_search(
-            answer.question, k=k, fetch_k=5 * k
-        )
+        if marginal_relevance:
+            docs = self._faiss_index.max_marginal_relevance_search(
+                answer.question, k=k, fetch_k=5 * k
+            )
+        else:
+            docs = self._faiss_index.similarity_search(
+                answer.question, k=k, fetch_k=5 * k
+            )
         for doc in docs:
             c = (
                 doc.metadata["key"],
@@ -251,9 +261,14 @@ class Docs:
         k: int = 10,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
+        marginal_relevance: bool = True,
     ):
         yield from self._query(
-            query, k=k, max_sources=max_sources, length_prompt=length_prompt
+            query,
+            k=k,
+            max_sources=max_sources,
+            length_prompt=length_prompt,
+            marginal_relevance=marginal_relevance,
         )
 
     def query(
@@ -262,20 +277,37 @@ class Docs:
         k: int = 10,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
+        marginal_relevance: bool = True,
     ):
         for answer in self._query(
-            query, k=k, max_sources=max_sources, length_prompt=length_prompt
+            query,
+            k=k,
+            max_sources=max_sources,
+            length_prompt=length_prompt,
+            marginal_relevance=marginal_relevance,
         ):
             pass
         return answer
 
-    def _query(self, query: str, k: int, max_sources: int, length_prompt: str):
+    def _query(
+        self,
+        query: str,
+        k: int,
+        max_sources: int,
+        length_prompt: str,
+        marginal_relevance: bool,
+    ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         tokens = 0
         answer = Answer(query)
         with get_openai_callback() as cb:
-            for answer in self.get_evidence(answer, k=k, max_sources=max_sources):
+            for answer in self.get_evidence(
+                answer,
+                k=k,
+                max_sources=max_sources,
+                marginal_relevance=marginal_relevance,
+            ):
                 yield answer
             tokens += cb.total_tokens
         context_str, citations = answer.context, answer.contexts
@@ -290,11 +322,14 @@ class Docs:
                 answer_text = self.qa_chain.run(
                     question=query, context_str=context_str, length=length_prompt
                 )[1:]
-                if maybe_is_truncated(answer_text):
-                    answer_text = self.edit_chain.run(
-                        question=query, answer=answer_text
-                    )
+                # if maybe_is_truncated(answer_text):
+                #     answer_text = self.edit_chain.run(
+                #         question=query, answer=answer_text
+                #     )
                 tokens += cb.total_tokens
+        # it still happens lol
+        if "(Foo2012)" in answer_text:
+            answer_text = answer_text.replace("(Foo2012)", "")
         for key, citation, summary, text in citations:
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
