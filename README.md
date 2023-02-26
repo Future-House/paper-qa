@@ -119,7 +119,7 @@ I use some of my own code to pull papers from Google Scholar. This code is not i
 
 ### Can I save or load?
 
-The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later. The database is stored in a file called `faiss_index` in the current directory.
+The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later. The database is stored in `$HOME/.paperqa/{name}` where `name` is `default`, or you can pass a `name` when you instantiate the `paperqa` doc object.
 
 ```python
 import pickle
