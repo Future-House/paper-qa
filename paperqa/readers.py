@@ -95,7 +95,7 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
     return splits, metadatas
 
 
-def read_doc(path, citation, key, chunk_chars=2000, overlap=50, disable_check=False):
+def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
     """Parse a document into chunks."""
     if path.endswith(".pdf"):
         return parse_pdf(path, citation, key, chunk_chars, overlap)

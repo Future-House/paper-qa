@@ -44,6 +44,6 @@ search_prompt = prompts.PromptTemplate(
     template="We want to answer the following question: {question} \n"
     "Provide three different targeted keyword searches (one search per line) "
     "that will find papers that help answer the question. Do not use boolean operators. "
-    "The current year is 2023.\n\n"
+    "Recent years are 2021, 2022, 2023.\n\n"
     "1.",
 )
