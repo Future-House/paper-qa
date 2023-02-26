@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Dict, Callable
+from typing import List, Optional, Tuple, Dict, Callable, Any
 from functools import reduce
 from pathlib import Path
 import re
@@ -19,12 +19,20 @@ class Answer:
     """A class to hold the answer to a question."""
 
     question: str
-    answer: str
-    context: str
-    references: str
-    formatted_answer: str
-    passages: Dict[str, str]
-    tokens: int
+    answer: str = ""
+    context: str = ""
+    contexts: List[Any] = None
+    references: str = ""
+    formatted_answer: str = ""
+    passages: Dict[str, str] = None
+    tokens: int = 0
+
+    def __post_init__(self):
+        """Initialize the answer."""
+        if self.contexts is None:
+            self.contexts = []
+        if self.passages is None:
+            self.passages = {}
 
     def __str__(self) -> str:
         """Return the answer as a string."""
@@ -65,6 +73,7 @@ class Docs:
         if index_path is None:
             index_path = Path.home() / ".paperqa" / name
         self.index_path = index_path
+        self.name = name
 
     def update_llm(self, llm: LLM, summary_llm: Optional[LLM] = None) -> None:
         """Update the LLM for answering questions."""
@@ -113,7 +122,10 @@ class Docs:
 
         texts, metadata = read_doc(path, citation, key)
         # loose check to see if document was loaded
-        if not disable_check and not maybe_is_text("".join(texts)):
+        #
+        if len("".join(texts)) < 10 or (
+            not disable_check and not maybe_is_text("".join(texts))
+        ):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
@@ -122,20 +134,38 @@ class Docs:
         if self._faiss_index is not None:
             self._faiss_index.add_texts(texts, metadatas=metadata)
 
+    def clear(self) -> None:
+        """Clear the collection of documents."""
+        self.docs = dict()
+        self.keys = set()
+        self._faiss_index = None
+        # delete index file
+        pkl = self.index_path / "index.pkl"
+        if pkl.exists():
+            pkl.unlink()
+        fs = self.index_path / "index.faiss"
+        if fs.exists():
+            fs.unlink()
+
     @property
     def doc_previews(self) -> List[Tuple[int, str, str]]:
         """Return a list of tuples of (key, citation) for each document."""
         return [
-            (i, doc["metadata"][0]["dockey"], doc["metadata"][0]["citation"])
-            for i, doc in enumerate(self.docs.values())
+            (
+                len(doc["texts"]),
+                doc["metadata"][0]["dockey"],
+                doc["metadata"][0]["citation"],
+            )
+            for doc in self.docs.values()
         ]
 
     # to pickle, we have to save the index as a file
     def __getstate__(self):
-        if self._faiss_index is None:
+        if self._faiss_index is None and len(self.docs) > 0:
             self._build_faiss_index()
         state = self.__dict__.copy()
-        state["_faiss_index"].save_local(self.index_path)
+        if self._faiss_index is not None:
+            state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
         # remove LLMs (they can have callbacks, which can't be pickled)
         del state["summary_chain"]
@@ -146,7 +176,11 @@ class Docs:
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
+        try:
+            self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
+        except:
+            # they use some special exception type, but I don't want to import it
+            self._faiss_index = None
         self.update_llm(OpenAI(temperature=0.1), OpenAI(temperature=0.1))
 
     def _build_faiss_index(self):
@@ -163,43 +197,38 @@ class Docs:
 
     def get_evidence(
         self,
-        question: str,
+        answer: Answer,
         k: int = 3,
         max_sources: int = 5,
-        progress: Callable[[str], str] = None,
     ) -> str:
-        if progress is None:
-
-            def progress(x):
-                return x
-
-        context = []
         if self._faiss_index is None:
             self._build_faiss_index()
         # want to work through indices but less k
         docs = self._faiss_index.max_marginal_relevance_search(
-            question, k=k, fetch_k=5 * k
+            answer.question, k=k, fetch_k=5 * k
         )
         for doc in docs:
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
-                self.summary_chain.run(question=question, context_str=doc.page_content),
+                self.summary_chain.run(
+                    question=answer.question, context_str=doc.page_content
+                ),
                 doc.page_content,
             )
             if "Not applicable" not in c[-1]:
-                print("Here with ", progress)
-                progress(f"Found evidence in {c[1]}\n\n{c[2]}")
-                context.append(c)
-            if len(context) == max_sources:
+                answer.contexts.append(c)
+                yield answer
+            if len(answer.contexts) == max_sources:
                 break
         context_str = "\n\n".join(
-            [f"{k}: {s}" for k, c, s, t in context if "Not applicable" not in s]
+            [f"{k}: {s}" for k, c, s, t in answer.contexts if "Not applicable" not in s]
         )
-        valid_keys = [k for k, c, s, t in context if "Not applicable" not in s]
+        valid_keys = [k for k, c, s, t in answer.contexts if "Not applicable" not in s]
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
-        return context_str, context
+        answer.context = context_str
+        yield answer
 
     def generate_search_query(self, query: str) -> List[str]:
         """Generate a list of search strings that can be used to find
@@ -215,53 +244,72 @@ class Docs:
         queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
         return queries
 
+    def query_gen(
+        self,
+        query: str,
+        k: int = 10,
+        max_sources: int = 5,
+        length_prompt: str = "about 100 words",
+    ):
+        yield from self._query(
+            query, k=k, max_sources=max_sources, length_prompt=length_prompt
+        )
+
     def query(
         self,
         query: str,
         k: int = 10,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
-        progress: Callable[[str], str] = None,
     ):
+        for answer in self._query(
+            query, k=k, max_sources=max_sources, length_prompt=length_prompt
+        ):
+            pass
+        return answer
+
+    def _query(self, query: str, k: int, max_sources: int, length_prompt: str):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         tokens = 0
+        answer = Answer(query)
         with get_openai_callback() as cb:
-            context_str, citations = self.get_evidence(
-                query, k=k, max_sources=max_sources, progress=progress
-            )
+            for answer in self.get_evidence(answer, k=k, max_sources=max_sources):
+                yield answer
             tokens += cb.total_tokens
+        context_str, citations = answer.context, answer.contexts
         bib = dict()
         passages = dict()
         if len(context_str) < 10:
-            answer = "I cannot answer this question due to insufficient information."
+            answer_text = (
+                "I cannot answer this question due to insufficient information."
+            )
         else:
             with get_openai_callback() as cb:
-                answer = self.qa_chain.run(
+                answer_text = self.qa_chain.run(
                     question=query, context_str=context_str, length=length_prompt
                 )[1:]
-                if maybe_is_truncated(answer):
-                    answer = self.edit_chain.run(question=query, answer=answer)
+                if maybe_is_truncated(answer_text):
+                    answer_text = self.edit_chain.run(
+                        question=query, answer=answer_text
+                    )
                 tokens += cb.total_tokens
         for key, citation, summary, text in citations:
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
-            if skey + " " in answer or skey + ")" in answer:
+            if skey + " " in answer_text or skey + ")" in answer_text:
                 bib[skey] = citation
                 passages[key] = text
         bib_str = "\n\n".join(
             [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
-        formatted_answer = f"Question: {query}\n\n{answer}\n"
+        formatted_answer = f"Question: {query}\n\n{answer_text}\n"
         if len(bib) > 0:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
         formatted_answer += f"\nTokens Used: {tokens} Cost: ${tokens/1000 * 0.02:.2f}"
-        return Answer(
-            answer=answer,
-            question=query,
-            formatted_answer=formatted_answer,
-            context=context_str,
-            references=bib_str,
-            passages=passages,
-            tokens=tokens,
-        )
+        answer.answer = answer_text
+        answer.formatted_answer = formatted_answer
+        answer.references = bib_str
+        answer.passages = passages
+        answer.tokens = tokens
+        yield answer

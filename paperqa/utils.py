@@ -18,6 +18,15 @@ def maybe_is_text(s, thresh=2.5):
     return False
 
 
+def maybe_is_code(s):
+    if len(s) == 0:
+        return False
+    # Check if the string contains a lot of non-ascii characters
+    if len([c for c in s if ord(c) > 128]) / len(s) > 0.1:
+        return True
+    return False
+
+
 def strings_similarity(s1, s2):
     if len(s1) == 0 or len(s2) == 0:
         return 0

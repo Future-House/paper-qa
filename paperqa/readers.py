@@ -1,9 +1,11 @@
+from .utils import maybe_is_code
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 TextSplitter = RecursiveCharacterTextSplitter
 
 
-def parse_pdf(path, citation, key, chunk_chars=4000, overlap=50):
+def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
     import pypdf
 
     pdfFileObj = open(path, "rb")
@@ -26,13 +28,23 @@ def parse_pdf(path, citation, key, chunk_chars=4000, overlap=50):
                     key=f"{key} pages {pg}",
                 )
             )
-            split = split[chunk_chars - overlap:]
+            split = split[-overlap:]
             pages = [str(i + 1)]
+    if len(split) > overlap:
+        splits.append(split)
+        pg = "-".join([pages[0], pages[-1]])
+        metadatas.append(
+            dict(
+                citation=citation,
+                dockey=key,
+                key=f"{key} pages {pg}",
+            )
+        )
     pdfFileObj.close()
     return splits, metadatas
 
 
-def parse_txt(path, citation, key, chunk_chars=4000, overlap=50):
+def parse_txt(path, citation, key, chunk_chars=2000, overlap=50):
 
     try:
         with open(path) as f:
@@ -46,11 +58,45 @@ def parse_txt(path, citation, key, chunk_chars=4000, overlap=50):
     return texts, [dict(citation=citation, dockey=key, key=key)] * len(texts)
 
 
-def read_doc(path, citation, key, chunk_chars=4000, overlap=50, disable_check=False):
+def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
+    """Parse a document into chunks, based on line numbers (for code)."""
+
+    splits = []
+    split = ""
+    metadatas = []
+    last_line = 0
+
+    with open(path) as f:
+        for i, line in enumerate(f):
+            split += line
+            if len(split) > chunk_chars:  # we violate a bit the overlap here
+                splits.append(split)
+                metadatas.append(
+                    dict(
+                        citation=citation,
+                        dockey=key,
+                        key=f"{key} lines {last_line}-{i}",
+                    )
+                )
+                split = split[-overlap:]
+                last_line = i
+    if len(split) > overlap:
+        splits.append(split)
+        metadatas.append(
+            dict(
+                citation=citation,
+                dockey=key,
+                key=f"{key} lines {last_line}-{i}",
+            )
+        )
+    return splits, metadatas
+
+
+def read_doc(path, citation, key, chunk_chars=2000, overlap=50, disable_check=False):
     """Parse a document into chunks."""
     if path.endswith(".pdf"):
         return parse_pdf(path, citation, key, chunk_chars, overlap)
     elif path.endswith(".txt"):
         return parse_txt(path, citation, key, chunk_chars, overlap)
     else:
-        raise ValueError(f"Unknown file type: {path} (expected .pdf or .txt).")
+        return parse_code_txt(path, citation, key, chunk_chars, overlap)
