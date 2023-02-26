@@ -203,6 +203,7 @@ class Docs:
     ) -> str:
         if self._faiss_index is None:
             self._build_faiss_index()
+
         # want to work through indices but less k
         docs = self._faiss_index.max_marginal_relevance_search(
             answer.question, k=k, fetch_k=5 * k

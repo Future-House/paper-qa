@@ -28,7 +28,7 @@ def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
                     key=f"{key} pages {pg}",
                 )
             )
-            split = split[-overlap:]
+            split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
     if len(split) > overlap:
         splits.append(split)
@@ -69,8 +69,8 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
     with open(path) as f:
         for i, line in enumerate(f):
             split += line
-            if len(split) > chunk_chars:  # we violate a bit the overlap here
-                splits.append(split)
+            if len(split) > chunk_chars:
+                splits.append(split[:chunk_chars])
                 metadatas.append(
                     dict(
                         citation=citation,
@@ -78,7 +78,7 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
                         key=f"{key} lines {last_line}-{i}",
                     )
                 )
-                split = split[-overlap:]
+                split = split[chunk_chars - overlap :]
                 last_line = i
     if len(split) > overlap:
         splits.append(split)
