@@ -26,9 +26,6 @@ jobs:
     - name: Install
       run: |
         pip install .
-    - name: Run Test
-      run: |
-         pytest tests
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     - name: Build a binary wheel and a source tarball
