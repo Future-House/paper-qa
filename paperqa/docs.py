@@ -15,7 +15,7 @@ from langchain.callbacks import get_openai_callback
 from langchain.cache import SQLiteCache
 import langchain
 
-langchain.llm_cache = SQLiteCache("paperqa_cache.db")
+langchain.llm_cache = SQLiteCache(Path.home() / ".paperqa" / "llm_cache.db")
 
 
 @dataclass
