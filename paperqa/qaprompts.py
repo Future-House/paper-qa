@@ -2,9 +2,9 @@ import langchain.prompts as prompts
 
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str"],
-    template="Provide relevant information that will help answer a question only from the context below. "
-    "Summarize the information in an unbiased tone. Use direct quotes "
-    "where possible. Do not directly answer the question. "
+    template="Provide relevant information that will help answer a question from the context below. "
+    "Summarize the information in an unbiased tone. "
+    "Do not directly answer the question and only use the context. "
     'Reply with "Not applicable" if the context is irrelevant to the question. '
     "Use 50 or less words."
     "\n\n"
