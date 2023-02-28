@@ -12,10 +12,10 @@ from langchain.llms import OpenAI
 from langchain.llms.base import LLM
 from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
-from langchain.cache import InMemoryCache
+from langchain.cache import SQLiteCache
 import langchain
 
-langchain.llm_cache = InMemoryCache()
+langchain.llm_cache = SQLiteCache("paperqa_cache.db")
 
 
 @dataclass
