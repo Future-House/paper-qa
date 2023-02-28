@@ -117,9 +117,14 @@ def test_bad_context():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs = paperqa.Docs(llm=OpenAI(temperature=0.1, model_name="text-davinci-003"))
+    docs = paperqa.Docs(
+        llm=OpenAI(temperature=0.1, model_name="text-davinci-003", max_tokens=100)
+    )
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What year was Barack Obama born greatest accomplishment?")
+    answer = docs.query(
+        "What year was Barack Obama born greatest accomplishment?",
+        length_prompt="about 20 words",
+    )
     assert "cannot answer" in answer.answer
     os.remove(doc_path)
 
