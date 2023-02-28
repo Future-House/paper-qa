@@ -70,7 +70,7 @@ class Docs:
         self.keys = set()
         self._faiss_index = None
         if llm is None:
-            llm = OpenAI(temperature=0.1)
+            llm = OpenAI(temperature=0.1, max_tokens=-1)
         if summary_llm is None:
             summary_llm = llm
         self.update_llm(llm, summary_llm)
