@@ -6,7 +6,7 @@ summary_prompt = prompts.PromptTemplate(
     "Summarize the information in an unbiased tone. Use direct quotes "
     "where possible. Do not directly answer the question. "
     'Reply with "Not applicable" if the context is irrelevant to the question. '
-    "Use 35 or less words."
+    "Use 50 or less words."
     "\n\n"
     "{context_str}\n"
     "\n"
