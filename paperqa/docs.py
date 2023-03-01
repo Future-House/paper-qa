@@ -231,7 +231,7 @@ class Docs:
                 ),
                 doc.page_content,
             )
-            if "Not applicable" not in c[-1]:
+            if "Not applicable" not in c[2]:
                 answer.contexts.append(c)
                 yield answer
             if len(answer.contexts) == max_sources:
