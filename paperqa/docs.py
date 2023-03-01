@@ -1,5 +1,7 @@
 from typing import List, Optional, Tuple, Dict, Callable, Any
 from functools import reduce
+import os
+import os
 from pathlib import Path
 import re
 from .utils import maybe_is_text, maybe_is_truncated
@@ -15,7 +17,9 @@ from langchain.callbacks import get_openai_callback
 from langchain.cache import SQLiteCache
 import langchain
 
-langchain.llm_cache = SQLiteCache(Path.home() / ".paperqa" / "llm_cache.db")
+CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
+os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
+langchain.llm_cache = SQLiteCache(CACHE_PATH)
 
 
 @dataclass
