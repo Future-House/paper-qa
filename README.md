@@ -24,12 +24,6 @@ create summary of each passage relevant to query -> put summaries into prompt ->
 
 ![image](https://user-images.githubusercontent.com/908389/218957863-4aa2fa2c-14cf-4b0d-82fd-bf837f5f550b.png)
 
-
-## What's New
-
-- Made it possible to switch models besides OpenAI.
-- Can access the raw passages and references from the answer object.
-
 ## Example
 
 Question: How can carbon nanotubes be manufactured at a large scale?
@@ -111,11 +105,19 @@ print(answer.formatted_answer)
 
 ### How is this different from gpt-index?
 
-gpt-index does generate answers, but in a somewhat opinionated way. It doesn't have a great way to track where text comes from and it's not easy to force it to pull from multiple documents. I don't know which way is better, but for writing scholarly text I found it to work better to pull from multiple relevant documents and then generate an answer. I would like to PR to do this to gpt-index but it looks pretty involved right now.
+It's not that different! This is similar to the tree response method in GPT-index. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one tasks - answering technical questions with cited sources.
+
+### Caching
+
+This code will cache responses from LLMS by default in `$HOME/.paperqa/llm_cache.db`. Delete this file to clear the cache. 
+
+### Can I use different LLMs?
+
+Yes, you can use any LLMs from [langchain](langchain.readthedocs.io/) by passing the `llm` argument to the `Docs` class. You can use different LLMs for summarization and for question answering too.
 
 ### Where do the documents come from?
 
-I use some of my own code to pull papers from Google Scholar. This code is not included because it may enable people to violate Google's terms of service and publisher's terms of service.
+You can provide your own. I use some of my own code to pull papers from Google Scholar. This code is not included because it may enable people to violate Google's terms of service and publisher's terms of service.
 
 ### Can I save or load?
 
