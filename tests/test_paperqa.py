@@ -122,7 +122,7 @@ def test_bad_context():
     )
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query(
-        "What year was Barack Obama born greatest accomplishment?",
+        "What year was Barack Obama born?",
         length_prompt="about 20 words",
     )
     assert "cannot answer" in answer.answer
@@ -164,7 +164,7 @@ def test_pdf_reader():
     doc_path = os.path.join(tests_dir, "paper.pdf")
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-curie-001"))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
-    answer = docs.query("Are counterfactuals actionable (yes/no)?")
+    answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 

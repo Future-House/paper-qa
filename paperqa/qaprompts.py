@@ -2,10 +2,10 @@ import langchain.prompts as prompts
 
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str"],
-    template="Provide relevant information that will help answer a question from the context below. "
-    "Summarize the information in an unbiased tone. "
-    "Do not directly answer the question and only use the context. "
-    'Reply with "Not applicable" if the context is irrelevant to the question. '
+    template="Summarize the text below to help answer a question. "
+    "Do not directly answer the question, instead provide a summary with the context of the question. "
+    "Do not use outside sources. "
+    'Reply with "Not applicable" if the text is unrelated to the question. '
     "Use 50 or less words."
     "\n\n"
     "{context_str}\n"
@@ -19,7 +19,7 @@ qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "length"],
     template="Write a comprehensive answer ({length}) "
     "for the question below solely based on the provided context. "
-    "If the context is insufficient, "
+    "If the context is irrelevant, "
     'reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Foo2012). "
