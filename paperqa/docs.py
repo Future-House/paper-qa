@@ -114,7 +114,7 @@ class Docs:
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             with get_openai_callback() as cb:
-                citation = self.cite_chain(texts[0])
+                citation = self.cite_chain.run(texts[0])
             print(f"Guessed citation {citation} for {cb.total_tokens} tokens")
 
         if path in self.docs:
