@@ -63,8 +63,7 @@ from paperqa import Docs
 docs = Docs()
 for d in my_docs:
     docs.add(d)
-
-# takes ~ 1 min and costs $0.10-$0.20 to execute this line
+    
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
 print(answer.formatted_answer)
 ```
@@ -96,7 +95,6 @@ for path,data in papers.items():
     except ValueError as e:
         # sometimes this happens if PDFs aren't downloaded or readable
         print('Could not read', path, e)
-# takes ~ 1 min and costs $0.50 to execute this line
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
 print(answer.formatted_answer)
 ```
