@@ -208,4 +208,4 @@ def test_citation():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path)
-    print(list(docs.docs.values())[0]["metadata"])
+    assert list(docs.docs.values())[0]["metadata"][0]["key"] == "Wikipedia2023"

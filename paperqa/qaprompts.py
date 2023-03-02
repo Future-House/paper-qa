@@ -1,4 +1,5 @@
 import langchain.prompts as prompts
+from datetime import datetime
 
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str"],
@@ -40,9 +41,18 @@ search_prompt = prompts.PromptTemplate(
     "1.",
 )
 
+
+def _get_datetime():
+    now = datetime.now()
+    return now.strftime("%m/%d/%Y")
+
+
 citation_prompt = prompts.PromptTemplate(
     input_variables=["text"],
-    template="Provide a possible citation for the following text in MLA Format: {text}",
+    template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
+    "{text}\n\n"
+    "Citation:",
+    partial_variables={"date": _get_datetime},
 )
 
 chat_pref = [
