@@ -42,3 +42,11 @@ def maybe_is_truncated(s):
     if s[-1] in punct:
         return False
     return True
+
+
+def maybe_is_html(s):
+    if len(s) == 0:
+        return False
+    # check for html tags
+    if "<body" in s or "<html" in s or "<div" in s:
+        return True

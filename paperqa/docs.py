@@ -5,12 +5,18 @@ import os
 from pathlib import Path
 import re
 from .utils import maybe_is_text, maybe_is_truncated
-from .qaprompts import summary_prompt, qa_prompt, edit_prompt, search_prompt
+from .qaprompts import (
+    summary_prompt,
+    qa_prompt,
+    search_prompt,
+    citation_prompt,
+    chat_pref,
+)
 from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import OpenAI
+from langchain.llms import OpenAI, OpenAIChat
 from langchain.llms.base import LLM
 from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
@@ -64,7 +70,7 @@ class Docs:
 
         Args:
             chunk_size_limit: The maximum number of characters to use for a single chunk of text.
-            llm: The language model to use for answering questions. Default - OpenAI text-davinci-003.
+            llm: The language model to use for answering questions. Default - OpenAI chat-gpt-turbo
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
@@ -74,7 +80,7 @@ class Docs:
         self.keys = set()
         self._faiss_index = None
         if llm is None:
-            llm = OpenAI(temperature=0.1, max_tokens=-1)
+            llm = OpenAIChat(temperature=0.1, max_tokens=512, prefix_messages=chat_pref)
         if summary_llm is None:
             summary_llm = llm
         self.update_llm(llm, summary_llm)
@@ -91,17 +97,26 @@ class Docs:
         self.summary_llm = summary_llm
         self.summary_chain = LLMChain(prompt=summary_prompt, llm=summary_llm)
         self.qa_chain = LLMChain(prompt=qa_prompt, llm=llm)
-        self.edit_chain = LLMChain(prompt=edit_prompt, llm=llm)
         self.search_chain = LLMChain(prompt=search_prompt, llm=llm)
+        self.cite_chain = LLMChain(prompt=citation_prompt, llm=llm)
 
     def add(
         self,
         path: str,
-        citation: str,
+        citation: Optional[str] = None,
         key: Optional[str] = None,
         disable_check: bool = False,
+        chunk_chars: Optional[int] = 3000,
     ) -> None:
         """Add a document to the collection."""
+
+        if citation is None:
+            # peak first chunk
+            texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
+            with get_openai_callback() as cb:
+                citation = self.cite_chain(texts[0])
+            print(f"Guessed citation {citation} for {cb.total_tokens} tokens")
+
         if path in self.docs:
             raise ValueError(f"Document {path} already in collection.")
         if key is None:
@@ -128,7 +143,7 @@ class Docs:
         key += suffix
         self.keys.add(key)
 
-        texts, metadata = read_doc(path, citation, key)
+        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -178,7 +193,7 @@ class Docs:
         # remove LLMs (they can have callbacks, which can't be pickled)
         del state["summary_chain"]
         del state["qa_chain"]
-        del state["edit_chain"]
+        del state["cite_chain"]
         del state["search_chain"]
         return state
 
@@ -189,7 +204,9 @@ class Docs:
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
-        self.update_llm(OpenAI(temperature=0.1), OpenAI(temperature=0.1))
+        self.update_llm(
+            OpenAIChat(temperature=0.1, max_tokens=512, prefix_messages=chat_pref)
+        )
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
@@ -325,11 +342,7 @@ class Docs:
             with get_openai_callback() as cb:
                 answer_text = self.qa_chain.run(
                     question=query, context_str=context_str, length=length_prompt
-                )[1:]
-                # if maybe_is_truncated(answer_text):
-                #     answer_text = self.edit_chain.run(
-                #         question=query, answer=answer_text
-                #     )
+                )
                 tokens += cb.total_tokens
         # it still happens lol
         if "(Foo2012)" in answer_text:

@@ -1,8 +1,9 @@
 from .utils import maybe_is_code
+from html2text import html2text
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import TokenTextSplitter
 
-TextSplitter = RecursiveCharacterTextSplitter
+TextSplitter = TokenTextSplitter
 
 
 def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
@@ -47,7 +48,7 @@ def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
     return splits, metadatas
 
 
-def parse_txt(path, citation, key, chunk_chars=2000, overlap=50):
+def parse_txt(path, citation, key, chunk_chars=2000, overlap=50, html=False):
 
     try:
         with open(path) as f:
@@ -55,6 +56,8 @@ def parse_txt(path, citation, key, chunk_chars=2000, overlap=50):
     except UnicodeDecodeError as e:
         with open(path, encoding="utf-8", errors="ignore") as f:
             doc = f.read()
+    if html:
+        doc = html2text(doc)
     # yo, no idea why but the texts are not split correctly
     text_splitter = TextSplitter(chunk_size=chunk_chars, chunk_overlap=overlap)
     texts = text_splitter.split_text(doc)
@@ -101,5 +104,7 @@ def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=F
         return parse_pdf(path, citation, key, chunk_chars, overlap)
     elif path.endswith(".txt"):
         return parse_txt(path, citation, key, chunk_chars, overlap)
+    elif path.endswith(".html"):
+        return parse_txt(path, citation, key, chunk_chars, overlap, html=True)
     else:
         return parse_code_txt(path, citation, key, chunk_chars, overlap)
