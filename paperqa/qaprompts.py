@@ -3,11 +3,11 @@ from datetime import datetime
 
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str"],
-    template="Summarize the text below to help answer a question. "
-    "Do not directly answer the question, instead provide a summary with the context of the question. "
+    template="Summarize and provide direct quotes from the text below to help answer a question. "
+    "Do not directly answer the question, instead provide a summary and quotes with the context of the question. "
     "Do not use outside sources. "
     'Reply with "Not applicable" if the text is unrelated to the question. '
-    "Use 75 or less words. Include quotations if possible."
+    "Use 75 or less words."
     "\n\n"
     "{context_str}\n"
     "\n"
@@ -18,13 +18,13 @@ summary_prompt = prompts.PromptTemplate(
 
 qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "length"],
-    template="Write a comprehensive answer ({length}) "
+    template="Write an answer ({length}) "
     "for the question below solely based on the provided context. "
     "If the context is irrelevant, "
     'reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
-    "Answer in an unbiased, balanced, and scientific tone. "
+    "Answer in an unbiased and scholarly tone. Make clear what is your opinion. "
     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
     "{context_str}\n"
     "Question: {question}\n"

@@ -22,6 +22,7 @@ from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
 from langchain.cache import SQLiteCache
 import langchain
+from datetime import datetime
 
 CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
@@ -115,7 +116,8 @@ class Docs:
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             with get_openai_callback() as cb:
                 citation = self.cite_chain.run(texts[0])
-            print(f"Guessed citation {citation} for {cb.total_tokens} tokens")
+            if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
+                citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
         if path in self.docs:
             raise ValueError(f"Document {path} already in collection.")
