@@ -6,7 +6,7 @@ summary_prompt = prompts.PromptTemplate(
     "Do not directly answer the question, instead provide a summary with the context of the question. "
     "Do not use outside sources. "
     'Reply with "Not applicable" if the text is unrelated to the question. '
-    "Use 50 or less words."
+    "Use 75 or less words. Include quotations if possible."
     "\n\n"
     "{context_str}\n"
     "\n"
@@ -22,20 +22,12 @@ qa_prompt = prompts.PromptTemplate(
     "If the context is irrelevant, "
     'reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
-    "via valid citation markers at the end of sentences, like (Foo2012). "
+    "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, balanced, and scientific tone. "
-    "Use Markdown for formatting code or text.\n\n"
+    "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
     "{context_str}\n"
     "Question: {question}\n"
     "Answer: ",
-)
-
-edit_prompt = prompts.PromptTemplate(
-    input_variables=["question", "answer"],
-    template="The original question is: {question} "
-    "We have been provided the following answer: {answer} "
-    "Part of it may be truncated, please edit the answer to make it complete. "
-    "If it appears to be complete, repeat it unchanged.\n\n",
 )
 
 
@@ -47,3 +39,16 @@ search_prompt = prompts.PromptTemplate(
     "Recent years are 2021, 2022, 2023.\n\n"
     "1.",
 )
+
+citation_prompt = prompts.PromptTemplate(
+    input_variables=["text"],
+    template="Provide a possible citation for the following text in MLA Format: {text}",
+)
+
+chat_pref = [
+    {
+        "role": "system",
+        "content": "You are a scholarly researcher that answers in an unbiased, scholarly tone. "
+        "You sometimes refuse to answer if there is insufficient information.",
+    }
+]

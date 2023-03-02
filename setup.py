@@ -16,10 +16,11 @@ setup(
     packages=["paperqa"],
     install_requires=[
         "pypdf",
-        "langchain>=0.0.80",
+        "langchain>=0.0.98",
         "openai",
         "faiss-cpu",
         "PyCryptodome",
+        "html2text",
     ],
     test_suite="tests",
     long_description=long_description,

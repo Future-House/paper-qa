@@ -107,9 +107,13 @@ print(answer.formatted_answer)
 
 It's not that different! This is similar to the tree response method in GPT-index. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one tasks - answering technical questions with cited sources.
 
+### How is this different from LangChain?
+
+It's not! We use langchain to abstract the LLMS, and the process is very similar to the `map_reduce` chain in LangChain.
+
 ### Caching
 
-This code will cache responses from LLMS by default in `$HOME/.paperqa/llm_cache.db`. Delete this file to clear the cache. 
+This code will cache responses from LLMS by default in `$HOME/.paperqa/llm_cache.db`. Delete this file to clear the cache.
 
 ### Can I use different LLMs?
 
