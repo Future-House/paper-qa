@@ -17,10 +17,11 @@ setup(
     install_requires=[
         "pypdf",
         "langchain>=0.0.98",
-        "openai",
+        "openai>=0.27.0",
         "faiss-cpu",
         "PyCryptodome",
         "html2text",
+        "tiktoken",
     ],
     test_suite="tests",
     long_description=long_description,
