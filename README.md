@@ -91,7 +91,7 @@ papers = paperscraper.search_papers(keyword_search)
 docs = paperqa.Docs()
 for path,data in papers.items():
     try:
-        docs.add(path, data['citation'], data['key'])
+        docs.add(path)
     except ValueError as e:
         # sometimes this happens if PDFs aren't downloaded or readable
         print('Could not read', path, e)
