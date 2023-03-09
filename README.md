@@ -9,7 +9,7 @@ This is a minimal package for doing question and answering from
 PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations. It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
 generate answers.
 
-It uses this process
+It uses this process:
 
 ```text
 embed docs into vectors -> embed query into vector -> search for top k passages in docs
