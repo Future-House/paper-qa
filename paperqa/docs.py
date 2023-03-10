@@ -110,7 +110,12 @@ class Docs:
         chunk_chars: Optional[int] = 3000,
     ) -> None:
         """Add a document to the collection."""
-
+        
+        # first check to see if we already have this document 
+        # this way we don't make api call to create citation on file we already have
+        if path in self.docs:
+            raise ValueError(f"Document {path} already in collection.")
+        
         if citation is None:
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
@@ -119,8 +124,7 @@ class Docs:
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
-        if path in self.docs:
-            raise ValueError(f"Document {path} already in collection.")
+
         if key is None:
             # get first name and year from citation
             try:
