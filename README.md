@@ -115,7 +115,7 @@ This code will cache responses from LLMS by default in `$HOME/.paperqa/llm_cache
 
 ### Can I use different LLMs?
 
-Yes, you can use any LLMs from [langchain](langchain.readthedocs.io/) by passing the `llm` argument to the `Docs` class. You can use different LLMs for summarization and for question answering too.
+Yes, you can use any LLMs from [langchain](https://langchain.readthedocs.io/) by passing the `llm` argument to the `Docs` class. You can use different LLMs for summarization and for question answering too.
 
 ### Where do the documents come from?
 
