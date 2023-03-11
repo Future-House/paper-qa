@@ -356,7 +356,7 @@ class Docs:
         for key, citation, summary, text in citations:
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             skey = key.split(" ")[0]
-            if skey + " " in answer_text or skey + ")" in answer_text:
+            if skey + " " in answer_text or skey + ")" or skey + "," in answer_text:
                 bib[skey] = citation
                 passages[key] = text
         bib_str = "\n\n".join(
