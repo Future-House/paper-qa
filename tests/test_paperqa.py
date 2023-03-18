@@ -94,14 +94,14 @@ def test_docs_pickle():
             list(
                 docs.get_evidence(
                     paperqa.Answer("What date is flag day in Canada?"),
-                    k=1,
+                    k=3,
                     max_sources=1,
                 )
             )[-1].context,
             list(
                 docs2.get_evidence(
                     paperqa.Answer("What date is flag day in Canada?"),
-                    k=1,
+                    k=3,
                     max_sources=1,
                 )
             )[-1].context,
