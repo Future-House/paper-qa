@@ -64,6 +64,7 @@ class Docs:
         summary_llm: Optional[LLM] = None,
         name: str = "default",
         index_path: Optional[Path] = None,
+        model_name: str = 'gpt-3.5-turbo'
     ) -> None:
         """Initialize the collection of documents.
 
@@ -75,13 +76,14 @@ class Docs:
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
+            model_name: The name of the model to use assuming OpenAI. Default - gpt-3.5-turbo
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
         if llm is None:
-            llm = OpenAIChat(temperature=0.1, max_tokens=512, prefix_messages=chat_pref)
+            llm = OpenAIChat(temperature=0.1, max_tokens=512, prefix_messages=chat_pref, model_name=model_name)
         if summary_llm is None:
             summary_llm = llm
         self.update_llm(llm, summary_llm)

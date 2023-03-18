@@ -101,9 +101,9 @@ print(answer.formatted_answer)
 
 ## FAQ
 
-### How is this different from gpt-index?
+### How is this different from LlamaIndex?
 
-It's not that different! This is similar to the tree response method in GPT-index. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one tasks - answering technical questions with cited sources.
+It's not that different! This is similar to the tree response method in LlamaIndex. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one tasks - answering technical questions with cited sources.
 
 ### How is this different from LangChain?
 
