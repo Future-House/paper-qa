@@ -119,6 +119,10 @@ class Docs:
     ) -> None:
         """Add a document to the collection."""
 
+        # Pass .DS_Store
+        if path.endswith(".DS_Store"):
+            return
+
         # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have
         if path in self.docs:
