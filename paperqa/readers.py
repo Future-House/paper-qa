@@ -8,8 +8,19 @@ TextSplitter = TokenTextSplitter
 
 def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
     import pypdf
+    import chardet
 
-    pdfFileObj = open(path, "rb")
+    # Pass .DS_Store
+    if path.endswith(".DS_Store"):
+        return [], []
+
+    with open(path, 'rb') as f:
+        # Use chardet to detect the encoding
+        result = chardet.detect(f.read())
+        encoding = result['encoding']
+        print(encoding)
+
+    pdfFileObj = open(path, "rb", encoding=encoding)
     pdfReader = pypdf.PdfReader(pdfFileObj)
     splits = []
     split = ""
