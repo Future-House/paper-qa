@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Dict, Callable, Any
+from typing import List, Optional, Tuple, Dict, Callable, Any, Union
 from functools import reduce
 import os
 import os
@@ -10,13 +10,13 @@ from .qaprompts import (
     qa_prompt,
     search_prompt,
     citation_prompt,
-    chat_pref,
+    make_chain,
 )
 from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import OpenAI, OpenAIChat
+from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import LLM
 from langchain.chains import LLMChain
 from langchain.callbacks import get_openai_callback
@@ -64,7 +64,7 @@ class Docs:
         summary_llm: Optional[LLM] = None,
         name: str = "default",
         index_path: Optional[Path] = None,
-        model_name: str = 'gpt-3.5-turbo'
+        model_name: str = "gpt-3.5-turbo",
     ) -> None:
         """Initialize the collection of documents.
 
@@ -82,26 +82,32 @@ class Docs:
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
-        if llm is None:
-            llm = OpenAIChat(temperature=0.1, max_tokens=512, prefix_messages=chat_pref, model_name=model_name)
-        if summary_llm is None:
-            summary_llm = llm
         self.update_llm(llm, summary_llm)
         if index_path is None:
             index_path = Path.home() / ".paperqa" / name
         self.index_path = index_path
         self.name = name
 
-    def update_llm(self, llm: LLM, summary_llm: Optional[LLM] = None) -> None:
+    def update_llm(
+        self,
+        llm: Optional[Union[LLM, str]] = None,
+        summary_llm: Optional[Union[LLM, str]] = None,
+    ) -> None:
         """Update the LLM for answering questions."""
+        if llm is None:
+            llm = "gpt-3.5-turbo"
+        if type(llm) is str:
+            llm = ChatOpenAI(temperature=0.1, model=llm)
+        if type(summary_llm) is str:
+            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm)
         self.llm = llm
         if summary_llm is None:
             summary_llm = llm
         self.summary_llm = summary_llm
-        self.summary_chain = LLMChain(prompt=summary_prompt, llm=summary_llm)
-        self.qa_chain = LLMChain(prompt=qa_prompt, llm=llm)
-        self.search_chain = LLMChain(prompt=search_prompt, llm=llm)
-        self.cite_chain = LLMChain(prompt=citation_prompt, llm=llm)
+        self.summary_chain = make_chain(prompt=summary_prompt, llm=summary_llm)
+        self.qa_chain = make_chain(prompt=qa_prompt, llm=llm)
+        self.search_chain = make_chain(prompt=search_prompt, llm=summary_llm)
+        self.cite_chain = make_chain(prompt=citation_prompt, llm=summary_llm)
 
     def add(
         self,
@@ -112,12 +118,12 @@ class Docs:
         chunk_chars: Optional[int] = 3000,
     ) -> None:
         """Add a document to the collection."""
-        
-        # first check to see if we already have this document 
+
+        # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have
         if path in self.docs:
             raise ValueError(f"Document {path} already in collection.")
-        
+
         if citation is None:
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
@@ -125,7 +131,6 @@ class Docs:
                 citation = self.cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
-
 
         if key is None:
             # get first name and year from citation
@@ -212,9 +217,7 @@ class Docs:
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
-        self.update_llm(
-            OpenAIChat(temperature=0.1, max_tokens=512, prefix_messages=chat_pref)
-        )
+        self.update_llm("gpt-3.5-turbo")
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
@@ -252,7 +255,9 @@ class Docs:
                 doc.metadata["key"],
                 doc.metadata["citation"],
                 self.summary_chain.run(
-                    question=answer.question, context_str=doc.page_content
+                    question=answer.question,
+                    context_str=doc.page_content,
+                    citation=doc.metadata["citation"],
                 ),
                 doc.page_content,
             )
