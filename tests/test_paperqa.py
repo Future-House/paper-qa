@@ -210,3 +210,17 @@ def test_citation():
         list(docs.docs.values())[0]["metadata"][0]["key"] == "Wikipedia2023"
         or list(docs.docs.values())[0]["metadata"][0]["key"] == "Frederick2023"
     )
+
+
+def test_dockey_filter():
+    """Test that we can filter evidence with dockeys"""
+    doc_path = "example2.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    # add with new dockey
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    docs.get_evidence("What country is Bates from?", key_filter=["test"])

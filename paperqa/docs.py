@@ -60,11 +60,10 @@ class Docs:
     def __init__(
         self,
         chunk_size_limit: int = 3000,
-        llm: Optional[LLM] = None,
-        summary_llm: Optional[LLM] = None,
+        llm: Optional[Union[LLM, str]] = None,
+        summary_llm: Optional[Union[LLM, str]] = None,
         name: str = "default",
         index_path: Optional[Path] = None,
-        model_name: str = "gpt-3.5-turbo",
     ) -> None:
         """Initialize the collection of documents.
 
@@ -76,7 +75,6 @@ class Docs:
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
-            model_name: The name of the model to use assuming OpenAI. Default - gpt-3.5-turbo
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -237,20 +235,25 @@ class Docs:
         k: int = 3,
         max_sources: int = 5,
         marginal_relevance: bool = True,
+        key_filter: Optional[List[str]] = None,
     ) -> str:
         if self._faiss_index is None:
             self._build_faiss_index()
-
+        _k = k
+        if key_filter is not None:
+            _k = k * 10  # heuristic
         # want to work through indices but less k
         if marginal_relevance:
             docs = self._faiss_index.max_marginal_relevance_search(
-                answer.question, k=k, fetch_k=5 * k
+                answer.question, k=_k, fetch_k=5 * _k
             )
         else:
             docs = self._faiss_index.similarity_search(
-                answer.question, k=k, fetch_k=5 * k
+                answer.question, k=_k, fetch_k=5 * _k
             )
         for doc in docs:
+            if key_filter is not None and doc.metadata["dockey"] not in key_filter:
+                continue
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
