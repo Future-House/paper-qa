@@ -95,7 +95,6 @@ class AnswerTool(BaseTool):
             return "Failed to answer question. Deleting evidence." + status(
                 self.answer, self.docs
             )
-        print(self.answer)
         return self.answer.answer + status(self.answer, self.docs)
 
     def _arun(self, query: str) -> str:
