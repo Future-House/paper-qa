@@ -48,6 +48,18 @@ search_prompt = prompts.PromptTemplate(
 )
 
 
+select_paper_prompt = prompts.PromptTemplate(
+    input_variables=["instructions", "papers"],
+    template="Select papers according to instructions below. "
+    "Papers are listed as $KEY: $PAPER_INFO. "
+    "Return a list of keys, separated by commas. "
+    'Return "None", if no papers are applicable. \n\n'
+    "Instructions: {instructions}\n\n"
+    "{papers}\n\n"
+    "Selected keys:",
+)
+
+
 def _get_datetime():
     now = datetime.now()
     return now.strftime("%m/%d/%Y")

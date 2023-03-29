@@ -254,6 +254,9 @@ class Docs:
         for doc in docs:
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
                 continue
+            # check if it is already in answer (possible in agent setting)
+            if doc.metadata["key"] in [c[0] for c in answer.contexts]:
+                continue
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
@@ -275,7 +278,7 @@ class Docs:
         valid_keys = [k for k, c, s, t in answer.contexts if "Not applicable" not in s]
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
-        answer.context = context_str
+        answer.context += context_str
         yield answer
 
     def generate_search_query(self, query: str) -> List[str]:
@@ -299,6 +302,7 @@ class Docs:
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
+        answer: Optional[Answer] = None,
     ):
         yield from self._query(
             query,
@@ -306,6 +310,7 @@ class Docs:
             max_sources=max_sources,
             length_prompt=length_prompt,
             marginal_relevance=marginal_relevance,
+            answer=answer,
         )
 
     def query(
@@ -315,6 +320,7 @@ class Docs:
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
+        answer: Optional[Answer] = None,
     ):
         for answer in self._query(
             query,
@@ -322,6 +328,7 @@ class Docs:
             max_sources=max_sources,
             length_prompt=length_prompt,
             marginal_relevance=marginal_relevance,
+            answer=answer,
         ):
             pass
         return answer
@@ -333,11 +340,13 @@ class Docs:
         max_sources: int,
         length_prompt: str,
         marginal_relevance: bool,
+        answer: Optional[Answer] = None,
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         tokens = 0
-        answer = Answer(query)
+        if answer is None:
+            answer = Answer(query)
         with get_openai_callback() as cb:
             for answer in self.get_evidence(
                 answer,
