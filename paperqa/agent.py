@@ -129,9 +129,7 @@ class Search(BaseTool):
         raise NotImplementedError()
 
 
-def make_tools(docs, question):
-
-    answer = Answer(question)
+def make_tools(docs, answer):
 
     tools = []
 
@@ -146,11 +144,14 @@ def make_tools(docs, question):
 def run_agent(docs, question, llm=None, budget=10000):
     if llm is None:
         llm = ChatOpenAI(temperature=0, model="gpt-4")
-    tools = make_tools(docs, question)
+    answer = Answer(question)
+    tools = make_tools(docs, answer)
     mrkl = initialize_agent(
         tools, llm, agent="chat-zero-shot-react-description", verbose=True
     )
-    return mrkl.run(
+    mrkl.run(
         f"Answer question: {question}. Find papers, gather evidence, and answer. "
         "Once you have five pieces of evidence, call the Answer tool."
     )
+
+    return answer
