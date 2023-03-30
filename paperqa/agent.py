@@ -104,7 +104,9 @@ class AnswerTool(BaseTool):
 
 class Search(BaseTool):
     name = "Search for Papers"
-    description = "Search for papers using Google Scholar. Input should be a string that can be used on Google Scholar"
+    description = (
+        "Search for papers using Google Scholar. Input should be a string keywords."
+    )
     docs: Docs = None
     answer: Answer = None
 
