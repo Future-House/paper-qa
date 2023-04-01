@@ -1,7 +1,8 @@
 from typing import List, Optional, Tuple, Dict, Callable, Any, Union
 from functools import reduce
 import os
-import os
+import sys
+import asyncio
 from pathlib import Path
 import re
 from .utils import maybe_is_text, maybe_is_truncated
@@ -237,6 +238,34 @@ class Docs:
         marginal_relevance: bool = True,
         key_filter: Optional[List[str]] = None,
     ) -> str:
+        # special case for jupyter notebooks
+        if "get_ipython" in globals() or "google.colab" in sys.modules:
+            import nest_asyncio
+
+            nest_asyncio.apply()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(
+            self.aget_evidence(
+                answer,
+                k=k,
+                max_sources=max_sources,
+                marginal_relevance=marginal_relevance,
+                key_filter=key_filter,
+            )
+        )
+
+    async def aget_evidence(
+        self,
+        answer: Answer,
+        k: int = 3,
+        max_sources: int = 5,
+        marginal_relevance: bool = True,
+        key_filter: Optional[List[str]] = None,
+    ) -> str:
         if self._faiss_index is None:
             self._build_faiss_index()
         _k = k
@@ -257,7 +286,7 @@ class Docs:
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
-                self.summary_chain.run(
+                await self.summary_chain.arun(
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
@@ -266,7 +295,6 @@ class Docs:
             )
             if "Not applicable" not in c[2]:
                 answer.contexts.append(c)
-                yield answer
             if len(answer.contexts) == max_sources:
                 break
         context_str = "\n\n".join(
@@ -276,7 +304,7 @@ class Docs:
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         answer.context = context_str
-        yield answer
+        return answer
 
     def generate_search_query(self, query: str) -> List[str]:
         """Generate a list of search strings that can be used to find
@@ -292,22 +320,6 @@ class Docs:
         queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
         return queries
 
-    def query_gen(
-        self,
-        query: str,
-        k: int = 10,
-        max_sources: int = 5,
-        length_prompt: str = "about 100 words",
-        marginal_relevance: bool = True,
-    ):
-        yield from self._query(
-            query,
-            k=k,
-            max_sources=max_sources,
-            length_prompt=length_prompt,
-            marginal_relevance=marginal_relevance,
-        )
-
     def query(
         self,
         query: str,
@@ -316,36 +328,45 @@ class Docs:
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
     ):
-        for answer in self._query(
-            query,
-            k=k,
-            max_sources=max_sources,
-            length_prompt=length_prompt,
-            marginal_relevance=marginal_relevance,
-        ):
-            pass
-        return answer
+        # special case for jupyter notebooks
+        if "get_ipython" in globals() or "google.colab" in sys.modules:
+            import nest_asyncio
 
-    def _query(
+            nest_asyncio.apply()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(
+            self.aquery(
+                query,
+                k=k,
+                max_sources=max_sources,
+                length_prompt=length_prompt,
+                marginal_relevance=marginal_relevance,
+            )
+        )
+
+    async def aquery(
         self,
         query: str,
-        k: int,
-        max_sources: int,
-        length_prompt: str,
-        marginal_relevance: bool,
+        k: int = 10,
+        max_sources: int = 5,
+        length_prompt: str = "about 100 words",
+        marginal_relevance: bool = True,
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         tokens = 0
         answer = Answer(query)
         with get_openai_callback() as cb:
-            for answer in self.get_evidence(
+            answer = await self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-            ):
-                yield answer
+            )
             tokens += cb.total_tokens
         context_str, citations = answer.context, answer.contexts
         bib = dict()
@@ -356,7 +377,7 @@ class Docs:
             )
         else:
             with get_openai_callback() as cb:
-                answer_text = self.qa_chain.run(
+                answer_text = await self.qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )
                 tokens += cb.total_tokens
@@ -381,4 +402,4 @@ class Docs:
         answer.references = bib_str
         answer.passages = passages
         answer.tokens = tokens
-        yield answer
+        return answer

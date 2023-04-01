@@ -4,6 +4,7 @@ import os
 import pickle
 from paperqa.utils import strings_similarity
 from langchain.llms import OpenAI
+from unittest import IsolatedAsyncioTestCase
 
 
 def test_maybe_is_text():
@@ -41,10 +42,9 @@ def test_evidence():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    for evidence in docs.get_evidence(
+    evidence = docs.get_evidence(
         paperqa.Answer("For which state was he a governor"), k=1, max_sources=1
-    ):
-        pass
+    )
     assert "Missouri" in evidence.context
     os.remove(doc_path)
 
@@ -61,19 +61,20 @@ def test_query():
     os.remove(doc_path)
 
 
-def test_query_gen():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
-        f.write(r.text)
-    docs = paperqa.Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    i = 0
-    for answer in docs.query_gen("What is Frederick Bates's greatest accomplishment?"):
-        i += 1
-    assert i >= 2
-    os.remove(doc_path)
+class Test(IsolatedAsyncioTestCase):
+    async def test_aquery(self):
+        doc_path = "example.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+            )
+            f.write(r.text)
+        docs = paperqa.Docs()
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        i = 0
+        answer = await docs.aquery("What is Frederick Bates's greatest accomplishment?")
+        os.remove(doc_path)
 
 
 def test_docs_pickle():
@@ -91,20 +92,16 @@ def test_docs_pickle():
     assert len(docs.docs) == len(docs2.docs)
     assert (
         strings_similarity(
-            list(
-                docs.get_evidence(
-                    paperqa.Answer("What date is flag day in Canada?"),
-                    k=3,
-                    max_sources=1,
-                )
-            )[-1].context,
-            list(
-                docs2.get_evidence(
-                    paperqa.Answer("What date is flag day in Canada?"),
-                    k=3,
-                    max_sources=1,
-                )
-            )[-1].context,
+            docs.get_evidence(
+                paperqa.Answer("What date is flag day in Canada?"),
+                k=3,
+                max_sources=1,
+            ).context,
+            docs2.get_evidence(
+                paperqa.Answer("What date is flag day in Canada?"),
+                k=3,
+                max_sources=1,
+            ).context,
         )
         > 0.75
     )
@@ -223,4 +220,5 @@ def test_dockey_filter():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     # add with new dockey
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
-    docs.get_evidence("What country is Bates from?", key_filter=["test"])
+    answer = paperqa.Answer("What country is Bates from?")
+    docs.get_evidence(answer, key_filter=["test"])
