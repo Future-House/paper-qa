@@ -283,6 +283,9 @@ class Docs:
         for doc in docs:
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
                 continue
+            # check if it is already in answer (possible in agent setting)
+            if doc.metadata["key"] in [c[0] for c in answer.contexts]:
+                continue
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
@@ -327,6 +330,7 @@ class Docs:
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
+        answer: Optional[Answer] = None,
     ):
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -355,11 +359,13 @@ class Docs:
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
+        answer: Optional[Answer] = None,
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         tokens = 0
-        answer = Answer(query)
+        if answer is None:
+            answer = Answer(query)
         with get_openai_callback() as cb:
             answer = await self.aget_evidence(
                 answer,
