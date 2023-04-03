@@ -21,9 +21,6 @@ create summary of each passage relevant to query -> put summaries into prompt ->
 
 [Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
 
-
-![image](https://user-images.githubusercontent.com/908389/218957863-4aa2fa2c-14cf-4b0d-82fd-bf837f5f550b.png)
-
 ## Example
 
 Question: How can carbon nanotubes be manufactured at a large scale?
@@ -103,7 +100,7 @@ print(answer.formatted_answer)
 
 ### How is this different from LlamaIndex?
 
-It's not that different! This is similar to the tree response method in LlamaIndex. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one tasks - answering technical questions with cited sources.
+It's not that different! This is similar to the tree response method in LlamaIndex. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one task - answering technical questions with cited sources.
 
 ### How is this different from LangChain?
 
