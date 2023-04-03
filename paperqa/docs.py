@@ -11,6 +11,7 @@ from .qaprompts import (
     qa_prompt,
     search_prompt,
     citation_prompt,
+    select_paper_prompt,
     make_chain,
 )
 from dataclasses import dataclass
@@ -81,6 +82,7 @@ class Docs:
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
+        self._doc_index = None
         self.update_llm(llm, summary_llm)
         if index_path is None:
             index_path = Path.home() / ".paperqa" / name
@@ -174,6 +176,7 @@ class Docs:
         self.docs = dict()
         self.keys = set()
         self._faiss_index = None
+        self._doc_index = None
         # delete index file
         pkl = self.index_path / "index.pkl"
         if pkl.exists():
@@ -182,7 +185,6 @@ class Docs:
         if fs.exists():
             fs.unlink()
 
-    @property
     def doc_previews(self) -> List[Tuple[int, str, str]]:
         """Return a list of tuples of (key, citation) for each document."""
         return [
@@ -194,7 +196,22 @@ class Docs:
             for doc in self.docs.values()
         ]
 
+    async def adoc_match(self, query: str, k: int = 5) -> List[str]:
+        """Return a list of documents that match the query."""
+        if self._doc_index is None or len(self.docs) != len(self._doc_index):
+            texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
+            metadatas = [doc["metadata"][0]["dockey"] for doc in self.docs.values()]
+            self._doc_index = FAISS.from_texts(
+                texts, metadatas=metadatas, embeddings=OpenAIEmbeddings()
+            )
+        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        chain = make_chain(select_paper_prompt, self.docs.summary_llm)
+        papers = [f"{d.metadata}: {d.text}" for d in docs]
+        result = await chain.arun(instructions=query, papers="\n".join(papers))
+        return result
+
     # to pickle, we have to save the index as a file
+
     def __getstate__(self):
         if self._faiss_index is None and len(self.docs) > 0:
             self._build_faiss_index()
@@ -202,6 +219,7 @@ class Docs:
         if self._faiss_index is not None:
             state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
+        del state["_doc_index"]
         # remove LLMs (they can have callbacks, which can't be pickled)
         del state["summary_chain"]
         del state["qa_chain"]
@@ -216,7 +234,7 @@ class Docs:
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
-        self.update_llm("gpt-3.5-turbo")
+        self.update_llm(None, None)
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
