@@ -153,20 +153,34 @@ class QAZotero(zotero.Zotero):
         num_remaining = limit - len(items)
 
         while num_remaining > 0:
-            new_items = self.top(
+            _items = self.top(
                 **query_kwargs, limit=min(max_limit, num_remaining), start=start
             )
-            items.extend(new_items)
-            pdfs.extend([self.get_pdf(item) for item in new_items])
+            _pdfs = [self.get_pdf(item) for item in _items]
+
+            # Filter:
+            new_items = []
+            for (item, pdf) in zip(_items, _pdfs):
+                no_pdf = item is None or pdf is None
+                is_duplicate = pdf in pdfs
+
+                if no_pdf or is_duplicate:
+                    continue
+
+                new_items.append(item)
+                items.append(item)
+                pdfs.append(pdf)
+
+
             citations.extend([_get_citation_key(item) for item in new_items])
-            keys.extend([item["key"] for item in new_items])
+
             num_remaining = limit - len(items)
             start += len(new_items)
 
         docs = Docs()
 
-        for pdf, citation, key in zip(pdfs, citations):
-            docs.add(path=pdf, citation=citation, key=key)
+        for i in range(len(items)):
+            docs.add(path=pdfs[i], citation=citations[i], key=items[i]["key"])
 
         return docs
 
@@ -176,6 +190,7 @@ def _get_citation_key(item: dict) -> str:
         "data" not in item
         or "creators" not in item["data"]
         or len(item["data"]["creators"]) == 0
+        or "lastName" not in item["data"]["creators"][0]
         or "title" not in item["data"]
         or "date" not in item["data"]
     ):
