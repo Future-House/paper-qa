@@ -1,1 +1,1 @@
-from . import zotero
+from .zotero import QAZotero
