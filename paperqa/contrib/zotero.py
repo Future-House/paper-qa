@@ -12,6 +12,16 @@ StrPath = Union[str, Path]
 
 
 class QAZotero(zotero.Zotero):
+    """An extension of pyzotero.zotero.Zotero to interface with paperqa.
+    
+    This class automatically reads in your `ZOTERO_USER_ID` and `ZOTERO_API_KEY`
+    from your environment variables. If you do not have these, see 
+    step 2 of https://github.com/urschrei/pyzotero#quickstart.
+    
+    This class will download PDFs from your Zotero library and store them in
+    `~/.paperqa/zotero` by default. To use this class, call the `gen_paperdb`
+    method, which returns a `paperqa.Docs` object.
+    """
     def __init__(
         self,
         *,
