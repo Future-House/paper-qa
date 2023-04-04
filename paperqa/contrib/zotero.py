@@ -176,6 +176,7 @@ class QAZotero(zotero.Zotero):
             _items = self.top(
                 **query_kwargs, limit=cur_limit, start=start
             )
+            start += cur_limit
             self.logger.info(f"Downloading PDFs.")
             _pdfs = [self.get_pdf(item) for item in _items]
 
@@ -196,7 +197,6 @@ class QAZotero(zotero.Zotero):
             citations.extend([_get_citation_key(item) for item in new_items])
 
             num_remaining = limit - len(items)
-            start += len(new_items)
 
         self.logger.info("Finished downloading papers. Now creating Docs object.")
         docs = Docs()
