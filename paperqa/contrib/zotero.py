@@ -6,6 +6,7 @@ from pathlib import Path
 from pyzotero import zotero
 
 from ..docs import CACHE_PATH
+from .. import Docs
 
 StrPath = Union[str, Path]
 
@@ -72,6 +73,92 @@ class QAZotero(zotero.Zotero):
             self.dump(pdf_key, pdf_path)
 
         return pdf_path
+
+    def gen_paperdb(self,
+                q=None,
+                qmode=None,
+                since=None,
+                tag=None,
+                sort=None,
+                direction=None,
+                limit=None,
+                start=None,
+                ):
+        """Given a search query, this converts the Zotero library to a `paperqa.docs.Docs` object.
+        
+        This will download all PDFs in the query.
+        For information on parameters, see
+        https://pyzotero.readthedocs.io/en/latest/?badge=latest#zotero.Zotero.add_parameters
+        For extra information on the query, see
+        https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.
+
+        Parameters
+        ----------
+        q : str, optional
+            Quick search query. Searches only titles and creator fields by default.
+            Control with `qmode`.
+        qmode : str, optional
+            Quick search mode. One of `titleCreatorYear` or `everything`.
+        since : int, optional
+            Only return objects modified after the specified library version.
+        tag : str, optional
+            Tag search. Can use `AND` or `OR` to combine tags.
+        sort : str, optional
+            The name of the field to sort by. One of dateAdded, dateModified,
+            title, creator, itemType, date, publisher, publicationTitle,
+            journalAbbreviation, language, accessDate, libraryCatalog, callNumber,
+            rights, addedBy, numItems (tags).
+        direction : str, optional
+            asc or desc.
+        limit : int, optional
+            The maximum number of items to return. Default is 25. You may use the `start`
+            parameter to continue where you left off.
+        start : int, optional
+            The index of the first item to return. Default is 0.
+        """
+        query_kwargs = {}
+        if q is not None:
+            query_kwargs["q"] = q
+        if qmode is not None:
+            query_kwargs["qmode"] = qmode
+        if since is not None:
+            query_kwargs["since"] = since
+        if tag is not None:
+            query_kwargs["tag"] = tag
+        if sort is not None:
+            query_kwargs["sort"] = sort
+        if direction is not None:
+            query_kwargs["direction"] = direction
+        
+        # (We deal with start and limit manually)
+        if limit is None:
+            limit = 25
+
+        if start is None:
+            start = 0
+
+        max_limit = 100
+
+        items = []
+        pdfs = []
+        citations = []
+        num_remaining = limit - len(items)
+
+        while num_remaining > 0:
+            new_items = self.top(**query_kwargs, limit=min(max_limit, num_remaining), start=start)
+            items.extend(new_items)
+            pdfs.extend([self.get_pdf(item) for item in new_items])
+            num_remaining = limit - len(items)
+            start += len(new_items)
+
+        docs = Docs()
+
+
+def _get_citation_key(item: dict) -> str:
+    if ("data" not in item or "creators" not in item["data"]:
+        or len(item["data"]["creators"]) == 0)
+        return item["key"]
+
         
 
 def _extract_pdf_key(item: dict) -> str:
