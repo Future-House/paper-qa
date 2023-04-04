@@ -2,7 +2,7 @@
 import os
 from typing import Union
 from pathlib import Path
-from logging import getLogger
+import logging
 
 from pyzotero import zotero
 
@@ -32,7 +32,8 @@ class QAZotero(zotero.Zotero):
         storage=None,
         **kwargs,
     ):
-        self.logger = getLogger("paperqa.contrib.QAZotero")
+        self.logger = logging.getLogger("QAZotero")
+
         if library_id is None:
             self.logger.info(f"Attempting to get ZOTERO_USER_ID from `os.environ`...")
             if "ZOTERO_USER_ID" not in os.environ:
@@ -222,9 +223,14 @@ def _get_citation_key(item: dict) -> str:
 
     last_name = item["data"]["creators"][0]["lastName"]
     short_title = "".join(item["data"]["title"].split(" ")[:3])
-    year = item["data"]["date"]
+    date = item["data"]["date"]
 
-    return f"{last_name}{short_title}{year}_{item['key']}"
+    # Delete non-alphanumeric characters:
+    short_title = "".join([c for c in short_title if c.isalnum()])
+    last_name = "".join([c for c in last_name if c.isalnum()])
+    date = "".join([c for c in date if c.isalnum()])
+
+    return f"{last_name}_{short_title}_{date}_{item['key']}".replace(" ", "")
 
 
 def _extract_pdf_key(item: dict) -> str:
