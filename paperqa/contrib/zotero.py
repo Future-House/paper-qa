@@ -6,9 +6,6 @@ import logging
 
 from pyzotero import zotero
 
-from ..docs import CACHE_PATH
-from .. import Docs
-
 StrPath = Union[str, Path]
 
 
@@ -62,6 +59,8 @@ class QAZotero(zotero.Zotero):
         self.logger.info(f"Using library ID: {library_id} with type: {library_type}.")
 
         if storage is None:
+            from ..docs import CACHE_PATH
+
             storage = CACHE_PATH.parent / "zotero"
 
         self.logger.info(f"Using cache location: {storage}")
@@ -192,6 +191,8 @@ class QAZotero(zotero.Zotero):
             num_remaining = limit - len(items)
 
         self.logger.info("Finished downloading papers. Now creating Docs object.")
+        from .. import Docs
+
         docs = Docs()
 
         for i in range(len(items)):
