@@ -2,6 +2,7 @@
 import os
 from typing import Union
 from pathlib import Path
+from logging import getLogger
 
 from pyzotero import zotero
 
@@ -31,7 +32,9 @@ class QAZotero(zotero.Zotero):
         storage=None,
         **kwargs,
     ):
+        self.logger = getLogger("paperqa.contrib.QAZotero")
         if library_id is None:
+            self.logger.info(f"Attempting to get ZOTERO_USER_ID from `os.environ`...")
             if "ZOTERO_USER_ID" not in os.environ:
                 raise ValueError(
                     "ZOTERO_USER_ID not set. Please navigate to"
@@ -43,6 +46,7 @@ class QAZotero(zotero.Zotero):
                 library_id = os.environ["ZOTERO_USER_ID"]
 
         if api_key is None:
+            self.logger.info(f"Attempting to get ZOTERO_API_KEY from `os.environ`...")
             if "ZOTERO_API_KEY" not in os.environ:
                 raise ValueError(
                     "ZOTERO_API_KEY not set. Please navigate to"
@@ -53,9 +57,12 @@ class QAZotero(zotero.Zotero):
             else:
                 api_key = os.environ["ZOTERO_API_KEY"]
 
+        self.logger.info(f"Using library ID: {library_id} with type: {library_type}.")
+
         if storage is None:
             storage = CACHE_PATH.parent / "zotero"
 
+        self.logger.info(f"Using cache location: {storage}")
         self.storage = storage
 
         super().__init__(
@@ -86,6 +93,7 @@ class QAZotero(zotero.Zotero):
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
+            self.logger.info(f"|  Downloading PDF for: {_get_citation_key(item)}")
             self.dump(pdf_key, pdf_path)
 
         return pdf_path
@@ -163,9 +171,12 @@ class QAZotero(zotero.Zotero):
         num_remaining = limit - len(items)
 
         while num_remaining > 0:
+            cur_limit = min(max_limit, num_remaining)
+            self.logger.info(f"Downloading new batch of up to {cur_limit} papers.")
             _items = self.top(
-                **query_kwargs, limit=min(max_limit, num_remaining), start=start
+                **query_kwargs, limit=cur_limit, start=start
             )
+            self.logger.info(f"Downloading PDFs.")
             _pdfs = [self.get_pdf(item) for item in _items]
 
             # Filter:
@@ -187,11 +198,14 @@ class QAZotero(zotero.Zotero):
             num_remaining = limit - len(items)
             start += len(new_items)
 
+        self.logger.info("Finished downloading papers. Now creating Docs object.")
         docs = Docs()
 
         for i in range(len(items)):
+            self.logger.info(f"|  Adding paper {citations[i]} to Docs.")
             docs.add(path=pdfs[i], citation=citations[i], key=items[i]["key"])
 
+        self.logger.info(f"Done.")
         return docs
 
 
