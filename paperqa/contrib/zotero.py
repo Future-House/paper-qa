@@ -9,7 +9,7 @@ from pyzotero import zotero
 StrPath = Union[str, Path]
 
 
-class QAZotero(zotero.Zotero):
+class ZoteroQA(zotero.Zotero):
     """An extension of pyzotero.zotero.Zotero to interface with paperqa.
 
     This class automatically reads in your `ZOTERO_USER_ID` and `ZOTERO_API_KEY`
@@ -30,7 +30,7 @@ class QAZotero(zotero.Zotero):
         storage: Optional[StrPath] = None,
         **kwargs,
     ):
-        self.logger = logging.getLogger("QAZotero")
+        self.logger = logging.getLogger("ZoteroQA")
 
         if library_id is None:
             self.logger.info(f"Attempting to get ZOTERO_USER_ID from `os.environ`...")
