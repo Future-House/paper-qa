@@ -204,7 +204,7 @@ class QAZotero(zotero.Zotero):
 
         for i in range(len(items)):
             self.logger.info(f"|  Adding paper {citations[i]} to Docs.")
-            docs.add(path=pdfs[i], citation=citations[i], key=items[i]["key"])
+            docs.add(path=pdfs[i], key=citations[i])
 
         self.logger.info(f"Done.")
         return docs
