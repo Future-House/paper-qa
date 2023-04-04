@@ -3,12 +3,12 @@ from langchain.chains import LLMChain
 from .qaprompts import select_paper_prompt, make_chain
 from .docs import Answer, Docs
 import paperscraper
-from langchain.agents import initialize_agent
+from langchain.agents import initialize_agent, Tool
 from langchain.chat_models import ChatOpenAI
 
 
 def status(answer: Answer, docs: Docs):
-    return f"| Papers: {len(docs.doc_previews)} Evidence: {len(answer.contexts)}"
+    return f"| Total Papers: {len(docs.doc_previews())} Total Evidence: {len(answer.contexts)} Total Cost: {answer.cost}"
 
 
 class PaperChoice(BaseTool):
@@ -27,10 +27,7 @@ class PaperChoice(BaseTool):
         self.chain = make_chain(select_paper_prompt, self.docs.summary_llm)
 
     def _run(self, query: str) -> str:
-        papers = [f"{d[1]}: {d[-1]}" for d in self.docs.doc_previews]
-        result = self.chain.run(instructions=query, papers="\n".join(papers))
-        if "None" in result:
-            result = "No relevant papers found"
+        result = self.docs.doc_match(query)
         return result + status(self.answer, self.docs)
 
     async def _arun(self, query: str) -> str:
@@ -66,7 +63,7 @@ class ReadPapers(BaseTool):
         old = self.answer.question
         self.answer.question = question
         # generator, so run it
-        list(self.docs.get_evidence(self.answer, key_filter=keys))
+        self.docs.get_evidence(self.answer, key_filter=keys)
         self.answer.question = old
         return status(self.answer, self.docs)
 
@@ -89,7 +86,7 @@ class AnswerTool(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        self.docs.query(query, answer=self.answer)
+        self.answer = self.docs.query(query, answer=self.answer)
         if "cannot answer" in self.answer.answer:
             self.answer = Answer(self.answer.question)
             return "Failed to answer question. Deleting evidence." + status(
@@ -118,7 +115,7 @@ class Search(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        papers = paperscraper.search_papers(query, verbose=False)
+        papers = paperscraper.search_papers(query, limit=20, verbose=False)
         for path, data in papers.items():
             try:
                 self.docs.add(path)
@@ -139,6 +136,13 @@ def make_tools(docs, answer):
     tools.append(PaperChoice(docs, answer))
     tools.append(AnswerTool(docs, answer))
     tools.append(Search(docs, answer))
+    tools.append(
+        Tool(
+            name="Reflect",
+            description="Use this tool if you are stuck or repeating the same steps",
+            func=lambda x: "Reflect on your process. Are you repeating the same steps? Are you stuck? If so, try to think of a new way to approach the problem.",
+        )
+    )
 
     return tools
 
@@ -153,7 +157,9 @@ def run_agent(docs, question, llm=None, budget=10000):
     )
     mrkl.run(
         f"Answer question: {question}. Find papers, gather evidence, and answer. "
-        "Once you have five pieces of evidence, call the Answer tool."
+        "Once you have five pieces of evidence, call the Answer tool. Reflect if stuck "
+        "and remember the tools are deterministic -- calling the same tool twice will give "
+        "the same result."
     )
 
     return answer

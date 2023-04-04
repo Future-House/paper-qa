@@ -43,6 +43,7 @@ class Answer:
     formatted_answer: str = ""
     passages: Dict[str, str] = None
     tokens: int = 0
+    cost: float = 0
 
     def __post_init__(self):
         """Initialize the answer."""
@@ -196,18 +197,20 @@ class Docs:
             for doc in self.docs.values()
         ]
 
-    async def adoc_match(self, query: str, k: int = 5) -> List[str]:
+    def doc_match(self, query: str, k: int = 25) -> List[str]:
         """Return a list of documents that match the query."""
         if self._doc_index is None or len(self.docs) != len(self._doc_index):
             texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
-            metadatas = [doc["metadata"][0]["dockey"] for doc in self.docs.values()]
+            metadatas = [
+                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs.values()
+            ]
             self._doc_index = FAISS.from_texts(
-                texts, metadatas=metadatas, embeddings=OpenAIEmbeddings()
+                texts, metadatas=metadatas, embedding=OpenAIEmbeddings()
             )
         docs = self._doc_index.max_marginal_relevance_search(query, k=k)
-        chain = make_chain(select_paper_prompt, self.docs.summary_llm)
-        papers = [f"{d.metadata}: {d.text}" for d in docs]
-        result = await chain.arun(instructions=query, papers="\n".join(papers))
+        chain = make_chain(select_paper_prompt, self.summary_llm)
+        papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
+        result = chain.run(instructions=query, papers="\n".join(papers))
         return result
 
     # to pickle, we have to save the index as a file
@@ -298,12 +301,13 @@ class Docs:
             docs = self._faiss_index.similarity_search(
                 answer.question, k=_k, fetch_k=5 * _k
             )
-        for doc in docs:
+
+        async def process(doc):
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
-                continue
+                return None
             # check if it is already in answer (possible in agent setting)
             if doc.metadata["key"] in [c[0] for c in answer.contexts]:
-                continue
+                return None
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
@@ -315,9 +319,24 @@ class Docs:
                 doc.page_content,
             )
             if "Not applicable" not in c[2]:
+                return c
+            return None
+
+        with get_openai_callback() as cb:
+            contexts = await asyncio.gather(*[process(doc) for doc in docs])
+        answer.tokens += cb.total_tokens
+        answer.cost += cb.total_cost
+        contexts = [c for c in contexts if c is not None]
+        if len(contexts) == 0:
+            return answer
+        contexts = sorted(contexts, key=lambda x: x[2], reverse=True)
+        contexts = contexts[:max_sources]
+        # add to answer (if not already there)
+        keys = [c[0] for c in answer.contexts]
+        for c in contexts:
+            if c[0] not in keys:
                 answer.contexts.append(c)
-            if len(answer.contexts) == max_sources:
-                break
+
         context_str = "\n\n".join(
             [f"{k}: {s}" for k, c, s, t in answer.contexts if "Not applicable" not in s]
         )
@@ -367,6 +386,7 @@ class Docs:
                 max_sources=max_sources,
                 length_prompt=length_prompt,
                 marginal_relevance=marginal_relevance,
+                answer=answer,
             )
         )
 
@@ -381,17 +401,15 @@ class Docs:
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
-        tokens = 0
         if answer is None:
             answer = Answer(query)
-        with get_openai_callback() as cb:
+        if len(answer.contexts) == 0:
             answer = await self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
             )
-            tokens += cb.total_tokens
         context_str, citations = answer.context, answer.contexts
         bib = dict()
         passages = dict()
@@ -404,7 +422,8 @@ class Docs:
                 answer_text = await self.qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )
-                tokens += cb.total_tokens
+            answer.tokens += cb.total_tokens
+            answer.cost += cb.total_cost
         # it still happens lol
         if "(Foo2012)" in answer_text:
             answer_text = answer_text.replace("(Foo2012)", "")
@@ -420,10 +439,9 @@ class Docs:
         formatted_answer = f"Question: {query}\n\n{answer_text}\n"
         if len(bib) > 0:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
-        formatted_answer += f"\nTokens Used: {tokens} Cost: ${tokens/1000 * 0.002:.2f}"
+        formatted_answer += f"\nTokens Used: {answer.tokens} Cost: ${answer.cost:.2f}"
         answer.answer = answer_text
         answer.formatted_answer = formatted_answer
         answer.references = bib_str
         answer.passages = passages
-        answer.tokens = tokens
         return answer

@@ -77,6 +77,20 @@ class Test(IsolatedAsyncioTestCase):
         os.remove(doc_path)
 
 
+def test_doc_match():
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    i = 0
+    result = docs.doc_match("What is Frederick Bates's greatest accomplishment?")
+    print(result)
+    os.remove(doc_path)
+
+
 def test_docs_pickle():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -183,7 +197,7 @@ def test_doc_preview():
         f.write(r.text)
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    assert len(docs.doc_previews) == 1
+    assert len(docs.doc_previews()) == 1
 
 
 def test_code():
