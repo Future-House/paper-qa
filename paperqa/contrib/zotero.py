@@ -13,7 +13,13 @@ StrPath = Union[str, Path]
 
 class QAZotero(zotero.Zotero):
     def __init__(
-        self, *, library_type: str = "user", library_id=None, api_key=None, storage=None, **kwargs
+        self,
+        *,
+        library_type: str = "user",
+        library_id=None,
+        api_key=None,
+        storage=None,
+        **kwargs,
     ):
         if library_id is None:
             if "ZOTERO_USER_ID" not in os.environ:
@@ -39,7 +45,7 @@ class QAZotero(zotero.Zotero):
 
         if storage is None:
             storage = CACHE_PATH.parent / "zotero"
-        
+
         self.storage = storage
 
         super().__init__(
@@ -74,18 +80,19 @@ class QAZotero(zotero.Zotero):
 
         return pdf_path
 
-    def gen_paperdb(self,
-                q=None,
-                qmode=None,
-                since=None,
-                tag=None,
-                sort=None,
-                direction=None,
-                limit=None,
-                start=None,
-                ):
+    def gen_paperdb(
+        self,
+        q=None,
+        qmode=None,
+        since=None,
+        tag=None,
+        sort=None,
+        direction=None,
+        limit=None,
+        start=None,
+    ):
         """Given a search query, this converts the Zotero library to a `paperqa.docs.Docs` object.
-        
+
         This will download all PDFs in the query.
         For information on parameters, see
         https://pyzotero.readthedocs.io/en/latest/?badge=latest#zotero.Zotero.add_parameters
@@ -129,7 +136,7 @@ class QAZotero(zotero.Zotero):
             query_kwargs["sort"] = sort
         if direction is not None:
             query_kwargs["direction"] = direction
-        
+
         # (We deal with start and limit manually)
         if limit is None:
             limit = 25
@@ -142,24 +149,44 @@ class QAZotero(zotero.Zotero):
         items = []
         pdfs = []
         citations = []
+        keys = []
         num_remaining = limit - len(items)
 
         while num_remaining > 0:
-            new_items = self.top(**query_kwargs, limit=min(max_limit, num_remaining), start=start)
+            new_items = self.top(
+                **query_kwargs, limit=min(max_limit, num_remaining), start=start
+            )
             items.extend(new_items)
             pdfs.extend([self.get_pdf(item) for item in new_items])
+            citations.extend([_get_citation_key(item) for item in new_items])
+            keys.extend([item["key"] for item in new_items])
             num_remaining = limit - len(items)
             start += len(new_items)
 
         docs = Docs()
 
+        for pdf, citation, key in zip(pdfs, citations):
+            docs.add(path=pdf, citation=citation, key=key)
+
+        return docs
+
 
 def _get_citation_key(item: dict) -> str:
-    if ("data" not in item or "creators" not in item["data"]:
-        or len(item["data"]["creators"]) == 0)
+    if (
+        "data" not in item
+        or "creators" not in item["data"]
+        or len(item["data"]["creators"]) == 0
+        or "title" not in item["data"]
+        or "date" not in item["data"]
+    ):
         return item["key"]
 
-        
+    last_name = item["data"]["creators"][0]["lastName"]
+    short_title = "".join(item["data"]["title"].split(" ")[:3])
+    year = item["data"]["date"]
+
+    return f"{last_name}{short_title}{year}_{item['key']}"
+
 
 def _extract_pdf_key(item: dict) -> str:
     """Extract the PDF key from a Zotero item."""
