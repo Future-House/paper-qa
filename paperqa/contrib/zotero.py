@@ -1,6 +1,6 @@
 # This file gets PDF files from the user's Zotero library
 import os
-from typing import Union
+from typing import Union, Optional
 from pathlib import Path
 import logging
 
@@ -28,9 +28,9 @@ class QAZotero(zotero.Zotero):
         self,
         *,
         library_type: str = "user",
-        library_id=None,
-        api_key=None,
-        storage=None,
+        library_id: Optional[str] = None,
+        api_key: Optional[str] = None,
+        storage: Optional[StrPath] = None,
         **kwargs,
     ):
         self.logger = logging.getLogger("QAZotero")
@@ -102,14 +102,14 @@ class QAZotero(zotero.Zotero):
 
     def gen_paperdb(
         self,
-        q=None,
-        qmode=None,
-        since=None,
-        tag=None,
-        sort=None,
-        direction=None,
-        limit=None,
-        start=None,
+        q: Optional[str] = None,
+        qmode: Optional[str] = None,
+        since: Optional[str] = None,
+        tag: Optional[str] = None,
+        sort: Optional[str] = None,
+        direction: Optional[str] = None,
+        limit: int = 25,
+        start: int = 0,
     ):
         """Given a search query, this converts the Zotero library to a `paperqa.docs.Docs` object.
 
@@ -157,19 +157,11 @@ class QAZotero(zotero.Zotero):
         if direction is not None:
             query_kwargs["direction"] = direction
 
-        # (We deal with start and limit manually)
-        if limit is None:
-            limit = 25
-
-        if start is None:
-            start = 0
-
         max_limit = 100
 
         items = []
         pdfs = []
         citations = []
-        keys = []
         num_remaining = limit - len(items)
 
         while num_remaining > 0:
