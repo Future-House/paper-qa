@@ -3,13 +3,22 @@ import os
 from typing import Union, Optional
 from pathlib import Path
 import logging
+from collections import namedtuple
 
 from pyzotero import zotero
 
 from ..docs import CACHE_PATH
-from .. import Docs
 
 StrPath = Union[str, Path]
+
+_ZoteroPaper = namedtuple(
+    "ZoteroPaper", ["key", "title", "pdf", "zotero_key", "details"]
+)
+
+
+class ZoteroPaper(_ZoteroPaper):
+    def __repr__(self) -> str:
+        return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
 
 
 class ZoteroQA(zotero.Zotero):
@@ -111,13 +120,20 @@ class ZoteroQA(zotero.Zotero):
         limit: int = 25,
         start: int = 0,
     ):
-        """Given a search query, this converts the Zotero library to a `paperqa.docs.Docs` object.
+        """Given a search query, this will lazily iterate over papers in a Zotero library, downloading PDFs as needed.
 
         This will download all PDFs in the query.
         For information on parameters, see
         https://pyzotero.readthedocs.io/en/latest/?badge=latest#zotero.Zotero.add_parameters
         For extra information on the query, see
         https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.
+
+        For each item, it will return a `ZoteroPaper` object, which has the following fields:
+
+            - `pdf`: The path to the PDF for the item (pass to `paperqa.Docs`)
+            - `key`: The citation key.
+            - `title`: The title of the item.
+            - `details`: The full item details from Zotero.
 
         Parameters
         ----------
@@ -161,21 +177,21 @@ class ZoteroQA(zotero.Zotero):
 
         items = []
         pdfs = []
-        citations = []
+        i = 0
+        actual_i = 0
         num_remaining = limit - len(items)
 
         while num_remaining > 0:
             cur_limit = min(max_limit, num_remaining)
             self.logger.info(f"Downloading new batch of up to {cur_limit} papers.")
-            _items = self.top(**query_kwargs, limit=cur_limit, start=start)
+            _items = self.top(**query_kwargs, limit=cur_limit, start=i)
             if len(_items) == 0:
                 break
-            start += cur_limit
+            i += cur_limit
             self.logger.info(f"Downloading PDFs.")
             _pdfs = [self.get_pdf(item) for item in _items]
 
             # Filter:
-            new_items = []
             for item, pdf in zip(_items, _pdfs):
                 no_pdf = item is None or pdf is None
                 is_duplicate = pdf in pdfs
@@ -183,24 +199,23 @@ class ZoteroQA(zotero.Zotero):
                 if no_pdf or is_duplicate:
                     continue
 
-                new_items.append(item)
+                title = item["data"]["title"] if "title" in item["data"] else ""
+                if len(items) >= start:
+                    yield ZoteroPaper(
+                        key=_get_citation_key(item),
+                        title=title,
+                        pdf=pdf,
+                        details=item,
+                        zotero_key=item["key"],
+                    )
+                    actual_i += 1
+
                 items.append(item)
                 pdfs.append(pdf)
 
-            citations.extend([_get_citation_key(item) for item in new_items])
-
-            num_remaining = limit - len(items)
+            num_remaining = limit - actual_i
 
         self.logger.info("Finished downloading papers. Now creating Docs object.")
-
-        docs = Docs()
-
-        for i in range(len(items)):
-            self.logger.info(f"|  Adding paper {citations[i]} to Docs.")
-            docs.add(path=pdfs[i], key=citations[i])
-
-        self.logger.info(f"Done.")
-        return docs
 
 
 def _get_citation_key(item: dict) -> str:
