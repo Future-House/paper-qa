@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html class="client-nojs vector-feature-language-in-header-enabled vector-feature-language-in-main-page-header-disabled vector-feature-language-alert-in-sidebar-enabled vector-feature-sticky-header-disabled vector-feature-page-tools-enabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-enabled vector-feature-main-menu-pinned-disabled vector-feature-limited-width-enabled vector-feature-limited-width-content-enabled" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<title>Frederick Bates (politician) - Wikipedia</title>
+<script>document.documentElement.className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-page-header-disabled vector-feature-language-alert-in-sidebar-enabled vector-feature-sticky-header-disabled vector-feature-page-tools-enabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-enabled vector-feature-main-menu-pinned-disabled vector-feature-limited-width-enabled vector-feature-limited-width-content-enabled";(function(){var cookie=document.cookie.match(/(?:^|; )enwikimwclientprefs=([^;]+)/);if(cookie){var featureName=cookie[1];document.documentElement.className=document.documentElement.className.replace(featureName+'-enabled',featureName+'-disabled');}}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":
+"22cd0c7e-9824-4d1c-9281-ffc064395709","wgCSPNonce":false,"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Frederick_Bates_(politician)","wgTitle":"Frederick Bates (politician)","wgCurRevisionId":1148264453,"wgRevisionId":1148264453,"wgArticleId":315502,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Articles with short description","Short description is different from Wikidata","Articles with FAST identifiers","Articles with ISNI identifiers","Articles with VIAF identifiers","Articles with WorldCat identifiers","Articles with GND identifiers","Articles with LCCN identifiers","Articles with SNAC-ID identifiers","1777 births","1825 deaths","People from Loudoun County, Virginia","Missouri Democratic-Republicans","Missouri Territory officials","Governors of Missouri","Michigan postmasters","People from St. Louis County, Missouri","Justices of the Michigan Supreme Court",
+"Democratic-Republican Party state governors of the United States","19th-century American judges","19th-century American lawyers"],"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Frederick_Bates_(politician)","wgRelevantArticleId":315502,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":8000,"wgNoticeProject":"wikipedia","wgVector2022PreviewPages":[],"wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":10,"wgULSCurrentAutonym":"English","wgEditSubmitButtonLabelPublish":true,"wgCentralAuthMobileDomain":false,"wgULSPosition":"interlanguage",
+"wgULSisCompactLinksEnabled":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q1452792","GEHomepageSuggestedEditsEnableTopics":true,"wgGETopicsMatchModeEnabled":false,"wgGEStructuredTaskRejectionReasonTextInputEnabled":false,"wgGELevelingUpEnabledForUser":false};RLSTATE={"skins.vector.user.styles":"ready","ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","skins.vector.user":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.cite.styles":"ready","mediawiki.ui.button":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","mediawiki.ui.icon":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.wikimediaBadges":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","mediawiki.toc","skins.vector.js","skins.vector.es6","mmv.head",
+"mmv.bootstrap.autostart","ext.visualEditor.desktopArticleTarget.init","ext.visualEditor.targetLoader","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.cx.eventlogging.campaigns","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.charinsert","ext.gadget.extra-toolbar-buttons","ext.gadget.switcher","ext.centralauth.centralautologin","ext.popups","ext.echo.centralauth","ext.uls.compactlinks","ext.uls.interface","ext.cx.uls.quick.actions","wikibase.client.vector-2022","ext.growthExperiments.SuggestedEditSession"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.implement("user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.cite.styles%7Cext.uls.interlanguage%7Cext.visualEditor.desktopArticleTarget.noscript%7Cext.wikimediaBadges%7Cjquery.makeCollapsible.styles%7Cmediawiki.ui.button%2Cicon%7Cskins.vector.icons%2Cstyles%7Cwikibase.client.init&amp;only=styles&amp;skin=vector-2022"/>
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector-2022"></script>
+<meta name="ResourceLoaderDynamicStyles" content=""/>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector-2022"/>
+<meta name="generator" content="MediaWiki 1.41.0-wmf.2"/>
+<meta name="referrer" content="origin"/>
+<meta name="referrer" content="origin-when-crossorigin"/>
+<meta name="referrer" content="origin-when-cross-origin"/>
+<meta name="robots" content="max-image-preview:standard"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/1/10/Frederick_Bates.jpg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="1492"/>
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/1/10/Frederick_Bates.jpg"/>
+<meta property="og:image:width" content="800"/>
+<meta property="og:image:height" content="995"/>
+<meta property="og:image:width" content="640"/>
+<meta property="og:image:height" content="796"/>
+<meta name="viewport" content="width=1000"/>
+<meta property="og:title" content="Frederick Bates (politician) - Wikipedia"/>
+<meta property="og:type" content="website"/>
+<link rel="preconnect" href="//upload.wikimedia.org"/>
+<link rel="alternate" media="only screen and (max-width: 720px)" href="//en.m.wikipedia.org/wiki/Frederick_Bates_(politician)"/>
+<link rel="alternate" type="application/x-wiki" title="Edit this page" href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit"/>
+<link rel="apple-touch-icon" href="/static/apple-touch/wikipedia.png"/>
+<link rel="icon" href="/static/favicon/wikipedia.ico"/>
+<link rel="search" type="application/opensearchdescription+xml" href="/w/opensearch_desc.php" title="Wikipedia (en)"/>
+<link rel="EditURI" type="application/rsd+xml" href="//en.wikipedia.org/w/api.php?action=rsd"/>
+<link rel="canonical" href="https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"/>
+<link rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/"/>
+<link rel="alternate" type="application/atom+xml" title="Wikipedia Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom"/>
+<link rel="dns-prefetch" href="//meta.wikimedia.org" />
+<link rel="dns-prefetch" href="//login.wikimedia.org"/>
+</head>
+<body class="skin-vector skin-vector-search-vue mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject mw-editable page-Frederick_Bates_politician rootpage-Frederick_Bates_politician skin-vector-2022 action-view"><div class="mw-page-container">
+	<a class="mw-jump-link" href="#bodyContent">Jump to content</a>
+	<div class="mw-page-container-inner">
+		<input
+			type="checkbox"
+			id="mw-sidebar-checkbox"
+			class="mw-checkbox-hack-checkbox"
+			>
+		<header class="mw-header">
+			<div class="vector-header-start">
+					<nav class="vector-main-menu-landmark" aria-label="Site" role="navigation">
+						
+<div id="vector-main-menu-dropdown" class="vector-menu vector-dropdown vector-menu-dropdown vector-main-menu-dropdown mw-ui-icon-flush-left mw-ui-icon-flush-right"  >
+	<input type="checkbox"
+		id="vector-main-menu-dropdown-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-vector-main-menu-dropdown"
+		class="vector-menu-checkbox "
+		
+		aria-label="Main menu"
+		
+	/>
+	<label
+		id="vector-main-menu-dropdown-label"
+		for="vector-main-menu-dropdown-checkbox"
+		class="vector-menu-heading mw-checkbox-hack-button mw-ui-button mw-ui-quiet mw-ui-icon-element "
+		aria-hidden="true"
+		
+	>
+		<span class="mw-ui-icon mw-ui-icon-menu mw-ui-icon-wikimedia-menu"></span>
+
+		<span class="vector-menu-heading-label">Main menu</span>
+	</label>
+	<div class="vector-menu-content vector-dropdown-content">
+
+
+					<div id="vector-main-menu-unpinned-container" class="vector-unpinned-container">
+		
+<div id="vector-main-menu" class="vector-main-menu vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-main-menu-pinnable-header vector-pinnable-header-unpinned"
+	data-feature-name="main-menu-pinned"
+	data-pinnable-element-id="vector-main-menu"
+	data-pinned-container-id="vector-main-menu-pinned-container"
+	data-unpinned-container-id="vector-main-menu-unpinned-container"
+>
+	<div class="vector-pinnable-header-label">Main menu</div>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-main-menu.pin">move to sidebar</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-main-menu.unpin">hide</button>
+</div>
+
+
+	
+<div id="p-navigation" class="vector-menu mw-portlet mw-portlet-navigation"  >
+	<div class="vector-menu-heading">
+		Navigation
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main page</span></a></li><li id="n-contents" class="mw-list-item"><a href="/wiki/Wikipedia:Contents" title="Guides to browsing Wikipedia"><span>Contents</span></a></li><li id="n-currentevents" class="mw-list-item"><a href="/wiki/Portal:Current_events" title="Articles related to current events"><span>Current events</span></a></li><li id="n-randompage" class="mw-list-item"><a href="/wiki/Special:Random" title="Visit a randomly selected article [x]" accesskey="x"><span>Random article</span></a></li><li id="n-aboutsite" class="mw-list-item"><a href="/wiki/Wikipedia:About" title="Learn about Wikipedia and how it works"><span>About Wikipedia</span></a></li><li id="n-contactpage" class="mw-list-item"><a href="//en.wikipedia.org/wiki/Wikipedia:Contact_us" title="How to contact Wikipedia"><span>Contact us</span></a></li><li id="n-sitesupport" class="mw-list-item"><a href="https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_en.wikipedia.org&amp;uselang=en" title="Support us by donating to the Wikimedia Foundation"><span>Donate</span></a></li></ul>
+		
+	</div>
+</div>
+
+	
+	
+<div id="p-interaction" class="vector-menu mw-portlet mw-portlet-interaction"  >
+	<div class="vector-menu-heading">
+		Contribute
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="n-help" class="mw-list-item"><a href="/wiki/Help:Contents" title="Guidance on how to use and edit Wikipedia"><span>Help</span></a></li><li id="n-introduction" class="mw-list-item"><a href="/wiki/Help:Introduction" title="Learn how to edit Wikipedia"><span>Learn to edit</span></a></li><li id="n-portal" class="mw-list-item"><a href="/wiki/Wikipedia:Community_portal" title="The hub for editors"><span>Community portal</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes to Wikipedia [r]" accesskey="r"><span>Recent changes</span></a></li><li id="n-upload" class="mw-list-item"><a href="/wiki/Wikipedia:File_upload_wizard" title="Add images or other media for use on Wikipedia"><span>Upload file</span></a></li></ul>
+		
+	</div>
+</div>
+
+	
+<div class="vector-main-menu-action vector-main-menu-action-lang-alert">
+	<div class="vector-main-menu-action-item">
+		<div class="vector-main-menu-action-heading vector-menu-heading">Languages</div>
+		<div class="vector-main-menu-action-content vector-menu-content">
+			<div class="mw-message-box-notice vector-language-sidebar-alert mw-message-box">Language links are at the top of the page across from the title.</div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+					</div>
+
+	</div>
+</div>
+			</nav>
+				
+<a href="/wiki/Main_Page" class="mw-logo">
+	<img class="mw-logo-icon" src="/static/images/icons/wikipedia.png" alt=""
+		aria-hidden="true" height="50" width="50">
+	<span class="mw-logo-container">
+		<img class="mw-logo-wordmark" alt="Wikipedia"
+			src="/static/images/mobile/copyright/wikipedia-wordmark-en.svg" style="width: 7.5em; height: 1.125em;">
+		<img class="mw-logo-tagline"
+			alt="The Free Encyclopedia"
+			src="/static/images/mobile/copyright/wikipedia-tagline-en.svg" width="117" height="13" style="width: 7.3125em; height: 0.8125em;">
+	</span>
+</a>
+
+			</div>
+			<div class="vector-header-end">
+				
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-collapses  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<a href="/wiki/Special:Search"
+	
+		
+		
+		
+		title="Search Wikipedia [f]"
+		accesskey="f"
+		class="mw-ui-button mw-ui-quiet mw-ui-icon mw-ui-icon-element mw-ui-icon-wikimedia-search search-toggle">
+		<span>Search</span>
+	</a>
+	
+	<div>
+		<form action="/w/index.php" id="searchform"
+			class="vector-search-box-form">
+			<div id="simpleSearch"
+				class="vector-search-box-inner"
+				 data-search-loc="header-moved">
+				<input class="vector-search-box-input"
+					 type="search" name="search" placeholder="Search Wikipedia" aria-label="Search Wikipedia" autocapitalize="sentences" title="Search Wikipedia [f]" accesskey="f" id="searchInput"
+				>
+				<input type="hidden" name="title" value="Special:Search">
+				<input id="mw-searchButton"
+					 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search Wikipedia for this text" value="Search">
+				<input id="searchButton"
+					 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+			</div>
+		</form>
+	</div>
+</div>
+
+				<nav class="vector-user-links" aria-label="Personal tools" role="navigation" >
+	
+<div id="p-vector-user-menu-overflow" class="vector-menu mw-portlet mw-portlet-vector-user-menu-overflow"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="pt-createaccount-2" class="user-links-collapsible-item mw-list-item"><a href="/w/index.php?title=Special:CreateAccount&amp;returnto=Frederick+Bates+%28politician%29" title="You are encouraged to create an account and log in; however, it is not mandatory"><span>Create account</span></a></li><li id="pt-login-2" class="user-links-collapsible-item mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Frederick+Bates+%28politician%29" title="You&#039;re encouraged to log in; however, it&#039;s not mandatory. [o]" accesskey="o"><span>Log in</span></a></li></ul>
+		
+	</div>
+</div>
+
+	
+<div id="vector-user-links-dropdown" class="vector-menu vector-dropdown vector-menu-dropdown vector-user-menu mw-ui-icon-flush-right vector-user-menu-logged-out"  title="Log in and more options" >
+	<input type="checkbox"
+		id="vector-user-links-dropdown-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-vector-user-links-dropdown"
+		class="vector-menu-checkbox "
+		
+		aria-label="Personal tools"
+		
+	/>
+	<label
+		id="vector-user-links-dropdown-label"
+		for="vector-user-links-dropdown-checkbox"
+		class="vector-menu-heading mw-checkbox-hack-button mw-ui-button mw-ui-quiet mw-ui-icon-element "
+		aria-hidden="true"
+		
+	>
+		<span class="mw-ui-icon mw-ui-icon-ellipsis mw-ui-icon-wikimedia-ellipsis"></span>
+
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</label>
+	<div class="vector-menu-content vector-dropdown-content">
+
+
+		
+<div id="p-personal" class="vector-menu mw-portlet mw-portlet-personal user-links-collapsible-item"  title="User menu" >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="pt-createaccount" class="user-links-collapsible-item mw-list-item"><a href="/w/index.php?title=Special:CreateAccount&amp;returnto=Frederick+Bates+%28politician%29" title="You are encouraged to create an account and log in; however, it is not mandatory"><span class="mw-ui-icon mw-ui-icon-userAdd mw-ui-icon-wikimedia-userAdd"></span> <span>Create account</span></a></li><li id="pt-login" class="user-links-collapsible-item mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Frederick+Bates+%28politician%29" title="You&#039;re encouraged to log in; however, it&#039;s not mandatory. [o]" accesskey="o"><span class="mw-ui-icon mw-ui-icon-logIn mw-ui-icon-wikimedia-logIn"></span> <span>Log in</span></a></li></ul>
+		
+	</div>
+</div>
+
+<div id="p-user-menu-anon-editor" class="vector-menu mw-portlet mw-portlet-user-menu-anon-editor"  >
+	<div class="vector-menu-heading">
+		Pages for logged out editors <a href="/wiki/Help:Introduction" aria-label="Learn more about editing"><span>learn more</span></a>
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="pt-anoncontribs" class="mw-list-item"><a href="/wiki/Special:MyContributions" title="A list of edits made from this IP address [y]" accesskey="y"><span>Contributions</span></a></li><li id="pt-anontalk" class="mw-list-item"><a href="/wiki/Special:MyTalk" title="Discussion about edits from this IP address [n]" accesskey="n"><span>Talk</span></a></li></ul>
+		
+	</div>
+</div>
+
+	
+	</div>
+</div>
+</nav>
+
+			</div>
+		</header>
+		<div class="vector-main-menu-container ">
+			<div id="mw-navigation">
+				<nav id="mw-panel" class="vector-main-menu-landmark" aria-label="Site" role="navigation">
+							<div id="vector-main-menu-pinned-container" class="vector-pinned-container">
+						
+							</div>
+		</nav>
+			</div>
+		</div>
+		<div class="vector-sitenotice-container">
+			<div id="siteNotice"><!-- CentralNotice --></div>
+		</div>
+		<input type="checkbox" id="vector-toc-collapsed-checkbox" class="mw-checkbox-hack-checkbox">
+		<nav id="mw-panel-toc" role="navigation" aria-label="Contents" data-event-name="ui.sidebar-toc" class="mw-table-of-contents-container vector-toc-landmark">
+			<div id="vector-toc-pinned-container" class="vector-pinned-container">
+					<div id="vector-toc" class="vector-toc vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-toc-pinnable-header vector-pinnable-header-pinned"
+	data-feature-name="toc-pinned"
+	data-pinnable-element-id="vector-toc"
+	
+	
+>
+	<h2 class="vector-pinnable-header-label">Contents</h2>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-toc.pin">move to sidebar</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-toc.unpin">hide</button>
+</div>
+
+
+	<ul class="vector-toc-contents" id="mw-panel-toc-list">
+		<li id="toc-mw-content-text"
+			class="vector-toc-list-item vector-toc-level-1">
+			<a href="#" class="vector-toc-link">
+				<div class="vector-toc-text">(Top)</div>
+			</a>
+		</li>
+		<li id="toc-Early_life_and_education"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Early_life_and_education">
+			<div class="vector-toc-text">
+			<span class="vector-toc-numb">1</span>Early life and education</div>
+		</a>
+		
+		<ul id="toc-Early_life_and_education-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Career"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Career">
+			<div class="vector-toc-text">
+			<span class="vector-toc-numb">2</span>Career</div>
+		</a>
+		
+		<ul id="toc-Career-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Marriage_and_family"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Marriage_and_family">
+			<div class="vector-toc-text">
+			<span class="vector-toc-numb">3</span>Marriage and family</div>
+		</a>
+		
+		<ul id="toc-Marriage_and_family-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Legacy_and_honors"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Legacy_and_honors">
+			<div class="vector-toc-text">
+			<span class="vector-toc-numb">4</span>Legacy and honors</div>
+		</a>
+		
+		<ul id="toc-Legacy_and_honors-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-References"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#References">
+			<div class="vector-toc-text">
+			<span class="vector-toc-numb">5</span>References</div>
+		</a>
+		
+		<ul id="toc-References-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-External_links"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#External_links">
+			<div class="vector-toc-text">
+			<span class="vector-toc-numb">6</span>External links</div>
+		</a>
+		
+		<ul id="toc-External_links-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+</ul>
+</div>
+
+			</div>
+		</nav>
+		<div class="mw-content-container">
+			<main id="content" class="mw-body" role="main">
+				<header class="mw-body-header vector-page-titlebar">
+					<label
+						id="vector-toc-collapsed-button"
+						class="mw-ui-button mw-ui-quiet mw-ui-icon mw-ui-icon-flush-left mw-ui-icon-element mw-ui-icon-wikimedia-listBullet mw-checkbox-hack-button"
+						for="vector-toc-collapsed-checkbox"
+						role="button"
+						aria-controls="toc-toggle-list"
+						data-event-name="vector.toc-toggle-list"
+						tabindex="0"
+						title="Table of Contents">
+						Toggle the table of contents
+					</label>
+				
+					<nav role="navigation" aria-label="Contents" class="vector-toc-landmark">
+						
+<div id="vector-page-titlebar-toc" class="vector-menu vector-dropdown vector-menu-dropdown vector-page-titlebar-toc mw-ui-icon-flush-left"  >
+	<input type="checkbox"
+		id="vector-page-titlebar-toc-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-vector-page-titlebar-toc"
+		class="vector-menu-checkbox "
+		
+		aria-label="Toggle the table of contents"
+		
+	/>
+	<label
+		id="vector-page-titlebar-toc-label"
+		for="vector-page-titlebar-toc-checkbox"
+		class="vector-menu-heading mw-checkbox-hack-button mw-ui-button mw-ui-quiet mw-ui-icon-element "
+		aria-hidden="true"
+		
+	>
+		<span class="mw-ui-icon mw-ui-icon-listBullet mw-ui-icon-wikimedia-listBullet"></span>
+
+		<span class="vector-menu-heading-label">Toggle the table of contents</span>
+	</label>
+	<div class="vector-menu-content vector-dropdown-content">
+
+
+							<div id="vector-page-titlebar-toc-unpinned-container" class="vector-unpinned-container">
+			</div>
+		
+	</div>
+</div>
+					</nav>
+					<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">Frederick Bates (politician)</span></h1>
+				
+							
+<div id="p-lang-btn" class="vector-menu vector-dropdown vector-menu-dropdown mw-portlet mw-portlet-lang"  >
+	<input type="checkbox"
+		id="p-lang-btn-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-lang-btn"
+		class="vector-menu-checkbox mw-interlanguage-selector"
+		aria-label="Go to an article in another language. Available in 5 languages"
+		
+		
+	/>
+	<label
+		id="p-lang-btn-label"
+		for="p-lang-btn-checkbox"
+		class="vector-menu-heading mw-ui-button mw-ui-quiet mw-ui-progressive mw-portlet-lang-heading-5"
+		aria-hidden="true"
+		
+	>
+		<span class="mw-ui-icon mw-ui-icon-language-progressive mw-ui-icon-wikimedia-language-progressive"></span>
+
+		<span class="vector-menu-heading-label">5 languages</span>
+	</label>
+	<div class="vector-menu-content vector-dropdown-content">
+
+		<div class="vector-menu-content">
+			
+			<ul class="vector-menu-content-list"><li class="interlanguage-link interwiki-ar mw-list-item"><a href="https://ar.wikipedia.org/wiki/%D9%81%D8%B1%D9%8A%D8%AF%D8%B1%D9%8A%D9%83_%D8%A8%D9%8A%D8%AA%D8%B3" title="فريدريك بيتس – Arabic" lang="ar" hreflang="ar" class="interlanguage-link-target"><span>العربية</span></a></li><li class="interlanguage-link interwiki-de mw-list-item"><a href="https://de.wikipedia.org/wiki/Frederick_Bates" title="Frederick Bates – German" lang="de" hreflang="de" class="interlanguage-link-target"><span>Deutsch</span></a></li><li class="interlanguage-link interwiki-fr mw-list-item"><a href="https://fr.wikipedia.org/wiki/Frederick_Bates_(homme_politique)" title="Frederick Bates (homme politique) – French" lang="fr" hreflang="fr" class="interlanguage-link-target"><span>Français</span></a></li><li class="interlanguage-link interwiki-arz mw-list-item"><a href="https://arz.wikipedia.org/wiki/%D9%81%D8%B1%D9%8A%D8%AF%D8%B1%D9%8A%D9%83_%D8%A8%D9%8A%D8%AA%D8%B3" title="فريدريك بيتس – Egyptian Arabic" lang="arz" hreflang="arz" class="interlanguage-link-target"><span>مصرى</span></a></li><li class="interlanguage-link interwiki-sv mw-list-item"><a href="https://sv.wikipedia.org/wiki/Frederick_Bates_(politiker)" title="Frederick Bates (politiker) – Swedish" lang="sv" hreflang="sv" class="interlanguage-link-target"><span>Svenska</span></a></li></ul>
+			<div class="after-portlet after-portlet-lang"><span class="wb-langlinks-edit wb-langlinks-link"><a href="https://www.wikidata.org/wiki/Special:EntityPage/Q1452792#sitelinks-wikipedia" title="Edit interlanguage links" class="wbc-editpage">Edit links</a></span></div>
+		</div>
+
+	</div>
+</div>
+				</header>
+				<div class="vector-page-toolbar">
+					<div class="vector-page-toolbar-container">
+						<div id="left-navigation">
+							<nav aria-label="Namespaces">
+								
+<div id="p-associated-pages" class="vector-menu vector-menu-tabs mw-portlet mw-portlet-associated-pages"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			<li id="ca-nstab-main" class="selected vector-tab-noicon mw-list-item"><a data-mw="interface" href="/wiki/Frederick_Bates_(politician)" title="View the content page [c]" accesskey="c" class=""><span>Article</span></a>
+</li>
+<li id="ca-talk" class="vector-tab-noicon mw-list-item"><a data-mw="interface" href="/wiki/Talk:Frederick_Bates_(politician)" rel="discussion" title="Discuss improvements to the content page [t]" accesskey="t" class=""><span>Talk</span></a>
+</li>
+
+		</ul>
+		
+	</div>
+</div>
+
+								
+
+<div id="p-variants" class="vector-menu vector-dropdown vector-menu-dropdown mw-portlet mw-portlet-variants emptyPortlet"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-label="Change language variant"
+		
+		
+	/>
+	<label
+		id="p-variants-label"
+		for="p-variants-checkbox"
+		class="vector-menu-heading "
+		aria-hidden="true"
+		
+	>
+		
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content vector-dropdown-content">
+
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"></ul>
+		
+	</div>
+
+	</div>
+</div>
+							</nav>
+						</div>
+						<div id="right-navigation" class="vector-collapsible">
+							<nav aria-label="Views">
+								
+<div id="p-views" class="vector-menu vector-menu-tabs mw-portlet mw-portlet-views"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			<li id="ca-view" class="selected vector-tab-noicon mw-list-item"><a data-mw="interface" href="/wiki/Frederick_Bates_(politician)" class=""><span>Read</span></a>
+</li>
+<li id="ca-edit" class="vector-tab-noicon mw-list-item"><a data-mw="interface" href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit" title="Edit this page [e]" accesskey="e" class=""><span>Edit</span></a>
+</li>
+<li id="ca-history" class="vector-tab-noicon mw-list-item"><a data-mw="interface" href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=history" title="Past revisions of this page [h]" accesskey="h" class=""><span>View history</span></a>
+</li>
+
+		</ul>
+		
+	</div>
+</div>
+
+							</nav>
+				
+							<nav class="vector-page-tools-landmark" aria-label="More options">
+								
+<div id="vector-page-tools-dropdown" class="vector-menu vector-dropdown vector-menu-dropdown vector-page-tools-dropdown"  >
+	<input type="checkbox"
+		id="vector-page-tools-dropdown-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-vector-page-tools-dropdown"
+		class="vector-menu-checkbox "
+		
+		aria-label="Tools"
+		
+	/>
+	<label
+		id="vector-page-tools-dropdown-label"
+		for="vector-page-tools-dropdown-checkbox"
+		class="vector-menu-heading "
+		aria-hidden="true"
+		
+	>
+		
+		<span class="vector-menu-heading-label">Tools</span>
+	</label>
+	<div class="vector-menu-content vector-dropdown-content">
+
+
+									<div id="vector-page-tools-unpinned-container" class="vector-unpinned-container">
+						
+<div id="vector-page-tools" class="vector-page-tools vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-page-tools-pinnable-header vector-pinnable-header-unpinned"
+	data-feature-name="page-tools-pinned"
+	data-pinnable-element-id="vector-page-tools"
+	data-pinned-container-id="vector-page-tools-pinned-container"
+	data-unpinned-container-id="vector-page-tools-unpinned-container"
+>
+	<div class="vector-pinnable-header-label">Tools</div>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-page-tools.pin">move to sidebar</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-page-tools.unpin">hide</button>
+</div>
+
+	
+<div id="p-cactions" class="vector-menu mw-portlet mw-portlet-cactions emptyPortlet vector-has-collapsible-items"  title="More options" >
+	<div class="vector-menu-heading">
+		Actions
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="ca-more-view" class="selected vector-more-collapsible-item mw-list-item"><a href="/wiki/Frederick_Bates_(politician)"><span>Read</span></a></li><li id="ca-more-edit" class="vector-more-collapsible-item mw-list-item"><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit"><span>Edit</span></a></li><li id="ca-more-history" class="vector-more-collapsible-item mw-list-item"><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=history"><span>View history</span></a></li></ul>
+		
+	</div>
+</div>
+
+<div id="p-tb" class="vector-menu mw-portlet mw-portlet-tb"  >
+	<div class="vector-menu-heading">
+		General
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Frederick_Bates_(politician)" title="List of all English Wikipedia pages containing links to this page [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Frederick_Bates_(politician)" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-upload" class="mw-list-item"><a href="/wiki/Wikipedia:File_Upload_Wizard" title="Upload files [u]" accesskey="u"><span>Upload file</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;oldid=1148264453" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=info" title="More information about this page"><span>Page information</span></a></li><li id="t-cite" class="mw-list-item"><a href="/w/index.php?title=Special:CiteThisPage&amp;page=Frederick_Bates_%28politician%29&amp;id=1148264453&amp;wpFormIdentifier=titleform" title="Information on how to cite this page"><span>Cite this page</span></a></li><li id="t-wikibase" class="mw-list-item"><a href="https://www.wikidata.org/wiki/Special:EntityPage/Q1452792" title="Structured data on this page hosted by Wikidata [g]" accesskey="g"><span>Wikidata item</span></a></li></ul>
+		
+	</div>
+</div>
+
+<div id="p-coll-print_export" class="vector-menu mw-portlet mw-portlet-coll-print_export"  >
+	<div class="vector-menu-heading">
+		Print/export
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:DownloadAsPdf&amp;page=Frederick_Bates_%28politician%29&amp;action=show-download-screen" title="Download this page as a PDF file"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li></ul>
+		
+	</div>
+</div>
+
+<div id="p-wikibase-otherprojects" class="vector-menu mw-portlet mw-portlet-wikibase-otherprojects"  >
+	<div class="vector-menu-heading">
+		In other projects
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list"><li class="wb-otherproject-link wb-otherproject-commons mw-list-item"><a href="https://commons.wikimedia.org/wiki/Category:Frederick_Bates" hreflang="en"><span>Wikimedia Commons</span></a></li></ul>
+		
+	</div>
+</div>
+
+</div>
+
+									</div>
+				
+	</div>
+</div>
+								
+							</nav>
+						</div>
+					</div>
+				</div>
+				<div class="vector-column-end">
+	<nav class="vector-page-tools-landmark" aria-label="More options">
+		<div id="vector-page-tools-pinned-container" class="vector-pinned-container">
+			
+		</div>
+	</nav>
+</div>
+
+				<div id="bodyContent" class="vector-body" aria-labelledby="firstHeading" data-mw-ve-target-container>
+					<div class="vector-body-before-content">
+							<div class="mw-indicators">
+		</div>
+
+						<div id="siteSub" class="noprint">From Wikipedia, the free encyclopedia</div>
+					</div>
+					<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+					
+					
+					<div id="mw-content-text" class="mw-body-content mw-content-ltr" lang="en" dir="ltr"><div class="mw-parser-output"><div class="shortdescription nomobile noexcerpt noprint searchaux" style="display:none">American judge</div>
+<style data-mw-deduplicate="TemplateStyles:r1066479718">.mw-parser-output .infobox-subbox{padding:0;border:none;margin:-3px;width:auto;min-width:100%;font-size:100%;clear:none;float:none;background-color:transparent}.mw-parser-output .infobox-3cols-child{margin:auto}.mw-parser-output .infobox .navbar{font-size:100%}body.skin-minerva .mw-parser-output .infobox-header,body.skin-minerva .mw-parser-output .infobox-subheader,body.skin-minerva .mw-parser-output .infobox-above,body.skin-minerva .mw-parser-output .infobox-title,body.skin-minerva .mw-parser-output .infobox-image,body.skin-minerva .mw-parser-output .infobox-full-data,body.skin-minerva .mw-parser-output .infobox-below{text-align:center}</style><table class="infobox vcard"><tbody><tr><th colspan="2" class="infobox-above" style="font-size: 100%;"><div class="fn" style="font-size:125%;">Frederick Bates</div></th></tr><tr><td colspan="2" class="infobox-image"><a href="/wiki/File:Frederick_Bates.jpg" class="image"><img alt="Frederick Bates.jpg" src="//upload.wikimedia.org/wikipedia/commons/thumb/1/10/Frederick_Bates.jpg/220px-Frederick_Bates.jpg" decoding="async" width="220" height="274" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/10/Frederick_Bates.jpg/330px-Frederick_Bates.jpg 1.5x, //upload.wikimedia.org/wikipedia/commons/1/10/Frederick_Bates.jpg 2x" data-file-width="378" data-file-height="470" /></a></td></tr><tr><td colspan="2" class="infobox-full-data"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1066479718"/></td></tr><tr><th colspan="2" class="infobox-header" style="background:lavender;line-height:normal;padding:0.2em;">2nd <a href="/wiki/List_of_governors_of_Missouri" title="List of governors of Missouri">Governor of Missouri</a></th></tr><tr><td colspan="2" class="infobox-full-data" style="border-bottom:none"><span class="nowrap"><b>In office</b></span><br />November 15, 1824&#160;–&#32;August 4, 1825</td><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1066479718"/></tr><tr><th scope="row" class="infobox-label" style="text-align:left">Lieutenant</th><td class="infobox-data"><a href="/wiki/Benjamin_Harrison_Reeves" title="Benjamin Harrison Reeves">Benjamin Harrison Reeves</a></td></tr><tr><th scope="row" class="infobox-label" style="text-align:left"><span class="nowrap">Preceded by</span></th><td class="infobox-data"><a href="/wiki/Alexander_McNair" title="Alexander McNair">Alexander McNair</a></td></tr><tr><th scope="row" class="infobox-label" style="text-align:left"><span class="nowrap">Succeeded by</span></th><td class="infobox-data"><a href="/wiki/Abraham_J._Williams" title="Abraham J. Williams">Abraham J. Williams</a></td></tr><tr style="display:none"><td colspan="2">
+</td></tr><tr><th colspan="2" class="infobox-header" style="background:lavender">Personal details</th></tr><tr><th scope="row" class="infobox-label">Born</th><td class="infobox-data"><span style="display:none">(<span class="bday">1777-06-23</span>)</span>June 23, 1777<br /><a href="/w/index.php?title=Belmont_Manor_house&amp;action=edit&amp;redlink=1" class="new" title="Belmont Manor house (page does not exist)">Belmont</a>, <a href="/wiki/Goochland_County" class="mw-redirect" title="Goochland County">Goochland County</a>, <a href="/wiki/Virginia" title="Virginia">Virginia</a>, U.S.</td></tr><tr><th scope="row" class="infobox-label">Died</th><td class="infobox-data">August 4, 1825<span style="display:none">(1825-08-04)</span> (aged&#160;48)<br /><a href="/wiki/Chesterfield,_Missouri" title="Chesterfield, Missouri">Chesterfield, Missouri</a>, U.S.</td></tr><tr><th scope="row" class="infobox-label">Spouse</th><td class="infobox-data">Nancy Opie Ball</td></tr><tr><th scope="row" class="infobox-label">Relations</th><td class="infobox-data"><a href="/wiki/Edward_Bates" title="Edward Bates">Edward</a> (brother), <a href="/wiki/James_Woodson_Bates" title="James Woodson Bates">James</a> (brother); see <a href="/wiki/Bates_family" title="Bates family">Bates extended family</a></td></tr><tr><th scope="row" class="infobox-label">Children</th><td class="infobox-data">Emily Caroline (1820–1891), Lucius Lee (1821–1898), Woodville (1823–1840) and Frederick Jr. (1826–1862)</td></tr><tr><td colspan="2" class="infobox-below" style="border-top: 1px solid right; font-size: 95%"><div></div></td></tr></tbody></table>
+<p><b>Frederick Bates</b> (June 23, 1777 &#8211; August 4, 1825), was an American <a href="/wiki/Lawyer" title="Lawyer">attorney</a> and politician. He was <a href="/wiki/1824_Missouri_gubernatorial_election" title="1824 Missouri gubernatorial election">elected in 1824</a> as the second governor of <a href="/wiki/Missouri" title="Missouri">Missouri</a> and died in office in 1825. Before that he had served as a justice of the Territorial Supreme Court for <a href="/wiki/Michigan_Territory" title="Michigan Territory">Michigan Territory</a>, was appointed by <a href="/wiki/Thomas_Jefferson" title="Thomas Jefferson">Thomas Jefferson</a> as Secretary of the Louisiana Territory and started to build his political base in <a href="/wiki/St._Louis" title="St. Louis">St. Louis</a>.
+</p>
+<meta property="mw:PageProp/toc" />
+<h2><span class="mw-headline" id="Early_life_and_education">Early life and education</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit&amp;section=1" title="Edit section: Early life and education">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<p>Born in 1777 into the <a href="/wiki/Plantations_in_the_American_South" class="mw-redirect" title="Plantations in the American South">planter</a> class in <a href="/wiki/Goochland_County,_Virginia" title="Goochland County, Virginia">Goochland County, Virginia</a>, Bates was schooled privately at his family's <a href="/w/index.php?title=Belmont_Manor_house&amp;action=edit&amp;redlink=1" class="new" title="Belmont Manor house (page does not exist)">Belmont plantation</a> by tutors. Later he went to college and read the law with an established firm.  He settled in Detroit in 1797 and became its first postmaster in 1803.<sup id="cite_ref-1" class="reference"><a href="#cite_note-1">&#91;1&#93;</a></sup> He was a member of the <a href="/wiki/Bates_family" title="Bates family">Bates family</a> along with his brothers <a href="/wiki/Edward_Bates" title="Edward Bates">Edward</a> and <a href="/wiki/James_Woodson_Bates" title="James Woodson Bates">James Woodson Bates</a>.<sup id="cite_ref-2" class="reference"><a href="#cite_note-2">&#91;2&#93;</a></sup>
+</p>
+<h2><span class="mw-headline" id="Career">Career</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit&amp;section=2" title="Edit section: Career">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<p>After working as an attorney, Bates started his political career when appointed as a justice of the Territorial Supreme Court for <a href="/wiki/Michigan_Territory" title="Michigan Territory">Michigan Territory</a> in <a href="/wiki/Detroit" title="Detroit">Detroit</a>.  He received a significant promotion when the <a href="/wiki/Burr_conspiracy" title="Burr conspiracy">Aaron Burr conspiracy</a> was uncovered. In February 1807, while Bates was in Washington, President <a href="/wiki/Thomas_Jefferson" title="Thomas Jefferson">Thomas Jefferson</a> appointed him to be Secretary of the <a href="/wiki/Louisiana_Territory" title="Louisiana Territory">Louisiana Territory</a>, as well as a recorder of land titles.<sup id="cite_ref-Foley2014_3-0" class="reference"><a href="#cite_note-Foley2014-3">&#91;3&#93;</a></sup> As secretary, he was also <a href="/wiki/Commander_in_chief" class="mw-redirect" title="Commander in chief">commander in chief</a> of the militia.<sup id="cite_ref-4" class="reference"><a href="#cite_note-4">&#91;4&#93;</a></sup> He held this position in <a href="/wiki/St._Louis" title="St. Louis">St. Louis</a> until 1812. Bates helped determine whether conflicting French, Spanish, and American land claims in the territory would be upheld, as it had been subject to three differing political systems.<sup id="cite_ref-Beers1989_5-0" class="reference"><a href="#cite_note-Beers1989-5">&#91;5&#93;</a></sup>
+</p><p>Jefferson had already decided on the returning explorer and fellow Virginian <a href="/wiki/Meriwether_Lewis" title="Meriwether Lewis">Meriwether Lewis</a> as governor of the huge new Louisiana Territory, which approximately equaled the size of the existing United States.  Bates preceded Lewis to St. Louis and became a powerful political force in the new territory; he was a political rival of Lewis until the latter's death while traveling from St. Louis to Washington on business in 1809. Later, as Secretary of the newly formed <a href="/wiki/Missouri_Territory" title="Missouri Territory">Missouri Territory</a> (1812–1821), he became acting governor in the frequent absences of Territorial Governor <a href="/wiki/William_Clark" title="William Clark">William Clark</a>.<sup id="cite_ref-Foley2014_3-1" class="reference"><a href="#cite_note-Foley2014-3">&#91;3&#93;</a></sup>
+</p><p>In the <a href="/wiki/Missouri_gubernatorial_election,_1824" class="mw-redirect" title="Missouri gubernatorial election, 1824">August 1824 election</a>, Bates was elected the second governor of <a href="/wiki/Missouri" title="Missouri">Missouri</a>.  He died in office in August 1825 in <a href="/wiki/Chesterfield,_Missouri" title="Chesterfield, Missouri">Chesterfield, Missouri</a>, due to a short illness thought to be <a href="/wiki/Pneumonia" title="Pneumonia">pneumonia</a>. Bates was buried at the family cemetery on the Thornhill estate near St. Louis.
+</p>
+<h2><span class="mw-headline" id="Marriage_and_family">Marriage and family</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit&amp;section=3" title="Edit section: Marriage and family">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<div class="thumb tright"><div class="thumbinner" style="width:202px;"><a href="/wiki/File:Thornhill_Bates.jpg" class="image"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/1/18/Thornhill_Bates.jpg/200px-Thornhill_Bates.jpg" decoding="async" width="200" height="150" class="thumbimage" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/18/Thornhill_Bates.jpg/300px-Thornhill_Bates.jpg 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/18/Thornhill_Bates.jpg/400px-Thornhill_Bates.jpg 2x" data-file-width="1600" data-file-height="1200" /></a>  <div class="thumbcaption"><div class="magnify"><a href="/wiki/File:Thornhill_Bates.jpg" class="internal" title="Enlarge"></a></div>Main house at Thornhill, Governor Bates estate.</div></div></div>
+<p>In 1819, Bates married Nancy Opie Ball (1802–1877), daughter of a wealthy Virginia colonel. The couple had four children, Emily Caroline (1820–1891), Lucius Lee (1821–1898), Woodville (1823–1840) and Frederick Jr. (1826–1862).<sup id="cite_ref-BryanMacgunnigle2009_6-0" class="reference"><a href="#cite_note-BryanMacgunnigle2009-6">&#91;6&#93;</a></sup>
+</p><p>During his time in <a href="/wiki/Missouri" title="Missouri">Missouri</a>, Bates acquired nearly 1000 acres (4&#160;km<sup>2</sup>) of land, which he called Thornhill. He had built a Federal-style home with high ceilings for summer ventilation, fine woodwork and a sophisticated floor plan; all this would have been familiar to Bates from his childhood home, Belmont, in <a href="/wiki/Goochland_County,_Virginia" title="Goochland County, Virginia">Goochland County, Virginia</a>. The Thornhill estate still exists today and can be viewed by the public. It is located in <a href="/w/index.php?title=Faust_County_Park&amp;action=edit&amp;redlink=1" class="new" title="Faust County Park (page does not exist)">Faust County Park</a> in <a href="/wiki/Chesterfield,_Missouri" title="Chesterfield, Missouri">Chesterfield, Missouri</a>.
+</p>
+<h2><span class="mw-headline" id="Legacy_and_honors">Legacy and honors</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit&amp;section=4" title="Edit section: Legacy and honors">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<p>Governor Bates is the namesake of <a href="/wiki/Bates_County,_Missouri" title="Bates County, Missouri">Bates County, Missouri</a>.<sup id="cite_ref-7" class="reference"><a href="#cite_note-7">&#91;7&#93;</a></sup>
+</p>
+<h2><span class="mw-headline" id="References">References</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit&amp;section=5" title="Edit section: References">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<style data-mw-deduplicate="TemplateStyles:r1011085734">.mw-parser-output .reflist{font-size:90%;margin-bottom:0.5em;list-style-type:decimal}.mw-parser-output .reflist .references{font-size:100%;margin-bottom:0;list-style-type:inherit}.mw-parser-output .reflist-columns-2{column-width:30em}.mw-parser-output .reflist-columns-3{column-width:25em}.mw-parser-output .reflist-columns{margin-top:0.3em}.mw-parser-output .reflist-columns ol{margin-top:0}.mw-parser-output .reflist-columns li{page-break-inside:avoid;break-inside:avoid-column}.mw-parser-output .reflist-upper-alpha{list-style-type:upper-alpha}.mw-parser-output .reflist-upper-roman{list-style-type:upper-roman}.mw-parser-output .reflist-lower-alpha{list-style-type:lower-alpha}.mw-parser-output .reflist-lower-greek{list-style-type:lower-greek}.mw-parser-output .reflist-lower-roman{list-style-type:lower-roman}</style><div class="reflist">
+<div class="mw-references-wrap"><ol class="references">
+<li id="cite_note-1"><span class="mw-cite-backlink"><b><a href="#cite_ref-1">^</a></b></span> <span class="reference-text">Dunbar, Willis F. &amp; May, George S. (3d ed. 1995). <a rel="nofollow" class="external text" href="https://books.google.com/books?id=HqGWEAnByeMC&amp;pg=PA113"><i>Michigan: A History of the Wolverine State</i></a>, p. 113. Wm. B. Eerdmans Publishing Co.</span>
+</li>
+<li id="cite_note-2"><span class="mw-cite-backlink"><b><a href="#cite_ref-2">^</a></b></span> <span class="reference-text"><style data-mw-deduplicate="TemplateStyles:r1133582631">.mw-parser-output cite.citation{font-style:inherit;word-wrap:break-word}.mw-parser-output .citation q{quotes:"\"""\"""'""'"}.mw-parser-output .citation:target{background-color:rgba(0,127,255,0.133)}.mw-parser-output .id-lock-free a,.mw-parser-output .citation .cs1-lock-free a{background:url("//upload.wikimedia.org/wikipedia/commons/6/65/Lock-green.svg")right 0.1em center/9px no-repeat}.mw-parser-output .id-lock-limited a,.mw-parser-output .id-lock-registration a,.mw-parser-output .citation .cs1-lock-limited a,.mw-parser-output .citation .cs1-lock-registration a{background:url("//upload.wikimedia.org/wikipedia/commons/d/d6/Lock-gray-alt-2.svg")right 0.1em center/9px no-repeat}.mw-parser-output .id-lock-subscription a,.mw-parser-output .citation .cs1-lock-subscription a{background:url("//upload.wikimedia.org/wikipedia/commons/a/aa/Lock-red-alt-2.svg")right 0.1em center/9px no-repeat}.mw-parser-output .cs1-ws-icon a{background:url("//upload.wikimedia.org/wikipedia/commons/4/4c/Wikisource-logo.svg")right 0.1em center/12px no-repeat}.mw-parser-output .cs1-code{color:inherit;background:inherit;border:none;padding:inherit}.mw-parser-output .cs1-hidden-error{display:none;color:#d33}.mw-parser-output .cs1-visible-error{color:#d33}.mw-parser-output .cs1-maint{display:none;color:#3a3;margin-left:0.3em}.mw-parser-output .cs1-format{font-size:95%}.mw-parser-output .cs1-kern-left{padding-left:0.2em}.mw-parser-output .cs1-kern-right{padding-right:0.2em}.mw-parser-output .citation .mw-selflink{font-weight:inherit}</style><cite id="CITEREFMercer1990" class="citation book cs1">Mercer, Thomas (1990). <i>Bates: A Familial Journey</i>. Boston Herald Publ.</cite><span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=Bates%3A+A+Familial+Journey&amp;rft.pub=Boston+Herald+Publ.&amp;rft.date=1990&amp;rft.aulast=Mercer&amp;rft.aufirst=Thomas&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AFrederick+Bates+%28politician%29" class="Z3988"></span></span>
+</li>
+<li id="cite_note-Foley2014-3"><span class="mw-cite-backlink">^ <a href="#cite_ref-Foley2014_3-0"><sup><i><b>a</b></i></sup></a> <a href="#cite_ref-Foley2014_3-1"><sup><i><b>b</b></i></sup></a></span> <span class="reference-text"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631"/><cite id="CITEREFWilliam_E._Foley2014" class="citation book cs1">William E. Foley (12 March 2014). <a rel="nofollow" class="external text" href="https://books.google.com/books?id=Vm2XAwAAQBAJ&amp;pg=PA215"><i>The Genesis of Missouri: From Wilderness Outpost to Statehood</i></a>. University of Missouri Press. pp.&#160;215–. <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&#160;<a href="/wiki/Special:BookSources/978-0-8262-6053-6" title="Special:BookSources/978-0-8262-6053-6"><bdi>978-0-8262-6053-6</bdi></a>.</cite><span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=The+Genesis+of+Missouri%3A+From+Wilderness+Outpost+to+Statehood&amp;rft.pages=215-&amp;rft.pub=University+of+Missouri+Press&amp;rft.date=2014-03-12&amp;rft.isbn=978-0-8262-6053-6&amp;rft.au=William+E.+Foley&amp;rft_id=https%3A%2F%2Fbooks.google.com%2Fbooks%3Fid%3DVm2XAwAAQBAJ%26pg%3DPA215&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AFrederick+Bates+%28politician%29" class="Z3988"></span></span>
+</li>
+<li id="cite_note-4"><span class="mw-cite-backlink"><b><a href="#cite_ref-4">^</a></b></span> <span class="reference-text"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631"/><cite id="CITEREFSalter" class="citation web cs1"><a href="/wiki/William_Salter_(minister)" title="William Salter (minister)">Salter, William</a>. <a rel="nofollow" class="external text" href="http://www.americanwest.amdigital.co.uk/Documents/Details/Graff_3659">"The life of Henry Dodge, from 1782 to 1833: with portrait by George Catlin and maps of the battles of the Pecatonica and Wisconsin Heights in the Black Hawk War"</a>. <i>American West</i>. <a href="/wiki/Adam_Matthew_Digital" title="Adam Matthew Digital">Adam Matthew Digital</a>. p.&#160;3<span class="reference-accessdate">. Retrieved <span class="nowrap">5 April</span> 2023</span>.</cite><span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=unknown&amp;rft.jtitle=American+West&amp;rft.atitle=The+life+of+Henry+Dodge%2C+from+1782+to+1833%3A+with+portrait+by+George+Catlin+and+maps+of+the+battles+of+the+Pecatonica+and+Wisconsin+Heights+in+the+Black+Hawk+War&amp;rft.pages=3&amp;rft.aulast=Salter&amp;rft.aufirst=William&amp;rft_id=http%3A%2F%2Fwww.americanwest.amdigital.co.uk%2FDocuments%2FDetails%2FGraff_3659&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AFrederick+Bates+%28politician%29" class="Z3988"></span></span>
+</li>
+<li id="cite_note-Beers1989-5"><span class="mw-cite-backlink"><b><a href="#cite_ref-Beers1989_5-0">^</a></b></span> <span class="reference-text"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631"/><cite id="CITEREFHenry_Putney_Beers1989" class="citation book cs1">Henry Putney Beers (1 December 1989). <a rel="nofollow" class="external text" href="https://books.google.com/books?id=CxO3RcGScEUC&amp;pg=PA281"><i>French and Spanish Records of Louisiana: A Bibliographical Guide to Archive and Manuscript Sources</i></a>. LSU Press. pp.&#160;281–. <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&#160;<a href="/wiki/Special:BookSources/978-0-8071-2793-3" title="Special:BookSources/978-0-8071-2793-3"><bdi>978-0-8071-2793-3</bdi></a>.</cite><span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=French+and+Spanish+Records+of+Louisiana%3A+A+Bibliographical+Guide+to+Archive+and+Manuscript+Sources&amp;rft.pages=281-&amp;rft.pub=LSU+Press&amp;rft.date=1989-12-01&amp;rft.isbn=978-0-8071-2793-3&amp;rft.au=Henry+Putney+Beers&amp;rft_id=https%3A%2F%2Fbooks.google.com%2Fbooks%3Fid%3DCxO3RcGScEUC%26pg%3DPA281&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AFrederick+Bates+%28politician%29" class="Z3988"></span></span>
+</li>
+<li id="cite_note-BryanMacgunnigle2009-6"><span class="mw-cite-backlink"><b><a href="#cite_ref-BryanMacgunnigle2009_6-0">^</a></b></span> <span class="reference-text"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631"/><cite id="CITEREFWilliam_Smith_BryanMacgunnigle2009" class="citation book cs1">William Smith Bryan; Macgunnigle (1 June 2009). <a rel="nofollow" class="external text" href="https://books.google.com/books?id=WZtq0GysnfsC&amp;pg=PA131"><i>Rhode Island Freemen, 1747-1755</i></a>. Genealogical Publishing Com. pp.&#160;131–. <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&#160;<a href="/wiki/Special:BookSources/978-0-8063-0753-4" title="Special:BookSources/978-0-8063-0753-4"><bdi>978-0-8063-0753-4</bdi></a>.</cite><span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=Rhode+Island+Freemen%2C+1747-1755&amp;rft.pages=131-&amp;rft.pub=Genealogical+Publishing+Com&amp;rft.date=2009-06-01&amp;rft.isbn=978-0-8063-0753-4&amp;rft.au=William+Smith+Bryan&amp;rft.au=Macgunnigle&amp;rft_id=https%3A%2F%2Fbooks.google.com%2Fbooks%3Fid%3DWZtq0GysnfsC%26pg%3DPA131&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AFrederick+Bates+%28politician%29" class="Z3988"></span></span>
+</li>
+<li id="cite_note-7"><span class="mw-cite-backlink"><b><a href="#cite_ref-7">^</a></b></span> <span class="reference-text"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631"/><cite id="CITEREFEaton,_David_Wolfe1916" class="citation book cs1">Eaton, David Wolfe (1916). <a rel="nofollow" class="external text" href="https://archive.org/details/bub_gb_RfAuAAAAYAAJ"><i>How Missouri Counties, Towns and Streams Were Named</i></a>. The State Historical Society of Missouri. pp.&#160;<a rel="nofollow" class="external text" href="https://archive.org/details/bub_gb_RfAuAAAAYAAJ/page/n19">208</a>.</cite><span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=How+Missouri+Counties%2C+Towns+and+Streams+Were+Named&amp;rft.pages=208&amp;rft.pub=The+State+Historical+Society+of+Missouri&amp;rft.date=1916&amp;rft.au=Eaton%2C+David+Wolfe&amp;rft_id=https%3A%2F%2Farchive.org%2Fdetails%2Fbub_gb_RfAuAAAAYAAJ&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AFrederick+Bates+%28politician%29" class="Z3988"></span></span>
+</li>
+</ol></div></div>
+<h2><span class="mw-headline" id="External_links">External links</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=Frederick_Bates_(politician)&amp;action=edit&amp;section=6" title="Edit section: External links">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<style data-mw-deduplicate="TemplateStyles:r1132942124">.mw-parser-output .portalbox{padding:0;margin:0.5em 0;display:table;box-sizing:border-box;max-width:175px;list-style:none}.mw-parser-output .portalborder{border:solid #aaa 1px;padding:0.1em;background:#f9f9f9}.mw-parser-output .portalbox-entry{display:table-row;font-size:85%;line-height:110%;height:1.9em;font-style:italic;font-weight:bold}.mw-parser-output .portalbox-image{display:table-cell;padding:0.2em;vertical-align:middle;text-align:center}.mw-parser-output .portalbox-link{display:table-cell;padding:0.2em 0.2em 0.2em 0.3em;vertical-align:middle}@media(min-width:720px){.mw-parser-output .portalleft{clear:left;float:left;margin:0.5em 1em 0.5em 0}.mw-parser-output .portalright{clear:right;float:right;margin:0.5em 0 0.5em 1em}}</style><ul role="navigation" aria-label="Portals" class="noprint portalbox portalborder portalright">
+<li class="portalbox-entry"><span class="portalbox-image"><img alt="" src="//upload.wikimedia.org/wikipedia/en/thumb/6/69/P_vip.svg/28px-P_vip.svg.png" decoding="async" width="28" height="28" class="noviewer" srcset="//upload.wikimedia.org/wikipedia/en/thumb/6/69/P_vip.svg/41px-P_vip.svg.png 1.5x, //upload.wikimedia.org/wikipedia/en/thumb/6/69/P_vip.svg/55px-P_vip.svg.png 2x" data-file-width="1911" data-file-height="1944" /></span><span class="portalbox-link"><a href="/wiki/Portal:Biography" title="Portal:Biography">Biography portal</a></span></li></ul>
+<ul><li><a rel="nofollow" class="external text" href="https://www.findagrave.com/memorial/5859928">Frederick Bates</a> at <a href="/wiki/Find_a_Grave" title="Find a Grave">Find a Grave</a></li>
+<li><a rel="nofollow" class="external text" href="http://www.nga.org/portal/site/nga/menuitem.29fab9fb4add37305ddcbeeb501010a0/?vgnextoid=d334a572ab695010VgnVCM1000001a01010aRCRD&amp;vgnextchannel=e449a0ca9e3f1010VgnVCM1000001a01010aRCRD">National Governors Association profile</a></li></ul>
+<table class="wikitable succession-box noprint" style="margin:0.5em auto; font-size:95%;clear:both;">
+
+<tbody><tr>
+<th colspan="3" style="border-top: 5px solid #ccccff;">Political offices
+</th></tr>
+
+<tr style="text-align:center;">
+<td style="width:30%;" rowspan="1">Preceded&#160;by<div style="font-weight: bold"><a href="/wiki/Alexander_McNair" title="Alexander McNair">Alexander McNair</a></div>
+</td>
+<td style="width: 40%; text-align: center;" rowspan="1"><b> <a href="/wiki/List_of_Governors_of_Missouri" class="mw-redirect" title="List of Governors of Missouri">Governor of Missouri</a> </b><br />1824–1825
+</td>
+<td style="width: 30%; text-align: center;" rowspan="1">Succeeded&#160;by<div style="font-weight: bold"><a href="/wiki/Abraham_J._Williams" title="Abraham J. Williams">Abraham J. Williams</a></div>
+</td></tr>
+</tbody></table>
+<div class="navbox-styles"><style data-mw-deduplicate="TemplateStyles:r1129693374">.mw-parser-output .hlist dl,.mw-parser-output .hlist ol,.mw-parser-output .hlist ul{margin:0;padding:0}.mw-parser-output .hlist dd,.mw-parser-output .hlist dt,.mw-parser-output .hlist li{margin:0;display:inline}.mw-parser-output .hlist.inline,.mw-parser-output .hlist.inline dl,.mw-parser-output .hlist.inline ol,.mw-parser-output .hlist.inline ul,.mw-parser-output .hlist dl dl,.mw-parser-output .hlist dl ol,.mw-parser-output .hlist dl ul,.mw-parser-output .hlist ol dl,.mw-parser-output .hlist ol ol,.mw-parser-output .hlist ol ul,.mw-parser-output .hlist ul dl,.mw-parser-output .hlist ul ol,.mw-parser-output .hlist ul ul{display:inline}.mw-parser-output .hlist .mw-empty-li{display:none}.mw-parser-output .hlist dt::after{content:": "}.mw-parser-output .hlist dd::after,.mw-parser-output .hlist li::after{content:" · ";font-weight:bold}.mw-parser-output .hlist dd:last-child::after,.mw-parser-output .hlist dt:last-child::after,.mw-parser-output .hlist li:last-child::after{content:none}.mw-parser-output .hlist dd dd:first-child::before,.mw-parser-output .hlist dd dt:first-child::before,.mw-parser-output .hlist dd li:first-child::before,.mw-parser-output .hlist dt dd:first-child::before,.mw-parser-output .hlist dt dt:first-child::before,.mw-parser-output .hlist dt li:first-child::before,.mw-parser-output .hlist li dd:first-child::before,.mw-parser-output .hlist li dt:first-child::before,.mw-parser-output .hlist li li:first-child::before{content:" (";font-weight:normal}.mw-parser-output .hlist dd dd:last-child::after,.mw-parser-output .hlist dd dt:last-child::after,.mw-parser-output .hlist dd li:last-child::after,.mw-parser-output .hlist dt dd:last-child::after,.mw-parser-output .hlist dt dt:last-child::after,.mw-parser-output .hlist dt li:last-child::after,.mw-parser-output .hlist li dd:last-child::after,.mw-parser-output .hlist li dt:last-child::after,.mw-parser-output .hlist li li:last-child::after{content:")";font-weight:normal}.mw-parser-output .hlist ol{counter-reset:listitem}.mw-parser-output .hlist ol>li{counter-increment:listitem}.mw-parser-output .hlist ol>li::before{content:" "counter(listitem)"\a0 "}.mw-parser-output .hlist dd ol>li:first-child::before,.mw-parser-output .hlist dt ol>li:first-child::before,.mw-parser-output .hlist li ol>li:first-child::before{content:" ("counter(listitem)"\a0 "}</style><style data-mw-deduplicate="TemplateStyles:r1061467846">.mw-parser-output .navbox{box-sizing:border-box;border:1px solid #a2a9b1;width:100%;clear:both;font-size:88%;text-align:center;padding:1px;margin:1em auto 0}.mw-parser-output .navbox .navbox{margin-top:0}.mw-parser-output .navbox+.navbox,.mw-parser-output .navbox+.navbox-styles+.navbox{margin-top:-1px}.mw-parser-output .navbox-inner,.mw-parser-output .navbox-subgroup{width:100%}.mw-parser-output .navbox-group,.mw-parser-output .navbox-title,.mw-parser-output .navbox-abovebelow{padding:0.25em 1em;line-height:1.5em;text-align:center}.mw-parser-output .navbox-group{white-space:nowrap;text-align:right}.mw-parser-output .navbox,.mw-parser-output .navbox-subgroup{background-color:#fdfdfd}.mw-parser-output .navbox-list{line-height:1.5em;border-color:#fdfdfd}.mw-parser-output .navbox-list-with-group{text-align:left;border-left-width:2px;border-left-style:solid}.mw-parser-output tr+tr>.navbox-abovebelow,.mw-parser-output tr+tr>.navbox-group,.mw-parser-output tr+tr>.navbox-image,.mw-parser-output tr+tr>.navbox-list{border-top:2px solid #fdfdfd}.mw-parser-output .navbox-title{background-color:#ccf}.mw-parser-output .navbox-abovebelow,.mw-parser-output .navbox-group,.mw-parser-output .navbox-subgroup .navbox-title{background-color:#ddf}.mw-parser-output .navbox-subgroup .navbox-group,.mw-parser-output .navbox-subgroup .navbox-abovebelow{background-color:#e6e6ff}.mw-parser-output .navbox-even{background-color:#f7f7f7}.mw-parser-output .navbox-odd{background-color:transparent}.mw-parser-output .navbox .hlist td dl,.mw-parser-output .navbox .hlist td ol,.mw-parser-output .navbox .hlist td ul,.mw-parser-output .navbox td.hlist dl,.mw-parser-output .navbox td.hlist ol,.mw-parser-output .navbox td.hlist ul{padding:0.125em 0}.mw-parser-output .navbox .navbar{display:block;font-size:100%}.mw-parser-output .navbox-title .navbar{float:left;text-align:left;margin-right:0.5em}</style><style data-mw-deduplicate="TemplateStyles:r886047488">.mw-parser-output .nobold{font-weight:normal}</style><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r886047488"/></div><div role="navigation" class="navbox" aria-labelledby="Governors_of_Missouri" style="padding:3px"><table class="nowraplinks mw-collapsible mw-collapsed navbox-inner" style="border-spacing:0;background:transparent;color:inherit"><tbody><tr><th scope="col" class="navbox-title" colspan="3"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1129693374"/><style data-mw-deduplicate="TemplateStyles:r1063604349">.mw-parser-output .navbar{display:inline;font-size:88%;font-weight:normal}.mw-parser-output .navbar-collapse{float:left;text-align:left}.mw-parser-output .navbar-boxtext{word-spacing:0}.mw-parser-output .navbar ul{display:inline-block;white-space:nowrap;line-height:inherit}.mw-parser-output .navbar-brackets::before{margin-right:-0.125em;content:"[ "}.mw-parser-output .navbar-brackets::after{margin-left:-0.125em;content:" ]"}.mw-parser-output .navbar li{word-spacing:-0.125em}.mw-parser-output .navbar a>span,.mw-parser-output .navbar a>abbr{text-decoration:inherit}.mw-parser-output .navbar-mini abbr{font-variant:small-caps;border-bottom:none;text-decoration:none;cursor:inherit}.mw-parser-output .navbar-ct-full{font-size:114%;margin:0 7em}.mw-parser-output .navbar-ct-mini{font-size:114%;margin:0 4em}</style><div class="navbar plainlinks hlist navbar-mini"><ul><li class="nv-view"><a href="/wiki/Template:Governors_of_Missouri" title="Template:Governors of Missouri"><abbr title="View this template" style=";;background:none transparent;border:none;box-shadow:none;padding:0;">v</abbr></a></li><li class="nv-talk"><a href="/wiki/Template_talk:Governors_of_Missouri" title="Template talk:Governors of Missouri"><abbr title="Discuss this template" style=";;background:none transparent;border:none;box-shadow:none;padding:0;">t</abbr></a></li><li class="nv-edit"><a class="external text" href="https://en.wikipedia.org/w/index.php?title=Template:Governors_of_Missouri&amp;action=edit"><abbr title="Edit this template" style=";;background:none transparent;border:none;box-shadow:none;padding:0;">e</abbr></a></li></ul></div><div id="Governors_of_Missouri" style="font-size:114%;margin:0 4em"><a href="/wiki/List_of_governors_of_Missouri" title="List of governors of Missouri">Governors of Missouri</a></div></th></tr><tr><th scope="row" class="navbox-group" style="width:1%"><a href="/wiki/Missouri_Territory" title="Missouri Territory">Territorial <br /> <span class="nobold">(1805–1820)</span></a></th><td class="navbox-list-with-group navbox-list navbox-odd hlist" style="width:100%;padding:0"><div style="padding:0 0.25em">
+<ul><li><a href="/wiki/James_Wilkinson" title="James Wilkinson">Wilkinson</a></li>
+<li><a href="/wiki/Meriwether_Lewis" title="Meriwether Lewis">Lewis</a></li>
+<li><a href="/wiki/Benjamin_Howard_(Missouri_politician)" title="Benjamin Howard (Missouri politician)">Howard</a></li>
+<li><a href="/wiki/William_Clark" title="William Clark">Clark</a></li></ul>
+</div></td><td class="noviewer navbox-image" rowspan="2" style="width:1px;padding:0 0 0 2px"><div><img alt="" src="//upload.wikimedia.org/wikipedia/commons/thumb/d/de/Seal_of_Missouri.svg/75px-Seal_of_Missouri.svg.png" decoding="async" width="75" height="75" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/d/de/Seal_of_Missouri.svg/113px-Seal_of_Missouri.svg.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/d/de/Seal_of_Missouri.svg/150px-Seal_of_Missouri.svg.png 2x" data-file-width="300" data-file-height="300" /></div></td></tr><tr><th scope="row" class="navbox-group" style="width:1%">State <br /> <span class="nobold">(since 1820)</span></th><td class="navbox-list-with-group navbox-list navbox-even hlist" style="width:100%;padding:0"><div style="padding:0 0.25em">
+<ul><li><a href="/wiki/Alexander_McNair" title="Alexander McNair">McNair</a></li>
+<li><a class="mw-selflink selflink">Bates</a></li>
+<li><a href="/wiki/Abraham_J._Williams" title="Abraham J. Williams">Williams</a></li>
+<li><a href="/wiki/John_Miller_(Missouri_politician)" title="John Miller (Missouri politician)">Miller</a></li>
+<li><a href="/wiki/Daniel_Dunklin" title="Daniel Dunklin">Dunklin</a></li>
+<li><a href="/wiki/Lilburn_Boggs" title="Lilburn Boggs">Boggs</a></li>
+<li><a href="/wiki/Thomas_Reynolds_(governor)" title="Thomas Reynolds (governor)">Reynolds</a></li>
+<li><a href="/wiki/Meredith_Miles_Marmaduke" title="Meredith Miles Marmaduke">M. Marmaduke</a></li>
+<li><a href="/wiki/John_Cummins_Edwards" title="John Cummins Edwards">Edwards</a></li>
+<li><a href="/wiki/Austin_Augustus_King" title="Austin Augustus King">King</a></li>
+<li><a href="/wiki/Sterling_Price" title="Sterling Price">Price</a></li>
+<li><a href="/wiki/Trusten_Polk" title="Trusten Polk">Polk</a></li>
+<li><a href="/wiki/Hancock_Lee_Jackson" title="Hancock Lee Jackson">H. Jackson</a></li>
+<li><a href="/wiki/Robert_Marcellus_Stewart" title="Robert Marcellus Stewart">Stewart</a></li>
+<li><a href="/wiki/Claiborne_Fox_Jackson" title="Claiborne Fox Jackson">C. Jackson</a></li>
+<li><a href="/wiki/Hamilton_Rowan_Gamble" title="Hamilton Rowan Gamble">Gamble</a></li>
+<li><a href="/wiki/Willard_Preble_Hall" title="Willard Preble Hall">Hall</a></li>
+<li><a href="/wiki/Thomas_Clement_Fletcher" title="Thomas Clement Fletcher">Fletcher</a></li>
+<li><a href="/wiki/Joseph_W._McClurg" title="Joseph W. McClurg">McClurg</a></li>
+<li><a href="/wiki/Benjamin_Gratz_Brown" title="Benjamin Gratz Brown">Brown</a></li>
+<li><a href="/wiki/Silas_Woodson" title="Silas Woodson">Woodson</a></li>
+<li><a href="/wiki/Charles_Henry_Hardin" title="Charles Henry Hardin">Hardin</a></li>
+<li><a href="/wiki/John_S._Phelps" title="John S. Phelps">Phelps</a></li>
+<li><a href="/wiki/Thomas_Theodore_Crittenden" title="Thomas Theodore Crittenden">Crittenden</a></li>
+<li><a href="/wiki/John_S._Marmaduke" title="John S. Marmaduke">J. Marmaduke</a></li>
+<li><a href="/wiki/Albert_P._Morehouse" title="Albert P. Morehouse">Morehouse</a></li>
+<li><a href="/wiki/David_R._Francis" title="David R. Francis">Francis</a></li>
+<li><a href="/wiki/William_J._Stone" title="William J. Stone">Stone</a></li>
+<li><a href="/wiki/Lawrence_Vest_Stephens" title="Lawrence Vest Stephens">Stephens</a></li>
+<li><a href="/wiki/Alexander_Monroe_Dockery" title="Alexander Monroe Dockery">Dockery</a></li>
+<li><a href="/wiki/Joseph_W._Folk" title="Joseph W. Folk">Folk</a></li>
+<li><a href="/wiki/Herbert_S._Hadley" title="Herbert S. Hadley">Hadley</a></li>
+<li><a href="/wiki/Elliott_Woolfolk_Major" title="Elliott Woolfolk Major">Major</a></li>
+<li><a href="/wiki/Frederick_D._Gardner" title="Frederick D. Gardner">Gardner</a></li>
+<li><a href="/wiki/Arthur_M._Hyde" title="Arthur M. Hyde">Hyde</a></li>
+<li><a href="/wiki/Sam_Aaron_Baker" title="Sam Aaron Baker">Baker</a></li>
+<li><a href="/wiki/Henry_S._Caulfield" title="Henry S. Caulfield">Caulfield</a></li>
+<li><a href="/wiki/Guy_Brasfield_Park" title="Guy Brasfield Park">Park</a></li>
+<li><a href="/wiki/Lloyd_C._Stark" title="Lloyd C. Stark">Stark</a></li>
+<li><a href="/wiki/Forrest_C._Donnell" title="Forrest C. Donnell">Donnell</a></li>
+<li><a href="/wiki/Phil_M._Donnelly" title="Phil M. Donnelly">Donnelly</a></li>
+<li><a href="/wiki/Forrest_Smith" title="Forrest Smith">Smith</a></li>
+<li><a href="/wiki/Phil_M._Donnelly" title="Phil M. Donnelly">Donnelly</a></li>
+<li><a href="/wiki/James_T._Blair_Jr." title="James T. Blair Jr.">Blair</a></li>
+<li><a href="/wiki/John_M._Dalton" title="John M. Dalton">Dalton</a></li>
+<li><a href="/wiki/Warren_E._Hearnes" title="Warren E. Hearnes">Hearnes</a></li>
+<li><a href="/wiki/Kit_Bond" title="Kit Bond">Bond</a></li>
+<li><a href="/wiki/Joseph_P._Teasdale" title="Joseph P. Teasdale">Teasdale</a></li>
+<li><a href="/wiki/Kit_Bond" title="Kit Bond">Bond</a></li>
+<li><a href="/wiki/John_Ashcroft" title="John Ashcroft">Ashcroft</a></li>
+<li><a href="/wiki/Mel_Carnahan" title="Mel Carnahan">Carnahan</a></li>
+<li><a href="/wiki/Roger_B._Wilson" title="Roger B. Wilson">Wilson</a></li>
+<li><a href="/wiki/Bob_Holden" title="Bob Holden">Holden</a></li>
+<li><a href="/wiki/Matt_Blunt" title="Matt Blunt">Blunt</a></li>
+<li><a href="/wiki/Jay_Nixon" title="Jay Nixon">Nixon</a></li>
+<li><a href="/wiki/Eric_Greitens" title="Eric Greitens">Greitens</a></li>
+<li><a href="/wiki/Mike_Parson" title="Mike Parson">Parson</a></li></ul>
+</div></td></tr></tbody></table></div>
+<div class="navbox-styles"><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1129693374"/><link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1061467846"/></div><div role="navigation" class="navbox authority-control" aria-labelledby="Authority_control_frameless&amp;#124;text-top&amp;#124;10px&amp;#124;alt=Edit_this_at_Wikidata&amp;#124;link=https&amp;#58;//www.wikidata.org/wiki/Q1452792#identifiers&amp;#124;class=noprint&amp;#124;Edit_this_at_Wikidata" style="padding:3px"><table class="nowraplinks hlist mw-collapsible autocollapse navbox-inner" style="border-spacing:0;background:transparent;color:inherit"><tbody><tr><th scope="col" class="navbox-title" colspan="2"><div id="Authority_control_frameless&amp;#124;text-top&amp;#124;10px&amp;#124;alt=Edit_this_at_Wikidata&amp;#124;link=https&amp;#58;//www.wikidata.org/wiki/Q1452792#identifiers&amp;#124;class=noprint&amp;#124;Edit_this_at_Wikidata" style="font-size:114%;margin:0 4em"><a href="/wiki/Help:Authority_control" title="Help:Authority control">Authority control</a> <a href="https://www.wikidata.org/wiki/Q1452792#identifiers" title="Edit this at Wikidata"><img alt="Edit this at Wikidata" src="//upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/10px-OOjs_UI_icon_edit-ltr-progressive.svg.png" decoding="async" width="10" height="10" style="vertical-align: text-top" class="noprint" srcset="//upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/15px-OOjs_UI_icon_edit-ltr-progressive.svg.png 1.5x, //upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/20px-OOjs_UI_icon_edit-ltr-progressive.svg.png 2x" data-file-width="20" data-file-height="20" /></a></div></th></tr><tr><th scope="row" class="navbox-group" style="width:1%">International</th><td class="navbox-list-with-group navbox-list navbox-odd" style="width:100%;padding:0"><div style="padding:0 0.25em">
+<ul><li><span class="uid"><a rel="nofollow" class="external text" href="http://id.worldcat.org/fast/269830/">FAST</a></span></li>
+<li><span class="uid"><a rel="nofollow" class="external text" href="https://isni.org/isni/0000000029538403">ISNI</a></span></li>
+<li><span class="uid"><a rel="nofollow" class="external text" href="https://viaf.org/viaf/63167084">VIAF</a></span></li>
+<li><span class="uid"><a rel="nofollow" class="external text" href="https://www.worldcat.org/identities/lccn-n90649611/">WorldCat</a></span></li></ul>
+</div></td></tr><tr><th scope="row" class="navbox-group" style="width:1%">National</th><td class="navbox-list-with-group navbox-list navbox-even" style="width:100%;padding:0"><div style="padding:0 0.25em">
+<ul><li><span class="uid"><a rel="nofollow" class="external text" href="https://d-nb.info/gnd/102120899X">Germany</a></span></li>
+<li><span class="uid"><a rel="nofollow" class="external text" href="https://id.loc.gov/authorities/names/n90649611">United States</a></span></li></ul>
+</div></td></tr><tr><th scope="row" class="navbox-group" style="width:1%">Other</th><td class="navbox-list-with-group navbox-list navbox-odd" style="width:100%;padding:0"><div style="padding:0 0.25em">
+<ul><li><span class="uid"><a rel="nofollow" class="external text" href="https://snaccooperative.org/ark:/99166/w6f20hg1">SNAC</a></span></li></ul>
+</div></td></tr></tbody></table></div>
+<!-- 
+NewPP limit report
+Parsed by mw2330
+Cached time: 20230405023959
+Cache expiry: 86400
+Reduced expiry: true
+Complications: [vary‐revision‐sha1, show‐toc]
+CPU time usage: 0.451 seconds
+Real time usage: 0.571 seconds
+Preprocessor visited node count: 8541/1000000
+Post‐expand include size: 41389/2097152 bytes
+Template argument size: 3154/2097152 bytes
+Highest expansion depth: 18/100
+Expensive parser function count: 8/500
+Unstrip recursion depth: 1/20
+Unstrip post‐expand size: 34260/5000000 bytes
+Lua time usage: 0.248/10.000 seconds
+Lua memory usage: 6809516/52428800 bytes
+Number of Wikibase entities loaded: 1/400
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%  523.024      1 -total
+ 42.51%  222.359      1 Template:Infobox_officeholder
+ 20.65%  108.012      1 Template:Reflist
+ 15.97%   83.541      5 Template:Cite_book
+ 14.73%   77.034     17 Template:Infobox_officeholder/office
+ 12.84%   67.170      1 Template:Governors_of_Missouri
+ 12.47%   65.232      1 Template:Navbox
+  8.82%   46.128      1 Template:Short_description
+  6.34%   33.145      1 Template:Country2nationality
+  5.51%   28.803      1 Template:Birth_date
+-->
+
+<!-- Saved in parser cache with key enwiki:pcache:idhash:315502-0!canonical and timestamp 20230405023959 and revision id 1148264453. Rendering was triggered because: edit-page
+ -->
+</div><!--esi <esi:include src="/esitest-fa8a495983347898/content" /> --><noscript><img src="//en.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="https://en.wikipedia.org/w/index.php?title=Frederick_Bates_(politician)&amp;oldid=1148264453">https://en.wikipedia.org/w/index.php?title=Frederick_Bates_(politician)&amp;oldid=1148264453</a>"</div></div>
+					<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/wiki/Help:Category" title="Help:Category">Categories</a>: <ul><li><a href="/wiki/Category:1777_births" title="Category:1777 births">1777 births</a></li><li><a href="/wiki/Category:1825_deaths" title="Category:1825 deaths">1825 deaths</a></li><li><a href="/wiki/Category:People_from_Loudoun_County,_Virginia" title="Category:People from Loudoun County, Virginia">People from Loudoun County, Virginia</a></li><li><a href="/wiki/Category:Missouri_Democratic-Republicans" title="Category:Missouri Democratic-Republicans">Missouri Democratic-Republicans</a></li><li><a href="/wiki/Category:Missouri_Territory_officials" title="Category:Missouri Territory officials">Missouri Territory officials</a></li><li><a href="/wiki/Category:Governors_of_Missouri" title="Category:Governors of Missouri">Governors of Missouri</a></li><li><a href="/wiki/Category:Michigan_postmasters" title="Category:Michigan postmasters">Michigan postmasters</a></li><li><a href="/wiki/Category:People_from_St._Louis_County,_Missouri" title="Category:People from St. Louis County, Missouri">People from St. Louis County, Missouri</a></li><li><a href="/wiki/Category:Justices_of_the_Michigan_Supreme_Court" title="Category:Justices of the Michigan Supreme Court">Justices of the Michigan Supreme Court</a></li><li><a href="/wiki/Category:Democratic-Republican_Party_state_governors_of_the_United_States" title="Category:Democratic-Republican Party state governors of the United States">Democratic-Republican Party state governors of the United States</a></li><li><a href="/wiki/Category:19th-century_American_judges" title="Category:19th-century American judges">19th-century American judges</a></li><li><a href="/wiki/Category:19th-century_American_lawyers" title="Category:19th-century American lawyers">19th-century American lawyers</a></li></ul></div><div id="mw-hidden-catlinks" class="mw-hidden-catlinks mw-hidden-cats-hidden">Hidden categories: <ul><li><a href="/wiki/Category:Articles_with_short_description" title="Category:Articles with short description">Articles with short description</a></li><li><a href="/wiki/Category:Short_description_is_different_from_Wikidata" title="Category:Short description is different from Wikidata">Short description is different from Wikidata</a></li><li><a href="/wiki/Category:Articles_with_FAST_identifiers" title="Category:Articles with FAST identifiers">Articles with FAST identifiers</a></li><li><a href="/wiki/Category:Articles_with_ISNI_identifiers" title="Category:Articles with ISNI identifiers">Articles with ISNI identifiers</a></li><li><a href="/wiki/Category:Articles_with_VIAF_identifiers" title="Category:Articles with VIAF identifiers">Articles with VIAF identifiers</a></li><li><a href="/wiki/Category:Articles_with_WorldCat_identifiers" title="Category:Articles with WorldCat identifiers">Articles with WorldCat identifiers</a></li><li><a href="/wiki/Category:Articles_with_GND_identifiers" title="Category:Articles with GND identifiers">Articles with GND identifiers</a></li><li><a href="/wiki/Category:Articles_with_LCCN_identifiers" title="Category:Articles with LCCN identifiers">Articles with LCCN identifiers</a></li><li><a href="/wiki/Category:Articles_with_SNAC-ID_identifiers" title="Category:Articles with SNAC-ID identifiers">Articles with SNAC-ID identifiers</a></li></ul></div></div>
+					
+				</div>
+				
+			</main>
+			
+		</div>
+		<div class="mw-footer-container">
+			
+<footer id="footer" class="mw-footer" role="contentinfo" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 5 April 2023, at 02:39<span class="anonymous-show">&#160;(UTC)</span>.</li>
+	<li id="footer-info-copyright">Text is available under the <a rel="license" href="//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative Commons Attribution-ShareAlike License 3.0</a><a rel="license" href="//creativecommons.org/licenses/by-sa/3.0/" style="display:none;"></a>;
+additional terms may apply.  By using this site, you agree to the <a href="//foundation.wikimedia.org/wiki/Terms_of_Use">Terms of Use</a> and <a href="//foundation.wikimedia.org/wiki/Privacy_policy">Privacy Policy</a>. Wikipedia® is a registered trademark of the <a href="//www.wikimediafoundation.org/">Wikimedia Foundation, Inc.</a>, a non-profit organization.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="https://foundation.wikimedia.org/wiki/Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/Wikipedia:About">About Wikipedia</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/Wikipedia:General_disclaimer">Disclaimers</a></li>
+	<li id="footer-places-contact"><a href="//en.wikipedia.org/wiki/Wikipedia:Contact_us">Contact Wikipedia</a></li>
+	<li id="footer-places-mobileview"><a href="//en.m.wikipedia.org/w/index.php?title=Frederick_Bates_(politician)&amp;mobileaction=toggle_view_mobile" class="noprint stopMobileRedirectToggle">Mobile view</a></li>
+	<li id="footer-places-developers"><a href="https://developer.wikimedia.org">Developers</a></li>
+	<li id="footer-places-statslink"><a href="https://stats.wikimedia.org/#/en.wikipedia.org">Statistics</a></li>
+	<li id="footer-places-cookiestatement"><a href="https://foundation.wikimedia.org/wiki/Cookie_statement">Cookie statement</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-copyrightico"><a href="https://wikimediafoundation.org/"><img src="/static/images/footer/wikimedia-button.png" srcset="/static/images/footer/wikimedia-button-1.5x.png 1.5x, /static/images/footer/wikimedia-button-2x.png 2x" width="88" height="31" alt="Wikimedia Foundation" loading="lazy" /></a></li>
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/"><img src="/static/images/footer/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/static/images/footer/poweredby_mediawiki_132x47.png 1.5x, /static/images/footer/poweredby_mediawiki_176x62.png 2x" width="88" height="31" loading="lazy"/></a></li>
+</ul>
+
+</footer>
+
+		</div>
+	</div> 
+</div> 
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgHostname":"mw2386","wgBackendResponseTime":100,"wgPageParseReport":{"limitreport":{"cputime":"0.451","walltime":"0.571","ppvisitednodes":{"value":8541,"limit":1000000},"postexpandincludesize":{"value":41389,"limit":2097152},"templateargumentsize":{"value":3154,"limit":2097152},"expansiondepth":{"value":18,"limit":100},"expensivefunctioncount":{"value":8,"limit":500},"unstrip-depth":{"value":1,"limit":20},"unstrip-size":{"value":34260,"limit":5000000},"entityaccesscount":{"value":1,"limit":400},"timingprofile":["100.00%  523.024      1 -total"," 42.51%  222.359      1 Template:Infobox_officeholder"," 20.65%  108.012      1 Template:Reflist"," 15.97%   83.541      5 Template:Cite_book"," 14.73%   77.034     17 Template:Infobox_officeholder/office"," 12.84%   67.170      1 Template:Governors_of_Missouri"," 12.47%   65.232      1 Template:Navbox","  8.82%   46.128      1 Template:Short_description","  6.34%   33.145      1 Template:Country2nationality","  5.51%   28.803      1 Template:Birth_date"]},"scribunto":{"limitreport-timeusage":{"value":"0.248","limit":"10.000"},"limitreport-memusage":{"value":6809516,"limit":52428800}},"cachereport":{"origin":"mw2330","timestamp":"20230405023959","ttl":86400,"transientcontent":true}}});});</script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"Article","name":"Frederick Bates (politician)","url":"https:\/\/en.wikipedia.org\/wiki\/Frederick_Bates_(politician)","sameAs":"http:\/\/www.wikidata.org\/entity\/Q1452792","mainEntity":"http:\/\/www.wikidata.org\/entity\/Q1452792","author":{"@type":"Organization","name":"Contributors to Wikimedia projects"},"publisher":{"@type":"Organization","name":"Wikimedia Foundation, Inc.","logo":{"@type":"ImageObject","url":"https:\/\/www.wikimedia.org\/static\/images\/wmf-hor-googpub.png"}},"datePublished":"2003-09-10T19:53:11Z","dateModified":"2023-04-05T02:39:58Z","image":"https:\/\/upload.wikimedia.org\/wikipedia\/commons\/1\/10\/Frederick_Bates.jpg","headline":"American politician, Missouri (1777-1825)"}</script><script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"Article","name":"Frederick Bates (politician)","url":"https:\/\/en.wikipedia.org\/wiki\/Frederick_Bates_(politician)","sameAs":"http:\/\/www.wikidata.org\/entity\/Q1452792","mainEntity":"http:\/\/www.wikidata.org\/entity\/Q1452792","author":{"@type":"Organization","name":"Contributors to Wikimedia projects"},"publisher":{"@type":"Organization","name":"Wikimedia Foundation, Inc.","logo":{"@type":"ImageObject","url":"https:\/\/www.wikimedia.org\/static\/images\/wmf-hor-googpub.png"}},"datePublished":"2003-09-10T19:53:11Z","dateModified":"2023-04-05T02:39:58Z","image":"https:\/\/upload.wikimedia.org\/wikipedia\/commons\/1\/10\/Frederick_Bates.jpg","headline":"American politician, Missouri (1777-1825)"}</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+paper-qa>=0.0.21
+gradio
+requests
+transformers

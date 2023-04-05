@@ -164,6 +164,7 @@ def test_pdf_reader():
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-curie-001"))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
+    print(answer)
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
@@ -224,3 +225,7 @@ def test_dockey_filter():
     # add with new dockey
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
     docs.get_evidence("What country is Bates from?", key_filter=["test"])
+
+
+if __name__ == '__main__':
+    test_pdf_reader()
