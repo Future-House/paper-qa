@@ -21,7 +21,7 @@ class ZoteroPaper(_ZoteroPaper):
         return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
 
 
-class ZoteroQA(zotero.Zotero):
+class ZoteroDB(zotero.Zotero):
     """An extension of pyzotero.zotero.Zotero to interface with paperqa.
 
     This class automatically reads in your `ZOTERO_USER_ID` and `ZOTERO_API_KEY`
@@ -29,7 +29,7 @@ class ZoteroQA(zotero.Zotero):
     step 2 of https://github.com/urschrei/pyzotero#quickstart.
 
     This class will download PDFs from your Zotero library and store them in
-    `~/.paperqa/zotero` by default. To use this class, call the `gen_paperdb`
+    `~/.paperqa/zotero` by default. To use this class, call the `iterate`
     method, which returns a `paperqa.Docs` object.
     """
 
@@ -42,7 +42,7 @@ class ZoteroQA(zotero.Zotero):
         storage: Optional[StrPath] = None,
         **kwargs,
     ):
-        self.logger = logging.getLogger("ZoteroQA")
+        self.logger = logging.getLogger("ZoteroDB")
 
         if library_id is None:
             self.logger.info(f"Attempting to get ZOTERO_USER_ID from `os.environ`...")
@@ -109,7 +109,7 @@ class ZoteroQA(zotero.Zotero):
 
         return pdf_path
 
-    def gen_paperdb(
+    def iterate(
         self,
         q: Optional[str] = None,
         qmode: Optional[str] = None,
