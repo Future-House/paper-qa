@@ -171,6 +171,8 @@ class Docs:
         self.docs[path] = dict(texts=texts, metadata=metadata, key=key)
         if self._faiss_index is not None:
             self._faiss_index.add_texts(texts, metadatas=metadata)
+        if self._doc_index is not None:
+            self._doc_index.add_texts([citation], metadatas=[{"key": key}])
 
     def clear(self) -> None:
         """Clear the collection of documents."""
@@ -199,7 +201,7 @@ class Docs:
 
     def doc_match(self, query: str, k: int = 25) -> List[str]:
         """Return a list of documents that match the query."""
-        if self._doc_index is None or len(self.docs) != len(self._doc_index):
+        if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
             metadatas = [
                 {"key": doc["metadata"][0]["dockey"]} for doc in self.docs.values()

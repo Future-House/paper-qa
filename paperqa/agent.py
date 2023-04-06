@@ -8,7 +8,7 @@ from langchain.chat_models import ChatOpenAI
 
 
 def status(answer: Answer, docs: Docs):
-    return f"| Total Papers: {len(docs.doc_previews())} Total Evidence: {len(answer.contexts)} Total Cost: {answer.cost}"
+    return f"Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
 
 
 class PaperChoice(BaseTool):
@@ -28,6 +28,8 @@ class PaperChoice(BaseTool):
 
     def _run(self, query: str) -> str:
         result = self.docs.doc_match(query)
+        if result is None:
+            return "No relevant papers found."
         return result + status(self.answer, self.docs)
 
     async def _arun(self, query: str) -> str:
@@ -73,8 +75,8 @@ class ReadPapers(BaseTool):
 
 
 class AnswerTool(BaseTool):
-    name = "Answer Question"
-    description = "Ask a researcher to answer a question using evidence from papers. Input is the question to be answered."
+    name = "Propose Answer"
+    description = "Ask a researcher to propose an answer using evidence from papers. Input is the question to be answered."
     docs: Docs = None
     answer: Answer = None
 
@@ -86,7 +88,9 @@ class AnswerTool(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        self.answer = self.docs.query(query, answer=self.answer)
+        self.answer = self.docs.query(
+            query, answer=self.answer, length_prompt="length as long as needed"
+        )
         if "cannot answer" in self.answer.answer:
             self.answer = Answer(self.answer.question)
             return "Failed to answer question. Deleting evidence." + status(
@@ -156,8 +160,8 @@ def run_agent(docs, question, llm=None, budget=10000):
         tools, llm, agent="chat-zero-shot-react-description", verbose=True
     )
     mrkl.run(
-        f"Answer question: {question}. Find papers, gather evidence, and answer. "
-        "Once you have five pieces of evidence, call the Answer tool. Reflect if stuck "
+        f"Answer question: {question}. Find papers, choose papers, gather evidence, and answer. "
+        "Once you have at least five pieces of evidence, call the Propose Answer tool. Iterate as needed. Reflect if stuck "
         "and remember the tools are deterministic -- calling the same tool twice will give "
         "the same result."
     )
