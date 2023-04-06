@@ -1,5 +1,6 @@
 from .utils import maybe_is_code
 from html2text import html2text
+from pathlib import Path
 
 from langchain.text_splitter import TokenTextSplitter
 
@@ -100,6 +101,8 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
 
 def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
     """Parse a document into chunks."""
+    if isinstance(path, Path):
+        path = str(path)
     if path.endswith(".pdf"):
         return parse_pdf(path, citation, key, chunk_chars, overlap)
     elif path.endswith(".txt"):
