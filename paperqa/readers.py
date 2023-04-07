@@ -161,6 +161,7 @@ def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=F
             chunk_chars=chunk_chars,
             overlap=overlap,
             disable_check=disable_check,
+            version=__version__,
         )
     )
     logger.debug(f"Looking up cache key for {path}")
