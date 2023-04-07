@@ -118,20 +118,27 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
 
 
 def _serialize_s(obj):
+    """Convert a json-like object to a string"""
+    # We sort the keys to ensure
+    # that the same object always gets serialized to the same string.
     return json.dumps(obj, sort_keys=True, ensure_ascii=False)
+
+
+def _deserialize_s(obj):
+    """The inverse of _serialize_s"""
+    return json.loads(obj)
 
 
 def _serialize(obj):
     # llmchain wants a list of "Generation" objects, so we simply
-    # stick this regular text into it. We sort the keys to ensure
-    # that the same object always gets serialized to the same string.
+    # stick this regular text into it. 
     return [Generation(text=_serialize_s(obj))]
 
 
 def _deserialize(obj):
     # (The inverse of _serialize)
     try:
-        return json.loads(obj[0].text)
+        return _deserialize_s(obj[0].text)
     except json.JSONDecodeError:
         return None
 
