@@ -5,6 +5,7 @@ from html2text import html2text
 from pathlib import Path
 import json
 import logging
+from hashlib import md5
 
 from langchain.text_splitter import TokenTextSplitter
 from langchain.cache import SQLiteCache
@@ -146,15 +147,14 @@ def _deserialize(obj):
 def _filehash(path):
     """Fast hash of a file - about 1ms per MB."""
     bufsize = 65536
-    h = 0
+    h = md5()
     with open(path, "rb") as f:
         while True:
             data = f.read(bufsize)
             if not data:
                 break
-            h = hash((h, data))
-
-    return h
+            h.update(data)
+    return h.hexdigest()
 
 
 def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
@@ -172,7 +172,7 @@ def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=F
         )
     )
     logger.debug(f"Looking up cache key for {path}")
-    cache_lookup = _get_ocr_cache().lookup(prompt=cache_key, llm_string="pdf")
+    cache_lookup = _get_ocr_cache().lookup(prompt=cache_key, llm_string="")
 
     out = None
     successful_lookup = False
@@ -205,7 +205,7 @@ def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=F
         logger.debug(f"Updating cache for {path}")
         _get_ocr_cache().update(
             prompt=cache_key,
-            llm_string="pdf",
+            llm_string="",
             return_val=_serialize(out),
         )
     return out
