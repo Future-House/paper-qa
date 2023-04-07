@@ -117,11 +117,15 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
     return splits, metadatas
 
 
+def _serialize_s(obj):
+    return json.dumps(obj, sort_keys=True, ensure_ascii=False)
+
+
 def _serialize(obj):
     # llmchain wants a list of "Generation" objects, so we simply
     # stick this regular text into it. We sort the keys to ensure
     # that the same object always gets serialized to the same string.
-    return [Generation(text=json.dumps(obj, sort_keys=True, ensure_ascii=False))]
+    return [Generation(text=_serialize_s(obj))]
 
 
 def _deserialize(obj):
@@ -135,7 +139,7 @@ def _deserialize(obj):
 def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
     logger = logging.getLogger(__name__)
     logger.debug(f"Creating cache key for {path}")
-    cache_key = json.dumps(
+    cache_key = _serialize_s(
         dict(
             path=str(path),
             citation=citation,
@@ -143,8 +147,7 @@ def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=F
             chunk_chars=chunk_chars,
             overlap=overlap,
             disable_check=disable_check,
-        ),
-        sort_keys=True,
+        )
     )
     logger.debug(f"Looking up cache key for {path}")
     cache_lookup = _get_ocr_cache().lookup(prompt=cache_key, llm_string="pdf")
