@@ -136,12 +136,26 @@ def _deserialize(obj):
         return None
 
 
+def _filehash(path):
+    """Fast hash of a file - about 1ms per MB."""
+    bufsize = 65536
+    h = 0
+    with open(path, "rb") as f:
+        while True:
+            data = f.read(bufsize)
+            if not data:
+                break
+            h = hash((h, data))
+
+    return h
+
+
 def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
     logger = logging.getLogger(__name__)
     logger.debug(f"Creating cache key for {path}")
     cache_key = _serialize_s(
         dict(
-            path=str(path),
+            hash=str(_filehash(path)),
             citation=citation,
             key=key,
             chunk_chars=chunk_chars,
