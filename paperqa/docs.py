@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings.base import Embeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import LLM
 from langchain.chains import LLMChain
@@ -67,6 +68,7 @@ class Docs:
         summary_llm: Optional[Union[LLM, str]] = None,
         name: str = "default",
         index_path: Optional[Path] = None,
+        embeddings: Optional[Embeddings] = None,
     ) -> None:
         """Initialize the collection of documents.
 
@@ -89,6 +91,9 @@ class Docs:
             index_path = Path.home() / ".paperqa" / name
         self.index_path = index_path
         self.name = name
+        if embeddings is None:
+            embeddings = OpenAIEmbeddings()
+        self.embeddings = embeddings
 
     def update_llm(
         self,
@@ -209,7 +214,7 @@ class Docs:
                 {"key": doc["metadata"][0]["dockey"]} for doc in self.docs.values()
             ]
             self._doc_index = FAISS.from_texts(
-                texts, metadatas=metadatas, embedding=OpenAIEmbeddings()
+                texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.max_marginal_relevance_search(query, k=k)
         chain = make_chain(select_paper_prompt, self.summary_llm)
@@ -237,7 +242,7 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
+            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
@@ -252,7 +257,7 @@ class Docs:
                 lambda x, y: x + y, [doc["metadata"] for doc in self.docs.values()], []
             )
             self._faiss_index = FAISS.from_texts(
-                texts, OpenAIEmbeddings(), metadatas=metadatas
+                texts, self.embeddings, metadatas=metadatas
             )
 
     def get_evidence(
@@ -373,6 +378,7 @@ class Docs:
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
+        key_filter: Optional[bool] = None,
     ):
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -392,6 +398,7 @@ class Docs:
                 length_prompt=length_prompt,
                 marginal_relevance=marginal_relevance,
                 answer=answer,
+                key_filter=key_filter
             )
         )
 
@@ -403,17 +410,24 @@ class Docs:
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
+        key_filter: Optional[bool] = None
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         if answer is None:
             answer = Answer(query)
+        if key_filter or (key_filter is None and len(self.docs) > 5)    :
+            with get_openai_callback() as cb:
+                keys = self.doc_match(answer.question)
+            answer.tokens += cb.total_tokens
+            answer.cost += cb.total_cost
         if len(answer.contexts) == 0:
             answer = await self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
+                key_filter=keys if key_filter else None
             )
         context_str, citations = answer.context, answer.contexts
         bib = dict()

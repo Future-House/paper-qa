@@ -234,3 +234,19 @@ def test_dockey_filter():
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
     answer = paperqa.Answer("What country is Bates from?")
     docs.get_evidence(answer, key_filter=["test"])
+
+
+def test_query_filter():
+    """Test that we can filter evidence with in query"""
+    doc_path = "example2.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now")
+    # add with new dockey
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    answer = docs.query("What country is Bates from?", key_filter=True)
+    print(answer.context)
+    assert "United States" in answer.answer

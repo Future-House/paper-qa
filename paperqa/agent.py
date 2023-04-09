@@ -9,32 +9,6 @@ from langchain.chat_models import ChatOpenAI
 def status(answer: Answer, docs: Docs):
     return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
 
-class PaperSelection(BaseTool):
-    name = "Select Papers"
-    description = "Ask a researcher to select from current papers. Only provide instructions as string for the researcher."
-    docs: Docs = None
-    answer: Answer = None
-    chain: LLMChain = None
-
-    def __init__(self, docs, answer):
-        # call the parent class constructor
-        super(PaperSelection, self).__init__()
-
-        self.docs = docs
-        self.answer = answer
-        self.chain = make_chain(select_paper_prompt, self.docs.summary_llm)
-
-    def _run(self, query: str) -> str:
-        result = self.docs.doc_match(query)
-        if result is None:
-            return "No relevant papers found."
-        return result + status(self.answer, self.docs)
-
-    async def _arun(self, query: str) -> str:
-        """Use the tool asynchronously."""
-        raise NotImplementedError()
-
-
 class ReadPapers(BaseTool):
     name = "Gather Evidence"
     description = (
@@ -104,7 +78,7 @@ class AnswerTool(BaseTool):
 class Search(BaseTool):
     name = "Paper Search"
     description = (
-        "Search for papers to add to current papers. Input should be a string keywords."
+        "Search for papers to add to current papers. Input should be a string of keywords."
     )
     docs: Docs = None
     answer: Answer = None
@@ -140,7 +114,6 @@ def make_tools(docs, answer):
     tools = []
 
     tools.append(Search(docs, answer))
-    tools.append(PaperSelection(docs, answer))
     tools.append(ReadPapers(docs, answer))
     tools.append(AnswerTool(docs, answer))
     tools.append(
@@ -163,7 +136,7 @@ def run_agent(docs, question, llm=None):
         tools, llm, agent="chat-zero-shot-react-description", verbose=True
     )
     mrkl.run(
-        f"Answer question: {question}. Search for papers, select papers, gather evidence, and answer. "
+        f"Answer question: {question}. Search for papers, gather evidence, and answer. "
         "Once you have at least five pieces of evidence, call the Propose Answer tool. "
         "If you do not have enough evidence, search with different keywords. Remember to format with JSON. "
     )
