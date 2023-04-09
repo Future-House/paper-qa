@@ -201,6 +201,8 @@ class Docs:
 
     def doc_match(self, query: str, k: int = 25) -> List[str]:
         """Return a list of documents that match the query."""
+        if len(self.docs) == 0:
+            return ''
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
             metadatas = [
@@ -264,7 +266,6 @@ class Docs:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
             import nest_asyncio
-
             nest_asyncio.apply()
         try:
             loop = asyncio.get_event_loop()
@@ -289,6 +290,8 @@ class Docs:
         marginal_relevance: bool = True,
         key_filter: Optional[List[str]] = None,
     ) -> str:
+        if len(self.docs) == 0:
+            return answer
         if self._faiss_index is None:
             self._build_faiss_index()
         _k = k

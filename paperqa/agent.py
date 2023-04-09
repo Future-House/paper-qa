@@ -8,18 +8,18 @@ from langchain.chat_models import ChatOpenAI
 
 
 def status(answer: Answer, docs: Docs):
-    return f"Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
+    return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
 
-class PaperChoice(BaseTool):
-    name = "Choose Papers"
-    description = "Ask a researcher to select papers based expert knowledge and paper citations. Only provide instructions as string for the researcher."
+class PaperSelection(BaseTool):
+    name = "Select Papers"
+    description = "Ask a researcher to select from current papers. Only provide instructions as string for the researcher."
     docs: Docs = None
     answer: Answer = None
     chain: LLMChain = None
 
     def __init__(self, docs, answer):
         # call the parent class constructor
-        super(PaperChoice, self).__init__()
+        super(PaperSelection, self).__init__()
 
         self.docs = docs
         self.answer = answer
@@ -40,7 +40,7 @@ class ReadPapers(BaseTool):
     name = "Gather Evidence"
     description = (
         "Give a specific question to a researcher that will return evidence for it. "
-        "Optionally, you may specify papers using their key provided by the Choose Papers tool. "
+        "Optionally, you may specify papers using their key provided by the Select Papers tool. "
         "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
     )
     docs: Docs = None
@@ -75,7 +75,7 @@ class ReadPapers(BaseTool):
 
 class AnswerTool(BaseTool):
     name = "Propose Answer"
-    description = "Ask a researcher to propose an answer using evidence from papers. Input is the question to be answered."
+    description = "Ask a researcher to propose an answer using evidence from papers. The input is the question to be answered."
     docs: Docs = None
     answer: Answer = None
 
@@ -103,9 +103,9 @@ class AnswerTool(BaseTool):
 
 
 class Search(BaseTool):
-    name = "Search for Papers"
+    name = "Paper Search"
     description = (
-        "Search for papers using Google Scholar. Input should be a string keywords."
+        "Search for papers to add to current papers. Input should be a string keywords."
     )
     docs: Docs = None
     answer: Answer = None
@@ -135,10 +135,10 @@ def make_tools(docs, answer):
 
     tools = []
 
-    tools.append(ReadPapers(docs, answer))
-    tools.append(PaperChoice(docs, answer))
-    tools.append(AnswerTool(docs, answer))
     tools.append(Search(docs, answer))
+    tools.append(PaperSelection(docs, answer))
+    tools.append(ReadPapers(docs, answer))
+    tools.append(AnswerTool(docs, answer))
     tools.append(
         Tool(
             name="Reflect",
@@ -146,7 +146,7 @@ def make_tools(docs, answer):
             func=lambda x: "Reflect on your process. Are you repeating the same steps? Are you stuck? If so, try to think of a new way to approach the problem.",
         )
     )
-
+    # reflect is left off for now - doesn't seem to help
     return tools[:-1]
 
 
@@ -159,10 +159,9 @@ def run_agent(docs, question, llm=None):
         tools, llm, agent="chat-zero-shot-react-description", verbose=True
     )
     mrkl.run(
-        f"Answer question: {question}. Find papers, choose papers, gather evidence, and answer. "
-        "Once you have at least five pieces of evidence, call the Propose Answer tool. Iterate as needed. Reflect if stuck "
-        "and remember the tools are deterministic -- calling the same tool twice will give "
-        "the same result."
+        f"Answer question: {question}. Search for papers, select papers, gather evidence, and answer. "
+        "Once you have at least five pieces of evidence, call the Propose Answer tool. "
+        "If you do not have enough evidence, search with different keywords. Remember to format with JSON. "
     )
 
     return answer

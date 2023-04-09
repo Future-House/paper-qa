@@ -30,7 +30,7 @@ qa_prompt = prompts.PromptTemplate(
     'reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
-    "Answer in an unbiased and scholarly tone. "
+    "Answer in an unbiased, comprehensive, and scholarly tone. "
     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
     "{context_str}\n"
     "Question: {question}\n"
