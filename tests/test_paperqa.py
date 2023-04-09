@@ -87,7 +87,6 @@ def test_doc_match():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     i = 0
     result = docs.doc_match("What is Frederick Bates's greatest accomplishment?")
-    print(result)
     os.remove(doc_path)
 
 
@@ -134,7 +133,6 @@ def test_bad_context():
         "What year was Barack Obama born?",
         length_prompt="about 20 words",
     )
-    print(answer.context)
     assert "cannot answer" in answer.answer
     os.remove(doc_path)
 

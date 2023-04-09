@@ -10,7 +10,6 @@ from langchain.chat_models import ChatOpenAI
 def status(answer: Answer, docs: Docs):
     return f"Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
 
-
 class PaperChoice(BaseTool):
     name = "Choose Papers"
     description = "Ask a researcher to select papers based expert knowledge and paper citations. Only provide instructions as string for the researcher."
@@ -148,12 +147,12 @@ def make_tools(docs, answer):
         )
     )
 
-    return tools
+    return tools[:-1]
 
 
-def run_agent(docs, question, llm=None, budget=10000):
+def run_agent(docs, question, llm=None):
     if llm is None:
-        llm = ChatOpenAI(temperature=0, model="gpt-4")
+        llm = ChatOpenAI(temperature=0.1, model="gpt-4")
     answer = Answer(question)
     tools = make_tools(docs, answer)
     mrkl = initialize_agent(
