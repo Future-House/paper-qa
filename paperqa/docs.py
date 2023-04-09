@@ -5,6 +5,7 @@ import sys
 import asyncio
 from pathlib import Path
 import re
+from .paths import CACHE_PATH
 from .utils import maybe_is_text, maybe_is_truncated
 from .qaprompts import (
     summary_prompt,
@@ -27,7 +28,6 @@ from langchain.cache import SQLiteCache
 import langchain
 from datetime import datetime
 
-CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
 

@@ -1,8 +1,27 @@
-from .utils import maybe_is_code
+import os
+from .paths import OCR_CACHE_PATH
+from .version import __version__
 from html2text import html2text
 from pathlib import Path
+import json
+import logging
+from hashlib import md5
 
 from langchain.text_splitter import TokenTextSplitter
+from langchain.cache import SQLiteCache
+from langchain.schema import Generation
+
+OCR_CACHE = None
+
+
+def _get_ocr_cache() -> SQLiteCache:
+    """Used to lazily create the cache directory and cache object."""
+    global OCR_CACHE
+    if OCR_CACHE is None:
+        os.makedirs(os.path.dirname(OCR_CACHE_PATH), exist_ok=True)
+        OCR_CACHE = SQLiteCache(OCR_CACHE_PATH)
+    return OCR_CACHE
+
 
 TextSplitter = TokenTextSplitter
 
@@ -99,7 +118,100 @@ def parse_code_txt(path, citation, key, chunk_chars=2000, overlap=50):
     return splits, metadatas
 
 
+def _serialize_s(obj):
+    """Convert a json-like object to a string"""
+    # We sort the keys to ensure
+    # that the same object always gets serialized to the same string.
+    return json.dumps(obj, sort_keys=True, ensure_ascii=False)
+
+
+def _deserialize_s(obj):
+    """The inverse of _serialize_s"""
+    return json.loads(obj)
+
+
+def _serialize(obj):
+    # llmchain wants a list of "Generation" objects, so we simply
+    # stick this regular text into it. 
+    return [Generation(text=_serialize_s(obj))]
+
+
+def _deserialize(obj):
+    # (The inverse of _serialize)
+    try:
+        return _deserialize_s(obj[0].text)
+    except json.JSONDecodeError:
+        return None
+
+
+def _filehash(path):
+    """Fast hash of a file - about 1ms per MB."""
+    bufsize = 65536
+    h = md5()
+    with open(path, "rb") as f:
+        while True:
+            data = f.read(bufsize)
+            if not data:
+                break
+            h.update(data)
+    return h.hexdigest()
+
+
 def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
+    logger = logging.getLogger(__name__)
+    logger.debug(f"Creating cache key for {path}")
+    cache_key = _serialize_s(
+        dict(
+            hash=str(_filehash(path)),
+            citation=citation,
+            key=key,
+            chunk_chars=chunk_chars,
+            overlap=overlap,
+            disable_check=disable_check,
+            version=__version__,
+        )
+    )
+    logger.debug(f"Looking up cache key for {path}")
+    cache_lookup = _get_ocr_cache().lookup(prompt=cache_key, llm_string="")
+
+    out = None
+    successful_lookup = False
+    cache_exists = cache_lookup is not None
+    if cache_exists:
+        logger.debug(f"Found cache key for {path}")
+        out = _deserialize(cache_lookup)
+
+    successful_lookup = out is not None
+    if successful_lookup:
+        logger.debug(f"Succesfully loaded cache key for {path}")
+    elif cache_exists:
+        logger.debug(f"Failed to decode existing cache for {path}")
+
+    if out is None:
+        logger.debug(f"Did not load cache, so parsing {path}")
+
+        # The actual call:
+        out = _read_doc(
+            path=path,
+            citation=citation,
+            key=key,
+            chunk_chars=chunk_chars,
+            overlap=overlap,
+            disable_check=disable_check,
+        )
+
+        logger.debug(f"Done parsing document {path}")
+    if not successful_lookup:
+        logger.debug(f"Updating cache for {path}")
+        _get_ocr_cache().update(
+            prompt=cache_key,
+            llm_string="",
+            return_val=_serialize(out),
+        )
+    return out
+
+
+def _read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
     """Parse a document into chunks."""
     if isinstance(path, Path):
         path = str(path)
