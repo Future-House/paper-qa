@@ -2,7 +2,6 @@ from langchain.tools import BaseTool
 from langchain.chains import LLMChain
 from .qaprompts import select_paper_prompt, make_chain
 from .docs import Answer, Docs
-import paperscraper
 from langchain.agents import initialize_agent, Tool
 from langchain.chat_models import ChatOpenAI
 
@@ -118,6 +117,11 @@ class Search(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
+        try:
+            import paperscraper
+        except ImportError:
+            raise ImportError('Please install paperscraper (github.com/blackadad/paper-scraper) to use agent')
+
         papers = paperscraper.search_papers(query, limit=20, verbose=False)
         for path, data in papers.items():
             try:
