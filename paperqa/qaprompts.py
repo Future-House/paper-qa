@@ -13,7 +13,7 @@ summary_prompt = prompts.PromptTemplate(
     "quote to give evidence to help answer the question. "
     "Do not use outside sources. "
     'Reply with "Not applicable" if the text is unrelated to the question. '
-    "Use 75 or less words."
+    "Use 150 or less words."
     "\n\n"
     "{context_str}\n"
     "Extracted from {citation}\n"
@@ -25,12 +25,12 @@ summary_prompt = prompts.PromptTemplate(
 qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "length"],
     template="Write an answer ({length}) "
-    "for the question below solely based on the provided context. "
+    "for the question below based on the provided context. "
     "If the context provides insufficient information, "
     'reply "I cannot answer". '
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
-    "Answer in an unbiased and scholarly tone. Make clear what is your opinion. "
+    "Answer in an unbiased, comprehensive, and scholarly tone. "
     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
     "{context_str}\n"
     "Question: {question}\n"
@@ -45,6 +45,18 @@ search_prompt = prompts.PromptTemplate(
     "that will find papers to help answer the question. Do not use boolean operators. "
     "Recent years are 2021, 2022, 2023.\n\n"
     "1.",
+)
+
+
+select_paper_prompt = prompts.PromptTemplate(
+    input_variables=["instructions", "papers"],
+    template="Select papers according to instructions below. "
+    "Papers are listed as $KEY: $PAPER_INFO. "
+    "Return a list of keys, separated by commas. "
+    'Return "None", if no papers are applicable. \n\n'
+    "Instructions: {instructions}\n\n"
+    "{papers}\n\n"
+    "Selected keys:",
 )
 
 
