@@ -216,6 +216,81 @@ class ZoteroDB(zotero.Zotero):
             num_remaining = limit - actual_i
 
         self.logger.info("Finished downloading papers. Now creating Docs object.")
+    
+    def iterate_collection(
+        self,
+        collection_name: str,
+        limit: int = 25,
+        start: int = 0,
+    ):
+        """Given a collection name, this will lazily iterate over papers in a Zotero library, downloading PDFs as needed.
+
+        Args:
+            collection_name (str): name of the collection in Zotero
+            limit (int, optional): the limit of papers to download. Defaults to 25.
+            start (int, optional): the start index of the papers to download. Defaults to 0.
+        """
+        # specfic collection
+        collections = self.collections()
+        collection_id = None
+
+        for collection in collections:
+            name = collection["data"]["name"]
+            if name  == collection_name:
+                collection_id = collection["data"]["key"]
+                break
+
+        if collection_id:
+            coll_items = self.collection_items(collection_id)
+            self.logger.info(f"Collection '{collection_name}' found: {len(coll_items)} items")
+                
+        else:
+            self.logger.info(f"Collection '{collection_name}' not found")
+            return
+        
+        max_limit = 100
+
+        items = []
+        pdfs = []
+        i = 0
+        actual_i = 0
+        num_remaining = limit - len(items)
+
+        while num_remaining > 0:
+            cur_limit = min(max_limit, num_remaining)
+            self.logger.info(f"Downloading new batch of up to {cur_limit} papers.")
+            _items = coll_items
+            if len(_items) == 0:
+                break
+            i += cur_limit
+            self.logger.info(f"Downloading PDFs.")
+            _pdfs = [self.get_pdf(item) for item in _items]
+
+            # Filter:
+            for item, pdf in zip(_items, _pdfs):
+                no_pdf = item is None or pdf is None
+                is_duplicate = pdf in pdfs
+
+                if no_pdf or is_duplicate:
+                    continue
+
+                title = item["data"]["title"] if "title" in item["data"] else ""
+                if len(items) >= start:
+                    yield ZoteroPaper(
+                        key=_get_citation_key(item),
+                        title=title,
+                        pdf=pdf,
+                        details=item,
+                        zotero_key=item["key"],
+                    )
+                    actual_i += 1
+
+                items.append(item)
+                pdfs.append(pdf)
+
+            num_remaining = limit - actual_i
+
+        self.logger.info("Finished downloading papers. Now creating Docs object.")
 
 
 def _get_citation_key(item: dict) -> str:
