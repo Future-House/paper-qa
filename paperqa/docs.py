@@ -1,7 +1,8 @@
 from typing import List, Optional, Tuple, Dict, Callable, Any, Union
 from functools import reduce
 import os
-import os
+import sys
+import asyncio
 from pathlib import Path
 import re
 from .utils import maybe_is_text, maybe_is_truncated
@@ -10,12 +11,14 @@ from .qaprompts import (
     qa_prompt,
     search_prompt,
     citation_prompt,
+    select_paper_prompt,
     make_chain,
 )
 from dataclasses import dataclass
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings.base import Embeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import LLM
 from langchain.chains import LLMChain
@@ -41,6 +44,7 @@ class Answer:
     formatted_answer: str = ""
     passages: Dict[str, str] = None
     tokens: int = 0
+    cost: float = 0
 
     def __post_init__(self):
         """Initialize the answer."""
@@ -64,6 +68,7 @@ class Docs:
         summary_llm: Optional[Union[LLM, str]] = None,
         name: str = "default",
         index_path: Optional[Path] = None,
+        embeddings: Optional[Embeddings] = None,
     ) -> None:
         """Initialize the collection of documents.
 
@@ -80,11 +85,15 @@ class Docs:
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
+        self._doc_index = None
         self.update_llm(llm, summary_llm)
         if index_path is None:
             index_path = Path.home() / ".paperqa" / name
         self.index_path = index_path
         self.name = name
+        if embeddings is None:
+            embeddings = OpenAIEmbeddings()
+        self.embeddings = embeddings
 
     def update_llm(
         self,
@@ -167,12 +176,15 @@ class Docs:
         self.docs[path] = dict(texts=texts, metadata=metadata, key=key)
         if self._faiss_index is not None:
             self._faiss_index.add_texts(texts, metadatas=metadata)
+        if self._doc_index is not None:
+            self._doc_index.add_texts([citation], metadatas=[{"key": key}])
 
     def clear(self) -> None:
         """Clear the collection of documents."""
         self.docs = dict()
         self.keys = set()
         self._faiss_index = None
+        self._doc_index = None
         # delete index file
         pkl = self.index_path / "index.pkl"
         if pkl.exists():
@@ -181,7 +193,6 @@ class Docs:
         if fs.exists():
             fs.unlink()
 
-    @property
     def doc_previews(self) -> List[Tuple[int, str, str]]:
         """Return a list of tuples of (key, citation) for each document."""
         return [
@@ -193,7 +204,26 @@ class Docs:
             for doc in self.docs.values()
         ]
 
+    def doc_match(self, query: str, k: int = 25) -> List[str]:
+        """Return a list of documents that match the query."""
+        if len(self.docs) == 0:
+            return ''
+        if self._doc_index is None:
+            texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
+            metadatas = [
+                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs.values()
+            ]
+            self._doc_index = FAISS.from_texts(
+                texts, metadatas=metadatas, embedding=self.embeddings
+            )
+        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        chain = make_chain(select_paper_prompt, self.summary_llm)
+        papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
+        result = chain.run(instructions=query, papers="\n".join(papers))
+        return result
+
     # to pickle, we have to save the index as a file
+
     def __getstate__(self):
         if self._faiss_index is None and len(self.docs) > 0:
             self._build_faiss_index()
@@ -201,6 +231,7 @@ class Docs:
         if self._faiss_index is not None:
             state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
+        del state["_doc_index"]
         # remove LLMs (they can have callbacks, which can't be pickled)
         del state["summary_chain"]
         del state["qa_chain"]
@@ -211,11 +242,11 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(self.index_path, OpenAIEmbeddings())
+            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
-        self.update_llm("gpt-3.5-turbo")
+        self.update_llm(None, None)
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
@@ -226,7 +257,7 @@ class Docs:
                 lambda x, y: x + y, [doc["metadata"] for doc in self.docs.values()], []
             )
             self._faiss_index = FAISS.from_texts(
-                texts, OpenAIEmbeddings(), metadatas=metadatas
+                texts, self.embeddings, metadatas=metadatas
             )
 
     def get_evidence(
@@ -237,6 +268,35 @@ class Docs:
         marginal_relevance: bool = True,
         key_filter: Optional[List[str]] = None,
     ) -> str:
+        # special case for jupyter notebooks
+        if "get_ipython" in globals() or "google.colab" in sys.modules:
+            import nest_asyncio
+            nest_asyncio.apply()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(
+            self.aget_evidence(
+                answer,
+                k=k,
+                max_sources=max_sources,
+                marginal_relevance=marginal_relevance,
+                key_filter=key_filter,
+            )
+        )
+
+    async def aget_evidence(
+        self,
+        answer: Answer,
+        k: int = 3,
+        max_sources: int = 5,
+        marginal_relevance: bool = True,
+        key_filter: Optional[List[str]] = None,
+    ) -> str:
+        if len(self.docs) == 0:
+            return answer
         if self._faiss_index is None:
             self._build_faiss_index()
         _k = k
@@ -251,13 +311,17 @@ class Docs:
             docs = self._faiss_index.similarity_search(
                 answer.question, k=_k, fetch_k=5 * _k
             )
-        for doc in docs:
+
+        async def process(doc):
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
-                continue
+                return None
+            # check if it is already in answer (possible in agent setting)
+            if doc.metadata["key"] in [c[0] for c in answer.contexts]:
+                return None
             c = (
                 doc.metadata["key"],
                 doc.metadata["citation"],
-                self.summary_chain.run(
+                await self.summary_chain.arun(
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
@@ -265,10 +329,24 @@ class Docs:
                 doc.page_content,
             )
             if "Not applicable" not in c[2]:
+                return c
+            return None
+
+        with get_openai_callback() as cb:
+            contexts = await asyncio.gather(*[process(doc) for doc in docs])
+        answer.tokens += cb.total_tokens
+        answer.cost += cb.total_cost
+        contexts = [c for c in contexts if c is not None]
+        if len(contexts) == 0:
+            return answer
+        contexts = sorted(contexts, key=lambda x: x[2], reverse=True)
+        contexts = contexts[:max_sources]
+        # add to answer (if not already there)
+        keys = [c[0] for c in answer.contexts]
+        for c in contexts:
+            if c[0] not in keys:
                 answer.contexts.append(c)
-                yield answer
-            if len(answer.contexts) == max_sources:
-                break
+
         context_str = "\n\n".join(
             [f"{k}: {s}" for k, c, s, t in answer.contexts if "Not applicable" not in s]
         )
@@ -276,7 +354,7 @@ class Docs:
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         answer.context = context_str
-        yield answer
+        return answer
 
     def generate_search_query(self, query: str) -> List[str]:
         """Generate a list of search strings that can be used to find
@@ -292,22 +370,6 @@ class Docs:
         queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
         return queries
 
-    def query_gen(
-        self,
-        query: str,
-        k: int = 10,
-        max_sources: int = 5,
-        length_prompt: str = "about 100 words",
-        marginal_relevance: bool = True,
-    ):
-        yield from self._query(
-            query,
-            k=k,
-            max_sources=max_sources,
-            length_prompt=length_prompt,
-            marginal_relevance=marginal_relevance,
-        )
-
     def query(
         self,
         query: str,
@@ -315,38 +377,58 @@ class Docs:
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
+        answer: Optional[Answer] = None,
+        key_filter: Optional[bool] = None,
     ):
-        for answer in self._query(
-            query,
-            k=k,
-            max_sources=max_sources,
-            length_prompt=length_prompt,
-            marginal_relevance=marginal_relevance,
-        ):
-            pass
-        return answer
+        # special case for jupyter notebooks
+        if "get_ipython" in globals() or "google.colab" in sys.modules:
+            import nest_asyncio
 
-    def _query(
+            nest_asyncio.apply()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(
+            self.aquery(
+                query,
+                k=k,
+                max_sources=max_sources,
+                length_prompt=length_prompt,
+                marginal_relevance=marginal_relevance,
+                answer=answer,
+                key_filter=key_filter
+            )
+        )
+
+    async def aquery(
         self,
         query: str,
-        k: int,
-        max_sources: int,
-        length_prompt: str,
-        marginal_relevance: bool,
+        k: int = 10,
+        max_sources: int = 5,
+        length_prompt: str = "about 100 words",
+        marginal_relevance: bool = True,
+        answer: Optional[Answer] = None,
+        key_filter: Optional[bool] = None
     ):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
-        tokens = 0
-        answer = Answer(query)
-        with get_openai_callback() as cb:
-            for answer in self.get_evidence(
+        if answer is None:
+            answer = Answer(query)
+        if key_filter or (key_filter is None and len(self.docs) > 5)    :
+            with get_openai_callback() as cb:
+                keys = self.doc_match(answer.question)
+            answer.tokens += cb.total_tokens
+            answer.cost += cb.total_cost
+        if len(answer.contexts) == 0:
+            answer = await self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-            ):
-                yield answer
-            tokens += cb.total_tokens
+                key_filter=keys if key_filter else None
+            )
         context_str, citations = answer.context, answer.contexts
         bib = dict()
         passages = dict()
@@ -356,10 +438,11 @@ class Docs:
             )
         else:
             with get_openai_callback() as cb:
-                answer_text = self.qa_chain.run(
+                answer_text = await self.qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )
-                tokens += cb.total_tokens
+            answer.tokens += cb.total_tokens
+            answer.cost += cb.total_cost
         # it still happens lol
         if "(Foo2012)" in answer_text:
             answer_text = answer_text.replace("(Foo2012)", "")
@@ -375,10 +458,9 @@ class Docs:
         formatted_answer = f"Question: {query}\n\n{answer_text}\n"
         if len(bib) > 0:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
-        formatted_answer += f"\nTokens Used: {tokens} Cost: ${tokens/1000 * 0.002:.2f}"
+        formatted_answer += f"\nTokens Used: {answer.tokens} Cost: ${answer.cost:.2f}"
         answer.answer = answer_text
         answer.formatted_answer = formatted_answer
         answer.references = bib_str
         answer.passages = passages
-        answer.tokens = tokens
-        yield answer
+        return answer
