@@ -7,7 +7,7 @@ from collections import namedtuple
 
 from pyzotero import zotero
 
-from ..docs import CACHE_PATH
+from ..paths import CACHE_PATH
 
 StrPath = Union[str, Path]
 
