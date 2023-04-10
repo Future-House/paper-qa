@@ -109,7 +109,6 @@ class ZoteroDB(zotero.Zotero):
 
         return pdf_path
 
-
     def iterate(
         self,
         limit: int = 25,
@@ -162,7 +161,7 @@ class ZoteroDB(zotero.Zotero):
             The index of the first item to return. Default is 0.
         """
         query_kwargs = {}
-        
+
         if q is not None:
             query_kwargs["q"] = q
         if qmode is not None:
@@ -175,7 +174,12 @@ class ZoteroDB(zotero.Zotero):
             query_kwargs["sort"] = sort
         if direction is not None:
             query_kwargs["direction"] = direction
-    
+
+        if collection_name is not None and len(query_kwargs) > 0:
+            raise ValueError(
+                "You cannot specify a `collection_name` and search query simultaneously!"
+            )
+
         max_limit = 100
 
         items = []
@@ -183,21 +187,24 @@ class ZoteroDB(zotero.Zotero):
         i = 0
         actual_i = 0
         num_remaining = limit - len(items)
-        
+
         collection_id = None
-        if collection_name: 
-            collection_id = self._get_collection_id(collection_name)  # raise error if not found
-                
+        if collection_name:
+            collection_id = self._get_collection_id(
+                collection_name
+            )  # raise error if not found
+
         while num_remaining > 0:
             cur_limit = min(max_limit, num_remaining)
             self.logger.info(f"Downloading new batch of up to {cur_limit} papers.")
 
-            
-            if collection_id: 
-                _items = self.collection_items(collection_id, limit=cur_limit, start=i)
+            if collection_id:
+                _items = self._sliced_collection_items(
+                    collection_id, limit=cur_limit, start=i
+                )
             else:
                 _items = self.top(**query_kwargs, limit=cur_limit, start=i)
-                
+
             if len(_items) == 0:
                 break
             i += cur_limit
@@ -229,9 +236,16 @@ class ZoteroDB(zotero.Zotero):
             num_remaining = limit - actual_i
 
         self.logger.info("Finished downloading papers. Now creating Docs object.")
-        
+
+    def _sliced_collection_items(self, collection_id, limit, start):
+        items = self.collection_items(collection_id)
+        items = items[start:]
+        if len(items) < limit:
+            return items
+        return items[:limit]
+
     def _get_collection_id(self, collection_name: str) -> str:
-        """ Get the collection id for a given collection name
+        """Get the collection id for a given collection name
             Raises ValueError if collection not found
         Args:
             collection_name (str): The name of the collection
@@ -239,23 +253,26 @@ class ZoteroDB(zotero.Zotero):
         Returns:
             str: collection id
         """
-     # specfic collection
+        # specfic collection
         collections = self.collections()
         collection_id = ""
 
         for collection in collections:
             name = collection["data"]["name"]
-            if name  == collection_name:
+            if name == collection_name:
                 collection_id = collection["data"]["key"]
                 break
 
         if collection_id:
             coll_items = self.collection_items(collection_id)
-            self.logger.info(f"Collection '{collection_name}' found: {len(coll_items)} items")
-            
+            self.logger.info(
+                f"Collection '{collection_name}' found: {len(coll_items)} items"
+            )
+
         else:
             raise ValueError(f"Collection '{collection_name}' not found")
         return collection_id
+
 
 def _get_citation_key(item: dict) -> str:
     if (
@@ -307,5 +324,3 @@ def _extract_pdf_key(item: dict) -> str:
         return None
 
     return attachment["href"].split("/")[-1]
-
-
