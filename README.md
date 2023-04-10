@@ -9,19 +9,17 @@ This is a minimal package for doing question and answering from
 PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations. It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
 generate answers.
 
-It uses this process
+It uses the process shown below:
 
-```text
+```
 embed docs into vectors -> embed query into vector -> search for top k passages in docs
 
 create summary of each passage relevant to query -> put summaries into prompt -> generate answer
 ```
 
-## Hugging Face Demo
+<img src="https://user-images.githubusercontent.com/908389/230854097-8fa96768-c694-45c0-bb04-3a7386facef3.jpeg" width="600" alt="Process of vector search, refinement, and answer with context">
 
-[Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
-
-## Example
+## Output Example
 
 Question: How can carbon nanotubes be manufactured at a large scale?
 
@@ -34,6 +32,11 @@ Journet6644: Journet, Catherine, et al. "Large-scale production of single-walled
 Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly of carbon nanotubes for the fabrication of large-scale device arrays." Journal of the American Chemical Society 129.39 (2007): 11964-11968.
 
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
+
+
+## Hugging Face Demo
+
+[Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
 
 ## Install
 
@@ -48,8 +51,6 @@ pip install paper-qa
 Make sure you have set your OPENAI_API_KEY environment variable to your [openai api key](https://platform.openai.com/account/api-keys)
 
 To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
-
-*This uses a lot of tokens!! About 5-10k tokens per answer + embedding cost (negligible unless many documents used). That is up to $0.02 per answer with current GPT-3 pricing. Use wisely.*
 
 ```python
 
@@ -67,12 +68,71 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
 
-## Adjusting number of sources
+### Choosing Model
+
+By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have gpt-4 access or would like to save money, you can adjust:
+
+```py
+docs = Docs(llm='gpt-3.5-turbo')
+```
+#### Locally Hosted
+
+You can also use any other models (or embeddings) available in [langchain](https://github.com/hwchase17/langchain). Here's an example of using `llama.cpp` to have locally hosted paper-qa:
+
+```py
+from langchain.embeddings import LlamaCppEmbeddings
+from langchain.llms import LlamaCpp
+llm = LlamaCpp(model_path="./ggml-model-q4_0.bin")
+embeddings = LlamaCppEmbeddings(model_path="/path/to/model/ggml-model-q4_0.bin")
+docs = Docs(llm=llm, embeddings=embeddings)
+```
+
+### Adjusting number of sources
 
 You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources`  and `max_sources` is the number of sources used in the final answer.
 
 ```python
 docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 5, max_sources = 2)
+```
+
+### Using Code or HTML
+
+You do not need to use papers -- you can use code or raw HTML. Note that this tool is focused on answering questions, so it won't do well at writing code. One note is that the tool cannot infer citations from code, so you will need to provide them yourself.
+
+```python
+
+import glob
+
+source_files = glob.glob('**/*.js')
+
+docs = Docs()
+for f in source_files:
+    # this assumes the file names are unique in code
+    docs.add(f, citation='File ' + os.path.name(f), key=os.path.name(f))
+answer = docs.query("Where is the search bar in the header defined?")
+print(answer)
+```
+
+## Notebooks
+
+If you want to use this in an jupyter notebook or colab, you need to run the following command:
+
+```python
+import nest_asyncio
+nest_asyncio.apply()
+```
+
+Also - if you know how to make this automated, please let me know!
+
+## Agents (experimental)
+
+You can try to automate the collection of papers and assessment of correctness of papers using an agent. This is experimental and requires installation of [paper-scraper](https://github.com/blackadad/paper-scraper).
+
+```python
+
+docs = paperqa.Docs()
+answer = paperqa.run_agent(docs, 'What compounds target AKT1')
+print(answer)
 ```
 
 ## Where do I get papers?
@@ -148,7 +208,7 @@ for path,data in papers.items():
         # sometimes this happens if PDFs aren't downloaded or readable
         print('Could not read', path, e)
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
-print(answer.formatted_answer)
+print(answer)
 ```
 
 ## FAQ
@@ -175,14 +235,16 @@ You can provide your own. I use some of my own code to pull papers from Google S
 
 ### Can I save or load?
 
-The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later. The database is stored in `$HOME/.paperqa/{name}` where `name` is `default`, or you can pass a `name` when you instantiate the `paperqa` doc object.
+The `Docs` class can be pickled and unpickled. This is useful if you want to save the embeddings of the documents and then load them later.
 
 ```python
 import pickle
 
+# save
 with open("my_docs.pkl", "wb") as f:
     pickle.dump(docs, f)
 
+# load
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
 ```
