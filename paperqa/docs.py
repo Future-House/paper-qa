@@ -246,6 +246,7 @@ class Docs:
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
+        self._doc_index = None
         self.update_llm(None, None)
 
     def _build_faiss_index(self):
