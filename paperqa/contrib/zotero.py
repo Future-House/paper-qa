@@ -8,9 +8,7 @@ from collections import namedtuple
 try:
     from pyzotero import zotero
 except ImportError:
-    raise ImportError(
-        "Please install pyzotero: `pip install pyzotero`"
-    )
+    raise ImportError("Please install pyzotero: `pip install pyzotero`")
 from ..paths import CACHE_PATH
 from ..utils import count_pdf_pages
 from ..types import StrPath
