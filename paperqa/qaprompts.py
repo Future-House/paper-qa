@@ -2,7 +2,7 @@ import langchain.prompts as prompts
 from datetime import datetime
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import SystemMessage
 from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
 
 

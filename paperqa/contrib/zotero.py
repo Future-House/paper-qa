@@ -47,7 +47,7 @@ class ZoteroDB(zotero.Zotero):
         self.logger = logging.getLogger("ZoteroDB")
 
         if library_id is None:
-            self.logger.info(f"Attempting to get ZOTERO_USER_ID from `os.environ`...")
+            self.logger.info("Attempting to get ZOTERO_USER_ID from `os.environ`...")
             if "ZOTERO_USER_ID" not in os.environ:
                 raise ValueError(
                     "ZOTERO_USER_ID not set. Please navigate to"
@@ -59,7 +59,7 @@ class ZoteroDB(zotero.Zotero):
                 library_id = os.environ["ZOTERO_USER_ID"]
 
         if api_key is None:
-            self.logger.info(f"Attempting to get ZOTERO_API_KEY from `os.environ`...")
+            self.logger.info("Attempting to get ZOTERO_API_KEY from `os.environ`...")
             if "ZOTERO_API_KEY" not in os.environ:
                 raise ValueError(
                     "ZOTERO_API_KEY not set. Please navigate to"
@@ -190,7 +190,7 @@ class ZoteroDB(zotero.Zotero):
             if len(_items) == 0:
                 break
             i += cur_limit
-            self.logger.info(f"Downloading PDFs.")
+            self.logger.info("Downloading PDFs.")
             _pdfs = [self.get_pdf(item) for item in _items]
 
             # Filter:

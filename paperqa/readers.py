@@ -73,7 +73,7 @@ def parse_txt(path, citation, key, chunk_chars=2000, overlap=50, html=False):
     try:
         with open(path) as f:
             doc = f.read()
-    except UnicodeDecodeError as e:
+    except UnicodeDecodeError:
         with open(path, encoding="utf-8", errors="ignore") as f:
             doc = f.read()
     if html:
@@ -132,7 +132,7 @@ def _deserialize_s(obj):
 
 def _serialize(obj):
     # llmchain wants a list of "Generation" objects, so we simply
-    # stick this regular text into it. 
+    # stick this regular text into it.
     return [Generation(text=_serialize_s(obj))]
 
 
