@@ -45,6 +45,7 @@ def test_evidence():
     evidence = docs.get_evidence(
         paperqa.Answer("For which state was he a governor"), k=1, max_sources=1
     )
+    print(evidence.contexts[0].context, evidence.context)
     assert "Missouri" in evidence.context
     os.remove(doc_path)
 
@@ -250,3 +251,8 @@ def test_query_filter():
     answer = docs.query("What country is Bates from?", key_filter=True)
     print(answer.context)
     assert "United States" in answer.answer
+
+def disabled_test_agent():
+    docs = paperqa.Docs()
+    answer = paperqa.run_agent(docs, 'What compounds target AKT1')
+    print(answer)

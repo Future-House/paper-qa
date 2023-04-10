@@ -1,4 +1,5 @@
 from langchain.tools import BaseTool
+from langchain.tools.exception.tool import ExceptionTool
 from langchain.chains import LLMChain
 from .qaprompts import select_paper_prompt, make_chain
 from .docs import Answer, Docs
@@ -116,15 +117,8 @@ def make_tools(docs, answer):
     tools.append(Search(docs, answer))
     tools.append(ReadPapers(docs, answer))
     tools.append(AnswerTool(docs, answer))
-    tools.append(
-        Tool(
-            name="Reflect",
-            description="Use this tool if you are stuck or repeating the same steps",
-            func=lambda x: "Reflect on your process. Are you repeating the same steps? Are you stuck? If so, try to think of a new way to approach the problem.",
-        )
-    )
-    # reflect is left off for now - doesn't seem to help
-    return tools[:-1]
+    tools.append(ExceptionTool())
+    return tools
 
 
 def run_agent(docs, question, llm=None):
@@ -138,7 +132,7 @@ def run_agent(docs, question, llm=None):
     mrkl.run(
         f"Answer question: {question}. Search for papers, gather evidence, and answer. "
         "Once you have at least five pieces of evidence, call the Propose Answer tool. "
-        "If you do not have enough evidence, search with different keywords. Remember to format with JSON. "
+        "If you do not have enough evidence, search with different keywords. "
     )
 
     return answer
