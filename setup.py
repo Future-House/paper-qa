@@ -22,7 +22,6 @@ setup(
         "PyCryptodome",
         "html2text",
         "tiktoken",
-        "pyzotero",
     ],
     test_suite="tests",
     long_description=long_description,
