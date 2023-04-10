@@ -145,6 +145,13 @@ If you use [Zotero](https://www.zotero.org/) to organize your personal bibliogra
 you can use the `paperqa.contrib.ZoteroDB` to query papers from your library,
 which relies on [pyzotero](https://github.com/urschrei/pyzotero).
 
+Install `pyzotero` to use this feature:
+
+```bash
+pip install pyzotero
+```
+```
+
 First, note that `paperqa` parses the PDFs of papers to store in the database,
 so all relevant papers should have PDFs stored inside your database.
 You can get Zotero to automatically do this by highlighting the references
