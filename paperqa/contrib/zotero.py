@@ -11,14 +11,16 @@ from ..paths import CACHE_PATH
 from ..utils import count_pdf_pages
 from ..types import StrPath
 
-_ZoteroPaper = namedtuple(
+ZoteroPaper = namedtuple(
     "ZoteroPaper", ["key", "title", "pdf", "num_pages", "zotero_key", "details"]
 )
 
 
-class ZoteroPaper(_ZoteroPaper):
-    def __repr__(self) -> str:
-        return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+def _zotero_paper_repr(self) -> str:
+    return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+
+
+ZoteroPaper.__repr__ = _zotero_paper_repr
 
 
 class ZoteroDB(zotero.Zotero):
