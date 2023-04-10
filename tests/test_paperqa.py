@@ -58,7 +58,7 @@ def test_query():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
+    docs.query("What is Frederick Bates's greatest accomplishment?")
     os.remove(doc_path)
 
 
@@ -73,8 +73,7 @@ class Test(IsolatedAsyncioTestCase):
             f.write(r.text)
         docs = paperqa.Docs()
         docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-        i = 0
-        answer = await docs.aquery("What is Frederick Bates's greatest accomplishment?")
+        await docs.aquery("What is Frederick Bates's greatest accomplishment?")
         os.remove(doc_path)
 
 
@@ -86,8 +85,7 @@ def test_doc_match():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    i = 0
-    result = docs.doc_match("What is Frederick Bates's greatest accomplishment?")
+    docs.doc_match("What is Frederick Bates's greatest accomplishment?")
     os.remove(doc_path)
 
 
@@ -205,7 +203,7 @@ def test_code():
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "test_paperqa.py", key="test", disable_check=True)
     assert len(docs.docs) == 1
-    answer = docs.query("What function tests the preview?")
+    docs.query("What function tests the preview?")
 
 
 def test_citation():
@@ -245,14 +243,18 @@ def test_query_filter():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
-    docs.add(doc_path, "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        doc_path,
+        "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
+    )
     # add with new dockey
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
     answer = docs.query("What country is Bates from?", key_filter=True)
     print(answer.context)
     assert "United States" in answer.answer
 
+
 def disabled_test_agent():
     docs = paperqa.Docs()
-    answer = paperqa.run_agent(docs, 'What compounds target AKT1')
+    answer = paperqa.run_agent(docs, "What compounds target AKT1")
     print(answer)

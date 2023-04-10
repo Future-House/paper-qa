@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 StrPath = Union[str, Path]
 
+
 @dataclass
 class Answer:
     """A class to hold the answer to a question."""
@@ -29,9 +30,11 @@ class Answer:
         """Return the answer as a string."""
         return self.formatted_answer
 
+
 @dataclass
 class Context:
     """A class to hold the context of a question."""
+
     key: str
     citation: str
     context: str

@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Any, Union
+from typing import List, Optional, Tuple, Union
 from functools import reduce
 import os
 import sys
@@ -29,6 +29,7 @@ from datetime import datetime
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
+
 
 class Docs:
     """A collection of documents to be used for answering questions."""
@@ -93,7 +94,7 @@ class Docs:
         key: Optional[str] = None,
         disable_check: bool = False,
         chunk_chars: Optional[int] = 3000,
-        overwrite: bool=False,
+        overwrite: bool = False,
     ) -> None:
         """Add a document to the collection."""
 
@@ -106,7 +107,7 @@ class Docs:
         if citation is None:
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
-            with get_openai_callback() as cb:
+            with get_openai_callback():
                 citation = self.cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -133,7 +134,7 @@ class Docs:
             else:
                 suffix = chr(ord(suffix) + 1)
         key += suffix
-        
+
         texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
@@ -178,7 +179,7 @@ class Docs:
     def doc_match(self, query: str, k: int = 25) -> List[str]:
         """Return a list of documents that match the query."""
         if len(self.docs) == 0:
-            return ''
+            return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
             metadatas = [
@@ -242,6 +243,7 @@ class Docs:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
             import nest_asyncio
+
             nest_asyncio.apply()
         try:
             loop = asyncio.get_event_loop()
@@ -319,9 +321,15 @@ class Docs:
                 answer.contexts.append(c)
 
         context_str = "\n\n".join(
-            [f"{c.key}: {c.context}" for c in answer.contexts if "Not applicable" not in c.context]
+            [
+                f"{c.key}: {c.context}"
+                for c in answer.contexts
+                if "Not applicable" not in c.context
+            ]
         )
-        valid_keys = [c.key for c in answer.contexts if "Not applicable" not in c.context]
+        valid_keys = [
+            c.key for c in answer.contexts if "Not applicable" not in c.context
+        ]
         if len(valid_keys) > 0:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         answer.context = context_str
@@ -369,7 +377,7 @@ class Docs:
                 length_prompt=length_prompt,
                 marginal_relevance=marginal_relevance,
                 answer=answer,
-                key_filter=key_filter
+                key_filter=key_filter,
             )
         )
 
@@ -381,13 +389,13 @@ class Docs:
         length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
-        key_filter: Optional[bool] = None
+        key_filter: Optional[bool] = None,
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         if answer is None:
             answer = Answer(query)
-        if key_filter or (key_filter is None and len(self.docs) > 5)    :
+        if key_filter or (key_filter is None and len(self.docs) > 5):
             with get_openai_callback() as cb:
                 keys = self.doc_match(answer.question)
             answer.tokens += cb.total_tokens
@@ -398,7 +406,7 @@ class Docs:
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-                key_filter=keys if key_filter else None
+                key_filter=keys if key_filter else None,
             )
         context_str, contexts = answer.context, answer.contexts
         bib = dict()

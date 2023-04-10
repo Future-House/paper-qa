@@ -1,14 +1,12 @@
 from langchain.tools import BaseTool
-from langchain.tools.exception.tool import ExceptionTool
-from langchain.chains import LLMChain
-from .qaprompts import select_paper_prompt, make_chain
 from .docs import Answer, Docs
-from langchain.agents import initialize_agent, Tool
+from langchain.agents import initialize_agent
 from langchain.chat_models import ChatOpenAI
 
 
 def status(answer: Answer, docs: Docs):
     return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
+
 
 class ReadPapers(BaseTool):
     name = "Gather Evidence"
@@ -78,9 +76,7 @@ class AnswerTool(BaseTool):
 
 class Search(BaseTool):
     name = "Paper Search"
-    description = (
-        "Search for papers to add to current papers. Input should be a string of keywords."
-    )
+    description = "Search for papers to add to current papers. Input should be a string of keywords."
     docs: Docs = None
     answer: Answer = None
 
@@ -95,7 +91,9 @@ class Search(BaseTool):
         try:
             import paperscraper
         except ImportError:
-            raise ImportError('Please install paperscraper (github.com/blackadad/paper-scraper) to use agent')
+            raise ImportError(
+                "Please install paperscraper (github.com/blackadad/paper-scraper) to use agent"
+            )
 
         papers = paperscraper.search_papers(query, limit=20, verbose=False)
         for path, data in papers.items():
@@ -111,6 +109,8 @@ class Search(BaseTool):
 
 
 def make_tools(docs, answer):
+    # putting here until langchain PR is merged
+    from langchain.tools.exception.tool import ExceptionTool
 
     tools = []
 

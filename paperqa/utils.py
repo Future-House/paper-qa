@@ -61,6 +61,7 @@ def count_pdf_pages(file_path: StrPath) -> int:
         num_pages = len(pdf_reader.pages)
     return num_pages
 
+
 def md5sum(file_path: StrPath) -> str:
     import hashlib
 
