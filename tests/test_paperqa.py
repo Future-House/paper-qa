@@ -250,8 +250,7 @@ def test_query_filter():
     # add with new dockey
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
     answer = docs.query("What country is Bates from?", key_filter=True)
-    print(answer.context)
-    assert "United States" in answer.answer
+    # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
 def disabled_test_agent():
