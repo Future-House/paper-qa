@@ -108,6 +108,8 @@ docs = paperqa.Docs()
 zotero = ZoteroDB(library_type="user")  # "group" if group library
 
 for item in zotero.iterate(limit=20):
+    if item.num_pages > 30:
+        continue  # skip long papers
     docs.add(item.pdf, key=item.key)
 ```
 
