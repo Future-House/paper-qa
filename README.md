@@ -10,6 +10,15 @@ PDFs or text files (which can be raw HTML). It strives to give very good answers
 generate answers.
 
 It uses the process shown below:
+
+```
+embed docs into vectors -> embed query into vector -> search for top k passages in docs
+
+create summary of each passage relevant to query -> put summaries into prompt -> generate answer
+```
+
+<img src="https://user-images.githubusercontent.com/908389/230854097-8fa96768-c694-45c0-bb04-3a7386facef3.jpeg" width="600" alt="Process of vector search, refinement, and answer with context">
+
 ## Output Example
 
 Question: How can carbon nanotubes be manufactured at a large scale?
