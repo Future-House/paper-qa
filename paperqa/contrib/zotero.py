@@ -109,17 +109,8 @@ class ZoteroDB(zotero.Zotero):
 
         return pdf_path
 
-    def iterate(
-        self,
-        q: Optional[str] = None,
-        qmode: Optional[str] = None,
-        since: Optional[str] = None,
-        tag: Optional[str] = None,
-        sort: Optional[str] = None,
-        direction: Optional[str] = None,
-        limit: int = 25,
-        start: int = 0,
-    ):
+
+    def iterate(self, limit: int = 25, start: int = 0, collection_name: str = "", **kwargs):
         """Given a search query, this will lazily iterate over papers in a Zotero library, downloading PDFs as needed.
 
         This will download all PDFs in the query.
@@ -160,18 +151,18 @@ class ZoteroDB(zotero.Zotero):
             The index of the first item to return. Default is 0.
         """
         query_kwargs = {}
-        if q is not None:
-            query_kwargs["q"] = q
-        if qmode is not None:
-            query_kwargs["qmode"] = qmode
-        if since is not None:
-            query_kwargs["since"] = since
-        if tag is not None:
-            query_kwargs["tag"] = tag
-        if sort is not None:
-            query_kwargs["sort"] = sort
-        if direction is not None:
-            query_kwargs["direction"] = direction
+        if kwargs.get("q") is not None:
+            query_kwargs["q"] = kwargs.get("q")
+        if kwargs.get("qmode") is not None:
+            query_kwargs["qmode"] = kwargs.get("qmode")
+        if kwargs.get("since") is not None:
+            query_kwargs["since"] = kwargs.get("since")
+        if kwargs.get("tag") is not None:
+            query_kwargs["tag"] = kwargs.get("tag")
+        if kwargs.get("sort") is not None:
+            query_kwargs["sort"] = kwargs.get("sort")
+        if kwargs.get("direction") is not None:
+            query_kwargs["direction"] = kwargs.get("direction")
 
         max_limit = 100
 
@@ -184,7 +175,14 @@ class ZoteroDB(zotero.Zotero):
         while num_remaining > 0:
             cur_limit = min(max_limit, num_remaining)
             self.logger.info(f"Downloading new batch of up to {cur_limit} papers.")
-            _items = self.top(**query_kwargs, limit=cur_limit, start=i)
+
+            if collection_name: 
+                collection_id = self._get_collection_id(collection_name)
+                if not collection_id: continue
+                _items = self.collection_items(collection_id, limit=cur_limit, start=i)
+            else:
+                _items = self.top(**query_kwargs, limit=cur_limit, start=i)
+                
             if len(_items) == 0:
                 break
             i += cur_limit
@@ -216,23 +214,19 @@ class ZoteroDB(zotero.Zotero):
             num_remaining = limit - actual_i
 
         self.logger.info("Finished downloading papers. Now creating Docs object.")
-    
-    def iterate_collection(
-        self,
-        collection_name: str,
-        limit: int = 25,
-        start: int = 0,
-    ):
-        """Given a collection name, this will lazily iterate over papers in a Zotero library, downloading PDFs as needed.
+        
+    def _get_collection_id(self, collection_name: str) -> str:
+        """ Get the collection id for a given collection name
 
         Args:
-            collection_name (str): name of the collection in Zotero
-            limit (int, optional): the limit of papers to download. Defaults to 25.
-            start (int, optional): the start index of the papers to download. Defaults to 0.
+            collection_name (str): The name of the collection
+
+        Returns:
+            str: collection id
         """
-        # specfic collection
+     # specfic collection
         collections = self.collections()
-        collection_id = None
+        collection_id = ""
 
         for collection in collections:
             name = collection["data"]["name"]
@@ -243,55 +237,10 @@ class ZoteroDB(zotero.Zotero):
         if collection_id:
             coll_items = self.collection_items(collection_id)
             self.logger.info(f"Collection '{collection_name}' found: {len(coll_items)} items")
-                
+            
         else:
             self.logger.info(f"Collection '{collection_name}' not found")
-            return
-        
-        max_limit = 100
-
-        items = []
-        pdfs = []
-        i = 0
-        actual_i = 0
-        num_remaining = limit - len(items)
-
-        while num_remaining > 0:
-            cur_limit = min(max_limit, num_remaining)
-            self.logger.info(f"Downloading new batch of up to {cur_limit} papers.")
-            _items = coll_items
-            if len(_items) == 0:
-                break
-            i += cur_limit
-            self.logger.info(f"Downloading PDFs.")
-            _pdfs = [self.get_pdf(item) for item in _items]
-
-            # Filter:
-            for item, pdf in zip(_items, _pdfs):
-                no_pdf = item is None or pdf is None
-                is_duplicate = pdf in pdfs
-
-                if no_pdf or is_duplicate:
-                    continue
-
-                title = item["data"]["title"] if "title" in item["data"] else ""
-                if len(items) >= start:
-                    yield ZoteroPaper(
-                        key=_get_citation_key(item),
-                        title=title,
-                        pdf=pdf,
-                        details=item,
-                        zotero_key=item["key"],
-                    )
-                    actual_i += 1
-
-                items.append(item)
-                pdfs.append(pdf)
-
-            num_remaining = limit - actual_i
-
-        self.logger.info("Finished downloading papers. Now creating Docs object.")
-
+        return collection_id
 
 def _get_citation_key(item: dict) -> str:
     if (
@@ -343,3 +292,5 @@ def _extract_pdf_key(item: dict) -> str:
         return None
 
     return attachment["href"].split("/")[-1]
+
+
