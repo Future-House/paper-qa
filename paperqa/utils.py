@@ -1,5 +1,8 @@
 import math
 import string
+import pypdf
+
+from .types import StrPath
 
 
 def maybe_is_text(s, thresh=2.5):
@@ -50,3 +53,10 @@ def maybe_is_html(s):
     # check for html tags
     if "<body" in s or "<html" in s or "<div" in s:
         return True
+
+
+def count_pdf_pages(file_path: StrPath) -> int:
+    with open(file_path, "rb") as pdf_file:
+        pdf_reader = pypdf.PdfReader(pdf_file)
+        num_pages = len(pdf_reader.pages)
+    return num_pages
