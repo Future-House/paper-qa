@@ -57,6 +57,6 @@ def maybe_is_html(s):
 
 def count_pdf_pages(file_path: StrPath) -> int:
     with open(file_path, "rb") as pdf_file:
-        pdf_reader = pypdf.PdfFileReader(pdf_file)
-        num_pages = pdf_reader.getNumPages()
+        pdf_reader = pypdf.PdfReader(pdf_file)
+        num_pages = len(pdf_reader.pages)
     return num_pages
