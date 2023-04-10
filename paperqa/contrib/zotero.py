@@ -9,7 +9,7 @@ from pyzotero import zotero
 
 from ..paths import CACHE_PATH
 
-StrPath = Union[str, Path]
+from ..types import StrPath
 
 _ZoteroPaper = namedtuple(
     "ZoteroPaper", ["key", "title", "pdf", "zotero_key", "details"]
