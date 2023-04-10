@@ -68,6 +68,25 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
 
+### Choosing Model
+
+By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have gpt-4 access or would like to save money, you can adjust:
+
+```py
+docs = Docs(llm='gpt-3.5-turbo')
+```
+#### Locally Hosted
+
+You can also use any other models (or embeddings) available in [langchain](https://github.com/hwchase17/langchain). Here's an example of using `llama.cpp` to have locally hosted paper-qa:
+
+```py
+from langchain.embeddings import LlamaCppEmbeddings
+from langchain.llms import LlamaCpp
+llm = LlamaCpp(model_path="./ggml-model-q4_0.bin")
+embeddings = LlamaCppEmbeddings(model_path="/path/to/model/ggml-model-q4_0.bin")
+docs = Docs(llm=llm, embeddings=embeddings)
+```
+
 ### Adjusting number of sources
 
 You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources`  and `max_sources` is the number of sources used in the final answer.
