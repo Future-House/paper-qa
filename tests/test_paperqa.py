@@ -257,3 +257,13 @@ def disabled_test_agent():
     docs = paperqa.Docs()
     answer = paperqa.run_agent(docs, "What compounds target AKT1")
     print(answer)
+
+def test_zotera():
+    from paperqa.contrib import ZoteroDB
+
+    docs = paperqa.Docs()
+    try:
+        zotero = ZoteroDB(library_type="user")  # "group" if group library
+    except ValueError:
+        # close enough
+        return
