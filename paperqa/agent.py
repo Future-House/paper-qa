@@ -27,7 +27,7 @@ class PaperSelection(BaseTool):
 
     def _run(self, query: str) -> str:
         result = self.docs.doc_match(query)
-        if result is None:
+        if result is None or result.strip().startswith("None"):
             return "No relevant papers found."
         return result + status(self.answer, self.docs)
 
@@ -64,9 +64,11 @@ class ReadPapers(BaseTool):
         old = self.answer.question
         self.answer.question = question
         # generator, so run it
+        l0 = len(self.answer.contexts)
         self.docs.get_evidence(self.answer, key_filter=keys)
+        l1 = len(self.answer.contexts)
         self.answer.question = old
-        return status(self.answer, self.docs)
+        return f"Added {l1 - l0} pieces of evidence." + status(self.answer, self.docs)
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
@@ -161,12 +163,11 @@ def run_agent(docs, question, llm=None):
         tools,
         llm,
         agent="chat-zero-shot-react-description",
-        max_iterations=25,
         verbose=True,
     )
     mrkl.run(
         f"Answer question: {question}. Search for papers, select papers, gather evidence, and answer. "
-        "Once you have five pieces of evidence, call the Propose Answer tool. "
+        "Once you have five pieces of evidence, or you have tried for a while, call the Propose Answer tool. "
     )
 
     return answer
