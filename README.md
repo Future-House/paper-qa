@@ -150,7 +150,6 @@ Install `pyzotero` to use this feature:
 ```bash
 pip install pyzotero
 ```
-```
 
 First, note that `paperqa` parses the PDFs of papers to store in the database,
 so all relevant papers should have PDFs stored inside your database.
