@@ -104,7 +104,7 @@ class AnswerTool(BaseTool):
 
 class Search(BaseTool):
     name = "Paper Search"
-    description = "Search for papers to add to current papers. Input should be a string of keywords."
+    description = "Search for papers to add to cur. Input should be a string of keywords."
     docs: Docs = None
     answer: Answer = None
 
@@ -166,7 +166,7 @@ def run_agent(docs, question, llm=None):
     )
     mrkl.run(
         f"Answer question: {question}. Search for papers, select papers, gather evidence, and answer. "
-        "Once you have about five pieces of evidence, call the Propose Answer tool. "
+        "Once you have five pieces of evidence, call the Propose Answer tool. "
     )
 
     return answer
