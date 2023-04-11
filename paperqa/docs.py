@@ -119,8 +119,10 @@ class Docs:
     ) -> None:
         """Add a document to the collection."""
 
-        # Pass .DS_Store
-        if path.endswith(".DS_Store"):
+        file_name = os.path.basename(path)
+
+        # Check if the file name starts with a dot
+        if file_name.startswith("."):
             return
 
         # first check to see if we already have this document
