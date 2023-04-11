@@ -13,10 +13,10 @@ setup(
     author_email="white.d.andrew@gmail.com",
     url="https://github.com/whitead/paper-qa",
     license="MIT",
-    packages=["paperqa"],
+    packages=["paperqa", "paperqa.contrib"],
     install_requires=[
         "pypdf",
-        "langchain>=0.0.98",
+        "langchain>=0.0.129",
         "openai>=0.27.0",
         "faiss-cpu",
         "PyCryptodome",

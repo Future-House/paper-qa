@@ -4,6 +4,7 @@ import os
 import pickle
 from paperqa.utils import strings_similarity
 from langchain.llms import OpenAI
+from unittest import IsolatedAsyncioTestCase
 
 
 def test_maybe_is_text():
@@ -41,10 +42,10 @@ def test_evidence():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    for evidence in docs.get_evidence(
+    evidence = docs.get_evidence(
         paperqa.Answer("For which state was he a governor"), k=1, max_sources=1
-    ):
-        pass
+    )
+    print(evidence.contexts[0].context, evidence.context)
     assert "Missouri" in evidence.context
     os.remove(doc_path)
 
@@ -57,11 +58,26 @@ def test_query():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
+    docs.query("What is Frederick Bates's greatest accomplishment?")
     os.remove(doc_path)
 
 
-def test_query_gen():
+class Test(IsolatedAsyncioTestCase):
+    async def test_aquery(self):
+        doc_path = "example.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+            )
+            f.write(r.text)
+        docs = paperqa.Docs()
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        await docs.aquery("What is Frederick Bates's greatest accomplishment?")
+        os.remove(doc_path)
+
+
+def test_doc_match():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
@@ -69,10 +85,7 @@ def test_query_gen():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    i = 0
-    for answer in docs.query_gen("What is Frederick Bates's greatest accomplishment?"):
-        i += 1
-    assert i >= 2
+    docs.doc_match("What is Frederick Bates's greatest accomplishment?")
     os.remove(doc_path)
 
 
@@ -91,20 +104,16 @@ def test_docs_pickle():
     assert len(docs.docs) == len(docs2.docs)
     assert (
         strings_similarity(
-            list(
-                docs.get_evidence(
-                    paperqa.Answer("What date is flag day in Canada?"),
-                    k=3,
-                    max_sources=1,
-                )
-            )[-1].context,
-            list(
-                docs2.get_evidence(
-                    paperqa.Answer("What date is flag day in Canada?"),
-                    k=3,
-                    max_sources=1,
-                )
-            )[-1].context,
+            docs.get_evidence(
+                paperqa.Answer("What date is flag day in Canada?"),
+                k=3,
+                max_sources=1,
+            ).context,
+            docs2.get_evidence(
+                paperqa.Answer("What date is flag day in Canada?"),
+                k=3,
+                max_sources=1,
+            ).context,
         )
         > 0.75
     )
@@ -123,7 +132,6 @@ def test_bad_context():
         "What year was Barack Obama born?",
         length_prompt="about 20 words",
     )
-    print(answer.context)
     assert "cannot answer" in answer.answer
     os.remove(doc_path)
 
@@ -186,7 +194,7 @@ def test_doc_preview():
         f.write(r.text)
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    assert len(docs.doc_previews) == 1
+    assert len(docs.doc_previews()) == 1
 
 
 def test_code():
@@ -195,7 +203,7 @@ def test_code():
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "test_paperqa.py", key="test", disable_check=True)
     assert len(docs.docs) == 1
-    answer = docs.query("What function tests the preview?")
+    docs.query("What function tests the preview?")
 
 
 def test_citation():
@@ -210,3 +218,52 @@ def test_citation():
         list(docs.docs.values())[0]["metadata"][0]["key"] == "Wikipedia2023"
         or list(docs.docs.values())[0]["metadata"][0]["key"] == "Frederick2023"
     )
+
+
+def test_dockey_filter():
+    """Test that we can filter evidence with dockeys"""
+    doc_path = "example2.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    # add with new dockey
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    answer = paperqa.Answer("What country is Bates from?")
+    docs.get_evidence(answer, key_filter=["test"])
+
+
+def test_query_filter():
+    """Test that we can filter evidence with in query"""
+    doc_path = "example2.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(
+        doc_path,
+        "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
+    )
+    # add with new dockey
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    answer = docs.query("What country is Bates from?", key_filter=True)
+    # the filter shouldn't trigger, so just checking that it doesn't crash
+
+
+def disabled_test_agent():
+    docs = paperqa.Docs()
+    answer = paperqa.run_agent(docs, "What compounds target AKT1")
+    print(answer)
+
+def test_zotera():
+    from paperqa.contrib import ZoteroDB
+
+    docs = paperqa.Docs()
+    try:
+        zotero = ZoteroDB(library_type="user")  # "group" if group library
+    except ValueError:
+        # close enough
+        return
