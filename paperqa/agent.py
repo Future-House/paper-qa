@@ -12,7 +12,7 @@ def status(answer: Answer, docs: Docs):
 
 class PaperSelection(BaseTool):
     name = "Select Papers"
-    description = "Ask a researcher to select from current papers. Only provide instructions as string for the researcher."
+    description = "Select from current papers. Provide instructions as a string to use for choosing papers."
     docs: Docs = None
     answer: Answer = None
     chain: LLMChain = None
@@ -40,8 +40,8 @@ class ReadPapers(BaseTool):
     name = "Gather Evidence"
     description = (
         "Give a specific question to a researcher that will return evidence for it. "
-        "Optionally, you may specify papers using their key provided by the Select Papers tool. "
-        "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
+        # "Optionally, you may specify papers using their key provided by the Select Papers tool. "
+        # "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
     )
     docs: Docs = None
     answer: Answer = None
@@ -54,12 +54,12 @@ class ReadPapers(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        if "|" in query:
-            question, keys = query.split("|")
-            keys = [k.strip() for k in keys.split(",")]
-        else:
-            question = query
-            keys = None
+        # if "|" in query:
+        #     question, keys = query.split("|")
+        #     keys = [k.strip() for k in keys.split(",")]
+        # else:
+        question = query
+        keys = None
         # swap out the question
         old = self.answer.question
         self.answer.question = question
@@ -147,7 +147,7 @@ def make_tools(docs, answer):
     tools = []
 
     tools.append(Search(docs, answer))
-    tools.append(PaperSelection(docs, answer))
+    # tools.append(PaperSelection(docs, answer))
     tools.append(ReadPapers(docs, answer))
     tools.append(AnswerTool(docs, answer))
     tools.append(ExceptionTool())
@@ -166,7 +166,7 @@ def run_agent(docs, question, llm=None):
         verbose=True,
     )
     mrkl.run(
-        f"Answer question: {question}. Search for papers, select papers, gather evidence, and answer. "
+        f"Answer question: {question}. Search for papers, gather evidence, and answer. If you do not have enough evidence, you can search for more papers (preferred) or gather more evidence. You may rephrase or breaking-up the question in those steps. "
         "Once you have five pieces of evidence, or you have tried for a while, call the Propose Answer tool. "
     )
 
