@@ -42,6 +42,7 @@ class Docs:
         name: str = "default",
         index_path: Optional[Path] = None,
         embeddings: Optional[Embeddings] = None,
+        embeddings_kwargs: dict = {},
     ) -> None:
         """Initialize the collection of documents.
 
@@ -63,7 +64,7 @@ class Docs:
         self.index_path = index_path
         self.name = name
         if embeddings is None:
-            embeddings = OpenAIEmbeddings()
+            embeddings = OpenAIEmbeddings(**embeddings_kwargs)
         self.embeddings = embeddings
 
     def update_llm(
