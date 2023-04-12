@@ -66,6 +66,25 @@ class Docs:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
 
+        if self._in_notebook():
+            import nest_asyncio
+            nest_asyncio.apply()
+    
+    def _in_notebook(self) -> bool:
+        # From https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+        try:
+            from IPython import get_ipython
+            shell = get_ipython().__class__.__name__
+            if shell == 'ZMQInteractiveShell':
+                return True   # Jupyter notebook or qtconsole
+            elif shell == 'TerminalInteractiveShell':
+                return False  # Terminal running IPython
+            else:
+                return False  # Other type (?)
+        except NameError:
+            return False      # Probably standard Python interpreter
+
+
     def update_llm(
         self,
         llm: Optional[Union[LLM, str]] = None,
