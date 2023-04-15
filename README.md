@@ -68,6 +68,20 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
 
+If you prefer to use the CLI, you can also run the following command:
+
+```
+python app.py
+```
+
+This will bring up a basic interface from which you can select one of 3 options:
+
+1. Fetch a PDF from a website URL
+2. Load a PDF directly from a file path (e.g. /path/to/file.pdf)
+3. (Preferred) Read and parse PDF files from Zotero clipboard data (CTRL+SHIFT+C)
+
+If you are using Zotero, option 3 provides a nice streamlined way to ask questions about PDFs in your library. Simply open up Zotero, select the publications you want to query (using SHIFT or CTRL click), and then press CTRL+SHIFT+C. This will copy the BibTex data from those publications including their PDF locations on your computer to your clipboard, which will then be parsed accordingly in the application. 
+
 ### Choosing Model
 
 By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have gpt-4 access or would like to save money, you can adjust:
@@ -127,13 +141,13 @@ Then run the following command
 pytest tests/
 ```
 
-If you encounter an error, you may have to add the project root to the Python Path environmental varible. On MacOS you can run
+If you encounter an error, you may have to add the project root to the Python Path environmental varible. On MacOS this can be accomplished with
 
 ```
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 ```
 
-and you should then be able to succesfully run the tests.
+You should then be able to succesfully run the tests.
 
 ## Notebooks
 
