@@ -1,6 +1,8 @@
 import inquirer
 from paperqa import Docs
 from paperqa.utils import start_asking
+import sys
+import os.path
 
 # Contants
 STORE_DIR = "store"
@@ -14,15 +16,26 @@ def main():
     print("Welcome to paper-qa!")
     print("")
 
-    # Ask if user wants to clone new repo or load existing index
-    answer = inquirer.prompt(
-        [inquirer.List("type", message="How can I help you today?", choices=[
-            PDF_URL,
-            FILE,
-            ZOTERO_CLIPBOARD,
-            # TODO: Add more options, such as ability to query a webpage from URL, a github repo, YouTube video, etc.
-        ])]
-    )["type"]
+    answer = None
+    file_path = None
+
+    if sys.argv:
+        if len(sys.argv) == 2:
+            arg_value = sys.argv[1]
+            if os.path.isfile(arg_value):
+                answer = FILE
+                file_path = arg_value
+
+    if answer is None:
+        # Ask if user wants to clone new repo or load existing index
+        answer = inquirer.prompt(
+            [inquirer.List("type", message="How can I help you today?", choices=[
+                PDF_URL,
+                FILE,
+                ZOTERO_CLIPBOARD,
+                # TODO: Add more options, such as ability to query a webpage from URL, a github repo, YouTube video, etc.
+            ])]
+        )["type"]
 
     # Handle user input
     if answer == PDF_URL:
@@ -36,7 +49,8 @@ def main():
         docs.add_pdf_from_url(url)    
     elif answer == FILE:
         # Ask for user input for file path
-        file_path = input("Paste file path: ")
+        if file_path is None:
+            file_path = input("Paste file path: ")
 
         # add the file path to the docs object
         docs = Docs().add(file_path)
