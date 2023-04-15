@@ -2,9 +2,117 @@ import paperqa
 import requests
 import os
 import pickle
+import pyperclip
 from paperqa.utils import strings_similarity
 from langchain.llms import OpenAI
 from unittest import IsolatedAsyncioTestCase
+
+def test_add_from_pdf_url():
+    pdf_url = "https://arxiv.org/pdf/2009.09808.pdf"
+    docs = paperqa.Docs()
+    docs.add_pdf_from_url(pdf_url)
+
+    assert len(docs.docs) == 1
+
+def test_add_from_zotero_clipboard():
+    # create full path from relative path
+    relative_path = 'paper.pdf'
+    relative_path2 = 'paper2.pdf'
+    full_path = os.path.join(os.path.dirname(__file__), relative_path)
+    full_path2 = os.path.join(os.path.dirname(__file__), relative_path2)
+    clipboard_data = """
+    @inproceedings{turquois_exploring_2016,
+        location = {Carrboro North Carolina {USA}},
+        title = {Exploring the Benefits of 2D Visualizations for Drum Samples Retrieval},
+        isbn = {978-1-4503-3751-9},
+        url = {https://dl.acm.org/doi/10.1145/2854946.2854996},
+        doi = {10.1145/2854946.2854996},
+        abstract = {This paper explores the potential benefits of using similarity-based two-dimensional classifications and their corresponding {GUIs}, for drum samples retrieval in a creativity-oriented context. Preliminary user studies with professional electronic music producers point up the frustration and laboriousness of finding suitable drum samples in the increasingly large libraries of sounds available, and suggest the need for alternative interfaces and approaches. To address this issue, two novel spatial visualizations (respectively organized by name and by timbre-similarity) are designed as potential alternatives to the traditional 1D list-based browsers. These visualizations are implemented and compared in a music creation task, in terms of both the exploration experience and the resulting production quality, within a system for drum kit configuration. Our study shows that spatial visualizations do improve the overall exploration experience, and reveals the potential of similarity-based arrangements for the support of creative processes.},
+        eventtitle = {{CHIIR} '16: Conference on Human Information Interaction and Retrieval},
+        pages = {329--332},
+        booktitle = {Proceedings of the 2016 {ACM} on Conference on Human Information Interaction and Retrieval},
+        publisher = {{ACM}},
+        author = {Turquois, Chloé and Hermant, Martin and Gómez-Marín, Daniel and Jordà, Sergi},
+        urldate = {2023-04-15},
+        date = {2016-03-13},
+        langid = {english},
+        file = {Turquois et al. - 2016 - Exploring the Benefits of 2D Visualizations for Dr.pdf:paper.pdf:application/pdf},
+    }
+
+    @misc{bitton_assisted_2019,
+        title = {Assisted Sound Sample Generation with Musical Conditioning in Adversarial Auto-Encoders},
+        url = {http://arxiv.org/abs/1904.06215},
+        abstract = {Deep generative neural networks have thrived in the ﬁeld of computer vision, enabling unprecedented intelligent image processes. Yet the results in audio remain less advanced and many applications are still to be investigated. Our project targets real-time sound synthesis from a reduced set of high-level parameters, including semantic controls that can be adapted to different sound libraries and speciﬁc tags. These generative variables should allow expressive modulations of target musical qualities and continuously mix into new styles.},
+        number = {{arXiv}:1904.06215},
+        publisher = {{arXiv}},
+        author = {Bitton, Adrien and Esling, Philippe and Caillon, Antoine and Fouilleul, Martin},
+        urldate = {2023-04-15},
+        date = {2019-06-22},
+        langid = {english},
+        eprinttype = {arxiv},
+        eprint = {1904.06215 [cs, eess]},
+        keywords = {Computer Science - Machine Learning, Computer Science - Sound, Electrical Engineering and Systems Science - Audio and Speech Processing},
+        file = {Bitton et al. - 2019 - Assisted Sound Sample Generation with Musical Cond.pdf:paper2.pdf:application/pdf},
+    }
+    """.replace("paper.pdf", full_path).replace("paper2.pdf", full_path2)
+    # copy the clipboard data to the clipboard
+    pyperclip.copy(clipboard_data)
+
+    # initialize a docs object
+    docs = paperqa.Docs()
+
+    # add the clipboard data to the docs object
+    docs.add_from_zotero_clipboard()
+
+    assert docs.docs[full_path]["key"] == "Turquois2016"
+    assert docs.docs[full_path2]["key"] == "Bitton1904"
+
+
+def test_count_authors():
+    authors = [x.replace(" and ", ", ") for x in ['Doe, John','Doe, John and Smith, Jane','Doe, John and Smith, Jane and Jones, Joe']]
+    assert(paperqa.utils.count_authors(authors[0]) == 1)
+    assert(paperqa.utils.count_authors(authors[1]) == 2)
+    assert(paperqa.utils.count_authors(authors[2]) == 3)
+
+def test_clean_citation():
+    # define a messy citation with extra spaces, artifacts, and question marks
+    messy_citation = '  Doe, John. ????. "An Example Article". Example Journal. 1, pp. 1–10.  .'
+    new_citation = paperqa.utils.clean_citation(messy_citation)
+
+    assert(new_citation == 'Doe, John. "An Example Article". Example Journal. 1, pp. 1–10.')
+
+def test_zotero_clipboard_to_mla_citations():
+    test_citation = """
+        @article{doe2022example,
+        title={An Example Article},
+        author={Doe, John},
+        journal={Example Journal},
+        volume={1},
+        pages={1--10},
+        year={2022}
+        }
+
+        @article{john2022example,
+        title={An Example Article},
+        author={Doe, John and Smith, Jane},
+        }
+
+        @article{doe2022example,
+        title={An Example Article},
+        author={Doe, John and Smith, Jane and Jones, Joe},
+        journal={Example Journal},
+        volume={1},
+        pages={1--10},
+        year={2018}
+        }
+        """
+    
+    mla_citations = paperqa.utils.zotero_clipboard_to_mla_citations(test_citation)
+
+    assert(len(mla_citations) == 3)
+    assert(mla_citations[0] == '[0] Doe, John. "An Example Article." Example Journal 1, 2022, pp. 1–10.')
+    assert(mla_citations[1] == '[1] Doe, John, and Jane Smith. "An Example Article."')
+    assert(mla_citations[2] == '[2] Doe, John, et al. "An Example Article." Example Journal 1, 2018, pp. 1–10.')
 
 
 def test_maybe_is_text():

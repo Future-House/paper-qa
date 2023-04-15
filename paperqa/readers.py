@@ -5,6 +5,7 @@ from html2text import html2text
 from pathlib import Path
 import json
 import logging
+import fitz
 from hashlib import md5
 
 from langchain.text_splitter import TokenTextSplitter
@@ -27,16 +28,14 @@ TextSplitter = TokenTextSplitter
 
 
 def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
-    import pypdf
-
-    pdfFileObj = open(path, "rb")
-    pdfReader = pypdf.PdfReader(pdfFileObj)
+    pdfReader = fitz.open(path)
+    pdfReader.pages = list(range(1, pdfReader.page_count))
     splits = []
     split = ""
     pages = []
     metadatas = []
     for i, page in enumerate(pdfReader.pages):
-        split += page.extract_text()
+        split += pdfReader.get_page_text(page).replace('-\n','').replace('\n',' ')
         pages.append(str(i + 1))
         # split could be so long it needs to be split
         # into multiple chunks. Or it could be so short
@@ -64,7 +63,7 @@ def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
                 key=f"{key} pages {pg}",
             )
         )
-    pdfFileObj.close()
+    pdfReader.close()
     return splits, metadatas
 
 

@@ -113,6 +113,28 @@ answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
 
+## Contributing
+
+In order to contribute to this repo, first install the dependencies:
+
+```
+pip install dev-requirements.txt
+```
+
+Then run the following command
+
+```
+pytest tests/
+```
+
+If you encounter an error, you may have to add the project root to the Python Path environmental varible. On MacOS you can run
+
+```
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+```
+
+and you should then be able to succesfully run the tests.
+
 ## Notebooks
 
 If you want to use this in an jupyter notebook or colab, you need to run the following command:

@@ -5,8 +5,9 @@ import sys
 import asyncio
 from pathlib import Path
 import re
+import pyperclip
 from .paths import CACHE_PATH
-from .utils import maybe_is_text, md5sum
+from .utils import maybe_is_text, md5sum, download_pdf, zotero_clipboard_to_mla_citations
 from .qaprompts import (
     summary_prompt,
     qa_prompt,
@@ -42,6 +43,7 @@ class Docs:
         name: str = "default",
         index_path: Optional[Path] = None,
         embeddings: Optional[Embeddings] = None,
+        overlap: int = 100,
     ) -> None:
         """Initialize the collection of documents.
 
@@ -51,8 +53,11 @@ class Docs:
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
+            embeddings: The embeddings model to use for indexing. If None, defaults to OpenAIEmbeddings model.
+            overlap: The number of characters to overlap between chunks of text.
         """
         self.docs = dict()
+        self.overlap = overlap
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
@@ -135,7 +140,7 @@ class Docs:
                 suffix = chr(ord(suffix) + 1)
         key += suffix
 
-        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
+        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars, overlap=self.overlap)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -164,6 +169,44 @@ class Docs:
         fs = self.index_path / "index.faiss"
         if fs.exists():
             fs.unlink()
+    
+    def add_from_zotero_clipboard(self) -> None:
+        """Add documents to the collection from a zotero clipboard BibTex string obtained with the CTRL+SHIFT+C shortcut."""
+        # Paste the clipboard string into the input_str variable
+        input_str = pyperclip.paste()
+
+        # remove line breaks and create new variable
+        input_str_removed = input_str.replace('\n', '')
+        
+        # Define the regex pattern for matching file paths
+        pattern = r'(?<=:)[^:]+(?=:application\/pdf)'
+
+        # Use the findall() function from the re module to get all matches
+        matches = re.findall(pattern, input_str_removed)
+
+        # print that we found x matches
+        print(f"Found {len(matches)} files!")
+
+        file_paths = [x for x in matches if os.path.isabs(x)]
+
+        # get the citations of each bibtex file entry
+        citations = zotero_clipboard_to_mla_citations(input_str)
+
+        # add the files to the docs object
+        for (file_path, citation) in zip(file_paths, citations):
+            self.add(file_path,citation=citation)
+
+    def add_pdf_from_url(self, url, temp_dir=None) -> None:
+        """Add a document to the collection from a url."""
+        print(f"Downloading from {url}...")
+        asyncio.run(download_pdf(url,output_file='tmp.pdf')) # note, this function takes quite a long time to download, so future work could be to implement a faster function for downloading pdfs
+        print("Download complete!")
+
+        # add the temp file
+        self.add('tmp.pdf')
+
+        # remove the temp file
+        os.remove('tmp.pdf')
 
     def doc_previews(self) -> List[Tuple[int, str, str]]:
         """Return a list of tuples of (key, citation) for each document."""
@@ -361,16 +404,24 @@ class Docs:
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
     ) -> Answer:
-        # special case for jupyter notebooks
+        # Check if the code is running in a Jupyter Notebook or Google Colab environment
         if "get_ipython" in globals() or "google.colab" in sys.modules:
+            # If yes, import the nest_asyncio library to handle nested async calls
             import nest_asyncio
 
+            # Apply the nest_asyncio patch to the current event loop
             nest_asyncio.apply()
+
+        # Try to get the current event loop (if it exists)
         try:
             loop = asyncio.get_event_loop()
+        # If there's a RuntimeError (no current event loop), create a new one and set it as the current loop
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
+
+        # Call the asynchronous version of the query function (aquery) using the given arguments
+        # and run it with the event loop until it completes, returning the result (an Answer object)
         return loop.run_until_complete(
             self.aquery(
                 query,
@@ -382,6 +433,7 @@ class Docs:
                 key_filter=key_filter,
             )
         )
+
 
     async def aquery(
         self,

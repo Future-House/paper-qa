@@ -3,3 +3,10 @@ pre-commit
 requests
 paper-scraper@git+https://github.com/blackadad/paper-scraper.git
 pyzotero
+html2text
+faiss-cpu
+langchain
+pymupdf
+inquirer==3.1.2
+pyperclip
+aiohttp
