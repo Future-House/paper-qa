@@ -1,6 +1,6 @@
 import math
 import string
-import pypdf
+import PyPDF4
 import aiohttp
 import re
 

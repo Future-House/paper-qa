@@ -404,6 +404,21 @@ class Docs:
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
     ) -> Answer:
+        """
+        Synchronously executes a query and returns an Answer object.
+
+        Args:
+            query (str): The question to be answered.
+            k (int, optional): The number of top documents to consider. Default is 10.
+            max_sources (int, optional): The maximum number of sources to include in the answer. Default is 5.
+            length_prompt (str, optional): The desired length of the answer in words. Default is "about 100 words".
+            marginal_relevance (bool, optional): Whether to use marginal relevance in selecting sources. Default is True.
+            answer (Optional[Answer], optional): An existing Answer object to update. Default is None.
+            key_filter (Optional[bool], optional): Whether to filter results by key. Default is None.
+
+        Returns:
+            Answer: An Answer object containing the answer, formatted answer, tokens used, cost, references, and passages.
+        """
         # Check if the code is running in a Jupyter Notebook or Google Colab environment
         if "get_ipython" in globals() or "google.colab" in sys.modules:
             # If yes, import the nest_asyncio library to handle nested async calls
@@ -445,6 +460,21 @@ class Docs:
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
     ) -> Answer:
+        """
+        Asynchronously executes a query and returns an Answer object.
+
+        Args:
+            query (str): The question to be answered.
+            k (int, optional): The number of top documents to consider. Default is 10.
+            max_sources (int, optional): The maximum number of sources to include in the answer. Default is 5.
+            length_prompt (str, optional): The desired length of the answer in words. Default is "about 100 words".
+            marginal_relevance (bool, optional): Whether to use marginal relevance in selecting sources. Default is True.
+            answer (Optional[Answer], optional): An existing Answer object to update. Default is None.
+            key_filter (Optional[bool], optional): Whether to filter results by key. Default is None.
+
+        Returns:
+            Answer: An Answer object containing the answer, formatted answer, tokens used, cost, references, and passages.
+        """
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         if answer is None:
@@ -455,7 +485,7 @@ class Docs:
                     keys = self.doc_match(answer.question)
                 answer.tokens += cb.total_tokens
                 answer.cost += cb.total_cost
-            answer = await self.aget_evidence(
+            answer = await self.aget_evidence( # this block takes a lot of time
                 answer,
                 k=k,
                 max_sources=max_sources,
@@ -470,7 +500,7 @@ class Docs:
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            with get_openai_callback() as cb:
+            with get_openai_callback() as cb: # this block takes quite a bit of time
                 answer_text = await self.qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )
