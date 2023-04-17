@@ -4,7 +4,6 @@ import pypdf
 
 from .types import StrPath
 
-
 def maybe_is_text(s, thresh=2.5):
     if len(s) == 0:
         return False

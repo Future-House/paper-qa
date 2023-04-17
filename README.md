@@ -68,6 +68,14 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
 
+### Command Line Interface (CLI)
+
+If you prefer using CLI, you may also enter a chat session with your PDF document by running the following command:
+
+```
+paperqa your.pdf
+```
+
 ### Choosing Model
 
 By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have gpt-4 access or would like to save money, you can adjust:

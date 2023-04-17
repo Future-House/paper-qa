@@ -130,3 +130,16 @@ dmypy.json
 
 # testing files generated
 *.txt.json
+
+# ignore pdfs and text files
+*.txt
+*.pdf
+
+# ignore sandbox folder
+sandbox/
+
+# ignore vscode
+.vscode/
+
+# ignore DS Store
+.DS_Store

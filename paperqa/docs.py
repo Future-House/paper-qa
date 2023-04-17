@@ -448,3 +448,18 @@ class Docs:
         answer.references = bib_str
         answer.passages = passages
         return answer
+    
+    def chat(self):
+        """
+        Start a chat loop with the Docs object.
+        Args:
+            docs (Docs): paperqa.docs.Docs object
+        """
+        while True:
+            try:
+                # Ask for query
+                query = input("Enter query: ")
+                answer = self.query(query)
+                print(answer.formatted_answer)
+            except KeyboardInterrupt:
+                break  
