@@ -73,7 +73,13 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 If you prefer using CLI, you may also enter a chat session with your PDF document by running the following command:
 
 ```
-paperqa your.pdf
+paperqa my.pdf
+```
+
+or if you want to query all PDF's contained within a given directory, you can utilize glob patterns like so:
+
+```
+paperqa mypdfs/**/*.pdf
 ```
 
 ### Choosing Model
