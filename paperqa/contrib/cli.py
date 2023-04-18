@@ -8,7 +8,7 @@ from paperqa import Docs
 # Contants
 STORE_DIR = "store"
 PDF_URL = "Fetch a PDF from a URL"
-FILES = "Load from file path(s) (e.g. /path/to/file.pdf or /path/to/*.pdf)"
+FILES = "Load from file path or all pdf files in a directory (e.g. /path/to/file.pdf or /path/to/*.pdf)"
 ZOTERO_CLIPBOARD = "Read and parse PDF files from Zotero clipboard data (CTRL+SHIFT+C)" 
 
 @click.command()
@@ -25,10 +25,10 @@ def main(file_paths):
 
     # check if any command-line arguments were provided
     if sys.argv:
-        # if one ore more arguments is provided, assume they are file paths
-        if len(sys.argv) >= 2:
-            arg_values = sys.argv[1:]
-            glob_args = glob.glob(arg_values[0], recursive=True)
+        # if exactly one argument is provided, assume it is a file path or glob pattern
+        if len(sys.argv) == 2:
+            arg_value = sys.argv[1]
+            glob_args = glob.glob(arg_value, recursive=True)
             # check to make sure the file_paths are valid
             for arg in glob_args:
                 if os.path.isfile(arg):
