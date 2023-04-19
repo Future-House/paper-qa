@@ -24,6 +24,7 @@ setup(
         "tiktoken",
         "click",
         "inquirer",
+        "jinja2"
     ],
     test_suite="tests",
     long_description=long_description,
@@ -35,8 +36,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'paperqa=paperqa.contrib.cli:main',
+            'paperqa=paperqa.cli:main',
         ],
     },
 )
-1
