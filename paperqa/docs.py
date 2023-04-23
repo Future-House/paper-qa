@@ -368,7 +368,6 @@ class Docs:
             answer: Answer,
             k: int = 3,
             max_sources: int = 5,
-            marginal_relevance: bool = True,
             key_filter: Optional[List[str]] = None,
     ) -> Answer:
         # special case for jupyter notebooks
@@ -386,7 +385,6 @@ class Docs:
                 answer,
                 k=k,
                 max_sources=max_sources,
-                marginal_relevance=marginal_relevance,
                 key_filter=key_filter,
             )
         )
@@ -396,7 +394,6 @@ class Docs:
             answer: Answer,
             k: int = 3,
             max_sources: int = 5,
-            marginal_relevance: bool = False,
             key_filter: Optional[List[str]] = None,
     ) -> Answer:
         if len(self.docs) == 0:
@@ -406,12 +403,6 @@ class Docs:
         _k = k
         if key_filter is not None:
             _k = k * 10  # heuristic
-        # want to work through indices but less k
-        # if marginal_relevance:
-        #     docs = self._faiss_index.max_marginal_relevance_search(
-        #         answer.question, k=_k, fetch_k=5 * _k
-        #     )
-        # else:
         docs = self._faiss_index.similarity_search(
             answer.question, k=_k, fetch_k=5 * _k
         )
@@ -472,7 +463,6 @@ class Docs:
             k: int = 10,
             max_sources: int = 5,
             length_prompt: str = "about 100 words",
-            marginal_relevance: bool = True,
             answer: Optional[Answer] = None,
             key_filter: Optional[bool] = None,
     ) -> Answer:
@@ -492,7 +482,6 @@ class Docs:
                 k=k,
                 max_sources=max_sources,
                 length_prompt=length_prompt,
-                marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
             )
@@ -504,7 +493,6 @@ class Docs:
             k: int = 10,
             max_sources: int = 5,
             length_prompt: str = "about 100 words",
-            marginal_relevance: bool = True,
             answer: Optional[Answer] = None,
             key_filter: Optional[bool] = None,
     ) -> Answer:
@@ -522,7 +510,6 @@ class Docs:
                 answer,
                 k=k,
                 max_sources=max_sources,
-                marginal_relevance=marginal_relevance,
                 key_filter=keys if key_filter else None,
             )
         context_str, contexts = answer.context, answer.contexts
