@@ -3,32 +3,178 @@ from functools import reduce
 import os
 import sys
 import asyncio
-from pathlib import Path
 import re
-from .paths import CACHE_PATH
-from .utils import maybe_is_text, md5sum
-from .qaprompts import (
-    summary_prompt,
-    qa_prompt,
-    search_prompt,
-    citation_prompt,
-    select_paper_prompt,
-    make_chain,
-)
-from .types import Answer, Context
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
-from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import LLM
 from langchain.callbacks import get_openai_callback
 from langchain.cache import SQLiteCache
 import langchain
+import math
+import string
+from typing import Union, List, Dict, Any
+from pathlib import Path
+from dataclasses import dataclass
+import langchain.prompts as prompts
 from datetime import datetime
+from langchain.chains import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import SystemMessage
+from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
+
+CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
+
+
+StrPath = Union[str, Path]
+
+
+@dataclass
+class Answer:
+    """A class to hold the answer to a question."""
+
+    question: str
+    answer: str = ""
+    context: str = ""
+    contexts: List[Any] = None
+    references: str = ""
+    formatted_answer: str = ""
+    passages: Dict[str, str] = None
+    tokens: int = 0
+    cost: float = 0
+
+    def __post_init__(self):
+        """Initialize the answer."""
+        if self.contexts is None:
+            self.contexts = []
+        if self.passages is None:
+            self.passages = {}
+
+    def __str__(self) -> str:
+        """Return the answer as a string."""
+        return self.formatted_answer
+
+
+@dataclass
+class Context:
+    """A class to hold the context of a question."""
+
+    key: str
+    citation: str
+    context: str
+    text: str
+
+    def __str__(self) -> str:
+        """Return the context as a string."""
+        return self.context
+
+
+summary_prompt = prompts.PromptTemplate(
+    input_variables=["question", "context_str", "citation"],
+    template="Summarize and provide direct quotes from the text below to help answer a question. "
+             "Do not directly answer the question, instead summarize and "
+             "quote to give evidence to help answer the question. "
+             "Do not use outside sources. "
+             'Reply with "Not applicable" if the text is unrelated to the question. '
+             "Use 150 or less words."
+             "\n\n"
+             "{context_str}\n"
+             "Extracted from {citation}\n"
+             "Question: {question}\n"
+             "Relevant Information Summary:",
+)
+
+
+qa_prompt = prompts.PromptTemplate(
+    input_variables=["question", "context_str", "length"],
+    template="Write an answer ({length}) "
+             "for the question below based on the provided context. "
+             "If the context provides insufficient information, "
+             'reply "I cannot answer". '
+             "For each sentence in your answer, indicate which sources most support it "
+             "via valid citation markers at the end of sentences, like (Example2012). "
+             "Answer in an unbiased, comprehensive, and scholarly tone. "
+             "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
+             "{context_str}\n"
+             "Question: {question}\n"
+             "Answer: ",
+)
+
+
+search_prompt = prompts.PromptTemplate(
+    input_variables=["question"],
+    template="We want to answer the following question: {question} \n"
+             "Provide three keyword searches (one search per line) "
+             "that will find papers to help answer the question. Do not use boolean operators. "
+             "Recent years are 2021, 2022, 2023.\n\n"
+             "1.",
+)
+
+
+select_paper_prompt = prompts.PromptTemplate(
+    input_variables=["instructions", "papers"],
+    template="Select papers according to instructions below. "
+             "Papers are listed as $KEY: $PAPER_INFO. "
+             "Return a list of keys, separated by commas. "
+             'Return "None", if no papers are applicable. \n\n'
+             "Instructions: {instructions}\n\n"
+             "{papers}\n\n"
+             "Selected keys:",
+)
+
+
+def _get_datetime():
+    now = datetime.now()
+    return now.strftime("%m/%d/%Y")
+
+
+citation_prompt = prompts.PromptTemplate(
+    input_variables=["text"],
+    template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
+             "{text}\n\n"
+             "Citation:",
+    partial_variables={"date": _get_datetime},
+)
+
+
+def make_chain(prompt, llm):
+    if type(llm) == ChatOpenAI:
+        system_message_prompt = SystemMessage(
+            content="You are a scholarly researcher that answers in an unbiased, scholarly tone. "
+                    "You sometimes refuse to answer if there is insufficient information.",
+        )
+        human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
+        prompt = ChatPromptTemplate.from_messages(
+            [system_message_prompt, human_message_prompt]
+        )
+    return LLMChain(prompt=prompt, llm=llm)
+
+def maybe_is_text(s, thresh=2.5):
+    if len(s) == 0:
+        return False
+    # Calculate the entropy of the string
+    entropy = 0
+    for c in string.printable:
+        p = s.count(c) / len(s)
+        if p > 0:
+            entropy += -p * math.log2(p)
+
+    # Check if the entropy is within a reasonable range for text
+    if entropy > thresh:
+        return True
+    return False
+
+
+def md5sum(file_path: StrPath) -> str:
+    import hashlib
+
+    with open(file_path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
 
 
 class Docs:
