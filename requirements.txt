@@ -1,0 +1,7 @@
+pypdf
+langchain>=0.0.129
+openai>=0.27.0
+faiss-cpu
+PyCryptodome
+html2text
+tiktoken

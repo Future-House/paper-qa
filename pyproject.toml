@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "paper"
+version = "0.1.0"
+description = ""
+authors = ["Sway Ducky <swayducky@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pytest = "^7.3.1"
+pre-commit = "^3.2.2"
+requests = "^2.28.2"
+paper-scraper = {git = "https://github.com/blackadad/paper-scraper.git"}
+pyzotero = "^1.5.5"
+langchain = ">=0.0.129"
+pypdf = "^3.8.1"
+openai = ">=0.27.0"
+faiss-cpu = "^1.7.3"
+pycryptodome = "^3.17"
+html2text = "^2020.1.16"
+tiktoken = "^0.3.3"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
