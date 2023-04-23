@@ -1,17 +1,14 @@
+import json
 from typing import List, Optional, Tuple, Union
 from functools import reduce
-import os
 import sys
 import asyncio
-import re
 from .readers import read_doc
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.llms.base import LLM
 from langchain.callbacks import get_openai_callback
-# from langchain.cache import SQLiteCache
-# import langchain
 import math
 import string
 from typing import Union, List, Dict, Any
@@ -23,12 +20,6 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage
 from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
-
-# CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
-
-# os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-# langchain.llm_cache = SQLiteCache(CACHE_PATH)
-
 
 StrPath = Union[str, Path]
 
@@ -193,13 +184,6 @@ class Docs:
                      "Question: {question}\n"
                      "Answer: ",
         ), llm=llm)
-        self.cite_chain = make_chain(prompt=prompts.PromptTemplate(
-            input_variables=["text"],
-            template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
-                     "{text}\n\n"
-                     "Citation:",
-            partial_variables={"date": _get_datetime},
-        ), llm=summary_llm)
 
     def add(
             self,
@@ -217,32 +201,6 @@ class Docs:
         md5 = md5sum(path)
         if path in self.docs:
             raise ValueError(f"Document {path} already in collection.")
-
-        if citation is None:
-            # peak first chunk
-            texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
-            if not texts:
-                print(f"Empty ({path}):", texts)
-                return
-            with get_openai_callback():
-                citation = self.cite_chain.run(texts[0])
-            if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
-                citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
-
-        if key is None:
-            # get first name and year from citation
-            try:
-                author = re.search(r"([A-Z][a-z]+)", citation).group(1)
-            except AttributeError:
-                # panicking - no word??
-                raise ValueError(
-                    f"Could not parse key from citation {citation}. Consider just passing key explicitly - e.g. docs.py (path, citation, key='mykey')"
-                )
-            try:
-                year = re.search(r"(\d{4})", citation).group(1)
-            except AttributeError:
-                year = ""
-            key = f"{author}{year}"
         suffix = ""
         while key + suffix in self.keys:
             # move suffix to next letter
@@ -308,48 +266,22 @@ class Docs:
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.similarity_search(query, k=k)
-        chain = make_chain(
-            prompts.PromptTemplate(
-                input_variables=["instructions", "papers"],
-                template="Select papers according to instructions below. "
-                         "Papers are listed as $KEY: $PAPER_INFO. "
-                         "Return a list of keys, separated by commas. "
-                         'Return "None", if no papers are applicable. \n\n'
-                         "Instructions: {instructions}\n\n"
-                         "{papers}\n\n"
-                         "Selected keys:",
-            ),
-            self.summary_llm)
+        template = prompts.PromptTemplate(
+            input_variables=["instructions", "papers"],
+            template="Select papers according to instructions below. "
+                     "Papers are listed as $KEY: $PAPER_INFO. "
+                     "Return a list of keys, separated by commas. "
+                     'Return "None", if no papers are applicable. \n\n'
+                     "Instructions: {instructions}\n\n"
+                     "{papers}\n\n"
+                     "Selected keys:",
+        )
+        chain = make_chain(template, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
+        print("Yooooooooooooooooo", template.format(instructions=query, papers="\n".join(papers)))
         result = chain.run(instructions=query, papers="\n".join(papers))
+        print(json.dumps(result, indent=2))
         return result
-
-    # to pickle, we have to save the index as a file
-
-    def __getstate__(self):
-        if self._faiss_index is None and len(self.docs) > 0:
-            self._build_faiss_index()
-        state = self.__dict__.copy()
-        if self._faiss_index is not None:
-            state["_faiss_index"].save_local(self.index_path)
-        del state["_faiss_index"]
-        del state["_doc_index"]
-        # remove LLMs (they can have callbacks, which can't be pickled)
-        del state["summary_chain"]
-        del state["qa_chain"]
-        del state["cite_chain"]
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        try:
-            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
-        except:
-            # they use some special exception type, but I don't want to import it
-            self._faiss_index = None
-        if not hasattr(self, "_doc_index"):
-            self._doc_index = None
-        self.update_llm(None, None)
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
@@ -538,15 +470,14 @@ class Docs:
             if skey + " " in answer_text or skey + ")" or skey + "," in answer_text:
                 bib[skey] = citation
                 passages[key] = text
-        bib_str = "\n\n".join(
+        references = "\n\n".join(
             [f"{i + 1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
         formatted_answer = f"Question: {query}\n\n{answer_text}\n"
-        if len(bib) > 0:
-            formatted_answer += f"\nReferences\n\n{bib_str}\n"
+        formatted_answer += f"\nContext\n\n{answer.context}\n"
         formatted_answer += f"\nTokens Used: {answer.tokens} Cost: ${answer.cost:.2f}"
         answer.answer = answer_text
         answer.formatted_answer = formatted_answer
-        answer.references = bib_str
+        answer.references = references
         answer.passages = passages
         return answer

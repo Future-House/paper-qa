@@ -24,6 +24,7 @@ a = d.query("What does this codebase do?")
 print(len(a.contexts), 'contexts')
 print('Cost:', a.cost, 'Tokens:', a.tokens)
 print(a.formatted_answer)
+print(a.context)
 
 code.interact(local=locals(), banner="""
 Welcome to the PaperQA REPL! Try this:
