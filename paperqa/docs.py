@@ -193,14 +193,6 @@ class Docs:
                      "Question: {question}\n"
                      "Answer: ",
         ), llm=llm)
-        self.search_chain = make_chain(prompt=prompts.PromptTemplate(
-            input_variables=["question"],
-            template="We want to answer the following question: {question} \n"
-                     "Provide three keyword searches (one search per line) "
-                     "that will find papers to help answer the question. Do not use boolean operators. "
-                     "Recent years are 2021, 2022, 2023.\n\n"
-                     "1.",
-        ), llm=summary_llm)
         self.cite_chain = make_chain(prompt=prompts.PromptTemplate(
             input_variables=["text"],
             template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
@@ -346,7 +338,6 @@ class Docs:
         del state["summary_chain"]
         del state["qa_chain"]
         del state["cite_chain"]
-        del state["search_chain"]
         return state
 
     def __setstate__(self, state):
@@ -474,20 +465,6 @@ class Docs:
             context_str += "\n\nValid keys: " + ", ".join(valid_keys)
         answer.context = context_str
         return answer
-
-    def generate_search_query(self, query: str) -> List[str]:
-        """Generate a list of search strings that can be used to find
-        relevant papers.
-
-        Args:
-            query (str): The query to generate search strings for.
-        """
-
-        search_query = self.search_chain.run(question=query)
-        queries = [s for s in search_query.split("\n") if len(s) > 3]
-        # remove 2., 3. from queries
-        queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
-        return queries
 
     def query(
             self,
