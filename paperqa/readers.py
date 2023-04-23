@@ -6,7 +6,6 @@ import logging
 from hashlib import md5
 
 from langchain.text_splitter import TokenTextSplitter
-from langchain.cache import SQLiteCache
 from langchain.schema import Generation
 
 

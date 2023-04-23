@@ -10,8 +10,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.llms.base import LLM
 from langchain.callbacks import get_openai_callback
-from langchain.cache import SQLiteCache
-import langchain
+# from langchain.cache import SQLiteCache
+# import langchain
 import math
 import string
 from typing import Union, List, Dict, Any
@@ -24,10 +24,10 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage
 from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
 
-CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
+# CACHE_PATH = Path.home() / ".paperqa" / "llm_cache.db"
 
-os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-langchain.llm_cache = SQLiteCache(CACHE_PATH)
+# os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
+# langchain.llm_cache = SQLiteCache(CACHE_PATH)
 
 
 StrPath = Union[str, Path]
@@ -73,72 +73,9 @@ class Context:
         return self.context
 
 
-summary_prompt = prompts.PromptTemplate(
-    input_variables=["question", "context_str", "citation"],
-    template="Summarize and provide direct quotes from the text below to help answer a question. "
-             "Do not directly answer the question, instead summarize and "
-             "quote to give evidence to help answer the question. "
-             "Do not use outside sources. "
-             'Reply with "Not applicable" if the text is unrelated to the question. '
-             "Use 150 or less words."
-             "\n\n"
-             "{context_str}\n"
-             "Extracted from {citation}\n"
-             "Question: {question}\n"
-             "Relevant Information Summary:",
-)
-
-
-qa_prompt = prompts.PromptTemplate(
-    input_variables=["question", "context_str", "length"],
-    template="Write an answer ({length}) "
-             "for the question below based on the provided context. "
-             "If the context provides insufficient information, "
-             'reply "I cannot answer". '
-             "For each sentence in your answer, indicate which sources most support it "
-             "via valid citation markers at the end of sentences, like (Example2012). "
-             "Answer in an unbiased, comprehensive, and scholarly tone. "
-             "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
-             "{context_str}\n"
-             "Question: {question}\n"
-             "Answer: ",
-)
-
-
-search_prompt = prompts.PromptTemplate(
-    input_variables=["question"],
-    template="We want to answer the following question: {question} \n"
-             "Provide three keyword searches (one search per line) "
-             "that will find papers to help answer the question. Do not use boolean operators. "
-             "Recent years are 2021, 2022, 2023.\n\n"
-             "1.",
-)
-
-
-select_paper_prompt = prompts.PromptTemplate(
-    input_variables=["instructions", "papers"],
-    template="Select papers according to instructions below. "
-             "Papers are listed as $KEY: $PAPER_INFO. "
-             "Return a list of keys, separated by commas. "
-             'Return "None", if no papers are applicable. \n\n'
-             "Instructions: {instructions}\n\n"
-             "{papers}\n\n"
-             "Selected keys:",
-)
-
-
 def _get_datetime():
     now = datetime.now()
     return now.strftime("%m/%d/%Y")
-
-
-citation_prompt = prompts.PromptTemplate(
-    input_variables=["text"],
-    template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
-             "{text}\n\n"
-             "Citation:",
-    partial_variables={"date": _get_datetime},
-)
 
 
 def make_chain(prompt, llm):
@@ -152,6 +89,7 @@ def make_chain(prompt, llm):
             [system_message_prompt, human_message_prompt]
         )
     return LLMChain(prompt=prompt, llm=llm)
+
 
 def maybe_is_text(s, thresh=2.5):
     if len(s) == 0:
@@ -176,18 +114,17 @@ def md5sum(file_path: StrPath) -> str:
         return hashlib.md5(f.read()).hexdigest()
 
 
-
 class Docs:
     """A collection of documents to be used for answering questions."""
 
     def __init__(
-        self,
-        chunk_size_limit: int = 3000,
-        llm: Optional[Union[LLM, str]] = None,
-        summary_llm: Optional[Union[LLM, str]] = None,
-        name: str = "default",
-        index_path: Optional[Path] = None,
-        embeddings: Optional[Embeddings] = None,
+            self,
+            chunk_size_limit: int = 3000,
+            llm: Optional[Union[LLM, str]] = None,
+            summary_llm: Optional[Union[LLM, str]] = None,
+            name: str = "default",
+            index_path: Optional[Path] = None,
+            embeddings: Optional[Embeddings] = None,
     ) -> None:
         """Initialize the collection of documents.
 
@@ -205,7 +142,7 @@ class Docs:
         self._doc_index = None
         self.update_llm(llm, summary_llm)
         if index_path is None:
-            index_path = Path.home() / ".paperqa" / name
+            index_path = Path.cwd() / "data" / name
         self.index_path = index_path
         self.name = name
         if embeddings is None:
@@ -213,9 +150,9 @@ class Docs:
         self.embeddings = embeddings
 
     def update_llm(
-        self,
-        llm: Optional[Union[LLM, str]] = None,
-        summary_llm: Optional[Union[LLM, str]] = None,
+            self,
+            llm: Optional[Union[LLM, str]] = None,
+            summary_llm: Optional[Union[LLM, str]] = None,
     ) -> None:
         """Update the LLM for answering questions."""
         if llm is None:
@@ -228,19 +165,58 @@ class Docs:
         if summary_llm is None:
             summary_llm = llm
         self.summary_llm = summary_llm
-        self.summary_chain = make_chain(prompt=summary_prompt, llm=summary_llm)
-        self.qa_chain = make_chain(prompt=qa_prompt, llm=llm)
-        self.search_chain = make_chain(prompt=search_prompt, llm=summary_llm)
-        self.cite_chain = make_chain(prompt=citation_prompt, llm=summary_llm)
+        self.summary_chain = make_chain(prompt=prompts.PromptTemplate(
+            input_variables=["question", "context_str", "citation"],
+            template="Summarize and provide direct quotes from the text below to help answer a question. "
+                     "Do not directly answer the question, instead summarize and "
+                     "quote to give evidence to help answer the question. "
+                     "Do not use outside sources. "
+                     'Reply with "Not applicable" if the text is unrelated to the question. '
+                     "Use 150 or less words."
+                     "\n\n"
+                     "{context_str}\n"
+                     "Extracted from {citation}\n"
+                     "Question: {question}\n"
+                     "Relevant Information Summary:",
+        ), llm=summary_llm)
+        self.qa_chain = make_chain(prompt=prompts.PromptTemplate(
+            input_variables=["question", "context_str", "length"],
+            template="Write an answer ({length}) "
+                     "for the question below based on the provided context. "
+                     "If the context provides insufficient information, "
+                     'reply "I cannot answer". '
+                     "For each sentence in your answer, indicate which sources most support it "
+                     "via valid citation markers at the end of sentences, like (Example2012). "
+                     "Answer in an unbiased, comprehensive, and scholarly tone. "
+                     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
+                     "{context_str}\n"
+                     "Question: {question}\n"
+                     "Answer: ",
+        ), llm=llm)
+        self.search_chain = make_chain(prompt=prompts.PromptTemplate(
+            input_variables=["question"],
+            template="We want to answer the following question: {question} \n"
+                     "Provide three keyword searches (one search per line) "
+                     "that will find papers to help answer the question. Do not use boolean operators. "
+                     "Recent years are 2021, 2022, 2023.\n\n"
+                     "1.",
+        ), llm=summary_llm)
+        self.cite_chain = make_chain(prompt=prompts.PromptTemplate(
+            input_variables=["text"],
+            template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
+                     "{text}\n\n"
+                     "Citation:",
+            partial_variables={"date": _get_datetime},
+        ), llm=summary_llm)
 
     def add(
-        self,
-        path: str,
-        citation: Optional[str] = None,
-        key: Optional[str] = None,
-        disable_check: bool = False,
-        chunk_chars: Optional[int] = 3000,
-        overwrite: bool = False,
+            self,
+            path: str,
+            citation: Optional[str] = None,
+            key: Optional[str] = None,
+            disable_check: bool = False,
+            chunk_chars: Optional[int] = 3000,
+            overwrite: bool = False,
     ) -> None:
         """Add a document to the collection."""
 
@@ -290,7 +266,7 @@ class Docs:
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
-            not disable_check and not maybe_is_text("".join(texts))
+                not disable_check and not maybe_is_text("".join(texts))
         ):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
@@ -340,7 +316,18 @@ class Docs:
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.similarity_search(query, k=k)
-        chain = make_chain(select_paper_prompt, self.summary_llm)
+        chain = make_chain(
+            prompts.PromptTemplate(
+                input_variables=["instructions", "papers"],
+                template="Select papers according to instructions below. "
+                         "Papers are listed as $KEY: $PAPER_INFO. "
+                         "Return a list of keys, separated by commas. "
+                         'Return "None", if no papers are applicable. \n\n'
+                         "Instructions: {instructions}\n\n"
+                         "{papers}\n\n"
+                         "Selected keys:",
+            ),
+            self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = chain.run(instructions=query, papers="\n".join(papers))
         return result
@@ -386,12 +373,12 @@ class Docs:
             )
 
     def get_evidence(
-        self,
-        answer: Answer,
-        k: int = 3,
-        max_sources: int = 5,
-        marginal_relevance: bool = True,
-        key_filter: Optional[List[str]] = None,
+            self,
+            answer: Answer,
+            k: int = 3,
+            max_sources: int = 5,
+            marginal_relevance: bool = True,
+            key_filter: Optional[List[str]] = None,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -414,12 +401,12 @@ class Docs:
         )
 
     async def aget_evidence(
-        self,
-        answer: Answer,
-        k: int = 3,
-        max_sources: int = 5,
-        marginal_relevance: bool = False,
-        key_filter: Optional[List[str]] = None,
+            self,
+            answer: Answer,
+            k: int = 3,
+            max_sources: int = 5,
+            marginal_relevance: bool = False,
+            key_filter: Optional[List[str]] = None,
     ) -> Answer:
         if len(self.docs) == 0:
             return answer
@@ -503,14 +490,14 @@ class Docs:
         return queries
 
     def query(
-        self,
-        query: str,
-        k: int = 10,
-        max_sources: int = 5,
-        length_prompt: str = "about 100 words",
-        marginal_relevance: bool = True,
-        answer: Optional[Answer] = None,
-        key_filter: Optional[bool] = None,
+            self,
+            query: str,
+            k: int = 10,
+            max_sources: int = 5,
+            length_prompt: str = "about 100 words",
+            marginal_relevance: bool = True,
+            answer: Optional[Answer] = None,
+            key_filter: Optional[bool] = None,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -535,14 +522,14 @@ class Docs:
         )
 
     async def aquery(
-        self,
-        query: str,
-        k: int = 10,
-        max_sources: int = 5,
-        length_prompt: str = "about 100 words",
-        marginal_relevance: bool = True,
-        answer: Optional[Answer] = None,
-        key_filter: Optional[bool] = None,
+            self,
+            query: str,
+            k: int = 10,
+            max_sources: int = 5,
+            length_prompt: str = "about 100 words",
+            marginal_relevance: bool = True,
+            answer: Optional[Answer] = None,
+            key_filter: Optional[bool] = None,
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
@@ -588,7 +575,7 @@ class Docs:
                 bib[skey] = citation
                 passages[key] = text
         bib_str = "\n\n".join(
-            [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
+            [f"{i + 1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
         formatted_answer = f"Question: {query}\n\n{answer_text}\n"
         if len(bib) > 0:

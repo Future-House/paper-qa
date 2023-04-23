@@ -8,7 +8,7 @@ import re
 
 d = Docs()
 
-IGNORE_DIRS = set(['venv', 'node_modules'])
+IGNORE_DIRS = set(['venv', 'node_modules', 'data'])
 RX_IGNORE = re.compile(r'(^\..*)|(.*\.pyc$)')
 for code_dir in ['.']:
     for dirpath, dirnames, filenames in os.walk(code_dir, topdown=True):
