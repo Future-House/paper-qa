@@ -107,6 +107,9 @@ class Docs:
         if citation is None:
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
+            if not texts:
+                print(f"Empty ({path}):", texts)
+                return
             with get_openai_callback():
                 citation = self.cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
@@ -136,6 +139,8 @@ class Docs:
         key += suffix
 
         texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
+        if not texts:
+            return
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -188,7 +193,7 @@ class Docs:
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
-        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        docs = self._doc_index.similarity_search(query, k=k)
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = chain.run(instructions=query, papers="\n".join(papers))
@@ -267,7 +272,7 @@ class Docs:
         answer: Answer,
         k: int = 3,
         max_sources: int = 5,
-        marginal_relevance: bool = True,
+        marginal_relevance: bool = False,
         key_filter: Optional[List[str]] = None,
     ) -> Answer:
         if len(self.docs) == 0:
@@ -278,14 +283,14 @@ class Docs:
         if key_filter is not None:
             _k = k * 10  # heuristic
         # want to work through indices but less k
-        if marginal_relevance:
-            docs = self._faiss_index.max_marginal_relevance_search(
-                answer.question, k=_k, fetch_k=5 * _k
-            )
-        else:
-            docs = self._faiss_index.similarity_search(
-                answer.question, k=_k, fetch_k=5 * _k
-            )
+        # if marginal_relevance:
+        #     docs = self._faiss_index.max_marginal_relevance_search(
+        #         answer.question, k=_k, fetch_k=5 * _k
+        #     )
+        # else:
+        docs = self._faiss_index.similarity_search(
+            answer.question, k=_k, fetch_k=5 * _k
+        )
 
         async def process(doc):
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
