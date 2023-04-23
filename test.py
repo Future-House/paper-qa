@@ -3,7 +3,7 @@ load_dotenv()
 
 import code
 import os
-from paperqa import Docs
+from paperqa.docs import Docs
 import re
 
 d = Docs()
