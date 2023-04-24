@@ -64,14 +64,11 @@ def make_chain(prompt, llm):
 def maybe_is_text(s, thresh=2.5):
     if len(s) == 0:
         return False
-    # Calculate the entropy of the string
     entropy = 0
     for c in string.printable:
         p = s.count(c) / len(s)
         if p > 0:
             entropy += -p * math.log2(p)
-
-    # Check if the entropy is within a reasonable range for text
     if entropy > thresh:
         return True
     return False
@@ -84,8 +81,6 @@ def md5sum(file_path):
 
 
 class Docs:
-    """A collection of documents to be used for answering questions."""
-
     def __init__(
             self,
             chunk_size_limit: int = 3000,
@@ -179,7 +174,6 @@ class Docs:
         self.keys.add(key)
 
     def doc_previews(self) -> List[Tuple[int, str, str]]:
-        """Return a list of tuples of (key, citation) for each document."""
         return [
             (
                 len(doc["texts"]),
@@ -190,7 +184,6 @@ class Docs:
         ]
 
     def doc_match(self, query: str, k: int = 25) -> List[str]:
-        """Return a list of documents that match the query."""
         if len(self.docs) == 0:
             return ""
         if self._doc_index is None:
