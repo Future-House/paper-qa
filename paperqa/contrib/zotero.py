@@ -146,6 +146,8 @@ class ZoteroDB(zotero.Zotero):
                             zotero_pdf_path = zotero_doc_folder / pdf_files[0]
                             shutil.copy(zotero_pdf_path, pdf_path)
                             return pdf_path
+                        else:
+                            self.logger.warning("|  Found more than one PDF for {_get_citation_key(item)}, so skipping.")
 
                 except Exception as e:
                     self.logger.warning(f"Could not copy file from Zotero storage, redownloading file. Error: {e}")
