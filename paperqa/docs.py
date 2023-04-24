@@ -23,20 +23,15 @@ StrPath = Union[str, Path]
 @dataclass
 class Answer:
     question: str
-    answer: str = ""
     context: str = ""
     contexts: List[Any] = None
-    references: str = ""
     formatted_answer: str = ""
-    passages: Dict[str, str] = None
     tokens: int = 0
     cost: float = 0
 
     def __post_init__(self):
         if self.contexts is None:
             self.contexts = []
-        if self.passages is None:
-            self.passages = {}
 
 @dataclass
 class Context:
@@ -82,56 +77,20 @@ class Docs:
     def __init__(
             self,
             chunk_size_limit: int = 3000,
-            llm: Optional[Union[LLM, str]] = None,
-            summary_llm: Optional[Union[LLM, str]] = None,
             name: str = "default",
-            index_path: Optional[Path] = None,
             embeddings: Optional[Embeddings] = None,
     ) -> None:
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
+        self.llm = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo")
         self._faiss_index = None
         self._doc_index = None
-        self.update_llm(llm, summary_llm)
-        if index_path is None:
-            index_path = Path.cwd() / "data" / name
-        self.index_path = index_path
+        self.index_path = Path.cwd() / "data" / name
         self.name = name
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
-
-    def update_llm(
-            self,
-            llm: Optional[Union[LLM, str]] = None,
-            summary_llm: Optional[Union[LLM, str]] = None,
-    ) -> None:
-        if llm is None:
-            llm = "gpt-3.5-turbo"
-        if type(llm) is str:
-            llm = ChatOpenAI(temperature=0.1, model=llm)
-        if type(summary_llm) is str:
-            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm)
-        self.llm = llm
-        if summary_llm is None:
-            summary_llm = llm
-        self.summary_llm = summary_llm
-        # self.summary_chain =
-        self.qa_chain = make_chain(prompt=prompts.PromptTemplate(
-            input_variables=["question", "context_str", "length"],
-            template="Write an answer ({length}) "
-                     "for the question below based on the provided context. "
-                     "If the context provides insufficient information, "
-                     'reply "I cannot answer". '
-                     "For each sentence in your answer, indicate which sources most support it "
-                     "via valid citation markers at the end of sentences, like (Example2012). "
-                     "Answer in an unbiased, comprehensive, and scholarly tone. "
-                     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
-                     "{context_str}\n"
-                     "Question: {question}\n"
-                     "Answer: ",
-        ), llm=llm)
 
     def add(
             self,
@@ -171,16 +130,6 @@ class Docs:
         self.docs[path] = dict(texts=texts, metadata=metadata, key=key, md5=md5)
         self.keys.add(key)
 
-    def doc_previews(self) -> List[Tuple[int, str, str]]:
-        return [
-            (
-                len(doc["texts"]),
-                doc["metadata"][0]["dockey"],
-                doc["metadata"][0]["citation"],
-            )
-            for doc in self.docs.values()
-        ]
-
     def _build_faiss_index(self):
         if self._faiss_index is None:
             texts = reduce(
@@ -205,12 +154,9 @@ class Docs:
         if self._faiss_index is None:
             self._build_faiss_index()
         _k = k
-        if key_filter is not None:
-            _k = k * 10  # heuristic
-        fetch_k = 5 * _k
-        print("YOOOOOOOO fetch_k:", fetch_k)
+        print("YOOOOOOOOOO", k)
         docs = self._faiss_index.similarity_search(
-            answer.question, k=_k, fetch_k=fetch_k
+            answer.question, k=10, fetch_k=50
         )
 
         summary_template = prompts.PromptTemplate(
@@ -238,7 +184,7 @@ class Docs:
                                                        context_str=doc.page_content,
                                                        citation=doc.metadata["citation"]))
 
-            summary_chain = make_chain(prompt=summary_template, llm=self.summary_llm)
+            summary_chain = make_chain(prompt=summary_template, llm=self.llm)
 
             the_ai_context = await summary_chain.arun(
                 question=answer.question,
@@ -293,7 +239,6 @@ class Docs:
             query: str,
             k: int = 10,
             max_sources: int = 5,
-            length_prompt: str = "about 100 words",
     ) -> Answer:
         answer = Answer(query)
         answer = await self.aget_evidence(
@@ -303,15 +248,30 @@ class Docs:
             key_filter=None,
         )
         context_str, contexts = answer.context, answer.contexts
+        qa_chain = make_chain(prompt=prompts.PromptTemplate(
+            input_variables=["question", "context_str"],
+            template="""Write an answer (about 100 words) for the question below based on the context.
+
+If the context has insufficient information, reply "I cannot answer". 
+
+For each sentence in your answer, indicate which sources most support it via valid citation markers at the end of sentences, like (Example2012).
+
+Answer extremely intelligently. Use Slack Markdown for formatting, and try to use direct quotes to support arguments.
+
+Context:
+{context_str}
+
+Question: {question}
+Answer:""",
+        ), llm=self.llm)
         with get_openai_callback() as cb:
-            answer_text = await self.qa_chain.arun(
-                question=query, context_str=context_str, length=length_prompt
+            answer_text = await qa_chain.arun(
+                question=query, context_str=context_str
             )
         answer.tokens += cb.total_tokens
         answer.cost += cb.total_cost
         formatted_answer = f"Question: {query}\n\n{answer_text}\n"
         formatted_answer += f"\nContext\n\n{answer.context}\n"
         formatted_answer += f"\nTokens Used: {answer.tokens} Cost: ${answer.cost:.2f}"
-        answer.answer = answer_text
         answer.formatted_answer = formatted_answer
         return answer
