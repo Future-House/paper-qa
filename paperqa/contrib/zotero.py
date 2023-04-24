@@ -3,6 +3,7 @@ import os
 from typing import Union, Optional
 from pathlib import Path
 import logging
+import requests
 from collections import namedtuple
 
 try:
@@ -44,9 +45,27 @@ class ZoteroDB(zotero.Zotero):
         library_id: Optional[str] = None,
         api_key: Optional[str] = None,
         storage: Optional[StrPath] = None,
+        better_bibtex: bool = False,
+        hostname: str = "localhost",
+        port: int = 23119,
         **kwargs,
     ):
+        """Initialize the ZoteroDB object.
+
+        Parameters
+        ----------
+        better_bibtex : bool
+            Whether to use Better BibTeX to get document citekeys. If True,
+            you must have the Better BibTeX extension for Zotero installed 
+            and enabled.
+        hostname : str
+            The hostname of the Zotero server. Required for better_bibtex=True.
+        port : int
+            The port of the Zotero Connector Integration. Required for better_bibtex=True.
+        """
+
         self.logger = logging.getLogger("ZoteroDB")
+        self.better_bibtex = better_bibtex
 
         if library_id is None:
             self.logger.info("Attempting to get ZOTERO_USER_ID from `os.environ`...")
@@ -78,7 +97,9 @@ class ZoteroDB(zotero.Zotero):
             storage = CACHE_PATH.parent / "zotero"
 
         self.logger.info(f"Using cache location: {storage}")
-        self.storage = storage
+        self.storage = Path(storage)
+        self.hostname = hostname
+        self.port = port
 
         super().__init__(
             library_type=library_type, library_id=library_id, api_key=api_key, **kwargs
@@ -108,7 +129,7 @@ class ZoteroDB(zotero.Zotero):
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
-            self.logger.info(f"|  Downloading PDF for: {_get_citation_key(item)}")
+            self.logger.info(f"|  Downloading PDF for: {self._get_citation_key(item)}")
             self.dump(pdf_key, pdf_path)
 
         return pdf_path
@@ -226,7 +247,7 @@ class ZoteroDB(zotero.Zotero):
                 title = item["data"]["title"] if "title" in item["data"] else ""
                 if len(items) >= start:
                     yield ZoteroPaper(
-                        key=_get_citation_key(item),
+                        key=self._get_citation_key(item),
                         title=title,
                         pdf=pdf,
                         num_pages=count_pdf_pages(pdf),
@@ -278,28 +299,46 @@ class ZoteroDB(zotero.Zotero):
             raise ValueError(f"Collection '{collection_name}' not found")
         return collection_id
 
+    def _get_citation_key(self, item: dict) -> str:
+        if self.better_bibtex:
+            try:
+                url = f"http://{self.hostname}:{self.port}/better-bibtex/json-rpc"
+                headers = {"Content-Type": "application/json", "Accept": "application/json"}
+                payload = {
+                    "jsonrpc": "2.0",
+                    "method": "item.citationkey",
+                    "params": [[item["key"]]],
+                }
 
-def _get_citation_key(item: dict) -> str:
-    if (
-        "data" not in item
-        or "creators" not in item["data"]
-        or len(item["data"]["creators"]) == 0
-        or "lastName" not in item["data"]["creators"][0]
-        or "title" not in item["data"]
-        or "date" not in item["data"]
-    ):
-        return item["key"]
+                response = requests.post(url, headers=headers, json=payload)
 
-    last_name = item["data"]["creators"][0]["lastName"]
-    short_title = "".join(item["data"]["title"].split(" ")[:3])
-    date = item["data"]["date"]
+                return response.json()["result"][item["key"]]
 
-    # Delete non-alphanumeric characters:
-    short_title = "".join([c for c in short_title if c.isalnum()])
-    last_name = "".join([c for c in last_name if c.isalnum()])
-    date = "".join([c for c in date if c.isalnum()])
+            except Exception as e:
+                self.logger.warning(
+                    f"Failed to get citation key from Better BibTeX. Error: {e}. Using default citation key format."
+                )
 
-    return f"{last_name}_{short_title}_{date}_{item['key']}".replace(" ", "")
+        if (
+            "data" not in item
+            or "creators" not in item["data"]
+            or len(item["data"]["creators"]) == 0
+            or "lastName" not in item["data"]["creators"][0]
+            or "title" not in item["data"]
+            or "date" not in item["data"]
+        ):
+            return item["key"]
+
+        last_name = item["data"]["creators"][0]["lastName"]
+        short_title = "".join(item["data"]["title"].split(" ")[:3])
+        date = item["data"]["date"]
+
+        # Delete non-alphanumeric characters:
+        short_title = "".join([c for c in short_title if c.isalnum()])
+        last_name = "".join([c for c in last_name if c.isalnum()])
+        date = "".join([c for c in date if c.isalnum()])
+
+        return f"{last_name}_{short_title}_{date}_{item['key']}".replace(" ", "")
 
 
 def _extract_pdf_key(item: dict) -> str:
