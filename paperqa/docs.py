@@ -1,4 +1,3 @@
-import json
 from typing import Optional, Tuple
 from functools import reduce
 import asyncio
@@ -14,7 +13,6 @@ from typing import Union, List, Dict, Any
 from pathlib import Path
 from dataclasses import dataclass
 import langchain.prompts as prompts
-from datetime import datetime
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage
@@ -183,35 +181,6 @@ class Docs:
             for doc in self.docs.values()
         ]
 
-    def doc_match(self, query: str, k: int = 25) -> List[str]:
-        if len(self.docs) == 0:
-            return ""
-        if self._doc_index is None:
-            texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
-            metadatas = [
-                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs.values()
-            ]
-            self._doc_index = FAISS.from_texts(
-                texts, metadatas=metadatas, embedding=self.embeddings
-            )
-        docs = self._doc_index.similarity_search(query, k=k)
-        template = prompts.PromptTemplate(
-            input_variables=["instructions", "papers"],
-            template="Select papers according to instructions below. "
-                     "Papers are listed as $KEY: $PAPER_INFO. "
-                     "Return a list of keys, separated by commas. "
-                     'Return "None", if no papers are applicable. \n\n'
-                     "Instructions: {instructions}\n\n"
-                     "{papers}\n\n"
-                     "Selected keys:",
-        )
-        chain = make_chain(template, self.summary_llm)
-        papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
-        print("Yooooooooooooooooo", template.format(instructions=query, papers="\n".join(papers)))
-        result = chain.run(instructions=query, papers="\n".join(papers))
-        print(json.dumps(result, indent=2))
-        return result
-
     def _build_faiss_index(self):
         if self._faiss_index is None:
             texts = reduce(
@@ -325,25 +294,14 @@ class Docs:
             k: int = 10,
             max_sources: int = 5,
             length_prompt: str = "about 100 words",
-            answer: Optional[Answer] = None,
-            key_filter: Optional[bool] = None,
     ) -> Answer:
-        if k < max_sources:
-            raise ValueError("k should be greater than max_sources")
-        if answer is None:
-            answer = Answer(query)
-        if len(answer.contexts) == 0:
-            if key_filter or (key_filter is None and len(self.docs) > 5):
-                with get_openai_callback() as cb:
-                    keys = self.doc_match(answer.question)
-                answer.tokens += cb.total_tokens
-                answer.cost += cb.total_cost
-            answer = await self.aget_evidence(
-                answer,
-                k=k,
-                max_sources=max_sources,
-                key_filter=keys if key_filter else None,
-            )
+        answer = Answer(query)
+        answer = await self.aget_evidence(
+            answer,
+            k=k,
+            max_sources=max_sources,
+            key_filter=None,
+        )
         context_str, contexts = answer.context, answer.contexts
         with get_openai_callback() as cb:
             answer_text = await self.qa_chain.arun(
