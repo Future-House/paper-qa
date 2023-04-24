@@ -45,7 +45,7 @@ class ZoteroDB(zotero.Zotero):
         library_id: Optional[str] = None,
         api_key: Optional[str] = None,
         storage: Optional[StrPath] = None,
-        zotero_storage: Optional[Union[StrPath,bool]] = "~/Zotero/storage/",
+        zotero_storage: Optional[Union[StrPath,bool]] = None, 
         **kwargs,
     ):
         """Initialize the ZoteroDB object.
@@ -92,11 +92,18 @@ class ZoteroDB(zotero.Zotero):
         if storage is None:
             storage = CACHE_PATH.parent / "zotero"
         
-        if zotero_storage:
-            self.zotero_storage = Path(zotero_storage).expanduser()
-        else:
-            self.zotero_storage = None
 
+        if isinstance(zotero_storage, StrPath):
+            self.zotero_storage = Path(zotero_storage).expanduser()
+            if not self.zotero_storage.exists():
+                raise FileNotFoundError(f"Zotero storage directory {zotero_storage} does not exist.")
+
+        elif zotero_storage:
+            self.zotero_storage = Path.home() / "Zotero" / "storage" 
+            if not self.zotero_storage.exists():
+                self.logger.warning(f"Zotero storage directory {zotero_storage} does not exist. Disabling copy from Zotero storage.")
+                self.zotero_storage = False
+        
         self.logger.info(f"Using cache location: {storage}")
         self.storage = Path(storage)
 
