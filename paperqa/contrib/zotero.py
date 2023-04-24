@@ -45,7 +45,7 @@ class ZoteroDB(zotero.Zotero):
         library_id: Optional[str] = None,
         api_key: Optional[str] = None,
         storage: Optional[StrPath] = None,
-        zotero_storage: Optional[Union[StrPath,bool]] = None, 
+        zotero_storage: Union[StrPath,bool] = True, 
         **kwargs,
     ):
         """Initialize the ZoteroDB object.
