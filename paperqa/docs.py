@@ -1,7 +1,6 @@
 import json
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple
 from functools import reduce
-import sys
 import asyncio
 from .readers import read_doc
 from langchain.vectorstores import FAISS
@@ -23,11 +22,8 @@ from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplat
 
 StrPath = Union[str, Path]
 
-
 @dataclass
 class Answer:
-    """A class to hold the answer to a question."""
-
     question: str
     answer: str = ""
     context: str = ""
@@ -39,34 +35,17 @@ class Answer:
     cost: float = 0
 
     def __post_init__(self):
-        """Initialize the answer."""
         if self.contexts is None:
             self.contexts = []
         if self.passages is None:
             self.passages = {}
 
-    def __str__(self) -> str:
-        """Return the answer as a string."""
-        return self.formatted_answer
-
-
 @dataclass
 class Context:
-    """A class to hold the context of a question."""
-
     key: str
     citation: str
     context: str
     text: str
-
-    def __str__(self) -> str:
-        """Return the context as a string."""
-        return self.context
-
-
-def _get_datetime():
-    now = datetime.now()
-    return now.strftime("%m/%d/%Y")
 
 
 def make_chain(prompt, llm):
@@ -98,9 +77,8 @@ def maybe_is_text(s, thresh=2.5):
     return False
 
 
-def md5sum(file_path: StrPath) -> str:
+def md5sum(file_path):
     import hashlib
-
     with open(file_path, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()
 
@@ -117,15 +95,6 @@ class Docs:
             index_path: Optional[Path] = None,
             embeddings: Optional[Embeddings] = None,
     ) -> None:
-        """Initialize the collection of documents.
-
-        Args:
-            chunk_size_limit: The maximum number of characters to use for a single chunk of text.
-            llm: The language model to use for answering questions. Default - OpenAI chat-gpt-turbo
-            summary_llm: The language model to use for summarizing documents. If None, llm is used.
-            name: The name of the collection.
-            index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
-        """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
@@ -145,7 +114,6 @@ class Docs:
             llm: Optional[Union[LLM, str]] = None,
             summary_llm: Optional[Union[LLM, str]] = None,
     ) -> None:
-        """Update the LLM for answering questions."""
         if llm is None:
             llm = "gpt-3.5-turbo"
         if type(llm) is str:
@@ -179,12 +147,7 @@ class Docs:
             key: Optional[str] = None,
             disable_check: bool = False,
             chunk_chars: Optional[int] = 3000,
-            overwrite: bool = False,
     ) -> None:
-        """Add a document to the collection."""
-
-        # first check to see if we already have this document
-        # this way we don't make api call to create citation on file we already have
         md5 = md5sum(path)
         if path in self.docs:
             raise ValueError(f"Document {path} already in collection.")
@@ -214,20 +177,6 @@ class Docs:
             self._doc_index.add_texts([citation], metadatas=[{"key": key}])
         self.docs[path] = dict(texts=texts, metadata=metadata, key=key, md5=md5)
         self.keys.add(key)
-
-    def clear(self) -> None:
-        """Clear the collection of documents."""
-        self.docs = dict()
-        self.keys = set()
-        self._faiss_index = None
-        self._doc_index = None
-        # delete index file
-        pkl = self.index_path / "index.pkl"
-        if pkl.exists():
-            pkl.unlink()
-        fs = self.index_path / "index.faiss"
-        if fs.exists():
-            fs.unlink()
 
     def doc_previews(self) -> List[Tuple[int, str, str]]:
         """Return a list of tuples of (key, citation) for each document."""
@@ -281,32 +230,6 @@ class Docs:
             self._faiss_index = FAISS.from_texts(
                 texts, self.embeddings, metadatas=metadatas
             )
-
-    def get_evidence(
-            self,
-            answer: Answer,
-            k: int = 3,
-            max_sources: int = 5,
-            key_filter: Optional[List[str]] = None,
-    ) -> Answer:
-        # special case for jupyter notebooks
-        if "get_ipython" in globals() or "google.colab" in sys.modules:
-            import nest_asyncio
-
-            nest_asyncio.apply()
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        return loop.run_until_complete(
-            self.aget_evidence(
-                answer,
-                k=k,
-                max_sources=max_sources,
-                key_filter=key_filter,
-            )
-        )
 
     async def aget_evidence(
             self,
@@ -403,31 +326,6 @@ class Docs:
         answer.context = context_str
         return answer
 
-    def query(
-            self,
-            query: str,
-            k: int = 10,
-            max_sources: int = 5,
-            length_prompt: str = "about 100 words",
-            answer: Optional[Answer] = None,
-            key_filter: Optional[bool] = None,
-    ) -> Answer:
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        return loop.run_until_complete(
-            self.aquery(
-                query,
-                k=k,
-                max_sources=max_sources,
-                length_prompt=length_prompt,
-                answer=answer,
-                key_filter=key_filter,
-            )
-        )
-
     async def aquery(
             self,
             query: str,
@@ -454,39 +352,15 @@ class Docs:
                 key_filter=keys if key_filter else None,
             )
         context_str, contexts = answer.context, answer.contexts
-        bib = dict()
-        passages = dict()
-        if len(context_str) < 10:
-            answer_text = (
-                "I cannot answer this question due to insufficient information."
+        with get_openai_callback() as cb:
+            answer_text = await self.qa_chain.arun(
+                question=query, context_str=context_str, length=length_prompt
             )
-        else:
-            with get_openai_callback() as cb:
-                answer_text = await self.qa_chain.arun(
-                    question=query, context_str=context_str, length=length_prompt
-                )
-            answer.tokens += cb.total_tokens
-            answer.cost += cb.total_cost
-        # it still happens lol
-        if "(Foo2012)" in answer_text:
-            answer_text = answer_text.replace("(Foo2012)", "")
-        for c in contexts:
-            key = c.key
-            text = c.context
-            citation = c.citation
-            # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
-            skey = key.split(" ")[0]
-            if skey + " " in answer_text or skey + ")" or skey + "," in answer_text:
-                bib[skey] = citation
-                passages[key] = text
-        references = "\n\n".join(
-            [f"{i + 1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
-        )
+        answer.tokens += cb.total_tokens
+        answer.cost += cb.total_cost
         formatted_answer = f"Question: {query}\n\n{answer_text}\n"
         formatted_answer += f"\nContext\n\n{answer.context}\n"
         formatted_answer += f"\nTokens Used: {answer.tokens} Cost: ${answer.cost:.2f}"
         answer.answer = answer_text
         answer.formatted_answer = formatted_answer
-        answer.references = references
-        answer.passages = passages
         return answer

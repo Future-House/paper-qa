@@ -5,6 +5,7 @@ import code
 import os
 from paperqa.docs import Docs
 import re
+import asyncio
 
 d = Docs()
 
@@ -20,7 +21,12 @@ for code_dir in ['.']:
             print("Adding", path)
             d.add(path, citation=path, key=path)
 
-a = d.query("What does this codebase do?")
+a = asyncio.get_event_loop().run_until_complete(
+    d.aquery(
+        "What does this codebase do?",
+    )
+)
+
 print(len(a.contexts), 'contexts')
 print('Cost:', a.cost, 'Tokens:', a.tokens)
 print(a.formatted_answer)
