@@ -98,7 +98,7 @@ class ZoteroDB(zotero.Zotero):
             self.zotero_storage = None
 
         self.logger.info(f"Using cache location: {storage}")
-        self.storage = storage
+        self.storage = Path(storage)
 
         super().__init__(
             library_type=library_type, library_id=library_id, api_key=api_key, **kwargs
@@ -128,14 +128,14 @@ class ZoteroDB(zotero.Zotero):
 
         if not pdf_path.exists():
             if self.zotero_storage:
-                self.logger.info(f"|  Looking for existing PDF for: {self._get_citation_key(item)}")
+                self.logger.info(f"|  Looking for existing PDF for: {_get_citation_key(item)}")
                 try:
                     zotero_doc_folder = self.zotero_storage / pdf_key
 
                     if zotero_doc_folder.exists():
                         pdf_files = list(zotero_doc_folder.glob("*.pdf"))
                         if len(pdf_files) == 1:
-                            self.logger.info(f"|  Copying existing PDF for {self._get_citation_key(item)} from Zotero storage.")
+                            self.logger.info(f"|  Copying existing PDF for {_get_citation_key(item)} from Zotero storage.")
                             zotero_pdf_path = zotero_doc_folder / pdf_files[0]
                             shutil.copy(zotero_pdf_path, pdf_path)
                             return pdf_path
