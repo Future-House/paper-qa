@@ -156,20 +156,7 @@ class Docs:
         if summary_llm is None:
             summary_llm = llm
         self.summary_llm = summary_llm
-        self.summary_chain = make_chain(prompt=prompts.PromptTemplate(
-            input_variables=["question", "context_str", "citation"],
-            template="Summarize and provide direct quotes from the text below to help answer a question. "
-                     "Do not directly answer the question, instead summarize and "
-                     "quote to give evidence to help answer the question. "
-                     "Do not use outside sources. "
-                     'Reply with "Not applicable" if the text is unrelated to the question. '
-                     "Use 150 or less words."
-                     "\n\n"
-                     "{context_str}\n"
-                     "Extracted from {citation}\n"
-                     "Question: {question}\n"
-                     "Relevant Information Summary:",
-        ), llm=summary_llm)
+        # self.summary_chain =
         self.qa_chain = make_chain(prompt=prompts.PromptTemplate(
             input_variables=["question", "context_str", "length"],
             template="Write an answer ({length}) "
@@ -335,24 +322,51 @@ class Docs:
         _k = k
         if key_filter is not None:
             _k = k * 10  # heuristic
+        fetch_k = 5 * _k
+        print("YOOOOOOOO fetch_k:", fetch_k)
         docs = self._faiss_index.similarity_search(
-            answer.question, k=_k, fetch_k=5 * _k
+            answer.question, k=_k, fetch_k=fetch_k
         )
 
+        summary_template = prompts.PromptTemplate(
+            input_variables=["question", "context_str", "citation"],
+            template="Summarize and provide direct quotes from the text below to help answer a question. "
+                     "Do not directly answer the question, instead summarize and "
+                     "quote to give evidence to help answer the question. "
+                     "Do not use outside sources. "
+                     'Reply with "Not applicable" if the text is unrelated to the question. '
+                     "Use 150 or less words."
+                     "\n\n"
+                     "{context_str}\n"
+                     "Extracted from {citation}\n"
+                     "Question: {question}\n"
+                     "Relevant Information Summary:",
+        )
         async def process(doc):
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
                 return None
             # check if it is already in answer (possible in agent setting)
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
                 return None
+
+            print("XXXXXXXXX", summary_template.format(question=answer.question,
+                                                       context_str=doc.page_content,
+                                                       citation=doc.metadata["citation"]))
+
+            summary_chain = make_chain(prompt=summary_template, llm=self.summary_llm)
+
+            the_ai_context = await summary_chain.arun(
+                question=answer.question,
+                context_str=doc.page_content,
+                citation=doc.metadata["citation"],
+            )
+
+            print("YYYYYYYYY", the_ai_context)
+
             c = Context(
                 key=doc.metadata["key"],
                 citation=doc.metadata["citation"],
-                context=await self.summary_chain.arun(
-                    question=answer.question,
-                    context_str=doc.page_content,
-                    citation=doc.metadata["citation"],
-                ),
+                context=the_ai_context,
                 text=doc.page_content,
             )
             if "Not applicable" not in c.context:
@@ -398,11 +412,6 @@ class Docs:
             answer: Optional[Answer] = None,
             key_filter: Optional[bool] = None,
     ) -> Answer:
-        # special case for jupyter notebooks
-        if "get_ipython" in globals() or "google.colab" in sys.modules:
-            import nest_asyncio
-
-            nest_asyncio.apply()
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
