@@ -1,5 +1,6 @@
 # This file gets PDF files from the user's Zotero library
 import os
+import shutil
 from typing import Union, Optional
 from pathlib import Path
 import logging
@@ -44,8 +45,22 @@ class ZoteroDB(zotero.Zotero):
         library_id: Optional[str] = None,
         api_key: Optional[str] = None,
         storage: Optional[StrPath] = None,
+        zotero_storage: Optional[Union[StrPath,bool]] = "~/Zotero/storage/",
         **kwargs,
     ):
+        """Initialize the ZoteroDB object.
+
+        Parameters
+        ----------
+        storage: str, optional
+            The path to the directory where PDFs will be stored. Defaults to
+            `~/.paperqa/zotero`.
+        zotero_storage: str, optional
+            The path to storage directory where Zotero stores PDFs. Defaults to
+            `~/Zotero/storage/`. Set this to use previously-downloaded PDFs. Set to `False` to
+            disable this feature.
+        """
+
         self.logger = logging.getLogger("ZoteroDB")
 
         if library_id is None:
@@ -76,6 +91,11 @@ class ZoteroDB(zotero.Zotero):
 
         if storage is None:
             storage = CACHE_PATH.parent / "zotero"
+        
+        if zotero_storage:
+            self.zotero_storage = Path(zotero_storage).expanduser()
+        else:
+            self.zotero_storage = None
 
         self.logger.info(f"Using cache location: {storage}")
         self.storage = storage
@@ -107,6 +127,22 @@ class ZoteroDB(zotero.Zotero):
         pdf_path = self.storage / (pdf_key + ".pdf")
 
         if not pdf_path.exists():
+            if self.zotero_storage:
+                self.logger.info(f"|  Looking for existing PDF for: {self._get_citation_key(item)}")
+                try:
+                    zotero_doc_folder = self.zotero_storage / pdf_key
+
+                    if zotero_doc_folder.exists():
+                        pdf_files = list(zotero_doc_folder.glob("*.pdf"))
+                        if len(pdf_files) == 1:
+                            self.logger.info(f"|  Copying existing PDF for {self._get_citation_key(item)} from Zotero storage.")
+                            zotero_pdf_path = zotero_doc_folder / pdf_files[0]
+                            shutil.copy(zotero_pdf_path, pdf_path)
+                            return pdf_path
+
+                except Exception as e:
+                    self.logger.warning(f"Could not copy file from Zotero storage, redownloading file. Error: {e}")
+
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
             self.logger.info(f"|  Downloading PDF for: {_get_citation_key(item)}")
             self.dump(pdf_key, pdf_path)
