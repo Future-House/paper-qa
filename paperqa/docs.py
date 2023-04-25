@@ -403,12 +403,12 @@ class Docs:
             raise ValueError("k should be greater than max_sources")
         if answer is None:
             answer = Answer(query)
-        if key_filter or (key_filter is None and len(self.docs) > 5):
-            with get_openai_callback() as cb:
-                keys = self.doc_match(answer.question)
-            answer.tokens += cb.total_tokens
-            answer.cost += cb.total_cost
         if len(answer.contexts) == 0:
+            if key_filter or (key_filter is None and len(self.docs) > 5):
+                with get_openai_callback() as cb:
+                    keys = self.doc_match(answer.question)
+                answer.tokens += cb.total_tokens
+                answer.cost += cb.total_cost
             answer = await self.aget_evidence(
                 answer,
                 k=k,

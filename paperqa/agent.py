@@ -2,18 +2,46 @@ from langchain.tools import BaseTool
 from .docs import Answer, Docs
 from langchain.agents import initialize_agent
 from langchain.chat_models import ChatOpenAI
+from langchain.chains import LLMChain
+from .qaprompts import select_paper_prompt, make_chain
 
 
 def status(answer: Answer, docs: Docs):
     return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
 
 
+class PaperSelection(BaseTool):
+    name = "Select Papers"
+    description = "Select from current papers. Provide instructions as a string to use for choosing papers."
+    docs: Docs = None
+    answer: Answer = None
+    chain: LLMChain = None
+
+    def __init__(self, docs, answer):
+        # call the parent class constructor
+        super(PaperSelection, self).__init__()
+
+        self.docs = docs
+        self.answer = answer
+        self.chain = make_chain(select_paper_prompt, self.docs.summary_llm)
+
+    def _run(self, query: str) -> str:
+        result = self.docs.doc_match(query)
+        if result is None or result.strip().startswith("None"):
+            return "No relevant papers found."
+        return result + status(self.answer, self.docs)
+
+    async def _arun(self, query: str) -> str:
+        """Use the tool asynchronously."""
+        raise NotImplementedError()
+
+
 class ReadPapers(BaseTool):
     name = "Gather Evidence"
     description = (
         "Give a specific question to a researcher that will return evidence for it. "
-        "Optionally, you may specify papers using their key provided by the Select Papers tool. "
-        "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
+        # "Optionally, you may specify papers using their key provided by the Select Papers tool. "
+        # "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
     )
     docs: Docs = None
     answer: Answer = None
@@ -26,19 +54,21 @@ class ReadPapers(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        if "|" in query:
-            question, keys = query.split("|")
-            keys = [k.strip() for k in keys.split(",")]
-        else:
-            question = query
-            keys = None
+        # if "|" in query:
+        #     question, keys = query.split("|")
+        #     keys = [k.strip() for k in keys.split(",")]
+        # else:
+        question = query
+        keys = None
         # swap out the question
         old = self.answer.question
         self.answer.question = question
         # generator, so run it
+        l0 = len(self.answer.contexts)
         self.docs.get_evidence(self.answer, key_filter=keys)
+        l1 = len(self.answer.contexts)
         self.answer.question = old
-        return status(self.answer, self.docs)
+        return f"Added {l1 - l0} pieces of evidence." + status(self.answer, self.docs)
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
@@ -76,7 +106,7 @@ class AnswerTool(BaseTool):
 
 class Search(BaseTool):
     name = "Paper Search"
-    description = "Search for papers to add to current papers. Input should be a string of keywords."
+    description = "Search for papers to add to cur. Input should be a string of keywords."
     docs: Docs = None
     answer: Answer = None
 
@@ -95,10 +125,12 @@ class Search(BaseTool):
                 "Please install paperscraper (github.com/blackadad/paper-scraper) to use agent"
             )
 
-        papers = paperscraper.search_papers(query, limit=20, verbose=False)
+        papers = paperscraper.search_papers(
+            query, limit=20, verbose=False, pdir=self.docs.index_path
+        )
         for path, data in papers.items():
             try:
-                self.docs.add(path)
+                self.docs.add(path, citation=data["citation"])
             except:
                 pass
         return status(self.answer, self.docs)
@@ -115,6 +147,7 @@ def make_tools(docs, answer):
     tools = []
 
     tools.append(Search(docs, answer))
+    # tools.append(PaperSelection(docs, answer))
     tools.append(ReadPapers(docs, answer))
     tools.append(AnswerTool(docs, answer))
     tools.append(ExceptionTool())
@@ -127,12 +160,14 @@ def run_agent(docs, question, llm=None):
     answer = Answer(question)
     tools = make_tools(docs, answer)
     mrkl = initialize_agent(
-        tools, llm, agent="chat-zero-shot-react-description", verbose=True
+        tools,
+        llm,
+        agent="chat-zero-shot-react-description",
+        verbose=True,
     )
     mrkl.run(
-        f"Answer question: {question}. Search for papers, gather evidence, and answer. "
-        "Once you have at least five pieces of evidence, call the Propose Answer tool. "
-        "If you do not have enough evidence, search with different keywords. "
+        f"Answer question: {question}. Search for papers, gather evidence, and answer. If you do not have enough evidence, you can search for more papers (preferred) or gather more evidence. You may rephrase or breaking-up the question in those steps. "
+        "Once you have five pieces of evidence, or you have tried for a while, call the Propose Answer tool. "
     )
 
     return answer
