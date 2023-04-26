@@ -5,10 +5,11 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.agents import AgentType
 from .qaprompts import select_paper_prompt, make_chain
+from rmrkl import ChatZeroShotAgent, RetryAgentExecutor
 
 
 def status(answer: Answer, docs: Docs):
-    return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
+    return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: ${answer.cost:.2f}"
 
 
 class PaperSelection(BaseTool):
@@ -91,7 +92,7 @@ class AnswerTool(BaseTool):
 
     def _run(self, query: str) -> str:
         self.answer = self.docs.query(
-            query, answer=self.answer, length_prompt="length as long as needed"
+            query, answer=self.answer
         )
         if "cannot answer" in self.answer.answer:
             self.answer = Answer(self.answer.question)
@@ -157,10 +158,9 @@ def run_agent(docs, question, llm=None):
         llm = ChatOpenAI(temperature=0.0, model="gpt-4")
     answer = Answer(question)
     tools = make_tools(docs, answer)
-    mrkl = initialize_agent(
-        tools,
-        llm,
-        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    mrkl = RetryAgentExecutor.from_agent_and_tools(
+        tools=tools,
+        agent=ChatZeroShotAgent.from_llm_and_tools(llm, tools),
         verbose=True,
     )
     mrkl.run(
