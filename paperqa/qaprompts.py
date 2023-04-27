@@ -31,6 +31,7 @@ qa_prompt = prompts.PromptTemplate(
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, comprehensive, and scholarly tone. "
+    "Complete your answer with a concluding 1-2 sentences, which may be opinionated. "
     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
     "{context_str}\n"
     "Question: {question}\n"

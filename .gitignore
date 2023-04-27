@@ -130,3 +130,6 @@ dmypy.json
 
 # testing files generated
 *.txt.json
+
+*.ipynb
+env

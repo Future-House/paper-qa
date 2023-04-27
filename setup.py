@@ -22,6 +22,7 @@ setup(
         "PyCryptodome",
         "html2text",
         "tiktoken",
+        "rmrkl"
     ],
     test_suite="tests",
     long_description=long_description,
