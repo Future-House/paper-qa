@@ -3,11 +3,13 @@ from .docs import Answer, Docs
 from langchain.agents import initialize_agent
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
+from langchain.agents import AgentType
 from .qaprompts import select_paper_prompt, make_chain
+from rmrkl import ChatZeroShotAgent, RetryAgentExecutor
 
 
 def status(answer: Answer, docs: Docs):
-    return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: {answer.cost}"
+    return f" Status: Current Papers: {len(docs.doc_previews())} Current Evidence: {len(answer.contexts)} Current Cost: ${answer.cost:.2f}"
 
 
 class PaperSelection(BaseTool):
@@ -40,8 +42,8 @@ class ReadPapers(BaseTool):
     name = "Gather Evidence"
     description = (
         "Give a specific question to a researcher that will return evidence for it. "
-        # "Optionally, you may specify papers using their key provided by the Select Papers tool. "
-        # "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
+        "Optionally, you may specify papers using their key provided by the Select Papers tool. "
+        "Use the format: $QUESTION or use format $QUESTION|$KEY1,$KEY2,..."
     )
     docs: Docs = None
     answer: Answer = None
@@ -54,12 +56,12 @@ class ReadPapers(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        # if "|" in query:
-        #     question, keys = query.split("|")
-        #     keys = [k.strip() for k in keys.split(",")]
-        # else:
-        question = query
-        keys = None
+        if "|" in query:
+            question, keys = query.split("|")
+            keys = [k.strip() for k in keys.split(",")]
+        else:
+            question = query
+            keys = None
         # swap out the question
         old = self.answer.question
         self.answer.question = question
@@ -90,11 +92,11 @@ class AnswerTool(BaseTool):
 
     def _run(self, query: str) -> str:
         self.answer = self.docs.query(
-            query, answer=self.answer, length_prompt="length as long as needed"
+            query, answer=self.answer
         )
         if "cannot answer" in self.answer.answer:
             self.answer = Answer(self.answer.question)
-            return "Failed to answer question. Deleting evidence." + status(
+            return "Failed to answer question. Deleting evidence. Consider rephrasing question or evidence statement." + status(
                 self.answer, self.docs
             )
         return self.answer.answer + status(self.answer, self.docs)
@@ -141,28 +143,24 @@ class Search(BaseTool):
 
 
 def make_tools(docs, answer):
-    # putting here until langchain PR is merged
-    from langchain.tools.exception.tool import ExceptionTool
 
     tools = []
 
     tools.append(Search(docs, answer))
-    # tools.append(PaperSelection(docs, answer))
+    tools.append(PaperSelection(docs, answer))
     tools.append(ReadPapers(docs, answer))
     tools.append(AnswerTool(docs, answer))
-    tools.append(ExceptionTool())
     return tools
 
 
 def run_agent(docs, question, llm=None):
     if llm is None:
-        llm = ChatOpenAI(temperature=0.1, model="gpt-4")
+        llm = ChatOpenAI(temperature=0.0, model="gpt-4")
     answer = Answer(question)
     tools = make_tools(docs, answer)
-    mrkl = initialize_agent(
-        tools,
-        llm,
-        agent="chat-zero-shot-react-description",
+    mrkl = RetryAgentExecutor.from_agent_and_tools(
+        tools=tools,
+        agent=ChatZeroShotAgent.from_llm_and_tools(llm, tools),
         verbose=True,
     )
     mrkl.run(
