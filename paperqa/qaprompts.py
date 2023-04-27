@@ -5,7 +5,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage
 from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
 
-
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "citation"],
     template="Summarize and provide direct quotes from the text below to help answer a question. "
@@ -74,8 +73,11 @@ citation_prompt = prompts.PromptTemplate(
     partial_variables={"date": _get_datetime},
 )
 
-
-def make_chain(prompt, llm):
+def make_chain(prompt, llm, callback_manager=None):
+    if callback_manager is not None:
+        # need to clone to attach
+        llm = llm.copy()
+        llm.callback_manager = callback_manager
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
             content="You are a scholarly researcher that answers in an unbiased, scholarly tone. "
