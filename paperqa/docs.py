@@ -192,7 +192,7 @@ class Docs:
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.max_marginal_relevance_search(query, k=k)
-        chain = make_chain(select_paper_prompt, self.summary_llm, self.get_callbacks('doc_match'))
+        chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = chain.run(instructions=query, papers="\n".join(papers))
         return result
@@ -416,14 +416,15 @@ class Docs:
         context_str, contexts = answer.context, answer.contexts
         bib = dict()
         passages = dict()
-        qa_chain = make_chain(prompt=qa_prompt, llm=self.llm)
         if len(context_str) < 10:
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            with get_openai_callback() as cb:
-                answer_text = await qa_chain.arun(
+            cb = OpenAICallbackHandler()
+            manager = AsyncCallbackManager([cb] + self.get_callbacks('Answer:'))
+            qa_chain = make_chain(qa_prompt, self.llm, manager)
+            answer_text = await qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )
             answer.tokens += cb.total_tokens
