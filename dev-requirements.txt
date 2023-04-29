@@ -1,0 +1,6 @@
+pytest
+pre-commit
+requests
+paper-scraper@git+https://github.com/blackadad/paper-scraper.git
+pyzotero
+python-dotenv

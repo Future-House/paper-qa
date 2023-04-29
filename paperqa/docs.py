@@ -294,7 +294,7 @@ class Docs:
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
                 return None, None
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('Evidence:' + doc.metadata['key']))
+            manager = AsyncCallbackManager([cb] + self.get_callbacks('evidence:' + doc.metadata['key']))
             summary_chain = make_chain(summary_prompt, self.summary_llm, manager)
             c = Context(
                 key=doc.metadata["key"],
@@ -424,7 +424,7 @@ class Docs:
             )
         else:
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('Answer:'))
+            manager = AsyncCallbackManager([cb] + self.get_callbacks('answer'))
             qa_chain = make_chain(qa_prompt, self.llm, manager)
             answer_text = await qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
