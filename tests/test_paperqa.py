@@ -4,6 +4,7 @@ import os
 import pickle
 from paperqa.utils import strings_similarity
 from langchain.llms import OpenAI
+from langchain.llms.fake import FakeListLLM
 from unittest import IsolatedAsyncioTestCase
 
 
@@ -252,8 +253,19 @@ def test_query_filter():
     answer = docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
+def test_nonopenai_model():
+    responses = ["This is a test", "This is another test"]
+    model = FakeListLLM(responses=responses)
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs(llm=model)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    answer = docs.query("What country is Bates from?")
 
-def disabled_test_agent():
+def test_agent():
     docs = paperqa.Docs()
     answer = paperqa.run_agent(docs, "What compounds target AKT1")
     print(answer)
