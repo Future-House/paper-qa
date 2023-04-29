@@ -289,10 +289,10 @@ class Docs:
 
         async def process(doc):
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
-                return None
+                return None, None
             # check if it is already in answer (possible in agent setting)
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
-                return None
+                return None, None
             cb = OpenAICallbackHandler()
             manager = AsyncCallbackManager([cb] + self.get_callbacks('Evidence:' + doc.metadata['key']))
             summary_chain = make_chain(summary_prompt, self.summary_llm, manager)
@@ -308,9 +308,11 @@ class Docs:
             )
             if "Not applicable" not in c.context:
                 return c, cb
-            return None, cb
+            return None, None
 
         results = await asyncio.gather(*[process(doc) for doc in docs])
+        # filter out failures
+        results = [r for r in results if r[0] is not None]
         answer.tokens += sum([cb.total_tokens for _, cb in results])
         answer.cost += sum([cb.total_cost for _, cb in results])
         contexts = [c for c,_ in results if c is not None]
