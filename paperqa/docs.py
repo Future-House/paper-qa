@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Callable
 from functools import reduce
 import os
 import sys
@@ -18,11 +18,13 @@ from .qaprompts import (
 from .types import Answer, Context
 from .readers import read_doc
 from langchain.vectorstores import FAISS
+from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import LLM
-from langchain.callbacks import get_openai_callback
+from langchain.callbacks import get_openai_callback, OpenAICallbackHandler
+from langchain.callbacks.base import AsyncCallbackHandler, AsyncCallbackManager
 from langchain.cache import SQLiteCache
 import langchain
 from datetime import datetime
@@ -42,6 +44,7 @@ class Docs:
         name: str = "default",
         index_path: Optional[Path] = None,
         embeddings: Optional[Embeddings] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
     ) -> None:
         """Initialize the collection of documents.
 
@@ -51,6 +54,8 @@ class Docs:
             summary_llm: The language model to use for summarizing documents. If None, llm is used.
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
+            embeddings: The embeddings to use for indexing documents. Default - OpenAI embeddings
+            get_callbacks: A function that allows callbacks to built per stage of the pipeline.
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -65,6 +70,7 @@ class Docs:
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
+        self.get_callbacks = get_callbacks
 
     def update_llm(
         self,
@@ -82,10 +88,6 @@ class Docs:
         if summary_llm is None:
             summary_llm = llm
         self.summary_llm = summary_llm
-        self.summary_chain = make_chain(prompt=summary_prompt, llm=summary_llm)
-        self.qa_chain = make_chain(prompt=qa_prompt, llm=llm)
-        self.search_chain = make_chain(prompt=search_prompt, llm=summary_llm)
-        self.cite_chain = make_chain(prompt=citation_prompt, llm=summary_llm)
 
     def add(
         self,
@@ -105,10 +107,11 @@ class Docs:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
+            cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             with get_openai_callback():
-                citation = self.cite_chain.run(texts[0])
+                citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
@@ -204,15 +207,12 @@ class Docs:
             state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
         del state["_doc_index"]
-        # remove LLMs (they can have callbacks, which can't be pickled)
-        del state["summary_chain"]
-        del state["qa_chain"]
-        del state["cite_chain"]
-        del state["search_chain"]
+        del state["get_callbacks"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+        self.get_callbacks = lambda x: []
         try:
             self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
@@ -240,8 +240,8 @@ class Docs:
         k: int = 3,
         max_sources: int = 5,
         marginal_relevance: bool = True,
-        key_filter: Optional[List[str]] = None,
-    ) -> Answer:
+        key_filter: Optional[List[str]] = None    
+        ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
             import nest_asyncio
@@ -258,7 +258,7 @@ class Docs:
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-                key_filter=key_filter,
+                key_filter=key_filter
             )
         )
 
@@ -289,14 +289,17 @@ class Docs:
 
         async def process(doc):
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
-                return None
+                return None, None
             # check if it is already in answer (possible in agent setting)
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
-                return None
+                return None, None
+            cb = OpenAICallbackHandler()
+            manager = AsyncCallbackManager([cb] + self.get_callbacks('evidence:' + doc.metadata['key']))
+            summary_chain = make_chain(summary_prompt, self.summary_llm, manager)
             c = Context(
                 key=doc.metadata["key"],
                 citation=doc.metadata["citation"],
-                context=await self.summary_chain.arun(
+                context=await summary_chain.arun(
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
@@ -304,14 +307,15 @@ class Docs:
                 text=doc.page_content,
             )
             if "Not applicable" not in c.context:
-                return c
-            return None
+                return c, cb
+            return None, None
 
-        with get_openai_callback() as cb:
-            contexts = await asyncio.gather(*[process(doc) for doc in docs])
-        answer.tokens += cb.total_tokens
-        answer.cost += cb.total_cost
-        contexts = [c for c in contexts if c is not None]
+        results = await asyncio.gather(*[process(doc) for doc in docs])
+        # filter out failures
+        results = [r for r in results if r[0] is not None]
+        answer.tokens += sum([cb.total_tokens for _, cb in results])
+        answer.cost += sum([cb.total_cost for _, cb in results])
+        contexts = [c for c,_ in results if c is not None]
         if len(contexts) == 0:
             return answer
         contexts = sorted(contexts, key=lambda x: len(x.context), reverse=True)
@@ -345,7 +349,8 @@ class Docs:
             query (str): The query to generate search strings for.
         """
 
-        search_query = self.search_chain.run(question=query)
+        search_chain = make_chain(prompt=search_prompt, llm=self.summary_llm)
+        search_query = search_chain.run(question=query)
         queries = [s for s in search_query.split("\n") if len(s) > 3]
         # remove 2., 3. from queries
         queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
@@ -418,8 +423,10 @@ class Docs:
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            with get_openai_callback() as cb:
-                answer_text = await self.qa_chain.arun(
+            cb = OpenAICallbackHandler()
+            manager = AsyncCallbackManager([cb] + self.get_callbacks('answer'))
+            qa_chain = make_chain(qa_prompt, self.llm, manager)
+            answer_text = await qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )
             answer.tokens += cb.total_tokens
