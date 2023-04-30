@@ -43,8 +43,7 @@ class Docs:
         summary_llm: Optional[Union[LLM, str]] = None,
         name: str = "default",
         index_path: Optional[Path] = None,
-        embeddings: Optional[Embeddings] = None,
-        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
+        embeddings: Optional[Embeddings] = None
     ) -> None:
         """Initialize the collection of documents.
 
@@ -55,7 +54,6 @@ class Docs:
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
             embeddings: The embeddings to use for indexing documents. Default - OpenAI embeddings
-            get_callbacks: A function that allows callbacks to built per stage of the pipeline.
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -70,7 +68,6 @@ class Docs:
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
-        self.get_callbacks = get_callbacks
 
     def update_llm(
         self,
@@ -96,7 +93,7 @@ class Docs:
         key: Optional[str] = None,
         disable_check: bool = False,
         chunk_chars: Optional[int] = 3000,
-        overwrite: bool = False,
+        overwrite: bool = False
     ) -> None:
         """Add a document to the collection."""
 
@@ -207,12 +204,10 @@ class Docs:
             state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
         del state["_doc_index"]
-        del state["get_callbacks"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.get_callbacks = lambda x: []
         try:
             self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
@@ -240,7 +235,8 @@ class Docs:
         k: int = 3,
         max_sources: int = 5,
         marginal_relevance: bool = True,
-        key_filter: Optional[List[str]] = None    
+        key_filter: Optional[List[str]] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
         ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -258,7 +254,8 @@ class Docs:
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-                key_filter=key_filter
+                key_filter=key_filter,
+                get_callbacks=get_callbacks
             )
         )
 
@@ -269,6 +266,7 @@ class Docs:
         max_sources: int = 5,
         marginal_relevance: bool = True,
         key_filter: Optional[List[str]] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
     ) -> Answer:
         if len(self.docs) == 0:
             return answer
@@ -294,7 +292,7 @@ class Docs:
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
                 return None, None
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('evidence:' + doc.metadata['key']))
+            manager = AsyncCallbackManager([cb] + get_callbacks('evidence:' + doc.metadata['key']))
             summary_chain = make_chain(summary_prompt, self.summary_llm, manager)
             c = Context(
                 key=doc.metadata["key"],
@@ -365,6 +363,7 @@ class Docs:
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -385,6 +384,7 @@ class Docs:
                 marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
+                get_callbacks=get_callbacks
             )
         )
 
@@ -397,6 +397,7 @@ class Docs:
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
@@ -414,6 +415,7 @@ class Docs:
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
                 key_filter=keys if key_filter else None,
+                get_callbacks=get_callbacks
             )
         context_str, contexts = answer.context, answer.contexts
         bib = dict()
@@ -424,7 +426,7 @@ class Docs:
             )
         else:
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('answer'))
+            manager = AsyncCallbackManager([cb] + get_callbacks('answer'))
             qa_chain = make_chain(qa_prompt, self.llm, manager)
             answer_text = await qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
