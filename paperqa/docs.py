@@ -24,7 +24,7 @@ from langchain.embeddings.base import Embeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import LLM
 from langchain.callbacks import get_openai_callback, OpenAICallbackHandler
-from langchain.callbacks.base import AsyncCallbackHandler, AsyncCallbackManager
+from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.cache import SQLiteCache
 import langchain
 from datetime import datetime
@@ -294,8 +294,8 @@ class Docs:
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
                 return None, None
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('evidence:' + doc.metadata['key']))
-            summary_chain = make_chain(summary_prompt, self.summary_llm, manager)
+            callbacks = [cb] + self.get_callbacks('evidence:' + doc.metadata['key'])
+            summary_chain = make_chain(summary_prompt, self.summary_llm, callbacks)
             c = Context(
                 key=doc.metadata["key"],
                 citation=doc.metadata["citation"],
@@ -424,8 +424,8 @@ class Docs:
             )
         else:
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('answer'))
-            qa_chain = make_chain(qa_prompt, self.llm, manager)
+            callbacks = [cb] + self.get_callbacks('answer')
+            qa_chain = make_chain(qa_prompt, self.llm, callbacks)
             answer_text = await qa_chain.arun(
                     question=query, context_str=context_str, length=length_prompt
                 )

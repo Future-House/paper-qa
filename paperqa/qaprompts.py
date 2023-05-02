@@ -73,11 +73,11 @@ citation_prompt = prompts.PromptTemplate(
     partial_variables={"date": _get_datetime},
 )
 
-def make_chain(prompt, llm, callback_manager=None):
-    if callback_manager is not None:
+def make_chain(prompt, llm, callbacks=None):
+    if callbacks is not None:
         # need to clone to attach
         llm = llm.copy()
-        llm.callback_manager = callback_manager
+        llm.callbacks = callbacks
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
             content="You are a scholarly researcher that answers in an unbiased, scholarly tone. "
