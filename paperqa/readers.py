@@ -1,15 +1,16 @@
-import os
-from .paths import OCR_CACHE_PATH
-from .version import __version__
-from html2text import html2text
-from pathlib import Path
 import json
 import logging
+import os
 from hashlib import md5
+from pathlib import Path
 
-from langchain.text_splitter import TokenTextSplitter
+from html2text import html2text
 from langchain.cache import SQLiteCache
 from langchain.schema import Generation
+from langchain.text_splitter import TokenTextSplitter
+
+from .paths import OCR_CACHE_PATH
+from .version import __version__
 
 OCR_CACHE = None
 
@@ -69,7 +70,6 @@ def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
 
 
 def parse_txt(path, citation, key, chunk_chars=2000, overlap=50, html=False):
-
     try:
         with open(path) as f:
             doc = f.read()

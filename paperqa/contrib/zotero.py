@@ -1,17 +1,17 @@
 # This file gets PDF files from the user's Zotero library
-import os
-from typing import Union, Optional
-from pathlib import Path
 import logging
+import os
 from collections import namedtuple
+from pathlib import Path
+from typing import Optional, Union
 
 try:
     from pyzotero import zotero
 except ImportError:
     raise ImportError("Please install pyzotero: `pip install pyzotero`")
 from ..paths import CACHE_PATH
-from ..utils import count_pdf_pages
 from ..types import StrPath
+from ..utils import count_pdf_pages
 
 ZoteroPaper = namedtuple(
     "ZoteroPaper", ["key", "title", "pdf", "num_pages", "zotero_key", "details"]

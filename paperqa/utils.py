@@ -1,5 +1,6 @@
 import math
 import string
+
 import pypdf
 
 from .types import StrPath

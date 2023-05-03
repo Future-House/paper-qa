@@ -1,11 +1,11 @@
-from langchain.tools import BaseTool
-from .docs import Answer, Docs
-from langchain.agents import initialize_agent
-from langchain.chat_models import ChatOpenAI
+from langchain.agents import AgentType, initialize_agent
 from langchain.chains import LLMChain
-from langchain.agents import AgentType
-from .qaprompts import select_paper_prompt, make_chain
+from langchain.chat_models import ChatOpenAI
+from langchain.tools import BaseTool
 from rmrkl import ChatZeroShotAgent, RetryAgentExecutor
+
+from .docs import Answer, Docs
+from .qaprompts import make_chain, select_paper_prompt
 
 
 def status(answer: Answer, docs: Docs):
@@ -91,13 +91,12 @@ class AnswerTool(BaseTool):
         self.answer = answer
 
     def _run(self, query: str) -> str:
-        self.answer = self.docs.query(
-            query, answer=self.answer
-        )
+        self.answer = self.docs.query(query, answer=self.answer)
         if "cannot answer" in self.answer.answer:
             self.answer = Answer(self.answer.question)
-            return "Failed to answer question. Deleting evidence. Consider rephrasing question or evidence statement." + status(
-                self.answer, self.docs
+            return (
+                "Failed to answer question. Deleting evidence. Consider rephrasing question or evidence statement."
+                + status(self.answer, self.docs)
             )
         return self.answer.answer + status(self.answer, self.docs)
 
@@ -108,7 +107,9 @@ class AnswerTool(BaseTool):
 
 class Search(BaseTool):
     name = "Paper Search"
-    description = "Search for papers to add to cur. Input should be a string of keywords."
+    description = (
+        "Search for papers to add to cur. Input should be a string of keywords."
+    )
     docs: Docs = None
     answer: Answer = None
 
@@ -143,7 +144,6 @@ class Search(BaseTool):
 
 
 def make_tools(docs, answer):
-
     tools = []
 
     tools.append(Search(docs, answer))
