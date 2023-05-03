@@ -1,6 +1,6 @@
-from typing import Union, List, Dict, Any
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Union
 
 StrPath = Union[str, Path]
 

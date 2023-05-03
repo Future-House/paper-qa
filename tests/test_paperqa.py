@@ -1,11 +1,13 @@
-import paperqa
-import requests
 import os
 import pickle
-from paperqa.utils import strings_similarity
+from unittest import IsolatedAsyncioTestCase
+
+import requests
 from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
-from unittest import IsolatedAsyncioTestCase
+
+import paperqa
+from paperqa.utils import strings_similarity
 
 
 def test_maybe_is_text():
@@ -253,8 +255,9 @@ def test_query_filter():
     answer = docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
+
 def test_nonopenai_model():
-    responses = ["This is a test", "This is another test"]
+    responses = ["This is a test", "This is another test"] * 50
     model = FakeListLLM(responses=responses)
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -265,10 +268,12 @@ def test_nonopenai_model():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country is Bates from?")
 
+
 def test_agent():
     docs = paperqa.Docs()
     answer = paperqa.run_agent(docs, "What compounds target AKT1")
     print(answer)
+
 
 def test_zotera():
     from paperqa.contrib import ZoteroDB
