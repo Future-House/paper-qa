@@ -93,7 +93,7 @@ callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
 
 # Make sure the model path is correct for your system!
 llm = LlamaCpp(
-    model_path="./ggml-model-q4_0.bin", callback_manager=callback_manager, verbose=True
+    model_path="./ggml-model-q4_0.bin", callback_manager=callback_manager
 )
 embeddings = LlamaCppEmbeddings(model_path="./ggml-model-q4_0.bin")
 
