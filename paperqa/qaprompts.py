@@ -1,9 +1,13 @@
-import langchain.prompts as prompts
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import langchain.prompts as prompts
+from langchain.callbacks.manager import AsyncCallbackManagerForChainRun
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.schema import SystemMessage
-from langchain.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
+from langchain.prompts.chat import (ChatPromptTemplate,
+                                    HumanMessagePromptTemplate)
+from langchain.schema import LLMResult, SystemMessage
 
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "citation"],
@@ -73,11 +77,23 @@ citation_prompt = prompts.PromptTemplate(
     partial_variables={"date": _get_datetime},
 )
 
-def make_chain(prompt, llm, callback_manager=None):
-    if callback_manager is not None:
-        # need to clone to attach
-        llm = llm.copy()
-        llm.callback_manager = callback_manager
+
+class FallbackLLMChain(LLMChain):
+    """Chain that falls back to synchronous generation if the async generation fails."""
+
+    async def agenerate(
+        self,
+        input_list: List[Dict[str, Any]],
+        run_manager: Optional[AsyncCallbackManagerForChainRun] = None,
+    ) -> LLMResult:
+        """Generate LLM result from inputs."""
+        try:
+            return await super().agenerate(input_list, run_manager=run_manager)
+        except NotImplementedError as e:
+            return self.generate(input_list, run_manager=run_manager)
+
+
+def make_chain(prompt, llm):
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
             content="You are a scholarly researcher that answers in an unbiased, scholarly tone. "
@@ -87,4 +103,4 @@ def make_chain(prompt, llm, callback_manager=None):
         prompt = ChatPromptTemplate.from_messages(
             [system_message_prompt, human_message_prompt]
         )
-    return LLMChain(prompt=prompt, llm=llm)
+    return FallbackLLMChain(prompt=prompt, llm=llm)

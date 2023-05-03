@@ -1,33 +1,30 @@
-from typing import List, Optional, Tuple, Union, Callable
-from functools import reduce
-import os
-import sys
 import asyncio
-from pathlib import Path
+import os
 import re
-from .paths import CACHE_PATH
-from .utils import maybe_is_text, md5sum
-from .qaprompts import (
-    summary_prompt,
-    qa_prompt,
-    search_prompt,
-    citation_prompt,
-    select_paper_prompt,
-    make_chain,
-)
-from .types import Answer, Context
-from .readers import read_doc
-from langchain.vectorstores import FAISS
-from langchain.docstore.document import Document
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.embeddings.base import Embeddings
-from langchain.chat_models import ChatOpenAI
-from langchain.llms.base import LLM
-from langchain.callbacks import get_openai_callback, OpenAICallbackHandler
-from langchain.callbacks.base import AsyncCallbackHandler, AsyncCallbackManager
-from langchain.cache import SQLiteCache
-import langchain
+import sys
 from datetime import datetime
+from functools import reduce
+from pathlib import Path
+from typing import Callable, List, Optional, Tuple, Union
+
+import langchain
+from langchain.cache import SQLiteCache
+from langchain.callbacks import OpenAICallbackHandler, get_openai_callback
+from langchain.callbacks.base import AsyncCallbackHandler
+from langchain.callbacks.manager import AsyncCallbackManager
+from langchain.chat_models import ChatOpenAI
+from langchain.docstore.document import Document
+from langchain.embeddings.base import Embeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.llms.base import LLM
+from langchain.vectorstores import FAISS
+
+from .paths import CACHE_PATH
+from .qaprompts import (citation_prompt, make_chain, qa_prompt, search_prompt,
+                        select_paper_prompt, summary_prompt)
+from .readers import read_doc
+from .types import Answer, Context
+from .utils import maybe_is_text, md5sum
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
@@ -44,7 +41,6 @@ class Docs:
         name: str = "default",
         index_path: Optional[Path] = None,
         embeddings: Optional[Embeddings] = None,
-        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x : []
     ) -> None:
         """Initialize the collection of documents.
 
@@ -55,7 +51,6 @@ class Docs:
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
             embeddings: The embeddings to use for indexing documents. Default - OpenAI embeddings
-            get_callbacks: A function that allows callbacks to built per stage of the pipeline.
         """
         self.docs = dict()
         self.chunk_size_limit = chunk_size_limit
@@ -70,7 +65,6 @@ class Docs:
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
-        self.get_callbacks = get_callbacks
 
     def update_llm(
         self,
@@ -96,7 +90,6 @@ class Docs:
         key: Optional[str] = None,
         disable_check: bool = False,
         chunk_chars: Optional[int] = 3000,
-        overwrite: bool = False,
     ) -> None:
         """Add a document to the collection."""
 
@@ -110,8 +103,9 @@ class Docs:
             cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
-            with get_openai_callback():
-                citation = cite_chain.run(texts[0])
+            if len(texts) == 0:
+                raise ValueError(f"Could not read document {path}. Is it empty?")
+            citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
@@ -207,12 +201,10 @@ class Docs:
             state["_faiss_index"].save_local(self.index_path)
         del state["_faiss_index"]
         del state["_doc_index"]
-        del state["get_callbacks"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.get_callbacks = lambda x: []
         try:
             self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
@@ -240,8 +232,9 @@ class Docs:
         k: int = 3,
         max_sources: int = 5,
         marginal_relevance: bool = True,
-        key_filter: Optional[List[str]] = None    
-        ) -> Answer:
+        key_filter: Optional[List[str]] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x: [],
+    ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
             import nest_asyncio
@@ -258,7 +251,8 @@ class Docs:
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-                key_filter=key_filter
+                key_filter=key_filter,
+                get_callbacks=get_callbacks,
             )
         )
 
@@ -269,6 +263,7 @@ class Docs:
         max_sources: int = 5,
         marginal_relevance: bool = True,
         key_filter: Optional[List[str]] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x: [],
     ) -> Answer:
         if len(self.docs) == 0:
             return answer
@@ -293,9 +288,10 @@ class Docs:
             # check if it is already in answer (possible in agent setting)
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
                 return None, None
-            cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('evidence:' + doc.metadata['key']))
-            summary_chain = make_chain(summary_prompt, self.summary_llm, manager)
+            callbacks = [OpenAICallbackHandler()] + get_callbacks(
+                "evidence:" + doc.metadata["key"]
+            )
+            summary_chain = make_chain(summary_prompt, self.summary_llm)
             c = Context(
                 key=doc.metadata["key"],
                 citation=doc.metadata["citation"],
@@ -303,6 +299,7 @@ class Docs:
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
+                    callbacks=callbacks,
                 ),
                 text=doc.page_content,
             )
@@ -310,12 +307,13 @@ class Docs:
                 return c, cb
             return None, None
 
-        results = await asyncio.gather(*[process(doc) for doc in docs])
+        with get_openai_callback() as cb:
+            results = await asyncio.gather(*[process(doc) for doc in docs])
         # filter out failures
         results = [r for r in results if r[0] is not None]
         answer.tokens += sum([cb.total_tokens for _, cb in results])
         answer.cost += sum([cb.total_cost for _, cb in results])
-        contexts = [c for c,_ in results if c is not None]
+        contexts = [c for c, _ in results if c is not None]
         if len(contexts) == 0:
             return answer
         contexts = sorted(contexts, key=lambda x: len(x.context), reverse=True)
@@ -365,6 +363,7 @@ class Docs:
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x: [],
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -385,6 +384,7 @@ class Docs:
                 marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
+                get_callbacks=get_callbacks,
             )
         )
 
@@ -397,6 +397,7 @@ class Docs:
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
+        get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x: [],
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
@@ -414,6 +415,7 @@ class Docs:
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
                 key_filter=keys if key_filter else None,
+                get_callbacks=get_callbacks,
             )
         context_str, contexts = answer.context, answer.contexts
         bib = dict()
@@ -424,11 +426,14 @@ class Docs:
             )
         else:
             cb = OpenAICallbackHandler()
-            manager = AsyncCallbackManager([cb] + self.get_callbacks('answer'))
-            qa_chain = make_chain(qa_prompt, self.llm, manager)
+            callbacks = [OpenAICallbackHandler()] + get_callbacks("answer")
+            qa_chain = make_chain(qa_prompt, self.llm)
             answer_text = await qa_chain.arun(
-                    question=query, context_str=context_str, length=length_prompt
-                )
+                question=query,
+                context_str=context_str,
+                length=length_prompt,
+                callbacks=callbacks,
+            )
             answer.tokens += cb.total_tokens
             answer.cost += cb.total_cost
         # it still happens lol
