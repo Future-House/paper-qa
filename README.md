@@ -79,11 +79,35 @@ docs = Docs(llm='gpt-3.5-turbo')
 You can also use any other models (or embeddings) available in [langchain](https://github.com/hwchase17/langchain). Here's an example of using `llama.cpp` to have locally hosted paper-qa:
 
 ```py
-from langchain.embeddings import LlamaCppEmbeddings
+from paperqa import Docs
 from langchain.llms import LlamaCpp
-llm = LlamaCpp(model_path="./ggml-model-q4_0.bin")
-embeddings = LlamaCppEmbeddings(model_path="/path/to/model/ggml-model-q4_0.bin")
+from langchain import PromptTemplate, LLMChain
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain.embeddings import LlamaCppEmbeddings
+
+# Callbacks support token-wise streaming
+callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+# Verbose is required to pass to the callback manager
+
+# Make sure the model path is correct for your system!
+llm = LlamaCpp(
+    model_path="./ggml-model-q4_0.bin", callback_manager=callback_manager
+)
+embeddings = LlamaCppEmbeddings(model_path="./ggml-model-q4_0.bin")
+
 docs = Docs(llm=llm, embeddings=embeddings)
+
+keyword_search = 'bispecific antibody manufacture'
+papers = paperscraper.search_papers(keyword_search, limit=2)
+for path,data in papers.items():
+    try:
+        docs.add(path,chunk_chars=500)
+    except ValueError as e:
+        print('Could not read', path, e)
+
+answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
+print(answer)
 ```
 
 ### Adjusting number of sources
