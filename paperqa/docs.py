@@ -93,6 +93,12 @@ class Docs:
     ) -> None:
         """Add a document to the collection."""
 
+        file_name = os.path.basename(path)
+
+        # Check if the file name starts with a dot
+        if file_name.startswith("."):
+            return
+
         # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have
         md5 = md5sum(path)
