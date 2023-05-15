@@ -155,7 +155,7 @@ def make_tools(docs, answer):
 
 def run_agent(docs, question, llm=None):
     if llm is None:
-        llm = ChatOpenAI(temperature=0.0, model="gpt-4")
+        llm = ChatOpenAI(temperature=0.0, model_name="gpt-4")
     answer = Answer(question)
     tools = make_tools(docs, answer)
     mrkl = RetryAgentExecutor.from_agent_and_tools(

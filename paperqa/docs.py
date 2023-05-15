@@ -75,9 +75,9 @@ class Docs:
         if llm is None:
             llm = "gpt-3.5-turbo"
         if type(llm) is str:
-            llm = ChatOpenAI(temperature=0.1, model=llm)
+            llm = ChatOpenAI(temperature=0.1, model_name=llm)
         if type(summary_llm) is str:
-            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm)
+            summary_llm = ChatOpenAI(temperature=0.1, model_name=summary_llm)
         self.llm = llm
         if summary_llm is None:
             summary_llm = llm
