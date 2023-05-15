@@ -129,6 +129,39 @@ def test_docs_pickle():
     os.remove(doc_path)
 
 
+def test_docs_pickle_no_faiss():
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get front page of wikipedia
+        r = requests.get(
+            "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+        f.write(r.text)
+    llm = OpenAI(temperature=0.0, model_name="text-babbage-001")
+    docs = paperqa.Docs(llm=llm)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
+    docs._faiss_index = None
+    docs_pickle = pickle.dumps(docs)
+    docs2 = pickle.loads(docs_pickle)
+    docs2.update_llm(llm)
+    assert len(docs.docs) == len(docs2.docs)
+    assert (
+        strings_similarity(
+            docs.get_evidence(
+                paperqa.Answer("What date is flag day in Canada?"),
+                k=3,
+                max_sources=1,
+            ).context,
+            docs2.get_evidence(
+                paperqa.Answer("What date is flag day in Canada?"),
+                k=3,
+                max_sources=1,
+            ).context,
+        )
+        > 0.75
+    )
+    os.remove(doc_path)
+
+
 def test_bad_context():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
