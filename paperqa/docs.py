@@ -52,7 +52,7 @@ class Docs:
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
             embeddings: The embeddings to use for indexing documents. Default - OpenAI embeddings
         """
-        self.docs = dict()
+        self.docs = []
         self.chunk_size_limit = chunk_size_limit
         self.keys = set()
         self._faiss_index = None
@@ -83,6 +83,18 @@ class Docs:
             summary_llm = llm
         self.summary_llm = summary_llm
 
+    def get_unique_key(self, key: str) -> str:
+        '''Create a unique key given proposed key'''
+        suffix = ""
+        while key + suffix in self.keys:
+            # move suffix to next letter
+            if suffix == "":
+                suffix = "a"
+            else:
+                suffix = chr(ord(suffix) + 1)
+        key += suffix
+        return key
+
     def add(
         self,
         path: str,
@@ -95,16 +107,18 @@ class Docs:
 
         # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have
-        md5 = md5sum(path)
-        if path in self.docs:
+        hash = md5sum(path)
+        if hash in [d['hash'] for d in self.docs]:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
-            cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
+            cite_chain = make_chain(
+                prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             if len(texts) == 0:
-                raise ValueError(f"Could not read document {path}. Is it empty?")
+                raise ValueError(
+                    f"Could not read document {path}. Is it empty?")
             citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -123,16 +137,9 @@ class Docs:
             except AttributeError:
                 year = ""
             key = f"{author}{year}"
-        suffix = ""
-        while key + suffix in self.keys:
-            # move suffix to next letter
-            if suffix == "":
-                suffix = "a"
-            else:
-                suffix = chr(ord(suffix) + 1)
-        key += suffix
-
-        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
+        key = self.get_unique_key(key)
+        texts, metadata = read_doc(
+            path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -141,16 +148,35 @@ class Docs:
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
+        self.add_texts(texts, metadata, hash)
+
+    def add_texts(self,
+                  texts: List[str],
+                  metadatas: List[dict],
+                  hash: str):
+        '''Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
+
+        The metadatas should have the following keys: citation, dockey (same as key arg), and key (unique key for each chunk).
+        The hash is a unique identifier for the document. It is used to check if the document has already been added.
+        '''
+        if len(texts) != len(metadatas):
+            raise ValueError(
+                "texts and metadatas must have the same length.")
+        key = metadatas[0]["dockey"]
+        citation = metadatas[0]["citation"]
+        if key in self.keys:
+            raise ValueError(f"Document {key} already in collection.")
         if self._faiss_index is not None:
-            self._faiss_index.add_texts(texts, metadatas=metadata)
+            self._faiss_index.add_texts(texts, metadatas=metadatas)
         if self._doc_index is not None:
             self._doc_index.add_texts([citation], metadatas=[{"key": key}])
-        self.docs[path] = dict(texts=texts, metadata=metadata, key=key, md5=md5)
+        self.docs.append(dict(
+            texts=texts, metadata=metadatas, key=key, hash=hash))
         self.keys.add(key)
 
     def clear(self) -> None:
         """Clear the collection of documents."""
-        self.docs = dict()
+        self.docs = []
         self.keys = set()
         self._faiss_index = None
         self._doc_index = None
@@ -170,7 +196,7 @@ class Docs:
                 doc["metadata"][0]["dockey"],
                 doc["metadata"][0]["citation"],
             )
-            for doc in self.docs.values()
+            for doc in self.docs
         ]
 
     def doc_match(self, query: str, k: int = 25) -> List[str]:
@@ -178,9 +204,10 @@ class Docs:
         if len(self.docs) == 0:
             return ""
         if self._doc_index is None:
-            texts = [doc["metadata"][0]["citation"] for doc in self.docs.values()]
+            texts = [doc["metadata"][0]["citation"]
+                     for doc in self.docs]
             metadatas = [
-                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs.values()
+                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs
             ]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
@@ -206,7 +233,8 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
+            self._faiss_index = FAISS.load_local(
+                self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
@@ -217,10 +245,12 @@ class Docs:
     def _build_faiss_index(self):
         if self._faiss_index is None:
             texts = reduce(
-                lambda x, y: x + y, [doc["texts"] for doc in self.docs.values()], []
+                lambda x, y: x + y, [doc["texts"]
+                                     for doc in self.docs], []
             )
             metadatas = reduce(
-                lambda x, y: x + y, [doc["metadata"] for doc in self.docs.values()], []
+                lambda x, y: x + y, [doc["metadata"]
+                                     for doc in self.docs], []
             )
             self._faiss_index = FAISS.from_texts(
                 texts, self.embeddings, metadatas=metadatas
