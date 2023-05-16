@@ -133,8 +133,7 @@ def test_docs_pickle_no_faiss():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+        r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
     llm = OpenAI(temperature=0.0, model_name="text-babbage-001")
     docs = paperqa.Docs(llm=llm)
@@ -282,7 +281,7 @@ def test_dockey_filter():
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
-        f.write('\n')  # so we don't have same hash
+        f.write("\n")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
     answer = paperqa.Answer("What country is Bates from?")
     docs.get_evidence(answer, key_filter=["test"])
@@ -304,7 +303,7 @@ def test_query_filter():
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
-        f.write('\n')  # so we don't have same hash
+        f.write("\n")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
     answer = docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
