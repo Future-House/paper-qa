@@ -84,7 +84,7 @@ class Docs:
         self.summary_llm = summary_llm
 
     def get_unique_key(self, key: str) -> str:
-        '''Create a unique key given proposed key'''
+        """Create a unique key given proposed key"""
         suffix = ""
         while key + suffix in self.keys:
             # move suffix to next letter
@@ -108,17 +108,15 @@ class Docs:
         # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have
         hash = md5sum(path)
-        if hash in [d['hash'] for d in self.docs]:
+        if hash in [d["hash"] for d in self.docs]:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
-            cite_chain = make_chain(
-                prompt=citation_prompt, llm=self.summary_llm)
+            cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             if len(texts) == 0:
-                raise ValueError(
-                    f"Could not read document {path}. Is it empty?")
+                raise ValueError(f"Could not read document {path}. Is it empty?")
             citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -138,8 +136,7 @@ class Docs:
                 year = ""
             key = f"{author}{year}"
         key = self.get_unique_key(key)
-        texts, metadata = read_doc(
-            path, citation, key, chunk_chars=chunk_chars)
+        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -150,19 +147,20 @@ class Docs:
             )
         self.add_texts(texts, metadata, hash)
 
-    def add_texts(self,
-                  texts: List[str],
-                  metadatas: List[dict],
-                  hash: str,
-                  text_embeddings: Optional[List[List[float]]] = None,):
-        '''Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
+    def add_texts(
+        self,
+        texts: List[str],
+        metadatas: List[dict],
+        hash: str,
+        text_embeddings: Optional[List[List[float]]] = None,
+    ):
+        """Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
 
         The metadatas should have the following keys: citation, dockey (same as key arg), and key (unique key for each chunk).
         The hash is a unique identifier for the document. It is used to check if the document has already been added.
-        '''
+        """
         if len(texts) != len(metadatas):
-            raise ValueError(
-                "texts and metadatas must have the same length.")
+            raise ValueError("texts and metadatas must have the same length.")
         key = metadatas[0]["dockey"]
         citation = metadatas[0]["citation"]
         if key in self.keys:
@@ -174,12 +172,19 @@ class Docs:
             text_embeddings = self.embeddings.embed_documents(texts)
         if self._faiss_index is not None:
             self._faiss_index.add_embeddings(
-                zip(texts, text_embeddings), metadatas=metadatas)
+                zip(texts, text_embeddings), metadatas=metadatas
+            )
         elif self._doc_index is not None:
             self._doc_index.add_texts([citation], metadatas=[{"key": key}])
-        self.docs.append(dict(
-            texts=texts, metadata=metadatas, key=key, hash=hash,
-            text_embeddings=text_embeddings))
+        self.docs.append(
+            dict(
+                texts=texts,
+                metadata=metadatas,
+                key=key,
+                hash=hash,
+                text_embeddings=text_embeddings,
+            )
+        )
         self.keys.add(key)
 
     def clear(self) -> None:
@@ -212,11 +217,8 @@ class Docs:
         if len(self.docs) == 0:
             return ""
         if self._doc_index is None:
-            texts = [doc["metadata"][0]["citation"]
-                     for doc in self.docs]
-            metadatas = [
-                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs
-            ]
+            texts = [doc["metadata"][0]["citation"] for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
@@ -239,8 +241,7 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(
-                self.index_path, self.embeddings)
+            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
@@ -250,23 +251,18 @@ class Docs:
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
-            texts = reduce(
-                lambda x, y: x + y, [doc["texts"]
-                                     for doc in self.docs], []
-            )
+            texts = reduce(lambda x, y: x + y, [doc["texts"] for doc in self.docs], [])
             text_embeddings = reduce(
-                lambda x, y: x + y, [doc["text_embeddings"]
-                                     for doc in self.docs], []
+                lambda x, y: x + y, [doc["text_embeddings"] for doc in self.docs], []
             )
             metadatas = reduce(
-                lambda x, y: x + y, [doc["metadata"]
-                                     for doc in self.docs], []
+                lambda x, y: x + y, [doc["metadata"] for doc in self.docs], []
             )
             self._faiss_index = FAISS.from_embeddings(
                 # wow adding list to the zip was tricky
                 text_embeddings=list(zip(texts, text_embeddings)),
                 embedding=self.embeddings,
-                metadatas=metadatas
+                metadatas=metadatas,
             )
 
     def get_evidence(
