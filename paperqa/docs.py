@@ -84,7 +84,7 @@ class Docs:
         self.summary_llm = summary_llm
 
     def get_unique_key(self, key: str) -> str:
-        '''Create a unique key given proposed key'''
+        """Create a unique key given proposed key"""
         suffix = ""
         while key + suffix in self.keys:
             # move suffix to next letter
@@ -108,7 +108,7 @@ class Docs:
         # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have
         hash = md5sum(path)
-        if hash in [d['hash'] for d in self.docs]:
+        if hash in [d["hash"] for d in self.docs]:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
@@ -150,28 +150,44 @@ class Docs:
             )
         self.add_texts(texts, metadata, hash)
 
-    def add_texts(self,
-                  texts: List[str],
-                  metadatas: List[dict],
-                  hash: str):
-        '''Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
+    def add_texts(
+        self,
+        texts: List[str],
+        metadatas: List[dict],
+        hash: str,
+        text_embeddings: Optional[List[List[float]]] = None,
+    ):
+        """Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
 
         The metadatas should have the following keys: citation, dockey (same as key arg), and key (unique key for each chunk).
         The hash is a unique identifier for the document. It is used to check if the document has already been added.
-        '''
+        """
         if len(texts) != len(metadatas):
-            raise ValueError(
-                "texts and metadatas must have the same length.")
+            raise ValueError("texts and metadatas must have the same length.")
         key = metadatas[0]["dockey"]
         citation = metadatas[0]["citation"]
         if key in self.keys:
-            raise ValueError(f"Document {key} already in collection.")
+            new_key = self.get_unique_key(key)
+            for metadata in metadatas:
+                metadata["dockey"] = new_key
+                metadata["key"] = metadata["key"].replace(key, new_key)
+        if text_embeddings is None:
+            text_embeddings = self.embeddings.embed_documents(texts)
         if self._faiss_index is not None:
-            self._faiss_index.add_texts(texts, metadatas=metadatas)
-        if self._doc_index is not None:
+            self._faiss_index.add_embeddings(
+                zip(texts, text_embeddings), metadatas=metadatas
+            )
+        elif self._doc_index is not None:
             self._doc_index.add_texts([citation], metadatas=[{"key": key}])
-        self.docs.append(dict(
-            texts=texts, metadata=metadatas, key=key, hash=hash))
+        self.docs.append(
+            dict(
+                texts=texts,
+                metadata=metadatas,
+                key=key,
+                hash=hash,
+                text_embeddings=text_embeddings,
+            )
+        )
         self.keys.add(key)
 
     def clear(self) -> None:
@@ -204,11 +220,9 @@ class Docs:
         if len(self.docs) == 0:
             return ""
         if self._doc_index is None:
-            texts = [doc["metadata"][0]["citation"]
-                     for doc in self.docs]
-            metadatas = [
-                {"key": doc["metadata"][0]["dockey"]} for doc in self.docs
-            ]
+            texts = [doc["metadata"][0]["citation"] for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]}
+                         for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
@@ -221,8 +235,6 @@ class Docs:
     # to pickle, we have to save the index as a file
 
     def __getstate__(self):
-        if self._faiss_index is None and len(self.docs) > 0:
-            self._build_faiss_index()
         state = self.__dict__.copy()
         if self._faiss_index is not None:
             state["_faiss_index"].save_local(self.index_path)
@@ -244,16 +256,20 @@ class Docs:
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
-            texts = reduce(
-                lambda x, y: x + y, [doc["texts"]
+            texts = reduce(lambda x, y: x + y,
+                           [doc["texts"] for doc in self.docs], [])
+            text_embeddings = reduce(
+                lambda x, y: x + y, [doc["text_embeddings"]
                                      for doc in self.docs], []
             )
             metadatas = reduce(
-                lambda x, y: x + y, [doc["metadata"]
-                                     for doc in self.docs], []
+                lambda x, y: x + y, [doc["metadata"] for doc in self.docs], []
             )
-            self._faiss_index = FAISS.from_texts(
-                texts, self.embeddings, metadatas=metadatas
+            self._faiss_index = FAISS.from_embeddings(
+                # wow adding list to the zip was tricky
+                text_embeddings=list(zip(texts, text_embeddings)),
+                embedding=self.embeddings,
+                metadatas=metadatas,
             )
 
     def get_evidence(
