@@ -171,11 +171,12 @@ class Docs:
             for metadata in metadatas:
                 metadata["dockey"] = new_key
                 metadata["key"] = metadata["key"].replace(key, new_key)
+            key = new_key
         if text_embeddings is None:
             text_embeddings = self.embeddings.embed_documents(texts)
         if self._faiss_index is not None:
             self._faiss_index.add_embeddings(
-                zip(texts, text_embeddings), metadatas=metadatas
+                list(zip(texts, text_embeddings)), metadatas=metadatas
             )
         elif self._doc_index is not None:
             self._doc_index.add_texts([citation], metadatas=[{"key": key}])
