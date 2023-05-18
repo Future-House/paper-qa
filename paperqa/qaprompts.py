@@ -96,7 +96,7 @@ class FallbackLLMChain(LLMChain):
 def make_chain(prompt, llm):
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
-            content="You are a scholarly researcher that answers in an unbiased, scholarly tone. "
+            content="You are a scholarly researcher that answers in an unbiased, concise, scholarly tone. "
             "You sometimes refuse to answer if there is insufficient information.",
         )
         human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
