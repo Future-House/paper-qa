@@ -216,7 +216,7 @@ class Docs:
             for doc in self.docs
         ]
 
-    async def doc_match(self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []) -> List[str]:
+    async def adoc_match(self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []) -> List[str]:
         """Return a list of documents that match the query."""
         if len(self.docs) == 0:
             return ""
@@ -234,8 +234,25 @@ class Docs:
                                   callbacks=callbacks)
         return result
 
-    # to pickle, we have to save the index as a file
 
+    def doc_match(self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []) -> List[str]:
+        """Return a list of documents that match the query."""
+        if len(self.docs) == 0:
+            return ""
+        if self._doc_index is None:
+            texts = [doc["metadata"][0]["citation"] for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]}
+                         for doc in self.docs]
+            self._doc_index = FAISS.from_texts(
+                texts, metadatas=metadatas, embedding=self.embeddings
+            )
+        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        chain = make_chain(select_paper_prompt, self.summary_llm)
+        papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
+        result = chain.run(instructions=query, papers="\n".join(papers),
+                                  callbacks=callbacks)
+        return result
+            
     def __getstate__(self):
         state = self.__dict__.copy()
         if self._faiss_index is not None:
@@ -453,7 +470,7 @@ class Docs:
         if len(answer.contexts) == 0:
             if key_filter or (key_filter is None and len(self.docs) > 5):
                 callbacks = [OpenAICallbackHandler()] + get_callbacks("filter")
-                keys = await self.doc_match(answer.question, callbacks=callbacks)
+                keys = await self.adoc_match(answer.question, callbacks=callbacks)
                 answer.tokens += callbacks[0].total_tokens
                 answer.cost += callbacks[0].total_cost
             answer = await self.aget_evidence(
