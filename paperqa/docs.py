@@ -216,7 +216,7 @@ class Docs:
             for doc in self.docs
         ]
 
-    def doc_match(self, query: str, k: int = 25) -> List[str]:
+    async def doc_match(self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []) -> List[str]:
         """Return a list of documents that match the query."""
         if len(self.docs) == 0:
             return ""
@@ -230,7 +230,8 @@ class Docs:
         docs = self._doc_index.max_marginal_relevance_search(query, k=k)
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
-        result = chain.run(instructions=query, papers="\n".join(papers))
+        result = await chain.arun(instructions=query, papers="\n".join(papers),
+                                  callbacks=callbacks)
         return result
 
     # to pickle, we have to save the index as a file
@@ -451,10 +452,10 @@ class Docs:
             answer = Answer(query)
         if len(answer.contexts) == 0:
             if key_filter or (key_filter is None and len(self.docs) > 5):
-                with get_openai_callback() as cb:
-                    keys = self.doc_match(answer.question)
-                answer.tokens += cb.total_tokens
-                answer.cost += cb.total_cost
+                callbacks = [OpenAICallbackHandler()] + get_callbacks("filter")
+                keys = await self.doc_match(answer.question, callbacks=callbacks)
+                answer.tokens += callbacks[0].total_tokens
+                answer.cost += callbacks[0].total_cost
             answer = await self.aget_evidence(
                 answer,
                 k=k,
