@@ -351,11 +351,10 @@ class Docs:
                 text=doc.page_content,
             )
             if "Not applicable" not in c.context:
-                return c, cb
+                return c, callbacks[0]
             return None, None
 
-        with get_openai_callback() as cb:
-            results = await asyncio.gather(*[process(doc) for doc in docs])
+        results = await asyncio.gather(*[process(doc) for doc in docs])
         # filter out failures
         results = [r for r in results if r[0] is not None]
         answer.tokens += sum([cb.total_tokens for _, cb in results])
