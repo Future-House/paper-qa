@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -104,4 +105,4 @@ def make_chain(prompt, llm):
         prompt = ChatPromptTemplate.from_messages(
             [system_message_prompt, human_message_prompt]
         )
-    return LLMChain(prompt=prompt, llm=llm)#FallbackLLMChain(prompt=prompt, llm=llm)
+    return FallbackLLMChain(prompt=prompt, llm=llm)
