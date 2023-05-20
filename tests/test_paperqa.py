@@ -1,13 +1,20 @@
 import os
 import pickle
+from typing import Any
 from unittest import IsolatedAsyncioTestCase
 
 import requests
+from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
 
 import paperqa
 from paperqa.utils import strings_similarity
+
+
+class TestHandler(AsyncCallbackHandler):
+    async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
+        print(token)
 
 
 def test_maybe_is_text():
@@ -16,8 +23,7 @@ def test_maybe_is_text():
     )
     assert not paperqa.maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
-    r = requests.get(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+    r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
     assert paperqa.maybe_is_text(r.text)
 
     # now force it to contain lots of weird encoding
@@ -29,8 +35,7 @@ def test_docs():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+        r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
     llm = OpenAI(temperature=0.1, model_name="text-ada-001")
     docs = paperqa.Docs(llm=llm)
@@ -39,12 +44,42 @@ def test_docs():
     os.remove(doc_path)
 
 
+class TokenTest(IsolatedAsyncioTestCase):
+    async def test_token_count(self):
+        doc_path = "example.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+            )
+            f.write(r.text)
+        docs = paperqa.Docs()
+
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        os.remove(doc_path)
+        doc_path = "example2.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+            )
+            f.write(r.text)
+            f.write("\n")  # so we don't have same hash
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed tomorrow")
+        os.remove(doc_path)
+        answer = await docs.aquery(
+            "What is Frederick Bates's greatest accomplishment?",
+            get_callbacks=lambda x: [TestHandler()],
+        )
+        assert answer.tokens > 100
+        assert answer.cost > 0.01
+
+
 def test_evidence():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -60,8 +95,7 @@ def test_query():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -88,8 +122,7 @@ def test_doc_match():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -101,8 +134,7 @@ def test_docs_pickle():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+        r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
     llm = OpenAI(temperature=0.0, model_name="text-babbage-001")
     docs = paperqa.Docs(llm=llm)
@@ -165,8 +197,7 @@ def test_bad_context():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -182,8 +213,7 @@ def test_repeat_keys():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -213,8 +243,7 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = paperqa.Docs(llm=OpenAI(
-        temperature=0.0, model_name="text-curie-001"))
+    docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-curie-001"))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
@@ -224,8 +253,7 @@ def test_prompt_length():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -236,8 +264,7 @@ def test_doc_preview():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -257,8 +284,7 @@ def test_citation():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path)
@@ -273,8 +299,7 @@ def test_dockey_filter():
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -292,8 +317,7 @@ def test_query_filter():
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(
@@ -315,8 +339,7 @@ def test_nonopenai_model():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = paperqa.Docs(llm=model)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")

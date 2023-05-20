@@ -112,13 +112,11 @@ class Docs:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
-            cite_chain = make_chain(
-                prompt=citation_prompt, llm=self.summary_llm)
+            cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             if len(texts) == 0:
-                raise ValueError(
-                    f"Could not read document {path}. Is it empty?")
+                raise ValueError(f"Could not read document {path}. Is it empty?")
             citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -138,8 +136,7 @@ class Docs:
                 year = ""
             key = f"{author}{year}"
         key = self.get_unique_key(key)
-        texts, metadata = read_doc(
-            path, citation, key, chunk_chars=chunk_chars)
+        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -216,43 +213,46 @@ class Docs:
             for doc in self.docs
         ]
 
-    async def adoc_match(self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []) -> List[str]:
+    async def adoc_match(
+        self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []
+    ) -> List[str]:
         """Return a list of documents that match the query."""
         if len(self.docs) == 0:
             return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs]
-            metadatas = [{"key": doc["metadata"][0]["dockey"]}
-                         for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.max_marginal_relevance_search(query, k=k)
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
-        result = await chain.arun(instructions=query, papers="\n".join(papers),
-                                  callbacks=callbacks)
+        result = await chain.arun(
+            instructions=query, papers="\n".join(papers), callbacks=callbacks
+        )
         return result
 
-
-    def doc_match(self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []) -> List[str]:
+    def doc_match(
+        self, query: str, k: int = 25, callbacks: List[AsyncCallbackHandler] = []
+    ) -> List[str]:
         """Return a list of documents that match the query."""
         if len(self.docs) == 0:
             return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs]
-            metadatas = [{"key": doc["metadata"][0]["dockey"]}
-                         for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.max_marginal_relevance_search(query, k=k)
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
-        result = chain.run(instructions=query, papers="\n".join(papers),
-                                  callbacks=callbacks)
+        result = chain.run(
+            instructions=query, papers="\n".join(papers), callbacks=callbacks
+        )
         return result
-            
+
     def __getstate__(self):
         state = self.__dict__.copy()
         if self._faiss_index is not None:
@@ -264,8 +264,7 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(
-                self.index_path, self.embeddings)
+            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
@@ -275,11 +274,9 @@ class Docs:
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
-            texts = reduce(lambda x, y: x + y,
-                           [doc["texts"] for doc in self.docs], [])
+            texts = reduce(lambda x, y: x + y, [doc["texts"] for doc in self.docs], [])
             text_embeddings = reduce(
-                lambda x, y: x + y, [doc["text_embeddings"]
-                                     for doc in self.docs], []
+                lambda x, y: x + y, [doc["text_embeddings"] for doc in self.docs], []
             )
             metadatas = reduce(
                 lambda x, y: x + y, [doc["metadata"] for doc in self.docs], []
@@ -368,7 +365,7 @@ class Docs:
                 ),
                 text=doc.page_content,
             )
-            if "Not applicable" not in c.context:
+            if "not applicable" not in c.context.casefold():
                 return c, callbacks[0]
             return None, None
 
@@ -490,7 +487,7 @@ class Docs:
             )
         else:
             cb = OpenAICallbackHandler()
-            callbacks = [OpenAICallbackHandler()] + get_callbacks("answer")
+            callbacks = [cb] + get_callbacks("answer")
             qa_chain = make_chain(qa_prompt, self.llm)
             answer_text = await qa_chain.arun(
                 question=query,
