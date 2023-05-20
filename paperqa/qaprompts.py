@@ -34,7 +34,7 @@ qa_prompt = prompts.PromptTemplate(
     "For each sentence in your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, comprehensive, and scholarly tone. "
-    "Complete your answer with a concluding 1-2 sentences, which may be opinionated. "
+    "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. "
     "Use Markdown for formatting code or text, and try to use direct quotes to support arguments.\n\n"
     "{context_str}\n"
     "Question: {question}\n"
@@ -97,10 +97,11 @@ def make_chain(prompt, llm):
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
             content="You are a scholarly researcher that answers in an unbiased, concise, scholarly tone. "
-            "You sometimes refuse to answer if there is insufficient information.",
+            "You sometimes refuse to answer if there is insufficient information. "
+            "If there are potentially ambiguous terms or acronyms, first define them. ",
         )
         human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
         prompt = ChatPromptTemplate.from_messages(
             [system_message_prompt, human_message_prompt]
         )
-    return FallbackLLMChain(prompt=prompt, llm=llm)
+    return LLMChain(prompt=prompt, llm=llm)#FallbackLLMChain(prompt=prompt, llm=llm)

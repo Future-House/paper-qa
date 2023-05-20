@@ -27,7 +27,7 @@ from .types import Answer, Context
 from .utils import maybe_is_text, md5sum
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-langchain.llm_cache = SQLiteCache(CACHE_PATH)
+#langchain.llm_cache = SQLiteCache(CACHE_PATH)
 
 
 class Docs:
@@ -356,11 +356,12 @@ class Docs:
             callbacks = [OpenAICallbackHandler()] + get_callbacks(
                 "evidence:" + doc.metadata["key"]
             )
+            print(callbacks)
             summary_chain = make_chain(summary_prompt, self.summary_llm)
             c = Context(
                 key=doc.metadata["key"],
                 citation=doc.metadata["citation"],
-                context=await summary_chain.arun(
+                context=summary_chain.run(
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
@@ -368,7 +369,8 @@ class Docs:
                 ),
                 text=doc.page_content,
             )
-            if "Not applicable" not in c.context:
+            print(callbacks[0].total_tokens, callbacks[0].total_cost)
+            if "not applicable" not in c.context.casefold():
                 return c, callbacks[0]
             return None, None
 
@@ -490,7 +492,7 @@ class Docs:
             )
         else:
             cb = OpenAICallbackHandler()
-            callbacks = [OpenAICallbackHandler()] + get_callbacks("answer")
+            callbacks = [cb] + get_callbacks("answer")
             qa_chain = make_chain(qa_prompt, self.llm)
             answer_text = await qa_chain.arun(
                 question=query,

@@ -1,6 +1,8 @@
 import os
 import pickle
 from unittest import IsolatedAsyncioTestCase
+from langchain.callbacks.base import AsyncCallbackHandler
+from typing import Any
 
 import requests
 from langchain.llms import OpenAI
@@ -9,6 +11,9 @@ from langchain.llms.fake import FakeListLLM
 import paperqa
 from paperqa.utils import strings_similarity
 
+class TestHandler(AsyncCallbackHandler):
+    async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
+        print(token)
 
 def test_maybe_is_text():
     assert paperqa.maybe_is_text(
@@ -37,6 +42,32 @@ def test_docs():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     assert docs.docs[0]["key"] == "Wiki2023"
     os.remove(doc_path)
+
+class TokenTest(IsolatedAsyncioTestCase):
+    async def test_token_count(self):
+        doc_path = "example.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+            f.write(r.text)
+        docs = paperqa.Docs()
+        
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        os.remove(doc_path)
+        doc_path = "example2.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+            f.write(r.text)
+            f.write("\n")  # so we don't have same hash
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed tomorrow")
+        os.remove(doc_path)
+        answer = await docs.aquery("What is Frederick Bates's greatest accomplishment?",
+                            get_callbacks=lambda x: [TestHandler()])
+        assert answer.tokens > 100
+        assert answer.cost > 0.01
 
 
 def test_evidence():
