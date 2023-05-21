@@ -82,6 +82,7 @@ class AnswerTool(BaseTool):
     description = "Ask a researcher to propose an answer using evidence from papers. The input is the question to be answered."
     docs: Docs = None
     answer: Answer = None
+    return_direct = True
 
     def __init__(self, docs, answer):
         # call the parent class constructor

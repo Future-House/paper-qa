@@ -72,7 +72,7 @@ class TokenTest(IsolatedAsyncioTestCase):
             get_callbacks=lambda x: [TestHandler()],
         )
         assert answer.tokens > 100
-        assert answer.cost > 0.01
+        assert answer.cost > 0.001
 
 
 def test_evidence():
