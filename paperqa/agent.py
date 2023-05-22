@@ -130,7 +130,7 @@ class Search(BaseTool):
             )
 
         papers = paperscraper.search_papers(
-            query, limit=20, verbose=False, pdir=self.docs.index_path
+            query, limit=5, _limit=20, verbose=False, pdir=self.docs.index_path
         )
         for path, data in papers.items():
             try:
