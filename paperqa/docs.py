@@ -79,7 +79,7 @@ class Docs:
         summary_llm: Optional[Union[LLM, str]] = None,
     ) -> None:
         """Update the LLM for answering questions."""
-        if llm is None:
+        if llm is None and os.environ.get("OPENAI_API_KEY") is not None:
             llm = "gpt-3.5-turbo"
         if type(llm) is str:
             llm = ChatOpenAI(temperature=0.1, model_name=llm)
@@ -299,6 +299,9 @@ class Docs:
             self._faiss_index = None
         if not hasattr(self, "_doc_index"):
             self._doc_index = None
+        # must be a better way to have backwards compatibility
+        if not hasattr(self, "_deleted_keys"):
+            self._deleted_keys = set()
         self.update_llm(None, None)
 
     def _build_faiss_index(self):
