@@ -20,8 +20,14 @@ from langchain.llms.base import LLM
 from langchain.vectorstores import FAISS
 
 from .paths import CACHE_PATH
-from .qaprompts import (citation_prompt, make_chain, qa_prompt, search_prompt,
-                        select_paper_prompt, summary_prompt)
+from .qaprompts import (
+    citation_prompt,
+    make_chain,
+    qa_prompt,
+    search_prompt,
+    select_paper_prompt,
+    summary_prompt,
+)
 from .readers import read_doc
 from .types import Answer, Context
 from .utils import maybe_is_text, md5sum
@@ -65,6 +71,7 @@ class Docs:
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
+        self._deleted_keys = set()
 
     def update_llm(
         self,
@@ -188,6 +195,14 @@ class Docs:
         )
         self.keys.add(key)
 
+    def delete(self, key: str) -> None:
+        """Delete a document from the collection."""
+        if key not in self.keys:
+            return
+        self.keys.remove(key)
+        self.docs = [doc for doc in self.docs if doc["key"] != key]
+        self._deleted_keys.add(key)
+
     def clear(self) -> None:
         """Clear the collection of documents."""
         self.docs = []
@@ -225,7 +240,10 @@ class Docs:
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
-        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        docs = self._doc_index.max_marginal_relevance_search(
+            query, k=k + len(self._deleted_keys)
+        )
+        docs = [doc for doc in docs if doc["key"] not in self._deleted_keys]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = await chain.arun(
@@ -245,7 +263,10 @@ class Docs:
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
-        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        docs = self._doc_index.max_marginal_relevance_search(
+            query, k=k + len(self._deleted_keys)
+        )
+        docs = [doc for doc in docs if doc["key"] not in self._deleted_keys]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = chain.run(
@@ -345,6 +366,8 @@ class Docs:
             )
 
         async def process(doc):
+            if doc.metadata["dockey"] in self._deleted_keys:
+                return None, None
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
                 return None, None
             # check if it is already in answer (possible in agent setting)
