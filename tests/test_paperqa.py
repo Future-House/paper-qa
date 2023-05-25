@@ -312,6 +312,36 @@ def test_dockey_filter():
     docs.get_evidence(answer, key_filter=["test"])
 
 
+def test_dockey_delete():
+    """Test that we can filter evidence with dockeys"""
+    doc_path = "example2.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = paperqa.Docs()
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    # add with new dockey
+    with open("example.txt", "w", encoding="utf-8") as f:
+        f.write(r.text)
+        f.write("\n\nBates could be from Angola")  # so we don't have same hash
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    answer = paperqa.Answer("What country is Bates from?")
+    answer = docs.get_evidence(answer, marginal_relevance=False)
+    keys = set([c.key for c in answer.contexts])
+    assert len(keys) == 2
+    assert len(docs.docs) == 2
+    assert len(docs.keys) == 2
+
+    docs.delete("test")
+    assert len(docs.docs) == 1
+    assert len(docs.keys) == 1
+    answer = paperqa.Answer("What country is Bates from?")
+    answer = docs.get_evidence(answer, marginal_relevance=False)
+    keys = set([c.key for c in answer.contexts])
+    assert len(keys) == 1
+
+
 def test_query_filter():
     """Test that we can filter evidence with in query"""
     doc_path = "example2.txt"
