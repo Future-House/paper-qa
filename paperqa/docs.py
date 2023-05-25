@@ -20,8 +20,14 @@ from langchain.llms.base import LLM
 from langchain.vectorstores import FAISS
 
 from .paths import CACHE_PATH
-from .qaprompts import (citation_prompt, make_chain, qa_prompt, search_prompt,
-                        select_paper_prompt, summary_prompt)
+from .qaprompts import (
+    citation_prompt,
+    make_chain,
+    qa_prompt,
+    search_prompt,
+    select_paper_prompt,
+    summary_prompt,
+)
 from .readers import read_doc
 from .types import Answer, Context
 from .utils import maybe_is_text, md5sum
@@ -65,6 +71,7 @@ class Docs:
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
+        self._deleted_keys = set()
 
     def update_llm(
         self,
@@ -72,7 +79,7 @@ class Docs:
         summary_llm: Optional[Union[LLM, str]] = None,
     ) -> None:
         """Update the LLM for answering questions."""
-        if llm is None:
+        if llm is None and os.environ.get("OPENAI_API_KEY") is not None:
             llm = "gpt-3.5-turbo"
         if type(llm) is str:
             llm = ChatOpenAI(temperature=0.1, model_name=llm)
@@ -112,11 +119,13 @@ class Docs:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
-            cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
+            cite_chain = make_chain(
+                prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             if len(texts) == 0:
-                raise ValueError(f"Could not read document {path}. Is it empty?")
+                raise ValueError(
+                    f"Could not read document {path}. Is it empty?")
             citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -136,7 +145,8 @@ class Docs:
                 year = ""
             key = f"{author}{year}"
         key = self.get_unique_key(key)
-        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
+        texts, metadata = read_doc(
+            path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -188,6 +198,14 @@ class Docs:
         )
         self.keys.add(key)
 
+    def delete(self, key: str) -> None:
+        """Delete a document from the collection."""
+        if key not in self.keys:
+            return
+        self.keys.remove(key)
+        self.docs = [doc for doc in self.docs if doc["key"] != key]
+        self._deleted_keys.add(key)
+
     def clear(self) -> None:
         """Clear the collection of documents."""
         self.docs = []
@@ -221,11 +239,16 @@ class Docs:
             return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs]
-            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]}
+                         for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
-        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        docs = self._doc_index.max_marginal_relevance_search(
+            query, k=k + len(self._deleted_keys)
+        )
+        docs = [doc for doc in docs if doc.metadata["key"]
+                not in self._deleted_keys]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = await chain.arun(
@@ -241,11 +264,16 @@ class Docs:
             return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs]
-            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]}
+                         for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
-        docs = self._doc_index.max_marginal_relevance_search(query, k=k)
+        docs = self._doc_index.max_marginal_relevance_search(
+            query, k=k + len(self._deleted_keys)
+        )
+        docs = [doc for doc in docs if doc.metadata["key"]
+                not in self._deleted_keys]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = chain.run(
@@ -264,19 +292,25 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
+            self._faiss_index = FAISS.load_local(
+                self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
         if not hasattr(self, "_doc_index"):
             self._doc_index = None
+        # must be a better way to have backwards compatibility
+        if not hasattr(self, "_deleted_keys"):
+            self._deleted_keys = set()
         self.update_llm(None, None)
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
-            texts = reduce(lambda x, y: x + y, [doc["texts"] for doc in self.docs], [])
+            texts = reduce(lambda x, y: x + y,
+                           [doc["texts"] for doc in self.docs], [])
             text_embeddings = reduce(
-                lambda x, y: x + y, [doc["text_embeddings"] for doc in self.docs], []
+                lambda x, y: x + y, [doc["text_embeddings"]
+                                     for doc in self.docs], []
             )
             metadatas = reduce(
                 lambda x, y: x + y, [doc["metadata"] for doc in self.docs], []
@@ -345,6 +379,8 @@ class Docs:
             )
 
         async def process(doc):
+            if doc.metadata["dockey"] in self._deleted_keys:
+                return None, None
             if key_filter is not None and doc.metadata["dockey"] not in key_filter:
                 return None, None
             # check if it is already in answer (possible in agent setting)
