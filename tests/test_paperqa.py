@@ -391,3 +391,26 @@ def test_zotera():
     except ValueError:
         # close enough
         return
+
+
+def test_too_much_evidence():
+    doc_path = "example2.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")
+        f.write(r.text)
+    docs = paperqa.Docs(llm="gpt-3.5-turbo", summary_llm="gpt-3.5-turbo")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    # add with new dockey
+    with open("example.txt", "w", encoding="utf-8") as f:
+        f.write(r.text)
+        f.write("\n")  # so we don't have same hash
+    docs.add(
+        "example.txt",
+        "WikiMedia Foundation, 2023, Accessed now",
+        key="test",
+        chunk_chars=4000,
+    )
+    answer = docs.query(
+        "What is Barrack's greatest accomplishment?", max_sources=10, k=10
+    )

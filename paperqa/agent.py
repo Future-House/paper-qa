@@ -14,7 +14,7 @@ def status(answer: Answer, docs: Docs):
 
 class PaperSelection(BaseTool):
     name = "Select Papers"
-    description = "Select from current papers. Provide instructions as a string to use for choosing papers."
+    description = "Select from current papers. Provide a desired question to answer as a string to use for choosing papers."
     docs: Docs = None
     answer: Answer = None
     chain: LLMChain = None
