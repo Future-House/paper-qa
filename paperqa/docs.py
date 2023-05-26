@@ -109,7 +109,7 @@ class Docs:
         key: Optional[str] = None,
         disable_check: bool = False,
         chunk_chars: Optional[int] = 3000,
-    ) -> None:
+    ) -> str:
         """Add a document to the collection."""
 
         # first check to see if we already have this document
@@ -119,13 +119,11 @@ class Docs:
             raise ValueError(f"Document {path} already in collection.")
 
         if citation is None:
-            cite_chain = make_chain(
-                prompt=citation_prompt, llm=self.summary_llm)
+            cite_chain = make_chain(prompt=citation_prompt, llm=self.summary_llm)
             # peak first chunk
             texts, _ = read_doc(path, "", "", chunk_chars=chunk_chars)
             if len(texts) == 0:
-                raise ValueError(
-                    f"Could not read document {path}. Is it empty?")
+                raise ValueError(f"Could not read document {path}. Is it empty?")
             citation = cite_chain.run(texts[0])
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -145,8 +143,7 @@ class Docs:
                 year = ""
             key = f"{author}{year}"
         key = self.get_unique_key(key)
-        texts, metadata = read_doc(
-            path, citation, key, chunk_chars=chunk_chars)
+        texts, metadata = read_doc(path, citation, key, chunk_chars=chunk_chars)
         # loose check to see if document was loaded
         #
         if len("".join(texts)) < 10 or (
@@ -156,6 +153,7 @@ class Docs:
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
         self.add_texts(texts, metadata, hash)
+        return key
 
     def add_texts(
         self,
@@ -239,20 +237,18 @@ class Docs:
             return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs]
-            metadatas = [{"key": doc["metadata"][0]["dockey"]}
-                         for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.max_marginal_relevance_search(
             query, k=k + len(self._deleted_keys)
         )
-        docs = [doc for doc in docs if doc.metadata["key"]
-                not in self._deleted_keys]
+        docs = [doc for doc in docs if doc.metadata["key"] not in self._deleted_keys]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = await chain.arun(
-            instructions=query, papers="\n".join(papers), callbacks=callbacks
+            question=query, papers="\n".join(papers), callbacks=callbacks
         )
         return result
 
@@ -264,20 +260,18 @@ class Docs:
             return ""
         if self._doc_index is None:
             texts = [doc["metadata"][0]["citation"] for doc in self.docs]
-            metadatas = [{"key": doc["metadata"][0]["dockey"]}
-                         for doc in self.docs]
+            metadatas = [{"key": doc["metadata"][0]["dockey"]} for doc in self.docs]
             self._doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         docs = self._doc_index.max_marginal_relevance_search(
             query, k=k + len(self._deleted_keys)
         )
-        docs = [doc for doc in docs if doc.metadata["key"]
-                not in self._deleted_keys]
+        docs = [doc for doc in docs if doc.metadata["key"] not in self._deleted_keys]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.metadata['key']}: {d.page_content}" for d in docs]
         result = chain.run(
-            instructions=query, papers="\n".join(papers), callbacks=callbacks
+            question=query, papers="\n".join(papers), callbacks=callbacks
         )
         return result
 
@@ -292,8 +286,7 @@ class Docs:
     def __setstate__(self, state):
         self.__dict__.update(state)
         try:
-            self._faiss_index = FAISS.load_local(
-                self.index_path, self.embeddings)
+            self._faiss_index = FAISS.load_local(self.index_path, self.embeddings)
         except:
             # they use some special exception type, but I don't want to import it
             self._faiss_index = None
@@ -306,11 +299,9 @@ class Docs:
 
     def _build_faiss_index(self):
         if self._faiss_index is None:
-            texts = reduce(lambda x, y: x + y,
-                           [doc["texts"] for doc in self.docs], [])
+            texts = reduce(lambda x, y: x + y, [doc["texts"] for doc in self.docs], [])
             text_embeddings = reduce(
-                lambda x, y: x + y, [doc["text_embeddings"]
-                                     for doc in self.docs], []
+                lambda x, y: x + y, [doc["text_embeddings"] for doc in self.docs], []
             )
             metadatas = reduce(
                 lambda x, y: x + y, [doc["metadata"] for doc in self.docs], []
