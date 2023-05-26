@@ -15,8 +15,8 @@ summary_prompt = prompts.PromptTemplate(
     "Do not directly answer the question, instead summarize and "
     "quote to give evidence to help answer the question. "
     "Do not use outside sources. "
-    'Reply with "Not applicable" if the text is unrelated to the question. '
-    "Use 150 or less words."
+    'Reply with only "Not applicable" if the text is unrelated to the question. '
+    "Use 100 or less words."
     "\n\n"
     "{context_str}\n"
     "Extracted from {citation}\n"
@@ -54,12 +54,13 @@ search_prompt = prompts.PromptTemplate(
 
 
 select_paper_prompt = prompts.PromptTemplate(
-    input_variables=["instructions", "papers"],
-    template="Select papers according to instructions below. "
+    input_variables=["question", "papers"],
+    template="Select papers to help answer the question below. "
     "Papers are listed as $KEY: $PAPER_INFO. "
     "Return a list of keys, separated by commas. "
-    'Return "None", if no papers are applicable. \n\n'
-    "Instructions: {instructions}\n\n"
+    'Return "None", if no papers are applicable. '
+    "Choose papers that are relevant, from reputable sources, and timely. \n\n"
+    "Question: {question}\n\n"
     "{papers}\n\n"
     "Selected keys:",
 )
@@ -72,7 +73,7 @@ def _get_datetime():
 
 citation_prompt = prompts.PromptTemplate(
     input_variables=["text"],
-    template="Provide a possible citation for the following text in MLA Format. Today's date is {date}\n"
+    template="Provide a citation for the following text in MLA Format. You must answer. Today's date is {date}\n"
     "{text}\n\n"
     "Citation:",
     partial_variables={"date": _get_datetime},
