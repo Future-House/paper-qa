@@ -1,5 +1,6 @@
 import math
 import string
+import asyncio
 
 import pypdf
 
@@ -68,3 +69,14 @@ def md5sum(file_path: StrPath) -> str:
 
     with open(file_path, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()
+
+
+async def gather_with_concurrency(n, *coros):
+    # https://stackoverflow.com/a/61478547/2392535
+    semaphore = asyncio.Semaphore(n)
+
+    async def sem_coro(coro):
+        async with semaphore:
+            return await coro
+
+    return await asyncio.gather(*(sem_coro(c) for c in coros))
