@@ -27,6 +27,57 @@ def _get_ocr_cache() -> SQLiteCache:
 TextSplitter = TokenTextSplitter
 
 
+def clear_cache():
+    """Clear the OCR cache."""
+    # TODO: upstream broken
+    # _get_ocr_cache().clear()
+    global OCR_CACHE
+    OCR_CACHE = None
+    os.unlink(OCR_CACHE_PATH)
+
+
+def parse_pdf_fitz(path, citation, key, chunk_chars, overlap):
+    import fitz
+
+    doc = fitz.open(path)
+    splits = []
+    split = ""
+    pages = []
+    metadatas = []
+    for i in range(doc.page_count):
+        page = doc.load_page(i)
+        split += page.get_text("text", sort=True)
+        pages.append(str(i + 1))
+        # split could be so long it needs to be split
+        # into multiple chunks. Or it could be so short
+        # that it needs to be combined with the next chunk.
+        while len(split) > chunk_chars:
+            splits.append(split[:chunk_chars])
+            # pretty formatting of pages (e.g. 1-3, 4, 5-7)
+            pg = "-".join([pages[0], pages[-1]])
+            metadatas.append(
+                dict(
+                    citation=citation,
+                    dockey=key,
+                    key=f"{key} pages {pg}",
+                )
+            )
+            split = split[chunk_chars - overlap :]
+            pages = [str(i + 1)]
+    if len(split) > overlap:
+        splits.append(split[:chunk_chars])
+        pg = "-".join([pages[0], pages[-1]])
+        metadatas.append(
+            dict(
+                citation=citation,
+                dockey=key,
+                key=f"{key} pages {pg}",
+            )
+        )
+    doc.close()
+    return splits, metadatas
+
+
 def parse_pdf(path, citation, key, chunk_chars=2000, overlap=50):
     import pypdf
 
@@ -211,12 +262,27 @@ def read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=F
     return out
 
 
-def _read_doc(path, citation, key, chunk_chars=3000, overlap=100, disable_check=False):
+def _read_doc(
+    path,
+    citation,
+    key,
+    chunk_chars=3000,
+    overlap=100,
+    disable_check=False,
+    force_pypdf=False,
+):
     """Parse a document into chunks."""
     if isinstance(path, Path):
         path = str(path)
     if path.endswith(".pdf"):
-        return parse_pdf(path, citation, key, chunk_chars, overlap)
+        if force_pypdf:
+            return parse_pdf(path, citation, key, chunk_chars, overlap)
+        try:
+            import fitz
+
+            return parse_pdf_fitz(path, citation, key, chunk_chars, overlap)
+        except ImportError:
+            return parse_pdf(path, citation, key, chunk_chars, overlap)
     elif path.endswith(".txt"):
         return parse_txt(path, citation, key, chunk_chars, overlap)
     elif path.endswith(".html"):
