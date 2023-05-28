@@ -1,7 +1,11 @@
 import os
 import pickle
+import sys
 from typing import Any
 from unittest import IsolatedAsyncioTestCase
+from unittest import mock
+from importlib import reload
+from importlib import import_module
 
 import requests
 from langchain.callbacks.base import AsyncCallbackHandler
@@ -10,6 +14,7 @@ from langchain.llms.fake import FakeListLLM
 
 import paperqa
 from paperqa.utils import strings_similarity
+from paperqa.readers import clear_cache
 
 
 class TestHandler(AsyncCallbackHandler):
@@ -241,12 +246,25 @@ def test_repeat_keys():
 
 
 def test_pdf_reader():
+    clear_cache()
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-curie-001"))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_pdf_pypdf_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    splits1, _ = paperqa.readers._read_doc(
+        doc_path, "foo te al", "bar", force_pypdf=True
+    )
+    splits2, _ = paperqa.readers._read_doc(
+        doc_path, "foo te al", "bar", force_pypdf=False
+    )
+    assert strings_similarity(splits1[0].casefold(), splits2[0].casefold()) > 0.85
 
 
 def test_prompt_length():

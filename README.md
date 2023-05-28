@@ -49,7 +49,7 @@ pip install paper-qa
 
 Make sure you have set your OPENAI_API_KEY environment variable to your [openai api key](https://platform.openai.com/account/api-keys)
 
-To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them.
+To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them. If you don't have citations, `Docs` will try to guess them from the first page of your docs.
 
 ```python
 
@@ -60,7 +60,7 @@ from paperqa import Docs
 docs = Docs()
 for d in my_docs:
     docs.add(d)
-    
+
 answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
 print(answer.formatted_answer)
 ```
@@ -74,6 +74,17 @@ By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have g
 ```py
 docs = Docs(llm='gpt-3.5-turbo')
 ```
+
+or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
+
+```py
+from langchain.llms import Anthropic, OpenAIChat
+model = OpenAIChat(model='gpt-4')
+summary_model = Anthropic(model="claude-instant-v1-100k", anthropic_api_key="my-api-key")
+docs = Docs(llm=model, summary_llm=summary_model)
+```
+
+
 #### Locally Hosted
 
 You can also use any other models (or embeddings) available in [langchain](https://github.com/hwchase17/langchain). Here's an example of using `llama.cpp` to have locally hosted paper-qa:
@@ -210,7 +221,7 @@ We can also do specific queries of our Zotero library and iterate over the resul
 ```py
 for item in zotero.iterate(
         q="large language models",
-        qmode="everything", 
+        qmode="everything",
         sort="date",
         direction="desc",
         limit=100,
@@ -276,6 +287,14 @@ with open("my_docs.pkl", "wb") as f:
 # load
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
+```
+
+### PDF Reading Options
+
+By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure python and easy to install. For faster PDF reading, paper-qa will detect and use [PymuPDF (fitz)](https://pymupdf.readthedocs.io/en/latest/):
+
+```sh
+pip install pymupdf
 ```
 
 ### Callbacks
