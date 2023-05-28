@@ -30,7 +30,7 @@ from .qaprompts import (
 )
 from .readers import read_doc
 from .types import Answer, Context
-from .utils import maybe_is_text, md5sum
+from .utils import maybe_is_text, md5sum, gather_with_concurrency
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
@@ -47,6 +47,7 @@ class Docs:
         name: str = "default",
         index_path: Optional[Path] = None,
         embeddings: Optional[Embeddings] = None,
+        max_concurrent: int = 5,
     ) -> None:
         """Initialize the collection of documents.
 
@@ -57,6 +58,7 @@ class Docs:
             name: The name of the collection.
             index_path: The path to the index file IF pickled. If None, defaults to using name in $HOME/.paperqa/name
             embeddings: The embeddings to use for indexing documents. Default - OpenAI embeddings
+            max_concurrent: Number of concurrent LLM model calls to make
         """
         self.docs = []
         self.chunk_size_limit = chunk_size_limit
@@ -71,6 +73,7 @@ class Docs:
         if embeddings is None:
             embeddings = OpenAIEmbeddings()
         self.embeddings = embeddings
+        self.max_concurrent = max_concurrent
         self._deleted_keys = set()
 
     def update_llm(
@@ -295,6 +298,8 @@ class Docs:
         # must be a better way to have backwards compatibility
         if not hasattr(self, "_deleted_keys"):
             self._deleted_keys = set()
+        if not hasattr(self, "max_concurrent"):
+            self.max_concurrent = 5
         self.update_llm(None, None)
 
     def _build_faiss_index(self):
@@ -396,7 +401,9 @@ class Docs:
                 return c, callbacks[0]
             return None, None
 
-        results = await asyncio.gather(*[process(doc) for doc in docs])
+        results = await gather_with_concurrency(
+            self.max_concurrent, *[process(doc) for doc in docs]
+        )
         # filter out failures
         results = [r for r in results if r[0] is not None]
         answer.tokens += sum([cb.total_tokens for _, cb in results])
