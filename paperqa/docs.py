@@ -30,7 +30,7 @@ from .qaprompts import (
 )
 from .readers import read_doc
 from .types import Answer, Context
-from .utils import maybe_is_text, md5sum, gather_with_concurrency
+from .utils import maybe_is_text, md5sum, gather_with_concurrency, guess_is_4xx
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
@@ -386,15 +386,27 @@ class Docs:
                 "evidence:" + doc.metadata["key"]
             )
             summary_chain = make_chain(summary_prompt, self.summary_llm)
-            c = Context(
-                key=doc.metadata["key"],
-                citation=doc.metadata["citation"],
-                context=await summary_chain.arun(
+            # This is dangerous because it
+            # could mask errors that are important
+            # I also cannot know what the exception
+            # type is because any model could be used
+            # my best idea is see if there is a 4XX
+            # http code in the exception
+            try:
+                context = await summary_chain.arun(
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
                     callbacks=callbacks,
-                ),
+                )
+            except Exception as e:
+                if guess_is_4xx(e):
+                    return None, None
+                raise e
+            c = Context(
+                key=doc.metadata["key"],
+                citation=doc.metadata["citation"],
+                context=context,
                 text=doc.page_content,
             )
             if "not applicable" not in c.context.casefold():
