@@ -1,5 +1,6 @@
 import math
 import string
+import re
 import asyncio
 
 import pypdf
@@ -80,3 +81,9 @@ async def gather_with_concurrency(n, *coros):
             return await coro
 
     return await asyncio.gather(*(sem_coro(c) for c in coros))
+
+
+def guess_is_4xx(msg: str) -> bool:
+    if re.search(r"4\d\d", msg):
+        return True
+    return False

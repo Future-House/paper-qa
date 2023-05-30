@@ -6,13 +6,28 @@ StrPath = Union[str, Path]
 
 
 @dataclass
+class Context:
+    """A class to hold the context of a question."""
+
+    key: str
+    citation: str
+    context: str
+    text: str
+    score: int = 5
+
+    def __str__(self) -> str:
+        """Return the context as a string."""
+        return self.context
+
+
+@dataclass
 class Answer:
     """A class to hold the answer to a question."""
 
     question: str
     answer: str = ""
     context: str = ""
-    contexts: List[Any] = None
+    contexts: List[Context] = None
     references: str = ""
     formatted_answer: str = ""
     passages: Dict[str, str] = None
@@ -29,17 +44,3 @@ class Answer:
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
-
-
-@dataclass
-class Context:
-    """A class to hold the context of a question."""
-
-    key: str
-    citation: str
-    context: str
-    text: str
-
-    def __str__(self) -> str:
-        """Return the context as a string."""
-        return self.context
