@@ -27,10 +27,11 @@ from .qaprompts import (
     search_prompt,
     select_paper_prompt,
     summary_prompt,
+    get_score,
 )
 from .readers import read_doc
 from .types import Answer, Context
-from .utils import maybe_is_text, md5sum, gather_with_concurrency
+from .utils import maybe_is_text, md5sum, gather_with_concurrency, guess_is_4xx
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
@@ -373,11 +374,12 @@ class Docs:
             docs = self._faiss_index.similarity_search(
                 answer.question, k=_k, fetch_k=5 * _k
             )
+        # ok now filter
+        if key_filter is not None:
+            docs = [doc for doc in docs if doc.metadata["dockey"] in key_filter][:k]
 
         async def process(doc):
             if doc.metadata["dockey"] in self._deleted_keys:
-                return None, None
-            if key_filter is not None and doc.metadata["dockey"] not in key_filter:
                 return None, None
             # check if it is already in answer (possible in agent setting)
             if doc.metadata["key"] in [c.key for c in answer.contexts]:
@@ -386,18 +388,32 @@ class Docs:
                 "evidence:" + doc.metadata["key"]
             )
             summary_chain = make_chain(summary_prompt, self.summary_llm)
-            c = Context(
-                key=doc.metadata["key"],
-                citation=doc.metadata["citation"],
-                context=await summary_chain.arun(
+            # This is dangerous because it
+            # could mask errors that are important
+            # I also cannot know what the exception
+            # type is because any model could be used
+            # my best idea is see if there is a 4XX
+            # http code in the exception
+            try:
+                context = await summary_chain.arun(
                     question=answer.question,
                     context_str=doc.page_content,
                     citation=doc.metadata["citation"],
                     callbacks=callbacks,
-                ),
+                )
+            except Exception as e:
+                if guess_is_4xx(e):
+                    return None, None
+                raise e
+            c = Context(
+                key=doc.metadata["key"],
+                citation=doc.metadata["citation"],
+                context=context,
                 text=doc.page_content,
+                score=get_score(context),
             )
             if "not applicable" not in c.context.casefold():
+                print(c.score)
                 return c, callbacks[0]
             return None, None
 
@@ -411,7 +427,7 @@ class Docs:
         contexts = [c for c, _ in results if c is not None]
         if len(contexts) == 0:
             return answer
-        contexts = sorted(contexts, key=lambda x: len(x.context), reverse=True)
+        contexts = sorted(contexts, key=lambda x: x.score, reverse=True)
         contexts = contexts[:max_sources]
         # add to answer (if not already there)
         keys = [c.key for c in answer.contexts]
@@ -499,11 +515,12 @@ class Docs:
         if answer is None:
             answer = Answer(query)
         if len(answer.contexts) == 0:
-            if key_filter or (key_filter is None and len(self.docs) > 5):
+            if key_filter or (key_filter is None and len(self.docs) > max_sources):
                 callbacks = [OpenAICallbackHandler()] + get_callbacks("filter")
                 keys = await self.adoc_match(answer.question, callbacks=callbacks)
                 answer.tokens += callbacks[0].total_tokens
                 answer.cost += callbacks[0].total_cost
+                key_filter = True if len(keys) > 0 else False
             answer = await self.aget_evidence(
                 answer,
                 k=k,
@@ -532,8 +549,8 @@ class Docs:
             answer.tokens += cb.total_tokens
             answer.cost += cb.total_cost
         # it still happens lol
-        if "(Foo2012)" in answer_text:
-            answer_text = answer_text.replace("(Foo2012)", "")
+        if "(Example2012)" in answer_text:
+            answer_text = answer_text.replace("(Example2012)", "")
         for c in contexts:
             key = c.key
             text = c.context

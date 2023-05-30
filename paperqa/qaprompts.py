@@ -1,6 +1,7 @@
 import copy
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import re
 
 import langchain.prompts as prompts
 from langchain.callbacks.manager import AsyncCallbackManagerForChainRun
@@ -11,12 +12,12 @@ from langchain.schema import LLMResult, SystemMessage
 
 summary_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "citation"],
-    template="Summarize and provide direct quotes from the text below to help answer a question. "
-    "Do not directly answer the question, instead summarize and "
-    "quote to give evidence to help answer the question. "
-    "Do not use outside sources. "
-    'Reply with only "Not applicable" if the text is unrelated to the question. '
-    "Use 100 or less words."
+    template="Summarize the text below to help answer a question. "
+    "Do not directly answer the question, instead summarize "
+    "to give evidence to help answer the question. Include direct quotes. "
+    'Reply "Not applicable" if text is irrelevant. '
+    "Use around 100 words. At the end of your response, provide a score from 1-10 on a newline "
+    "indicating relevance to question. Do not explain your score. "
     "\n\n"
     "{context_str}\n"
     "Extracted from {citation}\n"
@@ -24,14 +25,13 @@ summary_prompt = prompts.PromptTemplate(
     "Relevant Information Summary:",
 )
 
-
 qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "length"],
     template="Write an answer ({length}) "
     "for the question below based on the provided context. "
     "If the context provides insufficient information, "
     'reply "I cannot answer". '
-    "For each sentence in your answer, indicate which sources most support it "
+    "For each part of your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, comprehensive, and scholarly tone. "
     "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. "
@@ -98,12 +98,21 @@ class FallbackLLMChain(LLMChain):
 def make_chain(prompt, llm):
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
-            content="You are a scholarly researcher that answers in an unbiased, concise, scholarly tone. "
-            "You sometimes refuse to answer if there is insufficient information. "
-            "If there are potentially ambiguous terms or acronyms, first define them. ",
+            content="Answer in an unbiased, concise, scholarly tone. "
+            "You may refuse to answer if there is insufficient information. "
+            "If there are ambiguous terms or acronyms, first define them. ",
         )
         human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
         prompt = ChatPromptTemplate.from_messages(
             [system_message_prompt, human_message_prompt]
         )
     return FallbackLLMChain(prompt=prompt, llm=llm)
+
+
+def get_score(text):
+    score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
+    if score:
+        return int(score.group(1))
+    if len(text) < 100:
+        return 1
+    return 5
