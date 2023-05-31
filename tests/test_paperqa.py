@@ -141,28 +141,26 @@ def test_docs_pickle():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
-    llm = OpenAI(temperature=0.0, model_name="text-babbage-001")
+    llm = OpenAI(temperature=0.0, model_name="text-curie-001")
     docs = paperqa.Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
     docs2.update_llm(llm)
     assert len(docs.docs) == len(docs2.docs)
-    assert (
-        strings_similarity(
-            docs.get_evidence(
-                paperqa.Answer("What date is flag day in Canada?"),
-                k=3,
-                max_sources=1,
-            ).context,
-            docs2.get_evidence(
-                paperqa.Answer("What date is flag day in Canada?"),
-                k=3,
-                max_sources=1,
-            ).context,
-        )
-        > 0.75
+    context1, context2 = (
+        docs.get_evidence(
+            paperqa.Answer("What date is flag day in Canada?"),
+            k=3,
+            max_sources=1,
+        ).context,
+        docs2.get_evidence(
+            paperqa.Answer("What date is flag day in Canada?"),
+            k=3,
+            max_sources=1,
+        ).context,
     )
+    assert strings_similarity(context1, context2) > 0.75
     os.remove(doc_path)
 
 
@@ -172,7 +170,7 @@ def test_docs_pickle_no_faiss():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
-    llm = OpenAI(temperature=0.0, model_name="text-babbage-001")
+    llm = OpenAI(temperature=0.0, model_name="text-curie-001")
     docs = paperqa.Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     docs._faiss_index = None
@@ -306,6 +304,7 @@ def test_citation():
         f.write(r.text)
     docs = paperqa.Docs()
     docs.add(doc_path)
+    print(docs.docs[0]["metadata"][0]["citation"])
     assert (
         list(docs.docs)[0]["metadata"][0]["key"] == "Wikipedia2023"
         or list(docs.docs)[0]["metadata"][0]["key"] == "Frederick2023"
