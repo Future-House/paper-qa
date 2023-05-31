@@ -73,7 +73,7 @@ def _get_datetime():
 
 citation_prompt = prompts.PromptTemplate(
     input_variables=["text"],
-    template="Provide a citation for the following text in MLA Format. You must answer. Today's date is {date}\n"
+    template="Provide the citation for the following text in MLA Format. Today's date is {date}\n"
     "{text}\n\n"
     "Citation:",
     partial_variables={"date": _get_datetime},
@@ -95,7 +95,7 @@ class FallbackLLMChain(LLMChain):
             return self.generate(input_list, run_manager=run_manager)
 
 
-def make_chain(prompt, llm):
+def make_chain(prompt, llm, skip_system=False):
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
             content="Answer in an unbiased, concise, scholarly tone. "
@@ -103,9 +103,12 @@ def make_chain(prompt, llm):
             "If there are ambiguous terms or acronyms, first define them. ",
         )
         human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
-        prompt = ChatPromptTemplate.from_messages(
-            [system_message_prompt, human_message_prompt]
-        )
+        if skip_system:
+            prompt = ChatPromptTemplate.from_messages([human_message_prompt])
+        else:
+            prompt = ChatPromptTemplate.from_messages(
+                [system_message_prompt, human_message_prompt]
+            )
     return FallbackLLMChain(prompt=prompt, llm=llm)
 
 
