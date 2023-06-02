@@ -25,6 +25,7 @@ summary_prompt = prompts.PromptTemplate(
     "Relevant Information Summary:",
 )
 
+
 qa_prompt = prompts.PromptTemplate(
     input_variables=["question", "context_str", "length"],
     template="Write an answer ({length}) "
@@ -39,6 +40,36 @@ qa_prompt = prompts.PromptTemplate(
     "{context_str}\n"
     "Question: {question}\n"
     "Answer: ",
+)
+
+
+adversarial_prompt = prompts.PromptTemplate(
+    input_variables=["question", "context_str"],
+    template="You are an adversarial and critical scientific reviewer. "
+    "Your task is to find deficiencies and shortcomings in the following answer to the original question. "
+    "Please be specific about the shortcomings of the answer and offer suggestions which would make the answer more complete and accurate."
+    "For each sentence in your critique, indicate which sources most support it "
+    "via valid citation markers at the end of sentences, like (Example2012).\n"
+    "{context_str}\n"
+    "{question}\n"
+    "Your Critique: ",
+)
+
+
+revision_prompt = prompts.PromptTemplate(
+    input_variables=["question", "context_str"],
+    template="For each sentence in your answer, indicate which sources most support it "
+    "via valid citation markers at the end of sentences, like (Example2012).\n"
+    "You are a scientist and use a scholarly tone. "
+    "You want to rewrite and improve your original answer to the original question to "
+    "to include better grammatical structure and logical reasoning. "
+    "You have also received critical feedback provided by a reviewer. Please address the "
+    "feedback from the reviewer so that your new answer is more comprehensive. "
+    "You can use dot points and paragraphs in your response where appropriate. "
+    #"You may conclude with one or two opinionated sentences to summarise your answer. "
+    "{context_str}\n"
+    "{question}\n"
+    "Your Improved Answer: ",
 )
 
 
