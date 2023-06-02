@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 StrPath = Union[str, Path]
 
@@ -33,6 +33,7 @@ class Answer:
     passages: Dict[str, str] = None
     tokens: int = 0
     cost: float = 0
+    key_filter: Optional[str] = None
 
     def __post_init__(self):
         """Initialize the answer."""

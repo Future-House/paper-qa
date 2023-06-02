@@ -364,10 +364,12 @@ class Docs:
     ) -> Answer:
         if len(self.docs) == 0:
             return answer
+        if key_filter is not None:
+            answer.key_filter = key_filter
         if self._faiss_index is None:
             self._build_faiss_index()
         _k = k
-        if key_filter is not None:
+        if answer.key_filter is not None:
             _k = k * 10  # heuristic
         # want to work through indices but less k
         if marginal_relevance:
@@ -379,8 +381,17 @@ class Docs:
                 answer.question, k=_k, fetch_k=5 * _k
             )
         # ok now filter
-        if key_filter is not None:
-            docs = [doc for doc in docs if doc.metadata["dockey"] in key_filter][:k]
+        if answer.key_filter is not None:
+            # I realize that by testing for existence
+            # in strings that weird cases can
+            # happen - like FooBar can match FooBar2023
+            # but remember there are later checks
+            # The risk of explicitly parsing is that the
+            # language model may not give back in predictable
+            # format (e.g., - "FooBar and BarSoo are good papers")
+            docs = [doc for doc in docs if doc.metadata["dockey"] in answer.key_filter][
+                :k
+            ]
 
         async def process(doc):
             if doc.metadata["dockey"] in self._deleted_keys:
@@ -524,12 +535,12 @@ class Docs:
                 answer.tokens += callbacks[0].total_tokens
                 answer.cost += callbacks[0].total_cost
                 key_filter = True if len(keys) > 0 else False
+                answer.key_filter = keys
             answer = await self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
-                key_filter=keys if key_filter else None,
                 get_callbacks=get_callbacks,
             )
         context_str, contexts = answer.context, answer.contexts
