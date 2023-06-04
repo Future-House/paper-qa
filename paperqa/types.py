@@ -13,6 +13,7 @@ class Context:
     citation: str
     context: str
     text: str
+    dockey: str
     score: int = 5
 
     def __str__(self) -> str:
@@ -27,10 +28,10 @@ class Answer:
     question: str
     answer: str = ""
     context: str = ""
-    contexts: List[Context] = None
+    contexts: Optional[List[Context]] = None
     references: str = ""
     formatted_answer: str = ""
-    passages: Dict[str, str] = None
+    passages: Optional[Dict[str, str]] = None
     tokens: int = 0
     cost: float = 0
     key_filter: Optional[str] = None

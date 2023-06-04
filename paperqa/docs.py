@@ -176,6 +176,10 @@ class Docs:
         """
         if len(texts) != len(metadatas):
             raise ValueError("texts and metadatas must have the same length.")
+
+        if hash in [d["hash"] for d in self.docs]:
+            raise ValueError(f"Document already in collection.")
+
         key = metadatas[0]["dockey"]
         citation = metadatas[0]["citation"]
         if key in self.keys:
@@ -426,6 +430,7 @@ class Docs:
                 context=context,
                 text=doc.page_content,
                 score=get_score(context),
+                dockey=doc.metadata["dockey"],
             )
             if "not applicable" not in c.context.casefold():
                 return c, callbacks[0]
