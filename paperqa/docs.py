@@ -31,7 +31,14 @@ from .qaprompts import (
 )
 from .readers import read_doc
 from .types import Answer, Context
-from .utils import maybe_is_text, md5sum, gather_with_concurrency, guess_is_4xx
+from .utils import (
+    maybe_is_text,
+    md5sum,
+    gather_with_concurrency,
+    guess_is_4xx,
+    is_url,
+    download_file
+)
 
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 langchain.llm_cache = SQLiteCache(CACHE_PATH)
@@ -115,6 +122,13 @@ class Docs:
         chunk_chars: Optional[int] = 3000,
     ) -> str:
         """Add a document to the collection."""
+
+        # if file is a url, download a temporary copy
+        if not os.path.isfile(path):
+            if is_url(path):
+                path = download_file(path)
+            else:
+                raise FileNotFoundError(f"Could not find file {path}.")
 
         # first check to see if we already have this document
         # this way we don't make api call to create citation on file we already have

@@ -2,7 +2,10 @@ import math
 import string
 import re
 import asyncio
+import tempfile
+import mimetypes
 
+import requests
 import pypdf
 
 from .types import StrPath
@@ -87,3 +90,25 @@ def guess_is_4xx(msg: str) -> bool:
     if re.search(r"4\d\d", msg):
         return True
     return False
+
+def is_url(string: str) -> bool:
+    """
+    Check if a string is a URL.
+    """
+    # match web URLs
+    url_pattern = r'^(http|https)://[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?$'
+    return re.match(url_pattern, string) is not None
+
+def download_file(url: str) -> str:
+    """
+    Download a file from a URL.
+    """
+    response = requests.get(url)
+    if response.status_code == 200:
+        file_extension = mimetypes.guess_extension(response.headers.get('content-type'))
+        with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
+            temp_file.write(response.content)
+            return temp_file.name
+    else:
+        # raise error if the status code is not 200
+        raise Exception(f"Error downloading file from {url}. Status code: {response.status_code}")
