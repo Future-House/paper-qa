@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Set, Union, cast
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms.base import LLM
+from langchain.base_language import BaseLanguageModel
 from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
@@ -32,8 +32,7 @@ from .utils import (
     name_in_text,
 )
 
-
-class Docs(BaseModel):
+class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     """A collection of documents to be used for answering questions."""
 
     docs: Dict[DocKey, Doc] = {}
@@ -41,8 +40,8 @@ class Docs(BaseModel):
     docnames: Set[str] = set()
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
-    summary_llm: Union[LLM, str] = "gpt-3.5-turbo"
-    llm: Union[LLM, str] = "gpt-3.5-turbo"
+    summary_llm: BaseLanguageModel = "gpt-3.5-turbo"
+    llm: BaseLanguageModel = "gpt-3.5-turbo"
     name: str = "default"
     index_path: Optional[Path] = Path.home() / ".paperqa" / name
     embeddings: Embeddings = OpenAIEmbeddings()
@@ -50,15 +49,15 @@ class Docs(BaseModel):
     deleted_dockeys: Set[DocKey] = set()
 
     @validator("llm", "summary_llm")
-    def check_llm(cls, v):
+    def check_llm(cls, v: Union[BaseLanguageModel, str]):
         if type(v) is str:
             return ChatOpenAI(temperature=0.1, model_name=v)
         return v
 
     def update_llm(
         self,
-        llm: Union[LLM, str],
-        summary_llm: Optional[Union[LLM, str]] = None,
+        llm: Union[BaseLanguageModel, str],
+        summary_llm: Optional[Union[BaseLanguageModel, str]] = None,
     ) -> None:
         """Update the LLM for answering questions."""
         if type(llm) is str:
@@ -124,7 +123,7 @@ class Docs(BaseModel):
             year = ""
             match = re.search(r"(\d{4})", citation)
             if match is not None:
-                year = match.group(1), str  # type: ignore
+                year = match.group(1)  # type: ignore
             docname = f"{author}{year}"
         docname = self.get_unique_name(docname)
         doc = Doc(name=docname, citation=citation, dockey=dockey)
@@ -154,7 +153,7 @@ class Docs(BaseModel):
             for t in texts:
                 t.name = t.name.replace(doc.name, new_docname)
             doc.name = new_docname
-        if texts[0].text_embeddings is None:
+        if texts[0].embeddings is None:
             text_embeddings = self.embeddings.embed_documents([t.text for t in texts])
             for i, t in enumerate(texts):
                 t.embeddings = text_embeddings[i]
@@ -277,7 +276,7 @@ class Docs(BaseModel):
             self._build_texts_index()
         self.texts_index = cast(VectorStore, self.texts_index)
         _k = k
-        if answer.key_filter is not None:
+        if answer.dockey_filter is not None:
             _k = k * 10  # heuristic
         # want to work through indices but less k
         if marginal_relevance:
@@ -289,9 +288,9 @@ class Docs(BaseModel):
                 answer.question, k=_k, fetch_k=5 * _k
             )
         # ok now filter
-        if answer.key_filter is not None:
+        if answer.dockey_filter is not None:
             matches = [
-                m for m in matches if m.metadata["doc"]["dockey"] in answer.key_filter
+                m for m in matches if m.metadata["doc"]["dockey"] in answer.dockey_filter
             ]
 
         # check if it is deleted
@@ -432,7 +431,7 @@ class Docs(BaseModel):
                     answer.question, get_callbacks=get_callbacks
                 )
                 if len(keys) > 0:
-                    answer.key_filter = keys
+                    answer.dockey_filter = keys
             answer = await self.aget_evidence(
                 answer,
                 k=k,

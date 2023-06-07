@@ -5,10 +5,10 @@ from typing import Any, Dict, List, Optional
 from langchain.callbacks.manager import AsyncCallbackManagerForChainRun
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.llms.base import LLM
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
-from prompts import PromptTemplate
+from langchain.prompts import PromptTemplate
+from langchain.base_language import BaseLanguageModel
 
 summary_prompt = PromptTemplate(
     input_variables=["question", "context_str", "citation"],
@@ -96,7 +96,7 @@ class FallbackLLMChain(LLMChain):
 
 
 def make_chain(
-    prompt: PromptTemplate, llm: LLM, skip_system: bool = False
+    prompt: PromptTemplate, llm: BaseLanguageModel, skip_system: bool = False
 ) -> FallbackLLMChain:
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
@@ -111,6 +111,8 @@ def make_chain(
             prompt = ChatPromptTemplate.from_messages(
                 [system_message_prompt, human_message_prompt]
             )
+    print(type(prompt))
+    print(type(llm))
     return FallbackLLMChain(prompt=prompt, llm=llm)
 
 
