@@ -13,18 +13,10 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
+from .chains import get_score, make_chain
 from .paths import PAPERQA_DIR
-from .qaprompts import (
-    citation_prompt,
-    get_score,
-    make_chain,
-    qa_prompt,
-    search_prompt,
-    select_paper_prompt,
-    summary_prompt,
-)
 from .readers import read_doc
-from .types import Answer, CallbackFactory, Context, Doc, DocKey, Text
+from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollection, Text
 from .utils import (
     gather_with_concurrency,
     guess_is_4xx,
@@ -51,6 +43,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     embeddings: Embeddings = OpenAIEmbeddings(client=None)
     max_concurrent: int = 5
     deleted_dockeys: Set[DocKey] = set()
+    prompts: PromptCollection = PromptCollection()
 
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
@@ -107,7 +100,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if citation is None:
             # skip system because it's too hesitant to answer
             cite_chain = make_chain(
-                prompt=citation_prompt,
+                prompt=self.prompts.cite,
                 llm=cast(BaseLanguageModel, self.summary_llm),
                 skip_system=True,
             )
@@ -217,7 +210,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         )
         matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
         chain = make_chain(
-            select_paper_prompt, cast(BaseLanguageModel, self.summary_llm)
+            self.prompts.select, cast(BaseLanguageModel, self.summary_llm)
         )
         papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
         result = await chain.arun(  # type: ignore
@@ -331,7 +324,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
 
         async def process(match):
             callbacks = get_callbacks("evidence:" + match.metadata["name"])
-            summary_chain = make_chain(summary_prompt, self.summary_llm)
+            summary_chain = make_chain(self.prompts.summary, self.summary_llm)
             # This is dangerous because it
             # could mask errors that are important- like auth errors
             # I also cannot know what the exception
@@ -340,9 +333,12 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             # http code in the exception
             try:
                 context = await summary_chain.arun(
-                    question=answer.question,
-                    context_str=match.page_content,
-                    citation=match.metadata["doc"]["citation"],
+                    answer=answer,
+                    text=Text(
+                        text=match.page_content,
+                        name=match.metadata["name"],
+                        doc=Doc(**match.metadata["doc"]),
+                    ),
                     callbacks=callbacks,
                 )
             except Exception as e:
@@ -390,7 +386,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         """
 
         search_chain = make_chain(
-            prompt=search_prompt, llm=cast(BaseLanguageModel, self.summary_llm)
+            prompt=self.prompts.search, llm=cast(BaseLanguageModel, self.summary_llm)
         )
         search_query = search_chain.run(question=query)
         queries = [s for s in search_query.split("\n") if len(s) > 3]
@@ -403,7 +399,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         query: str,
         k: int = 10,
         max_sources: int = 5,
-        length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
@@ -424,7 +419,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 query,
                 k=k,
                 max_sources=max_sources,
-                length_prompt=length_prompt,
                 marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
@@ -437,7 +431,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         query: str,
         k: int = 10,
         max_sources: int = 5,
-        length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
@@ -463,25 +456,22 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
             )
-        context_str, contexts = answer.context, answer.contexts
         bib = dict()
-        if len(context_str) < 10:
+        if len(answer.context) < 10:
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )
         else:
             callbacks = get_callbacks("answer")
-            qa_chain = make_chain(qa_prompt, self.llm)
+            qa_chain = make_chain(self.prompts.qa, self.llm)
             answer_text = await qa_chain.arun(
-                question=query,
-                context_str=context_str,
-                length=length_prompt,
+                answer=answer,
                 callbacks=callbacks,
             )
         # it still happens
         if "(Example2012)" in answer_text:
             answer_text = answer_text.replace("(Example2012)", "")
-        for c in contexts:
+        for c in answer.contexts:
             name = c.text.name
             citation = c.text.doc.citation
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
