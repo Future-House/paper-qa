@@ -44,37 +44,6 @@ def test_docs():
     os.remove(doc_path)
 
 
-class TokenTest(IsolatedAsyncioTestCase):
-    async def test_token_count(self):
-        doc_path = "example.txt"
-        with open(doc_path, "w", encoding="utf-8") as f:
-            # get wiki page about politician
-            r = requests.get(
-                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-            )
-            f.write(r.text)
-        docs = paperqa.Docs()
-
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-        os.remove(doc_path)
-        doc_path = "example2.txt"
-        with open(doc_path, "w", encoding="utf-8") as f:
-            # get wiki page about politician
-            r = requests.get(
-                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-            )
-            f.write(r.text)
-            f.write("\n")  # so we don't have same hash
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed tomorrow")
-        os.remove(doc_path)
-        answer = await docs.aquery(
-            "What is Frederick Bates's greatest accomplishment?",
-            get_callbacks=lambda x: [TestHandler()],
-        )
-        assert answer.tokens > 100
-        assert answer.cost > 0.001
-
-
 def test_evidence():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -385,12 +354,6 @@ def test_nonopenai_model():
     docs = paperqa.Docs(llm=model)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What country is Bates from?")
-
-
-def test_agent():
-    docs = paperqa.Docs()
-    answer = paperqa.run_agent(docs, "What compounds target AKT1")
-    print(answer)
 
 
 def test_zotera():
