@@ -157,10 +157,10 @@ Version 3 includes many changes to type the code, make it more focused/modular, 
 The following table shows the old names and the new names:
 
 | Old Name | New Name | Explanation |
-| :--- | :---: | ---- : |
+| :--- | :---: | ---: |
 | `key` | `name` | Name is a natural language name for text. |
-| `dockkey` | `docname` | Docname is a natural language name for a document. |
-| `hash` | `dockey` | Key is a unique identifier for the document. |
+| `dockey` | `docname` | Docname is a natural language name for a document. |
+| `hash` | `dockey` | Dockey is a unique identifier for the document. |
 
 ### Pickled objects
 
@@ -340,7 +340,7 @@ docs = Docs(llm=my_llm)
 ### LLM Caching
 
 You can using the builtin langchain caching capabilities. Just run this code at the top of yours:
-    
+
     ```python
 
     from langchain.cache import InMemoryCache
@@ -349,8 +349,8 @@ You can using the builtin langchain caching capabilities. Just run this code at 
 
 ### Caching Embeddings
 
-In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. If you would like to manage caching embeddings via an external database or other strategy, 
+In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. If you would like to manage caching embeddings via an external database or other strategy,
 you can populate a `Docs` object directly via
 the `add_texts` object. That can take chunked texts and documents, which are serializable objects, to populate `Docs`.
 
-You also can simply use a separate vector database by setting the `doc_index` and `texts_index` explicitly when building the `Docs` object. 
+You also can simply use a separate vector database by setting the `doc_index` and `texts_index` explicitly when building the `Docs` object.

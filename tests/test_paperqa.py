@@ -83,7 +83,7 @@ def test_docs():
     docs.add(
         doc_path, citation="WikiMedia Foundation, 2023, Accessed now", dockey="test"
     )
-    assert docs.docs["test"].name == "Wiki2023"
+    assert docs.docs["test"].docname == "Wiki2023"
     os.remove(doc_path)
 
 
@@ -256,8 +256,8 @@ def test_repeat_keys():
 
     # check keys
     ds = list(docs.docs.values())
-    assert ds[0].name == "Wiki2023"
-    assert ds[1].name == "Wiki2023a"
+    assert ds[0].docname == "Wiki2023"
+    assert ds[1].docname == "Wiki2023a"
 
     os.remove(doc_path)
     os.remove(doc_path2)
@@ -277,14 +277,14 @@ def test_pdf_pypdf_reader():
     doc_path = os.path.join(tests_dir, "paper.pdf")
     splits1 = read_doc(
         doc_path,
-        Doc(name="foo", citation="Foo et al, 2002", dockey="1"),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
         overlap=100,
         chunk_chars=3000,
     )
     splits2 = read_doc(
         doc_path,
-        Doc(name="foo", citation="Foo et al, 2002", dockey="1"),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
         chunk_chars=3000,
@@ -324,8 +324,8 @@ def test_citation():
     docs = Docs()
     docs.add(doc_path)
     assert (
-        list(docs.docs.values())[0].name == "Wikipedia2023"
-        or list(docs.docs.values())[0].name == "Frederick2023"
+        list(docs.docs.values())[0].docname == "Wikipedia2023"
+        or list(docs.docs.values())[0].docname == "Frederick2023"
     )
 
 
@@ -342,9 +342,9 @@ def test_dockey_filter():
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
-    answer = Answer(question="What country is Bates from?")
-    docs.get_evidence(answer, key_filter=["test"])
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
+    answer = Answer(question="What country is Bates from?", key_filter=["test"])
+    docs.get_evidence(answer)
 
 
 def test_dockey_delete():
@@ -360,20 +360,18 @@ def test_dockey_delete():
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n\nBates could be from Angola")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
     answer = Answer(question="What country is Bates from?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
-    keys = set([c.key for c in answer.contexts])
+    keys = set([c.text.doc.dockey for c in answer.contexts])
     assert len(keys) == 2
     assert len(docs.docs) == 2
-    assert len(docs.keys) == 2
 
-    docs.delete("test")
+    docs.delete(dockey="test")
     assert len(docs.docs) == 1
-    assert len(docs.keys) == 1
     answer = Answer(question="What country is Bates from?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
-    keys = set([c.key for c in answer.contexts])
+    keys = set([c.text.doc.dockey for c in answer.contexts])
     assert len(keys) == 1
 
 
@@ -393,7 +391,7 @@ def test_query_filter():
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
     docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
@@ -437,7 +435,7 @@ def test_too_much_evidence():
     docs.add(
         "example.txt",
         "WikiMedia Foundation, 2023, Accessed now",
-        key="test",
+        dockey="test",
         chunk_chars=4000,
     )
     docs.query("What is Barrack's greatest accomplishment?", max_sources=10, k=10)

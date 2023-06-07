@@ -25,13 +25,15 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
             # pretty formatting of pages (e.g. 1-3, 4, 5-7)
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
-                Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
+                Text(
+                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
+                )
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
+            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
         )
     file.close()
     return texts
@@ -55,14 +57,16 @@ def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text
             # pretty formatting of pages (e.g. 1-3, 4, 5-7)
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
-                Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
+                Text(
+                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
+                )
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
     if len(split) > overlap:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
+            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
         )
     pdfFileObj.close()
     return texts
@@ -83,7 +87,7 @@ def parse_txt(
     text_splitter = TokenTextSplitter(chunk_size=chunk_chars, chunk_overlap=overlap)
     raw_texts = text_splitter.split_text(text)
     texts = [
-        Text(text=t, name=f"{doc.name} chunk {i}", doc=doc)
+        Text(text=t, name=f"{doc.docname} chunk {i}", doc=doc)
         for i, t in enumerate(raw_texts)
     ]
     return texts
@@ -103,7 +107,7 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
                 texts.append(
                     Text(
                         text=split[:chunk_chars],
-                        name=f"{doc.name} lines {last_line}-{i}",
+                        name=f"{doc.docname} lines {last_line}-{i}",
                         doc=doc,
                     )
                 )
@@ -113,7 +117,7 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
         texts.append(
             Text(
                 text=split[:chunk_chars],
-                name=f"{doc.name} lines {last_line}-{i}",
+                name=f"{doc.docname} lines {last_line}-{i}",
                 doc=doc,
             )
         )

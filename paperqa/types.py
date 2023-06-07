@@ -15,7 +15,7 @@ CallbackFactory = Callable[[str], Union[None, List[BaseCallbackHandler]]]
 
 
 class Doc(BaseModel):
-    name: str
+    docname: str
     citation: str
     dockey: DocKey
 

@@ -112,7 +112,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 skip_system=True,
             )
             # peak first chunk
-            fake_doc = Doc(name="", citation="", dockey=dockey)
+            fake_doc = Doc(docname="", citation="", dockey=dockey)
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
@@ -138,7 +138,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 year = match.group(1)  # type: ignore
             docname = f"{author}{year}"
         docname = self.get_unique_name(docname)
-        doc = Doc(name=docname, citation=citation, dockey=dockey)
+        doc = Doc(docname=docname, citation=citation, dockey=dockey)
         texts = read_doc(path, doc, chunk_chars=chunk_chars, overlap=100)
         # loose check to see if document was loaded
         if len(texts[0].text) < 10 or (
@@ -160,11 +160,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             raise ValueError("Document already in collection.")
         if len(texts) == 0:
             raise ValueError("No texts to add.")
-        if doc.name in self.docnames:
-            new_docname = self.get_unique_name(doc.name)
+        if doc.docname in self.docnames:
+            new_docname = self.get_unique_name(doc.docname)
             for t in texts:
-                t.name = t.name.replace(doc.name, new_docname)
-            doc.name = new_docname
+                t.name = t.name.replace(doc.docname, new_docname)
+            doc.docname = new_docname
         if texts[0].embeddings is None:
             text_embeddings = self.embeddings.embed_documents([t.text for t in texts])
             for i, t in enumerate(texts):
@@ -185,17 +185,17 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             self.doc_index.add_texts([doc.citation], metadatas=[{"dockey": doc.dockey}])
         self.docs[doc.dockey] = doc
         self.texts += texts
-        self.docnames.add(doc.name)
+        self.docnames.add(doc.docname)
 
     def delete(
         self, name: Optional[str] = None, dockey: Optional[DocKey] = None
     ) -> None:
         """Delete a document from the collection."""
         if name is not None:
-            doc = next((doc for doc in self.docs.values() if doc.name == name), None)
+            doc = next((doc for doc in self.docs.values() if doc.docname == name), None)
             if doc is None:
                 return
-            self.docnames.remove(doc.name)
+            self.docnames.remove(doc.docname)
             dockey = doc.dockey
         del self.docs[dockey]
         self.deleted_dockeys.add(dockey)
@@ -219,11 +219,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         chain = make_chain(
             select_paper_prompt, cast(BaseLanguageModel, self.summary_llm)
         )
-        papers = [f"{d.name}: {d.citation}" for d in matched_docs]
+        papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
         result = await chain.arun(  # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
         )
-        return Set([d.dockey for d in matched_docs if d.name in result])
+        return Set([d.dockey for d in matched_docs if d.docname in result])
 
     def __getstate__(self):
         state = self.__dict__.copy()
