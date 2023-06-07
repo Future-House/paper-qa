@@ -48,6 +48,8 @@ class ZoteroPaper(BaseModel):
             f'title = "{self.title}",\n    pdf = "{self.pdf}",\n    '
             f'num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
         )
+
+
 class ZoteroDB(zotero.Zotero):
     """An extension of pyzotero.zotero.Zotero to interface with paperqa.
 

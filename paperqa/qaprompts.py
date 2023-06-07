@@ -3,13 +3,14 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, cast
 
 from langchain.base_language import BaseLanguageModel
-from langchain.callbacks.manager import (AsyncCallbackManagerForChainRun,
-                                         CallbackManagerForChainRun)
+from langchain.callbacks.manager import (
+    AsyncCallbackManagerForChainRun,
+    CallbackManagerForChainRun,
+)
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate, StringPromptTemplate
-from langchain.prompts.chat import (ChatPromptTemplate,
-                                    HumanMessagePromptTemplate)
+from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
 
 from .types import CBManager

@@ -5,3 +5,4 @@ pyzotero
 python-dotenv
 pymupdf
 build
+types-requests
