@@ -79,9 +79,9 @@ docs = Docs(llm='gpt-3.5-turbo')
 or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
 
 ```py
-from langchain.llms import Anthropic, OpenAIChat
-model = OpenAIChat(model='gpt-4')
-summary_model = Anthropic(model="claude-instant-v1-100k", anthropic_api_key="my-api-key")
+from langchain.chat_models import ChatAnthropic, ChatOpenAI
+model = ChatOpenAI(model='gpt-4')
+summary_model = ChatAnthropic(model="claude-instant-v1-100k", anthropic_api_key="my-api-key")
 docs = Docs(llm=model, summary_llm=summary_model)
 ```
 
@@ -292,10 +292,6 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 It's not! We use langchain to abstract the LLMS, and the process is very similar to the `map_reduce` chain in LangChain.
 
-### Caching
-
-This code will cache responses from LLMS by default in `$HOME/.paperqa/llm_cache.db`. Delete this file to clear the cache.
-
 ### Can I use different LLMs?
 
 Yes, you can use any LLMs from [langchain](https://langchain.readthedocs.io/) by passing the `llm` argument to the `Docs` class. You can use different LLMs for summarization and for question answering too.
@@ -328,6 +324,33 @@ By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure pyth
 pip install pymupdf
 ```
 
-### Callbacks
+### Typewriter View
 
-TODO
+To stream the completions as they occur (giving that ChatGPT typewriter look), you can simply instantiate models with those properties:
+
+```python
+from paperqa import Docs
+from langchain.chat_models import ChatOpenAI
+
+my_llm = ChatOpenAI(model='gpt-3.5-turbo', streaming=True)
+docs = Docs(llm=my_llm)
+
+```
+
+### LLM Caching
+
+You can using the builtin langchain caching capabilities. Just run this code at the top of yours:
+    
+    ```python
+
+    from langchain.cache import InMemoryCache
+    langchain.llm_cache = InMemoryCache()
+    ```
+
+### Caching Embeddings
+
+In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. If you would like to manage caching embeddings via an external database or other strategy, 
+you can populate a `Docs` object directly via
+the `add_texts` object. That can take chunked texts and documents, which are serializable objects, to populate `Docs`.
+
+You also can simply use a separate vector database by setting the `doc_index` and `texts_index` explicitly when building the `Docs` object. 
