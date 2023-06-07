@@ -96,7 +96,7 @@ def is_url(string: str) -> bool:
     Check if a string is a URL.
     """
     # match web URLs
-    url_pattern = r'^(http|https)://[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?$'
+    url_pattern = r'^(?:(?:https?|ftp)://)?[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?$'
     return re.match(url_pattern, string) is not None
 
 def download_file(url: str) -> str:
@@ -111,4 +111,4 @@ def download_file(url: str) -> str:
             return temp_file.name
     else:
         # raise error if the status code is not 200
-        raise Exception(f"Error downloading file from {url}. Status code: {response.status_code}")
+        raise requests.exceptions.HTTPError(f"Error downloading file from {url}. Status code: {response.status_code}")

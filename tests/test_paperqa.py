@@ -13,7 +13,7 @@ from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
 
 import paperqa
-from paperqa.utils import strings_similarity
+from paperqa.utils import strings_similarity, is_url, download_file
 from paperqa.readers import clear_cache
 
 
@@ -47,6 +47,14 @@ def test_docs():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     assert docs.docs[0]["key"] == "Wiki2023"
     os.remove(doc_path)
+
+
+def test_docs():
+    doc_path = "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
+    llm = OpenAI(temperature=0.1, model_name="text-ada-001")
+    docs = paperqa.Docs(llm=llm)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    assert docs.docs[0]["key"] == "Wiki2023"
 
 
 class TokenTest(IsolatedAsyncioTestCase):
@@ -431,3 +439,26 @@ def test_too_much_evidence():
     answer = docs.query(
         "What is Barrack's greatest accomplishment?", max_sources=10, k=10
     )
+
+
+def test_is_url():
+    assert is_url('http://www.example.com')   # Web URL (HTTP)
+    assert is_url('https://www.example.com')  # Web URL (HTTPS)
+    assert is_url('www.example.com')          # Web URL (no protocol, note this could be a valid filepath on Linux)
+    assert not is_url('/path/to/file.txt')    # Filepath
+    assert not is_url('relpath/to/file.txt')  # Relative filepath
+    assert not is_url('Hello, World!')        # Something else
+
+
+def test_download_file():
+    # Test is valid URL
+    url = "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
+    file_path = download_file(url)
+    assert os.path.isfile(file_path)
+
+    # Test is invalid URL
+    url = "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day_Does_Not_Exist"
+    try:
+        file_path = download_file(url)
+    except requests.exceptions.HTTPError:
+        pass
