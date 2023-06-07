@@ -41,19 +41,25 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     docnames: Set[str] = set()
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
-    summary_llm: BaseLanguageModel = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo", client=None) 
     llm: BaseLanguageModel = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo", client=None)
+    summary_llm: Optional[BaseLanguageModel] = None
     name: str = "default"
     index_path: Optional[Path] = PAPERQA_DIR / name
     embeddings: Embeddings = OpenAIEmbeddings(client=None)
     max_concurrent: int = 5
     deleted_dockeys: Set[DocKey] = set()
 
+    # TODO: Not sure how to get this to work
+    # while also passing mypy checks
     @validator("llm", "summary_llm")
     def check_llm(cls, v: Union[BaseLanguageModel, str]):
         if type(v) is str:
             return ChatOpenAI(temperature=0.1, model=v, client=None)
         return v
+
+    @validator("summary_llm", always=True)
+    def copy_llm_if_not_set(cls, v, values):
+        return v or values["llm"]
 
     def update_llm(
         self,
@@ -163,7 +169,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if self.texts_index is not None:
             try:
                 self.texts_index.add_embeddings(  # type: ignore
-                    list(zip(texts, text_embeddings)), metadatas=texts
+                    list(zip(texts, text_embeddings)), metadatas=[t.dict(exclude={"embeddings", "text"}) for t in self.texts]
                 )
             except AttributeError:
                 raise ValueError(
@@ -209,25 +215,24 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         result = await chain.arun( # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
         )
-        return Set([d.dockey for d in matched_docs if d.name in result])
+        return Set([d.dockey for d in matched_docs if d.name in result])    
 
     def __getstate__(self):
         state = self.__dict__.copy()
         if self.texts_index is not None:
             state["texts_index"].save_local(self.index_path)
         del state["texts_index"]
-        del state["_doc_index"]
-        return state
+        del state["doc_index"]
+        return {'__dict__': state, '__fields_set__': self.__fields_set__}
 
     def __setstate__(self, state):
-        self.__dict__.update(state)
+        object.__setattr__(self, '__dict__', state['__dict__'])
+        object.__setattr__(self, '__fields_set__', state['__fields_set__'])
         try:
             self.texts_index = FAISS.load_local(self.index_path, self.embeddings)
-        except Exception:
+        except Exception as e:
             # they use some special exception type, but I don't want to import it
             self.texts_index = None
-        self.update_llm(None, None)
-
     def _build_texts_index(self):
         if self.texts_index is None:
             raw_texts = [t.text for t in self.texts]

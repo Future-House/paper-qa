@@ -3,8 +3,8 @@ import logging
 import os
 from collections import namedtuple
 from pathlib import Path
-from dataclasses import dataclass
 from typing import Optional, Union, List, cast
+from pydantic import BaseModel
 
 try:
     from pyzotero import zotero
@@ -14,8 +14,7 @@ from ..paths import PAPERQA_DIR
 from ..types import StrPath
 from ..utils import count_pdf_pages
 
-@dataclass
-class ZoteroPaper:
+class ZoteroPaper(BaseModel):
     """A paper from Zotero.
 
     Attributes

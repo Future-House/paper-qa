@@ -10,6 +10,7 @@ from langchain.llms.fake import FakeListLLM
 
 from paperqa import Docs, Answer
 from paperqa.utils import strings_similarity, name_in_text, maybe_is_text
+from paperqa.readers import read_doc
 
 
 class TestHandler(AsyncCallbackHandler):
@@ -84,6 +85,13 @@ def test_docs():
     assert docs.docs["test"].name == "Wiki2023"
     os.remove(doc_path)
 
+def test_update_llm():
+    doc = Docs()
+    doc.update_llm('gpt-3.5-turbo')
+    assert doc.llm == doc.summary_llm
+
+    doc.update_llm(OpenAI(client=None, temperature=0.1, model="text-ada-001"))
+    assert doc.llm == doc.summary_llm
 
 def test_evidence():
     doc_path = "example.txt"
@@ -98,7 +106,6 @@ def test_evidence():
         k=1, 
         max_sources=1
     )
-    print(evidence.contexts[0].context, evidence.context)
     assert "Missouri" in evidence.context
     os.remove(doc_path)
 
@@ -129,17 +136,17 @@ class Test(IsolatedAsyncioTestCase):
         await docs.aquery("What is Frederick Bates's greatest accomplishment?")
         os.remove(doc_path)
 
-
-def test_doc_match():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
-        f.write(r.text)
-    docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.doc_match("What is Frederick Bates's greatest accomplishment?")
-    os.remove(doc_path)
+class Test(IsolatedAsyncioTestCase):
+    def test_adoc_match(self):
+        doc_path = "example.txt"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            # get wiki page about politician
+            r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+            f.write(r.text)
+        docs = Docs()
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        docs.adoc_match("What is Frederick Bates's greatest accomplishment?")
+        os.remove(doc_path)
 
 
 def test_docs_pickle():
@@ -157,12 +164,12 @@ def test_docs_pickle():
     assert len(docs.docs) == len(docs2.docs)
     context1, context2 = (
         docs.get_evidence(
-            Answer("What date is flag day in Canada?"),
+            Answer(question="What date is flag day in Canada?"),
             k=3,
             max_sources=1,
         ).context,
         docs2.get_evidence(
-            Answer("What date is flag day in Canada?"),
+            Answer(question="What date is flag day in Canada?"),
             k=3,
             max_sources=1,
         ).context,
@@ -180,7 +187,8 @@ def test_docs_pickle_no_faiss():
     llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
     docs = Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
-    docs._faiss_index = None
+    docs.doc_index = None
+    docs.texts_index = None
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
     docs2.update_llm(llm)
@@ -188,12 +196,12 @@ def test_docs_pickle_no_faiss():
     assert (
         strings_similarity(
             docs.get_evidence(
-                Answer("What date is flag day in Canada?"),
+                Answer(question="What date is flag day in Canada?"),
                 k=3,
                 max_sources=1,
             ).context,
             docs2.get_evidence(
-                Answer("What date is flag day in Canada?"),
+                Answer(question="What date is flag day in Canada?"),
                 k=3,
                 max_sources=1,
             ).context,
@@ -243,8 +251,9 @@ def test_repeat_keys():
     assert len(docs.docs) == 2
 
     # check keys
-    assert docs.docs[0]["key"] == "Wiki2023"
-    assert docs.docs[1]["key"] == "Wiki2023a"
+    ds = list(docs.docs.values())
+    assert ds[0].name == "Wiki2023"
+    assert ds[1].name == "Wiki2023a"
 
     os.remove(doc_path)
     os.remove(doc_path2)
@@ -262,11 +271,11 @@ def test_pdf_reader():
 def test_pdf_pypdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    splits1, _ = paperqa.readers._read_doc(
-        doc_path, "foo te al", "bar", force_pypdf=True
+    splits1, _ = read_doc(
+        doc_path, "foo te al", "bar", force_pypdf=True, overlap=100, chunk_chars=3000
     )
-    splits2, _ = paperqa.readers._read_doc(
-        doc_path, "foo te al", "bar", force_pypdf=False
+    splits2, _ = read_doc(
+        doc_path, "foo te al", "bar", force_pypdf=False, overlap=100, chunk_chars=3000
     )
     assert strings_similarity(splits1[0].casefold(), splits2[0].casefold()) > 0.85
 
@@ -310,7 +319,6 @@ def test_citation():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path)
-    print(docs.docs[0]["metadata"][0]["citation"])
     assert (
         list(docs.docs)[0]["metadata"][0]["key"] == "Wikipedia2023"
         or list(docs.docs)[0]["metadata"][0]["key"] == "Frederick2023"
@@ -331,7 +339,7 @@ def test_dockey_filter():
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
-    answer = Answer("What country is Bates from?")
+    answer = Answer(question="What country is Bates from?")
     docs.get_evidence(answer, key_filter=["test"])
 
 
@@ -349,7 +357,7 @@ def test_dockey_delete():
         f.write(r.text)
         f.write("\n\nBates could be from Angola")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
-    answer = Answer("What country is Bates from?")
+    answer = Answer(question="What country is Bates from?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
     keys = set([c.key for c in answer.contexts])
     assert len(keys) == 2
@@ -359,7 +367,7 @@ def test_dockey_delete():
     docs.delete("test")
     assert len(docs.docs) == 1
     assert len(docs.keys) == 1
-    answer = Answer("What country is Bates from?")
+    answer = Answer(question="What country is Bates from?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
     keys = set([c.key for c in answer.contexts])
     assert len(keys) == 1
