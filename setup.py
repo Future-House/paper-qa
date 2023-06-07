@@ -23,6 +23,7 @@ setup(
         "html2text",
         "tiktoken",
         "rmrkl>=0.0.2",
+        "requests",
     ],
     test_suite="tests",
     long_description=long_description,
