@@ -10,12 +10,12 @@ from .types import Doc, Text
 def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text]:
     import fitz
 
-    doc = fitz.open(path)
+    file = fitz.open(path)
     split = ""
     pages: List[str] = []
     texts: List[Text] = []
-    for i in range(doc.page_count):
-        page = doc.load_page(i)
+    for i in range(file.page_count):
+        page = file.load_page(i)
         split += page.get_text("text", sort=True)
         pages.append(str(i + 1))
         # split could be so long it needs to be split
@@ -26,16 +26,16 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
                 Text(
-                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
+                    text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc
                 )
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
+            Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
         )
-    doc.close()
+    file.close()
     return texts
 
 
@@ -58,7 +58,7 @@ def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
                 Text(
-                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
+                    text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc
                 )
             )
             split = split[chunk_chars - overlap :]
@@ -66,7 +66,7 @@ def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text
     if len(split) > overlap:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
+            Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
         )
     pdfFileObj.close()
     return texts
@@ -77,15 +77,15 @@ def parse_txt(
 ) -> List[Text]:
     try:
         with open(path) as f:
-            file = f.read()
+            text = f.read()
     except UnicodeDecodeError:
         with open(path, encoding="utf-8", errors="ignore") as f:
-            file = f.read()
+            text = f.read()
     if html:
-        doc = html2text(file)
+        text = html2text(text)
     # yo, no idea why but the texts are not split correctly
     text_splitter = TokenTextSplitter(chunk_size=chunk_chars, chunk_overlap=overlap)
-    raw_texts = text_splitter.split_text(file)
+    raw_texts = text_splitter.split_text(text)
     texts = [
         Text(text=t, name=f"{doc.name} chunk {i}", doc=doc)
         for i, t in enumerate(raw_texts)
@@ -107,7 +107,7 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
                 texts.append(
                     Text(
                         text=split[:chunk_chars],
-                        name=f"{doc.docname} lines {last_line}-{i}",
+                        name=f"{doc.name} lines {last_line}-{i}",
                         doc=doc,
                     )
                 )
@@ -117,7 +117,7 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
         texts.append(
             Text(
                 text=split[:chunk_chars],
-                name=f"{doc.docname} lines {last_line}-{i}",
+                name=f"{doc.name} lines {last_line}-{i}",
                 doc=doc,
             )
         )

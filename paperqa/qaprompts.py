@@ -1,14 +1,15 @@
 import re
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
-from langchain.callbacks.manager import AsyncCallbackManagerForChainRun
+from langchain.callbacks.manager import AsyncCallbackManagerForChainRun, CallbackManagerForChainRun
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
-from langchain.prompts import PromptTemplate
+from langchain.prompts import PromptTemplate, StringPromptTemplate
 from langchain.base_language import BaseLanguageModel
+from .types import CBManager
 
 summary_prompt = PromptTemplate(
     input_variables=["question", "context_str", "citation"],
@@ -86,17 +87,19 @@ class FallbackLLMChain(LLMChain):
     async def agenerate(
         self,
         input_list: List[Dict[str, Any]],
-        run_manager: Optional[AsyncCallbackManagerForChainRun] = None,
+        run_manager: Optional[CBManager] = None,
     ) -> LLMResult:
         """Generate LLM result from inputs."""
         try:
+            run_manager = cast(AsyncCallbackManagerForChainRun, run_manager)
             return await super().agenerate(input_list, run_manager=run_manager)
         except NotImplementedError:
-            return self.generate(input_list, run_manager=run_manager)
+            run_manager = cast(CallbackManagerForChainRun, run_manager)
+            return self.generate(input_list)
 
 
 def make_chain(
-    prompt: PromptTemplate, llm: BaseLanguageModel, skip_system: bool = False
+    prompt: StringPromptTemplate, llm: BaseLanguageModel, skip_system: bool = False
 ) -> FallbackLLMChain:
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
@@ -106,13 +109,12 @@ def make_chain(
         )
         human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
         if skip_system:
-            prompt = ChatPromptTemplate.from_messages([human_message_prompt])
+            chat_prompt = ChatPromptTemplate.from_messages([human_message_prompt])
         else:
-            prompt = ChatPromptTemplate.from_messages(
+            chat_prompt = ChatPromptTemplate.from_messages(
                 [system_message_prompt, human_message_prompt]
             )
-    print(type(prompt))
-    print(type(llm))
+        return FallbackLLMChain(prompt=chat_prompt, llm=llm)
     return FallbackLLMChain(prompt=prompt, llm=llm)
 
 

@@ -1,13 +1,14 @@
 from pathlib import Path
 from typing import Any, Callable, List, Optional, Set, Union
 
-from langchain.callbacks.base import AsyncCallbackHandler
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.callbacks.manager import AsyncCallbackManagerForChainRun, CallbackManagerForChainRun
 from pydantic import BaseModel
 
 StrPath = Union[str, Path]
 DocKey = Any
-CallbackFactory = Callable[[str], AsyncCallbackHandler]
-
+CBManager = Union[AsyncCallbackManagerForChainRun, CallbackManagerForChainRun]
+CallbackFactory = Callable[[str], Union[None, List[BaseCallbackHandler]]]
 
 class Doc(BaseModel):
     name: str

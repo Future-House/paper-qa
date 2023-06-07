@@ -76,7 +76,7 @@ def test_docs():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
-    llm = OpenAI(temperature=0.1, model_name="text-ada-001")
+    llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
     docs = Docs(llm=llm)
     docs.add(doc_path, 
              citation="WikiMedia Foundation, 2023, Accessed now", 
@@ -148,7 +148,7 @@ def test_docs_pickle():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
-    llm = OpenAI(temperature=0.0, model_name="text-curie-001")
+    llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
     docs = Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     docs_pickle = pickle.dumps(docs)
@@ -177,7 +177,7 @@ def test_docs_pickle_no_faiss():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
         f.write(r.text)
-    llm = OpenAI(temperature=0.0, model_name="text-curie-001")
+    llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
     docs = Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     docs._faiss_index = None
@@ -225,7 +225,7 @@ def test_repeat_keys():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs = Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
+    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     try:
         docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -253,7 +253,7 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = Docs(llm=OpenAI(temperature=0.0, model_name="text-curie-001"))
+    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-curie-001"))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
@@ -288,7 +288,7 @@ def test_doc_preview():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs = Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
+    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     assert len(docs.doc_previews()) == 1
 
@@ -296,7 +296,7 @@ def test_doc_preview():
 def test_code():
     # load this script
     doc_path = os.path.abspath(__file__)
-    docs = Docs(llm=OpenAI(temperature=0.0, model_name="text-ada-001"))
+    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
     docs.add(doc_path, "test_paperqa.py", key="test", disable_check=True)
     assert len(docs.docs) == 1
     docs.query("What function tests the preview?")
@@ -386,7 +386,7 @@ def test_query_filter():
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
-def test_nonopenai_model():
+def test_nonopenai_client():
     responses = ["This is a test", "This is another test"] * 50
     model = FakeListLLM(responses=responses)
     doc_path = "example.txt"

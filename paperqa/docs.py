@@ -13,6 +13,7 @@ from langchain.base_language import BaseLanguageModel
 from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
+from .paths import PAPERQA_DIR
 from .qaprompts import (
     citation_prompt,
     get_score,
@@ -40,18 +41,18 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     docnames: Set[str] = set()
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
-    summary_llm: BaseLanguageModel = "gpt-3.5-turbo"
-    llm: BaseLanguageModel = "gpt-3.5-turbo"
+    summary_llm: BaseLanguageModel = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo", client=None) 
+    llm: BaseLanguageModel = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo", client=None)
     name: str = "default"
-    index_path: Optional[Path] = Path.home() / ".paperqa" / name
-    embeddings: Embeddings = OpenAIEmbeddings()
+    index_path: Optional[Path] = PAPERQA_DIR / name
+    embeddings: Embeddings = OpenAIEmbeddings(client=None)
     max_concurrent: int = 5
     deleted_dockeys: Set[DocKey] = set()
 
     @validator("llm", "summary_llm")
     def check_llm(cls, v: Union[BaseLanguageModel, str]):
         if type(v) is str:
-            return ChatOpenAI(temperature=0.1, model_name=v)
+            return ChatOpenAI(temperature=0.1, model=v, client=None)
         return v
 
     def update_llm(
@@ -61,13 +62,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     ) -> None:
         """Update the LLM for answering questions."""
         if type(llm) is str:
-            llm = ChatOpenAI(temperature=0.1, model_name=llm)
+            llm = ChatOpenAI(temperature=0.1, model=llm, client=None)
         if type(summary_llm) is str:
-            summary_llm = ChatOpenAI(temperature=0.1, model_name=summary_llm)
-        self.llm = llm
+            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm, client=None)
+        self.llm = cast(BaseLanguageModel, llm)
         if summary_llm is None:
             summary_llm = llm
-        self.summary_llm = summary_llm
+        self.summary_llm = cast(BaseLanguageModel, summary_llm)
 
     def get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name"""
@@ -100,7 +101,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 prompt=citation_prompt, llm=self.summary_llm, skip_system=True
             )
             # peak first chunk
-            fake_doc = Doc(name=docname, citation="", dockey=dockey)
+            fake_doc = Doc(name="", citation="", dockey=dockey)
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
@@ -149,7 +150,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if len(texts) == 0:
             raise ValueError("No texts to add.")
         if doc.name in self.docnames:
-            new_docname = self.get_unique_key(doc.name)
+            new_docname = self.get_unique_name(doc.name)
             for t in texts:
                 t.name = t.name.replace(doc.name, new_docname)
             doc.name = new_docname
@@ -158,11 +159,16 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             for i, t in enumerate(texts):
                 t.embeddings = text_embeddings[i]
         else:
-            text_embeddings = [t.embeddings for t in texts]
+            text_embeddings = cast(List[List[float]], [t.embeddings for t in texts])
         if self.texts_index is not None:
-            self.texts_index.add_embeddings(
-                list(zip(texts, text_embeddings)), metadatas=texts
-            )
+            try:
+                self.texts_index.add_embeddings(  # type: ignore
+                    list(zip(texts, text_embeddings)), metadatas=texts
+                )
+            except AttributeError:
+                raise ValueError(
+                    "Need a vector store that supports adding embeddings."
+                )
         if self.doc_index is not None:
             self.doc_index.add_texts([doc.citation], metadatas=[{"dockey": doc.dockey}])
         self.docs[doc.dockey] = doc
@@ -183,27 +189,27 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         self.deleted_dockeys.add(dockey)
 
     async def adoc_match(
-        self, query: str, k: int = 25, get_callbacks: CallbackFactory = lambda x: []
-    ) -> List[DocKey]:
+        self, query: str, k: int = 25, get_callbacks: CallbackFactory = lambda x: None
+    ) -> Set[DocKey]:
         """Return a list of dockeys that match the query."""
         if len(self.docs) == 0:
-            return []
+            return Set()
         if self.doc_index is None:
             texts = [doc.citation for doc in self.docs.values()]
-            metadatas = list(self.docs.values())
+            metadatas = [d.dict() for d in self.docs.values()]
             self.doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         matches = self.doc_index.max_marginal_relevance_search(
-            query, k=k + len(self._deleted_keys)
+            query, k=k + len(self.deleted_dockeys)
         )
         matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
         chain = make_chain(select_paper_prompt, self.summary_llm)
         papers = [f"{d.name}: {d.citation}" for d in matched_docs]
-        result = await chain.arun(
+        result = await chain.arun( # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
         )
-        return [d.dockey for d in matched_docs if d.name in result]
+        return Set([d.dockey for d in matched_docs if d.name in result])
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -240,7 +246,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         k: int = 3,
         max_sources: int = 5,
         marginal_relevance: bool = True,
-        get_callbacks: CallbackFactory = lambda x: [],
+        get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -268,7 +274,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         k: int = 3,
         max_sources: int = 5,
         marginal_relevance: bool = True,
-        get_callbacks: CallbackFactory = lambda x: [],
+        get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
         if len(self.docs) == 0:
             return answer
@@ -383,7 +389,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
-        get_callbacks: CallbackFactory = lambda x: [],
+        get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -417,12 +423,12 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
-        get_callbacks: CallbackFactory = lambda x: [],
+        get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         if answer is None:
-            answer = Answer(query)
+            answer = Answer(question=query)
         if len(answer.contexts) == 0:
             # this is heuristic - max_sources and len(docs) are not
             # comparable - one is chunks and one is docs
@@ -448,7 +454,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         else:
             callbacks = get_callbacks("answer")
             qa_chain = make_chain(qa_prompt, self.llm)
-            answer_text = await qa_chain.arun(
+            answer_text = await qa_chain.arun( 
                 question=query,
                 context_str=context_str,
                 length=length_prompt,
