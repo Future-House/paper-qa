@@ -2,10 +2,8 @@ from pathlib import Path
 from typing import Any, Callable, List, Optional, Set, Union
 
 from langchain.callbacks.base import BaseCallbackHandler
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForChainRun,
-    CallbackManagerForChainRun,
-)
+from langchain.callbacks.manager import (AsyncCallbackManagerForChainRun,
+                                         CallbackManagerForChainRun)
 from pydantic import BaseModel
 
 StrPath = Union[str, Path]

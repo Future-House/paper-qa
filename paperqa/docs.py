@@ -14,24 +14,12 @@ from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
 from .paths import PAPERQA_DIR
-from .qaprompts import (
-    citation_prompt,
-    get_score,
-    make_chain,
-    qa_prompt,
-    search_prompt,
-    select_paper_prompt,
-    summary_prompt,
-)
+from .qaprompts import (citation_prompt, get_score, make_chain, qa_prompt,
+                        search_prompt, select_paper_prompt, summary_prompt)
 from .readers import read_doc
 from .types import Answer, CallbackFactory, Context, Doc, DocKey, Text
-from .utils import (
-    gather_with_concurrency,
-    guess_is_4xx,
-    maybe_is_text,
-    md5sum,
-    name_in_text,
-)
+from .utils import (gather_with_concurrency, guess_is_4xx, maybe_is_text,
+                    md5sum, name_in_text)
 
 
 class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):

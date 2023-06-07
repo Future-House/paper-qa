@@ -10,6 +10,7 @@ from langchain.llms.fake import FakeListLLM
 
 from paperqa import Answer, Docs
 from paperqa.readers import read_doc
+from paperqa.types import Doc
 from paperqa.utils import maybe_is_text, name_in_text, strings_similarity
 
 
@@ -274,13 +275,24 @@ def test_pdf_reader():
 def test_pdf_pypdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    splits1, _ = read_doc(
-        doc_path, "foo te al", "bar", force_pypdf=True, overlap=100, chunk_chars=3000
+    splits1 = read_doc(
+        doc_path,
+        Doc(name="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
     )
-    splits2, _ = read_doc(
-        doc_path, "foo te al", "bar", force_pypdf=False, overlap=100, chunk_chars=3000
+    splits2 = read_doc(
+        doc_path,
+        Doc(name="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
     )
-    assert strings_similarity(splits1[0].casefold(), splits2[0].casefold()) > 0.85
+    assert (
+        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
+        > 0.85
+    )
 
 
 def test_prompt_length():
@@ -294,22 +306,11 @@ def test_prompt_length():
     docs.query("What is the name of the politician?", length_prompt="25 words")
 
 
-def test_doc_preview():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
-        f.write(r.text)
-    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    assert len(docs.doc_previews()) == 1
-
-
 def test_code():
     # load this script
     doc_path = os.path.abspath(__file__)
     docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
-    docs.add(doc_path, "test_paperqa.py", key="test", disable_check=True)
+    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)
     assert len(docs.docs) == 1
     docs.query("What function tests the preview?")
 
@@ -323,8 +324,8 @@ def test_citation():
     docs = Docs()
     docs.add(doc_path)
     assert (
-        list(docs.docs)[0]["metadata"][0]["key"] == "Wikipedia2023"
-        or list(docs.docs)[0]["metadata"][0]["key"] == "Frederick2023"
+        list(docs.docs.values())[0].name == "Wikipedia2023"
+        or list(docs.docs.values())[0].name == "Frederick2023"
     )
 
 

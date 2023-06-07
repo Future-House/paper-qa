@@ -43,9 +43,11 @@ class ZoteroPaper(BaseModel):
 
     def __str__(self) -> str:
         """Return the title of the paper."""
-        return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
-
-
+        return (
+            f'ZoteroPaper(\n    key = "{self.key}",\n'
+            f'title = "{self.title}",\n    pdf = "{self.pdf}",\n    '
+            f'num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+        )
 class ZoteroDB(zotero.Zotero):
     """An extension of pyzotero.zotero.Zotero to interface with paperqa.
 
