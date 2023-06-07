@@ -1,16 +1,16 @@
-import copy
+import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-import re
 
-import langchain.prompts as prompts
 from langchain.callbacks.manager import AsyncCallbackManagerForChainRun
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
+from langchain.llms.base import LLM
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
+from prompts import PromptTemplate
 
-summary_prompt = prompts.PromptTemplate(
+summary_prompt = PromptTemplate(
     input_variables=["question", "context_str", "citation"],
     template="Summarize the text below to help answer a question. "
     "Do not directly answer the question, instead summarize "
@@ -25,7 +25,7 @@ summary_prompt = prompts.PromptTemplate(
     "Relevant Information Summary:",
 )
 
-qa_prompt = prompts.PromptTemplate(
+qa_prompt = PromptTemplate(
     input_variables=["question", "context_str", "length"],
     template="Write an answer ({length}) "
     "for the question below based on the provided context. "
@@ -42,7 +42,7 @@ qa_prompt = prompts.PromptTemplate(
 )
 
 
-search_prompt = prompts.PromptTemplate(
+search_prompt = PromptTemplate(
     input_variables=["question"],
     template="We want to answer the following question: {question} \n"
     "Provide three keyword searches (one search per line) "
@@ -53,7 +53,7 @@ search_prompt = prompts.PromptTemplate(
 )
 
 
-select_paper_prompt = prompts.PromptTemplate(
+select_paper_prompt = PromptTemplate(
     input_variables=["question", "papers"],
     template="Select papers to help answer the question below. "
     "Papers are listed as $KEY: $PAPER_INFO. "
@@ -71,7 +71,7 @@ def _get_datetime():
     return now.strftime("%m/%d/%Y")
 
 
-citation_prompt = prompts.PromptTemplate(
+citation_prompt = PromptTemplate(
     input_variables=["text"],
     template="Provide the citation for the following text in MLA Format. Today's date is {date}\n"
     "{text}\n\n"
@@ -91,11 +91,13 @@ class FallbackLLMChain(LLMChain):
         """Generate LLM result from inputs."""
         try:
             return await super().agenerate(input_list, run_manager=run_manager)
-        except NotImplementedError as e:
+        except NotImplementedError:
             return self.generate(input_list, run_manager=run_manager)
 
 
-def make_chain(prompt, llm, skip_system=False):
+def make_chain(
+    prompt: PromptTemplate, llm: LLM, skip_system: bool = False
+) -> FallbackLLMChain:
     if type(llm) == ChatOpenAI:
         system_message_prompt = SystemMessage(
             content="Answer in an unbiased, concise, scholarly tone. "
@@ -112,7 +114,7 @@ def make_chain(prompt, llm, skip_system=False):
     return FallbackLLMChain(prompt=prompt, llm=llm)
 
 
-def get_score(text):
+def get_score(text: str) -> int:
     score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
     if score:
         return int(score.group(1))

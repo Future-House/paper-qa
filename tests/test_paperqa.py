@@ -1,11 +1,7 @@
 import os
 import pickle
-import sys
 from typing import Any
 from unittest import IsolatedAsyncioTestCase
-from unittest import mock
-from importlib import reload
-from importlib import import_module
 
 import requests
 from langchain.callbacks.base import AsyncCallbackHandler
@@ -14,7 +10,6 @@ from langchain.llms.fake import FakeListLLM
 
 import paperqa
 from paperqa.utils import strings_similarity
-from paperqa.readers import clear_cache
 
 
 class TestHandler(AsyncCallbackHandler):
@@ -244,7 +239,6 @@ def test_repeat_keys():
 
 
 def test_pdf_reader():
-    clear_cache()
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     docs = paperqa.Docs(llm=OpenAI(temperature=0.0, model_name="text-curie-001"))
@@ -376,7 +370,7 @@ def test_query_filter():
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", key="test")
-    answer = docs.query("What country is Bates from?", key_filter=True)
+    docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
@@ -390,7 +384,7 @@ def test_nonopenai_model():
         f.write(r.text)
     docs = paperqa.Docs(llm=model)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What country is Bates from?")
+    docs.query("What country is Bates from?")
 
 
 def test_agent():
@@ -402,9 +396,9 @@ def test_agent():
 def test_zotera():
     from paperqa.contrib import ZoteroDB
 
-    docs = paperqa.Docs()
+    paperqa.Docs()
     try:
-        zotero = ZoteroDB(library_type="user")  # "group" if group library
+        ZoteroDB(library_type="user")  # "group" if group library
     except ValueError:
         # close enough
         return
@@ -428,6 +422,4 @@ def test_too_much_evidence():
         key="test",
         chunk_chars=4000,
     )
-    answer = docs.query(
-        "What is Barrack's greatest accomplishment?", max_sources=10, k=10
-    )
+    docs.query("What is Barrack's greatest accomplishment?", max_sources=10, k=10)

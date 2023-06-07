@@ -32,7 +32,6 @@ Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly
 
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
 
-
 ## Hugging Face Demo
 
 [Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
@@ -66,6 +65,8 @@ print(answer.formatted_answer)
 ```
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
+
+
 
 ### Choosing Model
 
@@ -146,6 +147,32 @@ for f in source_files:
 answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
+
+## Version 3 Changes
+
+Version 3 includes many changes to type the code, make it more focused/modular, and enable performance to very large numbers of documents. The major breaking changes are documented below
+
+### Renaming
+
+The following table shows the old names and the new names:
+
+| Old Name | New Name | Explanation |
+| :--- | :---: | ---- : |
+| `key` | `name` | Name is a natural language name for text. |
+| `dockkey` | `docname` | Docname is a natural language name for a document. |
+| `hash` | `dockey` | Key is a unique identifier for the document. |
+
+### Pickled objects
+
+The pickled objects are not compatible with the new version.
+
+### Agents
+
+The agent functionality has been removed, as it's not a core focus of the library
+
+### Answers
+
+Answers will not include passages, but instead return dockeys that can be used to retrieve the passages. Tokens/cost will also not be counted since that is built into langchain by default (see below for an example).
 
 ## Notebooks
 

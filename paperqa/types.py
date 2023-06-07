@@ -1,47 +1,50 @@
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Callable, List, Optional, Set, Union
+
+from langchain.callbacks.base import AsyncCallbackHandler
+from pydantic import BaseModel
 
 StrPath = Union[str, Path]
+DocKey = Any
+CallbackFactory = Callable[[str], AsyncCallbackHandler]
 
 
-@dataclass
-class Context:
+class Doc(BaseModel):
+    name: str
+    citation: str
+    dockey: DocKey
+
+
+class Text(BaseModel):
+    text: str
+    name: str
+    doc: Doc
+    embeddings: Optional[List[float]] = None
+
+
+class Context(BaseModel):
     """A class to hold the context of a question."""
 
-    key: str
-    citation: str
     context: str
-    text: str
-    dockey: str
+    text: Text
     score: int = 5
 
-    def __str__(self) -> str:
-        """Return the context as a string."""
-        return self.context
+
+def __str__(self) -> str:
+    """Return the context as a string."""
+    return self.context
 
 
-@dataclass
-class Answer:
+class Answer(BaseModel):
     """A class to hold the answer to a question."""
 
     question: str
     answer: str = ""
     context: str = ""
-    contexts: Optional[List[Context]] = None
+    contexts: List[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    passages: Optional[Dict[str, str]] = None
-    tokens: int = 0
-    cost: float = 0
-    key_filter: Optional[str] = None
-
-    def __post_init__(self):
-        """Initialize the answer."""
-        if self.contexts is None:
-            self.contexts = []
-        if self.passages is None:
-            self.passages = {}
+    dockey_filter: Optional[Set[DocKey]] = None
 
     def __str__(self) -> str:
         """Return the answer as a string."""
