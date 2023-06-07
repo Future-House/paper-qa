@@ -194,7 +194,7 @@ class Docs:
             self._faiss_index.add_embeddings(
                 list(zip(texts, text_embeddings)), metadatas=metadatas
             )
-        elif self._doc_index is not None:
+        if self._doc_index is not None:
             self._doc_index.add_texts([citation], metadatas=[{"key": key}])
         self.docs.append(
             dict(
