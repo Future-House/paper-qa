@@ -6,10 +6,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Union, cast
 
+from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.base_language import BaseLanguageModel
 from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
@@ -33,6 +33,7 @@ from .utils import (
     name_in_text,
 )
 
+
 class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     """A collection of documents to be used for answering questions."""
 
@@ -41,7 +42,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     docnames: Set[str] = set()
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
-    llm: BaseLanguageModel = ChatOpenAI(temperature=0.1, model="gpt-3.5-turbo", client=None)
+    llm: BaseLanguageModel = ChatOpenAI(
+        temperature=0.1, model="gpt-3.5-turbo", client=None
+    )
     summary_llm: Optional[BaseLanguageModel] = None
     name: str = "default"
     index_path: Optional[Path] = PAPERQA_DIR / name
@@ -104,7 +107,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if citation is None:
             # skip system because it's too hesitant to answer
             cite_chain = make_chain(
-                prompt=citation_prompt, llm=self.summary_llm, skip_system=True
+                prompt=citation_prompt,
+                llm=cast(BaseLanguageModel, self.summary_llm),
+                skip_system=True,
             )
             # peak first chunk
             fake_doc = Doc(name="", citation="", dockey=dockey)
@@ -169,12 +174,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if self.texts_index is not None:
             try:
                 self.texts_index.add_embeddings(  # type: ignore
-                    list(zip(texts, text_embeddings)), metadatas=[t.dict(exclude={"embeddings", "text"}) for t in self.texts]
+                    list(zip(texts, text_embeddings)),
+                    metadatas=[
+                        t.dict(exclude={"embeddings", "text"}) for t in self.texts
+                    ],
                 )
             except AttributeError:
-                raise ValueError(
-                    "Need a vector store that supports adding embeddings."
-                )
+                raise ValueError("Need a vector store that supports adding embeddings.")
         if self.doc_index is not None:
             self.doc_index.add_texts([doc.citation], metadatas=[{"dockey": doc.dockey}])
         self.docs[doc.dockey] = doc
@@ -210,12 +216,14 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             query, k=k + len(self.deleted_dockeys)
         )
         matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
-        chain = make_chain(select_paper_prompt, self.summary_llm)
+        chain = make_chain(
+            select_paper_prompt, cast(BaseLanguageModel, self.summary_llm)
+        )
         papers = [f"{d.name}: {d.citation}" for d in matched_docs]
-        result = await chain.arun( # type: ignore
+        result = await chain.arun(  # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
         )
-        return Set([d.dockey for d in matched_docs if d.name in result])    
+        return Set([d.dockey for d in matched_docs if d.name in result])
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -223,16 +231,17 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             state["texts_index"].save_local(self.index_path)
         del state["texts_index"]
         del state["doc_index"]
-        return {'__dict__': state, '__fields_set__': self.__fields_set__}
+        return {"__dict__": state, "__fields_set__": self.__fields_set__}
 
     def __setstate__(self, state):
-        object.__setattr__(self, '__dict__', state['__dict__'])
-        object.__setattr__(self, '__fields_set__', state['__fields_set__'])
+        object.__setattr__(self, "__dict__", state["__dict__"])
+        object.__setattr__(self, "__fields_set__", state["__fields_set__"])
         try:
             self.texts_index = FAISS.load_local(self.index_path, self.embeddings)
-        except Exception as e:
+        except Exception:
             # they use some special exception type, but I don't want to import it
             self.texts_index = None
+
     def _build_texts_index(self):
         if self.texts_index is None:
             raw_texts = [t.text for t in self.texts]
@@ -301,7 +310,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         # ok now filter
         if answer.dockey_filter is not None:
             matches = [
-                m for m in matches if m.metadata["doc"]["dockey"] in answer.dockey_filter
+                m
+                for m in matches
+                if m.metadata["doc"]["dockey"] in answer.dockey_filter
             ]
 
         # check if it is deleted
@@ -378,7 +389,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             query (str): The query to generate search strings for.
         """
 
-        search_chain = make_chain(prompt=search_prompt, llm=self.summary_llm)
+        search_chain = make_chain(
+            prompt=search_prompt, llm=cast(BaseLanguageModel, self.summary_llm)
+        )
         search_query = search_chain.run(question=query)
         queries = [s for s in search_query.split("\n") if len(s) > 3]
         # remove 2., 3. from queries
@@ -459,7 +472,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         else:
             callbacks = get_callbacks("answer")
             qa_chain = make_chain(qa_prompt, self.llm)
-            answer_text = await qa_chain.arun( 
+            answer_text = await qa_chain.arun(
                 question=query,
                 context_str=context_str,
                 length=length_prompt,

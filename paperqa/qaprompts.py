@@ -2,13 +2,17 @@ import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional, cast
 
-from langchain.callbacks.manager import AsyncCallbackManagerForChainRun, CallbackManagerForChainRun
+from langchain.base_language import BaseLanguageModel
+from langchain.callbacks.manager import (
+    AsyncCallbackManagerForChainRun,
+    CallbackManagerForChainRun,
+)
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate, StringPromptTemplate
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
-from langchain.prompts import PromptTemplate, StringPromptTemplate
-from langchain.base_language import BaseLanguageModel
+
 from .types import CBManager
 
 summary_prompt = PromptTemplate(

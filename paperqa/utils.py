@@ -3,27 +3,10 @@ import math
 import re
 import string
 from typing import List
-from functools import wraps
 
 import pypdf
 
 from .types import StrPath
-
-def make_sync(f):
-    @wraps(f)
-    def with_sync(*args, **kwargs):
-         # special case for jupyter notebooks
-        if "get_ipython" in globals() or "google.colab" in sys.modules:
-            import nest_asyncio
-
-            nest_asyncio.apply()
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        return loop.run_until_complete(f(*args, **kwargs))
-    return with_sync
 
 
 def name_in_text(name: str, text: str) -> bool:

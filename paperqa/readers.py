@@ -25,9 +25,7 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
             # pretty formatting of pages (e.g. 1-3, 4, 5-7)
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
-                Text(
-                    text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc
-                )
+                Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
@@ -57,9 +55,7 @@ def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text
             # pretty formatting of pages (e.g. 1-3, 4, 5-7)
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
-                Text(
-                    text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc
-                )
+                Text(text=split[:chunk_chars], name=f"{doc.name} pages {pg}", doc=doc)
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]

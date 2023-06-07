@@ -1,9 +1,9 @@
 # This file gets PDF files from the user's Zotero library
 import logging
 import os
-from collections import namedtuple
 from pathlib import Path
-from typing import Optional, Union, List, cast
+from typing import List, Optional, Union, cast
+
 from pydantic import BaseModel
 
 try:
@@ -13,6 +13,7 @@ except ImportError:
 from ..paths import PAPERQA_DIR
 from ..types import StrPath
 from ..utils import count_pdf_pages
+
 
 class ZoteroPaper(BaseModel):
     """A paper from Zotero.
@@ -43,6 +44,7 @@ class ZoteroPaper(BaseModel):
     def __str__(self) -> str:
         """Return the title of the paper."""
         return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+
 
 class ZoteroDB(zotero.Zotero):
     """An extension of pyzotero.zotero.Zotero to interface with paperqa.
@@ -123,7 +125,7 @@ class ZoteroDB(zotero.Zotero):
         if pdf_key is None:
             return None
 
-        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf")) # type: ignore
+        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))  # type: ignore
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)

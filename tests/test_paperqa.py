@@ -8,9 +8,9 @@ from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
 
-from paperqa import Docs, Answer
-from paperqa.utils import strings_similarity, name_in_text, maybe_is_text
+from paperqa import Answer, Docs
 from paperqa.readers import read_doc
+from paperqa.utils import maybe_is_text, name_in_text, strings_similarity
 
 
 class TestHandler(AsyncCallbackHandler):
@@ -19,9 +19,7 @@ class TestHandler(AsyncCallbackHandler):
 
 
 def test_maybe_is_text():
-    assert maybe_is_text(
-        "This is a test. The sample conc. was 1.0 mM (at 245 ^F)"
-    )
+    assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
     r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
@@ -31,45 +29,47 @@ def test_maybe_is_text():
     bad_text = r.text.encode("latin1", "ignore").decode("utf-16", "ignore")
     assert not maybe_is_text(bad_text)
 
-def test_name_in_text():
-    name1 = 'FooBar2022'
-    name2 = 'FooBar2022a'
-    name3 = 'FooBar20'
 
-    text1 = 'As mentioned by FooBar2022, this is a great paper'
+def test_name_in_text():
+    name1 = "FooBar2022"
+    name2 = "FooBar2022a"
+    name3 = "FooBar20"
+
+    text1 = "As mentioned by FooBar2022, this is a great paper"
     assert name_in_text(name1, text1)
     assert not name_in_text(name2, text1)
     assert not name_in_text(name3, text1)
 
-    text2 = 'This is great, as found by FooBar20'
+    text2 = "This is great, as found by FooBar20"
     assert name_in_text(name3, text2)
     assert not name_in_text(name1, text2)
     assert not name_in_text(name2, text2)
 
-    text3 = 'Per previous work (FooBar2022, FooBar2022a), this is great'
+    text3 = "Per previous work (FooBar2022, FooBar2022a), this is great"
     assert name_in_text(name1, text3)
     assert name_in_text(name2, text3)
     assert not name_in_text(name3, text3)
 
-    text4 = 'Per previous work (Foo2022, Bar2023), this is great'
+    text4 = "Per previous work (Foo2022, Bar2023), this is great"
     assert not name_in_text(name1, text4)
     assert not name_in_text(name2, text4)
     assert not name_in_text(name3, text4)
 
-    text5 = 'Per previous work (FooBar2022; FooBar2022a), this is great'
+    text5 = "Per previous work (FooBar2022; FooBar2022a), this is great"
     assert name_in_text(name1, text5)
     assert name_in_text(name2, text5)
     assert not name_in_text(name3, text5)
 
-    text6 = 'According to FooBar2022 and Foobars, this is great'
+    text6 = "According to FooBar2022 and Foobars, this is great"
     assert name_in_text(name1, text6)
     assert not name_in_text(name2, text6)
     assert not name_in_text(name3, text6)
 
-    text7 = 'As stated by FooBar2022.\n\nThis is great'
+    text7 = "As stated by FooBar2022.\n\nThis is great"
     assert name_in_text(name1, text7)
     assert not name_in_text(name2, text7)
     assert not name_in_text(name3, text7)
+
 
 def test_docs():
     doc_path = "example.txt"
@@ -79,19 +79,21 @@ def test_docs():
         f.write(r.text)
     llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
     docs = Docs(llm=llm)
-    docs.add(doc_path, 
-             citation="WikiMedia Foundation, 2023, Accessed now", 
-             dockey="test")
+    docs.add(
+        doc_path, citation="WikiMedia Foundation, 2023, Accessed now", dockey="test"
+    )
     assert docs.docs["test"].name == "Wiki2023"
     os.remove(doc_path)
 
+
 def test_update_llm():
     doc = Docs()
-    doc.update_llm('gpt-3.5-turbo')
+    doc.update_llm("gpt-3.5-turbo")
     assert doc.llm == doc.summary_llm
 
     doc.update_llm(OpenAI(client=None, temperature=0.1, model="text-ada-001"))
     assert doc.llm == doc.summary_llm
+
 
 def test_evidence():
     doc_path = "example.txt"
@@ -102,9 +104,7 @@ def test_evidence():
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     evidence = docs.get_evidence(
-        Answer(question="For which state was he a governor"), 
-        k=1, 
-        max_sources=1
+        Answer(question="For which state was he a governor"), k=1, max_sources=1
     )
     assert "Missouri" in evidence.context
     os.remove(doc_path)
@@ -136,12 +136,15 @@ class Test(IsolatedAsyncioTestCase):
         await docs.aquery("What is Frederick Bates's greatest accomplishment?")
         os.remove(doc_path)
 
-class Test(IsolatedAsyncioTestCase):
+
+class TestDocMatch(IsolatedAsyncioTestCase):
     def test_adoc_match(self):
         doc_path = "example.txt"
         with open(doc_path, "w", encoding="utf-8") as f:
             # get wiki page about politician
-            r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+            r = requests.get(
+                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+            )
             f.write(r.text)
         docs = Docs()
         docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
