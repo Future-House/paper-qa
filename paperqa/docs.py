@@ -6,8 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Union, cast
 
-import langchain
-from langchain.cache import SQLiteCache
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -15,7 +13,6 @@ from langchain.llms.base import LLM
 from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
-from .paths import CACHE_PATH
 from .qaprompts import (
     citation_prompt,
     get_score,
@@ -34,9 +31,6 @@ from .utils import (
     md5sum,
     name_in_text,
 )
-
-os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-langchain.llm_cache = SQLiteCache(CACHE_PATH)
 
 
 class Docs(BaseModel):

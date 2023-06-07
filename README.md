@@ -150,7 +150,7 @@ print(answer)
 
 ## Version 3 Changes
 
-Version 3 includes many changes to type the code, make it more focused/modular, and enable performance to very large numbers of documents. The major breaking changes are documented below
+Version 3 includes many changes to type the code, make it more focused/modular, and enable performance to very large numbers of documents. The major breaking changes are documented below:
 
 ### Renaming
 
@@ -169,6 +169,10 @@ The pickled objects are not compatible with the new version.
 ### Agents
 
 The agent functionality has been removed, as it's not a core focus of the library
+
+### Caching
+
+Caching has been removed because it's not a core focus of the library. See example below for how to use caching.
 
 ### Answers
 
