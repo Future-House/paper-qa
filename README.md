@@ -154,7 +154,9 @@ print(answer)
 
 Version 3 includes many changes to type the code, make it more focused/modular, and enable performance to very large numbers of documents. The major breaking changes are documented below:
 
-### Renaming
+### Breaking Changes
+
+#### Naming
 
 The following table shows the old names and the new names:
 
@@ -164,21 +166,35 @@ The following table shows the old names and the new names:
 | `dockey` | `docname` | Docname is a natural language name for a document. |
 | `hash` | `dockey` | Dockey is a unique identifier for the document. |
 
-### Pickled objects
+#### Pickled objects
 
 The pickled objects are not compatible with the new version.
 
-### Agents
+#### Agents
 
 The agent functionality has been removed, as it's not a core focus of the library
 
-### Caching
+#### Caching
 
-Caching has been removed because it's not a core focus of the library. See example below for how to use caching.
+Caching has been removed because it's not a core focus of the library. See FAQ below for how to use caching.
 
-### Answers
+#### Answers
 
 Answers will not include passages, but instead return dockeys that can be used to retrieve the passages. Tokens/cost will also not be counted since that is built into langchain by default (see below for an example).
+
+#### Search Query
+
+The search query chain has been removed. You can use langchain directly to do this.
+
+### New Features
+
+The following new features are in v3:
+
+1. `add_url` and `add_file` are now supported for adding from URLs and file objects
+2. Prompts can be customized, and now can be executed pre and post query
+3. Consistent use of `dockey` and `docname` for unique and natural language names enable better tracking with external databases
+4. Texts and embeddings are no longer required to be part of `Docs` object, so you can use external databases or other strategies to manage them
+5. Various simplifications, bug fixes, and performance improvements
 
 ## Notebooks
 

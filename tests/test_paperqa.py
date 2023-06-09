@@ -13,7 +13,7 @@ from langchain.prompts import PromptTemplate
 from paperqa import Answer, Docs, PromptCollection
 from paperqa.readers import read_doc
 from paperqa.types import Doc
-from paperqa.utils import maybe_is_text, name_in_text, strings_similarity
+from paperqa.utils import maybe_is_html, maybe_is_text, name_in_text, strings_similarity
 
 
 class TestHandler(AsyncCallbackHandler):
@@ -27,6 +27,7 @@ def test_maybe_is_text():
     # get front page of wikipedia
     r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
     assert maybe_is_text(r.text)
+    assert maybe_is_html(r.text)
 
     # now force it to contain lots of weird encoding
     bad_text = r.text.encode("latin1", "ignore").decode("utf-16", "ignore")
@@ -75,18 +76,14 @@ def test_name_in_text():
 
 
 def test_docs():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get front page of wikipedia
-        r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
-        f.write(r.text)
     llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
     docs = Docs(llm=llm)
-    docs.add(
-        doc_path, citation="WikiMedia Foundation, 2023, Accessed now", dockey="test"
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
     )
     assert docs.docs["test"].docname == "Wiki2023"
-    os.remove(doc_path)
 
 
 def test_update_llm():
@@ -504,7 +501,8 @@ def test_custom_prompts():
 def test_pre_prompt():
     pre = PromptTemplate(
         input_variables=["question"],
-        template="Provide context you have memorized that could help answer '{question}'. ",
+        template="Provide context you have memorized "
+        "that could help answer '{question}'. ",
     )
 
     docs = Docs(prompts=PromptCollection(pre=pre))

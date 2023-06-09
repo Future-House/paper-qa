@@ -4,6 +4,7 @@ import re
 import sys
 import tempfile
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO, Dict, List, Optional, Set, Union, cast
 
@@ -21,6 +22,7 @@ from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollecti
 from .utils import (
     gather_with_concurrency,
     guess_is_4xx,
+    maybe_is_html,
     maybe_is_pdf,
     maybe_is_text,
     md5sum,
@@ -91,21 +93,46 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         file: BinaryIO,
         citation: Optional[str] = None,
         docname: Optional[str] = None,
-        disable_check: bool = False,
         dockey: Optional[DocKey] = None,
         chunk_chars: int = 3000,
     ) -> str:
         """Add a document to the collection."""
         # just put in temp file and use existing method
-        is_pdf = maybe_is_pdf(file)
-        with tempfile.NamedTemporaryFile(suffix=".pdf" if is_pdf else ".txt") as f:
+        suffix = ".txt"
+        if maybe_is_pdf(file):
+            suffix = ".pdf"
+        elif maybe_is_html(file):
+            suffix = ".html"
+
+        with tempfile.NamedTemporaryFile(suffix=suffix) as f:
             f.write(file.read())
             f.seek(0)
             return self.add(
-                f.path,
+                Path(f.name),
                 citation=citation,
                 docname=docname,
-                disable_check=disable_check,
+                dockey=dockey,
+                chunk_chars=chunk_chars,
+            )
+
+    def add_url(
+        self,
+        url: str,
+        citation: Optional[str] = None,
+        docname: Optional[str] = None,
+        dockey: Optional[DocKey] = None,
+        chunk_chars: int = 3000,
+    ) -> str:
+        """Add a document to the collection."""
+        import urllib.request
+
+        with urllib.request.urlopen(url) as f:
+            # need to wrap to enable seek
+            file = BytesIO(f.read())
+            return self.add_file(
+                file,
+                citation=citation,
+                docname=docname,
                 dockey=dockey,
                 chunk_chars=chunk_chars,
             )

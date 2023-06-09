@@ -39,6 +39,17 @@ def maybe_is_pdf(file: BinaryIO) -> bool:
     return magic_number == b"%PDF"
 
 
+def maybe_is_html(file: BinaryIO) -> bool:
+    magic_number = file.read(4)
+    file.seek(0)
+    return (
+        magic_number == b"<htm"
+        or magic_number == b"<!DO"
+        or magic_number == b"<xsl"
+        or magic_number == b"<!X"
+    )
+
+
 def strings_similarity(s1: str, s2: str) -> float:
     if len(s1) == 0 or len(s2) == 0:
         return 0
