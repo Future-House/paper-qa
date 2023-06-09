@@ -34,10 +34,10 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     docnames: Set[str] = set()
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
-    llm: BaseLanguageModel = ChatOpenAI(
+    llm: Union[str, BaseLanguageModel] = ChatOpenAI(
         temperature=0.1, model="gpt-3.5-turbo", client=None
     )
-    summary_llm: Optional[BaseLanguageModel] = None
+    summary_llm: Optional[Union[str, BaseLanguageModel]] = None
     name: str = "default"
     index_path: Optional[Path] = PAPERQA_DIR / name
     embeddings: Embeddings = OpenAIEmbeddings(client=None)
@@ -48,7 +48,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
     @validator("llm", "summary_llm")
-    def check_llm(cls, v: Union[BaseLanguageModel, str]):
+    def check_llm(cls, v: Union[BaseLanguageModel, str]) -> BaseLanguageModel:
         if type(v) is str:
             return ChatOpenAI(temperature=0.1, model=v, client=None)
         return v
@@ -198,7 +198,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     ) -> Set[DocKey]:
         """Return a list of dockeys that match the query."""
         if len(self.docs) == 0:
-            return Set()
+            return set()
         if self.doc_index is None:
             texts = [doc.citation for doc in self.docs.values()]
             metadatas = [d.dict() for d in self.docs.values()]
@@ -216,7 +216,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         result = await chain.arun(  # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
         )
-        return Set([d.dockey for d in matched_docs if d.docname in result])
+        return set([d.dockey for d in matched_docs if d.docname in result])
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -333,12 +333,10 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             # http code in the exception
             try:
                 context = await summary_chain.arun(
-                    answer=answer,
-                    text=Text(
-                        text=match.page_content,
-                        name=match.metadata["name"],
-                        doc=Doc(**match.metadata["doc"]),
-                    ),
+                    question=answer.question,
+                    citation=match.metadata["doc"]["citation"],
+                    summary_length=answer.summary_length,
+                    text=match.page_content,
                     callbacks=callbacks,
                 )
             except Exception as e:
@@ -399,6 +397,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         query: str,
         k: int = 10,
         max_sources: int = 5,
+        length_prompt="about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
@@ -419,6 +418,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 query,
                 k=k,
                 max_sources=max_sources,
+                length_prompt=length_prompt,
                 marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
@@ -431,6 +431,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         query: str,
         k: int = 10,
         max_sources: int = 5,
+        length_prompt: str = "about 100 words",
         marginal_relevance: bool = True,
         answer: Optional[Answer] = None,
         key_filter: Optional[bool] = None,
@@ -439,7 +440,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         if answer is None:
-            answer = Answer(question=query)
+            answer = Answer(question=query, answer_length=length_prompt)
         if len(answer.contexts) == 0:
             # this is heuristic - max_sources and len(docs) are not
             # comparable - one is chunks and one is docs
@@ -465,7 +466,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             callbacks = get_callbacks("answer")
             qa_chain = make_chain(self.prompts.qa, self.llm)
             answer_text = await qa_chain.arun(
-                answer=answer,
+                context=answer.context,
+                answer_length=answer.answer_length,
+                question=answer.question,
                 callbacks=callbacks,
             )
         # it still happens

@@ -3,7 +3,7 @@ from datetime import datetime
 from langchain.prompts import PromptTemplate
 
 summary_prompt = PromptTemplate(
-    input_variables=["answer", "text"],
+    input_variables=["text", "citation", "question", "summary_length"],
     template="Summarize the text below to help answer a question. "
     "Do not directly answer the question, instead summarize "
     "to give evidence to help answer the question. Include direct quotes. "
@@ -12,14 +12,14 @@ summary_prompt = PromptTemplate(
     "indicating relevance to question. Do not explain your score. "
     "\n\n"
     "{text}\n"
-    "Extracted from {text.doc.citation}\n"
-    "Question: {answer.question}\n"
+    "Extracted from {citation}\n"
+    "Question: {question}\n"
     "Relevant Information Summary:",
 )
 
 qa_prompt = PromptTemplate(
-    input_variables=["answer"],
-    template="Write an answer ({answer.answer_length}) "
+    input_variables=["context", "answer_length", "question"],
+    template="Write an answer ({answer_length}) "
     "for the question below based on the provided context. "
     "If the context provides insufficient information, "
     'reply "I cannot answer". '
@@ -27,8 +27,8 @@ qa_prompt = PromptTemplate(
     "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, comp rehensive, and scholarly tone. "
     "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. \n\n"
-    "{answer.context}\n"
-    "Question: {answer.question}\n"
+    "{context}\n"
+    "Question: {question}\n"
     "Answer: ",
 )
 

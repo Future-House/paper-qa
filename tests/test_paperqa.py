@@ -165,15 +165,23 @@ def test_docs_pickle():
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
     docs2.update_llm(llm)
+    assert llm.model_name == docs2.llm.model_name
+    assert docs2.summary_llm.model_name == docs2.llm.model_name
     assert len(docs.docs) == len(docs2.docs)
     context1, context2 = (
         docs.get_evidence(
-            Answer(question="What date is flag day in Canada?"),
+            Answer(
+                question="What date is flag day in Canada?",
+                summary_length="about 20 words",
+            ),
             k=3,
             max_sources=1,
         ).context,
         docs2.get_evidence(
-            Answer(question="What date is flag day in Canada?"),
+            Answer(
+                question="What date is flag day in Canada?",
+                summary_length="about 20 words",
+            ),
             k=3,
             max_sources=1,
         ).context,
@@ -200,12 +208,18 @@ def test_docs_pickle_no_faiss():
     assert (
         strings_similarity(
             docs.get_evidence(
-                Answer(question="What date is flag day in Canada?"),
+                Answer(
+                    question="What date is flag day in Canada?",
+                    summary_length="about 20 words",
+                ),
                 k=3,
                 max_sources=1,
             ).context,
             docs2.get_evidence(
-                Answer(question="What date is flag day in Canada?"),
+                Answer(
+                    question="What date is flag day in Canada?",
+                    summary_length="about 20 words",
+                ),
                 k=3,
                 max_sources=1,
             ).context,
@@ -223,10 +237,7 @@ def test_bad_context():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query(
-        "What year was Barack Obama born?",
-        length_prompt="about 20 words",
-    )
+    answer = docs.query("What year was Barack Obama born?")
     assert "cannot answer" in answer.answer
     os.remove(doc_path)
 
@@ -303,7 +314,7 @@ def test_prompt_length():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.query("What is the name of the politician?", length_prompt="25 words")
+    docs.query("What is the name of the politician?")
 
 
 def test_code():
