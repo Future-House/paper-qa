@@ -375,23 +375,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         answer.context = context_str
         return answer
 
-    def generate_search_query(self, query: str) -> List[str]:
-        """Generate a list of search strings that can be used to find
-        relevant papers.
-
-        Args:
-            query (str): The query to generate search strings for.
-        """
-
-        search_chain = make_chain(
-            prompt=self.prompts.search, llm=cast(BaseLanguageModel, self.summary_llm)
-        )
-        search_query = search_chain.run(question=query)
-        queries = [s for s in search_query.split("\n") if len(s) > 3]
-        # remove 2., 3. from queries
-        queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
-        return queries
-
     def query(
         self,
         query: str,
@@ -457,6 +440,12 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
             )
+        if self.prompts.pre is not None:
+            chain = make_chain(self.prompts.pre, self.llm)
+            pre = await chain.arun(
+                question=answer.question, callbacks=get_callbacks("pre")
+            )
+            answer.context = pre + "\n\n" + answer.context
         bib = dict()
         if len(answer.context) < 10:
             answer_text = (
@@ -465,6 +454,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         else:
             callbacks = get_callbacks("answer")
             qa_chain = make_chain(self.prompts.qa, self.llm)
+            print(self.prompts.qa)
             answer_text = await qa_chain.arun(
                 context=answer.context,
                 answer_length=answer.answer_length,
@@ -489,4 +479,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         answer.answer = answer_text
         answer.formatted_answer = formatted_answer
         answer.references = bib_str
+
+        if self.prompts.post is not None:
+            chain = make_chain(self.prompts.post, self.llm)
+            post = await chain.arun(**answer.dict(), callbacks=get_callbacks("post"))
+            answer.answer = post
+            answer.formatted_answer = f"Question: {query}\n\n{post}\n"
+            if len(bib) > 0:
+                answer.formatted_answer += f"\nReferences\n\n{bib_str}\n"
+
         return answer

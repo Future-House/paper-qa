@@ -7,8 +7,9 @@ import requests
 from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
+from langchain.prompts import PromptTemplate
 
-from paperqa import Answer, Docs
+from paperqa import Answer, Docs, PromptCollection
 from paperqa.readers import read_doc
 from paperqa.types import Doc
 from paperqa.utils import maybe_is_text, name_in_text, strings_similarity
@@ -452,3 +453,62 @@ def test_too_much_evidence():
         chunk_chars=4000,
     )
     docs.query("What is Barrack's greatest accomplishment?", max_sources=10, k=10)
+
+
+def test_custom_prompts():
+    my_qaprompt = PromptTemplate(
+        input_variables=["question", "context"],
+        template="Answer the question '{question}' "
+        "using the country name alone. For example: "
+        "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: ",
+    )
+
+    docs = Docs(prompts=PromptCollection(qa=my_qaprompt))
+
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    answer = docs.query("What country is Bates from?")
+    print(answer.answer)
+    assert "United States" == answer.answer
+
+
+def test_pre_prompt():
+    pre = PromptTemplate(
+        input_variables=["question"],
+        template="Provide context you have memorized that could help answer '{question}'. ",
+    )
+
+    docs = Docs(prompts=PromptCollection(pre=pre))
+
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.query("What country is Bates from?")
+
+
+def test_post_prompt():
+    post = PromptTemplate(
+        input_variables=["question", "answer"],
+        template="We are trying to answer the question below "
+        "and have an answer provided. "
+        "Please edit the answer be extremely terse, with no extra words or formatting"
+        "with no extra information.\n\n"
+        "Q: {question}\nA: {answer}\n\n",
+    )
+
+    docs = Docs(prompts=PromptCollection(post=post))
+
+    doc_path = "example.txt"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.query("What country is Bates from?")

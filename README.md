@@ -354,3 +354,29 @@ you can populate a `Docs` object directly via
 the `add_texts` object. That can take chunked texts and documents, which are serializable objects, to populate `Docs`.
 
 You also can simply use a separate vector database by setting the `doc_index` and `texts_index` explicitly when building the `Docs` object.
+
+### Customizing Prompts
+
+You can customize any of the prompts, using the `PromptCollection` class. For example, if you want to change the prompt for the question, you can do:
+
+```python
+from paperqa import Docs, Answer, PromptCollection
+from langchain.prompts import PromptTemplate
+
+my_qaprompt = PromptTemplate(
+    input_variables=["context", "question"],
+    template="Answer the question '{question}' "
+    "Use the context below if helpful. "
+    "You can cite the context using the key "
+    "like (Example2012). "
+    "If there is insufficient context, write a poem "
+    "about how you cannot answer.\n\n"
+    "Context: {context}\n\n")
+prompts=PromptCollection(qa=my_qaprompt)
+docs = Docs(prompts=prompts)
+```
+
+### Pre and Post Prompts
+
+Following the syntax above, you can also include prompts that
+are executed after the query and before the query. For example, you can use this to critique the answer.
