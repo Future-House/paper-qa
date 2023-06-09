@@ -111,45 +111,35 @@ def test_evidence():
 
 
 def test_query():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
-        f.write(r.text)
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
     docs.query("What is Frederick Bates's greatest accomplishment?")
-    os.remove(doc_path)
 
 
 class Test(IsolatedAsyncioTestCase):
     async def test_aquery(self):
-        doc_path = "example.txt"
-        with open(doc_path, "w", encoding="utf-8") as f:
-            # get wiki page about politician
-            r = requests.get(
-                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-            )
-            f.write(r.text)
         docs = Docs()
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        docs.add_url(
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+            citation="WikiMedia Foundation, 2023, Accessed now",
+            dockey="test",
+        )
         await docs.aquery("What is Frederick Bates's greatest accomplishment?")
-        os.remove(doc_path)
 
 
 class TestDocMatch(IsolatedAsyncioTestCase):
     def test_adoc_match(self):
-        doc_path = "example.txt"
-        with open(doc_path, "w", encoding="utf-8") as f:
-            # get wiki page about politician
-            r = requests.get(
-                "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-            )
-            f.write(r.text)
         docs = Docs()
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        docs.add_url(
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+            citation="WikiMedia Foundation, 2023, Accessed now",
+            dockey="test",
+        )
         docs.adoc_match("What is Frederick Bates's greatest accomplishment?")
-        os.remove(doc_path)
 
 
 def test_docs_pickle():
