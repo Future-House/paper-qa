@@ -2,9 +2,10 @@ import asyncio
 import os
 import re
 import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union, cast
+from typing import BinaryIO, Dict, List, Optional, Set, Union, cast
 
 from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
@@ -20,6 +21,7 @@ from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollecti
 from .utils import (
     gather_with_concurrency,
     guess_is_4xx,
+    maybe_is_pdf,
     maybe_is_text,
     md5sum,
     name_in_text,
@@ -84,6 +86,30 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         docname += suffix
         return docname
 
+    def add_file(
+        self,
+        file: BinaryIO,
+        citation: Optional[str] = None,
+        docname: Optional[str] = None,
+        disable_check: bool = False,
+        dockey: Optional[DocKey] = None,
+        chunk_chars: int = 3000,
+    ) -> str:
+        """Add a document to the collection."""
+        # just put in temp file and use existing method
+        is_pdf = maybe_is_pdf(file)
+        with tempfile.NamedTemporaryFile(suffix=".pdf" if is_pdf else ".txt") as f:
+            f.write(file.read())
+            f.seek(0)
+            return self.add(
+                f.path,
+                citation=citation,
+                docname=docname,
+                disable_check=disable_check,
+                dockey=dockey,
+                chunk_chars=chunk_chars,
+            )
+
     def add(
         self,
         path: Path,
@@ -96,7 +122,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         """Add a document to the collection."""
         if dockey is None:
             dockey = md5sum(path)
-
         if citation is None:
             # skip system because it's too hesitant to answer
             cite_chain = make_chain(

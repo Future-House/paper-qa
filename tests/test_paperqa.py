@@ -1,5 +1,6 @@
 import os
 import pickle
+from io import BytesIO
 from typing import Any
 from unittest import IsolatedAsyncioTestCase
 
@@ -284,6 +285,30 @@ def test_pdf_reader():
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_fileio_reader_pdf():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    with open(doc_path, "rb") as f:
+        docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-curie-001"))
+        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+        answer = docs.query("Are counterfactuals actionable?")
+        assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_fileio_reader_txt():
+    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-curie-001"))
+    r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+    if r.status_code != 200:
+        raise ValueError("Could not download wikipedia page")
+    docs.add_file(
+        BytesIO(r.text.encode()),
+        "WikiMedia Foundation, 2023, Accessed now",
+        chunk_chars=1000,
+    )
+    answer = docs.query("What country was Frederick Bates born in?")
+    assert "Missouri" in answer.answer
 
 
 def test_pdf_pypdf_reader():

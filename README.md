@@ -66,7 +66,9 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
 
+### Adding Documents
 
+`add` will add from paths. You can also use `add_file` (expects a file object) or `add_url` to work with other sources.
 
 ### Choosing Model
 

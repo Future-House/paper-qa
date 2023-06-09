@@ -2,7 +2,7 @@ import asyncio
 import math
 import re
 import string
-from typing import List
+from typing import BinaryIO, List
 
 import pypdf
 
@@ -31,6 +31,12 @@ def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
     if entropy > thresh:
         return True
     return False
+
+
+def maybe_is_pdf(file: BinaryIO) -> bool:
+    magic_number = file.read(4)
+    file.seek(0)
+    return magic_number == b"%PDF"
 
 
 def strings_similarity(s1: str, s2: str) -> float:
