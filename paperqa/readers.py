@@ -31,6 +31,7 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
+    if len(split) > overlap:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
             Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)

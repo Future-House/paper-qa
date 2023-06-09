@@ -157,7 +157,7 @@ def test_docs_pickle():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
-        r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+        r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
         f.write(r.text)
     llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
     docs = Docs(llm=llm)
@@ -171,7 +171,7 @@ def test_docs_pickle():
     context1, context2 = (
         docs.get_evidence(
             Answer(
-                question="What date is flag day in Canada?",
+                question="What date is bring your dog to work in the US?",
                 summary_length="about 20 words",
             ),
             k=3,
@@ -179,13 +179,15 @@ def test_docs_pickle():
         ).context,
         docs2.get_evidence(
             Answer(
-                question="What date is flag day in Canada?",
+                question="What date is bring your dog to work in the US?",
                 summary_length="about 20 words",
             ),
             k=3,
             max_sources=1,
         ).context,
     )
+    print(context1)
+    print(context2)
     assert strings_similarity(context1, context2) > 0.75
     os.remove(doc_path)
 
@@ -194,7 +196,7 @@ def test_docs_pickle_no_faiss():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
-        r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+        r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
         f.write(r.text)
     llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
     docs = Docs(llm=llm)
@@ -209,7 +211,7 @@ def test_docs_pickle_no_faiss():
         strings_similarity(
             docs.get_evidence(
                 Answer(
-                    question="What date is flag day in Canada?",
+                    question="What date is bring your dog to work in the US?",
                     summary_length="about 20 words",
                 ),
                 k=3,
@@ -217,7 +219,7 @@ def test_docs_pickle_no_faiss():
             ).context,
             docs2.get_evidence(
                 Answer(
-                    question="What date is flag day in Canada?",
+                    question="What date is bring your dog to work in the US?",
                     summary_length="about 20 words",
                 ),
                 k=3,
