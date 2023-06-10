@@ -152,6 +152,7 @@ def test_docs_pickle():
     llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
     docs = Docs(llm=llm)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
+    os.remove(doc_path)
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
     docs2.update_llm(llm)
@@ -179,7 +180,8 @@ def test_docs_pickle():
     print(context1)
     print(context2)
     assert strings_similarity(context1, context2) > 0.75
-    os.remove(doc_path)
+    # make sure we can query
+    docs.query("What date is bring your dog to work in the US?")
 
 
 def test_docs_pickle_no_faiss():
