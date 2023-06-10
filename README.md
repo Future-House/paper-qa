@@ -172,7 +172,7 @@ source_files = glob.glob('**/*.js')
 docs = Docs()
 for f in source_files:
     # this assumes the file names are unique in code
-    docs.add(f, citation='File ' + os.path.name(f), key=os.path.name(f))
+    docs.add(f, citation='File ' + os.path.name(f), docname=os.path.name(f))
 answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
@@ -278,7 +278,7 @@ zotero = ZoteroDB(library_type="user")  # "group" if group library
 for item in zotero.iterate(limit=20):
     if item.num_pages > 30:
         continue  # skip long papers
-    docs.add(item.pdf, key=item.key)
+    docs.add(item.pdf, docname=item.key)
 ```
 
 which will download the first 20 papers in your Zotero database and add
@@ -295,7 +295,7 @@ for item in zotero.iterate(
         limit=100,
 ):
     print("Adding", item.title)
-    docs.add(item.pdf, key=item.key)
+    docs.add(item.pdf, docname=item.key)
 ```
 
 You can read more about the search syntax by typing `zotero.iterate?` in IPython.
