@@ -1,16 +1,32 @@
+default_language_version:
+    python: python3
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.3
+    rev: v4.4.0
     hooks:
       - id: trailing-whitespace
       - id: check-yaml
       - id: end-of-file-fixer
       - id: mixed-line-ending
-  - repo: https://github.com/psf/black
-    rev: "22.3.0"
+      - id: check-added-large-files
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.0.270"
     hooks:
-    - id: black
-  - repo: https://github.com/isort/isort
-    rev: "5.11.2"
+      - id: ruff
+        args: [ --fix, --exit-non-zero-on-fix ]
+  - repo: https://github.com/psf/black
+    rev: "23.3.0"
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "v1.3.0"
+    hooks:
+      - id: mypy
+        args: [--pretty, --ignore-missing-imports]
+        additional_dependencies: [types-requests]
+  - repo: https://github.com/PyCQA/isort
+    rev: "5.12.0"
     hooks:
       - id: isort
+        args: [--profile=black, "--skip=__init__.py", "--filter-files"]

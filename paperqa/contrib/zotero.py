@@ -1,28 +1,53 @@
 # This file gets PDF files from the user's Zotero library
 import logging
 import os
-from collections import namedtuple
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union, cast
+
+from pydantic import BaseModel
 
 try:
     from pyzotero import zotero
 except ImportError:
     raise ImportError("Please install pyzotero: `pip install pyzotero`")
-from ..paths import CACHE_PATH
+from ..paths import PAPERQA_DIR
 from ..types import StrPath
 from ..utils import count_pdf_pages
 
-ZoteroPaper = namedtuple(
-    "ZoteroPaper", ["key", "title", "pdf", "num_pages", "zotero_key", "details"]
-)
 
+class ZoteroPaper(BaseModel):
+    """A paper from Zotero.
 
-def _zotero_paper_repr(self) -> str:
-    return f'ZoteroPaper(\n    key = "{self.key}",\n    title = "{self.title}",\n    pdf = "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+    Attributes
+    ----------
+    key : str
+        The citation key.
+    title : str
+        The title of the item.
+    pdf : Path
+        The path to the PDF for the item (pass to `paperqa.Docs`)
+    num_pages : int
+        The number of pages in the PDF.
+    zotero_key : str
+        The Zotero key for the item.
+    details : dict
+        The full item details from Zotero.
+    """
 
+    key: str
+    title: str
+    pdf: Path
+    num_pages: int
+    zotero_key: str
+    details: dict
 
-ZoteroPaper.__repr__ = _zotero_paper_repr
+    def __str__(self) -> str:
+        """Return the title of the paper."""
+        return (
+            f'ZoteroPaper(\n    key = "{self.key}",\n'
+            f'title = "{self.title}",\n    pdf = "{self.pdf}",\n    '
+            f'num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+        )
 
 
 class ZoteroDB(zotero.Zotero):
@@ -75,7 +100,7 @@ class ZoteroDB(zotero.Zotero):
         self.logger.info(f"Using library ID: {library_id} with type: {library_type}.")
 
         if storage is None:
-            storage = CACHE_PATH.parent / "zotero"
+            storage = PAPERQA_DIR / "zotero"
 
         self.logger.info(f"Using cache location: {storage}")
         self.storage = storage
@@ -104,7 +129,7 @@ class ZoteroDB(zotero.Zotero):
         if pdf_key is None:
             return None
 
-        pdf_path = self.storage / (pdf_key + ".pdf")
+        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))  # type: ignore
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
@@ -186,11 +211,11 @@ class ZoteroDB(zotero.Zotero):
 
         max_limit = 100
 
-        items = []
-        pdfs = []
+        items: List = []
+        pdfs: List[Path] = []
         i = 0
         actual_i = 0
-        num_remaining = limit - len(items)
+        num_remaining = limit
 
         collection_id = None
         if collection_name:
@@ -222,7 +247,7 @@ class ZoteroDB(zotero.Zotero):
 
                 if no_pdf or is_duplicate:
                     continue
-
+                pdf = cast(Path, pdf)
                 title = item["data"]["title"] if "title" in item["data"] else ""
                 if len(items) >= start:
                     yield ZoteroPaper(
@@ -302,7 +327,7 @@ def _get_citation_key(item: dict) -> str:
     return f"{last_name}_{short_title}_{date}_{item['key']}".replace(" ", "")
 
 
-def _extract_pdf_key(item: dict) -> str:
+def _extract_pdf_key(item: dict) -> Union[str, None]:
     """Extract the PDF key from a Zotero item."""
 
     if "links" not in item:

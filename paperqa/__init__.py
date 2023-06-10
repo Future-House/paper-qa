@@ -1,3 +1,4 @@
-from .agent import run_agent
-from .docs import Answer, Docs, maybe_is_text
+from .docs import Answer, Docs, PromptCollection
 from .version import __version__
+
+__all__ = ["Docs", "Answer", "PromptCollection", "__version__"]
