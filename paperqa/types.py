@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Set, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.callbacks.manager import (
@@ -106,6 +106,11 @@ class Answer(BaseModel):
     dockey_filter: Optional[Set[DocKey]] = None
     summary_length: str = "about 100 words"
     answer_length: str = "about 100 words"
+    # these two below are for convenience
+    # and are not set. But you can set them
+    # if you want to use them.
+    cost: Optional[float] = None
+    token_counts: Optional[Dict[str, List[int]]] = None
 
     def __str__(self) -> str:
         """Return the answer as a string."""
