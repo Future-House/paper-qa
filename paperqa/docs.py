@@ -272,7 +272,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        if self.texts_index is not None:
+        if self.texts_index is not None and self.index_path is not None:
             state["texts_index"].save_local(self.index_path)
         del state["texts_index"]
         del state["doc_index"]
@@ -286,6 +286,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         except Exception:
             # they use some special exception type, but I don't want to import it
             self.texts_index = None
+        self.doc_index = None
 
     def _build_texts_index(self):
         if self.texts_index is None:
