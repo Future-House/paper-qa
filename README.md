@@ -14,13 +14,12 @@
     - [Naming](#naming)
     - [Breaking Changes](#breaking-changes)
   - [Notebooks](#notebooks)
-  - [Agents (experimental)](#agents-experimental)
   - [Where do I get papers?](#where-do-i-get-papers)
     - [Zotero](#zotero)
     - [Paper Scraper](#paper-scraper)
   - [PDF Reading Options](#pdf-reading-options)
   - [Typewriter View](#typewriter-view)
-  - [Caching](#caching-1)
+  - [LLM/Embedding Caching](#llmembedding-caching)
     - [Caching Embeddings](#caching-embeddings)
   - [Customizing Prompts](#customizing-prompts)
     - [Pre and Post Prompts](#pre-and-post-prompts)
@@ -125,20 +124,16 @@ docs = Docs(llm=model, summary_llm=summary_model)
 You can also use any other models (or embeddings) available in [langchain](https://github.com/hwchase17/langchain). Here's an example of using `llama.cpp` to have locally hosted paper-qa:
 
 ```py
+import paperscraper
 from paperqa import Docs
 from langchain.llms import LlamaCpp
 from langchain import PromptTemplate, LLMChain
 from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.embeddings import LlamaCppEmbeddings
-
-# Callbacks support token-wise streaming
-callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-# Verbose is required to pass to the callback manager
 
 # Make sure the model path is correct for your system!
 llm = LlamaCpp(
-    model_path="./ggml-model-q4_0.bin", callback_manager=callback_manager
+    model_path="./ggml-model-q4_0.bin", callbacks=[StreamingStdOutCallbackHandler()]
 )
 embeddings = LlamaCppEmbeddings(model_path="./ggml-model-q4_0.bin")
 
@@ -242,17 +237,6 @@ nest_asyncio.apply()
 
 Also - if you know how to make this automated, please let me know!
 
-## Agents (experimental)
-
-You can try to automate the collection of papers and assessment of correctness of papers using an agent. This is experimental and requires installation of [paper-scraper](https://github.com/blackadad/paper-scraper).
-
-```python
-
-docs = paperqa.Docs()
-answer = paperqa.run_agent(docs, 'What compounds target AKT1')
-print(answer)
-```
-
 ## Where do I get papers?
 
 Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
@@ -349,13 +333,14 @@ To stream the completions as they occur (giving that ChatGPT typewriter look), y
 
 ```python
 from paperqa import Docs
+from langchain.callbacks.manager import CallbackManager
 from langchain.chat_models import ChatOpenAI
 
-my_llm = ChatOpenAI(model='gpt-3.5-turbo', streaming=True)
+my_llm = ChatOpenAI(callbacks=[StreamingStdOutCallbackHandler()], streaming=True)
 docs = Docs(llm=my_llm)
 ```
 
-## Caching
+## LLM/Embedding Caching
 
 You can using the builtin langchain caching capabilities. Just run this code at the top of yours:
 
