@@ -1,22 +1,60 @@
-# Paper QA
+# Paper QA- [Paper QA](#paper-qa)
+- [Paper QA- Paper QA](#paper-qa--paper-qa)
+  - [Output Example](#output-example)
+    - [References](#references)
+  - [Hugging Face Demo](#hugging-face-demo)
+  - [Install](#install)
+  - [Usage](#usage)
+    - [Adding Documents](#adding-documents)
+    - [Choosing Model](#choosing-model)
+      - [Locally Hosted](#locally-hosted)
+    - [Adjusting number of sources](#adjusting-number-of-sources)
+    - [Using Code or HTML](#using-code-or-html)
+  - [Version 3 Changes](#version-3-changes)
+    - [Breaking Changes](#breaking-changes)
+      - [Naming](#naming)
+      - [Pickled objects](#pickled-objects)
+      - [Agents](#agents)
+      - [Caching](#caching)
+      - [Answers](#answers)
+      - [Search Query](#search-query)
+    - [New Features](#new-features)
+  - [Notebooks](#notebooks)
+  - [Agents (experimental)](#agents-experimental)
+  - [Where do I get papers?](#where-do-i-get-papers)
+    - [Zotero](#zotero)
+    - [Paper Scraper](#paper-scraper)
+  - [FAQ](#faq)
+    - [How is this different from LlamaIndex?](#how-is-this-different-from-llamaindex)
+    - [How is this different from LangChain?](#how-is-this-different-from-langchain)
+    - [Can I use different LLMs?](#can-i-use-different-llms)
+    - [Where do the documents come from?](#where-do-the-documents-come-from)
+    - [Can I save or load?](#can-i-save-or-load)
+    - [PDF Reading Options](#pdf-reading-options)
+    - [Typewriter View](#typewriter-view)
+    - [LLM Caching](#llm-caching)
+    - [Caching Embeddings](#caching-embeddings)
+    - [Customizing Prompts](#customizing-prompts)
+    - [Pre and Post Prompts](#pre-and-post-prompts)
+
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
 This is a minimal package for doing question and answering from
-PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations. It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
-generate answers.
+PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
 
-It uses the process shown below:
+By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
 
-```
-embed docs into vectors -> embed query into vector -> search for top k passages in docs
+PaperQA uses the process shown below:
 
-create summary of each passage relevant to query -> put summaries into prompt -> generate answer
-```
-
-<img src="https://user-images.githubusercontent.com/908389/230854097-8fa96768-c694-45c0-bb04-3a7386facef3.jpeg" width="600" alt="Process of vector search, refinement, and answer with context">
+1. embed docs into vectors
+2. embed query into vector
+3. search for top k passages in docs
+4. create summary of each passage relevant to query
+5. put summaries into prompt
+6. generate answer with prompt
 
 ## Output Example
 
