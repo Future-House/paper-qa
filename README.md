@@ -352,18 +352,16 @@ from langchain.chat_models import ChatOpenAI
 
 my_llm = ChatOpenAI(model='gpt-3.5-turbo', streaming=True)
 docs = Docs(llm=my_llm)
-
 ```
 
 ### LLM Caching
 
 You can using the builtin langchain caching capabilities. Just run this code at the top of yours:
 
-    ```python
-
-    from langchain.cache import InMemoryCache
-    langchain.llm_cache = InMemoryCache()
-    ```
+```py
+from langchain.cache import InMemoryCache
+langchain.llm_cache = InMemoryCache()
+```
 
 ### Caching Embeddings
 
