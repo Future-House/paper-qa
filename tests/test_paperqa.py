@@ -27,7 +27,8 @@ def test_maybe_is_text():
     # get front page of wikipedia
     r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
     assert maybe_is_text(r.text)
-    assert maybe_is_html(r.text)
+
+    assert maybe_is_html(BytesIO(r.text.encode()))
 
     # now force it to contain lots of weird encoding
     bad_text = r.text.encode("latin1", "ignore").decode("utf-16", "ignore")
@@ -285,7 +286,8 @@ def test_fileio_reader_pdf():
 
 
 def test_fileio_reader_txt():
-    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-curie-001"))
+    # can't use curie, because it has trouble with parsed HTML
+    docs = Docs(llm=OpenAI(client=None, temperature=0.0))
     r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
     if r.status_code != 200:
         raise ValueError("Could not download wikipedia page")
@@ -295,7 +297,7 @@ def test_fileio_reader_txt():
         chunk_chars=1000,
     )
     answer = docs.query("What country was Frederick Bates born in?")
-    assert "Missouri" in answer.answer
+    assert "Virginia" in answer.answer
 
 
 def test_pdf_pypdf_reader():
