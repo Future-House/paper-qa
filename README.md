@@ -1,22 +1,54 @@
-# Paper QA
+# Paper QA- [Paper QA](#paper-qa)
+- [Paper QA- Paper QA](#paper-qa--paper-qa)
+  - [Output Example](#output-example)
+    - [References](#references)
+  - [Hugging Face Demo](#hugging-face-demo)
+  - [Install](#install)
+  - [Usage](#usage)
+    - [Adding Documents](#adding-documents)
+    - [Choosing Model](#choosing-model)
+    - [Adjusting number of sources](#adjusting-number-of-sources)
+    - [Using Code or HTML](#using-code-or-html)
+  - [Version 3 Changes](#version-3-changes)
+    - [New Features](#new-features)
+    - [Naming](#naming)
+    - [Breaking Changes](#breaking-changes)
+  - [Notebooks](#notebooks)
+  - [Agents (experimental)](#agents-experimental)
+  - [Where do I get papers?](#where-do-i-get-papers)
+    - [Zotero](#zotero)
+    - [Paper Scraper](#paper-scraper)
+  - [PDF Reading Options](#pdf-reading-options)
+  - [Typewriter View](#typewriter-view)
+  - [Caching](#caching-1)
+    - [Caching Embeddings](#caching-embeddings)
+  - [Customizing Prompts](#customizing-prompts)
+    - [Pre and Post Prompts](#pre-and-post-prompts)
+  - [FAQ](#faq)
+    - [How is this different from LlamaIndex?](#how-is-this-different-from-llamaindex)
+    - [How is this different from LangChain?](#how-is-this-different-from-langchain)
+    - [Can I use different LLMs?](#can-i-use-different-llms)
+    - [Where do the documents come from?](#where-do-the-documents-come-from)
+    - [Can I save or load?](#can-i-save-or-load)
+
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
 This is a minimal package for doing question and answering from
-PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations. It uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. [langchain](https://github.com/hwchase17/langchain) helps
-generate answers.
+PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
 
-It uses the process shown below:
+By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
 
-```
-embed docs into vectors -> embed query into vector -> search for top k passages in docs
+PaperQA uses the process shown below:
 
-create summary of each passage relevant to query -> put summaries into prompt -> generate answer
-```
-
-<img src="https://user-images.githubusercontent.com/908389/230854097-8fa96768-c694-45c0-bb04-3a7386facef3.jpeg" width="600" alt="Process of vector search, refinement, and answer with context">
+1. embed docs into vectors
+2. embed query into vector
+3. search for top k passages in docs
+4. create summary of each passage relevant to query
+5. put summaries into prompt
+6. generate answer with prompt
 
 ## Output Example
 
@@ -31,7 +63,6 @@ Journet6644: Journet, Catherine, et al. "Large-scale production of single-walled
 Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly of carbon nanotubes for the fabrication of large-scale device arrays." Journal of the American Chemical Society 129.39 (2007): 11964-11968.
 
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
-
 
 ## Hugging Face Demo
 
@@ -67,6 +98,10 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
 
+### Adding Documents
+
+`add` will add from paths. You can also use `add_file` (expects a file object) or `add_url` to work with other sources.
+
 ### Choosing Model
 
 By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have gpt-4 access or would like to save money, you can adjust:
@@ -78,9 +113,9 @@ docs = Docs(llm='gpt-3.5-turbo')
 or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
 
 ```py
-from langchain.llms import Anthropic, OpenAIChat
-model = OpenAIChat(model='gpt-4')
-summary_model = Anthropic(model="claude-instant-v1-100k", anthropic_api_key="my-api-key")
+from langchain.chat_models import ChatAnthropic, ChatOpenAI
+model = ChatOpenAI(model='gpt-4')
+summary_model = ChatAnthropic(model="claude-instant-v1-100k", anthropic_api_key="my-api-key")
 docs = Docs(llm=model, summary_llm=summary_model)
 ```
 
@@ -146,6 +181,55 @@ for f in source_files:
 answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
+
+## Version 3 Changes
+
+Version 3 includes many changes to type the code, make it more focused/modular, and enable performance to very large numbers of documents. The major breaking changes are documented below:
+
+
+### New Features
+
+The following new features are in v3:
+
+1. `add_url` and `add_file` are now supported for adding from URLs and file objects
+2. Prompts can be customized, and now can be executed pre and post query
+3. Consistent use of `dockey` and `docname` for unique and natural language names enable better tracking with external databases
+4. Texts and embeddings are no longer required to be part of `Docs` object, so you can use external databases or other strategies to manage them
+5. Various simplifications, bug fixes, and performance improvements
+
+### Naming
+
+The following table shows the old names and the new names:
+
+| Old Name | New Name | Explanation |
+| :--- | :---: | ---: |
+| `key` | `name` | Name is a natural language name for text. |
+| `dockey` | `docname` | Docname is a natural language name for a document. |
+| `hash` | `dockey` | Dockey is a unique identifier for the document. |
+
+
+### Breaking Changes
+
+
+#### Pickled objects
+
+The pickled objects are not compatible with the new version.
+
+#### Agents
+
+The agent functionality has been removed, as it's not a core focus of the library
+
+#### Caching
+
+Caching has been removed because it's not a core focus of the library. See FAQ below for how to use caching.
+
+#### Answers
+
+Answers will not include passages, but instead return dockeys that can be used to retrieve the passages. Tokens/cost will also not be counted since that is built into langchain by default (see below for an example).
+
+#### Search Query
+
+The search query chain has been removed. You can use langchain directly to do this.
 
 ## Notebooks
 
@@ -251,6 +335,70 @@ answer = docs.query("What manufacturing challenges are unique to bispecific anti
 print(answer)
 ```
 
+## PDF Reading Options
+
+By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure python and easy to install. For faster PDF reading, paper-qa will detect and use [PymuPDF (fitz)](https://pymupdf.readthedocs.io/en/latest/):
+
+```sh
+pip install pymupdf
+```
+
+## Typewriter View
+
+To stream the completions as they occur (giving that ChatGPT typewriter look), you can simply instantiate models with those properties:
+
+```python
+from paperqa import Docs
+from langchain.chat_models import ChatOpenAI
+
+my_llm = ChatOpenAI(model='gpt-3.5-turbo', streaming=True)
+docs = Docs(llm=my_llm)
+```
+
+## Caching
+
+You can using the builtin langchain caching capabilities. Just run this code at the top of yours:
+
+```py
+from langchain.cache import InMemoryCache
+langchain.llm_cache = InMemoryCache()
+```
+
+### Caching Embeddings
+
+In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. If you would like to manage caching embeddings via an external database or other strategy,
+you can populate a `Docs` object directly via
+the `add_texts` object. That can take chunked texts and documents, which are serializable objects, to populate `Docs`.
+
+You also can simply use a separate vector database by setting the `doc_index` and `texts_index` explicitly when building the `Docs` object.
+
+## Customizing Prompts
+
+You can customize any of the prompts, using the `PromptCollection` class. For example, if you want to change the prompt for the question, you can do:
+
+```python
+from paperqa import Docs, Answer, PromptCollection
+from langchain.prompts import PromptTemplate
+
+my_qaprompt = PromptTemplate(
+    input_variables=["context", "question"],
+    template="Answer the question '{question}' "
+    "Use the context below if helpful. "
+    "You can cite the context using the key "
+    "like (Example2012). "
+    "If there is insufficient context, write a poem "
+    "about how you cannot answer.\n\n"
+    "Context: {context}\n\n")
+prompts=PromptCollection(qa=my_qaprompt)
+docs = Docs(prompts=prompts)
+```
+
+### Pre and Post Prompts
+
+Following the syntax above, you can also include prompts that
+are executed after the query and before the query. For example, you can use this to critique the answer.
+
+
 ## FAQ
 
 ### How is this different from LlamaIndex?
@@ -260,10 +408,6 @@ It's not that different! This is similar to the tree response method in LlamaInd
 ### How is this different from LangChain?
 
 It's not! We use langchain to abstract the LLMS, and the process is very similar to the `map_reduce` chain in LangChain.
-
-### Caching
-
-This code will cache responses from LLMS by default in `$HOME/.paperqa/llm_cache.db`. Delete this file to clear the cache.
 
 ### Can I use different LLMs?
 
@@ -288,15 +432,3 @@ with open("my_docs.pkl", "wb") as f:
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
 ```
-
-### PDF Reading Options
-
-By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure python and easy to install. For faster PDF reading, paper-qa will detect and use [PymuPDF (fitz)](https://pymupdf.readthedocs.io/en/latest/):
-
-```sh
-pip install pymupdf
-```
-
-### Callbacks
-
-TODO
