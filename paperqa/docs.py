@@ -202,7 +202,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     ):
         """Add chunked texts to the collection. This is useful if you have already chunked the texts yourself."""
         if doc.dockey in self.docs:
-            raise ValueError("Document already in collection.")
+            raise ValueError(f"Document {doc.dockey} already in collection.")
         if len(texts) == 0:
             raise ValueError("No texts to add.")
         if doc.docname in self.docnames:
