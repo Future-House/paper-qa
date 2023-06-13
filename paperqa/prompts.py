@@ -25,7 +25,7 @@ qa_prompt = PromptTemplate(
     'reply "I cannot answer". '
     "For each part of your answer, indicate which sources most support it "
     "via valid citation markers at the end of sentences, like (Example2012). "
-    "Answer in an unbiased, comp rehensive, and scholarly tone. "
+    "Answer in an unbiased, comprehensive, and scholarly tone. "
     "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. \n\n"
     "{context}\n"
     "Question: {question}\n"
@@ -34,11 +34,12 @@ qa_prompt = PromptTemplate(
 
 select_paper_prompt = PromptTemplate(
     input_variables=["question", "papers"],
-    template="Select papers to help answer the question below. "
+    template="Select papers that may help answer the question below. "
     "Papers are listed as $KEY: $PAPER_INFO. "
     "Return a list of keys, separated by commas. "
     'Return "None", if no papers are applicable. '
-    "Choose papers that are relevant, from reputable sources, and timely. \n\n"
+    "Choose papers that are relevant, from reputable sources, and timely "
+    "(if the question requires timely information). \n\n"
     "Question: {question}\n\n"
     "{papers}\n\n"
     "Selected keys:",

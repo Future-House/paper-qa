@@ -261,9 +261,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             query, k=k + len(self.deleted_dockeys)
         )
         matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
-        chain = make_chain(
-            self.prompts.select, cast(BaseLanguageModel, self.summary_llm)
-        )
+        chain = make_chain(self.prompts.select, cast(BaseLanguageModel, self.llm))
         papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
         result = await chain.arun(  # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
@@ -507,7 +505,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         else:
             callbacks = get_callbacks("answer")
             qa_chain = make_chain(self.prompts.qa, self.llm)
-            print(self.prompts.qa)
             answer_text = await qa_chain.arun(
                 context=answer.context,
                 answer_length=answer.answer_length,
