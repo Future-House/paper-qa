@@ -128,8 +128,8 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
 def read_doc(
     path: Path,
     doc: Doc,
-    chunk_chars: int,
-    overlap: int,
+    chunk_chars: int = 3000,
+    overlap: int = 100,
     force_pypdf: bool = False,
 ) -> List[Text]:
     """Parse a document into chunks."""
