@@ -130,6 +130,7 @@ from langchain.llms import LlamaCpp
 from langchain import PromptTemplate, LLMChain
 from langchain.callbacks.manager import CallbackManager
 from langchain.embeddings import LlamaCppEmbeddings
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 # Make sure the model path is correct for your system!
 llm = LlamaCpp(
@@ -335,6 +336,7 @@ To stream the completions as they occur (giving that ChatGPT typewriter look), y
 from paperqa import Docs
 from langchain.callbacks.manager import CallbackManager
 from langchain.chat_models import ChatOpenAI
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 my_llm = ChatOpenAI(callbacks=[StreamingStdOutCallbackHandler()], streaming=True)
 docs = Docs(llm=my_llm)
