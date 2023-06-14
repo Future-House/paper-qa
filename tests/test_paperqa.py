@@ -529,3 +529,32 @@ def test_post_prompt():
         f.write(r.text)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What country is Bates from?")
+
+
+def test_memory():
+    docs = Docs(memory=True, k=3, max_sources=1, llm="gpt-3.5-turbo", key_filter=False)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Red_Army",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    answer1 = docs.query("When did the Soviet Union and Japan agree to a cease-fire?")
+    print(answer1.answer)
+    assert answer1.memory is not None
+    assert "1939" in answer1.answer
+    assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
+    answer2 = docs.query("When was the conflict resolved?")
+    assert "1941" in answer2.answer or "1945" in answer2.answer
+    assert answer2.memory is not None
+    assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
+    print(answer2.answer)
+
+    docs.clear_memory()
+
+    answer3 = docs.query("When was the conflict resolved?")
+    assert answer3.memory is not None
+    assert (
+        "I cannot answer" in answer3.answer
+        or "insufficient" in answer3.answer
+        or "does not provide" in answer3.answer
+    )

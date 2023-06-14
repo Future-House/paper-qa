@@ -187,11 +187,12 @@ Version 3 includes many changes to type the code, make it more focused/modular, 
 
 The following new features are in v3:
 
-1. `add_url` and `add_file` are now supported for adding from URLs and file objects
-2. Prompts can be customized, and now can be executed pre and post query
-3. Consistent use of `dockey` and `docname` for unique and natural language names enable better tracking with external databases
-4. Texts and embeddings are no longer required to be part of `Docs` object, so you can use external databases or other strategies to manage them
-5. Various simplifications, bug fixes, and performance improvements
+1. Memory is now possible in `query` by setting `Docs(memory=True)` - this means follow-up questions will have a record of the previous question and answer.
+2. `add_url` and `add_file` are now supported for adding from URLs and file objects
+3. Prompts can be customized, and now can be executed pre and post query
+4. Consistent use of `dockey` and `docname` for unique and natural language names enable better tracking with external databases
+5. Texts and embeddings are no longer required to be part of `Docs` object, so you can use external databases or other strategies to manage them
+6. Various simplifications, bug fixes, and performance improvements
 
 ### Naming
 

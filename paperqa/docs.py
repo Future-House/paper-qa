@@ -12,6 +12,8 @@ from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.memory import ConversationTokenBufferMemory
+from langchain.memory.chat_memory import BaseChatMemory
 from langchain.vectorstores import FAISS, VectorStore
 from pydantic import BaseModel, validator
 
@@ -48,6 +50,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     max_concurrent: int = 5
     deleted_dockeys: Set[DocKey] = set()
     prompts: PromptCollection = PromptCollection()
+    memory: bool = False
+    memory_model: Optional[BaseChatMemory] = None
 
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
@@ -60,6 +64,24 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     @validator("summary_llm", always=True)
     def copy_llm_if_not_set(cls, v, values):
         return v or values["llm"]
+
+    @validator("memory_model", always=True)
+    def check_memory_model(cls, v, values):
+        if values["memory"]:
+            if v is None:
+                return ConversationTokenBufferMemory(
+                    llm=values["summary_llm"],
+                    max_token_limit=512,
+                    memory_key="memory",
+                    human_prefix="Question",
+                    ai_prefix="Answer",
+                    input_key="Question",
+                    output_key="Answer",
+                )
+            if v.memory_variables()[0] != "memory":
+                raise ValueError("Memory model must have memory_variables=['memory']")
+            return values["memory_model"]
+        return None
 
     def update_llm(
         self,
@@ -76,7 +98,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             summary_llm = llm
         self.summary_llm = cast(BaseLanguageModel, summary_llm)
 
-    def get_unique_name(self, docname: str) -> str:
+    def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name"""
         suffix = ""
         while docname + suffix in self.docnames:
@@ -182,12 +204,14 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             if match is not None:
                 year = match.group(1)  # type: ignore
             docname = f"{author}{year}"
-        docname = self.get_unique_name(docname)
+        docname = self._get_unique_name(docname)
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
         texts = read_doc(path, doc, chunk_chars=chunk_chars, overlap=100)
         # loose check to see if document was loaded
-        if len(texts[0].text) < 10 or (
-            not disable_check and not maybe_is_text(texts[0].text)
+        if (
+            len(texts) == 0
+            or len(texts[0].text) < 10
+            or (not disable_check and not maybe_is_text(texts[0].text))
         ):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
@@ -206,7 +230,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if len(texts) == 0:
             raise ValueError("No texts to add.")
         if doc.docname in self.docnames:
-            new_docname = self.get_unique_name(doc.docname)
+            new_docname = self._get_unique_name(doc.docname)
             for t in texts:
                 t.name = t.name.replace(doc.docname, new_docname)
             doc.docname = new_docname
@@ -261,7 +285,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             query, k=k + len(self.deleted_dockeys)
         )
         matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
-        chain = make_chain(self.prompts.select, cast(BaseLanguageModel, self.llm))
+        chain = make_chain(
+            self.prompts.select, cast(BaseLanguageModel, self.llm), skip_system=True
+        )
         papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
         result = await chain.arun(  # type: ignore
             question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
@@ -297,6 +323,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 embedding=self.embeddings,
                 metadatas=metadatas,
             )
+
+    def clear_memory(self):
+        """Clear the memory of the model."""
+        if self.memory_model is not None:
+            self.memory_model.clear()
 
     def get_evidence(
         self,
@@ -375,7 +406,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
 
         async def process(match):
             callbacks = get_callbacks("evidence:" + match.metadata["name"])
-            summary_chain = make_chain(self.prompts.summary, self.summary_llm)
+            summary_chain = make_chain(
+                self.prompts.summary, self.summary_llm, memory=self.memory_model
+            )
             # This is dangerous because it
             # could mask errors that are important- like auth errors
             # I also cannot know what the exception
@@ -391,7 +424,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                     callbacks=callbacks,
                 )
             except Exception as e:
-                if guess_is_4xx(e):
+                if guess_is_4xx(str(e)):
                     return None
                 raise e
             if "not applicable" in context.lower():
@@ -476,9 +509,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if answer is None:
             answer = Answer(question=query, answer_length=length_prompt)
         if len(answer.contexts) == 0:
-            # this is heuristic - max_sources and len(docs) are not
+            # this is heuristic - k and len(docs) are not
             # comparable - one is chunks and one is docs
-            if key_filter or (key_filter is None and len(self.docs) > max_sources):
+            if key_filter or (key_filter is None and len(self.docs) > k):
                 keys = await self.adoc_match(
                     answer.question, get_callbacks=get_callbacks
                 )
@@ -492,19 +525,19 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 get_callbacks=get_callbacks,
             )
         if self.prompts.pre is not None:
-            chain = make_chain(self.prompts.pre, self.llm)
+            chain = make_chain(self.prompts.pre, self.llm, memory=self.memory_model)
             pre = await chain.arun(
                 question=answer.question, callbacks=get_callbacks("pre")
             )
             answer.context = pre + "\n\n" + answer.context
         bib = dict()
-        if len(answer.context) < 10:
+        if len(answer.context) < 10 and not self.memory:
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )
         else:
             callbacks = get_callbacks("answer")
-            qa_chain = make_chain(self.prompts.qa, self.llm)
+            qa_chain = make_chain(self.prompts.qa, self.llm, memory=self.memory_model)
             answer_text = await qa_chain.arun(
                 context=answer.context,
                 answer_length=answer.answer_length,
@@ -531,11 +564,16 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         answer.references = bib_str
 
         if self.prompts.post is not None:
-            chain = make_chain(self.prompts.post, self.llm)
+            chain = make_chain(self.prompts.post, self.llm, memory=self.memory_model)
             post = await chain.arun(**answer.dict(), callbacks=get_callbacks("post"))
             answer.answer = post
             answer.formatted_answer = f"Question: {query}\n\n{post}\n"
             if len(bib) > 0:
                 answer.formatted_answer += f"\nReferences\n\n{bib_str}\n"
+        if self.memory_model is not None:
+            answer.memory = self.memory_model.load_memory_variables(inputs={})["memory"]
+            self.memory_model.save_context(
+                {"Question": answer.question}, {"Answer": answer.answer}
+            )
 
         return answer
