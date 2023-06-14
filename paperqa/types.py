@@ -106,6 +106,7 @@ class Answer(BaseModel):
     dockey_filter: Optional[Set[DocKey]] = None
     summary_length: str = "about 100 words"
     answer_length: str = "about 100 words"
+    memory: Optional[str] = None
     # these two below are for convenience
     # and are not set. But you can set them
     # if you want to use them.
