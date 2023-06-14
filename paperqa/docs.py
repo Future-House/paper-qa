@@ -59,7 +59,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     def check_llm(cls, v: Union[BaseLanguageModel, str]) -> BaseLanguageModel:
         if type(v) is str:
             return ChatOpenAI(temperature=0.1, model=v, client=None)
-        return v
+        return cast(BaseLanguageModel, v)
 
     @validator("summary_llm", always=True)
     def copy_llm_if_not_set(cls, v, values):
@@ -525,7 +525,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 get_callbacks=get_callbacks,
             )
         if self.prompts.pre is not None:
-            chain = make_chain(self.prompts.pre, self.llm, memory=self.memory_model)
+            chain = make_chain(
+                self.prompts.pre,
+                cast(BaseLanguageModel, self.llm),
+                memory=self.memory_model,
+            )
             pre = await chain.arun(
                 question=answer.question, callbacks=get_callbacks("pre")
             )
@@ -537,7 +541,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             )
         else:
             callbacks = get_callbacks("answer")
-            qa_chain = make_chain(self.prompts.qa, self.llm, memory=self.memory_model)
+            qa_chain = make_chain(
+                self.prompts.qa,
+                cast(BaseLanguageModel, self.llm),
+                memory=self.memory_model,
+            )
             answer_text = await qa_chain.arun(
                 context=answer.context,
                 answer_length=answer.answer_length,
@@ -564,7 +572,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         answer.references = bib_str
 
         if self.prompts.post is not None:
-            chain = make_chain(self.prompts.post, self.llm, memory=self.memory_model)
+            chain = make_chain(
+                self.prompts.post,
+                cast(BaseLanguageModel, self.llm),
+                memory=self.memory_model,
+            )
             post = await chain.arun(**answer.dict(), callbacks=get_callbacks("post"))
             answer.answer = post
             answer.formatted_answer = f"Question: {query}\n\n{post}\n"
