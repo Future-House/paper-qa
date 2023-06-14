@@ -6,13 +6,13 @@ summary_prompt = PromptTemplate(
     input_variables=["text", "citation", "question", "summary_length"],
     template="Summarize the text below to help answer a question. "
     "Do not directly answer the question, instead summarize "
-    "to give evidence to help answer the question. Include direct quotes. "
+    "to give evidence to help answer the question. "
     'Reply "Not applicable" if text is irrelevant. '
     "Use {summary_length}. At the end of your response, provide a score from 1-10 on a newline "
     "indicating relevance to question. Do not explain your score. "
     "\n\n"
-    "{text}\n"
-    "Extracted from {citation}\n"
+    "{text}\n\n"
+    "Excerpt from {citation}\n"
     "Question: {question}\n"
     "Relevant Information Summary:",
 )
