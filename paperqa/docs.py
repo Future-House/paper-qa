@@ -117,7 +117,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         docname: Optional[str] = None,
         dockey: Optional[DocKey] = None,
         chunk_chars: int = 3000,
-    ) -> str:
+    ) -> Optional[str]:
         """Add a document to the collection."""
         # just put in temp file and use existing method
         suffix = ".txt"
@@ -144,7 +144,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         docname: Optional[str] = None,
         dockey: Optional[DocKey] = None,
         chunk_chars: int = 3000,
-    ) -> str:
+    ) -> Optional[str]:
         """Add a document to the collection."""
         import urllib.request
 
@@ -167,7 +167,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         disable_check: bool = False,
         dockey: Optional[DocKey] = None,
         chunk_chars: int = 3000,
-    ) -> str:
+    ) -> Optional[str]:
         """Add a document to the collection."""
         if dockey is None:
             dockey = md5sum(path)
@@ -216,17 +216,21 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
-        self.add_texts(texts, doc)
-        return docname
+        if self.add_texts(texts, doc):
+            return docname
+        return None
 
     def add_texts(
         self,
         texts: List[Text],
         doc: Doc,
-    ):
-        """Add chunked texts to the collection. This is useful if you have already chunked the texts yourself."""
+    ) -> bool:
+        """Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
+
+        Returns True if the document was added, False if it was already in the collection.
+        """
         if doc.dockey in self.docs:
-            raise ValueError(f"Document {doc.dockey} already in collection.")
+            return False
         if len(texts) == 0:
             raise ValueError("No texts to add.")
         if doc.docname in self.docnames:
@@ -255,6 +259,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
+        return True
 
     def delete(
         self, name: Optional[str] = None, dockey: Optional[DocKey] = None
