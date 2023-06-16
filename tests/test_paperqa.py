@@ -105,7 +105,7 @@ def test_evidence():
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     evidence = docs.get_evidence(
-        Answer(question="For which state was he a governor"), k=1, max_sources=1
+        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
     assert "Missouri" in evidence.context
     os.remove(doc_path)
@@ -119,6 +119,23 @@ def test_query():
         dockey="test",
     )
     docs.query("What is Frederick Bates's greatest accomplishment?")
+
+
+def test_duplicate():
+    docs = Docs()
+    assert docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert (
+        docs.add_url(
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+            citation="WikiMedia Foundation, 2023, Accessed now",
+            dockey="test",
+        )
+        is None
+    )
 
 
 class Test(IsolatedAsyncioTestCase):
