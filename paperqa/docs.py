@@ -247,7 +247,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if self.texts_index is not None:
             try:
                 self.texts_index.add_embeddings(  # type: ignore
-                    list(zip(texts, text_embeddings)),
+                    list(map(lambda x: (x.text, x.embeddings), texts)),
                     metadatas=[
                         t.dict(exclude={"embeddings", "text"}) for t in self.texts
                     ],
