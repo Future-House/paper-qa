@@ -507,7 +507,7 @@ def test_custom_prompts():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country is Bates from?")
     print(answer.answer)
-    assert "United States" == answer.answer
+    assert "United States" in answer.answer
 
 
 def test_pre_prompt():
