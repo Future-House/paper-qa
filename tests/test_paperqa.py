@@ -408,15 +408,16 @@ def test_dockey_delete():
         f.write(r.text)
         f.write("\n\nBates could be from Angola")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
-    answer = Answer(question="What country is Bates from?")
+    answer = Answer(question="What country was Bates born in?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
+    print(answer)
     keys = set([c.text.doc.dockey for c in answer.contexts])
     assert len(keys) == 2
     assert len(docs.docs) == 2
 
     docs.delete(dockey="test")
     assert len(docs.docs) == 1
-    answer = Answer(question="What country is Bates from?")
+    answer = Answer(question="What country was Bates born in?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
     keys = set([c.text.doc.dockey for c in answer.contexts])
     assert len(keys) == 1
