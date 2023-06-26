@@ -4,13 +4,14 @@ from io import BytesIO
 from typing import Any
 from unittest import IsolatedAsyncioTestCase
 
+import numpy as np
 import requests
 from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
 from langchain.prompts import PromptTemplate
 
-from paperqa import Answer, Docs, PromptCollection
+from paperqa import Answer, Docs, PromptCollection, Text
 from paperqa.readers import read_doc
 from paperqa.types import Doc
 from paperqa.utils import maybe_is_html, maybe_is_text, name_in_text, strings_similarity
@@ -576,3 +577,40 @@ def test_memory():
         or "insufficient" in answer3.answer
         or "does not provide" in answer3.answer
     )
+
+
+def test_add_texts():
+    llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
+    docs = Docs(llm=llm)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+
+    docs2 = Docs(llm=llm)
+    texts = [Text(**dict(t)) for t in docs.texts]
+    for t in texts:
+        t.embeddings = None
+    docs2.add_texts(texts, list(docs.docs.values())[0])
+
+    for t1, t2 in zip(docs2.texts, docs.texts):
+        assert t1.text == t2.text
+        assert np.allclose(t1.embeddings, t2.embeddings, atol=1e-3)
+
+    docs2._build_texts_index()
+    print("BUILT NOW")
+    # now do it again to test after text index is already built
+    llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
+    docs = Docs(llm=llm)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test3",
+    )
+
+    texts = [Text(**dict(t)) for t in docs.texts]
+    for t in texts:
+        t.embeddings = None
+    docs2.add_texts(texts, list(docs.docs.values())[0])
+    assert len(docs2.docs) == 2
