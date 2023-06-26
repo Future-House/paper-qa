@@ -246,10 +246,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             text_embeddings = cast(List[List[float]], [t.embeddings for t in texts])
         if self.texts_index is not None:
             try:
+                vec_store_text_and_embeddings = list(map(lambda x: (x.text, x.embeddings), texts))
                 self.texts_index.add_embeddings(  # type: ignore
-                    list(zip(texts, text_embeddings)),
+                    vec_store_text_and_embeddings,
                     metadatas=[
-                        t.dict(exclude={"embeddings", "text"}) for t in self.texts
+                        t.dict(exclude={"embeddings", "text"}) for t in texts
                     ],
                 )
             except AttributeError:
