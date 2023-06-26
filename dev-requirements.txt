@@ -6,3 +6,4 @@ python-dotenv
 pymupdf
 build
 types-requests
+numpy

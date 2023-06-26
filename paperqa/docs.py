@@ -244,14 +244,16 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 t.embeddings = text_embeddings[i]
         else:
             text_embeddings = cast(List[List[float]], [t.embeddings for t in texts])
+        print("HEEREERE", self.texts_index)
         if self.texts_index is not None:
             try:
-                vec_store_text_and_embeddings = list(map(lambda x: (x.text, x.embeddings), texts))
+                # TODO: Simplify - super weird
+                vec_store_text_and_embeddings = list(
+                    map(lambda x: (x.text, x.embeddings), texts)
+                )
                 self.texts_index.add_embeddings(  # type: ignore
                     vec_store_text_and_embeddings,
-                    metadatas=[
-                        t.dict(exclude={"embeddings", "text"}) for t in texts
-                    ],
+                    metadatas=[t.dict(exclude={"embeddings", "text"}) for t in texts],
                 )
             except AttributeError:
                 raise ValueError("Need a vector store that supports adding embeddings.")
@@ -329,6 +331,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 embedding=self.embeddings,
                 metadatas=metadatas,
             )
+        print("HEREEEEEFERAFAREVEA", self.texts_index)
 
     def clear_memory(self):
         """Clear the memory of the model."""
