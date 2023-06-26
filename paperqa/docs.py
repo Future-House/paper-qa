@@ -244,7 +244,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 t.embeddings = text_embeddings[i]
         else:
             text_embeddings = cast(List[List[float]], [t.embeddings for t in texts])
-        print("HEEREERE", self.texts_index)
         if self.texts_index is not None:
             try:
                 # TODO: Simplify - super weird
@@ -331,7 +330,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 embedding=self.embeddings,
                 metadatas=metadatas,
             )
-        print("HEREEEEEFERAFAREVEA", self.texts_index)
 
     def clear_memory(self):
         """Clear the memory of the model."""
