@@ -588,7 +588,7 @@ def test_add_texts():
         dockey="test",
     )
 
-    docs2 = Docs(llm=llm)
+    docs2 = Docs()
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
         t.embeddings = None
@@ -599,7 +599,6 @@ def test_add_texts():
         assert np.allclose(t1.embeddings, t2.embeddings, atol=1e-3)
 
     docs2._build_texts_index()
-    print("BUILT NOW")
     # now do it again to test after text index is already built
     llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
     docs = Docs(llm=llm)
@@ -614,3 +613,5 @@ def test_add_texts():
         t.embeddings = None
     docs2.add_texts(texts, list(docs.docs.values())[0])
     assert len(docs2.docs) == 2
+
+    docs2.query("What country was Bates Born in?")
