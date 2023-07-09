@@ -257,7 +257,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             except AttributeError:
                 raise ValueError("Need a vector store that supports adding embeddings.")
         if self.doc_index is not None:
-            self.doc_index.add_texts([doc.citation], metadatas=[{"dockey": doc.dockey}])
+            self.doc_index.add_texts([doc.citation], metadatas=[doc.dict()])
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
@@ -291,7 +291,17 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         matches = self.doc_index.max_marginal_relevance_search(
             query, k=k + len(self.deleted_dockeys)
         )
-        matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
+        # filter the matches
+        matches = [
+            m for m in matches if m.metadata["dockey"] not in self.deleted_dockeys
+        ]
+        try:
+            # for backwards compatibility (old pickled objects)
+            matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
+        except KeyError:
+            matched_docs = [Doc(**m.metadata) for m in matches]
+        if len(matched_docs) == 0:
+            return set()
         chain = make_chain(
             self.prompts.select, cast(BaseLanguageModel, self.llm), skip_system=True
         )
@@ -372,7 +382,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
-        if len(self.docs) == 0:
+        if len(self.docs) == 0 and self.doc_index is None:
             return answer
         if self.texts_index is None:
             self._build_texts_index()

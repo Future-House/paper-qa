@@ -195,8 +195,6 @@ def test_docs_pickle():
             max_sources=1,
         ).context,
     )
-    print(context1)
-    print(context2)
     assert strings_similarity(context1, context2) > 0.75
     # make sure we can query
     docs.query("What date is bring your dog to work in the US?")
@@ -615,3 +613,17 @@ def test_add_texts():
     assert len(docs2.docs) == 2
 
     docs2.query("What country was Bates Born in?")
+
+
+def test_external_doc_index():
+    docs = Docs()
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    evidence = docs.query(query="What is the date of flag day?", key_filter=True)
+    docs2 = Docs(doc_index=docs.doc_index, texts_index=docs.texts_index)
+    assert len(docs2.docs) == 0
+    evidence = docs2.query("What is the date of flag day?", key_filter=True)
+    assert "February 15" in evidence.context
