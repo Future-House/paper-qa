@@ -42,7 +42,7 @@ select_paper_prompt = PromptTemplate(
     "(if the question requires timely information). \n\n"
     "Question: {question}\n\n"
     "{papers}\n\n"
-    "Keys:",
+    "Selected keys:",
 )
 
 
