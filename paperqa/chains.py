@@ -90,8 +90,20 @@ def make_chain(
 
 def get_score(text: str) -> int:
     score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
+    if not score:
+        score = re.search(r"\(([0-9])\w*\/", text)
     if score:
-        return int(score.group(1))
+        s = int(score.group(1))
+        if s > 10:
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    last_few = text[-15:]
+    scores = re.findall(r"([0-9]+)", last_few)
+    if scores:
+        s = int(scores[-1])
+        if s > 10:
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
     if len(text) < 100:
         return 1
     return 5
