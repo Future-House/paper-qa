@@ -721,3 +721,24 @@ def test_external_doc_index():
     assert len(docs2.docs) == 0
     evidence = docs2.query("What is the date of flag day?", key_filter=True)
     assert "February 15" in evidence.context
+
+
+def test_external_texts_index():
+    docs = Docs(jit_texts_index=True)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        citation="Flag Day of Canada, WikiMedia Foundation, 2023, Accessed now",
+    )
+    answer = docs.query(query="What is the date of flag day?", key_filter=True)
+    assert "February 15" in answer.answer
+
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
+    )
+
+    answer = docs.query(query="What is the date of flag day?", key_filter=False)
+    assert "February 15" in answer.answer
+
+    answer = docs.query(query="What is the date of flag day?", key_filter=True)
+    assert "February 15" in answer.answer
