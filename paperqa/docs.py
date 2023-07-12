@@ -337,7 +337,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if self.texts_index is None:
             texts = self.texts
             if keys is not None:
-                texts = [t for t in texts if t.name in keys]
+                texts = [t for t in texts if t.doc.dockey in keys]
             raw_texts = [t.text for t in texts]
             text_embeddings = [t.embeddings for t in texts]
             metadatas = [t.dict(exclude={"embeddings", "text"}) for t in texts]
