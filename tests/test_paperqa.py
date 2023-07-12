@@ -192,7 +192,7 @@ def test_update_llm():
 
 
 def test_evidence():
-    doc_path = "example.txt"
+    doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
@@ -202,6 +202,7 @@ def test_evidence():
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
+    print(evidence.context)
     assert "Missouri" in evidence.context
     os.remove(doc_path)
 
@@ -256,7 +257,7 @@ class TestDocMatch(IsolatedAsyncioTestCase):
 
 
 def test_docs_pickle():
-    doc_path = "example.txt"
+    doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
@@ -295,7 +296,7 @@ def test_docs_pickle():
 
 
 def test_docs_pickle_no_faiss():
-    doc_path = "example.txt"
+    doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
@@ -592,13 +593,13 @@ def test_custom_prompts():
 
     docs = Docs(prompts=PromptCollection(qa=my_qaprompt))
 
-    doc_path = "example.txt"
+    doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What country is Bates from?")
+    answer = docs.query("What country is Frederick Bates from?")
     print(answer.answer)
     assert "United States" in answer.answer
 
@@ -643,18 +644,18 @@ def test_post_prompt():
 
 
 def test_memory():
-    docs = Docs(memory=True, k=3, max_sources=1, llm="gpt-3.5-turbo", key_filter=False)
+    # Not sure why, but gpt-3.5 cannot do this anymore.
+    docs = Docs(memory=True, k=3, max_sources=1, llm="gpt-4", key_filter=False)
     docs.add_url(
         "https://en.wikipedia.org/wiki/Red_Army",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     answer1 = docs.query("When did the Soviet Union and Japan agree to a cease-fire?")
-    print(answer1.answer)
     assert answer1.memory is not None
     assert "1939" in answer1.answer
     assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
-    answer2 = docs.query("When was the conflict resolved?")
+    answer2 = docs.query("When was it resolved?")
     assert "1941" in answer2.answer or "1945" in answer2.answer
     assert answer2.memory is not None
     assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
@@ -662,7 +663,7 @@ def test_memory():
 
     docs.clear_memory()
 
-    answer3 = docs.query("When was the conflict resolved?")
+    answer3 = docs.query("When was it resolved?")
     assert answer3.memory is not None
     assert (
         "I cannot answer" in answer3.answer

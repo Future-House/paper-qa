@@ -84,6 +84,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             return values["memory_model"]
         return None
 
+    def clear_docs(self):
+        self.texts = []
+        self.docs = {}
+        self.docnames = set()
+
     def update_llm(
         self,
         llm: Union[BaseLanguageModel, str],
@@ -281,9 +286,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         self, query: str, k: int = 25, get_callbacks: CallbackFactory = lambda x: None
     ) -> Set[DocKey]:
         """Return a list of dockeys that match the query."""
-        if len(self.docs) == 0:
-            return set()
         if self.doc_index is None:
+            if len(self.docs) == 0:
+                return set()
             texts = [doc.citation for doc in self.docs.values()]
             metadatas = [d.dict() for d in self.docs.values()]
             self.doc_index = FAISS.from_texts(
@@ -338,6 +343,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             texts = self.texts
             if keys is not None:
                 texts = [t for t in texts if t.doc.dockey in keys]
+            if len(texts) == 0:
+                return
             raw_texts = [t.text for t in texts]
             text_embeddings = [t.embeddings for t in texts]
             metadatas = [t.dict(exclude={"embeddings", "text"}) for t in texts]
@@ -392,6 +399,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if len(self.docs) == 0 and self.doc_index is None:
             return answer
         self._build_texts_index(keys=answer.dockey_filter)
+        if self.texts_index is None:
+            return answer
         self.texts_index = cast(VectorStore, self.texts_index)
         _k = k
         if answer.dockey_filter is not None:
