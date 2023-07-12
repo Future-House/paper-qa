@@ -52,6 +52,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     prompts: PromptCollection = PromptCollection()
     memory: bool = False
     memory_model: Optional[BaseChatMemory] = None
+    jit_texts_index: bool = False
 
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
@@ -82,6 +83,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 raise ValueError("Memory model must have memory_variables=['memory']")
             return values["memory_model"]
         return None
+
+    def clear_docs(self):
+        self.texts = []
+        self.docs = {}
+        self.docnames = set()
 
     def update_llm(
         self,
@@ -280,9 +286,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         self, query: str, k: int = 25, get_callbacks: CallbackFactory = lambda x: None
     ) -> Set[DocKey]:
         """Return a list of dockeys that match the query."""
-        if len(self.docs) == 0:
-            return set()
         if self.doc_index is None:
+            if len(self.docs) == 0:
+                return set()
             texts = [doc.citation for doc in self.docs.values()]
             metadatas = [d.dict() for d in self.docs.values()]
             self.doc_index = FAISS.from_texts(
@@ -329,11 +335,19 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             self.texts_index = None
         self.doc_index = None
 
-    def _build_texts_index(self):
+    def _build_texts_index(self, keys: Optional[Set[DocKey]] = None):
+        if keys is not None and self.jit_texts_index:
+            del self.texts_index
+            self.texts_index = None
         if self.texts_index is None:
-            raw_texts = [t.text for t in self.texts]
-            text_embeddings = [t.embeddings for t in self.texts]
-            metadatas = [t.dict(exclude={"embeddings", "text"}) for t in self.texts]
+            texts = self.texts
+            if keys is not None:
+                texts = [t for t in texts if t.doc.dockey in keys]
+            if len(texts) == 0:
+                return
+            raw_texts = [t.text for t in texts]
+            text_embeddings = [t.embeddings for t in texts]
+            metadatas = [t.dict(exclude={"embeddings", "text"}) for t in texts]
             self.texts_index = FAISS.from_embeddings(
                 # wow adding list to the zip was tricky
                 text_embeddings=list(zip(raw_texts, text_embeddings)),
@@ -384,8 +398,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     ) -> Answer:
         if len(self.docs) == 0 and self.doc_index is None:
             return answer
+        self._build_texts_index(keys=answer.dockey_filter)
         if self.texts_index is None:
-            self._build_texts_index()
+            return answer
         self.texts_index = cast(VectorStore, self.texts_index)
         _k = k
         if answer.dockey_filter is not None:
