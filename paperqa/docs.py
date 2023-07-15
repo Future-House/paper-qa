@@ -209,7 +209,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             match = re.search(r"(\d{4})", citation)
             if match is not None:
                 year = match.group(1)  # type: ignore
-            docname = f"{author}{year}"
+            # This step is added to remove edge case of a author having the 2 or more papers in a year
+            docname = f"{author}{year}_{str(abs(hash(citation)))}"
         docname = self._get_unique_name(docname)
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
         texts = read_doc(path, doc, chunk_chars=chunk_chars, overlap=100)
