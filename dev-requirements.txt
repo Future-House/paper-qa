@@ -7,3 +7,5 @@ pymupdf
 build
 types-requests
 numpy
+flask
+flask-session
