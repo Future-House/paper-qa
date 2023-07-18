@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from langchain.prompts import PromptTemplate
 
 summary_prompt = PromptTemplate(
@@ -45,16 +43,11 @@ select_paper_prompt = PromptTemplate(
     "Selected keys:",
 )
 
-
-def _get_datetime():
-    now = datetime.now()
-    return now.strftime("%m/%d/%Y")
-
-
+# We are unable to serialize with partial variables
+# so TODO: update year next year
 citation_prompt = PromptTemplate(
     input_variables=["text"],
-    template="Provide the citation for the following text in MLA Format. Today's date is {date}\n"
+    template="Provide the citation for the following text in MLA Format. The year is 2023\n"
     "{text}\n\n"
     "Citation:",
-    partial_variables={"date": _get_datetime},
 )

@@ -7,7 +7,7 @@ from langchain.callbacks.manager import (
     CallbackManagerForChainRun,
 )
 from langchain.prompts import PromptTemplate
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, validator
 
 from .prompts import citation_prompt, qa_prompt, select_paper_prompt, summary_prompt
 
@@ -31,10 +31,10 @@ class Text(BaseModel):
 
 
 class PromptCollection(BaseModel):
-    summary: PromptTemplate = Field(default_factory=lambda: summary_prompt)
-    qa: PromptTemplate = Field(default_factory=lambda: qa_prompt)
-    select: PromptTemplate = Field(default_factory=lambda: select_paper_prompt)
-    cite: PromptTemplate = Field(default_factory=lambda: citation_prompt)
+    summary: PromptTemplate = summary_prompt
+    qa: PromptTemplate = qa_prompt
+    select: PromptTemplate = select_paper_prompt
+    cite: PromptTemplate = citation_prompt
     pre: Optional[PromptTemplate] = None
     post: Optional[PromptTemplate] = None
 
