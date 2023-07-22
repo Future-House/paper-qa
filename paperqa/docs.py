@@ -367,6 +367,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         max_sources: int = 5,
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
+        detailed_citations: bool = False,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -385,6 +386,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 max_sources=max_sources,
                 marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
+                detailed_citations=detailed_citations,
             )
         )
 
@@ -395,6 +397,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         max_sources: int = 5,
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
+        detailed_citations: bool = False,
     ) -> Answer:
         if len(self.docs) == 0 and self.doc_index is None:
             return answer
@@ -448,9 +451,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             # my best idea is see if there is a 4XX
             # http code in the exception
             try:
+                citation = match.metadata["doc"]["citation"]
+                if detailed_citations:
+                    match.metadata["name"] + ": " + citation
                 context = await summary_chain.arun(
                     question=answer.question,
-                    citation=match.metadata["doc"]["citation"],
+                    # Add name so chunk is stated
+                    citation=citation,
                     summary_length=answer.summary_length,
                     text=match.page_content,
                     callbacks=callbacks,
@@ -484,7 +491,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         # add to answer contexts
         answer.contexts += contexts
         context_str = "\n\n".join(
-            [f"{c.text.name}: {c.context}" for c in answer.contexts]
+            [
+                f"{c.text.name}: {c.context}"
+                + (f". Based on {c.text.doc.citation}" if detailed_citations else "")
+                for c in answer.contexts
+            ]
         )
         valid_names = [c.text.name for c in answer.contexts]
         context_str += "\n\nValid keys: " + ", ".join(valid_names)
