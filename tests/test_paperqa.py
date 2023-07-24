@@ -36,13 +36,6 @@ def test_location_awareness():
             ),
             detailed_citations=True,
         )
-        # answer2 = docs.get_evidence(
-        #     Answer(
-        #         question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational chemistry because it can accurately model non-linear structure-function relationships.' on?"
-        #     ),
-        #     detailed_citations=False,
-        # )
-        # pdb.set_trace()
         assert "2" in answer.context or "1" in answer.context
 
 
