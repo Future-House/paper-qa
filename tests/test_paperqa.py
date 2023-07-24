@@ -16,11 +16,34 @@ from paperqa.chains import get_score
 from paperqa.readers import read_doc
 from paperqa.types import Doc
 from paperqa.utils import maybe_is_html, maybe_is_text, name_in_text, strings_similarity
+import pdb
 
 
 class TestHandler(AsyncCallbackHandler):
     async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
         print(token)
+
+
+def test_location_awareness():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    with open(doc_path, "rb") as f:
+        docs = Docs()
+        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+        answer = docs.get_evidence(
+            Answer(
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational chemistry because it can accurately model non-linear structure-function relationships.' on?"
+            ),
+            detailed_citations=True,
+        )
+        # answer2 = docs.get_evidence(
+        #     Answer(
+        #         question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational chemistry because it can accurately model non-linear structure-function relationships.' on?"
+        #     ),
+        #     detailed_citations=False,
+        # )
+        # pdb.set_trace()
+        assert "2" in answer.context or "1" in answer.context
 
 
 def test_maybe_is_text():

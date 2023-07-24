@@ -493,7 +493,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
-                + (f". Based on {c.text.doc.citation}" if detailed_citations else "")
+                + (f" Based on {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]
         )
