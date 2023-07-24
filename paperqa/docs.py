@@ -453,7 +453,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             try:
                 citation = match.metadata["doc"]["citation"]
                 if detailed_citations:
-                    match.metadata["name"] = match.metadata["name"] + ": " + citation
+                    citation = match.metadata["name"] + ": " + citation
                 context = await summary_chain.arun(
                     question=answer.question,
                     # Add name so chunk is stated
