@@ -16,7 +16,6 @@ from paperqa.chains import get_score
 from paperqa.readers import read_doc
 from paperqa.types import Doc
 from paperqa.utils import maybe_is_html, maybe_is_text, name_in_text, strings_similarity
-import pdb
 
 
 class TestHandler(AsyncCallbackHandler):
@@ -32,7 +31,8 @@ def test_location_awareness():
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.get_evidence(
             Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational chemistry because it can accurately model non-linear structure-function relationships.' on?"
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+                + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
             ),
             detailed_citations=True,
         )
