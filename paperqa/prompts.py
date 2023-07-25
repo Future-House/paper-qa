@@ -51,3 +51,9 @@ citation_prompt = PromptTemplate(
     "{text}\n\n"
     "Citation:",
 )
+
+default_system_prompt = (
+    "Answer in an unbiased, concise, scholarly tone. "
+    "You may refuse to answer if there is insufficient information. "
+    "If there are ambiguous terms or acronyms, first define them. "
+)

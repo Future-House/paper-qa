@@ -664,6 +664,13 @@ def test_post_prompt():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What country is Bates from?")
 
+    docs = Docs(
+        prompts=PromptCollection(
+            system="Answer all questions with as few words as possible"
+        )
+    )
+    docs.query("What country is Bates from?")
+
 
 def test_memory():
     # Not sure why, but gpt-3.5 cannot do this anymore.
