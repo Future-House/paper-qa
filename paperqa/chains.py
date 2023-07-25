@@ -18,7 +18,7 @@ from .types import CBManager
 
 memory_prompt = PromptTemplate(
     input_variables=["memory", "start"],
-    template="Previous answers that may be helpful:\n\n{memory}\n\n"
+    template="Here are previous questions and answers, which may be referenced in subsequent questions:\n\n{memory}\n\n"
     "----------------------------------------\n\n"
     "{start}",
 )
