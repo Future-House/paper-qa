@@ -25,7 +25,7 @@ qa_prompt = PromptTemplate(
     "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, comprehensive, and scholarly tone. "
     "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. \n\n"
-    "{context}\n"
+    "Context (with relevance scores):\n {context}\n"
     "Question: {question}\n"
     "Answer: ",
 )
