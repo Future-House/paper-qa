@@ -82,7 +82,7 @@ def make_chain(
             chat_prompt = ChatPromptTemplate.from_messages(
                 [system_message_prompt, human_message_prompt]
             )
-        return FallbackLLMChain(prompt=chat_prompt, llm=llm, verbose=True)
+        return FallbackLLMChain(prompt=chat_prompt, llm=llm)
     return FallbackLLMChain(prompt=prompt, llm=llm)
 
 
