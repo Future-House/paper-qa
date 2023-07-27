@@ -13,11 +13,12 @@ from langchain.prompts import BasePromptTemplate, PromptTemplate, StringPromptTe
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
 
+from .prompts import default_system_prompt
 from .types import CBManager
 
 memory_prompt = PromptTemplate(
     input_variables=["memory", "start"],
-    template="Previous answers that may be helpful:\n\n{memory}\n\n"
+    template="Here are previous questions and answers, which may be referenced in subsequent questions:\n\n{memory}\n\n"
     "----------------------------------------\n\n"
     "{start}",
 )
@@ -52,6 +53,7 @@ def make_chain(
     llm: BaseLanguageModel,
     skip_system: bool = False,
     memory: Optional[BaseChatMemory] = None,
+    system_prompt: str = default_system_prompt,
 ) -> FallbackLLMChain:
     if memory and len(memory.load_memory_variables({})["memory"]) > 0:
         # we copy the prompt so we don't modify the original
@@ -72,11 +74,7 @@ def make_chain(
         )
         prompt = new_prompt
     if type(llm) == ChatOpenAI:
-        system_message_prompt = SystemMessage(
-            content="Answer in an unbiased, concise, scholarly tone. "
-            "You may refuse to answer if there is insufficient information. "
-            "If there are ambiguous terms or acronyms, first define them. ",
-        )
+        system_message_prompt = SystemMessage(content=system_prompt)
         human_message_prompt = ExtendedHumanMessagePromptTemplate(prompt=prompt)
         if skip_system:
             chat_prompt = ChatPromptTemplate.from_messages([human_message_prompt])

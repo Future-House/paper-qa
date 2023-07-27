@@ -9,7 +9,13 @@ from langchain.callbacks.manager import (
 from langchain.prompts import PromptTemplate
 from pydantic import BaseModel, validator
 
-from .prompts import citation_prompt, qa_prompt, select_paper_prompt, summary_prompt
+from .prompts import (
+    citation_prompt,
+    default_system_prompt,
+    qa_prompt,
+    select_paper_prompt,
+    summary_prompt,
+)
 
 StrPath = Union[str, Path]
 DocKey = Any
@@ -37,6 +43,7 @@ class PromptCollection(BaseModel):
     cite: PromptTemplate = citation_prompt
     pre: Optional[PromptTemplate] = None
     post: Optional[PromptTemplate] = None
+    system: str = default_system_prompt
 
     @validator("summary")
     def check_summary(cls, v: PromptTemplate) -> PromptTemplate:
