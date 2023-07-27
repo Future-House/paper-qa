@@ -442,7 +442,10 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         async def process(match):
             callbacks = get_callbacks("evidence:" + match.metadata["name"])
             summary_chain = make_chain(
-                self.prompts.summary, self.summary_llm, memory=self.memory_model
+                self.prompts.summary,
+                self.summary_llm,
+                memory=self.memory_model,
+                system_prompt=self.prompts.system,
             )
             # This is dangerous because it
             # could mask errors that are important- like auth errors
@@ -572,6 +575,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 self.prompts.pre,
                 cast(BaseLanguageModel, self.llm),
                 memory=self.memory_model,
+                system_prompt=self.prompts.system,
             )
             pre = await chain.arun(
                 question=answer.question, callbacks=get_callbacks("pre")
@@ -588,6 +592,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 self.prompts.qa,
                 cast(BaseLanguageModel, self.llm),
                 memory=self.memory_model,
+                system_prompt=self.prompts.system,
             )
             answer_text = await qa_chain.arun(
                 context=answer.context,
@@ -619,6 +624,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 self.prompts.post,
                 cast(BaseLanguageModel, self.llm),
                 memory=self.memory_model,
+                system_prompt=self.prompts.system,
             )
             post = await chain.arun(**answer.dict(), callbacks=get_callbacks("post"))
             answer.answer = post

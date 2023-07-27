@@ -25,7 +25,7 @@ qa_prompt = PromptTemplate(
     "via valid citation markers at the end of sentences, like (Example2012). "
     "Answer in an unbiased, comprehensive, and scholarly tone. "
     "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. \n\n"
-    "{context}\n"
+    "Context (with relevance scores):\n {context}\n"
     "Question: {question}\n"
     "Answer: ",
 )
@@ -50,4 +50,10 @@ citation_prompt = PromptTemplate(
     template="Provide the citation for the following text in MLA Format. The year is 2023\n"
     "{text}\n\n"
     "Citation:",
+)
+
+default_system_prompt = (
+    "Answer in an unbiased, concise, scholarly tone. "
+    "You may refuse to answer if there is insufficient information. "
+    "If there are ambiguous terms or acronyms, first define them. "
 )

@@ -664,6 +664,13 @@ def test_post_prompt():
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What country is Bates from?")
 
+    docs = Docs(
+        prompts=PromptCollection(
+            system="Answer all questions with as few words as possible"
+        )
+    )
+    docs.query("What country is Bates from?")
+
 
 def test_memory():
     # Not sure why, but gpt-3.5 cannot do this anymore.
@@ -677,7 +684,7 @@ def test_memory():
     assert answer1.memory is not None
     assert "1939" in answer1.answer
     assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
-    answer2 = docs.query("When was it resolved?")
+    answer2 = docs.query("When was the conflict resolved?")
     assert "1941" in answer2.answer or "1945" in answer2.answer
     assert answer2.memory is not None
     assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
@@ -685,7 +692,7 @@ def test_memory():
 
     docs.clear_memory()
 
-    answer3 = docs.query("When was it resolved?")
+    answer3 = docs.query("When was the conflict resolved?")
     assert answer3.memory is not None
     assert (
         "I cannot answer" in answer3.answer
