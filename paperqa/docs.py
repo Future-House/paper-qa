@@ -53,6 +53,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     memory: bool = False
     memory_model: Optional[BaseChatMemory] = None
     jit_texts_index: bool = False
+    embed_query_prefix: str = ""
 
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
@@ -295,7 +296,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
         matches = self.doc_index.max_marginal_relevance_search(
-            query, k=k + len(self.deleted_dockeys)
+            self.embed_query_prefix + query, k=k + len(self.deleted_dockeys)
         )
         # filter the matches
         matches = [
@@ -411,11 +412,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         # want to work through indices but less k
         if marginal_relevance:
             matches = self.texts_index.max_marginal_relevance_search(
-                answer.question, k=_k, fetch_k=5 * _k
+                self.embed_query_prefix + answer.question, k=_k, fetch_k=5 * _k
             )
         else:
             matches = self.texts_index.similarity_search(
-                answer.question, k=_k, fetch_k=5 * _k
+                self.embed_query_prefix + answer.question, k=_k, fetch_k=5 * _k
             )
         # ok now filter
         if answer.dockey_filter is not None:
