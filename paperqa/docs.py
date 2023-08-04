@@ -363,11 +363,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     def get_evidence(
         self,
         answer: Answer,
-        k: int = 3,
+        k: int = 10,
         max_sources: int = 5,
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
+        ablate_vector_search: bool = False,
+        ablate_summarization: bool = False,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -387,18 +389,24 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
                 detailed_citations=detailed_citations,
+                ablate_vector_search=ablate_vector_search,
+                ablate_summarization=ablate_summarization,
             )
         )
 
     async def aget_evidence(
         self,
         answer: Answer,
-        k: int = 3,
-        max_sources: int = 5,
+        k: int = 10,  # Number of vectors to retrieve
+        max_sources: int = 5,  # Number of scored contexts to use
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
+        ablate_vector_search: bool = False,
+        ablate_summarization: bool = False,
     ) -> Answer:
+        if ablate_vector_search:
+            k = k * 10000
         if len(self.docs) == 0 and self.doc_index is None:
             return answer
         self._build_texts_index(keys=answer.dockey_filter)
@@ -408,7 +416,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         _k = k
         if answer.dockey_filter is not None:
             _k = k * 10  # heuristic
-        # want to work through indices but less k
         if marginal_relevance:
             matches = self.texts_index.max_marginal_relevance_search(
                 answer.question, k=_k, fetch_k=5 * _k
@@ -482,17 +489,34 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             )
             return c
 
-        results = await gather_with_concurrency(
-            self.max_concurrent, *[process(m) for m in matches]
-        )
-        # filter out failures
-        contexts = [c for c in results if c is not None]
-        if len(contexts) == 0:
-            return answer
-        contexts = sorted(contexts, key=lambda x: x.score, reverse=True)
-        contexts = contexts[:max_sources]
-        # add to answer contexts
-        answer.contexts += contexts
+        if ablate_summarization:
+            contexts = [
+                Context(
+                    context=match.page_content,
+                    score=10,
+                    text=Text(
+                        text=match.page_content,
+                        name=match.metadata["name"],
+                        doc=Doc(**match.metadata["doc"]),
+                    ),
+                )
+                for match in matches
+            ]
+            answer.contexts += contexts
+
+        else:
+            results = await gather_with_concurrency(
+                self.max_concurrent, *[process(m) for m in matches]
+            )
+            # filter out failures
+            contexts = [c for c in results if c is not None]
+            if len(contexts) == 0:
+                return answer
+            contexts = sorted(contexts, key=lambda x: x.score, reverse=True)
+            contexts = contexts[:max_sources]
+            # add to answer contexts
+            answer.contexts += contexts
+
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
@@ -500,6 +524,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 for c in answer.contexts
             ]
         )
+
         valid_names = [c.text.name for c in answer.contexts]
         context_str += "\n\nValid keys: " + ", ".join(valid_names)
         answer.context = context_str
