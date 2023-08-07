@@ -23,6 +23,31 @@ class TestHandler(AsyncCallbackHandler):
         print(token)
 
 
+def test_ablations():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    with open(doc_path, "rb") as f:
+        docs = Docs()
+        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+        answer = docs.get_evidence(
+            Answer(
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+                + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
+            ),
+            ablate_summarization=True,
+        )
+        assert (
+            answer.contexts[0].text.text == answer.contexts[0].context
+        ), "summarization not ablated"
+        answer = docs.get_evidence(
+            Answer(
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+                + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
+            ),
+            ablate_vector_search=True,
+        )
+
+
 def test_location_awareness():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
