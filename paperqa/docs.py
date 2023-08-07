@@ -439,52 +439,43 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         # now finally cut down
         matches = matches[:k]
 
-        async def process(match):
-            callbacks = get_callbacks("evidence:" + match.metadata["name"])
-            summary_chain = make_chain(
-                self.prompts.summary,
-                self.summary_llm,
-                memory=self.memory_model,
-                system_prompt=self.prompts.system,
-            )
-            # This is dangerous because it
-            # could mask errors that are important- like auth errors
-            # I also cannot know what the exception
-            # type is because any model could be used
-            # my best idea is see if there is a 4XX
-            # http code in the exception
-            try:
-                citation = match.metadata["doc"]["citation"]
-                if detailed_citations:
-                    citation = match.metadata["name"] + ": " + citation
-                context = await summary_chain.arun(
-                    question=answer.question,
-                    # Add name so chunk is stated
-                    citation=citation,
-                    summary_length=answer.summary_length,
-                    text=match.page_content,
-                    callbacks=callbacks,
-                )
-            except Exception as e:
-                if guess_is_4xx(str(e)):
-                    return None
-                raise e
-            if "not applicable" in context.lower():
-                return None
+        summary_chain = make_chain(
+            self.prompts.summary,
+            self.summary_llm,
+            memory=self.memory_model,
+            system_prompt=self.prompts.system,
+        )
+        citations = [
+            (match.metadata["name"] + ": " + match.metadata["doc"]["citation"])
+            if detailed_citations
+            else match.metadata["doc"]["citation"]
+            for match in matches
+        ]
+        contexts = await summary_chain.aapply([
+            {
+                "question": answer.question,
+                # Add name so chunk is stated
+                "citation": citation,
+                "summary_length": answer.summary_length,
+                "text": match.page_content,
+                "callbacks": get_callbacks("evidence:" + match.metadata["name"]),
+            } for citation, match in zip(citations, matches)
+        ])
+        results = []
+        for match, context in zip(matches, contexts):
+            if "not applicable" in context['text'].lower():
+                results.append(None)
             c = Context(
-                context=context,
+                context=context['text'],
                 text=Text(
                     text=match.page_content,
                     name=match.metadata["name"],
                     doc=Doc(**match.metadata["doc"]),
                 ),
-                score=get_score(context),
+                score=get_score(context['text']),
             )
-            return c
+            results.append(c)
 
-        results = await gather_with_concurrency(
-            self.max_concurrent, *[process(m) for m in matches]
-        )
         # filter out failures
         contexts = [c for c in results if c is not None]
         if len(contexts) == 0:
