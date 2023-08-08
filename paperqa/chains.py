@@ -6,6 +6,8 @@ from langchain.callbacks.manager import (
     AsyncCallbackManagerForChainRun,
     CallbackManagerForChainRun,
 )
+import litellm
+from litellm import completion
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.memory.chat_memory import BaseChatMemory

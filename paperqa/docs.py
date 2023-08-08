@@ -7,7 +7,8 @@ from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO, Dict, List, Optional, Set, Union, cast
-
+import litellm
+from litellm import completion
 from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.base import Embeddings
@@ -41,7 +42,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
     llm: Union[str, BaseLanguageModel] = ChatOpenAI(
-        temperature=0.1, model="gpt-3.5-turbo", client=None
+        temperature=0.1, model="gpt-3.5-turbo", client=completion
     )
     summary_llm: Optional[Union[str, BaseLanguageModel]] = None
     name: str = "default"
@@ -59,7 +60,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     @validator("llm", "summary_llm")
     def check_llm(cls, v: Union[BaseLanguageModel, str]) -> BaseLanguageModel:
         if type(v) is str:
-            return ChatOpenAI(temperature=0.1, model=v, client=None)
+            return ChatOpenAI(temperature=0.1, model=v, client=completion)
         return cast(BaseLanguageModel, v)
 
     @validator("summary_llm", always=True)
@@ -96,9 +97,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     ) -> None:
         """Update the LLM for answering questions."""
         if type(llm) is str:
-            llm = ChatOpenAI(temperature=0.1, model=llm, client=None)
+            llm = ChatOpenAI(temperature=0.1, model=llm, client=completion)
         if type(summary_llm) is str:
-            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm, client=None)
+            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm, client=completion)
         self.llm = cast(BaseLanguageModel, llm)
         if summary_llm is None:
             summary_llm = llm
