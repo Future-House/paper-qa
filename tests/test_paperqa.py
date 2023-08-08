@@ -34,7 +34,7 @@ def test_ablations():
                 question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
                 + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
             ),
-            ablate_summarization=True,
+            disable_summarization=True,
         )
         assert (
             answer.contexts[0].text.text == answer.contexts[0].context
@@ -44,7 +44,7 @@ def test_ablations():
                 question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
                 + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
             ),
-            ablate_vector_search=True,
+            disable_vector_search=True,
         )
 
 
