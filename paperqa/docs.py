@@ -368,8 +368,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
-        ablate_vector_search: bool = False,
-        ablate_summarization: bool = False,
+        disable_vector_search: bool = False,
+        disable_summarization: bool = False,
     ) -> Answer:
         # special case for jupyter notebooks
         if "get_ipython" in globals() or "google.colab" in sys.modules:
@@ -389,8 +389,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
                 detailed_citations=detailed_citations,
-                ablate_vector_search=ablate_vector_search,
-                ablate_summarization=ablate_summarization,
+                disable_vector_search=disable_vector_search,
+                disable_summarization=disable_summarization,
             )
         )
 
@@ -402,10 +402,10 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
-        ablate_vector_search: bool = False,
-        ablate_summarization: bool = False,
+        disable_vector_search: bool = False,
+        disable_summarization: bool = False,
     ) -> Answer:
-        if ablate_vector_search:
+        if disable_vector_search:
             k = k * 10000
         if len(self.docs) == 0 and self.doc_index is None:
             return answer
@@ -476,7 +476,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 if guess_is_4xx(str(e)):
                     return None
                 raise e
-            if "not applicable" in context.lower():
+            if "not applicable" in context.lower() or "not relevant" in context.lower():
                 return None
             c = Context(
                 context=context,
@@ -489,7 +489,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             )
             return c
 
-        if ablate_summarization:
+        if disable_summarization:
             contexts = [
                 Context(
                     context=match.page_content,
@@ -502,7 +502,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 )
                 for match in matches
             ]
-            answer.contexts += contexts
 
         else:
             results = await gather_with_concurrency(
@@ -510,13 +509,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             )
             # filter out failures
             contexts = [c for c in results if c is not None]
-            if len(contexts) == 0:
-                return answer
-            contexts = sorted(contexts, key=lambda x: x.score, reverse=True)
-            contexts = contexts[:max_sources]
-            # add to answer contexts
-            answer.contexts += contexts
 
+        answer.contexts = sorted(
+            contexts + answer.contexts, key=lambda x: x.score, reverse=True
+        )
+        answer.contexts = answer.contexts[:max_sources]
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
