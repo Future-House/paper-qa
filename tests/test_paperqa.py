@@ -558,6 +558,7 @@ def test_dockey_delete():
 
     docs.delete(dockey="test")
     assert len(docs.docs) == 1
+    assert len(list(filter(lambda x: x.doc.dockey == "test", docs.texts))) == 0
     answer = Answer(question="What country was Bates born in?")
     answer = docs.get_evidence(answer, marginal_relevance=False)
     keys = set([c.text.doc.dockey for c in answer.contexts])

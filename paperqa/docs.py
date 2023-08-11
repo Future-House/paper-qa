@@ -281,6 +281,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             dockey = doc.dockey
         del self.docs[dockey]
         self.deleted_dockeys.add(dockey)
+        self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
+
 
     async def adoc_match(
         self, query: str, k: int = 25, get_callbacks: CallbackFactory = lambda x: None
