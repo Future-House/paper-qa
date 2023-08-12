@@ -19,12 +19,10 @@ qa_prompt = PromptTemplate(
     input_variables=["context", "answer_length", "question"],
     template="Write an answer ({answer_length}) "
     "for the question below based on the provided context. "
-    "If the context provides insufficient information, "
+    "If the context provides insufficient information and the question cannot be directly answered, "
     'reply "I cannot answer". '
     "For each part of your answer, indicate which sources most support it "
-    "via valid citation markers at the end of sentences, like (Example2012). "
-    "Answer in an unbiased, comprehensive, and scholarly tone. "
-    "If the question is subjective, provide an opinionated answer in the concluding 1-2 sentences. \n\n"
+    "via valid citation markers at the end of sentences, like (Example2012). \n"
     "Context (with relevance scores):\n {context}\n"
     "Question: {question}\n"
     "Answer: ",
@@ -53,7 +51,6 @@ citation_prompt = PromptTemplate(
 )
 
 default_system_prompt = (
-    "Answer in an unbiased, concise, scholarly tone. "
-    "You may refuse to answer if there is insufficient information. "
+    "Answer in an direct, concise, scholarly tone. "
     "If there are ambiguous terms or acronyms, first define them. "
 )
