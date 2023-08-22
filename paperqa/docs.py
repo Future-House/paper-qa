@@ -308,14 +308,20 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             matched_docs = [Doc(**m.metadata) for m in matches]
         if len(matched_docs) == 0:
             return set()
-        chain = make_chain(
-            self.prompts.select, cast(BaseLanguageModel, self.llm), skip_system=True
-        )
-        papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
-        result = await chain.arun(  # type: ignore
-            question=query, papers="\n".join(papers), callbacks=get_callbacks("filter")
-        )
-        return set([d.dockey for d in matched_docs if d.docname in result])
+        # this only works for gpt-4 (in my testing)
+        if cast(BaseLanguageModel, self.llm).model_name.startswith("gpt-4"):
+            chain = make_chain(
+                self.prompts.select, cast(BaseLanguageModel, self.llm), skip_system=True
+            )
+            papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
+            result = await chain.arun(  # type: ignore
+                question=query,
+                papers="\n".join(papers),
+                callbacks=get_callbacks("filter"),
+            )
+            return set([d.dockey for d in matched_docs if d.docname in result])
+        else:
+            return set([d.dockey for d in matched_docs])
 
     def __getstate__(self):
         state = self.__dict__.copy()
