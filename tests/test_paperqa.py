@@ -293,14 +293,22 @@ class Test(IsolatedAsyncioTestCase):
 
 
 class TestDocMatch(IsolatedAsyncioTestCase):
-    def test_adoc_match(self):
+    async def test_adoc_match(self):
         docs = Docs()
         docs.add_url(
             "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test",
         )
-        docs.adoc_match("What is Frederick Bates's greatest accomplishment?")
+        sources = await docs.adoc_match(
+            "What is Frederick Bates's greatest accomplishment?"
+        )
+        assert len(sources) > 0
+        docs.update_llm("gpt-3.5-turbo")
+        sources = await docs.adoc_match(
+            "What is Frederick Bates's greatest accomplishment?"
+        )
+        assert len(sources) > 0
 
 
 def test_docs_pickle():
