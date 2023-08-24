@@ -309,19 +309,23 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         if len(matched_docs) == 0:
             return set()
         # this only works for gpt-4 (in my testing)
-        if cast(BaseLanguageModel, self.llm).model_name.startswith("gpt-4"):
-            chain = make_chain(
-                self.prompts.select, cast(BaseLanguageModel, self.llm), skip_system=True
-            )
-            papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
-            result = await chain.arun(  # type: ignore
-                question=query,
-                papers="\n".join(papers),
-                callbacks=get_callbacks("filter"),
-            )
-            return set([d.dockey for d in matched_docs if d.docname in result])
-        else:
-            return set([d.dockey for d in matched_docs])
+        try:
+            if cast(BaseLanguageModel, self.llm).model_name.startswith("gpt-4"):
+                chain = make_chain(
+                    self.prompts.select,
+                    cast(BaseLanguageModel, self.llm),
+                    skip_system=True,
+                )
+                papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
+                result = await chain.arun(  # type: ignore
+                    question=query,
+                    papers="\n".join(papers),
+                    callbacks=get_callbacks("filter"),
+                )
+                return set([d.dockey for d in matched_docs if d.docname in result])
+        except AttributeError:
+            pass
+        return set([d.dockey for d in matched_docs])
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -470,14 +474,17 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 citation = match.metadata["doc"]["citation"]
                 if detailed_citations:
                     citation = match.metadata["name"] + ": " + citation
-                context = await summary_chain.arun(
-                    question=answer.question,
-                    # Add name so chunk is stated
-                    citation=citation,
-                    summary_length=answer.summary_length,
-                    text=match.page_content,
-                    callbacks=callbacks,
-                )
+                if self.prompts.skip_summary:
+                    context = match.page_content
+                else:
+                    context = await summary_chain.arun(
+                        question=answer.question,
+                        # Add name so chunk is stated
+                        citation=citation,
+                        summary_length=answer.summary_length,
+                        text=match.page_content,
+                        callbacks=callbacks,
+                    )
             except Exception as e:
                 if guess_is_4xx(str(e)):
                     return None

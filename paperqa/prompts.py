@@ -5,6 +5,7 @@ summary_prompt = PromptTemplate(
     template="Summarize the text below to help answer a question. "
     "Do not directly answer the question, instead summarize "
     "to give evidence to help answer the question. "
+    "Focus on specific details, including numbers, equations, or specific quotes. "
     'Reply "Not applicable" if text is irrelevant. '
     "Use {summary_length}. At the end of your response, provide a score from 1-10 on a newline "
     "indicating relevance to question. Do not explain your score. "
@@ -51,6 +52,7 @@ citation_prompt = PromptTemplate(
 )
 
 default_system_prompt = (
-    "Answer in an direct, concise, scholarly tone. "
+    "Answer in an direct and concise tone, I am in a hurry. "
+    "Your audience is an expert, so be highly specific. "
     "If there are ambiguous terms or acronyms, first define them. "
 )

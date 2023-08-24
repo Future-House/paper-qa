@@ -44,6 +44,7 @@ class PromptCollection(BaseModel):
     pre: Optional[PromptTemplate] = None
     post: Optional[PromptTemplate] = None
     system: str = default_system_prompt
+    skip_summary: bool = False
 
     @validator("summary")
     def check_summary(cls, v: PromptTemplate) -> PromptTemplate:
