@@ -283,7 +283,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         self.deleted_dockeys.add(dockey)
 
     async def adoc_match(
-        self, query: str, k: int = 25, get_callbacks: CallbackFactory = lambda x: None
+        self,
+        query: str,
+        k: int = 25,
+        rerank: Optional[bool] = None,
+        get_callbacks: CallbackFactory = lambda x: None,
     ) -> Set[DocKey]:
         """Return a list of dockeys that match the query."""
         if self.doc_index is None:
@@ -310,7 +314,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             return set()
         # this only works for gpt-4 (in my testing)
         try:
-            if cast(BaseLanguageModel, self.llm).model_name.startswith("gpt-4"):
+            if (
+                rerank is None
+                and cast(BaseLanguageModel, self.llm).model_name.startswith("gpt-4")
+                or rerank is True
+            ):
                 chain = make_chain(
                     self.prompts.select,
                     cast(BaseLanguageModel, self.llm),
