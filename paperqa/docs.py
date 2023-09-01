@@ -23,6 +23,7 @@ from .readers import read_doc
 from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollection, Text
 from .utils import (
     gather_with_concurrency,
+    get_llm_name,
     guess_is_4xx,
     maybe_is_html,
     maybe_is_pdf,
@@ -316,7 +317,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         try:
             if (
                 rerank is None
-                and cast(BaseLanguageModel, self.llm).model_name.startswith("gpt-4")
+                and get_llm_name(cast(BaseLanguageModel, self.llm)).startswith("gpt-4")
                 or rerank is True
             ):
                 chain = make_chain(
@@ -538,7 +539,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
-                + (f" Based on {c.text.doc.citation}" if detailed_citations else "")
+                + (f"\n\n Based on {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]
         )
