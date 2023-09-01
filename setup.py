@@ -18,11 +18,12 @@ setup(
     packages=["paperqa", "paperqa.contrib"],
     install_requires=[
         "pypdf",
-        "pydantic<2",
+        "pydantic>2",
         "langchain>=0.0.198",
         "openai >= 0.27.8",
         "faiss-cpu",
         "PyCryptodome",
+        "pydantic>2",
         "html2text",
         "tiktoken>=0.4.0",
     ],

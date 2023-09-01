@@ -15,7 +15,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationTokenBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory
 from langchain.vectorstores import FAISS, VectorStore
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, model_validator
 
 from .chains import get_score, make_chain
 from .paths import PAPERQA_DIR
@@ -33,7 +33,7 @@ from .utils import (
 )
 
 
-class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
+class Docs(BaseModel, arbitrary_types_allowed=True):
     """A collection of documents to be used for answering questions."""
 
     docs: Dict[DocKey, Doc] = {}
@@ -57,22 +57,25 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
 
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
-    @validator("llm", "summary_llm")
+    @field_validator("llm", "summary_llm")
+    @classmethod
     def check_llm(cls, v: Union[BaseLanguageModel, str]) -> BaseLanguageModel:
         if type(v) is str:
             return ChatOpenAI(temperature=0.1, model=v, client=None)
         return cast(BaseLanguageModel, v)
 
-    @validator("summary_llm", always=True)
-    def copy_llm_if_not_set(cls, v, values):
-        return v or values["llm"]
+    @model_validator(mode="after")
+    def copy_llm_if_not_set(self) -> "Docs":
+        if self.summary_llm is None:
+            self.summary_llm = self.llm
+        return self
 
-    @validator("memory_model", always=True)
-    def check_memory_model(cls, v, values):
-        if values["memory"]:
-            if v is None:
-                return ConversationTokenBufferMemory(
-                    llm=values["summary_llm"],
+    @model_validator(mode="after")
+    def check_memory_model(self) -> "Docs":
+        if self.memory:
+            if self.memory_model is None:
+                self.memory_model = ConversationTokenBufferMemory(
+                    llm=self.llm,
                     max_token_limit=512,
                     memory_key="memory",
                     human_prefix="Question",
@@ -80,10 +83,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                     input_key="Question",
                     output_key="Answer",
                 )
-            if v.memory_variables()[0] != "memory":
+            if self.memory_model.memory_variables()[0] != "memory":
                 raise ValueError("Memory model must have memory_variables=['memory']")
-            return values["memory_model"]
-        return None
+        return self
 
     def clear_docs(self):
         self.texts = []
@@ -259,12 +261,14 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 )
                 self.texts_index.add_embeddings(  # type: ignore
                     vec_store_text_and_embeddings,
-                    metadatas=[t.dict(exclude={"embeddings", "text"}) for t in texts],
+                    metadatas=[
+                        t.model_dump(exclude={"embeddings", "text"}) for t in texts
+                    ],
                 )
             except AttributeError:
                 raise ValueError("Need a vector store that supports adding embeddings.")
         if self.doc_index is not None:
-            self.doc_index.add_texts([doc.citation], metadatas=[doc.dict()])
+            self.doc_index.add_texts([doc.citation], metadatas=[doc.model_dump()])
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
@@ -295,7 +299,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             if len(self.docs) == 0:
                 return set()
             texts = [doc.citation for doc in self.docs.values()]
-            metadatas = [d.dict() for d in self.docs.values()]
+            metadatas = [d.model_dump() for d in self.docs.values()]
             self.doc_index = FAISS.from_texts(
                 texts, metadatas=metadatas, embedding=self.embeddings
             )
@@ -366,7 +370,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 return
             raw_texts = [t.text for t in texts]
             text_embeddings = [t.embeddings for t in texts]
-            metadatas = [t.dict(exclude={"embeddings", "text"}) for t in texts]
+            metadatas = [t.model_dump(exclude={"embeddings", "text"}) for t in texts]
             self.texts_index = FAISS.from_embeddings(
                 # wow adding list to the zip was tricky
                 text_embeddings=list(zip(raw_texts, text_embeddings)),
@@ -670,7 +674,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 memory=self.memory_model,
                 system_prompt=self.prompts.system,
             )
-            post = await chain.arun(**answer.dict(), callbacks=get_callbacks("post"))
+            post = await chain.arun(
+                **answer.model_dump(), callbacks=get_callbacks("post")
+            )
             answer.answer = post
             answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"
             if len(bib) > 0:
