@@ -8,7 +8,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO, Dict, List, Optional, Set, Union, cast
 
-from langchain.base_language import BaseLanguageModel
+from langchain.schema.language_model import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
