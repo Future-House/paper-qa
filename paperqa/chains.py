@@ -1,7 +1,6 @@
 import re
 from typing import Any, Dict, List, Optional, cast
 
-from langchain.base_language import BaseLanguageModel
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForChainRun,
     CallbackManagerForChainRun,
@@ -12,6 +11,7 @@ from langchain.memory.chat_memory import BaseChatMemory
 from langchain.prompts import PromptTemplate, StringPromptTemplate
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import LLMResult, SystemMessage
+from langchain.schema.language_model import BaseLanguageModel
 
 from .prompts import default_system_prompt
 from .types import CBManager

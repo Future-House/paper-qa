@@ -5,7 +5,7 @@ import string
 from typing import BinaryIO, List
 
 import pypdf
-from langchain.base_language import BaseLanguageModel
+from langchain.schema.language_model import BaseLanguageModel
 
 from .types import StrPath
 
