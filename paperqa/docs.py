@@ -15,7 +15,11 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationTokenBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory
 from langchain.vectorstores import FAISS, VectorStore
-from pydantic import BaseModel, validator
+
+try:
+    from pydantic.v1 import BaseModel, validator
+except ImportError:
+    from pydantic import BaseModel, validator
 
 from .chains import get_score, make_chain
 from .paths import PAPERQA_DIR
