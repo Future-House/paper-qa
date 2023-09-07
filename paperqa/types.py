@@ -7,7 +7,12 @@ from langchain.callbacks.manager import (
     CallbackManagerForChainRun,
 )
 from langchain.prompts import PromptTemplate
-from pydantic import BaseModel, validator
+
+try:
+    from pydantic.v1 import BaseModel, validator
+except ImportError:
+    from pydantic import BaseModel, validator
+
 
 from .prompts import (
     citation_prompt,
