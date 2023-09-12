@@ -628,7 +628,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             pre = await chain.arun(
                 question=answer.question, callbacks=get_callbacks("pre")
             )
-            answer.context = pre + "\n\n" + answer.context
+            answer.context = answer.context + "\n\nExtra background information:" + pre
         bib = dict()
         if len(answer.context) < 10 and not self.memory:
             answer_text = (
