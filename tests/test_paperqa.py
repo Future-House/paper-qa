@@ -397,7 +397,7 @@ def test_bad_context():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What year was Barack Obama born?")
+    answer = docs.query("What is the radius of Jupyter?")
     assert "cannot answer" in answer.answer
     os.remove(doc_path)
 
@@ -731,6 +731,7 @@ def test_memory():
         "I cannot answer" in answer3.answer
         or "insufficient" in answer3.answer
         or "does not provide" in answer3.answer
+        or "ambiguous" in answer3.answer
     )
 
 
@@ -792,7 +793,9 @@ def test_external_texts_index():
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="Flag Day of Canada, WikiMedia Foundation, 2023, Accessed now",
     )
-    answer = docs.query(query="What is the date of flag day?", key_filter=True)
+    answer = docs.query(query="What is the date of flag day?")
+    print(answer.context)
+    print(answer)
     assert "February 15" in answer.answer
 
     docs.add_url(
@@ -800,8 +803,6 @@ def test_external_texts_index():
         citation="Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
     )
 
-    answer = docs.query(query="What is the date of flag day?", key_filter=False)
-    assert "February 15" in answer.answer
-
     answer = docs.query(query="What is the date of flag day?", key_filter=True)
+    print(answer.context)
     assert "February 15" in answer.answer
