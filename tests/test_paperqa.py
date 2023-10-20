@@ -793,9 +793,7 @@ def test_external_texts_index():
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="Flag Day of Canada, WikiMedia Foundation, 2023, Accessed now",
     )
-    answer = docs.query(query="What is the date of flag day?")
-    print(answer.context)
-    print(answer)
+    answer = docs.query(query="On which date is flag day annually observed?")
     assert "February 15" in answer.answer
 
     docs.add_url(
@@ -803,6 +801,7 @@ def test_external_texts_index():
         citation="Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
     )
 
-    answer = docs.query(query="What is the date of flag day?", key_filter=True)
-    print(answer.context)
+    answer = docs.query(
+        query="On which date is flag day annually observed?", key_filter=True
+    )
     assert "February 15" in answer.answer
