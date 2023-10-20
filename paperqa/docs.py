@@ -647,6 +647,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 answer_length=answer.answer_length,
                 question=answer.question,
                 callbacks=callbacks,
+                verbose=True,
             )
         # it still happens
         if "(Example2012)" in answer_text:
