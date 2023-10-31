@@ -8,13 +8,14 @@ from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO, Dict, List, Optional, Set, Union, cast
 
-from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationTokenBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory
 from langchain.schema.embeddings import Embeddings
-from langchain.vectorstores import FAISS, VectorStore
+from langchain.schema.language_model import BaseLanguageModel
+from langchain.schema.vectorstore import VectorStore
+from langchain.vectorstores import FAISS
 
 try:
     from pydantic.v1 import BaseModel, validator
