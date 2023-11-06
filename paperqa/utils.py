@@ -97,3 +97,11 @@ def get_llm_name(llm: BaseLanguageModel) -> str:
         return llm.model_name  # type: ignore
     except AttributeError:
         return llm.model  # type: ignore
+
+
+def strip_citations(text: str) -> str:
+    # Combined regex for identifying citations (see unit tests for examples)
+    citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
+    # Remove the citations from the text
+    text = re.sub(citation_regex, "", text, flags=re.MULTILINE)
+    return text
