@@ -35,6 +35,7 @@ from .utils import (
     maybe_is_text,
     md5sum,
     name_in_text,
+    strip_citations,
 )
 
 
@@ -59,6 +60,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     memory: bool = False
     memory_model: Optional[BaseChatMemory] = None
     jit_texts_index: bool = False
+    # This is used to strip indirect citations that come up from the summary llm
+    strip_citations: bool = True
 
     # TODO: Not sure how to get this to work
     # while also passing mypy checks
@@ -505,6 +508,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 raise e
             if "not applicable" in context.lower() or "not relevant" in context.lower():
                 return None
+            if self.strip_citations:
+                # remove citations that collide with our grounded citations (for the answer LLM)
+                context = strip_citations(context)
             c = Context(
                 context=context,
                 text=Text(

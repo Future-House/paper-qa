@@ -20,7 +20,7 @@ setup(
         "pypdf",
         "pydantic<2",
         "langchain>=0.0.303",
-        "openai >= 0.27.8",
+        "openai <1",
         "faiss-cpu",
         "PyCryptodome",
         "html2text",
