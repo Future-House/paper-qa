@@ -509,6 +509,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             if "not applicable" in context.lower() or "not relevant" in context.lower():
                 return None
             if self.strip_citations:
+            # remove citations that collide with our grounded citations (for the answer LLM)
                 context = strip_citations(context)
             c = Context(
                 context=context,
