@@ -15,12 +15,86 @@ from paperqa import Answer, Docs, PromptCollection, Text
 from paperqa.chains import get_score
 from paperqa.readers import read_doc
 from paperqa.types import Doc
-from paperqa.utils import maybe_is_html, maybe_is_text, name_in_text, strings_similarity
+from paperqa.utils import (
+    maybe_is_html,
+    maybe_is_text,
+    name_in_text,
+    strings_similarity,
+    strip_citations,
+)
 
 
 class TestHandler(AsyncCallbackHandler):
     async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
         print(token)
+
+
+# Assume strip_citations is imported or defined in this file.
+
+
+def test_single_author():
+    text = "This was first proposed by (Smith 1999)."
+    assert strip_citations(text) == "This was first proposed by ."
+
+
+def test_multiple_authors():
+    text = "Recent studies (Smith et al. 1999) show that this is true."
+    assert strip_citations(text) == "Recent studies  show that this is true."
+
+
+def test_multiple_citations():
+    text = "As discussed by several authors (Smith et al. 1999; Johnson 2001; Lee et al. 2003)."
+    assert strip_citations(text) == "As discussed by several authors ."
+
+
+def test_citations_with_pages():
+    text = "This is shown in (Smith et al. 1999, p. 150)."
+    assert strip_citations(text) == "This is shown in ."
+
+
+def test_citations_without_space():
+    text = "Findings by(Smith et al. 1999)were significant."
+    assert strip_citations(text) == "Findings bywere significant."
+
+
+def test_citations_with_commas():
+    text = "The method was adopted by (Smith, 1999, 2001; Johnson, 2002)."
+    assert strip_citations(text) == "The method was adopted by ."
+
+
+def test_citations_with_text():
+    text = "This was noted (see Smith, 1999, for a review)."
+    assert strip_citations(text) == "This was noted ."
+
+
+def test_no_citations():
+    text = "There are no references in this text."
+    assert strip_citations(text) == "There are no references in this text."
+
+
+def test_malformed_citations():
+    text = "This is a malformed citation (Smith 199)."
+    assert strip_citations(text) == "This is a malformed citation (Smith 199)."
+
+
+def test_edge_case_citations():
+    text = "Edge cases like (Smith et al.1999) should be handled."
+    assert strip_citations(text) == "Edge cases like  should be handled."
+
+
+def test_citations_with_special_characters():
+    text = "Some names have dashes (O'Neil et al. 2000; Smith-Jones 1998)."
+    assert strip_citations(text) == "Some names have dashes ."
+
+
+def test_citations_with_nonstandard_chars():
+    text = (
+        "In non-English languages, citations might look different (Müller et al. 1999)."
+    )
+    assert (
+        strip_citations(text)
+        == "In non-English languages, citations might look different ."
+    )
 
 
 def test_ablations():
