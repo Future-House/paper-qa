@@ -7,3 +7,4 @@ pymupdf
 build
 types-requests
 numpy
+unstructured==0.10.30

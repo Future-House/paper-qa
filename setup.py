@@ -25,6 +25,8 @@ setup(
         "PyCryptodome",
         "html2text",
         "tiktoken>=0.4.0",
+        "python-docx>=1.1.0",
+        "unstructured>=0.10.30",
     ],
     test_suite="tests",
     long_description=long_description,

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List
 
 from html2text import html2text
+from langchain.document_loaders import UnstructuredWordDocumentLoader
 from langchain.text_splitter import TokenTextSplitter
 
 from .types import Doc, Text
@@ -125,6 +126,22 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
     return texts
 
 
+def parse_docx(
+    path: Path,
+    doc: Doc,
+    chunk_chars: int,
+    overlap: int,
+    html: bool = False,
+) -> List[Text]:
+    docs = UnstructuredWordDocumentLoader(path).load()
+    text_splitter = TokenTextSplitter(chunk_size=chunk_chars, chunk_overlap=overlap)
+    docs = text_splitter.split_documents(docs)
+    return [
+        Text(text=d.page_content, name=f"{doc.docname} chunk {i}", doc=doc)
+        for i, d in enumerate(docs)
+    ]
+
+
 def read_doc(
     path: Path,
     doc: Doc,
@@ -134,7 +151,7 @@ def read_doc(
 ) -> List[Text]:
     """Parse a document into chunks."""
     str_path = str(path)
-    if str_path.endswith(".pdf"):
+    if str_path.endswith((".pdf", ".PDF")):
         if force_pypdf:
             return parse_pdf(path, doc, chunk_chars, overlap)
         try:
@@ -145,5 +162,7 @@ def read_doc(
         return parse_txt(path, doc, chunk_chars, overlap)
     elif str_path.endswith(".html"):
         return parse_txt(path, doc, chunk_chars, overlap, html=True)
+    elif str_path.endswith(".docx"):
+        return parse_docx(path, doc, chunk_chars, overlap)
     else:
         return parse_code_txt(path, doc, chunk_chars, overlap)
