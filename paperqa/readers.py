@@ -131,7 +131,6 @@ def parse_docx(
     doc: Doc,
     chunk_chars: int,
     overlap: int,
-    html: bool = False,
 ) -> List[Text]:
     docs = UnstructuredWordDocumentLoader(path).load()
     text_splitter = TokenTextSplitter(chunk_size=chunk_chars, chunk_overlap=overlap)
