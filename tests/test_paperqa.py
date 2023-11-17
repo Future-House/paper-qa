@@ -7,6 +7,7 @@ from unittest import IsolatedAsyncioTestCase
 import numpy as np
 import requests
 from langchain.callbacks.base import AsyncCallbackHandler
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
 from langchain.prompts import PromptTemplate
@@ -422,6 +423,29 @@ def test_docs_pickle():
     assert strings_similarity(context1, context2) > 0.75
     # make sure we can query
     docs.query("What date is bring your dog to work in the US?")
+
+
+def test_docs_pickle_noopenai():
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get front page of wikipedia
+        r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
+        f.write(r.text)
+    llm = FakeListLLM(responses=["This is a test", "This is another test"] * 50)
+    docs = Docs(llm=llm)
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
+    os.remove(doc_path)
+    docs_pickle = pickle.dumps(docs)
+    docs2 = pickle.loads(docs_pickle)
+    # should raise ValueError because no embeddings set
+    try:
+        docs2.query("What date is bring your dog to work in the US?")
+        raise RuntimeError("Should have raised ValueError")
+    except ValueError as e:
+        assert "embeddings" in str(e)
+    # now set them
+    docs2.embeddings = OpenAIEmbeddings(client=None)
+    docs2.query("What date is bring your dog to work in the US?")
 
 
 def test_docs_pickle_no_faiss():

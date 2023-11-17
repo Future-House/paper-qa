@@ -18,9 +18,9 @@ from langchain.schema.vectorstore import VectorStore
 from langchain.vectorstores import FAISS
 
 try:
-    from pydantic.v1 import BaseModel, validator
+    from pydantic.v1 import BaseModel, Field, validator
 except ImportError:
-    from pydantic import BaseModel, validator
+    from pydantic import BaseModel, validator, Field
 
 from .chains import get_score, make_chain
 from .paths import PAPERQA_DIR
@@ -47,13 +47,18 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     docnames: Set[str] = set()
     texts_index: Optional[VectorStore] = None
     doc_index: Optional[VectorStore] = None
-    llm: Union[str, BaseLanguageModel] = ChatOpenAI(
-        temperature=0.1, model="gpt-3.5-turbo", client=None
+    llm: Optional[Union[str, BaseLanguageModel]] = Field(
+        default_factory=lambda: ChatOpenAI(
+            model="gpt-3.5-turbo", temperature=0.1, request_timeout=30, client=None
+        )
     )
+
     summary_llm: Optional[Union[str, BaseLanguageModel]] = None
     name: str = "default"
     index_path: Optional[Path] = PAPERQA_DIR / name
-    embeddings: Embeddings = OpenAIEmbeddings(client=None)
+    embeddings: Optional[Embeddings] = Field(
+        default_factory=lambda: OpenAIEmbeddings(client=None)
+    )
     max_concurrent: int = 5
     deleted_dockeys: Set[DocKey] = set()
     prompts: PromptCollection = PromptCollection()
@@ -93,6 +98,16 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             return values["memory_model"]
         return None
 
+    def _check_is_set(self) -> None:
+        """Check if the non-serialized fields are set."""
+        status = self.embeddings is not None and self.llm is not None
+        if not status:
+            raise ValueError(
+                "You need to set embeddings and llm before using the Docs object. "
+                "This is a new requirement in 4.0.0 due to inability to "
+                "pickle OpenAI (version > 1) objects. "
+            )
+
     def clear_docs(self):
         self.texts = []
         self.docs = {}
@@ -105,13 +120,21 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     ) -> None:
         """Update the LLM for answering questions."""
         if type(llm) is str:
-            llm = ChatOpenAI(temperature=0.1, model=llm, client=None)
+            llm = ChatOpenAI(
+                temperature=0.1, model=llm, client=None, request_timeout=30
+            )
         if type(summary_llm) is str:
-            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm, client=None)
+            summary_llm = ChatOpenAI(
+                temperature=0.1, model=summary_llm, client=None, request_timeout=30
+            )
         self.llm = cast(BaseLanguageModel, llm)
         if summary_llm is None:
             summary_llm = llm
         self.summary_llm = cast(BaseLanguageModel, summary_llm)
+        # set the embeddings to OpenAI if not set already
+        # and we predict it is an OpenAI model
+        if self.embeddings is None and "OpenAI" in self.llm.__class__.__name__:
+            self.embeddings = OpenAIEmbeddings(client=None)
 
     def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name"""
@@ -244,6 +267,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
 
         Returns True if the document was added, False if it was already in the collection.
         """
+        self._check_is_set()
         if doc.dockey in self.docs:
             return False
         if len(texts) == 0:
@@ -254,7 +278,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 t.name = t.name.replace(doc.docname, new_docname)
             doc.docname = new_docname
         if texts[0].embeddings is None:
-            text_embeddings = self.embeddings.embed_documents([t.text for t in texts])
+            text_embeddings = cast(Embeddings, self.embeddings).embed_documents(
+                [t.text for t in texts]
+            )
             for i, t in enumerate(texts):
                 t.embeddings = text_embeddings[i]
         else:
@@ -299,6 +325,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> Set[DocKey]:
         """Return a list of dockeys that match the query."""
+        self._check_is_set()
         if self.doc_index is None:
             if len(self.docs) == 0:
                 return set()
@@ -350,6 +377,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             state["texts_index"].save_local(self.index_path)
         del state["texts_index"]
         del state["doc_index"]
+        # check for name this way to catch ChatOpenAI and OpenAI
+        if "OpenAI" in state["llm"].__class__.__name__:
+            del state["llm"]
+        if "OpenAI" in state["summary_llm"].__class__.__name__:
+            del state["summary_llm"]
+        if state["embeddings"].__class__.__name__ == "OpenAIEmbeddings":
+            del state["embeddings"]
         return {"__dict__": state, "__fields_set__": self.__fields_set__}
 
     def __setstate__(self, state):
@@ -361,6 +395,12 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             # they use some special exception type, but I don't want to import it
             self.texts_index = None
         self.doc_index = None
+        if not hasattr(self, "llm"):
+            self.llm = None
+        if not hasattr(self, "summary_llm"):
+            self.summary_llm = None
+        if not hasattr(self, "embeddings"):
+            self.embeddings = None
 
     def _build_texts_index(self, keys: Optional[Set[DocKey]] = None):
         if keys is not None and self.jit_texts_index:
@@ -432,6 +472,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         disable_vector_search: bool = False,
         disable_summarization: bool = False,
     ) -> Answer:
+        self._check_is_set()
         if disable_vector_search:
             k = k * 10000
         if len(self.docs) == 0 and self.doc_index is None:
@@ -481,12 +522,6 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 memory=self.memory_model,
                 system_prompt=self.prompts.system,
             )
-            # This is dangerous because it
-            # could mask errors that are important- like auth errors
-            # I also cannot know what the exception
-            # type is because any model could be used
-            # my best idea is see if there is a 4XX
-            # http code in the exception
             try:
                 citation = match.metadata["doc"]["citation"]
                 if detailed_citations:
@@ -503,6 +538,13 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                         callbacks=callbacks,
                     )
             except Exception as e:
+                # This is to catch timeouts
+                # This is dangerous because it
+                # could mask errors that are important- like auth errors
+                # I also cannot know what the exception
+                # type is because any model could be used
+                # my best idea is see if there is a 4XX
+                # http code in the exception
                 if guess_is_4xx(str(e)):
                     return None
                 raise e
@@ -605,6 +647,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         key_filter: Optional[bool] = None,
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
+        self._check_is_set()
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
         if answer is None:

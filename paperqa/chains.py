@@ -83,6 +83,14 @@ def make_chain(
                 [system_message_prompt, human_message_prompt]
             )
         return FallbackLLMChain(prompt=chat_prompt, llm=llm)
+    if not skip_system:
+        return FallbackLLMChain(
+            prompt=PromptTemplate(
+                input_variables=prompt.input_variables,
+                template=system_prompt + "\n\n" + prompt.template,
+            ),
+            llm=llm,
+        )
     return FallbackLLMChain(prompt=prompt, llm=llm)
 
 
