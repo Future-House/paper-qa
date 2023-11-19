@@ -113,3 +113,21 @@ def iter_citations(text: str) -> List[str]:
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
     result = re.findall(citation_regex, text, flags=re.MULTILINE)
     return result
+
+
+def extract_doi(reference: str) -> str:
+    """
+    Extracts DOI from the reference string using regex.
+
+    :param reference: A string containing the reference.
+    :return: A string containing the DOI link or a message if DOI is not found.
+    """
+    # DOI regex pattern
+    doi_pattern = r"10.\d{4,9}/[-._;()/:A-Z0-9]+"
+    doi_match = re.search(doi_pattern, reference, re.IGNORECASE)
+
+    # If DOI is found in the reference, return the DOI link
+    if doi_match:
+        return "https://doi.org/" + doi_match.group()
+    else:
+        return ""

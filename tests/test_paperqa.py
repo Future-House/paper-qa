@@ -11,10 +11,9 @@ from langchain.llms import OpenAI
 from langchain.llms.fake import FakeListLLM
 from langchain.prompts import PromptTemplate
 
-from paperqa import Answer, Docs, PromptCollection, Text
+from paperqa import Answer, Context, Doc, Docs, PromptCollection, Text
 from paperqa.chains import get_score
 from paperqa.readers import read_doc
-from paperqa.types import Doc
 from paperqa.utils import (
     iter_citations,
     maybe_is_html,
@@ -132,8 +131,31 @@ def test_markdown():
         question="What was Fredic's greatest accomplishment?",
         answer="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
         "and his service as governor of Missouri (Wiki2023 chunk 1).",
+        contexts=[
+            Context(
+                context="",
+                text=Text(
+                    text="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
+                    "and his service as governor of Missouri (Wiki2023 chunk 1).",
+                    name="Wiki2023 chunk 1",
+                    doc=Doc(
+                        name="Wiki2023",
+                        docname="Wiki2023",
+                        citation="WikiMedia Foundation, 2023, Accessed now",
+                        texts=[],
+                    ),
+                ),
+                score=5,
+            )
+        ],
     )
-    assert "[^1]" in answer.markdown()
+    m, r = answer.markdown()
+    print(r)
+    assert "[^1]" in m
+    answer = answer.combine_with(answer)
+    m2, r2 = answer.markdown()
+    assert m2.startswith(m)
+    assert r2 == r
 
 
 def test_ablations():
