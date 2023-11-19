@@ -14,8 +14,7 @@ try:
 except ImportError:
     raise ImportError("Please install pyzotero: `pip install pyzotero`")
 from ..paths import PAPERQA_DIR
-from ..types import StrPath
-from ..utils import count_pdf_pages
+from ..utils import StrPath, count_pdf_pages
 
 
 class ZoteroPaper(BaseModel):

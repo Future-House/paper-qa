@@ -16,6 +16,7 @@ from paperqa.chains import get_score
 from paperqa.readers import read_doc
 from paperqa.types import Doc
 from paperqa.utils import (
+    iter_citations,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -29,7 +30,36 @@ class TestHandler(AsyncCallbackHandler):
         print(token)
 
 
-# Assume strip_citations is imported or defined in this file.
+def test_iter_citations():
+    text = (
+        "Yes, COVID-19 vaccines are effective. Various studies have documented the "
+        "effectiveness of COVID-19 vaccines in preventing severe disease, "
+        "hospitalization, and death. The BNT162b2 vaccine has shown effectiveness "
+        "ranging from 65% to -41% for the 5-11 years age group and 76% to 46% for the "
+        "12-17 years age group, after the emergence of the Omicron variant in New York "
+        "(Dorabawila2022EffectivenessOT). Against the Delta variant, the effectiveness "
+        "of the BNT162b2 vaccine was approximately 88% after two doses "
+        "(Bernal2021EffectivenessOC pg. 1-3).\n\n"
+        "Vaccine effectiveness was also found to be 89% against hospitalization and "
+        "91% against emergency department or urgent care clinic visits "
+        "(Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo pg. 3-4). In the UK "
+        "vaccination program, vaccine effectiveness was approximately 56% in "
+        "individuals aged ≥70 years between 28-34 days post-vaccination, increasing to "
+        "approximately 58% from day 35 onwards (Marfé2021EffectivenessOC).\n\n"
+        "However, it is important to note that vaccine effectiveness can decrease over "
+        "time. For instance, the effectiveness of COVID-19 vaccines against severe "
+        "COVID-19 declined to 64% after 121 days, compared to around 90% initially "
+        "(Chemaitelly2022WaningEO, Foo2019Bar). Despite this, vaccines still provide "
+        "significant protection against severe outcomes."
+    )
+    ref = [
+        "(Dorabawila2022EffectivenessOT)",
+        "(Bernal2021EffectivenessOC pg. 1-3)",
+        "(Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo pg. 3-4)",
+        "(Marfé2021EffectivenessOC)",
+        "(Chemaitelly2022WaningEO, Foo2019Bar)",
+    ]
+    assert list(iter_citations(text)) == ref
 
 
 def test_single_author():
@@ -95,6 +125,15 @@ def test_citations_with_nonstandard_chars():
         strip_citations(text)
         == "In non-English languages, citations might look different ."
     )
+
+
+def test_markdown():
+    answer = Answer(
+        question="What was Fredic's greatest accomplishment?",
+        answer="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
+        "and his service as governor of Missouri (Wiki2023 chunk 1).",
+    )
+    assert "[^1]" in answer.markdown()
 
 
 def test_ablations():

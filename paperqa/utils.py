@@ -2,12 +2,13 @@ import asyncio
 import math
 import re
 import string
-from typing import BinaryIO, List
+from pathlib import Path
+from typing import BinaryIO, List, Union
 
 import pypdf
 from langchain.base_language import BaseLanguageModel
 
-from .types import StrPath
+StrPath = Union[str, Path]
 
 
 def name_in_text(name: str, text: str) -> bool:
@@ -105,3 +106,10 @@ def strip_citations(text: str) -> str:
     # Remove the citations from the text
     text = re.sub(citation_regex, "", text, flags=re.MULTILINE)
     return text
+
+
+def iter_citations(text: str) -> List[str]:
+    # Combined regex for identifying citations (see unit tests for examples)
+    citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
+    result = re.findall(citation_regex, text, flags=re.MULTILINE)
+    return result

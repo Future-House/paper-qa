@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 from langchain.callbacks.base import BaseCallbackHandler
@@ -21,8 +20,8 @@ from .prompts import (
     select_paper_prompt,
     summary_prompt,
 )
+from .utils import iter_citations
 
-StrPath = Union[str, Path]
 DocKey = Any
 CBManager = Union[AsyncCallbackManagerForChainRun, CallbackManagerForChainRun]
 CallbackFactory = Callable[[str], Union[None, List[BaseCallbackHandler]]]
@@ -129,3 +128,21 @@ class Answer(BaseModel):
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
+
+    def markdown(self) -> str:
+        """Return the answer with footnote style citations."""
+        # example: This is an answer.[^1]
+        # [^1]: This the citation.
+        index = 1
+        output = self.answer
+        ref_list = "## References\n\n"
+        for citation in iter_citations(self.answer):
+            refs = []
+            compound = ""
+            for c in citation.split(","):
+                refs.append(c.strip("() "))
+                compound += f"[^{index}]"
+                index += 1
+            output = output.replace(citation, compound)
+        ref_list += "\n".join([f"[^{i}]: {r}" for i, r in enumerate(refs, start=1)])
+        return output + "\n\n" + ref_list
