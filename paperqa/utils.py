@@ -2,12 +2,13 @@ import asyncio
 import math
 import re
 import string
-from typing import BinaryIO, List
+from pathlib import Path
+from typing import BinaryIO, List, Union
 
 import pypdf
 from langchain.base_language import BaseLanguageModel
 
-from .types import StrPath
+StrPath = Union[str, Path]
 
 
 def name_in_text(name: str, text: str) -> bool:
@@ -105,3 +106,28 @@ def strip_citations(text: str) -> str:
     # Remove the citations from the text
     text = re.sub(citation_regex, "", text, flags=re.MULTILINE)
     return text
+
+
+def iter_citations(text: str) -> List[str]:
+    # Combined regex for identifying citations (see unit tests for examples)
+    citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
+    result = re.findall(citation_regex, text, flags=re.MULTILINE)
+    return result
+
+
+def extract_doi(reference: str) -> str:
+    """
+    Extracts DOI from the reference string using regex.
+
+    :param reference: A string containing the reference.
+    :return: A string containing the DOI link or a message if DOI is not found.
+    """
+    # DOI regex pattern
+    doi_pattern = r"10.\d{4,9}/[-._;()/:A-Z0-9]+"
+    doi_match = re.search(doi_pattern, reference, re.IGNORECASE)
+
+    # If DOI is found in the reference, return the DOI link
+    if doi_match:
+        return "https://doi.org/" + doi_match.group()
+    else:
+        return ""
