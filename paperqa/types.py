@@ -134,7 +134,7 @@ class Answer(BaseModel):
             doc = next(filter(lambda x: x.text.name == name, self.contexts)).text.doc
         except StopIteration:
             raise ValueError(f"Could not find docname {name} in contexts")
-        return f"({doc.citation})"
+        return doc.citation
 
     def markdown(self) -> Tuple[str, str]:
         """Return the answer with footnote style citations."""
