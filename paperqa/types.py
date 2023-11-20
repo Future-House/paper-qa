@@ -145,12 +145,18 @@ class Answer(BaseModel):
         index = 1
         for citation in iter_citations(self.answer):
             compound = ""
-            for c in citation.split(","):
+            for c in citation.split(",;"):
                 c = c.strip("() ")
                 if c == "Extra background information":
                     continue
                 if c in refs:
                     compound += f"[^{refs[c]}]"
+                    continue
+                # check if it is a citation
+                try:
+                    self.get_citation(c)
+                except ValueError:
+                    # not a citation
                     continue
                 refs[c] = index
                 compound += f"[^{index}]"
