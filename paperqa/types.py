@@ -152,6 +152,12 @@ class Answer(BaseModel):
                 if c in refs:
                     compound += f"[^{refs[c]}]"
                     continue
+                # check if it is a citation
+                try:
+                    self.get_citation(c)
+                except ValueError:
+                    # not a citation
+                    continue
                 refs[c] = index
                 compound += f"[^{index}]"
                 index += 1

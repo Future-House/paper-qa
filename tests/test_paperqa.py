@@ -131,13 +131,13 @@ def test_markdown():
     answer = Answer(
         question="What was Fredic's greatest accomplishment?",
         answer="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
-        "and his service as governor of Missouri (Wiki2023 chunk 1).",
+        "and his service as governor of Missouri (Wiki2023 chunk 1). It is said (in 2010) that foo.",
         contexts=[
             Context(
                 context="",
                 text=Text(
                     text="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
-                    "and his service as governor of Missouri (Wiki2023 chunk 1).",
+                    "and his service as governor of Missouri.",
                     name="Wiki2023 chunk 1",
                     doc=Doc(
                         name="Wiki2023",
