@@ -145,7 +145,7 @@ class Answer(BaseModel):
         index = 1
         for citation in iter_citations(self.answer):
             compound = ""
-            for c in citation.split(","):
+            for c in citation.split(",;"):
                 c = c.strip("() ")
                 if c == "Extra background information":
                     continue

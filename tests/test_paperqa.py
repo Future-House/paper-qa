@@ -49,7 +49,7 @@ def test_iter_citations():
         "time. For instance, the effectiveness of COVID-19 vaccines against severe "
         "COVID-19 declined to 64% after 121 days, compared to around 90% initially "
         "(Chemaitelly2022WaningEO, Foo2019Bar). Despite this, vaccines still provide "
-        "significant protection against severe outcomes."
+        "significant protection against severe outcomes (Bar2000Foo pg 1-3; Far2000 pg 2-5)."
     )
     ref = [
         "(Dorabawila2022EffectivenessOT)",
@@ -57,6 +57,7 @@ def test_iter_citations():
         "(Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo pg. 3-4)",
         "(Marfé2021EffectivenessOC)",
         "(Chemaitelly2022WaningEO, Foo2019Bar)",
+        "(Bar2000Foo pg 1-3; Far2000 pg 2-5)",
     ]
     assert list(iter_citations(text)) == ref
 
