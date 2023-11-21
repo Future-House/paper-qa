@@ -145,6 +145,7 @@ class Answer(BaseModel):
         index = 1
         for citation in iter_citations(self.answer):
             compound = ""
+            strip = True
             for c in citation.split(",;"):
                 c = c.strip("() ")
                 if c == "Extra background information":
@@ -157,17 +158,21 @@ class Answer(BaseModel):
                     self.get_citation(c)
                 except ValueError:
                     # not a citation
+                    strip = False
                     continue
                 refs[c] = index
                 compound += f"[^{index}]"
                 index += 1
-            output = output.replace(citation, compound)
+            if strip:
+                output = output.replace(citation, compound)
         formatted_refs = "\n".join(
             [
                 f"[^{i}]: [{self.get_citation(r)}]({extract_doi(self.get_citation(r))})"
                 for r, i in refs.items()
             ]
         )
+        # quick fix of space before period
+        output = output.replace(" .", ".")
         return output, formatted_refs
 
     def combine_with(self, other: "Answer") -> "Answer":
