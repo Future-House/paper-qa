@@ -90,6 +90,8 @@ def get_score(text: str) -> int:
     score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
     if not score:
         score = re.search(r"\(([0-9])\w*\/", text)
+    if not score:
+        score = re.search(r"([0-9]+)\w*\/", text)
     if score:
         s = int(score.group(1))
         if s > 10:
