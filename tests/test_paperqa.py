@@ -347,6 +347,27 @@ def test_extract_score():
 
     assert get_score(sample) == 5
 
+    sample = """
+    Introduce dynamic elements such as moving nodes or edges to create a sense of activity within
+    the network. 2. Add more nodes and connections to make the network
+    appear more complex and interconnected. 3. Incorporate both red and
+    green colors into the network, as the current screenshot only shows
+    green lines. 4. Vary the thickness of the lines to add depth and
+    visual interest. 5. Implement different shades of red and green to
+    create a gradient effect for a more visually appealing experience.
+    6. Consider adding a background color or pattern to enhance the
+    contrast and make the network stand out. 7. Introduce interactive
+    elements that allow users to manipulate the network, such as
+    dragging nodes or zooming in/out. 8. Use animation effects like
+    pulsing or changing colors to highlight certain parts of the network
+    or to show activity. 9. Add labels or markers to provide information
+      about the nodes or connections, if relevant to the purpose of the
+        network visualization. 10. Consider the use of algorithms that
+        organize the network in a visually appealing manner, such as
+        force-directed placement or hierarchical layouts. 3/10 """
+
+    assert get_score(sample) == 3
+
 
 def test_docs():
     llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
