@@ -368,6 +368,38 @@ def test_extract_score():
 
     assert get_score(sample) == 3
 
+    sample = (
+        "The text mentions a work by Shozo Yokoyama titled "
+        '"Evolution of Dim-Light and Color Vision Pigments". '
+        "This work, published in the Annual Review of Genomics and "
+        "Human Genetics, discusses the evolution of human color vision. "
+        "However, the text does not provide specific details or findings "
+        "from Yokoyama's work. \n"
+        "Relevance Score: 7"
+    )
+
+    assert get_score(sample) == 7
+
+    sample = (
+        "The evolution of human color vision is "
+        "closely tied to theories about the nature "
+        "of light, dating back to the 17th to 19th "
+        "centuries. Initially, there was no clear distinction "
+        "between the properties of light, the eye and retina, "
+        "and color percepts. Major figures in science attempted "
+        "to resolve these issues, with physicists leading most "
+        "advances in color science into the 20th century. Prior "
+        "to Newton, colors were viewed as stages between black "
+        "and white. Newton was the first to describe colors in "
+        "a modern sense, using prisms to disperse light into "
+        "a spectrum of colors. He demonstrated that each color "
+        "band could not be further divided and that different "
+        "colors had different refrangibility. \n"
+        "Relevance Score: 9.5"
+    )
+
+    assert get_score(sample) == 9
+
 
 def test_docs():
     llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
