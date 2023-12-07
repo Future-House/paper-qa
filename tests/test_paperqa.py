@@ -131,7 +131,8 @@ def test_markdown():
     answer = Answer(
         question="What was Fredic's greatest accomplishment?",
         answer="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
-        "and his service as governor of Missouri (Wiki2023 chunk 1). It is said (in 2010) that foo.",
+        "and his service as governor of Missouri (Wiki2023 chunk 1, Wiki2023 chunk 2). It is said (in 2010) that foo."
+        "However many dispute this (Wiki2023 chunk 1).",
         contexts=[
             Context(
                 context="",
@@ -147,12 +148,29 @@ def test_markdown():
                     ),
                 ),
                 score=5,
-            )
+            ),
+            Context(
+                context="",
+                text=Text(
+                    text="It is said (in 2010) that foo.",
+                    name="Wiki2023 chunk 2",
+                    doc=Doc(
+                        name="Wiki2023",
+                        docname="Wiki2023",
+                        citation="WikiMedia Foundation, 2023, Accessed now",
+                        texts=[],
+                    ),
+                ),
+                score=5,
+            ),
         ],
     )
     m, r = answer.markdown()
-    print(r)
+    assert len(r.split("\n")) == 2
+    assert "[^2]" in m
+    assert "[^3]" not in m
     assert "[^1]" in m
+    print(m, r)
     answer = answer.combine_with(answer)
     m2, r2 = answer.markdown()
     assert m2.startswith(m)

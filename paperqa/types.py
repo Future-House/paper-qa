@@ -12,6 +12,8 @@ try:
 except ImportError:
     from pydantic import BaseModel, validator
 
+import re
+
 from .prompts import (
     citation_prompt,
     default_system_prompt,
@@ -146,7 +148,7 @@ class Answer(BaseModel):
         for citation in iter_citations(self.answer):
             compound = ""
             strip = True
-            for c in citation.split(",;"):
+            for c in re.split(",|;", citation):
                 c = c.strip("() ")
                 if c == "Extra background information":
                     continue
