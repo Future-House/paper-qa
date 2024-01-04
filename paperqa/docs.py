@@ -49,7 +49,7 @@ class Docs(BaseModel):
     docnames: set[str] = set()
     texts_index: VectorStore = NumpyVectorStore()
     doc_index: VectorStore = NumpyVectorStore()
-    llm_config: dict = dict(model="gpt-3.5-turbo", model_type="chat")
+    llm_config: dict = dict(model="gpt-3.5-turbo", model_type="chat", temperature=0.1)
     summary_llm_config: dict | None = Field(default=None, validate_default=True)
     name: str = "default"
     index_path: Path | None = PAPERQA_DIR / name
@@ -61,6 +61,7 @@ class Docs(BaseModel):
     jit_texts_index: bool = False
     # This is used to strip indirect citations that come up from the summary llm
     strip_citations: bool = True
+    verbose: bool = False
 
     def __init__(self, **data):
         if "client" in data:
@@ -183,7 +184,7 @@ class Docs(BaseModel):
             cite_chain = make_chain(
                 client=self._client,
                 prompt=self.prompts.cite,
-                llm_config=self.summary_llm_config,
+                llm_config=cast(dict, self.summary_llm_config),
                 skip_system=True,
             )
             # peak first chunk
@@ -191,7 +192,9 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            citation = asyncio.run(cite_chain(data=dict(text=texts[0].text)))
+            citation = asyncio.run(
+                cite_chain(dict(text=texts[0].text), None),
+            )
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
@@ -312,8 +315,8 @@ class Docs(BaseModel):
                 )
                 papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
                 result = await chain(
-                    data=[dict(question=query, papers="\n".join(papers))],
-                    callbacks=get_callbacks("filter"),
+                    dict(question=query, papers="\n".join(papers)),
+                    get_callbacks("filter"),
                 )
                 return set([d.dockey for d in matched_docs if d.docname in result])
         except AttributeError:
@@ -321,12 +324,20 @@ class Docs(BaseModel):
         return set([d.dockey for d in matched_docs])
 
     def _build_texts_index(self, keys: set[DocKey] | None = None):
+        texts = self.texts
         if keys is not None and self.jit_texts_index:
-            texts = self.texts
             if keys is not None:
                 texts = [t for t in texts if t.doc.dockey in keys]
             if len(texts) == 0:
                 return
+            self.texts_index.clear()
+            self.texts_index.add_texts_and_embeddings(texts)
+        if self.jit_texts_index and keys is None:
+            # Not sure what else to do here???????
+            print(
+                "Warning: JIT text index without keys "
+                "requires rebuilding index each time!"
+            )
             self.texts_index.clear()
             self.texts_index.add_texts_and_embeddings(texts)
 
@@ -369,7 +380,6 @@ class Docs(BaseModel):
             # do we have no docs?
             return answer
         self._build_texts_index(keys=answer.dockey_filter)
-        self.texts_index = cast(VectorStore, self.texts_index)
         _k = k
         if answer.dockey_filter is not None:
             _k = k * 10  # heuristic - get enough so we can downselect
@@ -414,7 +424,7 @@ class Docs(BaseModel):
                 summary_chain = make_chain(
                     client=self._client,
                     prompt=self.prompts.summary,
-                    llm_config=self.summary_llm_config,
+                    llm_config=cast(dict, self.summary_llm_config),
                     system_prompt=self.prompts.system,
                 )
                 # This is dangerous because it
@@ -425,14 +435,14 @@ class Docs(BaseModel):
                 # http code in the exception
                 try:
                     context = await summary_chain(
-                        data=dict(
+                        dict(
                             question=answer.question,
                             # Add name so chunk is stated
                             citation=citation,
                             summary_length=answer.summary_length,
                             text=match.text,
                         ),
-                        callbacks=callbacks,
+                        callbacks,
                     )
                 except Exception as e:
                     if guess_is_4xx(str(e)):
@@ -544,9 +554,7 @@ class Docs(BaseModel):
                 llm_config=self.llm_config,
                 system_prompt=self.prompts.system,
             )
-            pre = await chain(
-                data=dict(question=answer.question), callbacks=get_callbacks("pre")
-            )
+            pre = await chain(dict(question=answer.question), get_callbacks("pre"))
             answer.context = answer.context + "\n\nExtra background information:" + pre
         bib = dict()
         if len(answer.context) < 10:  # and not self.memory:
@@ -560,14 +568,16 @@ class Docs(BaseModel):
                 llm_config=self.llm_config,
                 system_prompt=self.prompts.system,
             )
+            print(answer.context)
             answer_text = await qa_chain(
-                data=dict(
+                dict(
                     context=answer.context,
                     answer_length=answer.answer_length,
                     question=answer.question,
                 ),
-                callbacks=get_callbacks("answer"),
+                get_callbacks("answer"),
             )
+            print(answer_text)
         # it still happens
         if "(Example2012)" in answer_text:
             answer_text = answer_text.replace("(Example2012)", "")
@@ -594,9 +604,7 @@ class Docs(BaseModel):
                 llm_config=self.llm_config,
                 system_prompt=self.prompts.system,
             )
-            post = await chain(
-                data=answer.model_dump(), callbacks=get_callbacks("post")
-            )
+            post = await chain(answer.model_dump(), get_callbacks("post"))
             answer.answer = post
             answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"
             if len(bib) > 0:

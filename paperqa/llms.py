@@ -1,5 +1,5 @@
 import re
-from typing import Any, Awaitable, Callable, get_args, get_type_hints
+from typing import Any, Callable, Coroutine, get_args, get_type_hints
 
 from openai import AsyncOpenAI
 
@@ -54,7 +54,7 @@ def make_chain(
     llm_config: dict,
     skip_system: bool = False,
     system_prompt: str = default_system_prompt,
-) -> Awaitable[Any]:
+) -> Callable[[dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, str]]:
     """Create a function to execute a batch of prompts
 
     Args:

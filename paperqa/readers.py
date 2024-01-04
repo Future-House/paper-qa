@@ -78,7 +78,9 @@ def parse_txt(
 ) -> List[Text]:
     """Parse a document into chunks, based on tiktoken encoding.
 
-    NOTE: We get some byte continuation errors. Currnetly ignored, but should explore more to make sure we don't miss anything.
+    NOTE: We get some byte continuation errors.
+    Currnetly ignored, but should explore more to make sure we
+    don't miss anything.
     """
     try:
         with open(path) as f:
@@ -88,7 +90,7 @@ def parse_txt(
             text = f.read()
     if html:
         text = html2text(text)
-    texts = []
+    texts: list[Text] = []
     # we tokenize using tiktoken so cuts are in reasonable places
     enc = tiktoken.get_encoding("cl100k_base")
     encoded = [enc.decode_single_token_bytes(token) for token in enc.encode(text)]

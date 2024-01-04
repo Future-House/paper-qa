@@ -15,7 +15,7 @@ summary_prompt = (
 
 qa_prompt = (
     "Write an answer ({answer_length}) "
-    "for the question below based on the provided context. "
+    "for the question below based on the provided context. Ignore irrelevant context. "
     "If the context provides insufficient information and the question cannot be directly answered, "
     'reply "I cannot answer". '
     "For each part of your answer, indicate which sources most support it "
@@ -37,7 +37,8 @@ select_paper_prompt = (
     "Selected keys:"
 )
 citation_prompt = (
-    "Provide the citation for the following text in MLA Format. If reporting date accessed, the current year is 2024\n\n"
+    "Provide the citation for the following text in MLA Format. "
+    "If reporting date accessed, the current year is 2024\n\n"
     "{text}\n\n"
     "Citation:"
 )

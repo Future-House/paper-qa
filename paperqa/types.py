@@ -15,7 +15,7 @@ from .prompts import (
 # Just for clarity
 DocKey = Any
 
-CallbackFactory = Callable[[str], Callable[[str], None]]
+CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
 
 class Embeddable(BaseModel):
@@ -78,7 +78,7 @@ class VectorStore(BaseModel, ABC):
             return texts, scores
 
         embeddings = np.array([t.embedding for t in texts])
-        scores = np.array(scores)
+        np_scores = np.array(scores)
         similarity_matrix = cosine_similarity(embeddings, embeddings)
 
         selected_indices = [0]
@@ -88,7 +88,7 @@ class VectorStore(BaseModel, ABC):
             selected_similarities = similarity_matrix[:, selected_indices]
             max_sim_to_selected = selected_similarities.max(axis=1)
 
-            mmr_scores = lambda_ * scores - (1 - lambda_) * max_sim_to_selected
+            mmr_scores = lambda_ * np_scores - (1 - lambda_) * max_sim_to_selected
             mmr_scores[selected_indices] = -np.inf  # Exclude already selected documents
 
             max_mmr_index = mmr_scores.argmax()
@@ -132,15 +132,21 @@ class NumpyVectorStore(VectorStore):
         )
 
 
+# Mock a dictionary and store any missing items
 class _FormatDict(dict):
+    def __init__(self) -> None:
+        self.key_set: set[str] = set()
+
     def __missing__(self, key: str) -> str:
+        self.key_set.add(key)
         return key
 
 
 def get_formatted_variables(s: str) -> set[str]:
+    """Returns the set of variables implied by the format string"""
     format_dict = _FormatDict()
     s.format_map(format_dict)
-    return set(format_dict.keys())
+    return format_dict.key_set
 
 
 class PromptCollection(BaseModel):
@@ -190,6 +196,8 @@ class PromptCollection(BaseModel):
     @classmethod
     def check_pre(cls, v: str | None) -> str | None:
         if v is not None:
+            print(v)
+            print(get_formatted_variables(v))
             if set(get_formatted_variables(v)) != set(["question"]):
                 raise ValueError("Pre prompt must have input variables: question")
         return v
@@ -199,7 +207,7 @@ class PromptCollection(BaseModel):
     def check_post(cls, v: str | None) -> str | None:
         if v is not None:
             # kind of a hack to get list of attributes in answer
-            attrs = [a.name for a in Answer.__fields__.values()]
+            attrs = set(Answer.model_fields.keys())
             if not set(get_formatted_variables(v)).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
         return v
