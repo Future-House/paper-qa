@@ -10,7 +10,7 @@ summary_prompt = (
     "{text}\n\n"
     "Excerpt from {citation}\n"
     "Question: {question}\n"
-    "Relevant Information Summary:",
+    "Relevant Information Summary:"
 )
 
 qa_prompt = (
@@ -22,7 +22,7 @@ qa_prompt = (
     "via valid citation markers at the end of sentences, like (Example2012). \n"
     "Context (with relevance scores):\n {context}\n"
     "Question: {question}\n"
-    "Answer: ",
+    "Answer: "
 )
 
 select_paper_prompt = (
@@ -34,12 +34,12 @@ select_paper_prompt = (
     "(if the question requires timely information). \n\n"
     "Question: {question}\n\n"
     "Papers: {papers}\n\n"
-    "Selected keys:",
+    "Selected keys:"
 )
 citation_prompt = (
-    "Provide the citation for the following text in MLA Format.\n\n"
+    "Provide the citation for the following text in MLA Format. If reporting date accessed, the current year is 2024\n\n"
     "{text}\n\n"
-    "Citation:",
+    "Citation:"
 )
 
 default_system_prompt = (

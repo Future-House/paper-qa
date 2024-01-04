@@ -7,7 +7,7 @@ import numpy as np
 import requests
 
 from paperqa import Answer, Doc, Docs, PromptCollection, Text
-from paperqa.chains import get_score
+from paperqa.llms import get_score
 from paperqa.readers import read_doc
 from paperqa.utils import (
     iter_citations,
@@ -370,15 +370,6 @@ def test_docs():
     assert docs.docs["test"].docname == "Wiki2023"
 
 
-def test_update_llm():
-    doc = Docs()
-    doc.update_llm("gpt-3.5-turbo")
-    assert doc.llm == doc.summary_llm
-
-    doc.update_llm(OpenAI(client=None, temperature=0.1, model="text-ada-001"))
-    assert doc.llm == doc.summary_llm
-
-
 def test_evidence():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -451,7 +442,6 @@ class TestDocMatch(IsolatedAsyncioTestCase):
             "What is Frederick Bates's greatest accomplishment?"
         )
         assert len(sources) > 0
-        docs.update_llm("gpt-3.5-turbo")
         sources = await docs.adoc_match(
             "What is Frederick Bates's greatest accomplishment?"
         )
@@ -464,15 +454,20 @@ def test_docs_pickle():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
         f.write(r.text)
-    llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
-    docs = Docs(llm=llm)
+    docs = Docs(llm_config=dict(temperature=0.0, model="davinci-002"))
+    old_config = docs.llm_config
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     os.remove(doc_path)
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
-    docs2.update_llm(llm)
-    assert llm.model_name == docs2.llm.model_name
-    assert docs2.summary_llm.model_name == docs2.llm.model_name
+    # make sure it fails if we haven't set client
+    try:
+        docs2.query("What date is bring your dog to work in the US?")
+    except ValueError:
+        pass
+    docs2.set_client()
+    assert docs2.llm_config == old_config
+    assert docs2.summary_llm_config == old_config
     assert len(docs.docs) == len(docs2.docs)
     context1, context2 = (
         docs.get_evidence(
@@ -497,45 +492,6 @@ def test_docs_pickle():
     docs.query("What date is bring your dog to work in the US?")
 
 
-def test_docs_pickle_no_faiss():
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get front page of wikipedia
-        r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
-        f.write(r.text)
-    llm = OpenAI(client=None, temperature=0.0, model="text-curie-001")
-    docs = Docs(llm=llm)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
-    docs.doc_index = None
-    docs.texts_index = None
-    docs_pickle = pickle.dumps(docs)
-    docs2 = pickle.loads(docs_pickle)
-    docs2.update_llm(llm)
-    assert len(docs.docs) == len(docs2.docs)
-    assert (
-        strings_similarity(
-            docs.get_evidence(
-                Answer(
-                    question="What date is bring your dog to work in the US?",
-                    summary_length="about 20 words",
-                ),
-                k=3,
-                max_sources=1,
-            ).context,
-            docs2.get_evidence(
-                Answer(
-                    question="What date is bring your dog to work in the US?",
-                    summary_length="about 20 words",
-                ),
-                k=3,
-                max_sources=1,
-            ).context,
-        )
-        > 0.75
-    )
-    os.remove(doc_path)
-
-
 def test_bad_context():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -555,7 +511,7 @@ def test_repeat_keys():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
+    docs = Docs(llm_config=dict(temperature=0.0, model="text-ada-001"))
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     try:
         docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -584,7 +540,7 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-curie-001"))
+    docs = Docs(llm_config=dict(temperature=0.0, model="davinci-002"))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
@@ -594,7 +550,7 @@ def test_fileio_reader_pdf():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     with open(doc_path, "rb") as f:
-        docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-curie-001"))
+        docs = Docs(llm_config=dict(temperature=0.0, model="davinci-002"))
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.query("Are counterfactuals actionable?")
         assert "yes" in answer.answer or "Yes" in answer.answer
@@ -602,7 +558,7 @@ def test_fileio_reader_pdf():
 
 def test_fileio_reader_txt():
     # can't use curie, because it has trouble with parsed HTML
-    docs = Docs(llm=OpenAI(client=None, temperature=0.0))
+    docs = Docs(llm_config=dict(temperature=0.0, model="davinci-002"))
     r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
     if r.status_code != 200:
         raise ValueError("Could not download wikipedia page")
@@ -652,7 +608,7 @@ def test_prompt_length():
 def test_code():
     # load this script
     doc_path = os.path.abspath(__file__)
-    docs = Docs(llm=OpenAI(client=None, temperature=0.0, model="text-ada-001"))
+    docs = Docs(llm_config=dict(temperature=0.0, model="babbage-002"))
     docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)
     assert len(docs.docs) == 1
     docs.query("What function tests the preview?")
@@ -667,8 +623,8 @@ def test_citation():
     docs = Docs()
     docs.add(doc_path)
     assert (
-        list(docs.docs.values())[0].docname == "Wikipedia2023"
-        or list(docs.docs.values())[0].docname == "Frederick2023"
+        list(docs.docs.values())[0].docname == "Wikipedia2024"
+        or list(docs.docs.values())[0].docname == "Frederick2024"
     )
 
 
@@ -740,19 +696,6 @@ def test_query_filter():
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
-def test_nonopenai_client():
-    responses = ["This is a test", "This is another test"] * 50
-    model = FakeListLLM(responses=responses)
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
-        f.write(r.text)
-    docs = Docs(llm=model)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.query("What country is Bates from?")
-
-
 def test_zotera():
     from paperqa.contrib import ZoteroDB
 
@@ -786,11 +729,10 @@ def test_too_much_evidence():
 
 
 def test_custom_prompts():
-    my_qaprompt = PromptTemplate(
-        input_variables=["question", "context"],
-        template="Answer the question '{question}' "
+    my_qaprompt = (
+        "Answer the question '{question}' "
         "using the country name alone. For example: "
-        "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: ",
+        "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: "
     )
 
     docs = Docs(prompts=PromptCollection(qa=my_qaprompt))
@@ -807,11 +749,7 @@ def test_custom_prompts():
 
 
 def test_pre_prompt():
-    pre = PromptTemplate(
-        input_variables=["question"],
-        template="Provide context you have memorized "
-        "that could help answer '{question}'. ",
-    )
+    pre = "Provide context you have memorized " "that could help answer '{question}'. "
 
     docs = Docs(prompts=PromptCollection(pre=pre))
 
@@ -825,13 +763,12 @@ def test_pre_prompt():
 
 
 def test_post_prompt():
-    post = PromptTemplate(
-        input_variables=["question", "answer"],
-        template="We are trying to answer the question below "
+    post = (
+        "We are trying to answer the question below "
         "and have an answer provided. "
         "Please edit the answer be extremely terse, with no extra words or formatting"
         "with no extra information.\n\n"
-        "Q: {question}\nA: {answer}\n\n",
+        "Q: {question}\nA: {answer}\n\n"
     )
 
     docs = Docs(prompts=PromptCollection(post=post))
@@ -883,8 +820,8 @@ def disabled_test_memory():
 
 
 def test_add_texts():
-    llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
-    docs = Docs(llm=llm)
+    llm_config = dict(temperature=0.1, model="text-ada-001")
+    docs = Docs(llm_config=llm_config)
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -894,17 +831,17 @@ def test_add_texts():
     docs2 = Docs()
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
-        t.embeddings = None
+        t.embedding = None
     docs2.add_texts(texts, list(docs.docs.values())[0])
 
     for t1, t2 in zip(docs2.texts, docs.texts):
         assert t1.text == t2.text
-        assert np.allclose(t1.embeddings, t2.embeddings, atol=1e-3)
+        assert np.allclose(t1.embedding, t2.embedding, atol=1e-3)
 
     docs2._build_texts_index()
     # now do it again to test after text index is already built
-    llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
-    docs = Docs(llm=llm)
+    llm_config = dict(temperature=0.1, model="text-ada-001")
+    docs = Docs(llm_config=llm_config)
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -913,7 +850,7 @@ def test_add_texts():
 
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
-        t.embeddings = None
+        t.embedding = None
     docs2.add_texts(texts, list(docs.docs.values())[0])
     assert len(docs2.docs) == 2
 

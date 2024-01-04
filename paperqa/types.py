@@ -50,7 +50,7 @@ class VectorStore(BaseModel, ABC):
     @abstractmethod
     def similarity_search(
         self, query: list[float], k: int
-    ) -> list[tuple[Embeddable, float]]:
+    ) -> tuple[list[Embeddable], list[float]]:
         pass
 
     @abstractmethod
@@ -59,7 +59,7 @@ class VectorStore(BaseModel, ABC):
 
     def max_marginal_relevance_search(
         self, query: list[float], k: int, fetch_k: int, lambda_: float = 0.5
-    ) -> list[tuple[Embeddable, float]]:
+    ) -> tuple[list[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:
@@ -73,16 +73,16 @@ class VectorStore(BaseModel, ABC):
         if fetch_k < k:
             raise ValueError("fetch_k must be greater or equal to k")
 
-        initial_results = self.similarity_search(query, fetch_k)
-        if len(initial_results) <= k:
-            return initial_results
+        texts, scores = self.similarity_search(query, fetch_k)
+        if len(texts) <= k:
+            return texts, scores
 
-        embeddings = np.array([t.embedding for t, _ in initial_results])
-        scores = np.array([score for _, score in initial_results])
+        embeddings = np.array([t.embedding for t in texts])
+        scores = np.array(scores)
         similarity_matrix = cosine_similarity(embeddings, embeddings)
 
         selected_indices = [0]
-        remaining_indices = list(range(1, len(initial_results)))
+        remaining_indices = list(range(1, len(texts)))
 
         while len(selected_indices) < k:
             selected_similarities = similarity_matrix[:, selected_indices]
@@ -95,7 +95,9 @@ class VectorStore(BaseModel, ABC):
             selected_indices.append(max_mmr_index)
             remaining_indices.remove(max_mmr_index)
 
-        return [(initial_results[i][0], scores[i]) for i in selected_indices]
+        return [texts[i] for i in selected_indices], [
+            scores[i] for i in selected_indices
+        ]
 
 
 class NumpyVectorStore(VectorStore):
@@ -115,16 +117,19 @@ class NumpyVectorStore(VectorStore):
 
     def similarity_search(
         self, query: list[float], k: int
-    ) -> list[tuple[Embeddable, float]]:
+    ) -> tuple[list[Embeddable], list[float]]:
         if len(self.texts) == 0:
-            return []
-        query = np.array(query)
+            return [], []
+        np_query = np.array(query)
         similarity_scores = cosine_similarity(
-            query.reshape(1, -1), self._embeddings_matrix
+            np_query.reshape(1, -1), self._embeddings_matrix
         )[0]
         similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
         sorted_indices = np.argsort(similarity_scores)[::-1]
-        return [(self.texts[i], similarity_scores[i]) for i in sorted_indices[:k]]
+        return (
+            [self.texts[i] for i in sorted_indices[:k]],
+            [similarity_scores[i] for i in sorted_indices[:k]],
+        )
 
 
 class _FormatDict(dict):

@@ -1,11 +1,22 @@
 import re
-from typing import Callable
+from typing import Any, Awaitable, Callable, get_args, get_type_hints
 
 from openai import AsyncOpenAI
 
 from .prompts import default_system_prompt
 
-default_system_prompt = "End your responses with [END]"
+
+def guess_model_type(model_name: str) -> str:
+    import openai
+
+    model_type = get_type_hints(
+        openai.types.chat.completion_create_params.CompletionCreateParamsBase
+    )["model"]
+    model_union = get_args(get_args(model_type)[1])
+    model_arr = list(model_union)
+    if model_name in model_arr:
+        return "chat"
+    return "completion"
 
 
 def process_llm_config(llm_config: dict) -> dict:
@@ -23,13 +34,27 @@ def process_llm_config(llm_config: dict) -> dict:
     return result
 
 
+async def embed_documents(
+    client: AsyncOpenAI, texts: list[str], embedding_model: str
+) -> list[list[float]]:
+    """Embed a list of documents with batching"""
+    if client is None:
+        raise ValueError(
+            "Your client is None - did you forget to set it after pickling?"
+        )
+    response = await client.embeddings.create(
+        model=embedding_model, input=texts, encoding_format="float"
+    )
+    return [e.embedding for e in response.data]
+
+
 def make_chain(
     client: AsyncOpenAI,
     prompt: str,
     llm_config: dict,
     skip_system: bool = False,
     system_prompt: str = default_system_prompt,
-) -> Callable[[list[dict], list[Callable[[str], None]] | None], list[str]]:
+) -> Awaitable[Any]:
     """Create a function to execute a batch of prompts
 
     Args:
@@ -45,6 +70,10 @@ def make_chain(
         where data is a dict with keys for the input variables that will be formatted into prompt
         and callbacks is a list of functions to call with each chunk of the completion.
     """
+    if client is None:
+        raise ValueError(
+            "Your client is None - did you forget to set it after pickling?"
+        )
     if llm_config["model_type"] == "chat":
         system_message_prompt = dict(role="system", content=system_prompt)
         human_message_prompt = dict(role="user", content=prompt)
