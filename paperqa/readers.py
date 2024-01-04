@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import List
 
 from html2text import html2text
-from langchain.text_splitter import TokenTextSplitter
 
 from .types import Doc, Text
 
@@ -84,9 +83,14 @@ def parse_txt(
             text = f.read()
     if html:
         text = html2text(text)
-    # yo, no idea why but the texts are not split correctly
-    text_splitter = TokenTextSplitter(chunk_size=chunk_chars, chunk_overlap=overlap)
-    raw_texts = text_splitter.split_text(text)
+    # chunk into size chunk_chars with overlap overlap
+    raw_texts = []
+    start = 0
+    while start < len(text):
+        end = min(start + chunk_chars, len(text))
+        raw_texts.append(text[start:end])
+        start = end - overlap
+
     texts = [
         Text(text=t, name=f"{doc.docname} chunk {i}", doc=doc)
         for i, t in enumerate(raw_texts)

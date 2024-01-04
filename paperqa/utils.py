@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import BinaryIO, List, Union
 
 import pypdf
-from langchain.base_language import BaseLanguageModel
 
 StrPath = Union[str, Path]
 
@@ -91,13 +90,6 @@ def guess_is_4xx(msg: str) -> bool:
     if re.search(r"4\d\d", msg):
         return True
     return False
-
-
-def get_llm_name(llm: BaseLanguageModel) -> str:
-    try:
-        return llm.model_name  # type: ignore
-    except AttributeError:
-        return llm.model  # type: ignore
 
 
 def strip_citations(text: str) -> str:

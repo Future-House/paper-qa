@@ -1,89 +1,116 @@
 import re
-from typing import Any, Dict, List, Optional, cast
+from typing import Callable
 
-from langchain.base_language import BaseLanguageModel
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForChainRun,
-    CallbackManagerForChainRun,
-)
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
-from langchain.memory.chat_memory import BaseChatMemory
-from langchain.prompts import PromptTemplate, StringPromptTemplate
-from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
-from langchain.schema import LLMResult, SystemMessage
+from openai import AsyncOpenAI
 
 from .prompts import default_system_prompt
-from .types import CBManager
 
-memory_prompt = PromptTemplate(
-    input_variables=["memory", "start"],
-    template="Here are previous questions and answers, which may be referenced in subsequent questions:\n\n{memory}\n\n"
-    "----------------------------------------\n\n"
-    "{start}",
-)
+default_system_prompt = "End your responses with [END]"
 
 
-class FallbackLLMChain(LLMChain):
-    """Chain that falls back to synchronous generation if the async generation fails."""
-
-    async def agenerate(
-        self,
-        input_list: List[Dict[str, Any]],
-        run_manager: Optional[CBManager] = None,
-    ) -> LLMResult:
-        """Generate LLM result from inputs."""
-        try:
-            run_manager = cast(AsyncCallbackManagerForChainRun, run_manager)
-            return await super().agenerate(input_list, run_manager=run_manager)
-        except NotImplementedError:
-            run_manager = cast(CallbackManagerForChainRun, run_manager)
-            return self.generate(input_list)
-
-
-# TODO: If upstream is fixed remove this
-
-
-class ExtendedHumanMessagePromptTemplate(HumanMessagePromptTemplate):
-    prompt: StringPromptTemplate
+def process_llm_config(llm_config: dict) -> dict:
+    """Remove model_type and try to set max_tokens"""
+    result = {k: v for k, v in llm_config.items() if k != "model_type"}
+    if "max_tokens" not in result or result["max_tokens"] == -1:
+        model = llm_config["model"]
+        # now we guess!
+        if model.startswith("gpt-4") or (
+            model.startswith("gpt-3.5") and "1106" in model
+        ):
+            result["max_tokens"] = 4096
+        else:
+            result["max_tokens"] = 2048  # ?
+    return result
 
 
 def make_chain(
-    prompt: StringPromptTemplate,
-    llm: BaseLanguageModel,
+    client: AsyncOpenAI,
+    prompt: str,
+    llm_config: dict,
     skip_system: bool = False,
-    memory: Optional[BaseChatMemory] = None,
     system_prompt: str = default_system_prompt,
-) -> FallbackLLMChain:
-    if memory and len(memory.load_memory_variables({})["memory"]) > 0:
-        # we copy the prompt so we don't modify the original
-        # TODO: Figure out pipeline prompts to avoid this
-        # the problem with pipeline prompts is that
-        # the memory is a constant (or partial), not  a prompt
-        # and I cannot seem to make an empty prompt (or str)
-        # work as an input to pipeline prompt
-        assert isinstance(
-            prompt, PromptTemplate
-        ), "Memory only works with prompt templates - see comment above"
-        assert "memory" in memory.load_memory_variables({})
-        new_prompt = PromptTemplate(
-            input_variables=prompt.input_variables,
-            template=memory_prompt.format(
-                start=prompt.template, **memory.load_memory_variables({})
-            ),
-        )
-        prompt = new_prompt
-    if type(llm) == ChatOpenAI:
-        system_message_prompt = SystemMessage(content=system_prompt)
-        human_message_prompt = ExtendedHumanMessagePromptTemplate(prompt=prompt)
+) -> Callable[[list[dict], list[Callable[[str], None]] | None], list[str]]:
+    """Create a function to execute a batch of prompts
+
+    Args:
+        client: OpenAI client
+        prompt: The prompt to use
+        llm_config: The config to use
+        skip_system: Whether to skip the system prompt
+        system_prompt: The system prompt to use
+
+    Returns:
+        A function to execute a prompt. Its signature is:
+        execute(data: dict, callbacks: list[Callable[[str], None]]] | None = None) -> str
+        where data is a dict with keys for the input variables that will be formatted into prompt
+        and callbacks is a list of functions to call with each chunk of the completion.
+    """
+    if llm_config["model_type"] == "chat":
+        system_message_prompt = dict(role="system", content=system_prompt)
+        human_message_prompt = dict(role="user", content=prompt)
         if skip_system:
-            chat_prompt = ChatPromptTemplate.from_messages([human_message_prompt])
+            chat_prompt = [human_message_prompt]
         else:
-            chat_prompt = ChatPromptTemplate.from_messages(
-                [system_message_prompt, human_message_prompt]
-            )
-        return FallbackLLMChain(prompt=chat_prompt, llm=llm)
-    return FallbackLLMChain(prompt=prompt, llm=llm)
+            chat_prompt = [system_message_prompt, human_message_prompt]
+
+        async def execute(
+            data: dict, callbacks: list[Callable[[str], None]] | None = None
+        ) -> str:
+            messages = chat_prompt[:-1] + [
+                dict(role="user", content=chat_prompt[-1]["content"].format(**data))
+            ]
+            if callbacks is None:
+                completion = await client.chat.completions.create(
+                    messages=messages, **process_llm_config(llm_config)
+                )
+                output = completion.choices[0].message.content
+            else:
+                completion = await client.chat.completions.create(
+                    messages=messages, **process_llm_config(llm_config), stream=True
+                )
+                result = []
+                async for chunk in completion:
+                    c = chunk.choices[0].delta.content
+                    if c:
+                        result.append(c)
+                        [f(c) for f in callbacks]
+                output = "".join(result)
+            return output
+
+        return execute
+    elif llm_config["model_type"] == "completion":
+        if skip_system:
+            completion_prompt = prompt
+        else:
+            completion_prompt = system_prompt + "\n\n" + prompt
+
+        async def execute(
+            data: dict, callbacks: list[Callable[[str], None]] | None = None
+        ) -> str:
+            if callbacks is None:
+                completion = await client.completions.create(
+                    prompt=completion_prompt.format(**data),
+                    **process_llm_config(llm_config),
+                )
+                output = completion.choices[0].text
+            else:
+                completion = await client.completions.create(
+                    prompt=completion_prompt.format(**data),
+                    **process_llm_config(llm_config),
+                    stream=True,
+                )
+                result = []
+                async for chunk in completion:
+                    c = chunk.choices[0].text
+                    if c:
+                        result.append(c)
+                        [f(c) for f in callbacks]
+                output = "".join(result)
+            return output
+
+        return execute
+    else:
+        raise NotImplementedError(f"Unknown model type {llm_config['model_type']}")
 
 
 def get_score(text: str) -> int:

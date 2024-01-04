@@ -1,8 +1,5 @@
-from langchain.prompts import PromptTemplate
-
-summary_prompt = PromptTemplate(
-    input_variables=["text", "citation", "question", "summary_length"],
-    template="Summarize the text below to help answer a question. "
+summary_prompt = (
+    "Summarize the text below to help answer a question. "
     "Do not directly answer the question, instead summarize "
     "to give evidence to help answer the question. "
     "Focus on specific details, including numbers, equations, or specific quotes. "
@@ -16,9 +13,8 @@ summary_prompt = PromptTemplate(
     "Relevant Information Summary:",
 )
 
-qa_prompt = PromptTemplate(
-    input_variables=["context", "answer_length", "question"],
-    template="Write an answer ({answer_length}) "
+qa_prompt = (
+    "Write an answer ({answer_length}) "
     "for the question below based on the provided context. "
     "If the context provides insufficient information and the question cannot be directly answered, "
     'reply "I cannot answer". '
@@ -29,9 +25,8 @@ qa_prompt = PromptTemplate(
     "Answer: ",
 )
 
-select_paper_prompt = PromptTemplate(
-    input_variables=["question", "papers"],
-    template="Select papers that may help answer the question below. "
+select_paper_prompt = (
+    "Select papers that may help answer the question below. "
     "Papers are listed as $KEY: $PAPER_INFO. "
     "Return a list of keys, separated by commas. "
     'Return "None", if no papers are applicable. '
@@ -41,12 +36,8 @@ select_paper_prompt = PromptTemplate(
     "Papers: {papers}\n\n"
     "Selected keys:",
 )
-
-# We are unable to serialize with partial variables
-# so TODO: update year next year
-citation_prompt = PromptTemplate(
-    input_variables=["text"],
-    template="Provide the citation for the following text in MLA Format. The year is 2023\n"
+citation_prompt = (
+    "Provide the citation for the following text in MLA Format.\n\n"
     "{text}\n\n"
     "Citation:",
 )

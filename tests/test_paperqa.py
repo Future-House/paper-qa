@@ -1,17 +1,12 @@
 import os
 import pickle
 from io import BytesIO
-from typing import Any
 from unittest import IsolatedAsyncioTestCase
 
 import numpy as np
 import requests
-from langchain.callbacks.base import AsyncCallbackHandler
-from langchain.llms import OpenAI
-from langchain.llms.fake import FakeListLLM
-from langchain.prompts import PromptTemplate
 
-from paperqa import Answer, Context, Doc, Docs, PromptCollection, Text
+from paperqa import Answer, Doc, Docs, PromptCollection, Text
 from paperqa.chains import get_score
 from paperqa.readers import read_doc
 from paperqa.utils import (
@@ -22,11 +17,6 @@ from paperqa.utils import (
     strings_similarity,
     strip_citations,
 )
-
-
-class TestHandler(AsyncCallbackHandler):
-    async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-        print(token)
 
 
 def test_iter_citations():
@@ -125,56 +115,6 @@ def test_citations_with_nonstandard_chars():
         strip_citations(text)
         == "In non-English languages, citations might look different ."
     )
-
-
-def test_markdown():
-    answer = Answer(
-        question="What was Fredic's greatest accomplishment?",
-        answer="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
-        "and his service as governor of Missouri (Wiki2023 chunk 1, Wiki2023 chunk 2). It is said (in 2010) that foo."
-        "However many dispute this (Wiki2023 chunk 1).",
-        contexts=[
-            Context(
-                context="",
-                text=Text(
-                    text="Frederick Bates's greatest accomplishment was his role in resolving land disputes "
-                    "and his service as governor of Missouri.",
-                    name="Wiki2023 chunk 1",
-                    doc=Doc(
-                        name="Wiki2023",
-                        docname="Wiki2023",
-                        citation="WikiMedia Foundation, 2023, Accessed now",
-                        texts=[],
-                    ),
-                ),
-                score=5,
-            ),
-            Context(
-                context="",
-                text=Text(
-                    text="It is said (in 2010) that foo.",
-                    name="Wiki2023 chunk 2",
-                    doc=Doc(
-                        name="Wiki2023",
-                        docname="Wiki2023",
-                        citation="WikiMedia Foundation, 2023, Accessed now",
-                        texts=[],
-                    ),
-                ),
-                score=5,
-            ),
-        ],
-    )
-    m, r = answer.markdown()
-    assert len(r.split("\n")) == 2
-    assert "[^2]" in m
-    assert "[^3]" not in m
-    assert "[^1]" in m
-    print(m, r)
-    answer = answer.combine_with(answer)
-    m2, r2 = answer.markdown()
-    assert m2.startswith(m)
-    assert r2 == r
 
 
 def test_ablations():
@@ -420,8 +360,8 @@ def test_extract_score():
 
 
 def test_docs():
-    llm = OpenAI(client=None, temperature=0.1, model="text-ada-001")
-    docs = Docs(llm=llm)
+    llm_config = dict(temperature=0.1, model="text-ada-001", model_type="completion")
+    docs = Docs(llm_config=llm_config)
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="WikiMedia Foundation, 2023, Accessed now",
