@@ -76,7 +76,7 @@ class Docs(BaseModel):
     def __init__(self, **data):
         if "embedding_client" in data:
             embedding_client = data.pop("embedding_client")
-        elif "client" in data:
+        elif "client" in data and data["client"] is not None:
             embedding_client = data["client"]
         else:
             embedding_client = AsyncOpenAI()
@@ -427,7 +427,9 @@ class Docs(BaseModel):
             matches = self.texts
         else:
             query_vector = (
-                await self.embedding.embed_documents(self._client, [answer.question])
+                await self.embedding.embed_documents(
+                    self._embedding_client, [answer.question]
+                )
             )[0]
             if marginal_relevance:
                 matches, _ = self.texts_index.max_marginal_relevance_search(

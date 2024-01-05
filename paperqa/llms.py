@@ -86,27 +86,23 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 class LLMModel(ABC, BaseModel):
     llm_type: str = "completion"
 
-    @abstractmethod
     async def acomplete(self, client: Any, prompt: str) -> str:
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     async def acomplete_iter(self, client: Any, prompt: str) -> Any:
         """Return an async generator that yields chunks of the completion.
 
         I cannot get mypy to understand the override, so marked as Any"""
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         """Return an async generator that yields chunks of the completion.
 
         I cannot get mypy to understand the override, so marked as Any"""
-        pass
+        raise NotImplementedError
 
     def make_chain(
         self,
@@ -129,10 +125,6 @@ class LLMModel(ABC, BaseModel):
             where data is a dict with keys for the input variables that will be formatted into prompt
             and callbacks is a list of functions to call with each chunk of the completion.
         """
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
         if self.llm_type == "chat":
             system_message_prompt = dict(role="system", content=system_prompt)
             human_message_prompt = dict(role="user", content=prompt)
@@ -201,12 +193,20 @@ class OpenAILLMModel(LLMModel):
         return m
 
     async def acomplete(self, client: Any, prompt: str) -> str:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
         completion = await client.completions.create(
             prompt=prompt, **process_llm_config(self.config)
         )
         return completion.choices[0].text
 
     async def acomplete_iter(self, client: Any, prompt: str) -> Any:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
         completion = await client.completions.create(
             prompt=prompt, **process_llm_config(self.config), stream=True
         )
@@ -214,12 +214,20 @@ class OpenAILLMModel(LLMModel):
             yield chunk.choices[0].text
 
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
         completion = await client.chat.completions.create(
             messages=messages, **process_llm_config(self.config)
         )
         return completion.choices[0].message.content
 
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
         completion = await client.chat.completions.create(
             messages=messages, **process_llm_config(self.config), stream=True
         )

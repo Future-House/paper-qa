@@ -8,7 +8,7 @@ import requests
 from openai import AsyncOpenAI
 
 from paperqa import Answer, Doc, Docs, PromptCollection, Text
-from paperqa.llms import EmbeddingModel, OpenAILLMModel, get_score
+from paperqa.llms import EmbeddingModel, LLMModel, OpenAILLMModel, get_score
 from paperqa.readers import read_doc
 from paperqa.utils import (
     iter_citations,
@@ -460,7 +460,32 @@ def test_duplicate():
 
 def test_custom_embedding():
     class MyEmbeds(EmbeddingModel):
-        pass
+        async def embed_documents(self, client, texts):
+            return [[1, 2, 3] for _ in texts]
+
+    docs = Docs(embedding=MyEmbeds())
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert docs.docs["test"].embedding == [1, 2, 3]
+
+
+def test_custom_llm():
+    class MyLLM(LLMModel):
+        async def acomplete(self, client, prompt):
+            assert client is None
+            return "Echo"
+
+    docs = Docs(llm_model=MyLLM(), client=None)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    evidence = docs.get_evidence(Answer(question="Echo"))
+    assert "Echo" in evidence.context
 
 
 class Test(IsolatedAsyncioTestCase):
