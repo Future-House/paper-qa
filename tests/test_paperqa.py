@@ -8,7 +8,7 @@ import requests
 from openai import AsyncOpenAI
 
 from paperqa import Answer, Doc, Docs, PromptCollection, Text
-from paperqa.llms import get_score, make_chain
+from paperqa.llms import EmbeddingModel, OpenAILLMModel, get_score
 from paperqa.readers import read_doc
 from paperqa.utils import (
     iter_citations,
@@ -363,15 +363,10 @@ def test_extract_score():
 class TestChains(IsolatedAsyncioTestCase):
     async def test_chain_completion(self):
         client = AsyncOpenAI()
-        call = make_chain(
+        llm = OpenAILLMModel(config=dict(model="babbage-002", temperature=0.2))
+        call = llm.make_chain(
             client,
             "The {animal} says",
-            llm_config=dict(
-                model_type="completion",
-                temperature=0,
-                model="babbage-002",
-                max_tokens=56,
-            ),
             skip_system=True,
         )
         outputs = []
@@ -385,12 +380,12 @@ class TestChains(IsolatedAsyncioTestCase):
 
     async def test_chain_chat(self):
         client = AsyncOpenAI()
-        call = make_chain(
+        llm = OpenAILLMModel(
+            config=dict(temperature=0, model="gpt-3.5-turbo", max_tokens=56)
+        )
+        call = llm.make_chain(
             client,
             "The {animal} says",
-            llm_config=dict(
-                model_type="chat", temperature=0, model="gpt-3.5-turbo", max_tokens=56
-            ),
             skip_system=True,
         )
         outputs = []
@@ -405,7 +400,7 @@ class TestChains(IsolatedAsyncioTestCase):
 
 def test_docs():
     llm_config = dict(temperature=0.1, model="text-ada-001", model_type="completion")
-    docs = Docs(llm_config=llm_config)
+    docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -463,6 +458,11 @@ def test_duplicate():
     )
 
 
+def test_custom_embedding():
+    class MyEmbeds(EmbeddingModel):
+        pass
+
+
 class Test(IsolatedAsyncioTestCase):
     async def test_aquery(self):
         docs = Docs()
@@ -498,8 +498,10 @@ def test_docs_pickle():
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
         f.write(r.text)
-    docs = Docs(llm_config=dict(temperature=0.0, model="gpt-3.5-turbo"))
-    old_config = docs.llm_config
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
+    )
+    old_config = docs.llm_model.config
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     os.remove(doc_path)
     docs_pickle = pickle.dumps(docs)
@@ -510,8 +512,8 @@ def test_docs_pickle():
     except ValueError:
         pass
     docs2.set_client()
-    assert docs2.llm_config == old_config
-    assert docs2.summary_llm_config == old_config
+    assert docs2.llm_model.config == old_config
+    assert docs2.summary_llm_model.config == old_config
     assert len(docs.docs) == len(docs2.docs)
     context1, context2 = (
         docs.get_evidence(
@@ -555,7 +557,9 @@ def test_repeat_keys():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs = Docs(llm_config=dict(temperature=0.0, model="babbage-002"))
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
+    )
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     try:
         docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -584,7 +588,9 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = Docs(llm_config=dict(temperature=0.0, model="gpt-3.5-turbo"))
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
+    )
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable?")
     assert "yes" in answer.answer or "Yes" in answer.answer
@@ -594,7 +600,11 @@ def test_fileio_reader_pdf():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     with open(doc_path, "rb") as f:
-        docs = Docs(llm_config=dict(temperature=0.0, model="gpt-3.5-turbo"))
+        docs = Docs(
+            llm_model=OpenAILLMModel(
+                config=dict(temperature=0.0, model="gpt-3.5-turbo")
+            )
+        )
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.query("Are counterfactuals actionable?")
         assert "yes" in answer.answer or "Yes" in answer.answer
@@ -602,7 +612,9 @@ def test_fileio_reader_pdf():
 
 def test_fileio_reader_txt():
     # can't use curie, because it has trouble with parsed HTML
-    docs = Docs(llm_config=dict(temperature=0.0, model="gpt-3.5-turbo"))
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
+    )
     r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
     if r.status_code != 200:
         raise ValueError("Could not download wikipedia page")
@@ -652,7 +664,9 @@ def test_prompt_length():
 def test_code():
     # load this script
     doc_path = os.path.abspath(__file__)
-    docs = Docs(llm_config=dict(temperature=0.0, model="babbage-002"))
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
+    )
     docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)
     assert len(docs.docs) == 1
     docs.query("What function tests the preview?")
@@ -788,7 +802,6 @@ def test_custom_prompts():
         f.write(r.text)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country is Frederick Bates from?")
-    print(answer.answer)
     assert "United States" in answer.answer
 
 
@@ -922,6 +935,7 @@ def test_external_texts_index():
         citation="Flag Day of Canada, WikiMedia Foundation, 2023, Accessed now",
     )
     answer = docs.query(query="On which date is flag day annually observed?")
+    print(answer.model_dump())
     assert "February 15" in answer.answer
 
     docs.add_url(
