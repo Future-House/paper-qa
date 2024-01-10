@@ -1,35 +1,4 @@
 # Paper QA- [Paper QA](#paper-qa)
-- [Paper QA- Paper QA](#paper-qa--paper-qa)
-  - [Output Example](#output-example)
-    - [References](#references)
-  - [Hugging Face Demo](#hugging-face-demo)
-  - [Install](#install)
-  - [Usage](#usage)
-    - [Adding Documents](#adding-documents)
-    - [Choosing Model](#choosing-model)
-    - [Adjusting number of sources](#adjusting-number-of-sources)
-    - [Using Code or HTML](#using-code-or-html)
-  - [Version 3 Changes](#version-3-changes)
-    - [New Features](#new-features)
-    - [Naming](#naming)
-    - [Breaking Changes](#breaking-changes)
-  - [Notebooks](#notebooks)
-  - [Where do I get papers?](#where-do-i-get-papers)
-    - [Zotero](#zotero)
-    - [Paper Scraper](#paper-scraper)
-  - [PDF Reading Options](#pdf-reading-options)
-  - [Typewriter View](#typewriter-view)
-  - [LLM/Embedding Caching](#llmembedding-caching)
-    - [Caching Embeddings](#caching-embeddings)
-  - [Customizing Prompts](#customizing-prompts)
-    - [Pre and Post Prompts](#pre-and-post-prompts)
-  - [FAQ](#faq)
-    - [How is this different from LlamaIndex?](#how-is-this-different-from-llamaindex)
-    - [How is this different from LangChain?](#how-is-this-different-from-langchain)
-    - [Can I use different LLMs?](#can-i-use-different-llms)
-    - [Where do the documents come from?](#where-do-the-documents-come-from)
-    - [Can I save or load?](#can-i-save-or-load)
-
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
@@ -40,14 +9,26 @@ PDFs or text files (which can be raw HTML). It strives to give very good answers
 
 By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
 
-PaperQA uses the process shown below:
+paper-qa uses the process shown below:
 
 1. embed docs into vectors
 2. embed query into vector
 3. search for top k passages in docs
 4. create summary of each passage relevant to query
-5. put summaries into prompt
-6. generate answer with prompt
+5. score and select only relevant summaries
+6. put summaries into prompt
+7. generate answer with prompt
+
+See our paper for more details:
+
+```bibtex
+@article{lala2023paperqa,
+  title={PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
+  author={L{\'a}la, Jakub and O'Donoghue, Odhran and Shtedritski, Aleksandar and Cox, Sam and Rodriques, Samuel G and White, Andrew D},
+  journal={arXiv preprint arXiv:2312.07559},
+  year={2023}
+}
+```
 
 ## Output Example
 
@@ -63,9 +44,10 @@ Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly
 
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
 
-## Hugging Face Demo
 
-[Hugging Face Demo](https://huggingface.co/spaces/whitead/paper-qa)
+## Version 4 Changes
+
+Version 4 removed langchain from the package because it no longer supports pickling. This also simplifies the package a bit - especially prompts. Langchain can still be used, but it's not required. You can use any LLMs from langchain, but you will need to use the `LangchainLLMModel` class to wrap the model.
 
 ## Install
 
@@ -75,17 +57,17 @@ Install with pip:
 pip install paper-qa
 ```
 
+You need to have an LLM to use paper-qa. You can use OpenAI, llama.cpp (via Server), or any LLMs from langchain. OpenAI just works, as long as you have set your OpenAI API key (`export OPENAI_API_KEY=sk-...`). See instructions below for other LLMs.
+
 ## Usage
 
-Make sure you have set your OPENAI_API_KEY environment variable to your [openai api key](https://platform.openai.com/account/api-keys)
-
-To use paper-qa, you need to have a list of paths (valid extensions include: .pdf, .txt) and a list of citations (strings) that correspond to the paths. You can then use the `Docs` class to add the documents and then query them. If you don't have citations, `Docs` will try to guess them from the first page of your docs.
+To use paper-qa, you need to have a list of paths/files/urls (valid extensions include: .pdf, .txt). You can then use the `Docs` class to add the documents and then query them. `Docs` will try to guess citation formats from the content of the files, but you can also provide them yourself.
 
 ```python
 
 from paperqa import Docs
 
-# get a list of paths
+my_docs = ...# get a list of paths
 
 docs = Docs()
 for d in my_docs:
@@ -95,7 +77,7 @@ answer = docs.query("What manufacturing challenges are unique to bispecific anti
 print(answer.formatted_answer)
 ```
 
-The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question`, `context` (the summaries of passages found for answer), `references` (the docs from which the passages came), and `passages` which contain the raw text of the passages as a dictionary.
+The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
 
 ### Adding Documents
 
@@ -103,7 +85,7 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 
 ### Choosing Model
 
-By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4`. If you don't have gpt-4 access or would like to save money, you can adjust:
+By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4-turbo`. If you don't have gpt-4 access or would like to save money, you can adjust:
 
 ```py
 docs = Docs(llm='gpt-3.5-turbo')
@@ -112,51 +94,49 @@ docs = Docs(llm='gpt-3.5-turbo')
 or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
 
 ```py
-from langchain.chat_models import ChatAnthropic, ChatOpenAI
-model = ChatOpenAI(model='gpt-4')
-summary_model = ChatAnthropic(model="claude-instant-v1-100k", anthropic_api_key="my-api-key")
-docs = Docs(llm=model, summary_llm=summary_model)
+from paperqa import Docs, LangchainLLMModel
+from langchain_community.chat_models import ChatAnthropic
+docs = Docs(llm_model=LangchainLLMModel(),
+            client=ChatAnthropic())
+```
+
+Notice that we split the model into `LangchainLLMModel` and `client` which is `ChatAnthropic`. This is because paper-qa can be pickled, but typically Langchain models cannot be pickled. Thus, the client is the unpicklable part. Specifically, you can save your state in paper-qa:
+
+```py
+import pickle
+docs = Docs(llm_model=LangchainLLMModel(),
+            client=ChatAnthropic())
+model_str = pickle.dumps(docs)
+docs = pickle.loads(model_str)
+# but you have to set the client after loading
+docs.set_client(ChatAnthropic())
 ```
 
 
 #### Locally Hosted
 
-You can also use any other models (or embeddings) available in [langchain](https://github.com/hwchase17/langchain). Here's an example of using `llama.cpp` to have locally hosted paper-qa:
+You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because paper-qa requires following a lot of instructions. You won't get good performance with 7B models. I recommend using the SentenceTransformer models for embeddings, rather than llama.cpp embeddings.
 
 ```py
-import paperscraper
-from paperqa import Docs
-from langchain.llms import LlamaCpp
-from langchain import PromptTemplate, LLMChain
-from langchain.callbacks.manager import CallbackManager
-from langchain.embeddings import LlamaCppEmbeddings
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from paperqa import Docs, SentenceTransformerEmbeddingModel
+from openai import AsyncOpenAI
 
-# Make sure the model path is correct for your system!
-llm = LlamaCpp(
-    model_path="./ggml-model-q4_0.bin", callbacks=[StreamingStdOutCallbackHandler()]
+# start llamap.cpp client with: -cb -np 4 -a my-alais --embedding
+
+local_client = AsyncOpenAI(
+    base_url="http://localhost:8080/v1",
+    api_key = "sk-no-key-required"
 )
-embeddings = LlamaCppEmbeddings(model_path="./ggml-model-q4_0.bin")
-
-docs = Docs(llm=llm, embeddings=embeddings)
-
-keyword_search = 'bispecific antibody manufacture'
-papers = paperscraper.search_papers(keyword_search, limit=2)
-for path,data in papers.items():
-    try:
-        docs.add(path,chunk_chars=500)
-    except ValueError as e:
-        print('Could not read', path, e)
-
-answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
-print(answer)
+docs = Docs(client=local_client,
+            embedding=SentenceTransformerEmbeddingModel(),
+            llm_model=OpenAILLMModel(config=dict(model="my-alias", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
 ```
 
 ### Adjusting number of sources
 
 You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources`  and `max_sources` is the number of sources used in the final answer.
 
-```python
+```py
 docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 5, max_sources = 2)
 ```
 
@@ -177,67 +157,6 @@ for f in source_files:
 answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
-
-## Version 3 Changes
-
-Version 3 includes many changes to type the code, make it more focused/modular, and enable performance to very large numbers of documents. The major breaking changes are documented below:
-
-
-### New Features
-
-The following new features are in v3:
-
-1. Memory is now possible in `query` by setting `Docs(memory=True)` - this means follow-up questions will have a record of the previous question and answer.
-2. `add_url` and `add_file` are now supported for adding from URLs and file objects
-3. Prompts can be customized, and now can be executed pre and post query
-4. Consistent use of `dockey` and `docname` for unique and natural language names enable better tracking with external databases
-5. Texts and embeddings are no longer required to be part of `Docs` object, so you can use external databases or other strategies to manage them
-6. Various simplifications, bug fixes, and performance improvements
-
-### Naming
-
-The following table shows the old names and the new names:
-
-| Old Name | New Name | Explanation |
-| :--- | :---: | ---: |
-| `key` | `name` | Name is a natural language name for text. |
-| `dockey` | `docname` | Docname is a natural language name for a document. |
-| `hash` | `dockey` | Dockey is a unique identifier for the document. |
-
-
-### Breaking Changes
-
-
-#### Pickled objects
-
-The pickled objects are not compatible with the new version.
-
-#### Agents
-
-The agent functionality has been removed, as it's not a core focus of the library
-
-#### Caching
-
-Caching has been removed because it's not a core focus of the library. See FAQ below for how to use caching.
-
-#### Answers
-
-Answers will not include passages, but instead return dockeys that can be used to retrieve the passages. Tokens/cost will also not be counted since that is built into langchain by default (see below for an example).
-
-#### Search Query
-
-The search query chain has been removed. You can use langchain directly to do this.
-
-## Notebooks
-
-If you want to use this in an jupyter notebook or colab, you need to run the following command:
-
-```python
-import nest_asyncio
-nest_asyncio.apply()
-```
-
-Also - if you know how to make this automated, please let me know!
 
 ## Where do I get papers?
 
@@ -329,27 +248,17 @@ By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure pyth
 pip install pymupdf
 ```
 
-## Typewriter View
+## Callbacks Factory
 
-To stream the completions as they occur (giving that ChatGPT typewriter look), you can simply instantiate models with those properties:
+To execute a function on each chunk of LLM completions, you need to provide a function that when called with the name of the step produces a list of functions to execute on each chunk. For example, to get a typewriter view of the completions, you can do:
 
 ```python
-from paperqa import Docs
-from langchain.callbacks.manager import CallbackManager
-from langchain.chat_models import ChatOpenAI
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-
-my_llm = ChatOpenAI(callbacks=[StreamingStdOutCallbackHandler()], streaming=True)
-docs = Docs(llm=my_llm)
-```
-
-## LLM/Embedding Caching
-
-You can using the builtin langchain caching capabilities. Just run this code at the top of yours:
-
-```py
-from langchain.cache import InMemoryCache
-langchain.llm_cache = InMemoryCache()
+def make_typewriter(step_name):
+    def typewriter(chunk):
+        print(chunk, end="")
+    return [typewriter] # <- note that this is a list of functions
+...
+docs.query("What manufacturing challenges are unique to bispecific antibodies?", get_callbacks=make_typewriter)
 ```
 
 ### Caching Embeddings
@@ -366,17 +275,14 @@ You can customize any of the prompts, using the `PromptCollection` class. For ex
 
 ```python
 from paperqa import Docs, Answer, PromptCollection
-from langchain.prompts import PromptTemplate
 
-my_qaprompt = PromptTemplate(
-    input_variables=["context", "question"],
-    template="Answer the question '{question}' "
+my_qaprompt = "Answer the question '{question}' "
     "Use the context below if helpful. "
     "You can cite the context using the key "
     "like (Example2012). "
     "If there is insufficient context, write a poem "
     "about how you cannot answer.\n\n"
-    "Context: {context}\n\n")
+    "Context: {context}\n\n"
 prompts=PromptCollection(qa=my_qaprompt)
 docs = Docs(prompts=prompts)
 ```
@@ -395,15 +301,7 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 ### How is this different from LangChain?
 
-It's not! We use langchain to abstract the LLMS, and the process is very similar to the `map_reduce` chain in LangChain.
-
-### Can I use different LLMs?
-
-Yes, you can use any LLMs from [langchain](https://langchain.readthedocs.io/) by passing the `llm` argument to the `Docs` class. You can use different LLMs for summarization and for question answering too.
-
-### Where do the documents come from?
-
-You can provide your own. I use some of my own code to pull papers from Google Scholar. This code is not included because it may enable people to violate Google's terms of service and publisher's terms of service.
+There has been some great work on retrievers in langchain and you could say this is an example of a retreiver.
 
 ### Can I save or load?
 

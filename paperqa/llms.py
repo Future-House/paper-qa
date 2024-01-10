@@ -1,11 +1,20 @@
 import re
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Coroutine, cast, get_args, get_type_hints
+from typing import (
+    Any,
+    AsyncGenerator,
+    Callable,
+    Coroutine,
+    cast,
+    get_args,
+    get_type_hints,
+)
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field, model_validator
 
 from .prompts import default_system_prompt
+from .utils import batch_iter, flatten, gather_with_concurrency
 
 
 def guess_model_type(model_name: str) -> str:
@@ -84,7 +93,7 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
 
 class LLMModel(ABC, BaseModel):
-    llm_type: str = "completion"
+    llm_type: str | None = None
 
     async def acomplete(self, client: Any, prompt: str) -> str:
         raise NotImplementedError
@@ -103,6 +112,9 @@ class LLMModel(ABC, BaseModel):
 
         I cannot get mypy to understand the override, so marked as Any"""
         raise NotImplementedError
+
+    def infer_llm_type(self, client: Any) -> str:
+        return "completion"
 
     def make_chain(
         self,
@@ -125,6 +137,9 @@ class LLMModel(ABC, BaseModel):
             where data is a dict with keys for the input variables that will be formatted into prompt
             and callbacks is a list of functions to call with each chunk of the completion.
         """
+        # check if it needs to be set
+        if self.llm_type is None:
+            self.llm_type = self.infer_llm_type(client)
         if self.llm_type == "chat":
             system_message_prompt = dict(role="system", content=system_prompt)
             human_message_prompt = dict(role="user", content=prompt)
@@ -185,6 +200,17 @@ class LLMModel(ABC, BaseModel):
 class OpenAILLMModel(LLMModel):
     config: dict = Field(default=dict(model="gpt-3.5-turbo", temperature=0.1))
 
+    def _check_client(self, client: Any) -> AsyncOpenAI:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
+        if not isinstance(client, AsyncOpenAI):
+            raise ValueError(
+                f"Your client is not a required AsyncOpenAI client. It is a {type(client)}"
+            )
+        return cast(AsyncOpenAI, client)
+
     @model_validator(mode="after")
     @classmethod
     def guess_llm_type(cls, data: Any) -> Any:
@@ -193,46 +219,140 @@ class OpenAILLMModel(LLMModel):
         return m
 
     async def acomplete(self, client: Any, prompt: str) -> str:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        completion = await client.completions.create(
+        aclient = self._check_client(client)
+        completion = await aclient.completions.create(
             prompt=prompt, **process_llm_config(self.config)
         )
         return completion.choices[0].text
 
     async def acomplete_iter(self, client: Any, prompt: str) -> Any:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        completion = await client.completions.create(
+        aclient = self._check_client(client)
+        completion = await aclient.completions.create(
             prompt=prompt, **process_llm_config(self.config), stream=True
         )
         async for chunk in completion:
             yield chunk.choices[0].text
 
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        completion = await client.chat.completions.create(
-            messages=messages, **process_llm_config(self.config)
+        aclient = self._check_client(client)
+        completion = await aclient.chat.completions.create(
+            messages=messages, **process_llm_config(self.config)  # type: ignore
         )
-        return completion.choices[0].message.content
+        return completion.choices[0].message.content or ""
 
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        completion = await client.chat.completions.create(
-            messages=messages, **process_llm_config(self.config), stream=True
+        aclient = self._check_client(client)
+        completion = await aclient.chat.completions.create(
+            messages=messages, **process_llm_config(self.config), stream=True  # type: ignore
         )
-        async for chunk in completion:
+        async for chunk in cast(AsyncGenerator, completion):
             yield chunk.choices[0].delta.content
+
+
+class LangchainLLMModel(LLMModel):
+    """A wrapper around the wrapper langchain"""
+
+    def infer_llm_type(self, client: Any) -> str:
+        from langchain_core.language_models.chat_models import BaseChatModel
+
+        if isinstance(client, BaseChatModel):
+            return "chat"
+        return "completion"
+
+    async def acomplete(self, client: Any, prompt: str) -> str:
+        return await client.ainvoke(prompt)
+
+    async def acomplete_iter(self, client: Any, prompt: str) -> Any:
+        async for chunk in cast(AsyncGenerator, client.astream(prompt)):
+            yield chunk
+
+    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+
+        lc_messages: list[BaseMessage] = []
+        for m in messages:
+            if m["role"] == "user":
+                lc_messages.append(HumanMessage(content=m["content"]))
+            elif m["role"] == "system":
+                lc_messages.append(SystemMessage(content=m["content"]))
+            else:
+                raise ValueError(f"Unknown role: {m['role']}")
+        return (await client.ainvoke(lc_messages)).content
+
+    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+
+        lc_messages: list[BaseMessage] = []
+        for m in messages:
+            if m["role"] == "user":
+                lc_messages.append(HumanMessage(content=m["content"]))
+            elif m["role"] == "system":
+                lc_messages.append(SystemMessage(content=m["content"]))
+            else:
+                raise ValueError(f"Unknown role: {m['role']}")
+        async for chunk in client.astream(lc_messages):
+            yield chunk.content
+
+
+class LangchainEmbeddingModel(EmbeddingModel):
+    """A wrapper around the wrapper langchain"""
+
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+        return await client.aembed_documents(texts)
+
+
+class LlamaEmbeddingModel(EmbeddingModel):
+    embedding_model: str = Field(default="llama")
+
+    batch_size: int = Field(default=4)
+    concurrency: int = Field(default=1)
+
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+        cast(AsyncOpenAI, client)
+
+        async def process(texts: list[str]) -> list[float]:
+            for i in range(3):
+                # access httpx client directly to avoid type casting
+                response = await client._client.post(
+                    client.base_url.join("../embedding"), json={"content": texts}
+                )
+                body = response.json()
+                if len(texts) == 1:
+                    if type(body) != dict or body.get("embedding") is None:
+                        continue
+                    return [body["embedding"]]
+                else:
+                    if type(body) != list or body[0] != "results":
+                        continue
+                    return [e["embedding"] for e in body[1]]
+            raise ValueError("Failed to embed documents - response was ", body)
+
+        return flatten(
+            await gather_with_concurrency(
+                self.concurrency,
+                [process(b) for b in batch_iter(texts, self.batch_size)],
+            )
+        )
+
+
+class SentenceTransformerEmbeddingModel(EmbeddingModel):
+    embedding_model: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
+    _model: Any = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError:
+            raise ImportError("Please install sentence-transformers to use this model")
+
+        self._model = SentenceTransformer(self.embedding_model)
+
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+        from sentence_transformers import SentenceTransformer
+
+        embeddings = cast(SentenceTransformer, self._model).encode(texts)
+        return embeddings
 
 
 def get_score(text: str) -> int:

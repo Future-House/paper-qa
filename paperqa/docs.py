@@ -13,6 +13,9 @@ from pydantic import BaseModel, Field, model_validator
 
 from .llms import (
     EmbeddingModel,
+    LangchainEmbeddingModel,
+    LangchainLLMModel,
+    LlamaEmbeddingModel,
     LLMModel,
     OpenAIEmbeddingModel,
     OpenAILLMModel,
@@ -50,14 +53,17 @@ nest_asyncio.apply()
 class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
-    # ephemeral clients that should not be pickled
+    # ephemeral vars that should not be pickled (_things)
     _client: Any | None
     _embedding_client: Any | None
     llm: str = "default"
     summary_llm: str | None = None
-    llm_model: LLMModel = Field(default_factory=OpenAILLMModel)
+    llm_model: LLMModel = Field(
+        default=OpenAILLMModel(config=dict(model="gpt-4-1106-preview", temperature=0.1))
+    )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
-    embedding: EmbeddingModel = OpenAIEmbeddingModel()
+    embedding: str | None = "default"
+    embedding_model: EmbeddingModel = OpenAIEmbeddingModel()
     docs: dict[DocKey, Doc] = {}
     texts: list[Text] = []
     docnames: set[str] = set()
@@ -66,7 +72,7 @@ class Docs(BaseModel):
     name: str = "default"
     index_path: Path | None = PAPERQA_DIR / name
     batch_size: int = 1
-    max_concurrent: int = 5
+    max_concurrent: int = 4
     deleted_dockeys: set[DocKey] = set()
     prompts: PromptCollection = PromptCollection()
     jit_texts_index: bool = False
@@ -74,16 +80,36 @@ class Docs(BaseModel):
     strip_citations: bool = True
 
     def __init__(self, **data):
+        # TODO: There may be a way to put this into pydantic model validator
+        # We do it here because we need to move things to private attributes
         if "embedding_client" in data:
             embedding_client = data.pop("embedding_client")
-        elif "client" in data and data["client"] is not None:
+        # convenience to pull embedding_client from client if reasonable
+        elif (
+            "client" in data
+            and data["client"] is not None
+            and type(data["client"]) == AsyncOpenAI
+        ):
+            # convenience
             embedding_client = data["client"]
         else:
-            embedding_client = AsyncOpenAI()
+            # if embedding_model is explicitly set, but not client then make it None
+            if "embedding_model" in data and data["embedding_model"] is not None:
+                embedding_client = None
+            else:
+                embedding_client = AsyncOpenAI()
         if "client" in data:
             client = data.pop("client")
         else:
-            client = AsyncOpenAI()
+            # if llm_model is explicitly set, but not client then make it None
+            if "llm_model" in data and data["llm_model"] is not None:
+                # except if it is an OpenAILLMModel
+                if type(data["llm_model"]) == OpenAILLMModel:
+                    client = AsyncOpenAI()
+                else:
+                    client = None
+            else:
+                client = AsyncOpenAI()
         super().__init__(**data)
         self._client = client
         self._embedding_client = embedding_client
@@ -95,6 +121,8 @@ class Docs(BaseModel):
             if "llm" in data and data["llm"] != "default":
                 if is_openai_model(data["llm"]):
                     data["llm_model"] = OpenAILLMModel(config=dict(model=data["llm"]))
+                elif data["llm"] == "langchain":
+                    data["llm_model"] = LangchainLLMModel()
                 else:
                     raise ValueError(f"Could not guess model type for {data['llm']}. ")
             if "summary_llm" in data and data["summary_llm"] is not None:
@@ -104,13 +132,32 @@ class Docs(BaseModel):
                     )
                 else:
                     raise ValueError(f"Could not guess model type for {data['llm']}. ")
+            if "embedding" in data and data["embedding"] != "default":
+                if data["embedding"] == "langchain":
+                    data["embedding_model"] = LangchainEmbeddingModel()
+                elif data["embedding"] == "llama":
+                    data["embedding_model"] = LlamaEmbeddingModel()
+                else:
+                    raise ValueError(
+                        f"Could not guess model type for {data['embedding']}. "
+                    )
         return data
 
     @model_validator(mode="after")
     @classmethod
     def config_summary_llm_config(cls, data: Any) -> Any:
         if isinstance(data, Docs):
-            if data.summary_llm_model is None:
+            # check our default gpt-4/3.5-turbo config
+            # default check is hard - becauise either llm is set or llm_model is set
+            if (
+                data.summary_llm_model is None
+                and data.llm == "default"
+                and type(data.llm_model) == OpenAILLMModel
+            ):
+                data.summary_llm_model = OpenAILLMModel(
+                    config=dict(model="gpt-3.5-turbo", temperature=0.1)
+                )
+            elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model
         return data
 
@@ -140,7 +187,10 @@ class Docs(BaseModel):
             client = AsyncOpenAI()
         self._client = client
         if embedding_client is None:
-            embedding_client = client
+            if type(client) == AsyncOpenAI:
+                embedding_client = client
+            else:
+                embedding_client = AsyncOpenAI()
         self._embedding_client = embedding_client
 
     def _get_unique_name(self, docname: str) -> str:
@@ -287,7 +337,7 @@ class Docs(BaseModel):
             doc.docname = new_docname
         if texts[0].embedding is None:
             text_embeddings = asyncio.run(
-                self.embedding.embed_documents(
+                self.embedding_model.embed_documents(
                     self._embedding_client, [t.text for t in texts]
                 )
             )
@@ -295,7 +345,9 @@ class Docs(BaseModel):
                 t.embedding = text_embeddings[i]
         if doc.embedding is None:
             doc.embedding = asyncio.run(
-                self.embedding.embed_documents(self._embedding_client, [doc.citation])
+                self.embedding_model.embed_documents(
+                    self._embedding_client, [doc.citation]
+                )
             )[0]
         if not self.jit_texts_index:
             self.texts_index.add_texts_and_embeddings(texts)
@@ -305,8 +357,16 @@ class Docs(BaseModel):
         self.docnames.add(doc.docname)
         return True
 
-    def delete(self, name: str | None = None, dockey: DocKey | None = None) -> None:
+    def delete(
+        self,
+        name: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
+    ) -> None:
         """Delete a document from the collection."""
+        # name is an alias for docname
+        name = docname if name is None else name
+
         if name is not None:
             doc = next((doc for doc in self.docs.values() if doc.docname == name), None)
             if doc is None:
@@ -325,7 +385,7 @@ class Docs(BaseModel):
     ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
         query_vector = (
-            await self.embedding.embed_documents(self._embedding_client, [query])
+            await self.embedding_model.embed_documents(self._embedding_client, [query])
         )[0]
         matches, _ = self.doc_index.max_marginal_relevance_search(
             query_vector,
@@ -333,7 +393,10 @@ class Docs(BaseModel):
             fetch_k=5 * (k + len(self.deleted_dockeys)),
         )
         # filter the matches
-        matched_docs = [m for m in matches if m.dockey not in self.deleted_dockeys]
+        matched_docs = [
+            m for m in cast(list[Doc], matches) if m.dockey not in self.deleted_dockeys
+        ]
+
         if len(matched_docs) == 0:
             return set()
         # this only works for gpt-4 (in my testing)
@@ -341,10 +404,8 @@ class Docs(BaseModel):
             if (
                 rerank is None
                 and (
-                    type(self.llm) == OpenAILLMModel
-                    and cast(OpenAILLMModel, self)
-                    .llm.config["model"]
-                    .startswith("gpt-4")
+                    type(self.llm_model) == OpenAILLMModel
+                    and cast(OpenAILLMModel, self).config["model"].startswith("gpt-4")
                 )
                 or rerank is True
             ):
@@ -386,22 +447,18 @@ class Docs(BaseModel):
         answer: Answer,
         k: int = 10,
         max_sources: int = 5,
-        marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
-        disable_summarization: bool = False,
     ) -> Answer:
         return asyncio.run(
             self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
-                marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
                 detailed_citations=detailed_citations,
                 disable_vector_search=disable_vector_search,
-                disable_summarization=disable_summarization,
             )
         )
 
@@ -410,11 +467,9 @@ class Docs(BaseModel):
         answer: Answer,
         k: int = 10,  # Number of evidence pieces to retrieve
         max_sources: int = 5,  # Number of scored contexts to use
-        marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
-        disable_summarization: bool = False,
     ) -> Answer:
         if len(self.docs) == 0 and self.doc_index is None:
             # do we have no docs?
@@ -427,16 +482,16 @@ class Docs(BaseModel):
             matches = self.texts
         else:
             query_vector = (
-                await self.embedding.embed_documents(
+                await self.embedding_model.embed_documents(
                     self._embedding_client, [answer.question]
                 )
             )[0]
-            if marginal_relevance:
-                matches, _ = self.texts_index.max_marginal_relevance_search(
+            matches = cast(
+                list[Text],
+                self.texts_index.max_marginal_relevance_search(
                     query_vector, k=_k, fetch_k=5 * _k
-                )
-            else:
-                matches, _ = self.texts_index.similarity_search(query_vector, k=_k)
+                )[0],
+            )
         # ok now filter (like ones from adoc_match)
         if answer.dockey_filter is not None:
             matches = [m for m in matches if m.doc.dockey in answer.dockey_filter]
@@ -457,7 +512,7 @@ class Docs(BaseModel):
             if detailed_citations:
                 citation = match.name + ": " + citation
 
-            if self.prompts.skip_summary or disable_summarization:
+            if self.prompts.skip_summary:
                 context = match.text
                 score = 5
             else:
@@ -509,7 +564,7 @@ class Docs(BaseModel):
             return c
 
         results = await gather_with_concurrency(
-            self.max_concurrent, *[process(m) for m in matches]
+            self.max_concurrent, [process(m) for m in matches]
         )
         # filter out failures
         contexts = [c for c in results if c is not None]
@@ -537,7 +592,6 @@ class Docs(BaseModel):
         k: int = 10,
         max_sources: int = 5,
         length_prompt="about 100 words",
-        marginal_relevance: bool = True,
         answer: Answer | None = None,
         key_filter: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
@@ -548,7 +602,6 @@ class Docs(BaseModel):
                 k=k,
                 max_sources=max_sources,
                 length_prompt=length_prompt,
-                marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
                 get_callbacks=get_callbacks,
@@ -561,7 +614,6 @@ class Docs(BaseModel):
         k: int = 10,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
-        marginal_relevance: bool = True,
         answer: Answer | None = None,
         key_filter: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
@@ -583,7 +635,6 @@ class Docs(BaseModel):
                 answer,
                 k=k,
                 max_sources=max_sources,
-                marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
             )
         if self.prompts.pre is not None:

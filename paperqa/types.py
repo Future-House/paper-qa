@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable
 
 import numpy as np
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, Sequence, field_validator
 
 from .prompts import (
     citation_prompt,
@@ -44,7 +44,7 @@ class VectorStore(BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible"""
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: list[Embeddable]) -> None:
+    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
         pass
 
     @abstractmethod
@@ -196,8 +196,6 @@ class PromptCollection(BaseModel):
     @classmethod
     def check_pre(cls, v: str | None) -> str | None:
         if v is not None:
-            print(v)
-            print(get_formatted_variables(v))
             if set(get_formatted_variables(v)) != set(["question"]):
                 raise ValueError("Pre prompt must have input variables: question")
         return v

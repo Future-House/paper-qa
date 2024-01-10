@@ -8,7 +8,14 @@ import requests
 from openai import AsyncOpenAI
 
 from paperqa import Answer, Doc, Docs, PromptCollection, Text
-from paperqa.llms import EmbeddingModel, LLMModel, OpenAILLMModel, get_score
+from paperqa.llms import (
+    EmbeddingModel,
+    LangchainEmbeddingModel,
+    LangchainLLMModel,
+    LLMModel,
+    OpenAILLMModel,
+    get_score,
+)
 from paperqa.readers import read_doc
 from paperqa.utils import (
     iter_citations,
@@ -122,14 +129,13 @@ def test_ablations():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     with open(doc_path, "rb") as f:
-        docs = Docs()
+        docs = Docs(prompts=PromptCollection(skip_summary=True))
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.get_evidence(
             Answer(
                 question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
                 + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
-            ),
-            disable_summarization=True,
+            )
         )
         assert (
             answer.contexts[0].text.text == answer.contexts[0].context
@@ -463,13 +469,14 @@ def test_custom_embedding():
         async def embed_documents(self, client, texts):
             return [[1, 2, 3] for _ in texts]
 
-    docs = Docs(embedding=MyEmbeds())
+    docs = Docs(embedding_model=MyEmbeds())
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     assert docs.docs["test"].embedding == [1, 2, 3]
+    assert docs._embedding_client is None
 
 
 def test_custom_llm():
@@ -486,6 +493,99 @@ def test_custom_llm():
     )
     evidence = docs.get_evidence(Answer(question="Echo"))
     assert "Echo" in evidence.context
+
+
+def test_custom_llm_stream():
+    class MyLLM(LLMModel):
+        async def acomplete_iter(self, client, prompt):
+            assert client is None
+            yield "Echo"
+
+    docs = Docs(llm_model=MyLLM(), client=None)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    evidence = docs.get_evidence(
+        Answer(question="Echo"), get_callbacks=lambda x: [lambda y: print(y, end="")]
+    )
+    assert "Echo" in evidence.context
+
+
+def test_langchain_llm():
+    from langchain_openai import ChatOpenAI, OpenAI
+
+    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-3.5-turbo"))
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert docs._client is not None
+    assert type(docs.llm_model) == LangchainLLMModel
+    assert docs.summary_llm_model == docs.llm_model
+
+    docs.get_evidence(
+        Answer(question="What is Frederick Bates's greatest accomplishment?"),
+        get_callbacks=lambda x: [lambda y: print(y, end="")],
+    )
+
+    assert docs.llm_model.llm_type == "chat"
+
+    # trying without callbacks (different codepath)
+    docs.get_evidence(
+        Answer(question="What is Frederick Bates's greatest accomplishment?")
+    )
+
+    # now completion
+
+    docs = Docs(llm_model=LangchainLLMModel(), client=OpenAI(model="babbage-002"))
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    docs.get_evidence(
+        Answer(question="What is Frederick Bates's greatest accomplishment?"),
+        get_callbacks=lambda x: [lambda y: print(y, end="")],
+    )
+
+    assert docs.summary_llm_model.llm_type == "completion"
+
+    # trying without callbacks (different codepath)
+    docs.get_evidence(
+        Answer(question="What is Frederick Bates's greatest accomplishment?")
+    )
+
+    # now make sure we can pickle it
+    docs_pickle = pickle.dumps(docs)
+    docs2 = pickle.loads(docs_pickle)
+    assert docs2._client is None
+    docs2.set_client(OpenAI(model="babbage-002"))
+    docs2.get_evidence(
+        Answer(question="What is Frederick Bates's greatest accomplishment?"),
+        get_callbacks=lambda x: [lambda y: print(y)],
+    )
+
+
+def test_langchain_embeddings():
+    from langchain_openai import OpenAIEmbeddings
+
+    docs = Docs(
+        embedding_model=LangchainEmbeddingModel(), embedding_client=OpenAIEmbeddings()
+    )
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    docs = Docs(embedding="langchain", embedding_client=OpenAIEmbeddings())
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
 
 
 class Test(IsolatedAsyncioTestCase):
@@ -526,7 +626,9 @@ def test_docs_pickle():
     docs = Docs(
         llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
     )
+    assert docs._client is not None
     old_config = docs.llm_model.config
+    old_sconfig = docs.summary_llm_model.config
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
     os.remove(doc_path)
     docs_pickle = pickle.dumps(docs)
@@ -537,8 +639,9 @@ def test_docs_pickle():
     except ValueError:
         pass
     docs2.set_client()
+    assert docs2._client is not None
     assert docs2.llm_model.config == old_config
-    assert docs2.summary_llm_model.config == old_config
+    assert docs2.summary_llm_model.config == old_sconfig
     assert len(docs.docs) == len(docs2.docs)
     context1, context2 = (
         docs.get_evidence(
@@ -742,18 +845,20 @@ def test_dockey_delete():
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n\nBates could be from Angola")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", docname="test")
     answer = Answer(question="What country was Bates born in?")
-    answer = docs.get_evidence(answer, marginal_relevance=False)
-    print(answer)
+    answer = docs.get_evidence(
+        answer, max_sources=25, k=30
+    )  # we just have a lot so we get both docs
     keys = set([c.text.doc.dockey for c in answer.contexts])
     assert len(keys) == 2
     assert len(docs.docs) == 2
 
-    docs.delete(dockey="test")
-    assert len(docs.docs) == 1
+    docs.delete(docname="test")
     answer = Answer(question="What country was Bates born in?")
-    answer = docs.get_evidence(answer, marginal_relevance=False)
+    assert len(docs.docs) == 1
+    assert len(docs.deleted_dockeys) == 1
+    answer = docs.get_evidence(answer, max_sources=25, k=30)
     keys = set([c.text.doc.dockey for c in answer.contexts])
     assert len(keys) == 1
 

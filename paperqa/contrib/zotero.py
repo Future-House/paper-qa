@@ -4,10 +4,7 @@ import os
 from pathlib import Path
 from typing import List, Optional, Union, cast
 
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
+from pydantic import BaseModel
 
 try:
     from pyzotero import zotero
