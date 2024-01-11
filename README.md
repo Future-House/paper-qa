@@ -6,7 +6,9 @@
 
 ## YOU ARE LOOKING AT PRE-RELEASE README
 
-**This is the README for an upcoming v4 release** You can see the current stable version [here](https://github.com/whitead/paper-qa/tree/84f13ea32c22b85924cd681a4b5f4fbd174afd71)
+**This is the README for an upcoming v4 release**
+
+You can see the current stable version [here](https://github.com/whitead/paper-qa/tree/84f13ea32c22b85924cd681a4b5f4fbd174afd71)
 
 This is a minimal package for doing question and answering from
 PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
@@ -198,7 +200,6 @@ print(answer)
 You may want to cache parsed texts and embeddings in an external database or file. You can then build a Docs object from those directly:
 
 ```py
-#....
 
 docs = Docs()
 
@@ -208,7 +209,7 @@ for ... in my_docs:
     docs.add_texts(texts, doc)
 ```
 
-If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) from langchain:
+If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) vector store from langchain:
 
 ```py
 from paperqa import LangchainVectorStore, Docs
@@ -325,11 +326,7 @@ docs.query("What manufacturing challenges are unique to bispecific antibodies?",
 
 ### Caching Embeddings
 
-In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. If you would like to manage caching embeddings via an external database or other strategy,
-you can populate a `Docs` object directly via
-the `add_texts` object. That can take chunked texts and documents, which are serializable objects, to populate `Docs`.
-
-You also can simply use a separate vector database by setting the `doc_index` and `texts_index` explicitly when building the `Docs` object.
+In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. See above for details on more explicit management of them.
 
 ## Customizing Prompts
 
