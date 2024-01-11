@@ -1,8 +1,12 @@
-# Paper QA- [Paper QA](#paper-qa)
+# PaperQA
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
+
+## YOU ARE LOOKING AT PRE-RELEASE README
+
+**This is the README for an upcoming v4 release** You can see the current stable version [here](https://github.com/whitead/paper-qa/tree/84f13ea32c22b85924cd681a4b5f4fbd174afd71)
 
 This is a minimal package for doing question and answering from
 PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
