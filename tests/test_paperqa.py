@@ -818,11 +818,9 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
-    )
+    docs = Docs(llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-4")))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
-    answer = docs.query("Are counterfactuals actionable?")
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
@@ -830,21 +828,15 @@ def test_fileio_reader_pdf():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     with open(doc_path, "rb") as f:
-        docs = Docs(
-            llm_model=OpenAILLMModel(
-                config=dict(temperature=0.0, model="gpt-3.5-turbo")
-            )
-        )
+        docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
-        answer = docs.query("Are counterfactuals actionable?")
+        answer = docs.query("Are counterfactuals actionable?[yes/no]")
         assert "yes" in answer.answer or "Yes" in answer.answer
 
 
 def test_fileio_reader_txt():
     # can't use curie, because it has trouble with parsed HTML
-    docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
-    )
+    docs = Docs()
     r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
     if r.status_code != 200:
         raise ValueError("Could not download wikipedia page")
