@@ -92,6 +92,7 @@ def parse_txt(
         text = html2text(text)
     texts: list[Text] = []
     # we tokenize using tiktoken so cuts are in reasonable places
+    # See https://github.com/openai/tiktoken
     enc = tiktoken.get_encoding("cl100k_base")
     encoded = [enc.decode_single_token_bytes(token) for token in enc.encode(text)]
     split_size = 0

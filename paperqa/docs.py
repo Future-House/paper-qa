@@ -656,8 +656,8 @@ class Docs(BaseModel):
                 get_callbacks("answer"),
             )
         # it still happens
-        if "(Example2012)" in answer_text:
-            answer_text = answer_text.replace("(Example2012)", "")
+        if "(Example2012Example pages 3-4)" in answer_text:
+            answer_text = answer_text.replace("(Example2012Example pages 3-4)", "")
         for c in answer.contexts:
             name = c.text.name
             citation = c.text.doc.citation

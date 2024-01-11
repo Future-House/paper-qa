@@ -21,6 +21,7 @@ from .utils import batch_iter, flatten, gather_with_concurrency
 
 
 def guess_model_type(model_name: str) -> str:
+    """Guess the model type from the model name for OpenAI models"""
     import openai
 
     model_type = get_type_hints(
@@ -128,6 +129,8 @@ class LLMModel(ABC, BaseModel):
         system_prompt: str = default_system_prompt,
     ) -> Callable[[dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, str]]:
         """Create a function to execute a batch of prompts
+
+        This replaces the previous use of langchain for combining prompts and LLMs.
 
         Args:
             client: a ephemeral client to use
@@ -369,6 +372,8 @@ class VectorStore(BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible"""
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
+    # can be tuned for different tasks
+    mmr_lambda: float = Field(default=0.5)
     model_config = ConfigDict(extra="forbid")
 
     @abstractmethod
@@ -386,14 +391,13 @@ class VectorStore(BaseModel, ABC):
         pass
 
     async def max_marginal_relevance_search(
-        self, client: Any, query: str, k: int, fetch_k: int, lambda_: float = 0.5
+        self, client: Any, query: str, k: int, fetch_k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:
             query: Query vector.
             k: Number of results to return.
-            lambda_: Weighting of relevance and diversity.
 
         Returns:
             List of tuples (doc, score) of length k.
@@ -416,7 +420,10 @@ class VectorStore(BaseModel, ABC):
             selected_similarities = similarity_matrix[:, selected_indices]
             max_sim_to_selected = selected_similarities.max(axis=1)
 
-            mmr_scores = lambda_ * np_scores - (1 - lambda_) * max_sim_to_selected
+            mmr_scores = (
+                self.mmr_lambda * np_scores
+                - (1 - self.mmr_lambda) * max_sim_to_selected
+            )
             mmr_scores[selected_indices] = -np.inf  # Exclude already selected documents
 
             max_mmr_index = mmr_scores.argmax()
