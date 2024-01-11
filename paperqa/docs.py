@@ -43,8 +43,8 @@ class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
     # ephemeral vars that should not be pickled (_things)
-    _client: Any | None
-    _embedding_client: Any | None
+    _client: Any | None = None
+    _embedding_client: Any | None = None
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
@@ -163,6 +163,10 @@ class Docs(BaseModel):
         self.docnames = set()
 
     def __getstate__(self):
+        # You may wonder why make these private if we're just going
+        # to be overriding the behavior on setstaet/getstate anyway.
+        # The reason is that the other serialization methods from Pydantic -
+        # model_dump - will not drop private attributes.
         state = super().__getstate__()
         # remove client from private attributes
         del state["__pydantic_private__"]["_client"]
@@ -170,9 +174,10 @@ class Docs(BaseModel):
         return state
 
     def __setstate__(self, state):
+        # add client back to private attributes
+        state["__pydantic_private__"]["_client"] = None
+        state["__pydantic_private__"]["_embedding_client"] = None
         super().__setstate__(state)
-        self._client = None
-        self._embedding_client = None
 
     def set_client(
         self,
@@ -421,6 +426,7 @@ class Docs(BaseModel):
     def _build_texts_index(self, keys: set[DocKey] | None = None):
         texts = self.texts
         if keys is not None and self.jit_texts_index:
+            # TODO: what is JIT even for??
             if keys is not None:
                 texts = [t for t in texts if t.doc.dockey in keys]
             if len(texts) == 0:

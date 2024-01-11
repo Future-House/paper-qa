@@ -12,6 +12,7 @@ from paperqa.llms import (
     EmbeddingModel,
     LangchainEmbeddingModel,
     LangchainLLMModel,
+    LangchainVectorStore,
     LLMModel,
     OpenAILLMModel,
     get_score,
@@ -594,6 +595,99 @@ def test_langchain_embeddings():
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
+
+
+class TestVectorStore(IsolatedAsyncioTestCase):
+    async def test_langchain_vector_store(self):
+        from langchain_community.vectorstores.faiss import FAISS
+        from langchain_openai import OpenAIEmbeddings
+
+        some_texts = [
+            Text(
+                embedding=OpenAIEmbeddings().embed_query("test"),
+                text="this is a test",
+                name="test",
+                doc=Doc(docname="test", citation="test", dockey="test"),
+            )
+        ]
+
+        # checks on builder
+        try:
+            index = LangchainVectorStore()
+            index.add_texts_and_embeddings(some_texts)
+            raise "Failed to check for builder"
+        except ValueError:
+            pass
+
+        try:
+            index = LangchainVectorStore(store_builder=lambda x: None)
+            raise "Failed to count arguments"
+        except ValueError:
+            pass
+
+        try:
+            index = LangchainVectorStore(store_builder="foo")
+            raise "Failed to check if builder is callable"
+        except ValueError:
+            pass
+
+        # now with real builder
+        index = LangchainVectorStore(
+            store_builder=lambda x, y: FAISS.from_embeddings(x, OpenAIEmbeddings(), y)
+        )
+        assert index._store is None
+        index.add_texts_and_embeddings(some_texts)
+        assert index._store is not None
+        # check search returns Text obj
+        data, score = await index.similarity_search(None, "test", k=1)
+        print(data)
+        assert type(data[0]) == Text
+
+        # now try with convenience
+        index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+        assert index._store is None
+        index.add_texts_and_embeddings(some_texts)
+        assert index._store is not None
+
+        docs = Docs(
+            texts_index=LangchainVectorStore(
+                cls=FAISS, embedding_model=OpenAIEmbeddings()
+            )
+        )
+        assert docs._embedding_client is not None  # from docs_index default
+
+        docs.add_url(
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+            citation="WikiMedia Foundation, 2023, Accessed now",
+            dockey="test",
+        )
+        # should be embedded
+
+        # now try with JIT
+        docs = Docs(texts_index=index, jit_texts_index=True)
+        docs.add_url(
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+            citation="WikiMedia Foundation, 2023, Accessed now",
+            dockey="test",
+        )
+        # should get cleared and rebuilt here
+        ev = docs.get_evidence(
+            answer=Answer(question="What is Frederick Bates's greatest accomplishment?")
+        )
+        assert len(ev.context) > 0
+        # now with dockkey filter
+        docs.get_evidence(
+            answer=Answer(
+                question="What is Frederick Bates's greatest accomplishment?",
+                dockey_filter=["test"],
+            )
+        )
+
+        # make sure we can pickle it
+        docs_pickle = pickle.dumps(docs)
+        pickle.loads(docs_pickle)
+
+        # will not work at this point - have to reset index
 
 
 class Test(IsolatedAsyncioTestCase):

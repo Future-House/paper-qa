@@ -1,11 +1,13 @@
 import re
 from abc import ABC, abstractmethod
+from inspect import signature
 from typing import (
     Any,
     AsyncGenerator,
     Callable,
     Coroutine,
     Sequence,
+    Type,
     cast,
     get_args,
     get_type_hints,
@@ -256,58 +258,6 @@ class OpenAILLMModel(LLMModel):
             yield chunk.choices[0].delta.content
 
 
-class LangchainLLMModel(LLMModel):
-    """A wrapper around the wrapper langchain"""
-
-    def infer_llm_type(self, client: Any) -> str:
-        from langchain_core.language_models.chat_models import BaseChatModel
-
-        if isinstance(client, BaseChatModel):
-            return "chat"
-        return "completion"
-
-    async def acomplete(self, client: Any, prompt: str) -> str:
-        return await client.ainvoke(prompt)
-
-    async def acomplete_iter(self, client: Any, prompt: str) -> Any:
-        async for chunk in cast(AsyncGenerator, client.astream(prompt)):
-            yield chunk
-
-    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
-        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-
-        lc_messages: list[BaseMessage] = []
-        for m in messages:
-            if m["role"] == "user":
-                lc_messages.append(HumanMessage(content=m["content"]))
-            elif m["role"] == "system":
-                lc_messages.append(SystemMessage(content=m["content"]))
-            else:
-                raise ValueError(f"Unknown role: {m['role']}")
-        return (await client.ainvoke(lc_messages)).content
-
-    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
-        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-
-        lc_messages: list[BaseMessage] = []
-        for m in messages:
-            if m["role"] == "user":
-                lc_messages.append(HumanMessage(content=m["content"]))
-            elif m["role"] == "system":
-                lc_messages.append(SystemMessage(content=m["content"]))
-            else:
-                raise ValueError(f"Unknown role: {m['role']}")
-        async for chunk in client.astream(lc_messages):
-            yield chunk.content
-
-
-class LangchainEmbeddingModel(EmbeddingModel):
-    """A wrapper around the wrapper langchain"""
-
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        return await client.aembed_documents(texts)
-
-
 class LlamaEmbeddingModel(EmbeddingModel):
     embedding_model: str = Field(default="llama")
 
@@ -469,22 +419,157 @@ class NumpyVectorStore(VectorStore):
         )
 
 
-class LangchainVectorStore(VectorStore):
+# All the langchain stuff is below
+# Many confusing woes here because langchain
+# is not serializable and so we have to
+# do some gymnastics to make it work
+
+
+class LangchainLLMModel(LLMModel):
     """A wrapper around the wrapper langchain"""
 
-    @abstractmethod
-    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
-        pass
+    def infer_llm_type(self, client: Any) -> str:
+        from langchain_core.language_models.chat_models import BaseChatModel
 
-    @abstractmethod
+        if isinstance(client, BaseChatModel):
+            return "chat"
+        return "completion"
+
+    async def acomplete(self, client: Any, prompt: str) -> str:
+        return await client.ainvoke(prompt)
+
+    async def acomplete_iter(self, client: Any, prompt: str) -> Any:
+        async for chunk in cast(AsyncGenerator, client.astream(prompt)):
+            yield chunk
+
+    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+
+        lc_messages: list[BaseMessage] = []
+        for m in messages:
+            if m["role"] == "user":
+                lc_messages.append(HumanMessage(content=m["content"]))
+            elif m["role"] == "system":
+                lc_messages.append(SystemMessage(content=m["content"]))
+            else:
+                raise ValueError(f"Unknown role: {m['role']}")
+        return (await client.ainvoke(lc_messages)).content
+
+    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+
+        lc_messages: list[BaseMessage] = []
+        for m in messages:
+            if m["role"] == "user":
+                lc_messages.append(HumanMessage(content=m["content"]))
+            elif m["role"] == "system":
+                lc_messages.append(SystemMessage(content=m["content"]))
+            else:
+                raise ValueError(f"Unknown role: {m['role']}")
+        async for chunk in client.astream(lc_messages):
+            yield chunk.content
+
+
+class LangchainEmbeddingModel(EmbeddingModel):
+    """A wrapper around the wrapper langchain"""
+
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+        return await client.aembed_documents(texts)
+
+
+class LangchainVectorStore(VectorStore):
+    """A wrapper around the wrapper langchain
+
+    Note that if you this is cleared (e.g., by `Docs` having `jit_texts_index` set to True),
+    this will calls the `from_texts` class method on the `store`. This means that any non-default
+    constructor arguments will be lost. You can override the clear method on this class.
+    """
+
+    _store_builder: Any | None = None
+    _store: Any | None = None
+    # JIT Generics - store the class type (Doc or Text)
+    class_type: Type[Embeddable] = Field(default=Embeddable)
+    model_config = ConfigDict(extra="forbid")
+
+    def __init__(self, **data):
+        # we have to separate out store from the rest of the data
+        # because langchain objects are not serializable
+        store_builder = None
+        if "store_builder" in data:
+            store_builder = LangchainVectorStore.check_store_builder(
+                data.pop("store_builder")
+            )
+        if "cls" in data and "embedding_model" in data:
+            # make a little closure
+            cls = data.pop("cls")
+            embedding_model = data.pop("embedding_model")
+
+            def candidate(x, y):
+                return cls.from_embeddings(x, embedding_model, y)
+
+            store_builder = LangchainVectorStore.check_store_builder(candidate)
+        super().__init__(**data)
+        self._store_builder = store_builder
+
+    @classmethod
+    def check_store_builder(cls, builder: Any) -> Any:
+        # check it is a callable
+        if not callable(builder):
+            raise ValueError("store_builder must be callable")
+        # check it takes two arguments
+        # we don't use type hints because it could be
+        # a partial
+        sig = signature(builder)
+        if len(sig.parameters) != 2:
+            raise ValueError("store_builder must take two arguments")
+        return builder
+
+    def __getstate__(self):
+        state = super().__getstate__()
+        # remove non-serializable private attributes
+        del state["__pydantic_private__"]["_store"]
+        del state["__pydantic_private__"]["_store_builder"]
+        return state
+
+    def __setstate__(self, state):
+        # restore non-serializable private attributes
+        state["__pydantic_private__"]["_store"] = None
+        state["__pydantic_private__"]["_store_builder"] = None
+        super().__setstate__(state)
+
+    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
+        if self._store_builder is None:
+            raise ValueError("You must set store_builder before adding texts")
+        self.class_type = type(texts[0])
+        vec_store_text_and_embeddings = list(
+            map(lambda x: (x.text, x.embedding), texts)
+        )
+        if self._store is None:
+            self._store = self._store_builder(  # type: ignore
+                vec_store_text_and_embeddings,
+                texts,
+            )
+            if self._store is None or not hasattr(self._store, "add_embeddings"):
+                raise ValueError("store_builder did not return a valid vectorstore")
+        self._store.add_embeddings(  # type: ignore
+            vec_store_text_and_embeddings,
+            metadatas=texts,
+        )
+
     async def similarity_search(
         self, client: Any, query: str, k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
-        pass
+        if self._store is None:
+            return [], []
+        results = await self._store.asimilarity_search_with_relevance_scores(query, k=k)
+        texts, scores = [self.class_type(**r[0].metadata) for r in results], [
+            r[1] for r in results
+        ]
+        return texts, scores
 
-    @abstractmethod
     def clear(self) -> None:
-        pass
+        del self._store  # be explicit, because it could be large
+        self._store = None
 
 
 def get_score(text: str) -> int:

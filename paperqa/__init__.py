@@ -9,6 +9,7 @@ from .llms import (
     OpenAILLMModel,
     LlamaEmbeddingModel,
     NumpyVectorStore,
+    LangchainVectorStore,
     SentenceTransformerEmbeddingModel,
 )
 
@@ -29,4 +30,5 @@ __all__ = [
     "SentenceTransformerEmbeddingModel",
     "LangchainEmbeddingModel",
     "NumpyVectorStore",
+    "LangchainVectorStore",
 ]

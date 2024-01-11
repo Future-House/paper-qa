@@ -7,3 +7,5 @@ pymupdf
 build
 types-requests
 langchain_openai
+langchain_community
+faiss-cpu

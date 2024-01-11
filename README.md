@@ -189,6 +189,33 @@ answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
 
+### Using External DB/Vector DB and Caching
+
+You may want to cache parsed texts and embeddings in an external database or file. You can then build a Docs object from those directly:
+
+```py
+#....
+
+docs = Docs()
+
+for ... in my_docs:
+    doc = Doc(docname=...,  citation=..., dockey=..., citation=...)
+    texts = [Text(text=..., name=..., doc=doc) for ... in my_texts]
+    docs.add_texts(texts, doc)
+```
+
+If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) from langchain:
+
+```py
+from paperqa import LangchainVectorStore, Docs
+from langchain_community.vector_store import FAISS
+from langchain_openai import OpenAIEmbeddings
+
+my_index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+docs = Docs(texts_index=my_index)
+
+```
+
 ## Where do I get papers?
 
 Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
