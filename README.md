@@ -7,7 +7,7 @@
 This is a minimal package for doing question and answering from
 PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
 
-By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a vector DB called [FAISS](https://github.com/facebookresearch/faiss) to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
+By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a simple numpy vector DB to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
 
 paper-qa uses the process shown below:
 
@@ -45,7 +45,7 @@ Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
 
 
-## Version 4 Changes
+## What's New?
 
 Version 4 removed langchain from the package because it no longer supports pickling. This also simplifies the package a bit - especially prompts. Langchain can still be used, but it's not required. You can use any LLMs from langchain, but you will need to use the `LangchainLLMModel` class to wrap the model.
 
@@ -85,7 +85,7 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 
 ### Choosing Model
 
-By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4-turbo`. If you don't have gpt-4 access or would like to save money, you can adjust:
+By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4-turbo`. You can adjust this:
 
 ```py
 docs = Docs(llm='gpt-3.5-turbo')
@@ -100,7 +100,7 @@ docs = Docs(llm_model=LangchainLLMModel(),
             client=ChatAnthropic())
 ```
 
-Notice that we split the model into `LangchainLLMModel` and `client` which is `ChatAnthropic`. This is because paper-qa can be pickled, but typically Langchain models cannot be pickled. Thus, the client is the unpicklable part. Specifically, you can save your state in paper-qa:
+Note we split the model into `LangchainLLMModel` (always empty) and `client` which is `ChatAnthropic`. This is because `client` stores the non-pickleable part and langchain LLMs are only sometimes serializable/pickleable. The paper-qa `Docs` must always serializable. Thus, we split the model into two parts.
 
 ```py
 import pickle
@@ -115,21 +115,52 @@ docs.set_client(ChatAnthropic())
 
 #### Locally Hosted
 
-You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because paper-qa requires following a lot of instructions. You won't get good performance with 7B models. I recommend using the SentenceTransformer models for embeddings, rather than llama.cpp embeddings.
+You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because paper-qa requires following a lot of instructions. You won't get good performance with 7B models.
+
+The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
 ```py
-from paperqa import Docs, SentenceTransformerEmbeddingModel
+from paperqa import Docs, LlamaEmbeddingModel
 from openai import AsyncOpenAI
 
-# start llamap.cpp client with: -cb -np 4 -a my-alais --embedding
+# start llamap.cpp client with
 
 local_client = AsyncOpenAI(
     base_url="http://localhost:8080/v1",
     api_key = "sk-no-key-required"
 )
+
+docs = Docs(client=local_client,
+            embedding=LlamaEmbeddingModel(),
+            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+```
+
+### Changing Embedding Model
+
+You can use langchain embedding models, or the [SentenceTransformer](https://www.sbert.net/) models. For example
+
+```py
+from paperqa import Docs, SentenceTransformerEmbeddingModel
+from openai import AsyncOpenAI
+
+# start llamap.cpp client with
+
+local_client = AsyncOpenAI(
+    base_url="http://localhost:8080/v1",
+    api_key = "sk-no-key-required"
+)
+
 docs = Docs(client=local_client,
             embedding=SentenceTransformerEmbeddingModel(),
-            llm_model=OpenAILLMModel(config=dict(model="my-alias", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+```
+
+Just like in the above examples, we have to split the Langchain model into a client and model to keep `Docs` serializable.
+```py
+
+from paperqa import Docs, LangchainEmbeddingModel
+
+docs = Docs(embedding_model=LangchainEmbeddingModel(), embedding_client=OpenAIEmbeddings())
 ```
 
 ### Adjusting number of sources
@@ -317,4 +348,6 @@ with open("my_docs.pkl", "wb") as f:
 # load
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
+
+docs.set_client() #defaults to OpenAI
 ```

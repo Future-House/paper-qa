@@ -5,15 +5,18 @@ from typing import (
     AsyncGenerator,
     Callable,
     Coroutine,
+    Sequence,
     cast,
     get_args,
     get_type_hints,
 )
 
+import numpy as np
 from openai import AsyncOpenAI
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .prompts import default_system_prompt
+from .types import Embeddable
 from .utils import batch_iter, flatten, gather_with_concurrency
 
 
@@ -94,6 +97,7 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
 class LLMModel(ABC, BaseModel):
     llm_type: str | None = None
+    model_config = ConfigDict(extra="forbid")
 
     async def acomplete(self, client: Any, prompt: str) -> str:
         raise NotImplementedError
@@ -353,6 +357,127 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
 
         embeddings = cast(SentenceTransformer, self._model).encode(texts)
         return embeddings
+
+
+def cosine_similarity(a, b):
+    dot_product = np.dot(a, b.T)
+    norm_product = np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1)
+    return dot_product / norm_product
+
+
+class VectorStore(BaseModel, ABC):
+    """Interface for vector store - very similar to LangChain's VectorStore to be compatible"""
+
+    embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
+    model_config = ConfigDict(extra="forbid")
+
+    @abstractmethod
+    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
+        pass
+
+    @abstractmethod
+    async def similarity_search(
+        self, client: Any, query: str, k: int
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        pass
+
+    @abstractmethod
+    def clear(self) -> None:
+        pass
+
+    async def max_marginal_relevance_search(
+        self, client: Any, query: str, k: int, fetch_k: int, lambda_: float = 0.5
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
+
+        Args:
+            query: Query vector.
+            k: Number of results to return.
+            lambda_: Weighting of relevance and diversity.
+
+        Returns:
+            List of tuples (doc, score) of length k.
+        """
+        if fetch_k < k:
+            raise ValueError("fetch_k must be greater or equal to k")
+
+        texts, scores = await self.similarity_search(client, query, fetch_k)
+        if len(texts) <= k:
+            return texts, scores
+
+        embeddings = np.array([t.embedding for t in texts])
+        np_scores = np.array(scores)
+        similarity_matrix = cosine_similarity(embeddings, embeddings)
+
+        selected_indices = [0]
+        remaining_indices = list(range(1, len(texts)))
+
+        while len(selected_indices) < k:
+            selected_similarities = similarity_matrix[:, selected_indices]
+            max_sim_to_selected = selected_similarities.max(axis=1)
+
+            mmr_scores = lambda_ * np_scores - (1 - lambda_) * max_sim_to_selected
+            mmr_scores[selected_indices] = -np.inf  # Exclude already selected documents
+
+            max_mmr_index = mmr_scores.argmax()
+            selected_indices.append(max_mmr_index)
+            remaining_indices.remove(max_mmr_index)
+
+        return [texts[i] for i in selected_indices], [
+            scores[i] for i in selected_indices
+        ]
+
+
+class NumpyVectorStore(VectorStore):
+    texts: list[Embeddable] = []
+    _embeddings_matrix: np.ndarray | None = None
+
+    def clear(self) -> None:
+        self.texts = []
+        self._embeddings_matrix = None
+
+    def add_texts_and_embeddings(
+        self,
+        texts: Sequence[Embeddable],
+    ) -> None:
+        self.texts.extend(texts)
+        self._embeddings_matrix = np.array([t.embedding for t in self.texts])
+
+    async def similarity_search(
+        self, client: Any, query: str, k: int
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        if len(self.texts) == 0:
+            return [], []
+        np_query = np.array(
+            (await self.embedding_model.embed_documents(client, [query]))[0]
+        )
+        similarity_scores = cosine_similarity(
+            np_query.reshape(1, -1), self._embeddings_matrix
+        )[0]
+        similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
+        sorted_indices = np.argsort(similarity_scores)[::-1]
+        return (
+            [self.texts[i] for i in sorted_indices[:k]],
+            [similarity_scores[i] for i in sorted_indices[:k]],
+        )
+
+
+class LangchainVectorStore(VectorStore):
+    """A wrapper around the wrapper langchain"""
+
+    @abstractmethod
+    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
+        pass
+
+    @abstractmethod
+    async def similarity_search(
+        self, client: Any, query: str, k: int
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        pass
+
+    @abstractmethod
+    def clear(self) -> None:
+        pass
 
 
 def get_score(text: str) -> int:

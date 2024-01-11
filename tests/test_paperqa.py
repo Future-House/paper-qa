@@ -7,7 +7,7 @@ import numpy as np
 import requests
 from openai import AsyncOpenAI
 
-from paperqa import Answer, Doc, Docs, PromptCollection, Text
+from paperqa import Answer, Doc, Docs, NumpyVectorStore, PromptCollection, Text
 from paperqa.llms import (
     EmbeddingModel,
     LangchainEmbeddingModel,
@@ -469,14 +469,18 @@ def test_custom_embedding():
         async def embed_documents(self, client, texts):
             return [[1, 2, 3] for _ in texts]
 
-    docs = Docs(embedding_model=MyEmbeds())
+    docs = Docs(
+        docs_index=NumpyVectorStore(embedding_model=MyEmbeds()),
+        texts_index=NumpyVectorStore(embedding_model=MyEmbeds()),
+        embedding_client=None,
+    )
+    assert docs._embedding_client is None
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     assert docs.docs["test"].embedding == [1, 2, 3]
-    assert docs._embedding_client is None
 
 
 def test_custom_llm():
@@ -573,8 +577,12 @@ def test_langchain_embeddings():
     from langchain_openai import OpenAIEmbeddings
 
     docs = Docs(
-        embedding_model=LangchainEmbeddingModel(), embedding_client=OpenAIEmbeddings()
+        texts_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
+        docs_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
+        embedding_client=OpenAIEmbeddings(),
     )
+    assert docs._embedding_client is not None
+
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -828,7 +836,7 @@ def test_dockey_filter():
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
     docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
-    answer = Answer(question="What country is Bates from?", key_filter=["test"])
+    answer = Answer(question="What country is Bates from?", dockey_filter=["test"])
     docs.get_evidence(answer)
 
 
@@ -1007,8 +1015,8 @@ def disabled_test_memory():
 
 
 def test_add_texts():
-    llm_config = dict(temperature=0.1, model="text-ada-001")
-    docs = Docs(llm_config=llm_config)
+    llm_config = dict(temperature=0.1, model="babbage-02")
+    docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1027,8 +1035,8 @@ def test_add_texts():
 
     docs2._build_texts_index()
     # now do it again to test after text index is already built
-    llm_config = dict(temperature=0.1, model="text-ada-001")
-    docs = Docs(llm_config=llm_config)
+    llm_config = dict(temperature=0.1, model="babbage-02")
+    docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1052,7 +1060,7 @@ def test_external_doc_index():
         dockey="test",
     )
     evidence = docs.query(query="What is the date of flag day?", key_filter=True)
-    docs2 = Docs(doc_index=docs.doc_index, texts_index=docs.texts_index)
+    docs2 = Docs(docs_index=docs.docs_index, texts_index=docs.texts_index)
     assert len(docs2.docs) == 0
     evidence = docs2.query("What is the date of flag day?", key_filter=True)
     assert "February 15" in evidence.context

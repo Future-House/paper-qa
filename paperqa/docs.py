@@ -9,32 +9,21 @@ from pathlib import Path
 from typing import Any, BinaryIO, cast
 
 from openai import AsyncOpenAI
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .llms import (
-    EmbeddingModel,
     LangchainEmbeddingModel,
     LangchainLLMModel,
-    LlamaEmbeddingModel,
     LLMModel,
-    OpenAIEmbeddingModel,
+    NumpyVectorStore,
     OpenAILLMModel,
+    VectorStore,
     get_score,
     is_openai_model,
 )
 from .paths import PAPERQA_DIR
 from .readers import read_doc
-from .types import (
-    Answer,
-    CallbackFactory,
-    Context,
-    Doc,
-    DocKey,
-    NumpyVectorStore,
-    PromptCollection,
-    Text,
-    VectorStore,
-)
+from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollection, Text
 from .utils import (
     gather_with_concurrency,
     guess_is_4xx,
@@ -63,12 +52,11 @@ class Docs(BaseModel):
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
-    embedding_model: EmbeddingModel = OpenAIEmbeddingModel()
     docs: dict[DocKey, Doc] = {}
     texts: list[Text] = []
     docnames: set[str] = set()
-    texts_index: VectorStore = NumpyVectorStore()
-    doc_index: VectorStore = NumpyVectorStore()
+    texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
+    docs_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = "default"
     index_path: Path | None = PAPERQA_DIR / name
     batch_size: int = 1
@@ -78,9 +66,9 @@ class Docs(BaseModel):
     jit_texts_index: bool = False
     # This is used to strip indirect citations that come up from the summary llm
     strip_citations: bool = True
+    model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
-        # TODO: There may be a way to put this into pydantic model validator
         # We do it here because we need to move things to private attributes
         if "embedding_client" in data:
             embedding_client = data.pop("embedding_client")
@@ -93,8 +81,7 @@ class Docs(BaseModel):
             # convenience
             embedding_client = data["client"]
         else:
-            # if embedding_model is explicitly set, but not client then make it None
-            if "embedding_model" in data and data["embedding_model"] is not None:
+            if "embedding" in data and data["embedding"] != "default":
                 embedding_client = None
             else:
                 embedding_client = AsyncOpenAI()
@@ -110,6 +97,9 @@ class Docs(BaseModel):
                     client = None
             else:
                 client = AsyncOpenAI()
+        # backwards compatibility
+        if "doc_index" in data:
+            data["docs_index"] = data.pop("doc_index")
         super().__init__(**data)
         self._client = client
         self._embedding_client = embedding_client
@@ -134,13 +124,19 @@ class Docs(BaseModel):
                     raise ValueError(f"Could not guess model type for {data['llm']}. ")
             if "embedding" in data and data["embedding"] != "default":
                 if data["embedding"] == "langchain":
-                    data["embedding_model"] = LangchainEmbeddingModel()
-                elif data["embedding"] == "llama":
-                    data["embedding_model"] = LlamaEmbeddingModel()
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=LangchainEmbeddingModel()
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=LangchainEmbeddingModel()
+                        )
                 else:
                     raise ValueError(
-                        f"Could not guess model type for {data['embedding']}. "
+                        f"Could not guess embedding model type for {data['embedding']}. "
                     )
+
         return data
 
     @model_validator(mode="after")
@@ -337,7 +333,7 @@ class Docs(BaseModel):
             doc.docname = new_docname
         if texts[0].embedding is None:
             text_embeddings = asyncio.run(
-                self.embedding_model.embed_documents(
+                self.texts_index.embedding_model.embed_documents(
                     self._embedding_client, [t.text for t in texts]
                 )
             )
@@ -345,13 +341,13 @@ class Docs(BaseModel):
                 t.embedding = text_embeddings[i]
         if doc.embedding is None:
             doc.embedding = asyncio.run(
-                self.embedding_model.embed_documents(
+                self.docs_index.embedding_model.embed_documents(
                     self._embedding_client, [doc.citation]
                 )
             )[0]
         if not self.jit_texts_index:
             self.texts_index.add_texts_and_embeddings(texts)
-        self.doc_index.add_texts_and_embeddings([doc])
+        self.docs_index.add_texts_and_embeddings([doc])
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
@@ -384,11 +380,9 @@ class Docs(BaseModel):
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
-        query_vector = (
-            await self.embedding_model.embed_documents(self._embedding_client, [query])
-        )[0]
-        matches, _ = self.doc_index.max_marginal_relevance_search(
-            query_vector,
+        matches, _ = await self.docs_index.max_marginal_relevance_search(
+            self._embedding_client,
+            query,
             k=k + len(self.deleted_dockeys),
             fetch_k=5 * (k + len(self.deleted_dockeys)),
         )
@@ -471,7 +465,7 @@ class Docs(BaseModel):
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
     ) -> Answer:
-        if len(self.docs) == 0 and self.doc_index is None:
+        if len(self.docs) == 0 and self.docs_index is None:
             # do we have no docs?
             return answer
         self._build_texts_index(keys=answer.dockey_filter)
@@ -481,15 +475,12 @@ class Docs(BaseModel):
         if disable_vector_search:
             matches = self.texts
         else:
-            query_vector = (
-                await self.embedding_model.embed_documents(
-                    self._embedding_client, [answer.question]
-                )
-            )[0]
             matches = cast(
                 list[Text],
-                self.texts_index.max_marginal_relevance_search(
-                    query_vector, k=_k, fetch_k=5 * _k
+                (
+                    await self.texts_index.max_marginal_relevance_search(
+                        self._embedding_client, answer.question, k=_k, fetch_k=5 * _k
+                    )
                 )[0],
             )
         # ok now filter (like ones from adoc_match)
