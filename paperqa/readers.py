@@ -31,7 +31,7 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
-    if len(split) > overlap:
+    if len(split) > overlap or len(texts) == 0:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
             Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
@@ -64,7 +64,7 @@ def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text
             )
             split = split[chunk_chars - overlap :]
             pages = [str(i + 1)]
-    if len(split) > overlap:
+    if len(split) > overlap or len(texts) == 0:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
             Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
@@ -112,7 +112,7 @@ def parse_txt(
             )
             split = [split_flat[chunk_chars - overlap :].encode("utf-8")]
             split_size = len(split[0])
-    if len(split) > overlap:
+    if split_size > overlap or len(texts) == 0:
         split_flat = b"".join(split).decode()
         texts.append(
             Text(
@@ -134,7 +134,7 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
     with open(path) as f:
         for i, line in enumerate(f):
             split += line
-            if len(split) > chunk_chars:
+            while len(split) > chunk_chars:
                 texts.append(
                     Text(
                         text=split[:chunk_chars],
@@ -144,7 +144,7 @@ def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
                 )
                 split = split[chunk_chars - overlap :]
                 last_line = i
-    if len(split) > overlap:
+    if len(split) > overlap or len(texts) == 0:
         texts.append(
             Text(
                 text=split[:chunk_chars],
