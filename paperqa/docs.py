@@ -103,6 +103,10 @@ class Docs(BaseModel):
         super().__init__(**data)
         self._client = client
         self._embedding_client = embedding_client
+        # run this here (instead of automateically) so it has access to privates
+        # If I ever figure out a better way of validating privates
+        # I can move this back to the decorator
+        Docs.make_llm_names_consistent(self)
 
     @model_validator(mode="before")
     @classmethod
@@ -136,7 +140,6 @@ class Docs(BaseModel):
                     raise ValueError(
                         f"Could not guess embedding model type for {data['embedding']}. "
                     )
-
         return data
 
     @model_validator(mode="after")
@@ -155,6 +158,24 @@ class Docs(BaseModel):
                 )
             elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model
+        return data
+
+    @classmethod
+    def make_llm_names_consistent(cls, data: Any) -> Any:
+        if isinstance(data, Docs):
+            data.llm = data.llm_model.name
+            if data.llm == "langchain":
+                # from langchain models - kind of hacky
+                # langchain models cannot know type until
+                # it sees client
+                data.llm_model.infer_llm_type(data._client)
+                data.llm = data.llm_model.name
+            if data.summary_llm_model is not None:
+                if data.summary_llm == "langchain":
+                    # from langchain models - kind of hacky
+                    data.summary_llm_model.infer_llm_type(data._client)
+                    data.summary_llm = data.summary_llm_model.name
+
         return data
 
     def clear_docs(self):
@@ -193,6 +214,7 @@ class Docs(BaseModel):
             else:
                 embedding_client = AsyncOpenAI()
         self._embedding_client = embedding_client
+        Docs.make_llm_names_consistent(self)
 
     def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name"""

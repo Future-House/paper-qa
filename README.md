@@ -100,24 +100,23 @@ docs = Docs(llm='gpt-3.5-turbo')
 or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
 
 ```py
-from paperqa import Docs, LangchainLLMModel
+from paperqa import Docs
 from langchain_community.chat_models import ChatAnthropic
-docs = Docs(llm_model=LangchainLLMModel(),
+docs = Docs(llm="langchain",
             client=ChatAnthropic())
 ```
 
-Note we split the model into `LangchainLLMModel` (always empty) and `client` which is `ChatAnthropic`. This is because `client` stores the non-pickleable part and langchain LLMs are only sometimes serializable/pickleable. The paper-qa `Docs` must always serializable. Thus, we split the model into two parts.
+Note we split the model into the wrapper and `client`, which is `ChatAnthropic` here. This is because `client` stores the non-pickleable part and langchain LLMs are only sometimes serializable/pickleable. The paper-qa `Docs` must always serializable. Thus, we split the model into two parts.
 
 ```py
 import pickle
-docs = Docs(llm_model=LangchainLLMModel(),
+docs = Docs(llm="langchain",
             client=ChatAnthropic())
 model_str = pickle.dumps(docs)
 docs = pickle.loads(model_str)
 # but you have to set the client after loading
 docs.set_client(ChatAnthropic())
 ```
-
 
 #### Locally Hosted
 

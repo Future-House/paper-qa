@@ -100,6 +100,7 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
 class LLMModel(ABC, BaseModel):
     llm_type: str | None = None
+    name: str
     model_config = ConfigDict(extra="forbid")
 
     async def acomplete(self, client: Any, prompt: str) -> str:
@@ -208,6 +209,7 @@ class LLMModel(ABC, BaseModel):
 
 class OpenAILLMModel(LLMModel):
     config: dict = Field(default=dict(model="gpt-3.5-turbo", temperature=0.1))
+    name: str = "gpt-3.5-turbo"
 
     def _check_client(self, client: Any) -> AsyncOpenAI:
         if client is None:
@@ -225,6 +227,13 @@ class OpenAILLMModel(LLMModel):
     def guess_llm_type(cls, data: Any) -> Any:
         m = cast(OpenAILLMModel, data)
         m.llm_type = guess_model_type(m.config["model"])
+        return m
+
+    @model_validator(mode="after")
+    @classmethod
+    def set_model_name(cls, data: Any) -> Any:
+        m = cast(OpenAILLMModel, data)
+        m.name = m.config["model"]
         return m
 
     async def acomplete(self, client: Any, prompt: str) -> str:
@@ -428,9 +437,12 @@ class NumpyVectorStore(VectorStore):
 class LangchainLLMModel(LLMModel):
     """A wrapper around the wrapper langchain"""
 
+    name: str = "langchain"
+
     def infer_llm_type(self, client: Any) -> str:
         from langchain_core.language_models.chat_models import BaseChatModel
 
+        self.name = client.model_name
         if isinstance(client, BaseChatModel):
             return "chat"
         return "completion"

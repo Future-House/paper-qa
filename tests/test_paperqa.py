@@ -406,14 +406,15 @@ class TestChains(IsolatedAsyncioTestCase):
 
 
 def test_docs():
-    llm_config = dict(temperature=0.1, model="text-ada-001", model_type="completion")
-    docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
+    docs = Docs(llm="babbage-002")
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     assert docs.docs["test"].docname == "Wiki2023"
+    assert docs.llm == "babbage-002"
+    assert docs.summary_llm == "babbage-002"
 
 
 def test_evidence():
@@ -486,6 +487,8 @@ def test_custom_embedding():
 
 def test_custom_llm():
     class MyLLM(LLMModel):
+        name: str = "myllm"
+
         async def acomplete(self, client, prompt):
             assert client is None
             return "Echo"
@@ -502,6 +505,8 @@ def test_custom_llm():
 
 def test_custom_llm_stream():
     class MyLLM(LLMModel):
+        name: str = "myllm"
+
         async def acomplete_iter(self, client, prompt):
             assert client is None
             yield "Echo"
@@ -522,6 +527,8 @@ def test_langchain_llm():
     from langchain_openai import ChatOpenAI, OpenAI
 
     docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-3.5-turbo"))
+    assert docs.llm == "gpt-3.5-turbo"
+    assert docs.summary_llm == "gpt-3.5-turbo"
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -567,7 +574,9 @@ def test_langchain_llm():
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
     assert docs2._client is None
+    assert docs2.llm == "babbage-002"
     docs2.set_client(OpenAI(model="babbage-002"))
+    assert docs2.summary_llm == "babbage-002"
     docs2.get_evidence(
         Answer(question="What is Frederick Bates's greatest accomplishment?"),
         get_callbacks=lambda x: [lambda y: print(y)],
