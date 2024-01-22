@@ -5,7 +5,6 @@ import string
 from pathlib import Path
 from typing import Any, BinaryIO, Coroutine, Iterator, Union
 
-import fitz
 import pypdf
 
 StrPath = Union[str, Path]
@@ -64,10 +63,12 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 def count_pdf_pages(file_path: StrPath) -> int:
     with open(file_path, "rb") as pdf_file:
-        try: # try fitz by default
+        try:  # try fitz by default
+            import fitz
+
             doc = fitz.open(file_path)
             num_pages = len(doc)
-        except: # pypdf instead
+        except ModuleNotFoundError:  # pypdf instead
             pdf_reader = pypdf.PdfReader(pdf_file)
             num_pages = len(pdf_reader.pages)
     return num_pages
