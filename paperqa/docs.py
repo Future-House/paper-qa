@@ -23,7 +23,16 @@ from .llms import (
 )
 from .paths import PAPERQA_DIR
 from .readers import read_doc
-from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollection, Text
+from .types import (
+    Answer,
+    CallbackFactory,
+    Context,
+    Doc,
+    DocKey,
+    LLMResult,
+    PromptCollection,
+    Text,
+)
 from .utils import (
     gather_with_concurrency,
     guess_is_4xx,
@@ -103,7 +112,7 @@ class Docs(BaseModel):
         super().__init__(**data)
         self._client = client
         self._embedding_client = embedding_client
-        # run this here (instead of automateically) so it has access to privates
+        # run this here (instead of automatically) so it has access to privates
         # If I ever figure out a better way of validating privates
         # I can move this back to the decorator
         Docs.make_llm_names_consistent(self)
@@ -171,11 +180,15 @@ class Docs(BaseModel):
                 data.llm_model.infer_llm_type(data._client)
                 data.llm = data.llm_model.name
             if data.summary_llm_model is not None:
+                if (
+                    data.summary_llm is None
+                    and data.summary_llm_model is data.llm_model
+                ):
+                    data.summary_llm = data.llm
                 if data.summary_llm == "langchain":
                     # from langchain models - kind of hacky
                     data.summary_llm_model.infer_llm_type(data._client)
                     data.summary_llm = data.summary_llm_model.name
-
         return data
 
     def clear_docs(self):
@@ -188,6 +201,9 @@ class Docs(BaseModel):
         # to be overriding the behavior on setstaet/getstate anyway.
         # The reason is that the other serialization methods from Pydantic -
         # model_dump - will not drop private attributes.
+        # So - this getstate/setstate removes private attributes for pickling
+        # and Pydantic will handle removing private attributes for other
+        # serialization methods (like model_dump)
         state = super().__getstate__()
         # remove client from private attributes
         del state["__pydantic_private__"]["_client"]
@@ -301,9 +317,10 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            citation = asyncio.run(
+            chain_result = asyncio.run(
                 cite_chain(dict(text=texts[0].text), None),
             )
+            citation = chain_result.text
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
@@ -405,6 +422,7 @@ class Docs(BaseModel):
         k: int = 25,
         rerank: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
+        answer: Answer | None = None,  # used for tracking tokens
     ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
         matches, _ = await self.docs_index.max_marginal_relevance_search(
@@ -440,7 +458,9 @@ class Docs(BaseModel):
                     dict(question=query, papers="\n".join(papers)),
                     get_callbacks("filter"),
                 )
-                return set([d.dockey for d in matched_docs if d.docname in result])
+                if answer:
+                    answer.add_tokens(result)
+                return set([d.dockey for d in matched_docs if d.docname in str(result)])
         except AttributeError:
             pass
         return set([d.dockey for d in matched_docs])
@@ -528,6 +548,8 @@ class Docs(BaseModel):
         async def process(match):
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
+            # empty result
+            llm_result = LLMResult(model="", date="")
             if detailed_citations:
                 citation = match.name + ": " + citation
 
@@ -547,7 +569,7 @@ class Docs(BaseModel):
                 # my best idea is see if there is a 4XX
                 # http code in the exception
                 try:
-                    context = await summary_chain(
+                    llm_result = await summary_chain(
                         dict(
                             question=answer.question,
                             # Add name so chunk is stated
@@ -557,15 +579,16 @@ class Docs(BaseModel):
                         ),
                         callbacks,
                     )
+                    context = llm_result.text
                 except Exception as e:
                     if guess_is_4xx(str(e)):
-                        return None
+                        return None, llm_result
                     raise e
                 if (
                     "not applicable" in context.lower()
                     or "not relevant" in context.lower()
                 ):
-                    return None
+                    return None, llm_result
                 if self.strip_citations:
                     # remove citations that collide with our grounded citations (for the answer LLM)
                     context = strip_citations(context)
@@ -580,13 +603,16 @@ class Docs(BaseModel):
                 ),
                 score=score,
             )
-            return c
+            return c, llm_result
 
         results = await gather_with_concurrency(
             self.max_concurrent, [process(m) for m in matches]
         )
+        # update token counts
+        [answer.add_tokens(r[1]) for r in results]
+
         # filter out failures
-        contexts = [c for c in results if c is not None]
+        contexts = [c for c, r in results if c is not None]
 
         answer.contexts = sorted(
             contexts + answer.contexts, key=lambda x: x.score, reverse=True
@@ -646,7 +672,9 @@ class Docs(BaseModel):
             # comparable - one is chunks and one is docs
             if key_filter or (key_filter is None and len(self.docs) > k):
                 keys = await self.adoc_match(
-                    answer.question, get_callbacks=get_callbacks
+                    answer.question,
+                    get_callbacks=get_callbacks,
+                    answer=answer,
                 )
                 if len(keys) > 0:
                     answer.dockey_filter = keys
@@ -663,7 +691,10 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             pre = await chain(dict(question=answer.question), get_callbacks("pre"))
-            answer.context = answer.context + "\n\nExtra background information:" + pre
+            answer.add_tokens(pre)
+            answer.context = (
+                answer.context + "\n\nExtra background information:" + str(pre)
+            )
         bib = dict()
         if len(answer.context) < 10:  # and not self.memory:
             answer_text = (
@@ -675,7 +706,7 @@ class Docs(BaseModel):
                 prompt=self.prompts.qa,
                 system_prompt=self.prompts.system,
             )
-            answer_text = await qa_chain(
+            answer_result = await qa_chain(
                 dict(
                     context=answer.context,
                     answer_length=answer.answer_length,
@@ -683,6 +714,8 @@ class Docs(BaseModel):
                 ),
                 get_callbacks("answer"),
             )
+            answer_text = answer_result.text
+            answer.add_tokens(answer_result)
         # it still happens
         if "(Example2012Example pages 3-4)" in answer_text:
             answer_text = answer_text.replace("(Example2012Example pages 3-4)", "")
@@ -709,7 +742,8 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             post = await chain(answer.model_dump(), get_callbacks("post"))
-            answer.answer = post
+            answer.answer = post.text
+            answer.add_tokens(post)
             answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"
             if len(bib) > 0:
                 answer.formatted_answer += f"\nReferences\n\n{bib_str}\n"

@@ -1,3 +1,4 @@
+from math import ceil
 from pathlib import Path
 from typing import List
 
@@ -94,30 +95,25 @@ def parse_txt(
     # we tokenize using tiktoken so cuts are in reasonable places
     # See https://github.com/openai/tiktoken
     enc = tiktoken.get_encoding("cl100k_base")
-    encoded = [enc.decode_single_token_bytes(token) for token in enc.encode(text)]
-    split_size = 0
-    split_flat = ""
+    encoded = enc.encode_ordinary(text)
     split = []
-    for chunk in encoded:
-        split.append(chunk)
-        split_size += len(chunk)
-        if split_size > chunk_chars:
-            split_flat = b"".join(split).decode()
-            texts.append(
-                Text(
-                    text=split_flat[:chunk_chars],
-                    name=f"{doc.docname} chunk {len(texts) + 1}",
-                    doc=doc,
-                )
+    # convert from characters to chunks
+    char_count = len(text)  # e.g., 25,000
+    token_count = len(encoded)  # e.g., 4,500
+    chars_per_token = char_count / token_count  # e.g., 5.5
+    chunk_tokens = chunk_chars / chars_per_token  # e.g., 3000 / 5.5 = 545
+    overlap_tokens = overlap / chars_per_token  # e.g., 100 / 5.5 = 18
+    chunk_count = ceil(token_count / chunk_tokens)  # e.g., 4500 / 545 = 9
+    for i in range(chunk_count):
+        split = encoded[
+            max(int(i * chunk_tokens - overlap_tokens), 0) : int(
+                (i + 1) * chunk_tokens + overlap_tokens
             )
-            split = [split_flat[chunk_chars - overlap :].encode("utf-8")]
-            split_size = len(split[0])
-    if split_size > overlap or len(texts) == 0:
-        split_flat = b"".join(split).decode()
+        ]
         texts.append(
             Text(
-                text=split_flat[:chunk_chars],
-                name=f"{doc.docname} lines {len(texts) + 1}",
+                text=enc.decode(split),
+                name=f"{doc.docname} chunk {i + 1}",
                 doc=doc,
             )
         )

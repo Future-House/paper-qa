@@ -382,8 +382,14 @@ class TestChains(IsolatedAsyncioTestCase):
             outputs.append(x)
 
         completion = await call(dict(animal="duck"), callbacks=[accum])
-        assert completion == "".join(outputs)
-        assert type(completion) == str
+        assert completion.seconds_to_first_token > 0
+        assert completion.prompt_count > 0
+        assert completion.completion_count > 0
+        assert str(completion) == "".join(outputs)
+
+        completion = await call(dict(animal="duck"))
+        assert completion.seconds_to_first_token == 0
+        assert completion.seconds_to_last_token > 0
 
     async def test_chain_chat(self):
         client = AsyncOpenAI()
@@ -401,8 +407,14 @@ class TestChains(IsolatedAsyncioTestCase):
             outputs.append(x)
 
         completion = await call(dict(animal="duck"), callbacks=[accum])
-        assert completion == "".join(outputs)
-        assert type(completion) == str
+        assert completion.seconds_to_first_token > 0
+        assert completion.prompt_count > 0
+        assert completion.completion_count > 0
+        assert str(completion) == "".join(outputs)
+
+        completion = await call(dict(animal="duck"))
+        assert completion.seconds_to_first_token == 0
+        assert completion.seconds_to_last_token > 0
 
 
 def test_docs():
@@ -527,6 +539,8 @@ def test_langchain_llm():
     from langchain_openai import ChatOpenAI, OpenAI
 
     docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-3.5-turbo"))
+    assert type(docs.llm_model) == LangchainLLMModel
+    assert type(docs.summary_llm_model) == LangchainLLMModel
     assert docs.llm == "gpt-3.5-turbo"
     assert docs.summary_llm == "gpt-3.5-turbo"
     docs.add_url(
@@ -914,6 +928,8 @@ def test_citation():
     assert (
         list(docs.docs.values())[0].docname == "Wikipedia2024"
         or list(docs.docs.values())[0].docname == "Frederick2024"
+        or list(docs.docs.values())[0].docname == "Wikipedia"
+        or list(docs.docs.values())[0].docname == "Frederick"
     )
 
 

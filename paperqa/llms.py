@@ -1,3 +1,5 @@
+import asyncio
+import datetime
 import re
 from abc import ABC, abstractmethod
 from inspect import signature
@@ -18,7 +20,7 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .prompts import default_system_prompt
-from .types import Embeddable
+from .types import Doc, Embeddable, LLMResult, Text
 from .utils import batch_iter, flatten, gather_with_concurrency
 
 
@@ -59,13 +61,14 @@ def process_llm_config(llm_config: dict) -> dict:
     result = {k: v for k, v in llm_config.items() if k != "model_type"}
     if "max_tokens" not in result or result["max_tokens"] == -1:
         model = llm_config["model"]
-        # now we guess!
+        # now we guess - we could use tiktoken to count,
+        # but do have the initative right now
         if model.startswith("gpt-4") or (
             model.startswith("gpt-3.5") and "1106" in model
         ):
-            result["max_tokens"] = 4096
+            result["max_tokens"] = 3000
         else:
-            result["max_tokens"] = 2048  # ?
+            result["max_tokens"] = 1500
     return result
 
 
@@ -124,13 +127,18 @@ class LLMModel(ABC, BaseModel):
     def infer_llm_type(self, client: Any) -> str:
         return "completion"
 
+    def count_tokens(self, text: str) -> int:
+        return len(text) // 4  # gross approximation
+
     def make_chain(
         self,
         client: Any,
         prompt: str,
         skip_system: bool = False,
         system_prompt: str = default_system_prompt,
-    ) -> Callable[[dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, str]]:
+    ) -> Callable[
+        [dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, LLMResult]
+    ]:
         """Create a function to execute a batch of prompts
 
         This replaces the previous use of langchain for combining prompts and LLMs.
@@ -143,7 +151,7 @@ class LLMModel(ABC, BaseModel):
 
         Returns:
             A function to execute a prompt. Its signature is:
-            execute(data: dict, callbacks: list[Callable[[str], None]]] | None = None) -> str
+            execute(data: dict, callbacks: list[Callable[[str], None]]] | None = None) -> LLMResult
             where data is a dict with keys for the input variables that will be formatted into prompt
             and callbacks is a list of functions to call with each chunk of the completion.
         """
@@ -160,21 +168,39 @@ class LLMModel(ABC, BaseModel):
 
             async def execute(
                 data: dict, callbacks: list[Callable[[str], None]] | None = None
-            ) -> str:
+            ) -> LLMResult:
+                start_clock = asyncio.get_running_loop().time()
+                result = LLMResult(
+                    model=self.name,
+                    date=datetime.datetime.now().isoformat(),
+                )
                 messages = chat_prompt[:-1] + [
                     dict(role="user", content=chat_prompt[-1]["content"].format(**data))
                 ]
+                result.prompt_count = sum(
+                    [self.count_tokens(m["content"]) for m in messages]
+                ) + sum([self.count_tokens(m["role"]) for m in messages])
+
                 if callbacks is None:
                     output = await self.achat(client, messages)
                 else:
                     completion = self.achat_iter(client, messages)  # type: ignore
-                    result = []
+                    text_result = []
                     async for chunk in completion:  # type: ignore
                         if chunk:
-                            result.append(chunk)
+                            if result.seconds_to_first_token == 0:
+                                result.seconds_to_first_token = (
+                                    asyncio.get_running_loop().time() - start_clock
+                                )
+                            text_result.append(chunk)
                             [f(chunk) for f in callbacks]
-                    output = "".join(result)
-                return output
+                    output = "".join(text_result)
+                result.completion_count = self.count_tokens(output)
+                result.text = output
+                result.seconds_to_last_token = (
+                    asyncio.get_running_loop().time() - start_clock
+                )
+                return result
 
             return execute
         elif self.llm_type == "completion":
@@ -185,23 +211,38 @@ class LLMModel(ABC, BaseModel):
 
             async def execute(
                 data: dict, callbacks: list[Callable[[str], None]] | None = None
-            ) -> str:
+            ) -> LLMResult:
+                start_clock = asyncio.get_running_loop().time()
+                result = LLMResult(
+                    model=self.name,
+                    date=datetime.datetime.now().isoformat(),
+                )
+                formatted_prompt = completion_prompt.format(**data)
+                result.prompt_count = self.count_tokens(formatted_prompt)
+
                 if callbacks is None:
-                    output = await self.acomplete(
-                        client, completion_prompt.format(**data)
-                    )
+                    output = await self.acomplete(client, formatted_prompt)
                 else:
                     completion = self.acomplete_iter(  # type: ignore
                         client,
-                        completion_prompt.format(**data),
+                        formatted_prompt,
                     )
-                    result = []
+                    text_result = []
                     async for chunk in completion:  # type: ignore
                         if chunk:
-                            result.append(chunk)
+                            if result.seconds_to_first_token == 0:
+                                result.seconds_to_first_token = (
+                                    asyncio.get_running_loop().time() - start_clock
+                                )
+                            text_result.append(chunk)
                             [f(chunk) for f in callbacks]
-                    output = "".join(result)
-                return output
+                    output = "".join(text_result)
+                result.completion_count = self.count_tokens(output)
+                result.text = output
+                result.seconds_to_last_token = (
+                    asyncio.get_running_loop().time() - start_clock
+                )
+                return result
 
             return execute
         raise ValueError(f"Unknown llm_type: {self.llm_type}")
@@ -553,9 +594,16 @@ class LangchainVectorStore(VectorStore):
         if self._store_builder is None:
             raise ValueError("You must set store_builder before adding texts")
         self.class_type = type(texts[0])
-        vec_store_text_and_embeddings = list(
-            map(lambda x: (x.text, x.embedding), texts)
-        )
+        if self.class_type == Text:
+            vec_store_text_and_embeddings = list(
+                map(lambda x: (x.text, x.embedding), cast(list[Text], texts))
+            )
+        elif self.class_type == Doc:
+            vec_store_text_and_embeddings = list(
+                map(lambda x: (x.citation, x.embedding), cast(list[Doc], texts))
+            )
+        else:
+            raise ValueError("Only embeddings of type Text are supported")
         if self._store is None:
             self._store = self._store_builder(  # type: ignore
                 vec_store_text_and_embeddings,

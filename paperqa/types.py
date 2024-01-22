@@ -16,6 +16,19 @@ DocKey = Any
 CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
 
+class LLMResult(BaseModel):
+    text: str = ""
+    prompt_count: int = 0
+    completion_count: int = 0
+    model: str
+    date: str
+    seconds_to_first_token: float = 0
+    seconds_to_last_token: float = 0
+
+    def __str__(self):
+        return self.text
+
+
 class Embeddable(BaseModel):
     embedding: list[float] | None = Field(default=None, repr=False)
 
@@ -137,11 +150,10 @@ class Answer(BaseModel):
     summary_length: str = "about 100 words"
     answer_length: str = "about 100 words"
     memory: str | None = None
-    # these two below are for convenience
-    # and are not set. But you can set them
-    # if you want to use them.
+    # just for convenience you can override this
     cost: float | None = None
-    token_counts: dict[str, list[int]] | None = None
+    # key is model name, value is (prompt, completion) token counts
+    token_counts: dict[str, list[int]] = Field(default_factory=dict)
     model_config = ConfigDict(extra="forbid")
 
     def __str__(self) -> str:
@@ -155,3 +167,14 @@ class Answer(BaseModel):
         except StopIteration:
             raise ValueError(f"Could not find docname {name} in contexts")
         return doc.citation
+
+    def add_tokens(self, result: LLMResult):
+        """Update the token counts for the given result."""
+        if result.model not in self.token_counts:
+            self.token_counts[result.model] = [
+                result.prompt_count,
+                result.completion_count,
+            ]
+        else:
+            self.token_counts[result.model][0] += result.prompt_count
+            self.token_counts[result.model][1] += result.completion_count
