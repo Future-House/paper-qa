@@ -3,10 +3,9 @@ import math
 import re
 import string
 from pathlib import Path
-from typing import BinaryIO, List, Union
+from typing import Any, BinaryIO, Coroutine, Iterator, Union
 
 import pypdf
-from langchain.base_language import BaseLanguageModel
 
 StrPath = Union[str, Path]
 
@@ -76,7 +75,7 @@ def md5sum(file_path: StrPath) -> str:
         return hashlib.md5(f.read()).hexdigest()
 
 
-async def gather_with_concurrency(n: int, *coros: List) -> List:
+async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
     # https://stackoverflow.com/a/61478547/2392535
     semaphore = asyncio.Semaphore(n)
 
@@ -93,13 +92,6 @@ def guess_is_4xx(msg: str) -> bool:
     return False
 
 
-def get_llm_name(llm: BaseLanguageModel) -> str:
-    try:
-        return llm.model_name  # type: ignore
-    except AttributeError:
-        return llm.model  # type: ignore
-
-
 def strip_citations(text: str) -> str:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
@@ -108,7 +100,7 @@ def strip_citations(text: str) -> str:
     return text
 
 
-def iter_citations(text: str) -> List[str]:
+def iter_citations(text: str) -> list[str]:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
     result = re.findall(citation_regex, text, flags=re.MULTILINE)
@@ -131,3 +123,26 @@ def extract_doi(reference: str) -> str:
         return "https://doi.org/" + doi_match.group()
     else:
         return ""
+
+
+def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
+    """
+    Batch an iterable into chunks of size n
+
+    :param iterable: The iterable to batch
+    :param n: The size of the batches
+    :return: A list of batches
+    """
+    length = len(iterable)
+    for ndx in range(0, length, n):
+        yield iterable[ndx : min(ndx + n, length)]
+
+
+def flatten(iteratble: list) -> list:
+    """
+    Flatten a list of lists
+
+    :param l: The list of lists to flatten
+    :return: A flattened list
+    """
+    return [item for sublist in iteratble for item in sublist]

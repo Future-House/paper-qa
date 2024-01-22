@@ -6,4 +6,6 @@ python-dotenv
 pymupdf
 build
 types-requests
-numpy
+langchain_openai
+langchain_community
+faiss-cpu

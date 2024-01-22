@@ -1,34 +1,40 @@
+import nest_asyncio  # isort:skip
 import asyncio
 import os
 import re
-import sys
 import tempfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO, Dict, List, Optional, Set, Union, cast
+from typing import Any, BinaryIO, cast
 
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.memory import ConversationTokenBufferMemory
-from langchain.memory.chat_memory import BaseChatMemory
-from langchain.schema.embeddings import Embeddings
-from langchain.schema.language_model import BaseLanguageModel
-from langchain.schema.vectorstore import VectorStore
-from langchain.vectorstores import FAISS
+from openai import AsyncOpenAI
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-try:
-    from pydantic.v1 import BaseModel, validator
-except ImportError:
-    from pydantic import BaseModel, validator
-
-from .chains import get_score, make_chain
+from .llms import (
+    LangchainEmbeddingModel,
+    LangchainLLMModel,
+    LLMModel,
+    NumpyVectorStore,
+    OpenAILLMModel,
+    VectorStore,
+    get_score,
+    is_openai_model,
+)
 from .paths import PAPERQA_DIR
 from .readers import read_doc
-from .types import Answer, CallbackFactory, Context, Doc, DocKey, PromptCollection, Text
+from .types import (
+    Answer,
+    CallbackFactory,
+    Context,
+    Doc,
+    DocKey,
+    LLMResult,
+    PromptCollection,
+    Text,
+)
 from .utils import (
     gather_with_concurrency,
-    get_llm_name,
     guess_is_4xx,
     maybe_is_html,
     maybe_is_pdf,
@@ -38,80 +44,193 @@ from .utils import (
     strip_citations,
 )
 
+# Apply the patch to allow nested loops
+nest_asyncio.apply()
 
-class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
+
+class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
-    docs: Dict[DocKey, Doc] = {}
-    texts: List[Text] = []
-    docnames: Set[str] = set()
-    texts_index: Optional[VectorStore] = None
-    doc_index: Optional[VectorStore] = None
-    llm: Union[str, BaseLanguageModel] = ChatOpenAI(
-        temperature=0.1, model="gpt-3.5-turbo", client=None
+    # ephemeral vars that should not be pickled (_things)
+    _client: Any | None = None
+    _embedding_client: Any | None = None
+    llm: str = "default"
+    summary_llm: str | None = None
+    llm_model: LLMModel = Field(
+        default=OpenAILLMModel(config=dict(model="gpt-4-1106-preview", temperature=0.1))
     )
-    summary_llm: Optional[Union[str, BaseLanguageModel]] = None
+    summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
+    embedding: str | None = "default"
+    docs: dict[DocKey, Doc] = {}
+    texts: list[Text] = []
+    docnames: set[str] = set()
+    texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
+    docs_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = "default"
-    index_path: Optional[Path] = PAPERQA_DIR / name
-    embeddings: Embeddings = OpenAIEmbeddings(client=None)
-    max_concurrent: int = 5
-    deleted_dockeys: Set[DocKey] = set()
+    index_path: Path | None = PAPERQA_DIR / name
+    batch_size: int = 1
+    max_concurrent: int = 4
+    deleted_dockeys: set[DocKey] = set()
     prompts: PromptCollection = PromptCollection()
-    memory: bool = False
-    memory_model: Optional[BaseChatMemory] = None
     jit_texts_index: bool = False
     # This is used to strip indirect citations that come up from the summary llm
     strip_citations: bool = True
+    model_config = ConfigDict(extra="forbid")
 
-    # TODO: Not sure how to get this to work
-    # while also passing mypy checks
-    @validator("llm", "summary_llm")
-    def check_llm(cls, v: Union[BaseLanguageModel, str]) -> BaseLanguageModel:
-        if type(v) is str:
-            return ChatOpenAI(temperature=0.1, model=v, client=None)
-        return cast(BaseLanguageModel, v)
+    def __init__(self, **data):
+        # We do it here because we need to move things to private attributes
+        if "embedding_client" in data:
+            embedding_client = data.pop("embedding_client")
+        # convenience to pull embedding_client from client if reasonable
+        elif (
+            "client" in data
+            and data["client"] is not None
+            and type(data["client"]) == AsyncOpenAI
+        ):
+            # convenience
+            embedding_client = data["client"]
+        else:
+            if "embedding" in data and data["embedding"] != "default":
+                embedding_client = None
+            else:
+                embedding_client = AsyncOpenAI()
+        if "client" in data:
+            client = data.pop("client")
+        else:
+            # if llm_model is explicitly set, but not client then make it None
+            if "llm_model" in data and data["llm_model"] is not None:
+                # except if it is an OpenAILLMModel
+                if type(data["llm_model"]) == OpenAILLMModel:
+                    client = AsyncOpenAI()
+                else:
+                    client = None
+            else:
+                client = AsyncOpenAI()
+        # backwards compatibility
+        if "doc_index" in data:
+            data["docs_index"] = data.pop("doc_index")
+        super().__init__(**data)
+        self._client = client
+        self._embedding_client = embedding_client
+        # run this here (instead of automatically) so it has access to privates
+        # If I ever figure out a better way of validating privates
+        # I can move this back to the decorator
+        Docs.make_llm_names_consistent(self)
 
-    @validator("summary_llm", always=True)
-    def copy_llm_if_not_set(cls, v, values):
-        return v or values["llm"]
+    @model_validator(mode="before")
+    @classmethod
+    def setup_alias_models(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "llm" in data and data["llm"] != "default":
+                if is_openai_model(data["llm"]):
+                    data["llm_model"] = OpenAILLMModel(config=dict(model=data["llm"]))
+                elif data["llm"] == "langchain":
+                    data["llm_model"] = LangchainLLMModel()
+                else:
+                    raise ValueError(f"Could not guess model type for {data['llm']}. ")
+            if "summary_llm" in data and data["summary_llm"] is not None:
+                if is_openai_model(data["summary_llm"]):
+                    data["summary_llm_model"] = OpenAILLMModel(
+                        config=dict(model=data["summary_llm"])
+                    )
+                else:
+                    raise ValueError(f"Could not guess model type for {data['llm']}. ")
+            if "embedding" in data and data["embedding"] != "default":
+                if data["embedding"] == "langchain":
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=LangchainEmbeddingModel()
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=LangchainEmbeddingModel()
+                        )
+                else:
+                    raise ValueError(
+                        f"Could not guess embedding model type for {data['embedding']}. "
+                    )
+        return data
 
-    @validator("memory_model", always=True)
-    def check_memory_model(cls, v, values):
-        if values["memory"]:
-            if v is None:
-                return ConversationTokenBufferMemory(
-                    llm=values["summary_llm"],
-                    max_token_limit=512,
-                    memory_key="memory",
-                    human_prefix="Question",
-                    ai_prefix="Answer",
-                    input_key="Question",
-                    output_key="Answer",
+    @model_validator(mode="after")
+    @classmethod
+    def config_summary_llm_config(cls, data: Any) -> Any:
+        if isinstance(data, Docs):
+            # check our default gpt-4/3.5-turbo config
+            # default check is hard - becauise either llm is set or llm_model is set
+            if (
+                data.summary_llm_model is None
+                and data.llm == "default"
+                and type(data.llm_model) == OpenAILLMModel
+            ):
+                data.summary_llm_model = OpenAILLMModel(
+                    config=dict(model="gpt-3.5-turbo", temperature=0.1)
                 )
-            if v.memory_variables()[0] != "memory":
-                raise ValueError("Memory model must have memory_variables=['memory']")
-            return values["memory_model"]
-        return None
+            elif data.summary_llm_model is None:
+                data.summary_llm_model = data.llm_model
+        return data
+
+    @classmethod
+    def make_llm_names_consistent(cls, data: Any) -> Any:
+        if isinstance(data, Docs):
+            data.llm = data.llm_model.name
+            if data.llm == "langchain":
+                # from langchain models - kind of hacky
+                # langchain models cannot know type until
+                # it sees client
+                data.llm_model.infer_llm_type(data._client)
+                data.llm = data.llm_model.name
+            if data.summary_llm_model is not None:
+                if (
+                    data.summary_llm is None
+                    and data.summary_llm_model is data.llm_model
+                ):
+                    data.summary_llm = data.llm
+                if data.summary_llm == "langchain":
+                    # from langchain models - kind of hacky
+                    data.summary_llm_model.infer_llm_type(data._client)
+                    data.summary_llm = data.summary_llm_model.name
+        return data
 
     def clear_docs(self):
         self.texts = []
         self.docs = {}
         self.docnames = set()
 
-    def update_llm(
+    def __getstate__(self):
+        # You may wonder why make these private if we're just going
+        # to be overriding the behavior on setstaet/getstate anyway.
+        # The reason is that the other serialization methods from Pydantic -
+        # model_dump - will not drop private attributes.
+        # So - this getstate/setstate removes private attributes for pickling
+        # and Pydantic will handle removing private attributes for other
+        # serialization methods (like model_dump)
+        state = super().__getstate__()
+        # remove client from private attributes
+        del state["__pydantic_private__"]["_client"]
+        del state["__pydantic_private__"]["_embedding_client"]
+        return state
+
+    def __setstate__(self, state):
+        # add client back to private attributes
+        state["__pydantic_private__"]["_client"] = None
+        state["__pydantic_private__"]["_embedding_client"] = None
+        super().__setstate__(state)
+
+    def set_client(
         self,
-        llm: Union[BaseLanguageModel, str],
-        summary_llm: Optional[Union[BaseLanguageModel, str]] = None,
-    ) -> None:
-        """Update the LLM for answering questions."""
-        if type(llm) is str:
-            llm = ChatOpenAI(temperature=0.1, model=llm, client=None)
-        if type(summary_llm) is str:
-            summary_llm = ChatOpenAI(temperature=0.1, model=summary_llm, client=None)
-        self.llm = cast(BaseLanguageModel, llm)
-        if summary_llm is None:
-            summary_llm = llm
-        self.summary_llm = cast(BaseLanguageModel, summary_llm)
+        client: AsyncOpenAI | None = None,
+        embedding_client: AsyncOpenAI | None = None,
+    ):
+        if client is None:
+            client = AsyncOpenAI()
+        self._client = client
+        if embedding_client is None:
+            if type(client) == AsyncOpenAI:
+                embedding_client = client
+            else:
+                embedding_client = AsyncOpenAI()
+        self._embedding_client = embedding_client
+        Docs.make_llm_names_consistent(self)
 
     def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name"""
@@ -128,11 +247,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     def add_file(
         self,
         file: BinaryIO,
-        citation: Optional[str] = None,
-        docname: Optional[str] = None,
-        dockey: Optional[DocKey] = None,
+        citation: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
         chunk_chars: int = 3000,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Add a document to the collection."""
         # just put in temp file and use existing method
         suffix = ".txt"
@@ -155,11 +274,11 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     def add_url(
         self,
         url: str,
-        citation: Optional[str] = None,
-        docname: Optional[str] = None,
-        dockey: Optional[DocKey] = None,
+        citation: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
         chunk_chars: int = 3000,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Add a document to the collection."""
         import urllib.request
 
@@ -177,20 +296,20 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
     def add(
         self,
         path: Path,
-        citation: Optional[str] = None,
-        docname: Optional[str] = None,
+        citation: str | None = None,
+        docname: str | None = None,
         disable_check: bool = False,
-        dockey: Optional[DocKey] = None,
+        dockey: DocKey | None = None,
         chunk_chars: int = 3000,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Add a document to the collection."""
         if dockey is None:
             dockey = md5sum(path)
         if citation is None:
             # skip system because it's too hesitant to answer
-            cite_chain = make_chain(
+            cite_chain = self.llm_model.make_chain(
+                client=self._client,
                 prompt=self.prompts.cite,
-                llm=cast(BaseLanguageModel, self.summary_llm),
                 skip_system=True,
             )
             # peak first chunk
@@ -198,7 +317,10 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            citation = cite_chain.run(texts[0].text)
+            chain_result = asyncio.run(
+                cite_chain(dict(text=texts[0].text), None),
+            )
+            citation = chain_result.text
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
@@ -237,7 +359,7 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
 
     def add_texts(
         self,
-        texts: List[Text],
+        texts: list[Text],
         doc: Doc,
     ) -> bool:
         """Add chunked texts to the collection. This is useful if you have already chunked the texts yourself.
@@ -253,35 +375,38 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             for t in texts:
                 t.name = t.name.replace(doc.docname, new_docname)
             doc.docname = new_docname
-        if texts[0].embeddings is None:
-            text_embeddings = self.embeddings.embed_documents([t.text for t in texts])
+        if texts[0].embedding is None:
+            text_embeddings = asyncio.run(
+                self.texts_index.embedding_model.embed_documents(
+                    self._embedding_client, [t.text for t in texts]
+                )
+            )
             for i, t in enumerate(texts):
-                t.embeddings = text_embeddings[i]
-        else:
-            text_embeddings = cast(List[List[float]], [t.embeddings for t in texts])
-        if self.texts_index is not None:
-            try:
-                # TODO: Simplify - super weird
-                vec_store_text_and_embeddings = list(
-                    map(lambda x: (x.text, x.embeddings), texts)
+                t.embedding = text_embeddings[i]
+        if doc.embedding is None:
+            doc.embedding = asyncio.run(
+                self.docs_index.embedding_model.embed_documents(
+                    self._embedding_client, [doc.citation]
                 )
-                self.texts_index.add_embeddings(  # type: ignore
-                    vec_store_text_and_embeddings,
-                    metadatas=[t.dict(exclude={"embeddings", "text"}) for t in texts],
-                )
-            except AttributeError:
-                raise ValueError("Need a vector store that supports adding embeddings.")
-        if self.doc_index is not None:
-            self.doc_index.add_texts([doc.citation], metadatas=[doc.dict()])
+            )[0]
+        if not self.jit_texts_index:
+            self.texts_index.add_texts_and_embeddings(texts)
+        self.docs_index.add_texts_and_embeddings([doc])
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
         return True
 
     def delete(
-        self, name: Optional[str] = None, dockey: Optional[DocKey] = None
+        self,
+        name: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
     ) -> None:
         """Delete a document from the collection."""
+        # name is an alias for docname
+        name = docname if name is None else name
+
         if name is not None:
             doc = next((doc for doc in self.docs.values() if doc.docname == name), None)
             if doc is None:
@@ -295,253 +420,199 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         self,
         query: str,
         k: int = 25,
-        rerank: Optional[bool] = None,
+        rerank: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
-    ) -> Set[DocKey]:
+        answer: Answer | None = None,  # used for tracking tokens
+    ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
-        if self.doc_index is None:
-            if len(self.docs) == 0:
-                return set()
-            texts = [doc.citation for doc in self.docs.values()]
-            metadatas = [d.dict() for d in self.docs.values()]
-            self.doc_index = FAISS.from_texts(
-                texts, metadatas=metadatas, embedding=self.embeddings
-            )
-        matches = self.doc_index.max_marginal_relevance_search(
-            query, k=k + len(self.deleted_dockeys)
+        matches, _ = await self.docs_index.max_marginal_relevance_search(
+            self._embedding_client,
+            query,
+            k=k + len(self.deleted_dockeys),
+            fetch_k=5 * (k + len(self.deleted_dockeys)),
         )
         # filter the matches
-        matches = [
-            m for m in matches if m.metadata["dockey"] not in self.deleted_dockeys
+        matched_docs = [
+            m for m in cast(list[Doc], matches) if m.dockey not in self.deleted_dockeys
         ]
-        try:
-            # for backwards compatibility (old pickled objects)
-            matched_docs = [self.docs[m.metadata["dockey"]] for m in matches]
-        except KeyError:
-            matched_docs = [Doc(**m.metadata) for m in matches]
+
         if len(matched_docs) == 0:
             return set()
         # this only works for gpt-4 (in my testing)
         try:
             if (
                 rerank is None
-                and get_llm_name(cast(BaseLanguageModel, self.llm)).startswith("gpt-4")
+                and (
+                    type(self.llm_model) == OpenAILLMModel
+                    and cast(OpenAILLMModel, self).config["model"].startswith("gpt-4")
+                )
                 or rerank is True
             ):
-                chain = make_chain(
-                    self.prompts.select,
-                    cast(BaseLanguageModel, self.llm),
+                chain = self.llm_model.make_chain(
+                    client=self._client,
+                    prompt=self.prompts.select,
                     skip_system=True,
                 )
                 papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
-                result = await chain.arun(  # type: ignore
-                    question=query,
-                    papers="\n".join(papers),
-                    callbacks=get_callbacks("filter"),
+                result = await chain(
+                    dict(question=query, papers="\n".join(papers)),
+                    get_callbacks("filter"),
                 )
-                return set([d.dockey for d in matched_docs if d.docname in result])
+                if answer:
+                    answer.add_tokens(result)
+                return set([d.dockey for d in matched_docs if d.docname in str(result)])
         except AttributeError:
             pass
         return set([d.dockey for d in matched_docs])
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        if self.texts_index is not None and self.index_path is not None:
-            state["texts_index"].save_local(self.index_path)
-        del state["texts_index"]
-        del state["doc_index"]
-        return {"__dict__": state, "__fields_set__": self.__fields_set__}
-
-    def __setstate__(self, state):
-        object.__setattr__(self, "__dict__", state["__dict__"])
-        object.__setattr__(self, "__fields_set__", state["__fields_set__"])
-        try:
-            self.texts_index = FAISS.load_local(self.index_path, self.embeddings)
-        except Exception:
-            # they use some special exception type, but I don't want to import it
-            self.texts_index = None
-        self.doc_index = None
-
-    def _build_texts_index(self, keys: Optional[Set[DocKey]] = None):
+    def _build_texts_index(self, keys: set[DocKey] | None = None):
+        texts = self.texts
         if keys is not None and self.jit_texts_index:
-            del self.texts_index
-            self.texts_index = None
-        if self.texts_index is None:
-            texts = self.texts
+            # TODO: what is JIT even for??
             if keys is not None:
                 texts = [t for t in texts if t.doc.dockey in keys]
             if len(texts) == 0:
                 return
-            raw_texts = [t.text for t in texts]
-            text_embeddings = [t.embeddings for t in texts]
-            metadatas = [t.dict(exclude={"embeddings", "text"}) for t in texts]
-            self.texts_index = FAISS.from_embeddings(
-                # wow adding list to the zip was tricky
-                text_embeddings=list(zip(raw_texts, text_embeddings)),
-                embedding=self.embeddings,
-                metadatas=metadatas,
+            self.texts_index.clear()
+            self.texts_index.add_texts_and_embeddings(texts)
+        if self.jit_texts_index and keys is None:
+            # Not sure what else to do here???????
+            print(
+                "Warning: JIT text index without keys "
+                "requires rebuilding index each time!"
             )
-
-    def clear_memory(self):
-        """Clear the memory of the model."""
-        if self.memory_model is not None:
-            self.memory_model.clear()
+            self.texts_index.clear()
+            self.texts_index.add_texts_and_embeddings(texts)
 
     def get_evidence(
         self,
         answer: Answer,
         k: int = 10,
         max_sources: int = 5,
-        marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
-        disable_summarization: bool = False,
     ) -> Answer:
-        # special case for jupyter notebooks
-        if "get_ipython" in globals() or "google.colab" in sys.modules:
-            import nest_asyncio
-
-            nest_asyncio.apply()
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        return loop.run_until_complete(
+        return asyncio.run(
             self.aget_evidence(
                 answer,
                 k=k,
                 max_sources=max_sources,
-                marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
                 detailed_citations=detailed_citations,
                 disable_vector_search=disable_vector_search,
-                disable_summarization=disable_summarization,
             )
         )
 
     async def aget_evidence(
         self,
         answer: Answer,
-        k: int = 10,  # Number of vectors to retrieve
+        k: int = 10,  # Number of evidence pieces to retrieve
         max_sources: int = 5,  # Number of scored contexts to use
-        marginal_relevance: bool = True,
         get_callbacks: CallbackFactory = lambda x: None,
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
-        disable_summarization: bool = False,
     ) -> Answer:
-        if disable_vector_search:
-            k = k * 10000
-        if len(self.docs) == 0 and self.doc_index is None:
+        if len(self.docs) == 0 and self.docs_index is None:
+            # do we have no docs?
             return answer
         self._build_texts_index(keys=answer.dockey_filter)
-        if self.texts_index is None:
-            return answer
-        self.texts_index = cast(VectorStore, self.texts_index)
         _k = k
         if answer.dockey_filter is not None:
-            _k = k * 10  # heuristic
-        if marginal_relevance:
-            matches = self.texts_index.max_marginal_relevance_search(
-                answer.question, k=_k, fetch_k=5 * _k
-            )
+            _k = k * 10  # heuristic - get enough so we can downselect
+        if disable_vector_search:
+            matches = self.texts
         else:
-            matches = self.texts_index.similarity_search(
-                answer.question, k=_k, fetch_k=5 * _k
+            matches = cast(
+                list[Text],
+                (
+                    await self.texts_index.max_marginal_relevance_search(
+                        self._embedding_client, answer.question, k=_k, fetch_k=5 * _k
+                    )
+                )[0],
             )
-        # ok now filter
+        # ok now filter (like ones from adoc_match)
         if answer.dockey_filter is not None:
-            matches = [
-                m
-                for m in matches
-                if m.metadata["doc"]["dockey"] in answer.dockey_filter
-            ]
+            matches = [m for m in matches if m.doc.dockey in answer.dockey_filter]
 
         # check if it is deleted
-        matches = [
-            m
-            for m in matches
-            if m.metadata["doc"]["dockey"] not in self.deleted_dockeys
-        ]
+        matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
 
         # check if it is already in answer
         cur_names = [c.text.name for c in answer.contexts]
-        matches = [m for m in matches if m.metadata["name"] not in cur_names]
+        matches = [m for m in matches if m.name not in cur_names]
 
         # now finally cut down
         matches = matches[:k]
 
         async def process(match):
-            callbacks = get_callbacks("evidence:" + match.metadata["name"])
-            summary_chain = make_chain(
-                self.prompts.summary,
-                self.summary_llm,
-                memory=self.memory_model,
-                system_prompt=self.prompts.system,
-            )
-            # This is dangerous because it
-            # could mask errors that are important- like auth errors
-            # I also cannot know what the exception
-            # type is because any model could be used
-            # my best idea is see if there is a 4XX
-            # http code in the exception
-            try:
-                citation = match.metadata["doc"]["citation"]
-                if detailed_citations:
-                    citation = match.metadata["name"] + ": " + citation
-                if self.prompts.skip_summary:
-                    context = match.page_content
-                else:
-                    context = await summary_chain.arun(
-                        question=answer.question,
-                        # Add name so chunk is stated
-                        citation=citation,
-                        summary_length=answer.summary_length,
-                        text=match.page_content,
-                        callbacks=callbacks,
+            callbacks = get_callbacks("evidence:" + match.name)
+            citation = match.doc.citation
+            # empty result
+            llm_result = LLMResult(model="", date="")
+            if detailed_citations:
+                citation = match.name + ": " + citation
+
+            if self.prompts.skip_summary:
+                context = match.text
+                score = 5
+            else:
+                summary_chain = self.summary_llm_model.make_chain(
+                    client=self._client,
+                    prompt=self.prompts.summary,
+                    system_prompt=self.prompts.system,
+                )
+                # This is dangerous because it
+                # could mask errors that are important- like auth errors
+                # I also cannot know what the exception
+                # type is because any model could be used
+                # my best idea is see if there is a 4XX
+                # http code in the exception
+                try:
+                    llm_result = await summary_chain(
+                        dict(
+                            question=answer.question,
+                            # Add name so chunk is stated
+                            citation=citation,
+                            summary_length=answer.summary_length,
+                            text=match.text,
+                        ),
+                        callbacks,
                     )
-            except Exception as e:
-                if guess_is_4xx(str(e)):
-                    return None
-                raise e
-            if "not applicable" in context.lower() or "not relevant" in context.lower():
-                return None
-            if self.strip_citations:
-                # remove citations that collide with our grounded citations (for the answer LLM)
-                context = strip_citations(context)
+                    context = llm_result.text
+                except Exception as e:
+                    if guess_is_4xx(str(e)):
+                        return None, llm_result
+                    raise e
+                if (
+                    "not applicable" in context.lower()
+                    or "not relevant" in context.lower()
+                ):
+                    return None, llm_result
+                if self.strip_citations:
+                    # remove citations that collide with our grounded citations (for the answer LLM)
+                    context = strip_citations(context)
+                score = get_score(context)
             c = Context(
                 context=context,
+                # below will remove embedding from Text/Doc
                 text=Text(
-                    text=match.page_content,
-                    name=match.metadata["name"],
-                    doc=Doc(**match.metadata["doc"]),
+                    text=match.text,
+                    name=match.name,
+                    doc=Doc(**match.doc.model_dump()),
                 ),
-                score=get_score(context),
+                score=score,
             )
-            return c
+            return c, llm_result
 
-        if disable_summarization:
-            contexts = [
-                Context(
-                    context=match.page_content,
-                    score=10,
-                    text=Text(
-                        text=match.page_content,
-                        name=match.metadata["name"],
-                        doc=Doc(**match.metadata["doc"]),
-                    ),
-                )
-                for match in matches
-            ]
+        results = await gather_with_concurrency(
+            self.max_concurrent, [process(m) for m in matches]
+        )
+        # update token counts
+        [answer.add_tokens(r[1]) for r in results]
 
-        else:
-            results = await gather_with_concurrency(
-                self.max_concurrent, *[process(m) for m in matches]
-            )
-            # filter out failures
-            contexts = [c for c in results if c is not None]
+        # filter out failures
+        contexts = [c for c, r in results if c is not None]
 
         answer.contexts = sorted(
             contexts + answer.contexts, key=lambda x: x.score, reverse=True
@@ -566,28 +637,16 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         k: int = 10,
         max_sources: int = 5,
         length_prompt="about 100 words",
-        marginal_relevance: bool = True,
-        answer: Optional[Answer] = None,
-        key_filter: Optional[bool] = None,
+        answer: Answer | None = None,
+        key_filter: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
-        # special case for jupyter notebooks
-        if "get_ipython" in globals() or "google.colab" in sys.modules:
-            import nest_asyncio
-
-            nest_asyncio.apply()
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        return loop.run_until_complete(
+        return asyncio.run(
             self.aquery(
                 query,
                 k=k,
                 max_sources=max_sources,
                 length_prompt=length_prompt,
-                marginal_relevance=marginal_relevance,
                 answer=answer,
                 key_filter=key_filter,
                 get_callbacks=get_callbacks,
@@ -600,9 +659,8 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         k: int = 10,
         max_sources: int = 5,
         length_prompt: str = "about 100 words",
-        marginal_relevance: bool = True,
-        answer: Optional[Answer] = None,
-        key_filter: Optional[bool] = None,
+        answer: Answer | None = None,
+        key_filter: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
         if k < max_sources:
@@ -614,7 +672,9 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
             # comparable - one is chunks and one is docs
             if key_filter or (key_filter is None and len(self.docs) > k):
                 keys = await self.adoc_match(
-                    answer.question, get_callbacks=get_callbacks
+                    answer.question,
+                    get_callbacks=get_callbacks,
+                    answer=answer,
                 )
                 if len(keys) > 0:
                     answer.dockey_filter = keys
@@ -622,43 +682,43 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
                 answer,
                 k=k,
                 max_sources=max_sources,
-                marginal_relevance=marginal_relevance,
                 get_callbacks=get_callbacks,
             )
         if self.prompts.pre is not None:
-            chain = make_chain(
-                self.prompts.pre,
-                cast(BaseLanguageModel, self.llm),
-                memory=self.memory_model,
+            chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=self.prompts.pre,
                 system_prompt=self.prompts.system,
             )
-            pre = await chain.arun(
-                question=answer.question, callbacks=get_callbacks("pre")
+            pre = await chain(dict(question=answer.question), get_callbacks("pre"))
+            answer.add_tokens(pre)
+            answer.context = (
+                answer.context + "\n\nExtra background information:" + str(pre)
             )
-            answer.context = answer.context + "\n\nExtra background information:" + pre
         bib = dict()
-        if len(answer.context) < 10 and not self.memory:
+        if len(answer.context) < 10:  # and not self.memory:
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            callbacks = get_callbacks("answer")
-            qa_chain = make_chain(
-                self.prompts.qa,
-                cast(BaseLanguageModel, self.llm),
-                memory=self.memory_model,
+            qa_chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=self.prompts.qa,
                 system_prompt=self.prompts.system,
             )
-            answer_text = await qa_chain.arun(
-                context=answer.context,
-                answer_length=answer.answer_length,
-                question=answer.question,
-                callbacks=callbacks,
-                verbose=True,
+            answer_result = await qa_chain(
+                dict(
+                    context=answer.context,
+                    answer_length=answer.answer_length,
+                    question=answer.question,
+                ),
+                get_callbacks("answer"),
             )
+            answer_text = answer_result.text
+            answer.add_tokens(answer_result)
         # it still happens
-        if "(Example2012)" in answer_text:
-            answer_text = answer_text.replace("(Example2012)", "")
+        if "(Example2012Example pages 3-4)" in answer_text:
+            answer_text = answer_text.replace("(Example2012Example pages 3-4)", "")
         for c in answer.contexts:
             name = c.text.name
             citation = c.text.doc.citation
@@ -676,21 +736,21 @@ class Docs(BaseModel, arbitrary_types_allowed=True, smart_union=True):
         answer.references = bib_str
 
         if self.prompts.post is not None:
-            chain = make_chain(
-                self.prompts.post,
-                cast(BaseLanguageModel, self.llm),
-                memory=self.memory_model,
+            chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=self.prompts.post,
                 system_prompt=self.prompts.system,
             )
-            post = await chain.arun(**answer.dict(), callbacks=get_callbacks("post"))
-            answer.answer = post
+            post = await chain(answer.model_dump(), get_callbacks("post"))
+            answer.answer = post.text
+            answer.add_tokens(post)
             answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"
             if len(bib) > 0:
                 answer.formatted_answer += f"\nReferences\n\n{bib_str}\n"
-        if self.memory_model is not None:
-            answer.memory = self.memory_model.load_memory_variables(inputs={})["memory"]
-            self.memory_model.save_context(
-                {"Question": answer.question}, {"Answer": answer.answer}
-            )
+        # if self.memory_model is not None:
+        #     answer.memory = self.memory_model.load_memory_variables(inputs={})["memory"]
+        #     self.memory_model.save_context(
+        #         {"Question": answer.question}, {"Answer": answer.answer}
+        #     )
 
         return answer
