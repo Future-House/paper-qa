@@ -1,18 +1,6 @@
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable
 
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForChainRun,
-    CallbackManagerForChainRun,
-)
-from langchain.prompts import PromptTemplate
-
-try:
-    from pydantic.v1 import BaseModel, validator
-except ImportError:
-    from pydantic import BaseModel, validator
-
-import re
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .prompts import (
     citation_prompt,
@@ -21,75 +9,117 @@ from .prompts import (
     select_paper_prompt,
     summary_prompt,
 )
-from .utils import extract_doi, iter_citations
 
+# Just for clarity
 DocKey = Any
-CBManager = Union[AsyncCallbackManagerForChainRun, CallbackManagerForChainRun]
-CallbackFactory = Callable[[str], Union[None, List[BaseCallbackHandler]]]
+
+CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
 
-class Doc(BaseModel):
+class LLMResult(BaseModel):
+    text: str = ""
+    prompt_count: int = 0
+    completion_count: int = 0
+    model: str
+    date: str
+    seconds_to_first_token: float = 0
+    seconds_to_last_token: float = 0
+
+    def __str__(self):
+        return self.text
+
+
+class Embeddable(BaseModel):
+    embedding: list[float] | None = Field(default=None, repr=False)
+
+
+class Doc(Embeddable):
     docname: str
     citation: str
     dockey: DocKey
 
 
-class Text(BaseModel):
+class Text(Embeddable):
     text: str
     name: str
     doc: Doc
-    embeddings: Optional[List[float]] = None
+
+
+# Mock a dictionary and store any missing items
+class _FormatDict(dict):
+    def __init__(self) -> None:
+        self.key_set: set[str] = set()
+
+    def __missing__(self, key: str) -> str:
+        self.key_set.add(key)
+        return key
+
+
+def get_formatted_variables(s: str) -> set[str]:
+    """Returns the set of variables implied by the format string"""
+    format_dict = _FormatDict()
+    s.format_map(format_dict)
+    return format_dict.key_set
 
 
 class PromptCollection(BaseModel):
-    summary: PromptTemplate = summary_prompt
-    qa: PromptTemplate = qa_prompt
-    select: PromptTemplate = select_paper_prompt
-    cite: PromptTemplate = citation_prompt
-    pre: Optional[PromptTemplate] = None
-    post: Optional[PromptTemplate] = None
+    summary: str = summary_prompt
+    qa: str = qa_prompt
+    select: str = select_paper_prompt
+    cite: str = citation_prompt
+    pre: str | None = None
+    post: str | None = None
     system: str = default_system_prompt
     skip_summary: bool = False
 
-    @validator("summary")
-    def check_summary(cls, v: PromptTemplate) -> PromptTemplate:
-        if not set(v.input_variables).issubset(set(summary_prompt.input_variables)):
-            raise ValueError(
-                f"Summary prompt can only have variables: {summary_prompt.input_variables}"
-            )
-        return v
-
-    @validator("qa")
-    def check_qa(cls, v: PromptTemplate) -> PromptTemplate:
-        if not set(v.input_variables).issubset(set(qa_prompt.input_variables)):
-            raise ValueError(
-                f"QA prompt can only have variables: {qa_prompt.input_variables}"
-            )
-        return v
-
-    @validator("select")
-    def check_select(cls, v: PromptTemplate) -> PromptTemplate:
-        if not set(v.input_variables).issubset(
-            set(select_paper_prompt.input_variables)
+    @field_validator("summary")
+    @classmethod
+    def check_summary(cls, v: str) -> str:
+        if not set(get_formatted_variables(v)).issubset(
+            set(get_formatted_variables(summary_prompt))
         ):
             raise ValueError(
-                f"Select prompt can only have variables: {select_paper_prompt.input_variables}"
+                f"Summary prompt can only have variables: {get_formatted_variables(summary_prompt)}"
             )
         return v
 
-    @validator("pre")
-    def check_pre(cls, v: Optional[PromptTemplate]) -> Optional[PromptTemplate]:
+    @field_validator("qa")
+    @classmethod
+    def check_qa(cls, v: str) -> str:
+        if not set(get_formatted_variables(v)).issubset(
+            set(get_formatted_variables(qa_prompt))
+        ):
+            raise ValueError(
+                f"QA prompt can only have variables: {get_formatted_variables(qa_prompt)}"
+            )
+        return v
+
+    @field_validator("select")
+    @classmethod
+    def check_select(cls, v: str) -> str:
+        if not set(get_formatted_variables(v)).issubset(
+            set(get_formatted_variables(select_paper_prompt))
+        ):
+            raise ValueError(
+                f"Select prompt can only have variables: {get_formatted_variables(select_paper_prompt)}"
+            )
+        return v
+
+    @field_validator("pre")
+    @classmethod
+    def check_pre(cls, v: str | None) -> str | None:
         if v is not None:
-            if set(v.input_variables) != set(["question"]):
+            if set(get_formatted_variables(v)) != set(["question"]):
                 raise ValueError("Pre prompt must have input variables: question")
         return v
 
-    @validator("post")
-    def check_post(cls, v: Optional[PromptTemplate]) -> Optional[PromptTemplate]:
+    @field_validator("post")
+    @classmethod
+    def check_post(cls, v: str | None) -> str | None:
         if v is not None:
             # kind of a hack to get list of attributes in answer
-            attrs = [a.name for a in Answer.__fields__.values()]
-            if not set(v.input_variables).issubset(attrs):
+            attrs = set(Answer.model_fields.keys())
+            if not set(get_formatted_variables(v)).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
         return v
 
@@ -113,18 +143,18 @@ class Answer(BaseModel):
     question: str
     answer: str = ""
     context: str = ""
-    contexts: List[Context] = []
+    contexts: list[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    dockey_filter: Optional[Set[DocKey]] = None
+    dockey_filter: set[DocKey] | None = None
     summary_length: str = "about 100 words"
     answer_length: str = "about 100 words"
-    memory: Optional[str] = None
-    # these two below are for convenience
-    # and are not set. But you can set them
-    # if you want to use them.
-    cost: Optional[float] = None
-    token_counts: Optional[Dict[str, List[int]]] = None
+    memory: str | None = None
+    # just for convenience you can override this
+    cost: float | None = None
+    # key is model name, value is (prompt, completion) token counts
+    token_counts: dict[str, list[int]] = Field(default_factory=dict)
+    model_config = ConfigDict(extra="forbid")
 
     def __str__(self) -> str:
         """Return the answer as a string."""
@@ -138,87 +168,13 @@ class Answer(BaseModel):
             raise ValueError(f"Could not find docname {name} in contexts")
         return doc.citation
 
-    def markdown(self) -> Tuple[str, str]:
-        """Return the answer with footnote style citations."""
-        # example: This is an answer.[^1]
-        # [^1]: This the citation.
-        output = self.answer
-        refs: Dict[str, int] = dict()
-        index = 1
-        for citation in iter_citations(self.answer):
-            compound = ""
-            strip = True
-            for c in re.split(",|;", citation):
-                c = c.strip("() ")
-                if c == "Extra background information":
-                    continue
-                if c in refs:
-                    compound += f"[^{refs[c]}]"
-                    continue
-                # check if it is a citation
-                try:
-                    self.get_citation(c)
-                except ValueError:
-                    # not a citation
-                    strip = False
-                    continue
-                refs[c] = index
-                compound += f"[^{index}]"
-                index += 1
-            if strip:
-                output = output.replace(citation, compound)
-        formatted_refs = "\n".join(
-            [
-                f"[^{i}]: [{self.get_citation(r)}]({extract_doi(self.get_citation(r))})"
-                for r, i in refs.items()
+    def add_tokens(self, result: LLMResult):
+        """Update the token counts for the given result."""
+        if result.model not in self.token_counts:
+            self.token_counts[result.model] = [
+                result.prompt_count,
+                result.completion_count,
             ]
-        )
-        # quick fix of space before period
-        output = output.replace(" .", ".")
-        return output, formatted_refs
-
-    def combine_with(self, other: "Answer") -> "Answer":
-        """
-        Combine this answer object with another, merging their context/answer.
-        """
-        combined = Answer(
-            question=self.question + " / " + other.question,
-            answer=self.answer + " " + other.answer,
-            context=self.context + " " + other.context,
-            contexts=self.contexts + other.contexts,
-            references=self.references + " " + other.references,
-            formatted_answer=self.formatted_answer + " " + other.formatted_answer,
-            summary_length=self.summary_length,  # Assuming the same summary_length for both
-            answer_length=self.answer_length,  # Assuming the same answer_length for both
-            memory=self.memory if self.memory else other.memory,
-            cost=self.cost if self.cost else other.cost,
-            token_counts=self.merge_token_counts(self.token_counts, other.token_counts),
-        )
-        # Handling dockey_filter if present in either of the Answer objects
-        if self.dockey_filter or other.dockey_filter:
-            combined.dockey_filter = (
-                self.dockey_filter if self.dockey_filter else set()
-            ) | (other.dockey_filter if other.dockey_filter else set())
-        return combined
-
-    @staticmethod
-    def merge_token_counts(
-        counts1: Optional[Dict[str, List[int]]], counts2: Optional[Dict[str, List[int]]]
-    ) -> Optional[Dict[str, List[int]]]:
-        """
-        Merge two dictionaries of token counts.
-        """
-        if counts1 is None and counts2 is None:
-            return None
-        if counts1 is None:
-            return counts2
-        if counts2 is None:
-            return counts1
-        merged_counts = counts1.copy()
-        for key, values in counts2.items():
-            if key in merged_counts:
-                merged_counts[key][0] += values[0]
-                merged_counts[key][1] += values[1]
-            else:
-                merged_counts[key] = values
-        return merged_counts
+        else:
+            self.token_counts[result.model][0] += result.prompt_count
+            self.token_counts[result.model][1] += result.completion_count
