@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import math
 import re
 import string
@@ -152,3 +153,20 @@ def flatten(iteratble: list) -> list:
     :return: A flattened list
     """
     return [item for sublist in iteratble for item in sublist]
+
+
+def get_loop() -> asyncio.AbstractEventLoop:
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop
+
+
+def is_coroutine_callable(obj):
+    if inspect.isfunction(obj):
+        return inspect.iscoroutinefunction(obj)
+    elif callable(obj):
+        return inspect.iscoroutinefunction(obj.__call__)
+    return False

@@ -85,6 +85,32 @@ print(answer.formatted_answer)
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
 
+### Async
+
+paper-qa is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
+
+| Sync | Async |
+| --- | --- |
+| `Docs.add` | `Docs.aadd` |
+| `Docs.add_file` | `Docs.aadd_file` |
+| `Docs.add_url` | `Docs.add_url` |
+| `Docs.get_evidence` | `Docs.aget_evidence` |
+| `Docs.query` | `Docs.aquery` |
+
+The synchronous version just call the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
+
+```py
+from paperqa import Docs
+
+my_docs = ...# get a list of paths
+
+docs = Docs()
+for d in my_docs:
+    await docs.aadd(d)
+
+answer = await docs.aquery("What manufacturing challenges are unique to bispecific antibodies?")
+```
+
 ### Adding Documents
 
 `add` will add from paths. You can also use `add_file` (expects a file object) or `add_url` to work with other sources.
