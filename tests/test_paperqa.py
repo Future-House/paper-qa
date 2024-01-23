@@ -451,6 +451,28 @@ def test_evidence():
     os.remove(doc_path)
 
 
+def test_json_evidence():
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    docs = Docs(prompts=PromptCollection(json_summary=True))
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    evidence = docs.get_evidence(
+        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
+    )
+    print(evidence.context)
+    assert "Missouri" in evidence.context
+
+    evidence = docs.get_evidence(
+        Answer(question="For which state was Bates a governor?"),
+        detailed_citations=True,
+    )
+    assert "Based on WikiMedia Foundation, 2023, Accessed now" in evidence.context
+    os.remove(doc_path)
+
+
 def test_query():
     docs = Docs()
     docs.add_url(

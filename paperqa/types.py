@@ -7,6 +7,8 @@ from .prompts import (
     default_system_prompt,
     qa_prompt,
     select_paper_prompt,
+    summary_json_prompt,
+    summary_json_system_prompt,
     summary_prompt,
 )
 
@@ -71,6 +73,9 @@ class PromptCollection(BaseModel):
     post: str | None = None
     system: str = default_system_prompt
     skip_summary: bool = False
+    json_summary: bool = False
+    summary_json: str = summary_json_prompt
+    summary_json_system: str = summary_json_system_prompt
 
     @field_validator("summary")
     @classmethod

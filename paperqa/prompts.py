@@ -10,6 +10,10 @@ summary_prompt = (
     "\n\nRelevant Information Summary ({summary_length}):"
 )
 
+summary_json_prompt = (
+    "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\n" "Question: {question}\n\n"
+)
+
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
@@ -53,3 +57,15 @@ default_system_prompt = (
     "Your audience is an expert, so be highly specific. "
     "If there are ambiguous terms or acronyms, first define them. "
 )
+
+summary_json_system_prompt = """\
+Respond with the following JSON format:
+
+{
+  question:  string;
+  // summary relevant information from text - {summary_length} words
+  summary: string;
+  // relevance of this summary to answer question (out of 10)
+  relevance_score: number;
+}
+"""

@@ -1,5 +1,6 @@
 import nest_asyncio  # isort:skip
 import asyncio
+import json
 import os
 import re
 import tempfile
@@ -548,8 +549,9 @@ class Docs(BaseModel):
         async def process(match):
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
-            # empty result
+            # needed empties for failures/skips
             llm_result = LLMResult(model="", date="")
+            extras: dict[str, Any] = {}
             if detailed_citations:
                 citation = match.name + ": " + citation
 
@@ -557,11 +559,18 @@ class Docs(BaseModel):
                 context = match.text
                 score = 5
             else:
-                summary_chain = self.summary_llm_model.make_chain(
-                    client=self._client,
-                    prompt=self.prompts.summary,
-                    system_prompt=self.prompts.system,
-                )
+                if self.prompts.json_summary:
+                    summary_chain = self.summary_llm_model.make_chain(
+                        client=self._client,
+                        prompt=self.prompts.summary_json,
+                        system_prompt=self.prompts.summary_json_system,
+                    )
+                else:
+                    summary_chain = self.summary_llm_model.make_chain(
+                        client=self._client,
+                        prompt=self.prompts.summary,
+                        system_prompt=self.prompts.system,
+                    )
                 # This is dangerous because it
                 # could mask errors that are important- like auth errors
                 # I also cannot know what the exception
@@ -584,15 +593,31 @@ class Docs(BaseModel):
                     if guess_is_4xx(str(e)):
                         return None, llm_result
                     raise e
-                if (
-                    "not applicable" in context.lower()
-                    or "not relevant" in context.lower()
-                ):
-                    return None, llm_result
+                success = True
+                if self.prompts.summary_json:
+                    try:
+                        result_data = json.loads(context)
+                        context = result_data["text"]
+                        score = result_data["score"]
+                        del result_data["text"]
+                        del result_data["score"]
+                        del result_data["question"]
+                        extras = result_data
+                    except Exception:
+                        # fallback
+                        success = False
+                # fallback to string (or json mode not enabled)
+                if not success or not self.prompts.summary_json:
+                    # Process as string
+                    if (
+                        "not applicable" in context.lower()
+                        or "not relevant" in context.lower()
+                    ):
+                        return None, llm_result
+                    score = get_score(context)
                 if self.strip_citations:
                     # remove citations that collide with our grounded citations (for the answer LLM)
                     context = strip_citations(context)
-                score = get_score(context)
             c = Context(
                 context=context,
                 # below will remove embedding from Text/Doc
@@ -602,6 +627,7 @@ class Docs(BaseModel):
                     doc=Doc(**match.doc.model_dump()),
                 ),
                 score=score,
+                **extras,
             )
             return c, llm_result
 

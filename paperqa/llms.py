@@ -174,9 +174,11 @@ class LLMModel(ABC, BaseModel):
                     model=self.name,
                     date=datetime.datetime.now().isoformat(),
                 )
-                messages = chat_prompt[:-1] + [
-                    dict(role="user", content=chat_prompt[-1]["content"].format(**data))
-                ]
+                messages = []
+                for m in chat_prompt:
+                    messages.append(
+                        dict(role=m["role"], content=m["content"].format(**data))
+                    )
                 result.prompt_count = sum(
                     [self.count_tokens(m["content"]) for m in messages]
                 ) + sum([self.count_tokens(m["role"]) for m in messages])
