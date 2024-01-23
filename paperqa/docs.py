@@ -1,5 +1,3 @@
-import nest_asyncio  # isort:skip
-import asyncio
 import os
 import re
 import tempfile
@@ -35,6 +33,7 @@ from .types import (
 )
 from .utils import (
     gather_with_concurrency,
+    get_loop,
     guess_is_4xx,
     maybe_is_html,
     maybe_is_pdf,
@@ -43,9 +42,6 @@ from .utils import (
     name_in_text,
     strip_citations,
 )
-
-# Apply the patch to allow nested loops
-nest_asyncio.apply()
 
 
 class Docs(BaseModel):
@@ -252,6 +248,25 @@ class Docs(BaseModel):
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
     ) -> str | None:
+        loop = get_loop()
+        return loop.run_until_complete(
+            self.aadd_file(
+                file,
+                citation=citation,
+                docname=docname,
+                dockey=dockey,
+                chunk_chars=chunk_chars,
+            )
+        )
+
+    async def aadd_file(
+        self,
+        file: BinaryIO,
+        citation: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
+        chunk_chars: int = 3000,
+    ) -> str | None:
         """Add a document to the collection."""
         # just put in temp file and use existing method
         suffix = ".txt"
@@ -263,7 +278,7 @@ class Docs(BaseModel):
         with tempfile.NamedTemporaryFile(suffix=suffix) as f:
             f.write(file.read())
             f.seek(0)
-            return self.add(
+            return await self.aadd(
                 Path(f.name),
                 citation=citation,
                 docname=docname,
@@ -279,13 +294,32 @@ class Docs(BaseModel):
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
     ) -> str | None:
+        loop = get_loop()
+        return loop.run_until_complete(
+            self.aadd_url(
+                url,
+                citation=citation,
+                docname=docname,
+                dockey=dockey,
+                chunk_chars=chunk_chars,
+            )
+        )
+
+    async def aadd_url(
+        self,
+        url: str,
+        citation: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
+        chunk_chars: int = 3000,
+    ) -> str | None:
         """Add a document to the collection."""
         import urllib.request
 
         with urllib.request.urlopen(url) as f:
             # need to wrap to enable seek
             file = BytesIO(f.read())
-            return self.add_file(
+            return await self.aadd_file(
                 file,
                 citation=citation,
                 docname=docname,
@@ -294,6 +328,27 @@ class Docs(BaseModel):
             )
 
     def add(
+        self,
+        path: Path,
+        citation: str | None = None,
+        docname: str | None = None,
+        disable_check: bool = False,
+        dockey: DocKey | None = None,
+        chunk_chars: int = 3000,
+    ) -> str | None:
+        loop = get_loop()
+        return loop.run_until_complete(
+            self.aadd(
+                path,
+                citation=citation,
+                docname=docname,
+                disable_check=disable_check,
+                dockey=dockey,
+                chunk_chars=chunk_chars,
+            )
+        )
+
+    async def aadd(
         self,
         path: Path,
         citation: str | None = None,
@@ -317,9 +372,7 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = asyncio.run(
-                cite_chain(dict(text=texts[0].text), None),
-            )
+            chain_result = await cite_chain(dict(text=texts[0].text), None)
             citation = chain_result.text
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -353,11 +406,19 @@ class Docs(BaseModel):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
-        if self.add_texts(texts, doc):
+        if await self.aadd_texts(texts, doc):
             return docname
         return None
 
     def add_texts(
+        self,
+        texts: list[Text],
+        doc: Doc,
+    ) -> bool:
+        loop = get_loop()
+        return loop.run_until_complete(self.aadd_texts(texts, doc))
+
+    async def aadd_texts(
         self,
         texts: list[Text],
         doc: Doc,
@@ -376,16 +437,14 @@ class Docs(BaseModel):
                 t.name = t.name.replace(doc.docname, new_docname)
             doc.docname = new_docname
         if texts[0].embedding is None:
-            text_embeddings = asyncio.run(
-                self.texts_index.embedding_model.embed_documents(
-                    self._embedding_client, [t.text for t in texts]
-                )
+            text_embeddings = await self.texts_index.embedding_model.embed_documents(
+                self._embedding_client, [t.text for t in texts]
             )
             for i, t in enumerate(texts):
                 t.embedding = text_embeddings[i]
         if doc.embedding is None:
-            doc.embedding = asyncio.run(
-                self.docs_index.embedding_model.embed_documents(
+            doc.embedding = (
+                await self.docs_index.embedding_model.embed_documents(
                     self._embedding_client, [doc.citation]
                 )
             )[0]
@@ -493,7 +552,7 @@ class Docs(BaseModel):
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
     ) -> Answer:
-        return asyncio.run(
+        return get_loop().run_until_complete(
             self.aget_evidence(
                 answer,
                 k=k,
@@ -641,7 +700,7 @@ class Docs(BaseModel):
         key_filter: bool | None = None,
         get_callbacks: CallbackFactory = lambda x: None,
     ) -> Answer:
-        return asyncio.run(
+        return get_loop().run_until_complete(
             self.aquery(
                 query,
                 k=k,

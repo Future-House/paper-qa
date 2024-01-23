@@ -21,7 +21,6 @@ setup(
         "pydantic>=2",
         "openai>=1",
         "numpy",
-        "nest-asyncio",
         "PyCryptodome",
         "html2text",
         "tiktoken>=0.4.0",

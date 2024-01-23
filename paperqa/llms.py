@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .prompts import default_system_prompt
 from .types import Doc, Embeddable, LLMResult, Text
-from .utils import batch_iter, flatten, gather_with_concurrency
+from .utils import batch_iter, flatten, gather_with_concurrency, is_coroutine_callable
 
 
 def guess_model_type(model_name: str) -> str:
@@ -167,7 +167,7 @@ class LLMModel(ABC, BaseModel):
                 chat_prompt = [system_message_prompt, human_message_prompt]
 
             async def execute(
-                data: dict, callbacks: list[Callable[[str], None]] | None = None
+                data: dict, callbacks: list[Callable] | None = None
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(
@@ -184,6 +184,10 @@ class LLMModel(ABC, BaseModel):
                 if callbacks is None:
                     output = await self.achat(client, messages)
                 else:
+                    sync_callbacks = [
+                        f for f in callbacks if not is_coroutine_callable(f)
+                    ]
+                    async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
                     completion = self.achat_iter(client, messages)  # type: ignore
                     text_result = []
                     async for chunk in completion:  # type: ignore
@@ -193,7 +197,8 @@ class LLMModel(ABC, BaseModel):
                                     asyncio.get_running_loop().time() - start_clock
                                 )
                             text_result.append(chunk)
-                            [f(chunk) for f in callbacks]
+                            [await f(chunk) for f in async_callbacks]
+                            [f(chunk) for f in sync_callbacks]
                     output = "".join(text_result)
                 result.completion_count = self.count_tokens(output)
                 result.text = output
@@ -210,7 +215,7 @@ class LLMModel(ABC, BaseModel):
                 completion_prompt = system_prompt + "\n\n" + prompt
 
             async def execute(
-                data: dict, callbacks: list[Callable[[str], None]] | None = None
+                data: dict, callbacks: list[Callable] | None = None
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(
@@ -223,6 +228,11 @@ class LLMModel(ABC, BaseModel):
                 if callbacks is None:
                     output = await self.acomplete(client, formatted_prompt)
                 else:
+                    sync_callbacks = [
+                        f for f in callbacks if not is_coroutine_callable(f)
+                    ]
+                    async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+
                     completion = self.acomplete_iter(  # type: ignore
                         client,
                         formatted_prompt,
@@ -235,7 +245,8 @@ class LLMModel(ABC, BaseModel):
                                     asyncio.get_running_loop().time() - start_clock
                                 )
                             text_result.append(chunk)
-                            [f(chunk) for f in callbacks]
+                            [await f(chunk) for f in async_callbacks]
+                            [f(chunk) for f in sync_callbacks]
                     output = "".join(text_result)
                 result.completion_count = self.count_tokens(output)
                 result.text = output
