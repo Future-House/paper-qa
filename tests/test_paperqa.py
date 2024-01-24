@@ -416,6 +416,12 @@ class TestChains(IsolatedAsyncioTestCase):
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
+        # check with mixed callbacks
+        async def ac(x):
+            pass
+
+        completion = await call(dict(animal="duck"), callbacks=[accum, ac])
+
 
 def test_docs():
     docs = Docs(llm="babbage-002")
@@ -701,7 +707,7 @@ class TestVectorStore(IsolatedAsyncioTestCase):
         )
         assert docs._embedding_client is not None  # from docs_index default
 
-        docs.add_url(
+        await docs.aadd_url(
             "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test",
@@ -710,18 +716,18 @@ class TestVectorStore(IsolatedAsyncioTestCase):
 
         # now try with JIT
         docs = Docs(texts_index=index, jit_texts_index=True)
-        docs.add_url(
+        await docs.aadd_url(
             "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test",
         )
         # should get cleared and rebuilt here
-        ev = docs.get_evidence(
+        ev = await docs.aget_evidence(
             answer=Answer(question="What is Frederick Bates's greatest accomplishment?")
         )
         assert len(ev.context) > 0
         # now with dockkey filter
-        docs.get_evidence(
+        await docs.aget_evidence(
             answer=Answer(
                 question="What is Frederick Bates's greatest accomplishment?",
                 dockey_filter=["test"],
@@ -738,7 +744,7 @@ class TestVectorStore(IsolatedAsyncioTestCase):
 class Test(IsolatedAsyncioTestCase):
     async def test_aquery(self):
         docs = Docs()
-        docs.add_url(
+        await docs.aadd_url(
             "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test",
@@ -749,7 +755,7 @@ class Test(IsolatedAsyncioTestCase):
 class TestDocMatch(IsolatedAsyncioTestCase):
     async def test_adoc_match(self):
         docs = Docs()
-        docs.add_url(
+        await docs.aadd_url(
             "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test",
