@@ -167,7 +167,8 @@ class LLMModel(ABC, BaseModel):
                 chat_prompt = [system_message_prompt, human_message_prompt]
 
             async def execute(
-                data: dict, callbacks: list[Callable] | None = None
+                data: dict,
+                callbacks: list[Callable] | None = None,
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(
@@ -179,6 +180,7 @@ class LLMModel(ABC, BaseModel):
                     messages.append(
                         dict(role=m["role"], content=m["content"].format(**data))
                     )
+                result.prompt = messages
                 result.prompt_count = sum(
                     [self.count_tokens(m["content"]) for m in messages]
                 ) + sum([self.count_tokens(m["role"]) for m in messages])
@@ -226,7 +228,7 @@ class LLMModel(ABC, BaseModel):
                 )
                 formatted_prompt = completion_prompt.format(**data)
                 result.prompt_count = self.count_tokens(formatted_prompt)
-
+                result.prompt = formatted_prompt
                 if callbacks is None:
                     output = await self.acomplete(client, formatted_prompt)
                 else:

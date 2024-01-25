@@ -1,4 +1,5 @@
 from typing import Any, Callable
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -14,11 +15,16 @@ from .prompts import (
 
 # Just for clarity
 DocKey = Any
-
 CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
 
 class LLMResult(BaseModel):
+    """A class to hold the result of a LLM completion."""
+
+    id: UUID = Field(default_factory=uuid4)
+    answer_id: UUID | None = None
+    name: str | None = None
+    prompt: str | list[dict] | None = None
     text: str = ""
     prompt_count: int = 0
     completion_count: int = 0
@@ -145,6 +151,7 @@ def __str__(self) -> str:
 class Answer(BaseModel):
     """A class to hold the answer to a question."""
 
+    id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
     context: str = ""
@@ -154,7 +161,6 @@ class Answer(BaseModel):
     dockey_filter: set[DocKey] | None = None
     summary_length: str = "about 100 words"
     answer_length: str = "about 100 words"
-    memory: str | None = None
     # just for convenience you can override this
     cost: float | None = None
     # key is model name, value is (prompt, completion) token counts

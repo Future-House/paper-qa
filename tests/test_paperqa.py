@@ -489,6 +489,23 @@ def test_query():
     docs.query("What is Frederick Bates's greatest accomplishment?")
 
 
+def test_llmresult_callbacks():
+    my_results = []
+
+    async def my_callback(result):
+        my_results.append(result)
+
+    docs = Docs(llm_result_callback=my_callback)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    docs.query("What is Frederick Bates's greatest accomplishment?")
+    assert any([x.name == "answer" for x in my_results])
+    assert len(my_results) > 1
+
+
 def test_duplicate():
     docs = Docs()
     assert docs.add_url(
@@ -523,6 +540,34 @@ def test_custom_embedding():
         dockey="test",
     )
     assert docs.docs["test"].embedding == [1, 2, 3]
+
+
+def test_sentence_transformer_embedding():
+    from paperqa import SentenceTransformerEmbeddingModel
+
+    docs = Docs(embedding="sentence-transformers")
+    assert docs._embedding_client is None
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert any(docs.docs["test"].embedding)
+
+    docs = Docs(
+        texts_index=NumpyVectorStore(
+            embedding_model=SentenceTransformerEmbeddingModel()
+        ),
+        doc_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
+        embedding_client=None,
+    )
+    assert docs._embedding_client is None
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert any(docs.docs["test"].embedding)
 
 
 def test_custom_llm():

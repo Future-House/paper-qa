@@ -5,7 +5,8 @@ import tempfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, cast
+from typing import Any, BinaryIO, Callable, Coroutine, cast
+from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -16,6 +17,7 @@ from .llms import (
     LLMModel,
     NumpyVectorStore,
     OpenAILLMModel,
+    SentenceTransformerEmbeddingModel,
     VectorStore,
     get_score,
     is_openai_model,
@@ -45,12 +47,18 @@ from .utils import (
 )
 
 
+# this is just to reduce None checks/type checks
+async def empty_result(result: LLMResult):
+    pass
+
+
 class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
     # ephemeral vars that should not be pickled (_things)
     _client: Any | None = None
     _embedding_client: Any | None = None
+    id: UUID = Field(default_factory=uuid4)
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
@@ -72,6 +80,7 @@ class Docs(BaseModel):
     jit_texts_index: bool = False
     # This is used to strip indirect citations that come up from the summary llm
     strip_citations: bool = True
+    llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = empty_result
     model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
@@ -141,6 +150,15 @@ class Docs(BaseModel):
                     if "docs_index" not in data:
                         data["docs_index"] = NumpyVectorStore(
                             embedding_model=LangchainEmbeddingModel()
+                        )
+                elif data["embedding"] == "sentence-transformers":
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=SentenceTransformerEmbeddingModel()
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=SentenceTransformerEmbeddingModel()
                         )
                 else:
                     raise ValueError(
@@ -519,6 +537,10 @@ class Docs(BaseModel):
                     get_callbacks("filter"),
                 )
                 if answer:
+                    result.answer_id = answer.id
+                result.name = "filter"
+                await self.llm_result_callback(result)
+                if answer:
                     answer.add_tokens(result)
                 return set([d.dockey for d in matched_docs if d.docname in str(result)])
         except AttributeError:
@@ -647,6 +669,9 @@ class Docs(BaseModel):
                         ),
                         callbacks,
                     )
+                    llm_result.answer_id = answer.id
+                    llm_result.name = "evidence:" + match.name
+                    await self.llm_result_callback(llm_result)
                     context = llm_result.text
                 except Exception as e:
                     if guess_is_4xx(str(e)):
@@ -776,6 +801,9 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             pre = await chain(dict(question=answer.question), get_callbacks("pre"))
+            pre.name = "pre"
+            pre.answer_id = answer.id
+            await self.llm_result_callback(pre)
             answer.add_tokens(pre)
             answer.context = (
                 answer.context + "\n\nExtra background information:" + str(pre)
@@ -799,6 +827,9 @@ class Docs(BaseModel):
                 ),
                 get_callbacks("answer"),
             )
+            answer_result.name = "answer"
+            answer_result.answer_id = answer.id
+            await self.llm_result_callback(answer_result)
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
         # it still happens
@@ -827,6 +858,9 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             post = await chain(answer.model_dump(), get_callbacks("post"))
+            post.name = "post"
+            post.answer_id = answer.id
+            await self.llm_result_callback(post)
             answer.answer = post.text
             answer.add_tokens(post)
             answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"
