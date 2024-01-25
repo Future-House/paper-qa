@@ -22,6 +22,7 @@ from paperqa.llms import (
     LangchainLLMModel,
     LangchainVectorStore,
     LLMModel,
+    OpenAIEmbeddingModel,
     OpenAILLMModel,
     get_score,
 )
@@ -544,6 +545,8 @@ def test_duplicate():
 
 def test_custom_embedding():
     class MyEmbeds(EmbeddingModel):
+        name: str = "my_embed"
+
         async def embed_documents(self, client, texts):
             return [[1, 2, 3] for _ in texts]
 
@@ -553,6 +556,7 @@ def test_custom_embedding():
         embedding_client=None,
     )
     assert docs._embedding_client is None
+    assert docs.embedding == "my_embed"
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1267,6 +1271,23 @@ def test_external_doc_index():
     assert len(docs2.docs) == 0
     evidence = docs2.query("What is the date of flag day?", key_filter=True)
     assert "February 15" in evidence.context
+
+
+def test_embedding_name_consistency():
+    docs = Docs()
+    assert docs.embedding == "text-embedding-ada-002"
+    assert docs.texts_index.embedding_model.name == "text-embedding-ada-002"
+    docs = Docs(embedding="langchain")
+    assert docs.embedding == "langchain"
+    assert docs.texts_index.embedding_model.name == "langchain"
+    assert type(docs.texts_index.embedding_model) == LangchainEmbeddingModel
+    docs = Docs(embedding="foo")
+    assert docs.embedding == "foo"
+    assert type(docs.texts_index.embedding_model) == OpenAIEmbeddingModel
+    docs = Docs(
+        texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="test"))
+    )
+    assert docs.embedding == "test"
 
 
 def test_external_texts_index():

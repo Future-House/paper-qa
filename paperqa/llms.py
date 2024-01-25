@@ -87,18 +87,18 @@ async def embed_documents(
 
 
 class EmbeddingModel(ABC, BaseModel):
+    name: str
+
     @abstractmethod
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         pass
 
 
 class OpenAIEmbeddingModel(EmbeddingModel):
-    embedding_model: str = Field(default="text-embedding-ada-002")
+    name: str = Field(default="text-embedding-ada-002")
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        return await embed_documents(
-            cast(AsyncOpenAI, client), texts, self.embedding_model
-        )
+        return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
 
 
 class LLMModel(ABC, BaseModel):
@@ -358,7 +358,7 @@ class LlamaEmbeddingModel(EmbeddingModel):
 
 
 class SentenceTransformerEmbeddingModel(EmbeddingModel):
-    embedding_model: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
+    name: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
     _model: Any = None
 
     def __init__(self, *args, **kwargs):
@@ -368,7 +368,7 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
         except ImportError:
             raise ImportError("Please install sentence-transformers to use this model")
 
-        self._model = SentenceTransformer(self.embedding_model)
+        self._model = SentenceTransformer(self.name)
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         from sentence_transformers import SentenceTransformer
@@ -540,6 +540,8 @@ class LangchainLLMModel(LLMModel):
 
 class LangchainEmbeddingModel(EmbeddingModel):
     """A wrapper around the wrapper langchain"""
+
+    name: str = "langchain"
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await client.aembed_documents(texts)

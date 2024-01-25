@@ -17,6 +17,7 @@ from .llms import (
     LangchainLLMModel,
     LLMModel,
     NumpyVectorStore,
+    OpenAIEmbeddingModel,
     OpenAILLMModel,
     SentenceTransformerEmbeddingModel,
     VectorStore,
@@ -168,9 +169,15 @@ class Docs(BaseModel):
                             embedding_model=SentenceTransformerEmbeddingModel()
                         )
                 else:
-                    raise ValueError(
-                        f"Could not guess embedding model type for {data['embedding']}. "
-                    )
+                    # must be an openai model
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=OpenAIEmbeddingModel(name=data["embedding"])
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=OpenAIEmbeddingModel(name=data["embedding"])
+                        )
         return data
 
     @model_validator(mode="after")
@@ -211,6 +218,7 @@ class Docs(BaseModel):
                     # from langchain models - kind of hacky
                     data.summary_llm_model.infer_llm_type(data._client)
                     data.summary_llm = data.summary_llm_model.name
+            data.embedding = data.texts_index.embedding_model.name
         return data
 
     def clear_docs(self):
