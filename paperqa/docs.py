@@ -126,6 +126,13 @@ class Docs(BaseModel):
         super().__init__(**data)
         self._client = client
         self._embedding_client = embedding_client
+        # more convenience
+        if (
+            type(self.texts_index.embedding_model) == OpenAIEmbeddingModel
+            and embedding_client is None
+        ):
+            self._embedding_client = self._client
+
         # run this here (instead of automatically) so it has access to privates
         # If I ever figure out a better way of validating privates
         # I can move this back to the decorator
