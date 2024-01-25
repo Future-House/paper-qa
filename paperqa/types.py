@@ -80,6 +80,9 @@ class PromptCollection(BaseModel):
     system: str = default_system_prompt
     skip_summary: bool = False
     json_summary: bool = False
+    # Not thrilled about this model,
+    # but need to split out the system/summary
+    # to get JSON
     summary_json: str = summary_json_prompt
     summary_json_system: str = summary_json_system_prompt
 

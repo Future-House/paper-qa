@@ -1,5 +1,6 @@
 import json
 import os
+import pprint
 import re
 import tempfile
 from datetime import datetime
@@ -48,8 +49,12 @@ from .utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_result(result: LLMResult):
+async def empty_callback(result: LLMResult):
     pass
+
+
+async def print_callback(result: LLMResult):
+    pprint.pprint(result.model_dump())
 
 
 class Docs(BaseModel):
@@ -80,7 +85,9 @@ class Docs(BaseModel):
     jit_texts_index: bool = False
     # This is used to strip indirect citations that come up from the summary llm
     strip_citations: bool = True
-    llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = empty_result
+    llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
+        default=empty_callback
+    )
     model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
@@ -662,7 +669,6 @@ class Docs(BaseModel):
                     llm_result = await summary_chain(
                         dict(
                             question=answer.question,
-                            # Add name so chunk is stated
                             citation=citation,
                             summary_length=answer.summary_length,
                             text=match.text,

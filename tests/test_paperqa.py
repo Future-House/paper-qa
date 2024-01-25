@@ -7,7 +7,15 @@ import numpy as np
 import requests
 from openai import AsyncOpenAI
 
-from paperqa import Answer, Doc, Docs, NumpyVectorStore, PromptCollection, Text
+from paperqa import (
+    Answer,
+    Doc,
+    Docs,
+    NumpyVectorStore,
+    PromptCollection,
+    Text,
+    print_callback,
+)
 from paperqa.llms import (
     EmbeddingModel,
     LangchainEmbeddingModel,
@@ -463,7 +471,18 @@ def test_json_evidence():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs = Docs(prompts=PromptCollection(json_summary=True))
+    summary_llm = OpenAILLMModel(
+        config=dict(
+            model="gpt-3.5-turbo-1106",
+            response_format=dict(type="json_object"),
+            temperature=0.0,
+        )
+    )
+    docs = Docs(
+        prompts=PromptCollection(json_summary=True),
+        summary_llm_model=summary_llm,
+        llm_result_callback=print_callback,
+    )
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
