@@ -62,7 +62,6 @@ summary_json_system_prompt = """\
 Respond with the following JSON format:
 
 {{
-  question:  string;
   // summary relevant information from text - {summary_length} words
   summary: string;
   // relevance of this summary to answer question (out of 10)

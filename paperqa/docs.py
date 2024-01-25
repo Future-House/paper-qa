@@ -687,15 +687,21 @@ class Docs(BaseModel):
                 if self.prompts.summary_json:
                     try:
                         result_data = json.loads(context)
-                        context = result_data["text"]
-                        score = result_data["score"]
-                        del result_data["text"]
-                        del result_data["score"]
-                        del result_data["question"]
-                        extras = result_data
-                    except Exception:
-                        # fallback
+                    except json.decoder.JSONDecodeError:
+                        # fallback to string
                         success = False
+                    if success:
+                        try:
+                            context = result_data["summary"]
+                            score = result_data["relevance_score"]
+                            del result_data["summary"]
+                            del result_data["relevance_score"]
+                            if "question" in result_data:
+                                del result_data["question"]
+                            extras = result_data
+                        except KeyError:
+                            # fallback
+                            success = False
                 # fallback to string (or json mode not enabled)
                 if not success or not self.prompts.summary_json:
                     # Process as string
