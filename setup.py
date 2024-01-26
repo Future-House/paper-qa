@@ -25,7 +25,6 @@ setup(
         "html2text",
         "tiktoken>=0.4.0",
     ],
-    python_requires=">=3.11",
     test_suite="tests",
     long_description=long_description,
     long_description_content_type="text/markdown",
