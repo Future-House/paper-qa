@@ -1,10 +1,13 @@
+import json
 import os
+import pprint
 import re
 import tempfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, cast
+from typing import Any, BinaryIO, Callable, Coroutine, cast
+from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -14,7 +17,9 @@ from .llms import (
     LangchainLLMModel,
     LLMModel,
     NumpyVectorStore,
+    OpenAIEmbeddingModel,
     OpenAILLMModel,
+    SentenceTransformerEmbeddingModel,
     VectorStore,
     get_score,
     is_openai_model,
@@ -44,12 +49,22 @@ from .utils import (
 )
 
 
+# this is just to reduce None checks/type checks
+async def empty_callback(result: LLMResult):
+    pass
+
+
+async def print_callback(result: LLMResult):
+    pprint.pprint(result.model_dump())
+
+
 class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
     # ephemeral vars that should not be pickled (_things)
     _client: Any | None = None
     _embedding_client: Any | None = None
+    id: UUID = Field(default_factory=uuid4)
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
@@ -71,6 +86,9 @@ class Docs(BaseModel):
     jit_texts_index: bool = False
     # This is used to strip indirect citations that come up from the summary llm
     strip_citations: bool = True
+    llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
+        default=empty_callback
+    )
     model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
@@ -108,6 +126,13 @@ class Docs(BaseModel):
         super().__init__(**data)
         self._client = client
         self._embedding_client = embedding_client
+        # more convenience
+        if (
+            type(self.texts_index.embedding_model) == OpenAIEmbeddingModel
+            and embedding_client is None
+        ):
+            self._embedding_client = self._client
+
         # run this here (instead of automatically) so it has access to privates
         # If I ever figure out a better way of validating privates
         # I can move this back to the decorator
@@ -141,10 +166,25 @@ class Docs(BaseModel):
                         data["docs_index"] = NumpyVectorStore(
                             embedding_model=LangchainEmbeddingModel()
                         )
+                elif data["embedding"] == "sentence-transformers":
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=SentenceTransformerEmbeddingModel()
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=SentenceTransformerEmbeddingModel()
+                        )
                 else:
-                    raise ValueError(
-                        f"Could not guess embedding model type for {data['embedding']}. "
-                    )
+                    # must be an openai model
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=OpenAIEmbeddingModel(name=data["embedding"])
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=OpenAIEmbeddingModel(name=data["embedding"])
+                        )
         return data
 
     @model_validator(mode="after")
@@ -185,6 +225,7 @@ class Docs(BaseModel):
                     # from langchain models - kind of hacky
                     data.summary_llm_model.infer_llm_type(data._client)
                     data.summary_llm = data.summary_llm_model.name
+            data.embedding = data.texts_index.embedding_model.name
         return data
 
     def clear_docs(self):
@@ -518,6 +559,10 @@ class Docs(BaseModel):
                     get_callbacks("filter"),
                 )
                 if answer:
+                    result.answer_id = answer.id
+                result.name = "filter"
+                await self.llm_result_callback(result)
+                if answer:
                     answer.add_tokens(result)
                 return set([d.dockey for d in matched_docs if d.docname in str(result)])
         except AttributeError:
@@ -607,8 +652,9 @@ class Docs(BaseModel):
         async def process(match):
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
-            # empty result
+            # needed empties for failures/skips
             llm_result = LLMResult(model="", date="")
+            extras: dict[str, Any] = {}
             if detailed_citations:
                 citation = match.name + ": " + citation
 
@@ -616,11 +662,18 @@ class Docs(BaseModel):
                 context = match.text
                 score = 5
             else:
-                summary_chain = self.summary_llm_model.make_chain(
-                    client=self._client,
-                    prompt=self.prompts.summary,
-                    system_prompt=self.prompts.system,
-                )
+                if self.prompts.json_summary:
+                    summary_chain = self.summary_llm_model.make_chain(
+                        client=self._client,
+                        prompt=self.prompts.summary_json,
+                        system_prompt=self.prompts.summary_json_system,
+                    )
+                else:
+                    summary_chain = self.summary_llm_model.make_chain(
+                        client=self._client,
+                        prompt=self.prompts.summary,
+                        system_prompt=self.prompts.system,
+                    )
                 # This is dangerous because it
                 # could mask errors that are important- like auth errors
                 # I also cannot know what the exception
@@ -631,27 +684,51 @@ class Docs(BaseModel):
                     llm_result = await summary_chain(
                         dict(
                             question=answer.question,
-                            # Add name so chunk is stated
                             citation=citation,
                             summary_length=answer.summary_length,
                             text=match.text,
                         ),
                         callbacks,
                     )
+                    llm_result.answer_id = answer.id
+                    llm_result.name = "evidence:" + match.name
+                    await self.llm_result_callback(llm_result)
                     context = llm_result.text
                 except Exception as e:
                     if guess_is_4xx(str(e)):
                         return None, llm_result
                     raise e
-                if (
-                    "not applicable" in context.lower()
-                    or "not relevant" in context.lower()
-                ):
-                    return None, llm_result
+                success = True
+                if self.prompts.summary_json:
+                    try:
+                        result_data = json.loads(context)
+                    except json.decoder.JSONDecodeError:
+                        # fallback to string
+                        success = False
+                    if success:
+                        try:
+                            context = result_data["summary"]
+                            score = result_data["relevance_score"]
+                            del result_data["summary"]
+                            del result_data["relevance_score"]
+                            if "question" in result_data:
+                                del result_data["question"]
+                            extras = result_data
+                        except KeyError:
+                            # fallback
+                            success = False
+                # fallback to string (or json mode not enabled)
+                if not success or not self.prompts.summary_json:
+                    # Process as string
+                    if (
+                        "not applicable" in context.lower()
+                        or "not relevant" in context.lower()
+                    ):
+                        return None, llm_result
+                    score = get_score(context)
                 if self.strip_citations:
                     # remove citations that collide with our grounded citations (for the answer LLM)
                     context = strip_citations(context)
-                score = get_score(context)
             c = Context(
                 context=context,
                 # below will remove embedding from Text/Doc
@@ -661,6 +738,7 @@ class Docs(BaseModel):
                     doc=Doc(**match.doc.model_dump()),
                 ),
                 score=score,
+                **extras,
             )
             return c, llm_result
 
@@ -750,6 +828,9 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             pre = await chain(dict(question=answer.question), get_callbacks("pre"))
+            pre.name = "pre"
+            pre.answer_id = answer.id
+            await self.llm_result_callback(pre)
             answer.add_tokens(pre)
             answer.context = (
                 answer.context + "\n\nExtra background information:" + str(pre)
@@ -773,6 +854,9 @@ class Docs(BaseModel):
                 ),
                 get_callbacks("answer"),
             )
+            answer_result.name = "answer"
+            answer_result.answer_id = answer.id
+            await self.llm_result_callback(answer_result)
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
         # it still happens
@@ -801,6 +885,9 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             post = await chain(answer.model_dump(), get_callbacks("post"))
+            post.name = "post"
+            post.answer_id = answer.id
+            await self.llm_result_callback(post)
             answer.answer = post.text
             answer.add_tokens(post)
             answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"

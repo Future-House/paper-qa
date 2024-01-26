@@ -7,13 +7,22 @@ import numpy as np
 import requests
 from openai import AsyncOpenAI
 
-from paperqa import Answer, Doc, Docs, NumpyVectorStore, PromptCollection, Text
+from paperqa import (
+    Answer,
+    Doc,
+    Docs,
+    NumpyVectorStore,
+    PromptCollection,
+    Text,
+    print_callback,
+)
 from paperqa.llms import (
     EmbeddingModel,
     LangchainEmbeddingModel,
     LangchainLLMModel,
     LangchainVectorStore,
     LLMModel,
+    OpenAIEmbeddingModel,
     OpenAILLMModel,
     get_score,
 )
@@ -457,6 +466,39 @@ def test_evidence():
     os.remove(doc_path)
 
 
+def test_json_evidence():
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    summary_llm = OpenAILLMModel(
+        config=dict(
+            model="gpt-3.5-turbo-1106",
+            response_format=dict(type="json_object"),
+            temperature=0.0,
+        )
+    )
+    docs = Docs(
+        prompts=PromptCollection(json_summary=True),
+        summary_llm_model=summary_llm,
+        llm_result_callback=print_callback,
+    )
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    evidence = docs.get_evidence(
+        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
+    )
+    print(evidence.context)
+    assert "Missouri" in evidence.context
+
+    evidence = docs.get_evidence(
+        Answer(question="For which state was Bates a governor?"),
+        detailed_citations=True,
+    )
+    assert "Based on WikiMedia Foundation, 2023, Accessed now" in evidence.context
+    os.remove(doc_path)
+
+
 def test_query():
     docs = Docs()
     docs.add_url(
@@ -465,6 +507,23 @@ def test_query():
         dockey="test",
     )
     docs.query("What is Frederick Bates's greatest accomplishment?")
+
+
+def test_llmresult_callbacks():
+    my_results = []
+
+    async def my_callback(result):
+        my_results.append(result)
+
+    docs = Docs(llm_result_callback=my_callback)
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    docs.query("What is Frederick Bates's greatest accomplishment?")
+    assert any([x.name == "answer" for x in my_results])
+    assert len(my_results) > 1
 
 
 def test_duplicate():
@@ -486,6 +545,8 @@ def test_duplicate():
 
 def test_custom_embedding():
     class MyEmbeds(EmbeddingModel):
+        name: str = "my_embed"
+
         async def embed_documents(self, client, texts):
             return [[1, 2, 3] for _ in texts]
 
@@ -495,12 +556,41 @@ def test_custom_embedding():
         embedding_client=None,
     )
     assert docs._embedding_client is None
+    assert docs.embedding == "my_embed"
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     assert docs.docs["test"].embedding == [1, 2, 3]
+
+
+def test_sentence_transformer_embedding():
+    from paperqa import SentenceTransformerEmbeddingModel
+
+    docs = Docs(embedding="sentence-transformers")
+    assert docs._embedding_client is None
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert any(docs.docs["test"].embedding)
+
+    docs = Docs(
+        texts_index=NumpyVectorStore(
+            embedding_model=SentenceTransformerEmbeddingModel()
+        ),
+        doc_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
+        embedding_client=None,
+    )
+    assert docs._embedding_client is None
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert any(docs.docs["test"].embedding)
 
 
 def test_custom_llm():
@@ -1181,6 +1271,23 @@ def test_external_doc_index():
     assert len(docs2.docs) == 0
     evidence = docs2.query("What is the date of flag day?", key_filter=True)
     assert "February 15" in evidence.context
+
+
+def test_embedding_name_consistency():
+    docs = Docs()
+    assert docs.embedding == "text-embedding-ada-002"
+    assert docs.texts_index.embedding_model.name == "text-embedding-ada-002"
+    docs = Docs(embedding="langchain")
+    assert docs.embedding == "langchain"
+    assert docs.texts_index.embedding_model.name == "langchain"
+    assert type(docs.texts_index.embedding_model) == LangchainEmbeddingModel
+    docs = Docs(embedding="foo")
+    assert docs.embedding == "foo"
+    assert type(docs.texts_index.embedding_model) == OpenAIEmbeddingModel
+    docs = Docs(
+        texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="test"))
+    )
+    assert docs.embedding == "test"
 
 
 def test_external_texts_index():
