@@ -87,18 +87,18 @@ async def embed_documents(
 
 
 class EmbeddingModel(ABC, BaseModel):
+    name: str
+
     @abstractmethod
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         pass
 
 
 class OpenAIEmbeddingModel(EmbeddingModel):
-    embedding_model: str = Field(default="text-embedding-ada-002")
+    name: str = Field(default="text-embedding-ada-002")
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        return await embed_documents(
-            cast(AsyncOpenAI, client), texts, self.embedding_model
-        )
+        return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
 
 
 class LLMModel(ABC, BaseModel):
@@ -167,16 +167,20 @@ class LLMModel(ABC, BaseModel):
                 chat_prompt = [system_message_prompt, human_message_prompt]
 
             async def execute(
-                data: dict, callbacks: list[Callable] | None = None
+                data: dict,
+                callbacks: list[Callable] | None = None,
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(
                     model=self.name,
                     date=datetime.datetime.now().isoformat(),
                 )
-                messages = chat_prompt[:-1] + [
-                    dict(role="user", content=chat_prompt[-1]["content"].format(**data))
-                ]
+                messages = []
+                for m in chat_prompt:
+                    messages.append(
+                        dict(role=m["role"], content=m["content"].format(**data))
+                    )
+                result.prompt = messages
                 result.prompt_count = sum(
                     [self.count_tokens(m["content"]) for m in messages]
                 ) + sum([self.count_tokens(m["role"]) for m in messages])
@@ -224,7 +228,7 @@ class LLMModel(ABC, BaseModel):
                 )
                 formatted_prompt = completion_prompt.format(**data)
                 result.prompt_count = self.count_tokens(formatted_prompt)
-
+                result.prompt = formatted_prompt
                 if callbacks is None:
                     output = await self.acomplete(client, formatted_prompt)
                 else:
@@ -354,7 +358,7 @@ class LlamaEmbeddingModel(EmbeddingModel):
 
 
 class SentenceTransformerEmbeddingModel(EmbeddingModel):
-    embedding_model: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
+    name: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
     _model: Any = None
 
     def __init__(self, *args, **kwargs):
@@ -364,7 +368,7 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
         except ImportError:
             raise ImportError("Please install sentence-transformers to use this model")
 
-        self._model = SentenceTransformer(self.embedding_model)
+        self._model = SentenceTransformer(self.name)
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         from sentence_transformers import SentenceTransformer
@@ -536,6 +540,8 @@ class LangchainLLMModel(LLMModel):
 
 class LangchainEmbeddingModel(EmbeddingModel):
     """A wrapper around the wrapper langchain"""
+
+    name: str = "langchain"
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await client.aembed_documents(texts)

@@ -1,4 +1,4 @@
-from .docs import Answer, Docs, PromptCollection, Doc, Text, Context
+from .docs import Answer, Docs, PromptCollection, Doc, Text, Context, print_callback
 from .version import __version__
 from .llms import (
     LLMModel,
@@ -31,4 +31,5 @@ __all__ = [
     "LangchainEmbeddingModel",
     "NumpyVectorStore",
     "LangchainVectorStore",
+    "print_callback",
 ]
