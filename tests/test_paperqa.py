@@ -25,6 +25,8 @@ from paperqa.llms import (
     OpenAIEmbeddingModel,
     OpenAILLMModel,
     get_score,
+    guess_model_type,
+    is_openai_model,
 )
 from paperqa.readers import read_doc
 from paperqa.utils import (
@@ -35,6 +37,24 @@ from paperqa.utils import (
     strings_similarity,
     strip_citations,
 )
+
+
+def test_is_openai_model():
+    assert is_openai_model("gpt-3.5-turbo")
+    assert is_openai_model("babbage-002")
+    assert is_openai_model("gpt-4-1106-preview")
+    assert is_openai_model("davinci-002")
+    assert not is_openai_model("llama")
+    assert not is_openai_model("labgpt")
+    assert not is_openai_model("mixtral-7B")
+
+
+def test_guess_model_type():
+    assert guess_model_type("gpt-3.5-turbo") == "chat"
+    assert guess_model_type("babbage-002") == "completion"
+    assert guess_model_type("gpt-4-1106-preview") == "chat"
+    assert guess_model_type("gpt-3.5-turbo-instruct") == "completion"
+    assert guess_model_type("davinci-002") == "completion"
 
 
 def test_iter_citations():

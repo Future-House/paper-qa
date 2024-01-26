@@ -3,17 +3,7 @@ import datetime
 import re
 from abc import ABC, abstractmethod
 from inspect import signature
-from typing import (
-    Any,
-    AsyncGenerator,
-    Callable,
-    Coroutine,
-    Sequence,
-    Type,
-    cast,
-    get_args,
-    get_type_hints,
-)
+from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, Type, cast
 
 import numpy as np
 from openai import AsyncOpenAI
@@ -23,37 +13,60 @@ from .prompts import default_system_prompt
 from .types import Doc, Embeddable, LLMResult, Text
 from .utils import batch_iter, flatten, gather_with_concurrency, is_coroutine_callable
 
+# only works for python 3.11
+# def guess_model_type(model_name: str) -> str:
+#     """Guess the model type from the model name for OpenAI models"""
+#     import openai
+
+#     model_type = get_type_hints(
+#         openai.types.chat.completion_create_params.CompletionCreateParamsBase
+#     )["model"]
+#     model_union = get_args(get_args(model_type)[1])
+#     model_arr = list(model_union)
+#     if model_name in model_arr:
+#         return "chat"
+#     return "completion"
+
+# def is_openai_model(model_name):
+#     import openai
+
+#     model_type = get_type_hints(
+#         openai.types.chat.completion_create_params.CompletionCreateParamsBase
+#     )["model"]
+#     model_union = get_args(get_args(model_type)[1])
+#     model_arr = list(model_union)
+
+#     complete_model_types = get_type_hints(
+#         openai.types.completion_create_params.CompletionCreateParamsBase
+#     )["model"]
+#     complete_model_union = get_args(get_args(complete_model_types)[1])
+#     complete_model_arr = list(complete_model_union)
+
+#     return model_name in model_arr or model_name in complete_model_arr
+
 
 def guess_model_type(model_name: str) -> str:
-    """Guess the model type from the model name for OpenAI models"""
-    import openai
-
-    model_type = get_type_hints(
-        openai.types.chat.completion_create_params.CompletionCreateParamsBase
-    )["model"]
-    model_union = get_args(get_args(model_type)[1])
-    model_arr = list(model_union)
-    if model_name in model_arr:
+    if model_name.startswith("babbage"):
+        return "completion"
+    if model_name.startswith("davinci"):
+        return "completion"
+    if "instruct" in model_name:
+        return "completion"
+    if model_name.startswith("gpt-4"):
+        if "base" in model_name:
+            return "completion"
+        return "chat"
+    if model_name.startswith("gpt-3.5"):
         return "chat"
     return "completion"
 
 
-def is_openai_model(model_name):
-    import openai
-
-    model_type = get_type_hints(
-        openai.types.chat.completion_create_params.CompletionCreateParamsBase
-    )["model"]
-    model_union = get_args(get_args(model_type)[1])
-    model_arr = list(model_union)
-
-    complete_model_types = get_type_hints(
-        openai.types.completion_create_params.CompletionCreateParamsBase
-    )["model"]
-    complete_model_union = get_args(get_args(complete_model_types)[1])
-    complete_model_arr = list(complete_model_union)
-
-    return model_name in model_arr or model_name in complete_model_arr
+def is_openai_model(model_name) -> bool:
+    return (
+        model_name.startswith("gpt-")
+        or model_name.startswith("babbage")
+        or model_name.startswith("davinci")
+    )
 
 
 def process_llm_config(llm_config: dict) -> dict:
