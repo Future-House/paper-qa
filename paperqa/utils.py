@@ -107,11 +107,24 @@ def strip_citations(text: str) -> str:
     return text
 
 
-def iter_citations(text: str) -> list[str]:
+def get_citenames(text: str) -> set[str]:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
-    result = re.findall(citation_regex, text, flags=re.MULTILINE)
-    return result
+    results = re.findall(citation_regex, text, flags=re.MULTILINE)
+    # now find None patterns
+    none_citation_regex = r"(\(None[a-f]{0,1} pages [0-9]{1,10}-[0-9]{1,10}\))"
+    none_results = re.findall(none_citation_regex, text, flags=re.MULTILINE)
+    results.extend(none_results)
+    values = []
+    for citation in results:
+        citation = citation.strip("() ")
+        for c in re.split(",|;", citation):
+            if c == "Extra background information":
+                continue
+            # remove leading/trailing spaces
+            c = c.strip()
+            values.append(c)
+    return set(values)
 
 
 def extract_doi(reference: str) -> str:

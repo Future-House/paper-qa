@@ -1,7 +1,7 @@
 from typing import Any, Callable
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
 from .prompts import (
     citation_prompt,
@@ -12,6 +12,7 @@ from .prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
+from .utils import get_citenames
 
 # Just for clarity
 DocKey = Any
@@ -173,6 +174,12 @@ class Answer(BaseModel):
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
+
+    @computed_field  # type: ignore
+    @property
+    def used_contexts(self) -> set[str]:
+        """Return the used contexts."""
+        return get_citenames(self.formatted_answer)
 
     def get_citation(self, name: str) -> str:
         """Return the formatted citation for the gien docname."""
