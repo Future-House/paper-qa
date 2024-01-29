@@ -30,7 +30,7 @@ from paperqa.llms import (
 )
 from paperqa.readers import read_doc
 from paperqa.utils import (
-    iter_citations,
+    get_citenames,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -57,7 +57,7 @@ def test_guess_model_type():
     assert guess_model_type("davinci-002") == "completion"
 
 
-def test_iter_citations():
+def test_get_citations():
     text = (
         "Yes, COVID-19 vaccines are effective. Various studies have documented the "
         "effectiveness of COVID-19 vaccines in preventing severe disease, "
@@ -79,15 +79,18 @@ def test_iter_citations():
         "(Chemaitelly2022WaningEO, Foo2019Bar). Despite this, vaccines still provide "
         "significant protection against severe outcomes (Bar2000Foo pg 1-3; Far2000 pg 2-5)."
     )
-    ref = [
-        "(Dorabawila2022EffectivenessOT)",
-        "(Bernal2021EffectivenessOC pg. 1-3)",
-        "(Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo pg. 3-4)",
-        "(Marfé2021EffectivenessOC)",
-        "(Chemaitelly2022WaningEO, Foo2019Bar)",
-        "(Bar2000Foo pg 1-3; Far2000 pg 2-5)",
-    ]
-    assert list(iter_citations(text)) == ref
+    ref = {
+        "Dorabawila2022EffectivenessOT",
+        "Bernal2021EffectivenessOC pg. 1-3",
+        "Thompson2021EffectivenessOC pg. 3-5",
+        "Goo2031Foo pg. 3-4",
+        "Marfé2021EffectivenessOC",
+        "Chemaitelly2022WaningEO",
+        "Foo2019Bar",
+        "Bar2000Foo pg 1-3",
+        "Far2000 pg 2-5",
+    }
+    assert get_citenames(text) == ref
 
 
 def test_single_author():
@@ -529,6 +532,27 @@ def test_query():
     docs.query("What is Frederick Bates's greatest accomplishment?")
 
 
+def test_answer_attributes():
+    docs = Docs()
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
+    used_citations = answer.used_contexts
+    assert len(used_citations) > 0
+    assert len(used_citations) < len(answer.contexts)
+    assert (
+        answer.get_citation(list(used_citations)[0])
+        == "WikiMedia Foundation, 2023, Accessed now"
+    )
+
+    # make sure it is serialized correctly
+    js = answer.model_dump_json()
+    assert "used_contexts" in js
+
+
 def test_llmresult_callbacks():
     my_results = []
 
@@ -905,6 +929,12 @@ def test_docs_pickle():
     assert strings_similarity(context1, context2) > 0.75
     # make sure we can query
     docs.query("What date is bring your dog to work in the US?")
+
+    # make sure we can embed documents
+    docs2.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+    )
 
 
 def test_bad_context():

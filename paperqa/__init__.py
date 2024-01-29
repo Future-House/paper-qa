@@ -11,6 +11,7 @@ from .llms import (
     NumpyVectorStore,
     LangchainVectorStore,
     SentenceTransformerEmbeddingModel,
+    LLMResult,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "NumpyVectorStore",
     "LangchainVectorStore",
     "print_callback",
+    "LLMResult",
 ]
