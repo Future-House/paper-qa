@@ -1,7 +1,14 @@
 from typing import Any, Callable
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from .prompts import (
     citation_prompt,
@@ -169,11 +176,18 @@ class Answer(BaseModel):
     cost: float | None = None
     # key is model name, value is (prompt, completion) token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
 
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
+
+    @model_validator(mode="before")
+    @classmethod
+    def remove_computed(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            data.pop("used_contexts", None)
+        return data
 
     @computed_field  # type: ignore
     @property

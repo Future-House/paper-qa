@@ -552,6 +552,10 @@ def test_answer_attributes():
     js = answer.model_dump_json()
     assert "used_contexts" in js
 
+    # make sure it can be deserialized
+    answer2 = Answer.model_validate_json(js)
+    assert answer2.used_contexts == used_citations
+
 
 def test_llmresult_callbacks():
     my_results = []
