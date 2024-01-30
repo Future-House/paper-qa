@@ -701,6 +701,8 @@ class Docs(BaseModel):
                 success = True
                 if self.prompts.summary_json:
                     try:
+                        # fetch from markdown ```json if present
+                        context = context.split("```json")[-1].split("```")[0]
                         result_data = json.loads(context)
                     except json.decoder.JSONDecodeError:
                         # fallback to string
@@ -758,7 +760,7 @@ class Docs(BaseModel):
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
-                + (f"\n\n Based on {c.text.doc.citation}" if detailed_citations else "")
+                + (f"\n\nBased on {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]
         )
