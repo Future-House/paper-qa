@@ -59,12 +59,12 @@ default_system_prompt = (
 )
 
 summary_json_system_prompt = """\
-Respond with the following JSON format:
+Provide a summary of the relevant information that could help answer the question based on the excerpt. Respond with the following JSON format:
 
 {{
-  // summary relevant information from text - {summary_length} words
-  summary: string;
-  // relevance of this summary to answer question (out of 10)
-  relevance_score: number;
+  "summary": "...",
+  "relevance_score": "..."
 }}
-"""
+
+where `summary` is relevant information from text - {summary_length} words and `relevance_score` is the relevance of `summary` to answer question (out of 10)
+"""  # noqa: E501
