@@ -522,6 +522,47 @@ def test_json_evidence():
     os.remove(doc_path)
 
 
+def test_custom_json_props():
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        f.write(r.text)
+    summary_llm = OpenAILLMModel(
+        config=dict(
+            model="gpt-3.5-turbo-0125",
+            response_format=dict(type="json_object"),
+            temperature=0.0,
+        )
+    )
+    my_prompts = PromptCollection(
+        json_summary=True,
+        summary_json_system="Provide a summary of the excerpt that could help answer the question based on the excerpt.  "
+        "The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. "
+        "Respond with the following JSON format:\n\n"
+        '{{\n"summary": "...",\n"person_name": "...",\n"relevance_score": "..."}}\n\n'
+        "where `summary` is relevant information from text - "
+        "about 100 words words, `person_name` specifies the person discussed in "
+        "the excerpt (may be different than query), and `relevance_score` is "
+        "the relevance of `summary` to answer the question (integer out of 10).",
+    )
+    docs = Docs(
+        prompts=my_prompts,
+        summary_llm_model=summary_llm,
+        llm_result_callback=print_callback,
+    )
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    evidence = docs.get_evidence(
+        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
+    )
+    assert "person_name" in evidence.contexts[0].model_extra
+    assert "person_name: " in evidence.context
+    print(evidence.context)
+    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
+    assert "person_name" in answer.context
+    os.remove(doc_path)
+
+
 def test_query():
     docs = Docs()
     docs.add_url(
