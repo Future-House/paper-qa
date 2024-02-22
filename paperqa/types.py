@@ -152,6 +152,9 @@ class Context(BaseModel):
     context: str
     text: Text
     score: int = 5
+    model_config = ConfigDict(
+        extra="allow",
+    )
 
 
 def __str__(self) -> str:
