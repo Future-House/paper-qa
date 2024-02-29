@@ -289,7 +289,7 @@ class OpenAILLMModel(LLMModel):
             raise ValueError(
                 f"Your client is not a required AsyncOpenAI client. It is a {type(client)}"
             )
-        return cast(AsyncOpenAI, client)
+        return client
 
     @model_validator(mode="after")
     @classmethod
