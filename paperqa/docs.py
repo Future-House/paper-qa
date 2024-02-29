@@ -619,7 +619,7 @@ class Docs(BaseModel):
     ) -> Answer:
         if len(self.docs) == 0 and self.docs_index is None:
             # do we have no docs?
-            return answer
+            return answer  # type: ignore[unreachable]
         self._build_texts_index(keys=answer.dockey_filter)
         _k = k
         if answer.dockey_filter is not None:
@@ -663,13 +663,13 @@ class Docs(BaseModel):
                 score = 5
             else:
                 if self.prompts.json_summary:
-                    summary_chain = self.summary_llm_model.make_chain(
+                    summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
                         client=self._client,
                         prompt=self.prompts.summary_json,
                         system_prompt=self.prompts.summary_json_system,
                     )
                 else:
-                    summary_chain = self.summary_llm_model.make_chain(
+                    summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
                         client=self._client,
                         prompt=self.prompts.summary,
                         system_prompt=self.prompts.system,

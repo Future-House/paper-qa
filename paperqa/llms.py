@@ -207,7 +207,7 @@ class LLMModel(ABC, BaseModel):
                     async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
                     completion = self.achat_iter(client, messages)
                     text_result = []
-                    async for chunk in completion:
+                    async for chunk in completion:  # type: ignore[attr-defined]
                         if chunk:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
@@ -255,7 +255,7 @@ class LLMModel(ABC, BaseModel):
                         formatted_prompt,
                     )
                     text_result = []
-                    async for chunk in completion:
+                    async for chunk in completion:  # type: ignore[attr-defined]
                         if chunk:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
