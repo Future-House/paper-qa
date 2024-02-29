@@ -422,7 +422,7 @@ class Docs(BaseModel):
             # get first name and year from citation
             match = re.search(r"([A-Z][a-z]+)", citation)
             if match is not None:
-                author = match.group(1)  # type: ignore
+                author = match.group(1)
             else:
                 # panicking - no word??
                 raise ValueError(
@@ -433,7 +433,7 @@ class Docs(BaseModel):
             year = ""
             match = re.search(r"(\d{4})", citation)
             if match is not None:
-                year = match.group(1)  # type: ignore
+                year = match.group(1)
             docname = f"{author}{year}"
         docname = self._get_unique_name(docname)
         doc = Doc(docname=docname, citation=citation, dockey=dockey)

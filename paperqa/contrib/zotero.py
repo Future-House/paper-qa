@@ -128,7 +128,7 @@ class ZoteroDB(zotero.Zotero):
         if pdf_key is None:
             return None
 
-        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))  # type: ignore
+        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)

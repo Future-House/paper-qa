@@ -192,7 +192,7 @@ class Answer(BaseModel):
             data.pop("used_contexts", None)
         return data
 
-    @computed_field  # type: ignore
+    @computed_field
     @property
     def used_contexts(self) -> set[str]:
         """Return the used contexts."""

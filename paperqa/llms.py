@@ -205,9 +205,9 @@ class LLMModel(ABC, BaseModel):
                         f for f in callbacks if not is_coroutine_callable(f)
                     ]
                     async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
-                    completion = self.achat_iter(client, messages)  # type: ignore
+                    completion = self.achat_iter(client, messages)
                     text_result = []
-                    async for chunk in completion:  # type: ignore
+                    async for chunk in completion:
                         if chunk:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
@@ -250,12 +250,12 @@ class LLMModel(ABC, BaseModel):
                     ]
                     async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
 
-                    completion = self.acomplete_iter(  # type: ignore
+                    completion = self.acomplete_iter(
                         client,
                         formatted_prompt,
                     )
                     text_result = []
-                    async for chunk in completion:  # type: ignore
+                    async for chunk in completion:
                         if chunk:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
@@ -323,14 +323,14 @@ class OpenAILLMModel(LLMModel):
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
         aclient = self._check_client(client)
         completion = await aclient.chat.completions.create(
-            messages=messages, **process_llm_config(self.config)  # type: ignore
+            messages=messages, **process_llm_config(self.config)
         )
         return completion.choices[0].message.content or ""
 
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         aclient = self._check_client(client)
         completion = await aclient.chat.completions.create(
-            messages=messages, **process_llm_config(self.config), stream=True  # type: ignore
+            messages=messages, **process_llm_config(self.config), stream=True
         )
         async for chunk in cast(AsyncGenerator, completion):
             yield chunk.choices[0].delta.content
@@ -635,13 +635,13 @@ class LangchainVectorStore(VectorStore):
         else:
             raise ValueError("Only embeddings of type Text are supported")
         if self._store is None:
-            self._store = self._store_builder(  # type: ignore
+            self._store = self._store_builder(
                 vec_store_text_and_embeddings,
                 texts,
             )
             if self._store is None or not hasattr(self._store, "add_embeddings"):
                 raise ValueError("store_builder did not return a valid vectorstore")
-        self._store.add_embeddings(  # type: ignore
+        self._store.add_embeddings(
             vec_store_text_and_embeddings,
             metadatas=texts,
         )
