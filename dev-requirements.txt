@@ -5,6 +5,7 @@ pyzotero
 python-dotenv
 pymupdf
 build
+types-setuptools
 types-requests
 langchain_openai
 langchain_community

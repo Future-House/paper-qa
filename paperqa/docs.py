@@ -422,7 +422,7 @@ class Docs(BaseModel):
             # get first name and year from citation
             match = re.search(r"([A-Z][a-z]+)", citation)
             if match is not None:
-                author = match.group(1)  # type: ignore
+                author = match.group(1)
             else:
                 # panicking - no word??
                 raise ValueError(
@@ -433,7 +433,7 @@ class Docs(BaseModel):
             year = ""
             match = re.search(r"(\d{4})", citation)
             if match is not None:
-                year = match.group(1)  # type: ignore
+                year = match.group(1)
             docname = f"{author}{year}"
         docname = self._get_unique_name(docname)
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
@@ -619,7 +619,7 @@ class Docs(BaseModel):
     ) -> Answer:
         if len(self.docs) == 0 and self.docs_index is None:
             # do we have no docs?
-            return answer
+            return answer  # type: ignore[unreachable]
         self._build_texts_index(keys=answer.dockey_filter)
         _k = k
         if answer.dockey_filter is not None:
@@ -663,13 +663,13 @@ class Docs(BaseModel):
                 score = 5
             else:
                 if self.prompts.json_summary:
-                    summary_chain = self.summary_llm_model.make_chain(
+                    summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
                         client=self._client,
                         prompt=self.prompts.summary_json,
                         system_prompt=self.prompts.summary_json_system,
                     )
                 else:
-                    summary_chain = self.summary_llm_model.make_chain(
+                    summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
                         client=self._client,
                         prompt=self.prompts.summary,
                         system_prompt=self.prompts.system,

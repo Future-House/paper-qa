@@ -413,13 +413,13 @@ class TestChains(IsolatedAsyncioTestCase):
         def accum(x):
             outputs.append(x)
 
-        completion = await call(dict(animal="duck"), callbacks=[accum])
+        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))
+        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
@@ -438,13 +438,13 @@ class TestChains(IsolatedAsyncioTestCase):
         def accum(x):
             outputs.append(x)
 
-        completion = await call(dict(animal="duck"), callbacks=[accum])
+        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))
+        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
@@ -452,7 +452,7 @@ class TestChains(IsolatedAsyncioTestCase):
         async def ac(x):
             pass
 
-        completion = await call(dict(animal="duck"), callbacks=[accum, ac])
+        completion = await call(dict(animal="duck"), callbacks=[accum, ac])  # type: ignore[call-arg]
 
 
 def test_docs():
@@ -474,7 +474,7 @@ def test_evidence():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
@@ -507,7 +507,7 @@ def test_json_evidence():
         summary_llm_model=summary_llm,
         llm_result_callback=print_callback,
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
@@ -551,7 +551,7 @@ def test_custom_json_props():
         summary_llm_model=summary_llm,
         llm_result_callback=print_callback,
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
@@ -664,7 +664,7 @@ def test_sentence_transformer_embedding():
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
-    assert any(docs.docs["test"].embedding)
+    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
     docs = Docs(
         texts_index=NumpyVectorStore(
@@ -679,7 +679,7 @@ def test_sentence_transformer_embedding():
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
-    assert any(docs.docs["test"].embedding)
+    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
 
 def test_custom_llm():
@@ -762,7 +762,7 @@ def test_langchain_llm():
         get_callbacks=lambda x: [lambda y: print(y, end="")],
     )
 
-    assert docs.summary_llm_model.llm_type == "completion"
+    assert docs.summary_llm_model.llm_type == "completion"  # type: ignore[union-attr]
 
     # trying without callbacks (different codepath)
     docs.get_evidence(
@@ -823,19 +823,19 @@ class TestVectorStore(IsolatedAsyncioTestCase):
         try:
             index = LangchainVectorStore()
             index.add_texts_and_embeddings(some_texts)
-            raise "Failed to check for builder"
+            raise "Failed to check for builder"  # type: ignore[misc]
         except ValueError:
             pass
 
         try:
             index = LangchainVectorStore(store_builder=lambda x: None)
-            raise "Failed to count arguments"
+            raise "Failed to count arguments"  # type: ignore[misc]
         except ValueError:
             pass
 
         try:
             index = LangchainVectorStore(store_builder="foo")
-            raise "Failed to check if builder is callable"
+            raise "Failed to check if builder is callable"  # type: ignore[misc]
         except ValueError:
             pass
 
@@ -847,7 +847,7 @@ class TestVectorStore(IsolatedAsyncioTestCase):
         index.add_texts_and_embeddings(some_texts)
         assert index._store is not None
         # check search returns Text obj
-        data, score = await index.similarity_search(None, "test", k=1)
+        data, score = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
         print(data)
         assert type(data[0]) == Text
 
@@ -938,8 +938,8 @@ def test_docs_pickle():
     )
     assert docs._client is not None
     old_config = docs.llm_model.config
-    old_sconfig = docs.summary_llm_model.config
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)
+    old_sconfig = docs.summary_llm_model.config  # type: ignore[union-attr]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)  # type: ignore[arg-type]
     os.remove(doc_path)
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
@@ -989,7 +989,7 @@ def test_bad_context():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     answer = docs.query("What is the radius of Jupyter?")
     assert "cannot answer" in answer.answer
     os.remove(doc_path)
@@ -1004,9 +1004,9 @@ def test_repeat_keys():
     docs = Docs(
         llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     try:
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     except ValueError:
         pass
     assert len(docs.docs) == 1
@@ -1017,7 +1017,7 @@ def test_repeat_keys():
         # get wiki page about politician
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
-    docs.add(doc_path2, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path2, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     assert len(docs.docs) == 2
 
     # check keys
@@ -1033,7 +1033,7 @@ def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     docs = Docs(llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-4")))
-    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")  # type: ignore[arg-type]
     answer = docs.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
@@ -1067,14 +1067,14 @@ def test_pdf_pypdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     splits1 = read_doc(
-        doc_path,
+        doc_path,  # type: ignore[arg-type]
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
         overlap=100,
         chunk_chars=3000,
     )
     splits2 = read_doc(
-        doc_path,
+        doc_path,  # type: ignore[arg-type]
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
@@ -1093,7 +1093,7 @@ def test_prompt_length():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     docs.query("What is the name of the politician?")
 
 
@@ -1103,7 +1103,7 @@ def test_code():
     docs = Docs(
         llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
     )
-    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)
+    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)  # type: ignore[arg-type]
     assert len(docs.docs) == 1
     docs.query("What function tests the preview?")
 
@@ -1115,7 +1115,7 @@ def test_citation():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs()
-    docs.add(doc_path)
+    docs.add(doc_path)  # type: ignore[arg-type]
     assert (
         list(docs.docs.values())[0].docname == "Wikipedia2024"
         or list(docs.docs.values())[0].docname == "Frederick2024"
@@ -1132,12 +1132,12 @@ def test_dockey_filter():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")  # type: ignore[arg-type]
     answer = Answer(question="What country is Bates from?", dockey_filter=["test"])
     docs.get_evidence(answer)
 
@@ -1150,12 +1150,12 @@ def test_dockey_delete():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n\nBates could be from Angola")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", docname="test")
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", docname="test")  # type: ignore[arg-type]
     answer = Answer(question="What country was Bates born in?")
     answer = docs.get_evidence(
         answer, max_sources=25, k=30
@@ -1182,14 +1182,14 @@ def test_query_filter():
         f.write(r.text)
     docs = Docs()
     docs.add(
-        doc_path,
+        doc_path,  # type: ignore[arg-type]
         "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
     )
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")
+    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")  # type: ignore[arg-type]
     docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
@@ -1212,13 +1212,13 @@ def test_too_much_evidence():
         r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")
         f.write(r.text)
     docs = Docs(llm="gpt-3.5-turbo", summary_llm="gpt-3.5-turbo")
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
         f.write(r.text)
         f.write("\n")  # so we don't have same hash
     docs.add(
-        "example.txt",
+        "example.txt",  # type: ignore[arg-type]
         "WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
         chunk_chars=4000,
@@ -1240,7 +1240,7 @@ def test_custom_prompts():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     answer = docs.query("What country is Frederick Bates from?")
     assert "United States" in answer.answer
 
@@ -1255,7 +1255,7 @@ def test_pre_prompt():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     docs.query("What country is Bates from?")
 
 
@@ -1275,7 +1275,7 @@ def test_post_prompt():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     docs.query("What country is Bates from?")
 
     docs = Docs(

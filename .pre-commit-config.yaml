@@ -20,11 +20,11 @@ repos:
       - id: black
         language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.3.0"
+    rev: v1.8.0
     hooks:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
-        additional_dependencies: [types-requests]
+        additional_dependencies: [types-requests, types-setuptools]
   - repo: https://github.com/PyCQA/isort
     rev: "5.12.0"
     hooks:
