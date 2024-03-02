@@ -16,6 +16,7 @@ setup(
     url="https://github.com/whitead/paper-qa",
     license="Apache License 2.0",
     packages=["paperqa", "paperqa.contrib"],
+    package_data={"paperqa": ["py.typed"]},
     install_requires=[
         "pypdf",
         "pydantic>=2",
