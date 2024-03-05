@@ -373,18 +373,43 @@ try:
 
         async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
             aclient = self._check_client(client)
-            completion = await aclient.messages.create(
-                messages=messages, **process_llm_config(self.config, "max_tokens")
+            # filter out system
+            sys_message = next(
+                (m["content"] for m in messages if m["role"] == "system"), None
             )
+            # BECAUISE THEY DO NOT USE NONE TO INDICATE SENTINEL
+            # LIKE ANY SANE PERSON
+            if sys_message:
+                completion = await aclient.messages.create(
+                    system=sys_message,
+                    messages=[m for m in messages if m["role"] != "system"],
+                    **process_llm_config(self.config, "max_tokens"),
+                )
+            else:
+                completion = await aclient.messages.create(
+                    messages=[m for m in messages if m["role"] != "system"],
+                    **process_llm_config(self.config, "max_tokens"),
+                )
             return completion.content or ""
 
         async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
             aclient = self._check_client(client)
-            completion = await aclient.messages.create(
-                messages=messages,
-                **process_llm_config(self.config, "max_tokens"),
-                stream=True,
+            sys_message = next(
+                (m["content"] for m in messages if m["role"] == "system"), None
             )
+            if sys_message:
+                completion = await aclient.messages.create(
+                    stream=True,
+                    system=sys_message,
+                    messages=[m for m in messages if m["role"] != "system"],
+                    **process_llm_config(self.config, "max_tokens"),
+                )
+            else:
+                completion = await aclient.messages.create(
+                    stream=True,
+                    messages=[m for m in messages if m["role"] != "system"],
+                    **process_llm_config(self.config, "max_tokens"),
+                )
             async for event in completion:
                 if isinstance(event, ContentBlockDeltaEvent):
                     yield event.delta.text
