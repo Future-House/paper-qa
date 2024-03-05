@@ -69,19 +69,19 @@ def is_openai_model(model_name) -> bool:
     )
 
 
-def process_llm_config(llm_config: dict) -> dict:
+def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> dict:
     """Remove model_type and try to set max_tokens"""
     result = {k: v for k, v in llm_config.items() if k != "model_type"}
-    if "max_tokens" not in result or result["max_tokens"] == -1:
+    if max_token_name not in result or result[max_token_name] == -1:
         model = llm_config["model"]
         # now we guess - we could use tiktoken to count,
         # but do have the initative right now
         if model.startswith("gpt-4") or (
             model.startswith("gpt-3.5") and "1106" in model
         ):
-            result["max_tokens"] = 3000
+            result[max_token_name] = 3000
         else:
-            result["max_tokens"] = 1500
+            result[max_token_name] = 1500
     return result
 
 
@@ -334,6 +334,64 @@ class OpenAILLMModel(LLMModel):
         )
         async for chunk in cast(AsyncGenerator, completion):
             yield chunk.choices[0].delta.content
+
+
+try:
+    from anthropic import AsyncAnthropic
+    from anthropic.types import ContentBlockDeltaEvent
+
+    class AnthropicLLMModel(LLMModel):
+        config: dict = Field(
+            default=dict(model="claude-3-sonnet-20240229", temperature=0.1)
+        )
+        name: str = "claude-3-sonnet-20240229"
+
+        def _check_client(self, client: Any) -> AsyncAnthropic:
+            if client is None:
+                raise ValueError(
+                    "Your client is None - did you forget to set it after pickling?"
+                )
+            if not isinstance(client, AsyncAnthropic):
+                raise ValueError(
+                    f"Your client is not a required AsyncAnthropic client. It is a {type(client)}"
+                )
+            return client
+
+        @model_validator(mode="after")
+        @classmethod
+        def set_llm_type(cls, data: Any) -> Any:
+            m = cast(AnthropicLLMModel, data)
+            m.llm_type = "chat"
+            return m
+
+        @model_validator(mode="after")
+        @classmethod
+        def set_model_name(cls, data: Any) -> Any:
+            m = cast(AnthropicLLMModel, data)
+            m.name = m.config["model"]
+            return m
+
+        async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+            aclient = self._check_client(client)
+            completion = await aclient.messages.create(
+                messages=messages, **process_llm_config(self.config, "max_tokens")
+            )
+            return completion.content or ""
+
+        async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+            aclient = self._check_client(client)
+            completion = await aclient.messages.create(
+                messages=messages,
+                **process_llm_config(self.config, "max_tokens"),
+                stream=True,
+            )
+            async for event in completion:
+                if isinstance(event, ContentBlockDeltaEvent):
+                    yield event.delta.text
+                # yield event.message.content
+
+except ImportError:
+    pass
 
 
 class LlamaEmbeddingModel(EmbeddingModel):
