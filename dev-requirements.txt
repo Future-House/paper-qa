@@ -11,3 +11,4 @@ langchain_openai
 langchain_community
 faiss-cpu
 sentence_transformers
+anthropic
