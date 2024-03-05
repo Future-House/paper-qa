@@ -17,6 +17,7 @@ from paperqa import (
     print_callback,
 )
 from paperqa.llms import (
+    AnthropicLLMModel,
     EmbeddingModel,
     LangchainEmbeddingModel,
     LangchainLLMModel,
@@ -453,6 +454,31 @@ class TestChains(IsolatedAsyncioTestCase):
             pass
 
         completion = await call(dict(animal="duck"), callbacks=[accum, ac])  # type: ignore[call-arg]
+
+    async def test_anthropic_chain(self):
+        from anthropic import AsyncAnthropic
+
+        client = AsyncAnthropic()
+        llm = AnthropicLLMModel()
+        call = llm.make_chain(
+            client,
+            "The {animal} says",
+            skip_system=True,
+        )
+
+        def accum(x):
+            outputs.append(x)
+
+        outputs: list[str] = []
+        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        assert completion.seconds_to_first_token > 0
+        assert completion.prompt_count > 0
+        assert completion.completion_count > 0
+        assert str(completion) == "".join(outputs)
+
+        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        assert completion.seconds_to_first_token == 0
+        assert completion.seconds_to_last_token > 0
 
 
 def test_docs():
