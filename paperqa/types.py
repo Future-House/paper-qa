@@ -177,7 +177,8 @@ class Answer(BaseModel):
     answer_length: str = "about 100 words"
     # just for convenience you can override this
     cost: float | None = None
-    # key is model name, value is (prompt, completion) token counts
+    # Map model name to a two-item list of LLM prompt token counts
+    # and LLM completion token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
     model_config = ConfigDict(extra="ignore")
 
