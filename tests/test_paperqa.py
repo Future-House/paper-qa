@@ -1190,7 +1190,10 @@ def test_dockey_delete():
     assert len(keys) == 2
     assert len(docs.docs) == 2
 
-    docs.delete(docname="test")
+    docs.delete(dockey="test")
+    assert len(docs.docs) == 1
+    assert len(list(filter(lambda x: x.doc.dockey == "test", docs.texts))) == 0
+
     answer = Answer(question="What country was Bates born in?")
     assert len(docs.docs) == 1
     assert len(docs.deleted_dockeys) == 1
