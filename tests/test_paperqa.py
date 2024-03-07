@@ -646,21 +646,31 @@ def test_llmresult_callbacks():
     assert len(my_results) > 1
 
 
-def test_duplicate():
+def test_duplicate() -> None:
+    """Check Docs doesn't store duplicates, while checking nonduplicate docs are stored."""
     docs = Docs()
     assert docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+        dockey="test1",
     )
     assert (
         docs.add_url(
             "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
             citation="WikiMedia Foundation, 2023, Accessed now",
-            dockey="test",
+            dockey="test1",
         )
         is None
     )
+    assert len(docs.docs) == 1, "Should have added only one document"
+    assert docs.add_url(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test2",
+    )
+    assert (
+        len(set(docs.docs.values())) == 2
+    ), "Unique documents should be hashed as unique"
 
 
 def test_custom_embedding():
@@ -1232,7 +1242,10 @@ def test_dockey_delete():
     assert len(keys) == 2
     assert len(docs.docs) == 2
 
-    docs.delete(docname="test")
+    docs.delete(dockey="test")
+    assert len(docs.docs) == 1
+    assert len(list(filter(lambda x: x.doc.dockey == "test", docs.texts))) == 0
+
     answer = Answer(question="What country was Bates born in?")
     assert len(docs.docs) == 1
     assert len(docs.deleted_dockeys) == 1

@@ -515,6 +515,7 @@ class Docs(BaseModel):
             dockey = doc.dockey
         del self.docs[dockey]
         self.deleted_dockeys.add(dockey)
+        self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
     async def adoc_match(
         self,
