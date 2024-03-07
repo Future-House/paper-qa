@@ -54,6 +54,9 @@ class Doc(Embeddable):
     citation: str
     dockey: DocKey
 
+    def __hash__(self) -> int:
+        return hash((self.docname, self.dockey))
+
 
 class Text(Embeddable):
     text: str
