@@ -1,12 +1,14 @@
 import asyncio
+import inspect
 import math
 import re
 import string
-from typing import BinaryIO, List
+from pathlib import Path
+from typing import Any, BinaryIO, Coroutine, Iterator, Union
 
 import pypdf
 
-from .types import StrPath
+StrPath = Union[str, Path]
 
 
 def name_in_text(name: str, text: str) -> bool:
@@ -62,8 +64,14 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 def count_pdf_pages(file_path: StrPath) -> int:
     with open(file_path, "rb") as pdf_file:
-        pdf_reader = pypdf.PdfReader(pdf_file)
-        num_pages = len(pdf_reader.pages)
+        try:  # try fitz by default
+            import fitz
+
+            doc = fitz.open(file_path)
+            num_pages = len(doc)
+        except ModuleNotFoundError:  # pypdf instead
+            pdf_reader = pypdf.PdfReader(pdf_file)
+            num_pages = len(pdf_reader.pages)
     return num_pages
 
 
@@ -74,7 +82,7 @@ def md5sum(file_path: StrPath) -> str:
         return hashlib.md5(f.read()).hexdigest()
 
 
-async def gather_with_concurrency(n: int, *coros: List) -> List:
+async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
     # https://stackoverflow.com/a/61478547/2392535
     semaphore = asyncio.Semaphore(n)
 
@@ -88,4 +96,90 @@ async def gather_with_concurrency(n: int, *coros: List) -> List:
 def guess_is_4xx(msg: str) -> bool:
     if re.search(r"4\d\d", msg):
         return True
+    return False
+
+
+def strip_citations(text: str) -> str:
+    # Combined regex for identifying citations (see unit tests for examples)
+    citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
+    # Remove the citations from the text
+    text = re.sub(citation_regex, "", text, flags=re.MULTILINE)
+    return text
+
+
+def get_citenames(text: str) -> set[str]:
+    # Combined regex for identifying citations (see unit tests for examples)
+    citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
+    results = re.findall(citation_regex, text, flags=re.MULTILINE)
+    # now find None patterns
+    none_citation_regex = r"(\(None[a-f]{0,1} pages [0-9]{1,10}-[0-9]{1,10}\))"
+    none_results = re.findall(none_citation_regex, text, flags=re.MULTILINE)
+    results.extend(none_results)
+    values = []
+    for citation in results:
+        citation = citation.strip("() ")
+        for c in re.split(",|;", citation):
+            if c == "Extra background information":
+                continue
+            # remove leading/trailing spaces
+            c = c.strip()
+            values.append(c)
+    return set(values)
+
+
+def extract_doi(reference: str) -> str:
+    """
+    Extracts DOI from the reference string using regex.
+
+    :param reference: A string containing the reference.
+    :return: A string containing the DOI link or a message if DOI is not found.
+    """
+    # DOI regex pattern
+    doi_pattern = r"10.\d{4,9}/[-._;()/:A-Z0-9]+"
+    doi_match = re.search(doi_pattern, reference, re.IGNORECASE)
+
+    # If DOI is found in the reference, return the DOI link
+    if doi_match:
+        return "https://doi.org/" + doi_match.group()
+    else:
+        return ""
+
+
+def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
+    """
+    Batch an iterable into chunks of size n
+
+    :param iterable: The iterable to batch
+    :param n: The size of the batches
+    :return: A list of batches
+    """
+    length = len(iterable)
+    for ndx in range(0, length, n):
+        yield iterable[ndx : min(ndx + n, length)]
+
+
+def flatten(iteratble: list) -> list:
+    """
+    Flatten a list of lists
+
+    :param l: The list of lists to flatten
+    :return: A flattened list
+    """
+    return [item for sublist in iteratble for item in sublist]
+
+
+def get_loop() -> asyncio.AbstractEventLoop:
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop
+
+
+def is_coroutine_callable(obj):
+    if inspect.isfunction(obj):
+        return inspect.iscoroutinefunction(obj)
+    elif callable(obj):
+        return inspect.iscoroutinefunction(obj.__call__)
     return False

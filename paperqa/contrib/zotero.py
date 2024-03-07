@@ -11,8 +11,7 @@ try:
 except ImportError:
     raise ImportError("Please install pyzotero: `pip install pyzotero`")
 from ..paths import PAPERQA_DIR
-from ..types import StrPath
-from ..utils import count_pdf_pages
+from ..utils import StrPath, count_pdf_pages
 
 
 class ZoteroPaper(BaseModel):
@@ -129,7 +128,7 @@ class ZoteroDB(zotero.Zotero):
         if pdf_key is None:
             return None
 
-        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))  # type: ignore
+        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))  # type: ignore[operator]
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
