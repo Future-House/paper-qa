@@ -734,11 +734,12 @@ class Docs(BaseModel):
                     context = strip_citations(context)
             c = Context(
                 context=context,
-                # below will remove embedding from Text/Doc
                 text=Text(
                     text=match.text,
                     name=match.name,
-                    doc=Doc(**match.doc.model_dump()),
+                    doc=match.doc.__class__(
+                        **match.doc.model_dump(exclude="embedding")
+                    ),
                 ),
                 score=score,
                 **extras,
