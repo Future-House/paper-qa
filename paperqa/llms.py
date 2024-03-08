@@ -428,7 +428,7 @@ class AnthropicLLMModel(LLMModel):
                 messages=[m for m in messages if m["role"] != "system"],
                 **process_llm_config(self.config, "max_tokens"),
             )
-        return completion.content or ""
+        return str(completion.content) or ""
 
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         aclient = self._check_client(client)
@@ -808,3 +808,38 @@ def get_score(text: str) -> int:
     if len(text) < 100:
         return 1
     return 5
+
+
+def llm_model_factory(llm: str) -> LLMModel:
+    if llm != "default":
+        if is_openai_model(llm):
+            return OpenAILLMModel(config=dict(model=llm))
+        elif llm == "langchain":
+            return LangchainLLMModel()
+        elif "claude" in llm:
+            return AnthropicLLMModel(config=dict(model=llm))
+        else:
+            raise ValueError(f"Could not guess model type for {llm}. ")
+    return OpenAILLMModel()
+
+
+def embedding_model_factory(embedding: str) -> EmbeddingModel:
+    if embedding == "langchain":
+        return LangchainEmbeddingModel()
+    elif embedding == "sentence-transformers":
+        return SentenceTransformerEmbeddingModel()
+    elif embedding.startswith("hybrid"):
+        embedding_model_name = "-".join(embedding.split("-")[1:])
+        return HybridEmbeddingModel(
+            models=[
+                OpenAIEmbeddingModel(name=embedding_model_name),
+                SparseEmbeddingModel(),
+            ]
+        )
+    elif embedding == "sparse":
+        return SparseEmbeddingModel()
+    return OpenAIEmbeddingModel(name=embedding)
+
+
+def vector_store_factory(embedding: str) -> NumpyVectorStore:
+    return NumpyVectorStore(embedding_model=embedding_model_factory(embedding))

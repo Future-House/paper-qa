@@ -482,10 +482,23 @@ class TestChains(IsolatedAsyncioTestCase):
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
+        assert type(completion.text) is str
 
         completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
+        assert type(completion.text) is str
+
+        docs = Docs(llm="claude-3-sonnet-20240229", client=client)
+        await docs.aadd_url(
+            "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+            citation="WikiMedia Foundation, 2023, Accessed now",
+            dockey="test",
+        )
+        answer = await docs.aget_evidence(
+            Answer(question="What is the national flag of Canada?")
+        )
+        await docs.aquery("What is the national flag of Canada?", answer=answer)
 
 
 def test_docs():
@@ -732,7 +745,7 @@ def test_sparse_embedding():
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
 
-def test_hyrbrid_embedding():
+def test_hybrid_embedding():
     model = HybridEmbeddingModel(
         models=[
             OpenAIEmbeddingModel(),

@@ -15,6 +15,9 @@ from .llms import (
     LangchainVectorStore,
     SentenceTransformerEmbeddingModel,
     LLMResult,
+    vector_store_factory,
+    llm_model_factory,
+    embedding_model_factory,
 )
 
 __all__ = [
@@ -40,4 +43,7 @@ __all__ = [
     "LangchainVectorStore",
     "print_callback",
     "LLMResult",
+    "vector_store_factory",
+    "llm_model_factory",
+    "embedding_model_factory",
 ]
