@@ -609,10 +609,9 @@ class NumpyVectorStore(VectorStore):
         )[0]
         similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
         # minus so descending
-        if k == len(self.texts):
-            sorted_indices = np.argsort(-similarity_scores)
-        else:
-            sorted_indices = np.argpartition(-similarity_scores, k)
+        # we could use arg-partition here
+        # but a lot of algorithms expect a sorted list
+        sorted_indices = np.argsort(-similarity_scores)
         return (
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
