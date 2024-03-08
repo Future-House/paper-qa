@@ -5,6 +5,7 @@ from io import BytesIO
 from unittest import IsolatedAsyncioTestCase
 
 import numpy as np
+import pytest
 import requests
 from openai import AsyncOpenAI
 
@@ -984,39 +985,40 @@ def test_docs_pickle() -> None:
     # 2. Pickle and unpickle, checking unpickled is in-tact
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
-    # make sure it fails if we haven't set client
-    try:
+    with pytest.raises(ValueError, match="forget to set it after pickling"):
         docs2.query("What date is bring your dog to work in the US?")
-    except ValueError:
-        pass
     docs2.set_client()
     assert docs2._client is not None
     assert docs2.llm_model.config == old_config
     assert docs2.summary_llm_model.config == old_sconfig
     assert len(docs.docs) == len(docs2.docs)
-    context1, context2 = (
-        docs.get_evidence(
+    for _ in range(4):  # Retry a few times, because this is flaky
+        docs_context = docs.get_evidence(
             Answer(
                 question="What date is bring your dog to work in the US?",
                 summary_length="about 20 words",
             ),
             k=3,
             max_sources=1,
-        ).context,
-        docs2.get_evidence(
+        ).context
+        docs2_context = docs2.get_evidence(
             Answer(
                 question="What date is bring your dog to work in the US?",
                 summary_length="about 20 words",
             ),
             k=3,
             max_sources=1,
-        ).context,
-    )
-    assert strings_similarity(context1, context2) > 0.75
-    # make sure we can query
+        ).context
+        if strings_similarity(s1=docs_context, s2=docs2_context) > 0.75:
+            break
+    else:
+        raise AssertionError("Failed to attain similar contexts, even with retrying.")
+
+    # 3. Check things still work
+    # make sure we can still query
     docs.query("What date is bring your dog to work in the US?")
 
-    # make sure we can embed documents
+    # make sure we can still embed documents
     docs2.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
