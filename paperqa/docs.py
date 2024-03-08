@@ -708,17 +708,15 @@ class Docs(BaseModel):
                     except json.decoder.JSONDecodeError:
                         # fallback to string
                         success = False
+                    else:
+                        success = isinstance(result_data, dict)
                     if success:
                         try:
-                            context = result_data["summary"]
-                            score = result_data["relevance_score"]
-                            del result_data["summary"]
-                            del result_data["relevance_score"]
-                            if "question" in result_data:
-                                del result_data["question"]
+                            context = result_data.pop("summary")
+                            score = result_data.pop("relevance_score")
+                            result_data.pop("question", None)
                             extras = result_data
                         except KeyError:
-                            # fallback
                             success = False
                 # fallback to string (or json mode not enabled)
                 if not success or not self.prompts.summary_json:
