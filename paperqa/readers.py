@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from math import ceil
 from pathlib import Path
 from typing import List
@@ -8,13 +10,13 @@ from html2text import html2text
 from .types import Doc, Text
 
 
-def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text]:
+def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> list[Text]:
     import fitz
 
     file = fitz.open(path)
     split = ""
-    pages: List[str] = []
-    texts: List[Text] = []
+    pages: list[str] = []
+    texts: list[Text] = []
     for i in range(file.page_count):
         page = file.load_page(i)
         split += page.get_text("text", sort=True)
@@ -41,14 +43,14 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List
     return texts
 
 
-def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text]:
+def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> list[Text]:
     import pypdf
 
     pdfFileObj = open(path, "rb")
     pdfReader = pypdf.PdfReader(pdfFileObj)
     split = ""
-    pages: List[str] = []
-    texts: List[Text] = []
+    pages: list[str] = []
+    texts: list[Text] = []
     for i, page in enumerate(pdfReader.pages):
         split += page.extract_text()
         pages.append(str(i + 1))
@@ -76,7 +78,7 @@ def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text
 
 def parse_txt(
     path: Path, doc: Doc, chunk_chars: int, overlap: int, html: bool = False
-) -> List[Text]:
+) -> list[Text]:
     """Parse a document into chunks, based on tiktoken encoding.
 
     NOTE: We get some byte continuation errors.
@@ -120,11 +122,10 @@ def parse_txt(
     return texts
 
 
-def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> List[Text]:
+def parse_code_txt(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> list[Text]:
     """Parse a document into chunks, based on line numbers (for code)."""
-
     split = ""
-    texts: List[Text] = []
+    texts: list[Text] = []
     last_line = 0
 
     with open(path) as f:
@@ -157,7 +158,7 @@ def read_doc(
     chunk_chars: int = 3000,
     overlap: int = 100,
     force_pypdf: bool = False,
-) -> List[Text]:
+) -> list[Text]:
     """Parse a document into chunks."""
     str_path = str(path)
     if str_path.endswith(".pdf"):

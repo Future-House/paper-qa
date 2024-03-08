@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pickle
 import tempfile
@@ -407,7 +409,7 @@ def test_extract_score():
 class TestChains(IsolatedAsyncioTestCase):
     async def test_chain_completion(self):
         client = AsyncOpenAI()
-        llm = OpenAILLMModel(config=dict(model="babbage-002", temperature=0.2))
+        llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
         call = llm.make_chain(
             client,
             "The {animal} says",
@@ -418,20 +420,20 @@ class TestChains(IsolatedAsyncioTestCase):
         def accum(x):
             outputs.append(x)
 
-        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
     async def test_chain_chat(self):
         client = AsyncOpenAI()
         llm = OpenAILLMModel(
-            config=dict(temperature=0, model="gpt-3.5-turbo", max_tokens=56)
+            config={"temperature": 0, "model": "gpt-3.5-turbo", "max_tokens": 56}
         )
         call = llm.make_chain(
             client,
@@ -443,13 +445,13 @@ class TestChains(IsolatedAsyncioTestCase):
         def accum(x):
             outputs.append(x)
 
-        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
@@ -457,7 +459,7 @@ class TestChains(IsolatedAsyncioTestCase):
         async def ac(x):
             pass
 
-        completion = await call(dict(animal="duck"), callbacks=[accum, ac])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
 
     async def test_anthropic_chain(self):
         try:
@@ -477,13 +479,13 @@ class TestChains(IsolatedAsyncioTestCase):
             outputs.append(x)
 
         outputs: list[str] = []
-        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
@@ -537,11 +539,11 @@ def test_json_evidence():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     summary_llm = OpenAILLMModel(
-        config=dict(
-            model="gpt-3.5-turbo-1106",
-            response_format=dict(type="json_object"),
-            temperature=0.0,
-        )
+        config={
+            "model": "gpt-3.5-turbo-1106",
+            "response_format": {"type": "json_object"},
+            "temperature": 0.0,
+        }
     )
     docs = Docs(
         prompts=PromptCollection(json_summary=True),
@@ -570,11 +572,11 @@ def test_custom_json_props():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     summary_llm = OpenAILLMModel(
-        config=dict(
-            model="gpt-3.5-turbo-0125",
-            response_format=dict(type="json_object"),
-            temperature=0.0,
-        )
+        config={
+            "model": "gpt-3.5-turbo-0125",
+            "response_format": {"type": "json_object"},
+            "temperature": 0.0,
+        }
     )
     my_prompts = PromptCollection(
         json_summary=True,
@@ -626,7 +628,7 @@ def test_answer_attributes():
     assert len(used_citations) > 0
     assert len(used_citations) < len(answer.contexts)
     assert (
-        answer.get_citation(list(used_citations)[0])
+        answer.get_citation(next(iter(used_citations)))
         == "WikiMedia Foundation, 2023, Accessed now"
     )
 
@@ -652,7 +654,7 @@ def test_llmresult_callbacks():
         dockey="test",
     )
     docs.query("What is Frederick Bates's greatest accomplishment?")
-    assert any([x.name == "answer" for x in my_results])
+    assert any(x.name == "answer" for x in my_results)
     assert len(my_results) > 1
 
 
@@ -1024,7 +1026,7 @@ def test_docs_pickle() -> None:
         f.write(r.text)
         docs = Docs(
             llm_model=OpenAILLMModel(
-                config=dict(temperature=0.0, model="gpt-3.5-turbo")
+                config={"temperature": 0.0, "model": "gpt-3.5-turbo"}
             )
         )
         assert docs._client is not None
@@ -1094,7 +1096,7 @@ def test_repeat_keys():
         r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
         f.write(r.text)
     docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
+        llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
     )
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     try:
@@ -1124,7 +1126,7 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = Docs(llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-4")))
+    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")  # type: ignore[arg-type]
     answer = docs.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
@@ -1193,7 +1195,7 @@ def test_code():
     # load this script
     doc_path = os.path.abspath(__file__)
     docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
+        llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
     )
     docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)  # type: ignore[arg-type]
     assert len(docs.docs) == 1
@@ -1208,16 +1210,16 @@ def test_citation():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path)  # type: ignore[arg-type]
-    assert (
-        list(docs.docs.values())[0].docname == "Wikipedia2024"
-        or list(docs.docs.values())[0].docname == "Frederick2024"
-        or list(docs.docs.values())[0].docname == "Wikipedia"
-        or list(docs.docs.values())[0].docname == "Frederick"
+    assert next(iter(docs.docs.values())).docname in (
+        "Wikipedia2024",
+        "Frederick2024",
+        "Wikipedia",
+        "Frederick",
     )
 
 
 def test_dockey_filter():
-    """Test that we can filter evidence with dockeys"""
+    """Test that we can filter evidence with dockeys."""
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
@@ -1235,7 +1237,7 @@ def test_dockey_filter():
 
 
 def test_dockey_delete():
-    """Test that we can filter evidence with dockeys"""
+    """Test that we can filter evidence with dockeys."""
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
@@ -1252,7 +1254,7 @@ def test_dockey_delete():
     answer = docs.get_evidence(
         answer, max_sources=25, k=30
     )  # we just have a lot so we get both docs
-    keys = set([c.text.doc.dockey for c in answer.contexts])
+    keys = {c.text.doc.dockey for c in answer.contexts}
     assert len(keys) == 2
     assert len(docs.docs) == 2
 
@@ -1264,12 +1266,12 @@ def test_dockey_delete():
     assert len(docs.docs) == 1
     assert len(docs.deleted_dockeys) == 1
     answer = docs.get_evidence(answer, max_sources=25, k=30)
-    keys = set([c.text.doc.dockey for c in answer.contexts])
+    keys = {c.text.doc.dockey for c in answer.contexts}
     assert len(keys) == 1
 
 
 def test_query_filter():
-    """Test that we can filter evidence with in query"""
+    """Test that we can filter evidence with in query."""
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
@@ -1341,7 +1343,7 @@ def test_custom_prompts():
 
 
 def test_pre_prompt():
-    pre = "Provide context you have memorized " "that could help answer '{question}'. "
+    pre = "Provide context you have memorized that could help answer '{question}'. "
 
     docs = Docs(prompts=PromptCollection(pre=pre))
 
@@ -1412,7 +1414,7 @@ def disabled_test_memory():
 
 
 def test_add_texts():
-    llm_config = dict(temperature=0.1, model="babbage-02")
+    llm_config = {"temperature": 0.1, "model": "babbage-02"}
     docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
@@ -1424,7 +1426,7 @@ def test_add_texts():
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
         t.embedding = None
-    docs2.add_texts(texts, list(docs.docs.values())[0])
+    docs2.add_texts(texts, next(iter(docs.docs.values())))
 
     for t1, t2 in zip(docs2.texts, docs.texts):
         assert t1.text == t2.text
@@ -1432,7 +1434,7 @@ def test_add_texts():
 
     docs2._build_texts_index()
     # now do it again to test after text index is already built
-    llm_config = dict(temperature=0.1, model="babbage-02")
+    llm_config = {"temperature": 0.1, "model": "babbage-02"}
     docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
@@ -1443,7 +1445,7 @@ def test_add_texts():
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
         t.embedding = None
-    docs2.add_texts(texts, list(docs.docs.values())[0])
+    docs2.add_texts(texts, next(iter(docs.docs.values())))
     assert len(docs2.docs) == 2
 
     docs2.query("What country was Bates Born in?")

@@ -11,7 +11,7 @@ summary_prompt = (
 )
 
 summary_json_prompt = (
-    "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\n" "Question: {question}\n\n"
+    "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\n"
 )
 
 qa_prompt = (

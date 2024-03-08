@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import pprint
@@ -55,7 +57,7 @@ async def empty_callback(result: LLMResult):
 
 
 async def print_callback(result: LLMResult):
-    pprint.pprint(result.model_dump())
+    pass
 
 
 class Docs(BaseModel):
@@ -68,7 +70,9 @@ class Docs(BaseModel):
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
-        default=OpenAILLMModel(config=dict(model="gpt-4-0125-preview", temperature=0.1))
+        default=OpenAILLMModel(
+            config={"model": "gpt-4-0125-preview", "temperature": 0.1}
+        )
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
@@ -103,23 +107,19 @@ class Docs(BaseModel):
         ):
             # convenience
             embedding_client = data["client"]
+        elif "embedding" in data and data["embedding"] != "default":
+            embedding_client = None
         else:
-            if "embedding" in data and data["embedding"] != "default":
-                embedding_client = None
-            else:
-                embedding_client = AsyncOpenAI()
+            embedding_client = AsyncOpenAI()
         if "client" in data:
             client = data.pop("client")
+        elif "llm_model" in data and data["llm_model"] is not None:
+            # except if it is an OpenAILLMModel
+            client = (
+                AsyncOpenAI() if type(data["llm_model"]) == OpenAILLMModel else None
+            )
         else:
-            # if llm_model is explicitly set, but not client then make it None
-            if "llm_model" in data and data["llm_model"] is not None:
-                # except if it is an OpenAILLMModel
-                if type(data["llm_model"]) == OpenAILLMModel:
-                    client = AsyncOpenAI()
-                else:
-                    client = None
-            else:
-                client = AsyncOpenAI()
+            client = AsyncOpenAI()
         # backwards compatibility
         if "doc_index" in data:
             data["docs_index"] = data.pop("doc_index")
@@ -144,7 +144,7 @@ class Docs(BaseModel):
         if isinstance(data, dict):
             if "llm" in data and data["llm"] != "default":
                 if is_openai_model(data["llm"]):
-                    data["llm_model"] = OpenAILLMModel(config=dict(model=data["llm"]))
+                    data["llm_model"] = OpenAILLMModel(config={"model": data["llm"]})
                 elif data["llm"] == "langchain":
                     data["llm_model"] = LangchainLLMModel()
                 else:
@@ -152,7 +152,7 @@ class Docs(BaseModel):
             if "summary_llm" in data and data["summary_llm"] is not None:
                 if is_openai_model(data["summary_llm"]):
                     data["summary_llm_model"] = OpenAILLMModel(
-                        config=dict(model=data["summary_llm"])
+                        config={"model": data["summary_llm"]}
                     )
                 else:
                     raise ValueError(f"Could not guess model type for {data['llm']}. ")
@@ -199,7 +199,7 @@ class Docs(BaseModel):
                 and type(data.llm_model) == OpenAILLMModel
             ):
                 data.summary_llm_model = OpenAILLMModel(
-                    config=dict(model="gpt-3.5-turbo", temperature=0.1)
+                    config={"model": "gpt-3.5-turbo", "temperature": 0.1}
                 )
             elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model
@@ -262,22 +262,16 @@ class Docs(BaseModel):
             client = AsyncOpenAI()
         self._client = client
         if embedding_client is None:
-            if type(client) == AsyncOpenAI:
-                embedding_client = client
-            else:
-                embedding_client = AsyncOpenAI()
+            embedding_client = client if type(client) == AsyncOpenAI else AsyncOpenAI()
         self._embedding_client = embedding_client
         Docs.make_llm_names_consistent(self)
 
     def _get_unique_name(self, docname: str) -> str:
-        """Create a unique name given proposed name"""
+        """Create a unique name given proposed name."""
         suffix = ""
         while docname + suffix in self.docnames:
             # move suffix to next letter
-            if suffix == "":
-                suffix = "a"
-            else:
-                suffix = chr(ord(suffix) + 1)
+            suffix = "a" if suffix == "" else chr(ord(suffix) + 1)
         docname += suffix
         return docname
 
@@ -413,7 +407,7 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain(dict(text=texts[0].text), None)
+            chain_result = await cite_chain({"text": texts[0].text}, None)
             citation = chain_result.text
             if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
@@ -556,7 +550,7 @@ class Docs(BaseModel):
                 )
                 papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
                 result = await chain(
-                    dict(question=query, papers="\n".join(papers)),
+                    {"question": query, "papers": "\n".join(papers)},
                     get_callbacks("filter"),
                 )
                 if answer:
@@ -565,10 +559,10 @@ class Docs(BaseModel):
                 await self.llm_result_callback(result)
                 if answer:
                     answer.add_tokens(result)
-                return set([d.dockey for d in matched_docs if d.docname in str(result)])
+                return {d.dockey for d in matched_docs if d.docname in str(result)}
         except AttributeError:
             pass
-        return set([d.dockey for d in matched_docs])
+        return {d.dockey for d in matched_docs}
 
     def _build_texts_index(self, keys: set[DocKey] | None = None):
         texts = self.texts
@@ -683,12 +677,12 @@ class Docs(BaseModel):
                 # http code in the exception
                 try:
                     llm_result = await summary_chain(
-                        dict(
-                            question=answer.question,
-                            citation=citation,
-                            summary_length=answer.summary_length,
-                            text=match.text,
-                        ),
+                        {
+                            "question": answer.question,
+                            "citation": citation,
+                            "summary_length": answer.summary_length,
+                            "text": match.text,
+                        },
                         callbacks,
                     )
                     llm_result.answer_id = answer.id
@@ -698,7 +692,7 @@ class Docs(BaseModel):
                 except Exception as e:
                     if guess_is_4xx(str(e)):
                         return None, llm_result
-                    raise e
+                    raise
                 success = True
                 if self.prompts.summary_json:
                     try:
@@ -830,7 +824,7 @@ class Docs(BaseModel):
                 prompt=self.prompts.pre,
                 system_prompt=self.prompts.system,
             )
-            pre = await chain(dict(question=answer.question), get_callbacks("pre"))
+            pre = await chain({"question": answer.question}, get_callbacks("pre"))
             pre.name = "pre"
             pre.answer_id = answer.id
             await self.llm_result_callback(pre)
@@ -838,7 +832,7 @@ class Docs(BaseModel):
             answer.context = (
                 answer.context + "\n\nExtra background information:" + str(pre)
             )
-        bib = dict()
+        bib = {}
         if len(answer.context) < 10:  # and not self.memory:
             answer_text = (
                 "I cannot answer this question due to insufficient information."
@@ -850,11 +844,11 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             answer_result = await qa_chain(
-                dict(
-                    context=answer.context,
-                    answer_length=answer.answer_length,
-                    question=answer.question,
-                ),
+                {
+                    "context": answer.context,
+                    "answer_length": answer.answer_length,
+                    "question": answer.question,
+                },
                 get_callbacks("answer"),
             )
             answer_result.name = "answer"

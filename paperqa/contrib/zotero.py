@@ -17,7 +17,7 @@ from ..utils import StrPath, count_pdf_pages
 class ZoteroPaper(BaseModel):
     """A paper from Zotero.
 
-    Attributes
+    Attributes:
     ----------
     key : str
         The citation key.
@@ -247,7 +247,7 @@ class ZoteroDB(zotero.Zotero):
                 if no_pdf or is_duplicate:
                     continue
                 pdf = cast(Path, pdf)
-                title = item["data"]["title"] if "title" in item["data"] else ""
+                title = item["data"].get("title", "")
                 if len(items) >= start:
                     yield ZoteroPaper(
                         key=_get_citation_key(item),
@@ -277,7 +277,7 @@ class ZoteroDB(zotero.Zotero):
         """Get the collection id for a given collection name
             Raises ValueError if collection not found
         Args:
-            collection_name (str): The name of the collection
+            collection_name (str): The name of the collection.
 
         Returns:
             str: collection id
@@ -328,7 +328,6 @@ def _get_citation_key(item: dict) -> str:
 
 def _extract_pdf_key(item: dict) -> Union[str, None]:
     """Extract the PDF key from a Zotero item."""
-
     if "links" not in item:
         return None
 

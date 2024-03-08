@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
 import re
@@ -63,15 +65,11 @@ def guess_model_type(model_name: str) -> str:
 
 
 def is_openai_model(model_name) -> bool:
-    return (
-        model_name.startswith("gpt-")
-        or model_name.startswith("babbage")
-        or model_name.startswith("davinci")
-    )
+    return model_name.startswith(("gpt-", "babbage", "davinci"))
 
 
 def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> dict:
-    """Remove model_type and try to set max_tokens"""
+    """Remove model_type and try to set max_tokens."""
     result = {k: v for k, v in llm_config.items() if k != "model_type"}
     if max_token_name not in result or result[max_token_name] == -1:
         model = llm_config["model"]
@@ -89,7 +87,7 @@ def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> 
 async def embed_documents(
     client: AsyncOpenAI, texts: list[str], embedding_model: str
 ) -> list[list[float]]:
-    """Embed a list of documents with batching"""
+    """Embed a list of documents with batching."""
     if client is None:
         raise ValueError(
             "Your client is None - did you forget to set it after pickling?"
@@ -116,7 +114,7 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
 
 class SparseEmbeddingModel(EmbeddingModel):
-    """This is a very simple keyword search model - probably best to be mixed with others"""
+    """This is a very simple keyword search model - probably best to be mixed with others."""
 
     name: str = "sparse-embed"
     ndim: int = 256
@@ -125,11 +123,10 @@ class SparseEmbeddingModel(EmbeddingModel):
     async def embed_documents(self, client, texts) -> list[list[float]]:
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
-        packed = [
+        return [
             np.bincount([xi % self.ndim for xi in x], minlength=self.ndim) / len(x)
             for x in enc_batch
         ]
-        return packed
 
 
 class HybridEmbeddingModel(EmbeddingModel):
@@ -154,7 +151,8 @@ class LLMModel(ABC, BaseModel):
     async def acomplete_iter(self, client: Any, prompt: str) -> Any:
         """Return an async generator that yields chunks of the completion.
 
-        I cannot get mypy to understand the override, so marked as Any"""
+        I cannot get mypy to understand the override, so marked as Any
+        """
         raise NotImplementedError
 
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
@@ -163,7 +161,8 @@ class LLMModel(ABC, BaseModel):
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         """Return an async generator that yields chunks of the completion.
 
-        I cannot get mypy to understand the override, so marked as Any"""
+        I cannot get mypy to understand the override, so marked as Any
+        """
         raise NotImplementedError
 
     def infer_llm_type(self, client: Any) -> str:
@@ -181,7 +180,7 @@ class LLMModel(ABC, BaseModel):
     ) -> Callable[
         [dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, LLMResult]
     ]:
-        """Create a function to execute a batch of prompts
+        """Create a function to execute a batch of prompts.
 
         This replaces the previous use of langchain for combining prompts and LLMs.
 
@@ -201,12 +200,13 @@ class LLMModel(ABC, BaseModel):
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type(client)
         if self.llm_type == "chat":
-            system_message_prompt = dict(role="system", content=system_prompt)
-            human_message_prompt = dict(role="user", content=prompt)
-            if skip_system:
-                chat_prompt = [human_message_prompt]
-            else:
-                chat_prompt = [system_message_prompt, human_message_prompt]
+            system_message_prompt = {"role": "system", "content": system_prompt}
+            human_message_prompt = {"role": "user", "content": prompt}
+            chat_prompt = (
+                [human_message_prompt]
+                if skip_system
+                else [system_message_prompt, human_message_prompt]
+            )
 
             async def execute(
                 data: dict,
@@ -220,7 +220,7 @@ class LLMModel(ABC, BaseModel):
                 messages = []
                 for m in chat_prompt:
                     messages.append(
-                        dict(role=m["role"], content=m["content"].format(**data))
+                        {"role": m["role"], "content": m["content"].format(**data)}
                     )
                 result.prompt = messages
                 result.prompt_count = sum(
@@ -255,10 +255,9 @@ class LLMModel(ABC, BaseModel):
 
             return execute
         elif self.llm_type == "completion":
-            if skip_system:
-                completion_prompt = prompt
-            else:
-                completion_prompt = system_prompt + "\n\n" + prompt
+            completion_prompt = (
+                prompt if skip_system else system_prompt + "\n\n" + prompt
+            )
 
             async def execute(
                 data: dict, callbacks: list[Callable] | None = None
@@ -306,7 +305,7 @@ class LLMModel(ABC, BaseModel):
 
 
 class OpenAILLMModel(LLMModel):
-    config: dict = Field(default=dict(model="gpt-3.5-turbo", temperature=0.1))
+    config: dict = Field(default={"model": "gpt-3.5-turbo", "temperature": 0.1})
     name: str = "gpt-3.5-turbo"
 
     def _check_client(self, client: Any) -> AsyncOpenAI:
@@ -375,7 +374,7 @@ except ImportError:
 
 class AnthropicLLMModel(LLMModel):
     config: dict = Field(
-        default=dict(model="claude-3-sonnet-20240229", temperature=0.1)
+        default={"model": "claude-3-sonnet-20240229", "temperature": 0.1}
     )
     name: str = "claude-3-sonnet-20240229"
 
@@ -504,8 +503,7 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         from sentence_transformers import SentenceTransformer
 
-        embeddings = cast(SentenceTransformer, self._model).encode(texts)
-        return embeddings
+        return cast(SentenceTransformer, self._model).encode(texts)
 
 
 def cosine_similarity(a, b):
@@ -514,7 +512,7 @@ def cosine_similarity(a, b):
 
 
 class VectorStore(BaseModel, ABC):
-    """Interface for vector store - very similar to LangChain's VectorStore to be compatible"""
+    """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
     # can be tuned for different tasks
@@ -625,7 +623,7 @@ class NumpyVectorStore(VectorStore):
 
 
 class LangchainLLMModel(LLMModel):
-    """A wrapper around the wrapper langchain"""
+    """A wrapper around the wrapper langchain."""
 
     name: str = "langchain"
 
@@ -673,7 +671,7 @@ class LangchainLLMModel(LLMModel):
 
 
 class LangchainEmbeddingModel(EmbeddingModel):
-    """A wrapper around the wrapper langchain"""
+    """A wrapper around the wrapper langchain."""
 
     name: str = "langchain"
 
@@ -682,7 +680,7 @@ class LangchainEmbeddingModel(EmbeddingModel):
 
 
 class LangchainVectorStore(VectorStore):
-    """A wrapper around the wrapper langchain
+    """A wrapper around the wrapper langchain.
 
     Note that if you this is cleared (e.g., by `Docs` having `jit_texts_index` set to True),
     this will calls the `from_texts` class method on the `store`. This means that any non-default
@@ -692,7 +690,7 @@ class LangchainVectorStore(VectorStore):
     _store_builder: Any | None = None
     _store: Any | None = None
     # JIT Generics - store the class type (Doc or Text)
-    class_type: Type[Embeddable] = Field(default=Embeddable)
+    class_type: type[Embeddable] = Field(default=Embeddable)
     model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
@@ -746,13 +744,13 @@ class LangchainVectorStore(VectorStore):
             raise ValueError("You must set store_builder before adding texts")
         self.class_type = type(texts[0])
         if self.class_type == Text:
-            vec_store_text_and_embeddings = list(
-                map(lambda x: (x.text, x.embedding), cast(list[Text], texts))
-            )
+            vec_store_text_and_embeddings = [
+                (x.text, x.embedding) for x in cast(list[Text], texts)
+            ]
         elif self.class_type == Doc:
-            vec_store_text_and_embeddings = list(
-                map(lambda x: (x.citation, x.embedding), cast(list[Doc], texts))
-            )
+            vec_store_text_and_embeddings = [
+                (x.citation, x.embedding) for x in cast(list[Doc], texts)
+            ]
         else:
             raise ValueError("Only embeddings of type Text are supported")
         if self._store is None:

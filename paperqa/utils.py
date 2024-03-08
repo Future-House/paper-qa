@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import inspect
 import math
@@ -13,7 +15,7 @@ StrPath = Union[str, Path]
 
 def name_in_text(name: str, text: str) -> bool:
     sname = name.strip()
-    pattern = r"\b({0})\b(?!\w)".format(re.escape(sname))
+    pattern = rf"\b({re.escape(sname)})\b(?!\w)"
     if re.search(pattern, text):
         return True
     return False
@@ -44,12 +46,7 @@ def maybe_is_pdf(file: BinaryIO) -> bool:
 def maybe_is_html(file: BinaryIO) -> bool:
     magic_number = file.read(4)
     file.seek(0)
-    return (
-        magic_number == b"<htm"
-        or magic_number == b"<!DO"
-        or magic_number == b"<xsl"
-        or magic_number == b"<!X"
-    )
+    return magic_number in (b"<htm", b"<!DO", b"<xsl", b"<!X")
 
 
 def strings_similarity(s1: str, s2: str) -> float:
@@ -103,8 +100,7 @@ def strip_citations(text: str) -> str:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
     # Remove the citations from the text
-    text = re.sub(citation_regex, "", text, flags=re.MULTILINE)
-    return text
+    return re.sub(citation_regex, "", text, flags=re.MULTILINE)
 
 
 def get_citenames(text: str) -> set[str]:
@@ -147,7 +143,7 @@ def extract_doi(reference: str) -> str:
 
 def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
     """
-    Batch an iterable into chunks of size n
+    Batch an iterable into chunks of size n.
 
     :param iterable: The iterable to batch
     :param n: The size of the batches
@@ -160,7 +156,7 @@ def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
 
 def flatten(iteratble: list) -> list:
     """
-    Flatten a list of lists
+    Flatten a list of lists.
 
     :param l: The list of lists to flatten
     :return: A flattened list
