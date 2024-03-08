@@ -6,6 +6,7 @@ from inspect import signature
 from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, Type, cast
 
 import numpy as np
+import tiktoken
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -112,6 +113,34 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
+
+
+class SparseEmbeddingModel(EmbeddingModel):
+    """This is a very simple keyword search model - probably best to be mixed with others"""
+
+    name: str = "sparse-embed"
+    ndim: int = 256
+    enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
+
+    async def embed_documents(self, client, texts) -> list[list[float]]:
+        enc_batch = self.enc.encode_ordinary_batch(texts)
+        # now get frequency of each token rel to length
+        packed = [
+            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim) / len(x)
+            for x in enc_batch
+        ]
+        return packed
+
+
+class HybridEmbeddingModel(EmbeddingModel):
+    name: str = "hybrid-embed"
+    models: list[EmbeddingModel]
+
+    async def embed_documents(self, client, texts):
+        all_embeds = await asyncio.gather(
+            *[m.embed_documents(client, texts) for m in self.models]
+        )
+        return np.concatenate(all_embeds, axis=1)
 
 
 class LLMModel(ABC, BaseModel):
@@ -339,84 +368,90 @@ class OpenAILLMModel(LLMModel):
 try:
     from anthropic import AsyncAnthropic
     from anthropic.types import ContentBlockDeltaEvent
-
-    class AnthropicLLMModel(LLMModel):
-        config: dict = Field(
-            default=dict(model="claude-3-sonnet-20240229", temperature=0.1)
-        )
-        name: str = "claude-3-sonnet-20240229"
-
-        def _check_client(self, client: Any) -> AsyncAnthropic:
-            if client is None:
-                raise ValueError(
-                    "Your client is None - did you forget to set it after pickling?"
-                )
-            if not isinstance(client, AsyncAnthropic):
-                raise ValueError(
-                    f"Your client is not a required AsyncAnthropic client. It is a {type(client)}"
-                )
-            return client
-
-        @model_validator(mode="after")
-        @classmethod
-        def set_llm_type(cls, data: Any) -> Any:
-            m = cast(AnthropicLLMModel, data)
-            m.llm_type = "chat"
-            return m
-
-        @model_validator(mode="after")
-        @classmethod
-        def set_model_name(cls, data: Any) -> Any:
-            m = cast(AnthropicLLMModel, data)
-            m.name = m.config["model"]
-            return m
-
-        async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
-            aclient = self._check_client(client)
-            # filter out system
-            sys_message = next(
-                (m["content"] for m in messages if m["role"] == "system"), None
-            )
-            # BECAUISE THEY DO NOT USE NONE TO INDICATE SENTINEL
-            # LIKE ANY SANE PERSON
-            if sys_message:
-                completion = await aclient.messages.create(
-                    system=sys_message,
-                    messages=[m for m in messages if m["role"] != "system"],
-                    **process_llm_config(self.config, "max_tokens"),
-                )
-            else:
-                completion = await aclient.messages.create(
-                    messages=[m for m in messages if m["role"] != "system"],
-                    **process_llm_config(self.config, "max_tokens"),
-                )
-            return completion.content or ""
-
-        async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
-            aclient = self._check_client(client)
-            sys_message = next(
-                (m["content"] for m in messages if m["role"] == "system"), None
-            )
-            if sys_message:
-                completion = await aclient.messages.create(
-                    stream=True,
-                    system=sys_message,
-                    messages=[m for m in messages if m["role"] != "system"],
-                    **process_llm_config(self.config, "max_tokens"),
-                )
-            else:
-                completion = await aclient.messages.create(
-                    stream=True,
-                    messages=[m for m in messages if m["role"] != "system"],
-                    **process_llm_config(self.config, "max_tokens"),
-                )
-            async for event in completion:
-                if isinstance(event, ContentBlockDeltaEvent):
-                    yield event.delta.text
-                # yield event.message.content
-
 except ImportError:
-    pass
+    AsyncAnthropic = Any
+    ContentBlockDeltaEvent = Any
+
+
+class AnthropicLLMModel(LLMModel):
+    config: dict = Field(
+        default=dict(model="claude-3-sonnet-20240229", temperature=0.1)
+    )
+    name: str = "claude-3-sonnet-20240229"
+
+    def __init__(self, *args, **kwargs):
+        if AsyncAnthropic is Any:
+            raise ImportError("Please install anthropic to use this model")
+        super().__init__(*args, **kwargs)
+
+    def _check_client(self, client: Any) -> AsyncAnthropic:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
+        if not isinstance(client, AsyncAnthropic):
+            raise ValueError(
+                f"Your client is not a required AsyncAnthropic client. It is a {type(client)}"
+            )
+        return client
+
+    @model_validator(mode="after")
+    @classmethod
+    def set_llm_type(cls, data: Any) -> Any:
+        m = cast(AnthropicLLMModel, data)
+        m.llm_type = "chat"
+        return m
+
+    @model_validator(mode="after")
+    @classmethod
+    def set_model_name(cls, data: Any) -> Any:
+        m = cast(AnthropicLLMModel, data)
+        m.name = m.config["model"]
+        return m
+
+    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+        aclient = self._check_client(client)
+        # filter out system
+        sys_message = next(
+            (m["content"] for m in messages if m["role"] == "system"), None
+        )
+        # BECAUISE THEY DO NOT USE NONE TO INDICATE SENTINEL
+        # LIKE ANY SANE PERSON
+        if sys_message:
+            completion = await aclient.messages.create(
+                system=sys_message,
+                messages=[m for m in messages if m["role"] != "system"],
+                **process_llm_config(self.config, "max_tokens"),
+            )
+        else:
+            completion = await aclient.messages.create(
+                messages=[m for m in messages if m["role"] != "system"],
+                **process_llm_config(self.config, "max_tokens"),
+            )
+        return completion.content or ""
+
+    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+        aclient = self._check_client(client)
+        sys_message = next(
+            (m["content"] for m in messages if m["role"] == "system"), None
+        )
+        if sys_message:
+            completion = await aclient.messages.create(
+                stream=True,
+                system=sys_message,
+                messages=[m for m in messages if m["role"] != "system"],
+                **process_llm_config(self.config, "max_tokens"),
+            )
+        else:
+            completion = await aclient.messages.create(
+                stream=True,
+                messages=[m for m in messages if m["role"] != "system"],
+                **process_llm_config(self.config, "max_tokens"),
+            )
+        async for event in completion:
+            if isinstance(event, ContentBlockDeltaEvent):
+                yield event.delta.text
+            # yield event.message.content
 
 
 class LlamaEmbeddingModel(EmbeddingModel):
@@ -474,9 +509,8 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
 
 
 def cosine_similarity(a, b):
-    dot_product = np.dot(a, b.T)
     norm_product = np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1)
-    return dot_product / norm_product
+    return a @ b.T / norm_product
 
 
 class VectorStore(BaseModel, ABC):
@@ -517,7 +551,7 @@ class VectorStore(BaseModel, ABC):
             raise ValueError("fetch_k must be greater or equal to k")
 
         texts, scores = await self.similarity_search(client, query, fetch_k)
-        if len(texts) <= k:
+        if len(texts) <= k or self.mmr_lambda >= 1.0:
             return texts, scores
 
         embeddings = np.array([t.embedding for t in texts])
@@ -564,7 +598,8 @@ class NumpyVectorStore(VectorStore):
     async def similarity_search(
         self, client: Any, query: str, k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
-        if len(self.texts) == 0:
+        k = min(k, len(self.texts))
+        if k == 0:
             return [], []
         np_query = np.array(
             (await self.embedding_model.embed_documents(client, [query]))[0]
@@ -573,7 +608,11 @@ class NumpyVectorStore(VectorStore):
             np_query.reshape(1, -1), self._embeddings_matrix
         )[0]
         similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
-        sorted_indices = np.argsort(similarity_scores)[::-1]
+        # minus so descending
+        if k == len(self.texts):
+            sorted_indices = np.argsort(-similarity_scores)
+        else:
+            sorted_indices = np.argpartition(-similarity_scores, k)
         return (
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],

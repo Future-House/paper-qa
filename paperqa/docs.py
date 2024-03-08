@@ -68,7 +68,7 @@ class Docs(BaseModel):
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
-        default=OpenAILLMModel(config=dict(model="gpt-4-1106-preview", temperature=0.1))
+        default=OpenAILLMModel(config=dict(model="gpt-4-0125-preview", temperature=0.1))
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
