@@ -1,5 +1,6 @@
 import os
 import pickle
+import tempfile
 from io import BytesIO
 from unittest import IsolatedAsyncioTestCase
 
@@ -963,20 +964,24 @@ class TestDocMatch(IsolatedAsyncioTestCase):
         assert len(sources) > 0
 
 
-def test_docs_pickle():
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
+def test_docs_pickle() -> None:
+    # 1. Fill out docs
+    with tempfile.NamedTemporaryFile(mode="r+", encoding="utf-8", suffix=".html") as f:
         # get front page of wikipedia
         r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
+        r.raise_for_status()
         f.write(r.text)
-    docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-3.5-turbo"))
-    )
-    assert docs._client is not None
-    old_config = docs.llm_model.config
-    old_sconfig = docs.summary_llm_model.config  # type: ignore[union-attr]
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)  # type: ignore[arg-type]
-    os.remove(doc_path)
+        docs = Docs(
+            llm_model=OpenAILLMModel(
+                config=dict(temperature=0.0, model="gpt-3.5-turbo")
+            )
+        )
+        assert docs._client is not None
+        old_config = docs.llm_model.config
+        old_sconfig = docs.summary_llm_model.config  # type: ignore[union-attr]
+        docs.add(f.name, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)  # type: ignore[arg-type]
+
+    # 2. Pickle and unpickle, checking unpickled is in-tact
     docs_pickle = pickle.dumps(docs)
     docs2 = pickle.loads(docs_pickle)
     # make sure it fails if we haven't set client
