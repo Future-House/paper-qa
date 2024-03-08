@@ -9,7 +9,7 @@ from pydantic import BaseModel
 try:
     from pyzotero import zotero
 except ImportError:
-    raise ImportError("Please install pyzotero: `pip install pyzotero`")
+    raise ImportError("Please install pyzotero: `pip install pyzotero`")  # noqa: B904
 from ..paths import PAPERQA_DIR
 from ..utils import StrPath, count_pdf_pages
 
@@ -65,9 +65,9 @@ class ZoteroDB(zotero.Zotero):
         self,
         *,
         library_type: str = "user",
-        library_id: Optional[str] = None,
-        api_key: Optional[str] = None,
-        storage: Optional[StrPath] = None,
+        library_id: Optional[str] = None,  # noqa: FA100
+        api_key: Optional[str] = None,  # noqa: FA100
+        storage: Optional[StrPath] = None,  # noqa: FA100
         **kwargs,
     ):
         self.logger = logging.getLogger("ZoteroDB")
@@ -81,7 +81,7 @@ class ZoteroDB(zotero.Zotero):
                     " from the text 'Your userID for use in API calls is [XXXXXX]'."
                     " Then, set the environment variable ZOTERO_USER_ID to this value."
                 )
-            else:
+            else:  # noqa: RET506
                 library_id = os.environ["ZOTERO_USER_ID"]
 
         if api_key is None:
@@ -93,7 +93,7 @@ class ZoteroDB(zotero.Zotero):
                     " with access to your library."
                     " Then, set the environment variable ZOTERO_API_KEY to this value."
                 )
-            else:
+            else:  # noqa: RET506
                 api_key = os.environ["ZOTERO_API_KEY"]
 
         self.logger.info(f"Using library ID: {library_id} with type: {library_type}.")
@@ -108,7 +108,7 @@ class ZoteroDB(zotero.Zotero):
             library_type=library_type, library_id=library_id, api_key=api_key, **kwargs
         )
 
-    def get_pdf(self, item: dict) -> Union[Path, None]:
+    def get_pdf(self, item: dict) -> Union[Path, None]:  # noqa: FA100
         """Gets a filename for a given Zotero key for a PDF.
 
         If the PDF is not found locally, the PDF will be downloaded to a local file at the correct key.
@@ -120,7 +120,7 @@ class ZoteroDB(zotero.Zotero):
             An item from `pyzotero`. Should have a `key` field, and also have an entry
             `links->attachment->attachmentType == application/pdf`.
         """
-        if type(item) != dict:
+        if type(item) != dict:  # noqa: E721
             raise TypeError("Pass the full item of the paper. The item must be a dict.")
 
         pdf_key = _extract_pdf_key(item)
@@ -137,17 +137,17 @@ class ZoteroDB(zotero.Zotero):
 
         return pdf_path
 
-    def iterate(
+    def iterate(  # noqa: C901, PLR0912
         self,
         limit: int = 25,
         start: int = 0,
-        q: Optional[str] = None,
-        qmode: Optional[str] = None,
-        since: Optional[str] = None,
-        tag: Optional[str] = None,
-        sort: Optional[str] = None,
-        direction: Optional[str] = None,
-        collection_name: Optional[str] = None,
+        q: Optional[str] = None,  # noqa: FA100
+        qmode: Optional[str] = None,  # noqa: FA100
+        since: Optional[str] = None,  # noqa: FA100
+        tag: Optional[str] = None,  # noqa: FA100
+        sort: Optional[str] = None,  # noqa: FA100
+        direction: Optional[str] = None,  # noqa: FA100
+        collection_name: Optional[str] = None,  # noqa: FA100
     ):
         """Given a search query, this will lazily iterate over papers in a Zotero library, downloading PDFs as needed.
 
@@ -210,8 +210,8 @@ class ZoteroDB(zotero.Zotero):
 
         max_limit = 100
 
-        items: List = []
-        pdfs: List[Path] = []
+        items: List = []  # noqa: FA100
+        pdfs: List[Path] = []  # noqa: FA100
         i = 0
         actual_i = 0
         num_remaining = limit
@@ -281,7 +281,7 @@ class ZoteroDB(zotero.Zotero):
 
         Returns:
             str: collection id
-        """
+        """  # noqa: D205
         # specific collection
         collections = self.collections()
         collection_id = ""
@@ -326,7 +326,7 @@ def _get_citation_key(item: dict) -> str:
     return f"{last_name}_{short_title}_{date}_{item['key']}".replace(" ", "")
 
 
-def _extract_pdf_key(item: dict) -> Union[str, None]:
+def _extract_pdf_key(item: dict) -> Union[str, None]:  # noqa: FA100
     """Extract the PDF key from a Zotero item."""
     if "links" not in item:
         return None
@@ -336,7 +336,7 @@ def _extract_pdf_key(item: dict) -> Union[str, None]:
 
     attachments = item["links"]["attachment"]
 
-    if type(attachments) != dict:
+    if type(attachments) != dict:  # noqa: E721
         # Find first attachment with attachmentType == application/pdf:
         for attachment in attachments:
             # TODO: This assumes there's only one PDF attachment.

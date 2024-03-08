@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-import pprint
+import pprint  # noqa: F401
 import re
 import tempfile
 from datetime import datetime
@@ -52,11 +52,11 @@ from .utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_callback(result: LLMResult):
+async def empty_callback(result: LLMResult):  # noqa: ARG001
     pass
 
 
-async def print_callback(result: LLMResult):
+async def print_callback(result: LLMResult):  # noqa: ARG001
     pass
 
 
@@ -140,7 +140,7 @@ class Docs(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def setup_alias_models(cls, data: Any) -> Any:
+    def setup_alias_models(cls, data: Any) -> Any:  # noqa: C901, PLR0912
         if isinstance(data, dict):
             if "llm" in data and data["llm"] != "default":
                 if is_openai_model(data["llm"]):
@@ -351,7 +351,7 @@ class Docs(BaseModel):
         """Add a document to the collection."""
         import urllib.request
 
-        with urllib.request.urlopen(url) as f:
+        with urllib.request.urlopen(url) as f:  # noqa: ASYNC100, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
             return await self.aadd_file(
@@ -409,7 +409,11 @@ class Docs(BaseModel):
                 raise ValueError(f"Could not read document {path}. Is it empty?")
             chain_result = await cite_chain({"text": texts[0].text}, None)
             citation = chain_result.text
-            if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
+            if (
+                len(citation) < 3  # noqa: PLR2004
+                or "Unknown" in citation
+                or "insufficient" in citation
+            ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
         if docname is None:
@@ -435,7 +439,7 @@ class Docs(BaseModel):
         # loose check to see if document was loaded
         if (
             len(texts) == 0
-            or len(texts[0].text) < 10
+            or len(texts[0].text) < 10  # noqa: PLR2004
             or (not disable_check and not maybe_is_text(texts[0].text))
         ):
             raise ValueError(
@@ -516,7 +520,7 @@ class Docs(BaseModel):
         query: str,
         k: int = 25,
         rerank: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
         answer: Answer | None = None,  # used for tracking tokens
     ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
@@ -588,7 +592,7 @@ class Docs(BaseModel):
         answer: Answer,
         k: int = 10,
         max_sources: int = 5,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
     ) -> Answer:
@@ -603,12 +607,12 @@ class Docs(BaseModel):
             )
         )
 
-    async def aget_evidence(
+    async def aget_evidence(  # noqa: C901, PLR0915
         self,
         answer: Answer,
         k: int = 10,  # Number of evidence pieces to retrieve
         max_sources: int = 5,  # Number of scored contexts to use
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
     ) -> Answer:
@@ -644,7 +648,7 @@ class Docs(BaseModel):
         # now finally cut down
         matches = matches[:k]
 
-        async def process(match):
+        async def process(match):  # noqa: C901, PLR0912
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
             # needed empties for failures/skips
@@ -773,7 +777,7 @@ class Docs(BaseModel):
         length_prompt="about 100 words",
         answer: Answer | None = None,
         key_filter: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aquery(
@@ -787,7 +791,7 @@ class Docs(BaseModel):
             )
         )
 
-    async def aquery(
+    async def aquery(  # noqa: C901, PLR0912, PLR0915
         self,
         query: str,
         k: int = 10,
@@ -795,7 +799,7 @@ class Docs(BaseModel):
         length_prompt: str = "about 100 words",
         answer: Answer | None = None,
         key_filter: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
@@ -833,7 +837,7 @@ class Docs(BaseModel):
                 answer.context + "\n\nExtra background information:" + str(pre)
             )
         bib = {}
-        if len(answer.context) < 10:  # and not self.memory:
+        if len(answer.context) < 10:  # and not self.memory:  # noqa: PLR2004
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )

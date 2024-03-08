@@ -5,7 +5,7 @@ import datetime
 import re
 from abc import ABC, abstractmethod
 from inspect import signature
-from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, Type, cast
+from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, cast
 
 import numpy as np
 import tiktoken
@@ -48,7 +48,7 @@ from .utils import batch_iter, flatten, gather_with_concurrency, is_coroutine_ca
 #     return model_name in model_arr or model_name in complete_model_arr
 
 
-def guess_model_type(model_name: str) -> str:
+def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
     if model_name.startswith("babbage"):
         return "completion"
     if model_name.startswith("davinci"):
@@ -68,7 +68,9 @@ def is_openai_model(model_name) -> bool:
     return model_name.startswith(("gpt-", "babbage", "davinci"))
 
 
-def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> dict:
+def process_llm_config(
+    llm_config: dict, max_token_name: str = "max_tokens"  # noqa: S107
+) -> dict:
     """Remove model_type and try to set max_tokens."""
     result = {k: v for k, v in llm_config.items() if k != "model_type"}
     if max_token_name not in result or result[max_token_name] == -1:
@@ -120,7 +122,7 @@ class SparseEmbeddingModel(EmbeddingModel):
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
-    async def embed_documents(self, client, texts) -> list[list[float]]:
+    async def embed_documents(self, client, texts) -> list[list[float]]:  # noqa: ARG002
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
         return [
@@ -165,13 +167,13 @@ class LLMModel(ABC, BaseModel):
         """
         raise NotImplementedError
 
-    def infer_llm_type(self, client: Any) -> str:
+    def infer_llm_type(self, client: Any) -> str:  # noqa: ARG002
         return "completion"
 
     def count_tokens(self, text: str) -> int:
         return len(text) // 4  # gross approximation
 
-    def make_chain(
+    def make_chain(  # noqa: C901, PLR0915
         self,
         client: Any,
         prompt: str,
@@ -219,7 +221,7 @@ class LLMModel(ABC, BaseModel):
                 )
                 messages = []
                 for m in chat_prompt:
-                    messages.append(
+                    messages.append(  # noqa: PERF401
                         {"role": m["role"], "content": m["content"].format(**data)}
                     )
                 result.prompt = messages
@@ -254,7 +256,7 @@ class LLMModel(ABC, BaseModel):
                 return result
 
             return execute
-        elif self.llm_type == "completion":
+        elif self.llm_type == "completion":  # noqa: RET505
             completion_prompt = (
                 prompt if skip_system else system_prompt + "\n\n" + prompt
             )
@@ -314,7 +316,7 @@ class OpenAILLMModel(LLMModel):
                 "Your client is None - did you forget to set it after pickling?"
             )
         if not isinstance(client, AsyncOpenAI):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004
                 f"Your client is not a required AsyncOpenAI client. It is a {type(client)}"
             )
         return client
@@ -389,7 +391,7 @@ class AnthropicLLMModel(LLMModel):
                 "Your client is None - did you forget to set it after pickling?"
             )
         if not isinstance(client, AsyncAnthropic):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004
                 f"Your client is not a required AsyncAnthropic client. It is a {type(client)}"
             )
         return client
@@ -463,18 +465,21 @@ class LlamaEmbeddingModel(EmbeddingModel):
         cast(AsyncOpenAI, client)
 
         async def process(texts: list[str]) -> list[float]:
-            for i in range(3):
+            for i in range(3):  # noqa: B007
                 # access httpx client directly to avoid type casting
                 response = await client._client.post(
                     client.base_url.join("../embedding"), json={"content": texts}
                 )
                 body = response.json()
                 if len(texts) == 1:
-                    if type(body) != dict or body.get("embedding") is None:
+                    if (
+                        type(body) != dict  # noqa: E721
+                        or body.get("embedding") is None
+                    ):
                         continue
                     return [body["embedding"]]
-                else:
-                    if type(body) != list or body[0] != "results":
+                else:  # noqa: RET505
+                    if type(body) != list or body[0] != "results":  # noqa: E721
                         continue
                     return [e["embedding"] for e in body[1]]
             raise ValueError("Failed to embed documents - response was ", body)
@@ -495,12 +500,16 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
         super().__init__(*args, **kwargs)
         try:
             from sentence_transformers import SentenceTransformer
-        except ImportError:
-            raise ImportError("Please install sentence-transformers to use this model")
+        except ImportError as exc:
+            raise ImportError(
+                "Please install sentence-transformers to use this model"
+            ) from exc
 
         self._model = SentenceTransformer(self.name)
 
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+    async def embed_documents(
+        self, client: Any, texts: list[str]  # noqa: ARG002
+    ) -> list[list[float]]:
         from sentence_transformers import SentenceTransformer
 
         return cast(SentenceTransformer, self._model).encode(texts)
@@ -533,7 +542,7 @@ class VectorStore(BaseModel, ABC):
     def clear(self) -> None:
         pass
 
-    async def max_marginal_relevance_search(
+    async def max_marginal_relevance_search(  # noqa: D417
         self, client: Any, query: str, k: int, fetch_k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
@@ -717,12 +726,12 @@ class LangchainVectorStore(VectorStore):
     def check_store_builder(cls, builder: Any) -> Any:
         # check it is a callable
         if not callable(builder):
-            raise ValueError("store_builder must be callable")
+            raise ValueError("store_builder must be callable")  # noqa: TRY004
         # check it takes two arguments
         # we don't use type hints because it could be
         # a partial
         sig = signature(builder)
-        if len(sig.parameters) != 2:
+        if len(sig.parameters) != 2:  # noqa: PLR2004
             raise ValueError("store_builder must take two arguments")
         return builder
 
@@ -766,7 +775,7 @@ class LangchainVectorStore(VectorStore):
         )
 
     async def similarity_search(
-        self, client: Any, query: str, k: int
+        self, client: Any, query: str, k: int  # noqa: ARG002
     ) -> tuple[Sequence[Embeddable], list[float]]:
         if self._store is None:
             return [], []
@@ -793,16 +802,16 @@ def get_score(text: str) -> int:
         score = re.search(r"([0-9]+)\w*\/", text)
     if score:
         s = int(score.group(1))
-        if s > 10:
+        if s > 10:  # noqa: PLR2004
             s = int(s / 10)  # sometimes becomes out of 100
         return s
     last_few = text[-15:]
     scores = re.findall(r"([0-9]+)", last_few)
     if scores:
         s = int(scores[-1])
-        if s > 10:
+        if s > 10:  # noqa: PLR2004
             s = int(s / 10)  # sometimes becomes out of 100
         return s
-    if len(text) < 100:
+    if len(text) < 100:  # noqa: PLR2004
         return 1
     return 5

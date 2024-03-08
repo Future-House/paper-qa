@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from math import ceil
 from pathlib import Path
-from typing import List
+from typing import List  # noqa: F401
 
 import tiktoken
 from html2text import html2text
@@ -46,7 +46,7 @@ def parse_pdf_fitz(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> list
 def parse_pdf(path: Path, doc: Doc, chunk_chars: int, overlap: int) -> list[Text]:
     import pypdf
 
-    pdfFileObj = open(path, "rb")
+    pdfFileObj = open(path, "rb")  # noqa: SIM115
     pdfReader = pypdf.PdfReader(pdfFileObj)
     split = ""
     pages: list[str] = []

@@ -161,7 +161,7 @@ class Context(BaseModel):
     )
 
 
-def __str__(self) -> str:
+def __str__(self) -> str:  # noqa: N807
     """Return the context as a string."""
     return self.context
 
@@ -208,7 +208,7 @@ class Answer(BaseModel):
         try:
             doc = next(filter(lambda x: x.text.name == name, self.contexts)).text.doc
         except StopIteration:
-            raise ValueError(f"Could not find docname {name} in contexts")
+            raise ValueError(f"Could not find docname {name} in contexts")  # noqa: B904
         return doc.citation
 
     def add_tokens(self, result: LLMResult):

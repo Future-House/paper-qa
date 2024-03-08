@@ -76,7 +76,7 @@ def md5sum(file_path: StrPath) -> str:
     import hashlib
 
     with open(file_path, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()
+        return hashlib.md5(f.read()).hexdigest()  # noqa: S324
 
 
 async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
@@ -113,12 +113,12 @@ def get_citenames(text: str) -> set[str]:
     results.extend(none_results)
     values = []
     for citation in results:
-        citation = citation.strip("() ")
+        citation = citation.strip("() ")  # noqa: PLW2901
         for c in re.split(",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces
-            c = c.strip()
+            c = c.strip()  # noqa: PLW2901
             values.append(c)
     return set(values)
 
@@ -137,7 +137,7 @@ def extract_doi(reference: str) -> str:
     # If DOI is found in the reference, return the DOI link
     if doi_match:
         return "https://doi.org/" + doi_match.group()
-    else:
+    else:  # noqa: RET505
         return ""
 
 
@@ -176,6 +176,6 @@ def get_loop() -> asyncio.AbstractEventLoop:
 def is_coroutine_callable(obj):
     if inspect.isfunction(obj):
         return inspect.iscoroutinefunction(obj)
-    elif callable(obj):
+    elif callable(obj):  # noqa: RET505
         return inspect.iscoroutinefunction(obj.__call__)
     return False

@@ -2,7 +2,7 @@ from setuptools import setup
 
 # for typing
 __version__ = ""
-exec(open("paperqa/version.py").read())
+exec(open("paperqa/version.py").read())  # noqa: S102, SIM115
 
 with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
