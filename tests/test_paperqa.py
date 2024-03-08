@@ -506,11 +506,19 @@ def test_evidence():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    original_doc = next(iter(docs.docs.values()))
+    assert (
+        original_doc.embedding is not None
+    ), "For downstream assertions of in-tact embedding, we need an embedding"
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
     print(evidence.context)
     assert "Missouri" in evidence.context
+    assert original_doc.embedding is not None, "Embedding should have remained in-tact"
+    assert (
+        evidence.contexts[0].text.doc.embedding is None
+    ), "Embedding should have been removed"
 
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"),
