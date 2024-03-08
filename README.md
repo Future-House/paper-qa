@@ -44,7 +44,6 @@ Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly
 
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
 
-
 ## What's New?
 
 Version 4 removed langchain from the package because it no longer supports pickling. This also simplifies the package a bit - especially prompts. Langchain can still be used, but it's not required. You can use any LLMs from langchain, but you will need to use the `LangchainLLMModel` class to wrap the model.
@@ -83,13 +82,13 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 
 paper-qa is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
 
-| Sync | Async |
-| --- | --- |
-| `Docs.add` | `Docs.aadd` |
-| `Docs.add_file` | `Docs.aadd_file` |
-| `Docs.add_url` | `Docs.add_url` |
+| Sync                | Async                |
+| ------------------- | -------------------- |
+| `Docs.add`          | `Docs.aadd`          |
+| `Docs.add_file`     | `Docs.aadd_file`     |
+| `Docs.add_url`      | `Docs.add_url`       |
 | `Docs.get_evidence` | `Docs.aget_evidence` |
-| `Docs.query` | `Docs.aquery` |
+| `Docs.query`        | `Docs.aquery`        |
 
 The synchronous version just call the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
 
@@ -181,6 +180,7 @@ docs = Docs(client=local_client,
 ```
 
 Just like in the above examples, we have to split the Langchain model into a client and model to keep `Docs` serializable.
+
 ```py
 
 from paperqa import Docs, LangchainEmbeddingModel
@@ -190,7 +190,7 @@ docs = Docs(embedding_model=LangchainEmbeddingModel(), embedding_client=OpenAIEm
 
 ### Adjusting number of sources
 
-You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources`  and `max_sources` is the number of sources used in the final answer.
+You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources` and `max_sources` is the number of sources used in the final answer.
 
 ```py
 docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 5, max_sources = 2)
@@ -259,16 +259,16 @@ pip install pyzotero
 First, note that `paperqa` parses the PDFs of papers to store in the database,
 so all relevant papers should have PDFs stored inside your database.
 You can get Zotero to automatically do this by highlighting the references
-you wish to retrieve, right clicking, and selecting *"Find Available PDFs"*.
+you wish to retrieve, right clicking, and selecting _"Find Available PDFs"_.
 You can also manually drag-and-drop PDFs onto each reference.
 
 To download papers, you need to get an API key for your account.
 
 1. Get your library ID, and set it as the environment variable `ZOTERO_USER_ID`.
-    - For personal libraries, this ID is given [here](https://www.zotero.org/settings/keys) at the part "*Your userID for use in API calls is XXXXXX*".
-    - For group libraries, go to your group page `https://www.zotero.org/groups/groupname`, and hover over the settings link. The ID is the integer after /groups/. (*h/t pyzotero!*)
+   - For personal libraries, this ID is given [here](https://www.zotero.org/settings/keys) at the part "_Your userID for use in API calls is XXXXXX_".
+   - For group libraries, go to your group page `https://www.zotero.org/groups/groupname`, and hover over the settings link. The ID is the integer after /groups/. (_h/t pyzotero!_)
 2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
-    - The key will need read access to the library.
+   - The key will need read access to the library.
 
 With this, we can download papers from our library and add them to `paperqa`:
 
@@ -369,7 +369,6 @@ docs = Docs(prompts=prompts)
 
 Following the syntax above, you can also include prompts that
 are executed after the query and before the query. For example, you can use this to critique the answer.
-
 
 ## FAQ
 
