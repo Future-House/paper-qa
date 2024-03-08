@@ -155,7 +155,7 @@ local_client = AsyncOpenAI(
 )
 
 docs = Docs(client=local_client,
-            embedding=LlamaEmbeddingModel(),
+            embedding_model=LlamaEmbeddingModel(),
             llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
 ```
 
@@ -175,7 +175,7 @@ local_client = AsyncOpenAI(
 )
 
 docs = Docs(client=local_client,
-            embedding=SentenceTransformerEmbeddingModel(),
+            embedding_model=SentenceTransformerEmbeddingModel(),
             llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
 ```
 
