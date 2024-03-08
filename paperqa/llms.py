@@ -116,18 +116,20 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
 
 class SparseEmbeddingModel(EmbeddingModel):
+    """This is a very simple keyword search model - probably best to be mixed with others"""
+
     name: str = "sparse-embed"
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
-    async def embed_documents(self, client, texts):
+    async def embed_documents(self, client, texts) -> list[list[float]]:
         enc_batch = self.enc.encode_ordinary_batch(texts)
-        # now get frequency of each token
+        # now get frequency of each token rel to length
         packed = [
-            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim)
+            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim) / len(x)
             for x in enc_batch
         ]
-        return [p / np.linalg.norm(p) for p in packed]
+        return packed
 
 
 class HybridEmbeddingModel(EmbeddingModel):
@@ -507,9 +509,8 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
 
 
 def cosine_similarity(a, b):
-    dot_product = np.dot(a, b.T)
     norm_product = np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1)
-    return dot_product / norm_product
+    return a @ b.T / norm_product
 
 
 class VectorStore(BaseModel, ABC):
@@ -597,7 +598,8 @@ class NumpyVectorStore(VectorStore):
     async def similarity_search(
         self, client: Any, query: str, k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
-        if len(self.texts) == 0:
+        k = min(k, len(self.texts))
+        if k == 0:
             return [], []
         np_query = np.array(
             (await self.embedding_model.embed_documents(client, [query]))[0]
@@ -606,7 +608,11 @@ class NumpyVectorStore(VectorStore):
             np_query.reshape(1, -1), self._embeddings_matrix
         )[0]
         similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
-        sorted_indices = np.argsort(similarity_scores)[::-1]
+        # minus so descending
+        if k == len(self.texts):
+            sorted_indices = np.argsort(-similarity_scores)
+        else:
+            sorted_indices = np.argpartition(-similarity_scores, k)
         return (
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
