@@ -13,6 +13,7 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .llms import (
+    HybridEmbeddingModel,
     LangchainEmbeddingModel,
     LangchainLLMModel,
     LLMModel,
@@ -20,6 +21,7 @@ from .llms import (
     OpenAIEmbeddingModel,
     OpenAILLMModel,
     SentenceTransformerEmbeddingModel,
+    SparseEmbeddingModel,
     VectorStore,
     get_score,
     is_openai_model,
@@ -127,10 +129,19 @@ class Docs(BaseModel):
         self._client = client
         self._embedding_client = embedding_client
         # more convenience
+        # If we are using an openai embedding model
+        # or we are using a hybrid model which contains an openai model
+        # and the embedding_client was not set, then we will use the client
         if (
-            type(self.texts_index.embedding_model) == OpenAIEmbeddingModel
-            and embedding_client is None
-        ):
+            isinstance(self.texts_index.embedding_model, OpenAIEmbeddingModel)
+            or (
+                isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
+                and any(
+                    isinstance(m, OpenAIEmbeddingModel)
+                    for m in self.texts_index.embedding_model.models
+                )
+            )
+        ) and embedding_client is None:
             self._embedding_client = self._client
 
         # run this here (instead of automatically) so it has access to privates
@@ -174,6 +185,36 @@ class Docs(BaseModel):
                     if "docs_index" not in data:
                         data["docs_index"] = NumpyVectorStore(
                             embedding_model=SentenceTransformerEmbeddingModel()
+                        )
+                # convenience for hybrid
+                elif data["embedding"].startswith("hybrid"):
+                    embedding_model_name = "-".join(data["embedding"].split("-")[1:])
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=HybridEmbeddingModel(
+                                models=[
+                                    OpenAIEmbeddingModel(name=embedding_model_name),
+                                    SparseEmbeddingModel(),
+                                ]
+                            )
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=HybridEmbeddingModel(
+                                models=[
+                                    OpenAIEmbeddingModel(name=embedding_model_name),
+                                    SparseEmbeddingModel(),
+                                ]
+                            )
+                        )
+                elif data["embedding"] == "sparse":
+                    if "texts_index" not in data:
+                        data["texts_index"] = NumpyVectorStore(
+                            embedding_model=SparseEmbeddingModel()
+                        )
+                    if "docs_index" not in data:
+                        data["docs_index"] = NumpyVectorStore(
+                            embedding_model=SparseEmbeddingModel()
                         )
                 else:
                     # must be an openai model

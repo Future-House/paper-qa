@@ -118,7 +118,7 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 class SparseEmbeddingModel(EmbeddingModel):
     """This is a very simple keyword search model - probably best to be mixed with others"""
 
-    name: str = "sparse-embed"
+    name: str = "sparse"
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
@@ -518,7 +518,7 @@ class VectorStore(BaseModel, ABC):
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
     # can be tuned for different tasks
-    mmr_lambda: float = Field(default=0.5)
+    mmr_lambda: float = Field(default=0.9)
     model_config = ConfigDict(extra="forbid")
 
     @abstractmethod
