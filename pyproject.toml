@@ -1,3 +1,41 @@
+[project]
+authors = [
+    {email = "white.d.andrew@gmail.com", name = "Andrew White"},
+]
+# Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python",
+]
+dependencies = [
+    "PyCryptodome",
+    "html2text",
+    "numpy",
+    "openai>=1",
+    "pydantic>=2",
+    "pypdf",
+    "tiktoken>=0.4.0",
+]
+description = "LLM Chain for answering questions from docs"
+keywords = ["question answering"]
+license = {file = "LICENSE"}
+maintainers = [
+    {email = "jamesbraza@gmail.com", name = "James Braza"},
+    {email = "white.d.andrew@gmail.com", name = "Andrew White"},
+]
+name = "paper-qa"
+readme = "README.md"
+requires-python = ">=3.8"
+urls = {repository = "https://github.com/whitead/paper-qa"}
+version = "4.2.0"
+
 [tool.codespell]
 check-filenames = true
 check-hidden = true
@@ -133,6 +171,9 @@ max-doc-length = 120  # Match line-length
 # Whether to use Google-style or NumPy-style conventions or the PEP257
 # defaults when analyzing docstring sections.
 convention = "google"
+
+[tool.setuptools.packages.find]
+include = ["paperqa*"]
 
 [tool.tomlsort]
 all = true
