@@ -68,7 +68,7 @@ class Docs(BaseModel):
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
-        default=OpenAILLMModel(config=dict(model="gpt-4-1106-preview", temperature=0.1))
+        default=OpenAILLMModel(config=dict(model="gpt-4-0125-preview", temperature=0.1))
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
@@ -708,17 +708,15 @@ class Docs(BaseModel):
                     except json.decoder.JSONDecodeError:
                         # fallback to string
                         success = False
+                    else:
+                        success = isinstance(result_data, dict)
                     if success:
                         try:
-                            context = result_data["summary"]
-                            score = result_data["relevance_score"]
-                            del result_data["summary"]
-                            del result_data["relevance_score"]
-                            if "question" in result_data:
-                                del result_data["question"]
+                            context = result_data.pop("summary")
+                            score = result_data.pop("relevance_score")
+                            result_data.pop("question", None)
                             extras = result_data
                         except KeyError:
-                            # fallback
                             success = False
                 # fallback to string (or json mode not enabled)
                 if not success or not self.prompts.summary_json:
@@ -734,11 +732,12 @@ class Docs(BaseModel):
                     context = strip_citations(context)
             c = Context(
                 context=context,
-                # below will remove embedding from Text/Doc
                 text=Text(
                     text=match.text,
                     name=match.name,
-                    doc=Doc(**match.doc.model_dump()),
+                    doc=match.doc.__class__(
+                        **match.doc.model_dump(exclude="embedding")
+                    ),
                 ),
                 score=score,
                 **extras,
