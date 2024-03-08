@@ -1063,7 +1063,7 @@ def test_docs_pickle() -> None:
             break
     else:
         raise AssertionError("Failed to attain similar contexts, even with retrying.")
-        
+
     # make sure we can query
     docs.query("What date is bring your dog to work in the US?")
 
