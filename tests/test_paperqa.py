@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pickle
 import tempfile
@@ -171,7 +173,7 @@ def test_ablations():
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.get_evidence(
             Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"  # noqa: ISC003
                 + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
             )
         )
@@ -180,7 +182,7 @@ def test_ablations():
         ), "summarization not ablated"
         answer = docs.get_evidence(
             Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"  # noqa: ISC003
                 + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
             ),
             disable_vector_search=True,
@@ -195,7 +197,7 @@ def test_location_awareness():
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.get_evidence(
             Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"  # noqa: ISC003
                 + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
             ),
             detailed_citations=True,
@@ -207,7 +209,9 @@ def test_maybe_is_text():
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
-    r = requests.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+    r = requests.get(  # noqa: S113
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
+    )
     assert maybe_is_text(r.text)
 
     assert maybe_is_html(BytesIO(r.text.encode()))
@@ -407,7 +411,7 @@ def test_extract_score():
 class TestChains(IsolatedAsyncioTestCase):
     async def test_chain_completion(self):
         client = AsyncOpenAI()
-        llm = OpenAILLMModel(config=dict(model="babbage-002", temperature=0.2))
+        llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
         call = llm.make_chain(
             client,
             "The {animal} says",
@@ -418,20 +422,20 @@ class TestChains(IsolatedAsyncioTestCase):
         def accum(x):
             outputs.append(x)
 
-        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
     async def test_chain_chat(self):
         client = AsyncOpenAI()
         llm = OpenAILLMModel(
-            config=dict(temperature=0, model="gpt-3.5-turbo", max_tokens=56)
+            config={"temperature": 0, "model": "gpt-3.5-turbo", "max_tokens": 56}
         )
         call = llm.make_chain(
             client,
@@ -443,21 +447,21 @@ class TestChains(IsolatedAsyncioTestCase):
         def accum(x):
             outputs.append(x)
 
-        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
         # check with mixed callbacks
-        async def ac(x):
+        async def ac(x):  # noqa: ARG001
             pass
 
-        completion = await call(dict(animal="duck"), callbacks=[accum, ac])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
 
     async def test_anthropic_chain(self):
         try:
@@ -477,13 +481,13 @@ class TestChains(IsolatedAsyncioTestCase):
             outputs.append(x)
 
         outputs: list[str] = []
-        completion = await call(dict(animal="duck"), callbacks=[accum])  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
         assert str(completion) == "".join(outputs)
 
-        completion = await call(dict(animal="duck"))  # type: ignore[call-arg]
+        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
 
@@ -504,7 +508,9 @@ def test_evidence():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
@@ -534,14 +540,16 @@ def test_json_evidence():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     summary_llm = OpenAILLMModel(
-        config=dict(
-            model="gpt-3.5-turbo-1106",
-            response_format=dict(type="json_object"),
-            temperature=0.0,
-        )
+        config={
+            "model": "gpt-3.5-turbo-1106",
+            "response_format": {"type": "json_object"},
+            "temperature": 0.0,
+        }
     )
     docs = Docs(
         prompts=PromptCollection(json_summary=True),
@@ -567,18 +575,20 @@ def test_custom_json_props():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     summary_llm = OpenAILLMModel(
-        config=dict(
-            model="gpt-3.5-turbo-0125",
-            response_format=dict(type="json_object"),
-            temperature=0.0,
-        )
+        config={
+            "model": "gpt-3.5-turbo-0125",
+            "response_format": {"type": "json_object"},
+            "temperature": 0.0,
+        }
     )
     my_prompts = PromptCollection(
         json_summary=True,
-        summary_json_system="Provide a summary of the excerpt that could help answer the question based on the excerpt.  "
+        summary_json_system="Provide a summary of the excerpt that could help answer the question based on the excerpt.  "  # noqa: E501
         "The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. "
         "Respond with the following JSON format:\n\n"
         '{{\n"summary": "...",\n"person_name": "...",\n"relevance_score": "..."}}\n\n'
@@ -626,7 +636,7 @@ def test_answer_attributes():
     assert len(used_citations) > 0
     assert len(used_citations) < len(answer.contexts)
     assert (
-        answer.get_citation(list(used_citations)[0])
+        answer.get_citation(next(iter(used_citations)))
         == "WikiMedia Foundation, 2023, Accessed now"
     )
 
@@ -652,7 +662,7 @@ def test_llmresult_callbacks():
         dockey="test",
     )
     docs.query("What is Frederick Bates's greatest accomplishment?")
-    assert any([x.name == "answer" for x in my_results])
+    assert any(x.name == "answer" for x in my_results)
     assert len(my_results) > 1
 
 
@@ -687,7 +697,7 @@ def test_custom_embedding():
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
-        async def embed_documents(self, client, texts):
+        async def embed_documents(self, client, texts):  # noqa: ARG002
             return [[1, 2, 3] for _ in texts]
 
     docs = Docs(
@@ -774,7 +784,7 @@ def test_custom_llm():
     class MyLLM(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, client, prompt):
+        async def acomplete(self, client, prompt):  # noqa: ARG002
             assert client is None
             return "Echo"
 
@@ -792,7 +802,7 @@ def test_custom_llm_stream():
     class MyLLM(LLMModel):
         name: str = "myllm"
 
-        async def acomplete_iter(self, client, prompt):
+        async def acomplete_iter(self, client, prompt):  # noqa: ARG002
             assert client is None
             yield "Echo"
 
@@ -803,7 +813,8 @@ def test_custom_llm_stream():
         dockey="test",
     )
     evidence = docs.get_evidence(
-        Answer(question="Echo"), get_callbacks=lambda x: [lambda y: print(y, end="")]
+        Answer(question="Echo"),
+        get_callbacks=lambda x: [lambda y: print(y, end="")],  # noqa: ARG005
     )
     assert "Echo" in evidence.context
 
@@ -827,7 +838,7 @@ def test_langchain_llm():
 
     docs.get_evidence(
         Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y, end="")],
+        get_callbacks=lambda x: [lambda y: print(y, end="")],  # noqa: ARG005
     )
 
     assert docs.llm_model.llm_type == "chat"
@@ -847,7 +858,7 @@ def test_langchain_llm():
     )
     docs.get_evidence(
         Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y, end="")],
+        get_callbacks=lambda x: [lambda y: print(y, end="")],  # noqa: ARG005
     )
 
     assert docs.summary_llm_model.llm_type == "completion"  # type: ignore[union-attr]
@@ -859,14 +870,14 @@ def test_langchain_llm():
 
     # now make sure we can pickle it
     docs_pickle = pickle.dumps(docs)
-    docs2 = pickle.loads(docs_pickle)
+    docs2 = pickle.loads(docs_pickle)  # noqa: S301
     assert docs2._client is None
     assert docs2.llm == "babbage-002"
     docs2.set_client(OpenAI(model="babbage-002"))
     assert docs2.summary_llm == "babbage-002"
     docs2.get_evidence(
         Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y)],
+        get_callbacks=lambda x: [lambda y: print(y)],  # noqa: ARG005
     )
 
 
@@ -911,19 +922,19 @@ class TestVectorStore(IsolatedAsyncioTestCase):
         try:
             index = LangchainVectorStore()
             index.add_texts_and_embeddings(some_texts)
-            raise "Failed to check for builder"  # type: ignore[misc]
+            raise "Failed to check for builder"  # type: ignore[misc]  # noqa: B016
         except ValueError:
             pass
 
         try:
-            index = LangchainVectorStore(store_builder=lambda x: None)
-            raise "Failed to count arguments"  # type: ignore[misc]
+            index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
+            raise "Failed to count arguments"  # type: ignore[misc]  # noqa: B016
         except ValueError:
             pass
 
         try:
             index = LangchainVectorStore(store_builder="foo")
-            raise "Failed to check if builder is callable"  # type: ignore[misc]
+            raise "Failed to check if builder is callable"  # type: ignore[misc]  # noqa: B016
         except ValueError:
             pass
 
@@ -981,7 +992,7 @@ class TestVectorStore(IsolatedAsyncioTestCase):
 
         # make sure we can pickle it
         docs_pickle = pickle.dumps(docs)
-        pickle.loads(docs_pickle)
+        pickle.loads(docs_pickle)  # noqa: S301
 
         # will not work at this point - have to reset index
 
@@ -1019,12 +1030,14 @@ def test_docs_pickle() -> None:
     # 1. Fill out docs
     with tempfile.NamedTemporaryFile(mode="r+", encoding="utf-8", suffix=".html") as f:
         # get front page of wikipedia
-        r = requests.get("https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day"
+        )
         r.raise_for_status()
         f.write(r.text)
         docs = Docs(
             llm_model=OpenAILLMModel(
-                config=dict(temperature=0.0, model="gpt-3.5-turbo")
+                config={"temperature": 0.0, "model": "gpt-3.5-turbo"}
             )
         )
         assert docs._client is not None
@@ -1034,7 +1047,7 @@ def test_docs_pickle() -> None:
 
     # 2. Pickle and unpickle, checking unpickled is in-tact
     docs_pickle = pickle.dumps(docs)
-    docs2 = pickle.loads(docs_pickle)
+    docs2 = pickle.loads(docs_pickle)  # noqa: S301
     with pytest.raises(ValueError, match="forget to set it after pickling"):
         docs2.query("What date is bring your dog to work in the US?")
     docs2.set_client()
@@ -1078,7 +1091,9 @@ def test_bad_context():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
@@ -1091,13 +1106,15 @@ def test_repeat_keys():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
+        llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
     )
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
-    try:
+    try:  # noqa: SIM105
         docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     except ValueError:
         pass
@@ -1124,7 +1141,7 @@ def test_repeat_keys():
 def test_pdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
-    docs = Docs(llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="gpt-4")))
+    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")  # type: ignore[arg-type]
     answer = docs.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
@@ -1143,7 +1160,9 @@ def test_fileio_reader_pdf():
 def test_fileio_reader_txt():
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
-    r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+    r = requests.get(  # noqa: S113
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+    )
     if r.status_code != 200:
         raise ValueError("Could not download wikipedia page")
     docs.add_file(
@@ -1182,7 +1201,9 @@ def test_prompt_length():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
@@ -1193,7 +1214,7 @@ def test_code():
     # load this script
     doc_path = os.path.abspath(__file__)
     docs = Docs(
-        llm_model=OpenAILLMModel(config=dict(temperature=0.0, model="babbage-002"))
+        llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
     )
     docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)  # type: ignore[arg-type]
     assert len(docs.docs) == 1
@@ -1204,24 +1225,28 @@ def test_citation():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path)  # type: ignore[arg-type]
-    assert (
-        list(docs.docs.values())[0].docname == "Wikipedia2024"
-        or list(docs.docs.values())[0].docname == "Frederick2024"
-        or list(docs.docs.values())[0].docname == "Wikipedia"
-        or list(docs.docs.values())[0].docname == "Frederick"
+    assert next(iter(docs.docs.values())).docname in (
+        "Wikipedia2024",
+        "Frederick2024",
+        "Wikipedia",
+        "Frederick",
     )
 
 
 def test_dockey_filter():
-    """Test that we can filter evidence with dockeys"""
+    """Test that we can filter evidence with dockeys."""
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
@@ -1235,11 +1260,13 @@ def test_dockey_filter():
 
 
 def test_dockey_delete():
-    """Test that we can filter evidence with dockeys"""
+    """Test that we can filter evidence with dockeys."""
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
@@ -1252,7 +1279,7 @@ def test_dockey_delete():
     answer = docs.get_evidence(
         answer, max_sources=25, k=30
     )  # we just have a lot so we get both docs
-    keys = set([c.text.doc.dockey for c in answer.contexts])
+    keys = {c.text.doc.dockey for c in answer.contexts}
     assert len(keys) == 2
     assert len(docs.docs) == 2
 
@@ -1264,16 +1291,18 @@ def test_dockey_delete():
     assert len(docs.docs) == 1
     assert len(docs.deleted_dockeys) == 1
     answer = docs.get_evidence(answer, max_sources=25, k=30)
-    keys = set([c.text.doc.dockey for c in answer.contexts])
+    keys = {c.text.doc.dockey for c in answer.contexts}
     assert len(keys) == 1
 
 
 def test_query_filter():
-    """Test that we can filter evidence with in query"""
+    """Test that we can filter evidence with in query."""
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs = Docs()
     docs.add(
@@ -1304,7 +1333,7 @@ def test_too_much_evidence():
     doc_path = "example2.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")
+        r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")  # noqa: S113
         f.write(r.text)
     docs = Docs(llm="gpt-3.5-turbo", summary_llm="gpt-3.5-turbo")
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
@@ -1333,7 +1362,9 @@ def test_custom_prompts():
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     answer = docs.query("What country is Frederick Bates from?")
@@ -1341,14 +1372,16 @@ def test_custom_prompts():
 
 
 def test_pre_prompt():
-    pre = "Provide context you have memorized " "that could help answer '{question}'. "
+    pre = "Provide context you have memorized that could help answer '{question}'. "
 
     docs = Docs(prompts=PromptCollection(pre=pre))
 
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     docs.query("What country is Bates from?")
@@ -1368,7 +1401,9 @@ def test_post_prompt():
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Frederick_Bates_(politician)")
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
         f.write(r.text)
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     docs.query("What country is Bates from?")
@@ -1412,7 +1447,7 @@ def disabled_test_memory():
 
 
 def test_add_texts():
-    llm_config = dict(temperature=0.1, model="babbage-02")
+    llm_config = {"temperature": 0.1, "model": "babbage-02"}
     docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
@@ -1424,7 +1459,7 @@ def test_add_texts():
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
         t.embedding = None
-    docs2.add_texts(texts, list(docs.docs.values())[0])
+    docs2.add_texts(texts, next(iter(docs.docs.values())))
 
     for t1, t2 in zip(docs2.texts, docs.texts):
         assert t1.text == t2.text
@@ -1432,7 +1467,7 @@ def test_add_texts():
 
     docs2._build_texts_index()
     # now do it again to test after text index is already built
-    llm_config = dict(temperature=0.1, model="babbage-02")
+    llm_config = {"temperature": 0.1, "model": "babbage-02"}
     docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
@@ -1443,7 +1478,7 @@ def test_add_texts():
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
         t.embedding = None
-    docs2.add_texts(texts, list(docs.docs.values())[0])
+    docs2.add_texts(texts, next(iter(docs.docs.values())))
     assert len(docs2.docs) == 2
 
     docs2.query("What country was Bates Born in?")

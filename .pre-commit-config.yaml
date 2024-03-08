@@ -2,15 +2,23 @@ default_language_version:
   python: python3
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
-      - id: trailing-whitespace
+      - id: check-added-large-files
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
       - id: check-yaml
+      - id: debug-statements
+      - id: detect-private-key
       - id: end-of-file-fixer
       - id: mixed-line-ending
-      - id: check-added-large-files
+      - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.0.270"
+    rev: v0.3.1
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -24,14 +32,18 @@ repos:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
         additional_dependencies: [types-requests, types-setuptools]
-  - repo: https://github.com/PyCQA/isort
-    rev: "5.12.0"
-    hooks:
-      - id: isort
-        args: [--profile=black, "--skip=__init__.py", "--filter-files"]
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.1.0
     hooks:
       - id: prettier
         additional_dependencies:
           - prettier@3.2.5 # SEE: https://github.com/pre-commit/pre-commit/issues/3133
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.23.1
+    hooks:
+      - id: toml-sort-fix
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        additional_dependencies: [".[toml]"]

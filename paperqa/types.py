@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Callable
 from uuid import UUID, uuid4
 
@@ -75,7 +77,7 @@ class _FormatDict(dict):
 
 
 def get_formatted_variables(s: str) -> set[str]:
-    """Returns the set of variables implied by the format string"""
+    """Returns the set of variables implied by the format string."""
     format_dict = _FormatDict()
     s.format_map(format_dict)
     return format_dict.key_set
@@ -133,9 +135,8 @@ class PromptCollection(BaseModel):
     @field_validator("pre")
     @classmethod
     def check_pre(cls, v: str | None) -> str | None:
-        if v is not None:
-            if set(get_formatted_variables(v)) != set(["question"]):
-                raise ValueError("Pre prompt must have input variables: question")
+        if v is not None and set(get_formatted_variables(v)) != {"question"}:
+            raise ValueError("Pre prompt must have input variables: question")
         return v
 
     @field_validator("post")
@@ -160,7 +161,7 @@ class Context(BaseModel):
     )
 
 
-def __str__(self) -> str:
+def __str__(self) -> str:  # noqa: N807
     """Return the context as a string."""
     return self.context
 
@@ -203,11 +204,11 @@ class Answer(BaseModel):
         return get_citenames(self.formatted_answer)
 
     def get_citation(self, name: str) -> str:
-        """Return the formatted citation for the gien docname."""
+        """Return the formatted citation for the given docname."""
         try:
             doc = next(filter(lambda x: x.text.name == name, self.contexts)).text.doc
         except StopIteration:
-            raise ValueError(f"Could not find docname {name} in contexts")
+            raise ValueError(f"Could not find docname {name} in contexts")  # noqa: B904
         return doc.citation
 
     def add_tokens(self, result: LLMResult):
