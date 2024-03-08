@@ -1,5 +1,5 @@
 default_language_version:
-    python: python3
+  python: python3
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -13,12 +13,11 @@ repos:
     rev: "v0.0.270"
     hooks:
       - id: ruff
-        args: [ --fix, --exit-non-zero-on-fix ]
-  - repo: https://github.com/psf/black
-    rev: "23.3.0"
+        args: [--fix, --exit-non-zero-on-fix]
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.2.0
     hooks:
       - id: black
-        language_version: python3
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
@@ -30,3 +29,9 @@ repos:
     hooks:
       - id: isort
         args: [--profile=black, "--skip=__init__.py", "--filter-files"]
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          - prettier@3.2.5 # SEE: https://github.com/pre-commit/pre-commit/issues/3133
