@@ -118,7 +118,7 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 class SparseEmbeddingModel(EmbeddingModel):
     """This is a very simple keyword search model - probably best to be mixed with others."""
 
-    name: str = "sparse-embed"
+    name: str = "sparse"
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
@@ -429,7 +429,7 @@ class AnthropicLLMModel(LLMModel):
                 messages=[m for m in messages if m["role"] != "system"],
                 **process_llm_config(self.config, "max_tokens"),
             )
-        return completion.content or ""
+        return str(completion.content) or ""
 
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         aclient = self._check_client(client)
@@ -525,7 +525,7 @@ class VectorStore(BaseModel, ABC):
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
     # can be tuned for different tasks
-    mmr_lambda: float = Field(default=0.5)
+    mmr_lambda: float = Field(default=0.9)
     model_config = ConfigDict(extra="forbid")
 
     @abstractmethod
@@ -815,3 +815,38 @@ def get_score(text: str) -> int:
     if len(text) < 100:  # noqa: PLR2004
         return 1
     return 5
+
+
+def llm_model_factory(llm: str) -> LLMModel:
+    if llm != "default":
+        if is_openai_model(llm):
+            return OpenAILLMModel(config={"model": llm})
+        elif llm == "langchain":  # noqa: RET505
+            return LangchainLLMModel()
+        elif "claude" in llm:
+            return AnthropicLLMModel(config={"model": llm})
+        else:
+            raise ValueError(f"Could not guess model type for {llm}. ")
+    return OpenAILLMModel()
+
+
+def embedding_model_factory(embedding: str) -> EmbeddingModel:
+    if embedding == "langchain":
+        return LangchainEmbeddingModel()
+    elif embedding == "sentence-transformers":  # noqa: RET505
+        return SentenceTransformerEmbeddingModel()
+    elif embedding.startswith("hybrid"):
+        embedding_model_name = "-".join(embedding.split("-")[1:])
+        return HybridEmbeddingModel(
+            models=[
+                OpenAIEmbeddingModel(name=embedding_model_name),
+                SparseEmbeddingModel(),
+            ]
+        )
+    elif embedding == "sparse":
+        return SparseEmbeddingModel()
+    return OpenAIEmbeddingModel(name=embedding)
+
+
+def vector_store_factory(embedding: str) -> NumpyVectorStore:
+    return NumpyVectorStore(embedding_model=embedding_model_factory(embedding))

@@ -14,6 +14,9 @@ from .llms import (
     OpenAILLMModel,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
+    embedding_model_factory,
+    llm_model_factory,
+    vector_store_factory,
 )
 from .version import __version__
 
@@ -40,4 +43,7 @@ __all__ = [
     "LangchainVectorStore",
     "print_callback",
     "LLMResult",
+    "vector_store_factory",
+    "llm_model_factory",
+    "embedding_model_factory",
 ]

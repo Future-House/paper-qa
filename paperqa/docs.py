@@ -15,16 +15,15 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .llms import (
-    LangchainEmbeddingModel,
-    LangchainLLMModel,
+    HybridEmbeddingModel,
     LLMModel,
     NumpyVectorStore,
     OpenAIEmbeddingModel,
     OpenAILLMModel,
-    SentenceTransformerEmbeddingModel,
     VectorStore,
     get_score,
-    is_openai_model,
+    llm_model_factory,
+    vector_store_factory,
 )
 from .paths import PAPERQA_DIR
 from .readers import read_doc
@@ -97,94 +96,31 @@ class Docs(BaseModel):
 
     def __init__(self, **data):
         # We do it here because we need to move things to private attributes
+        embedding_client: Any | None = None
+        client: Any | None = None
         if "embedding_client" in data:
             embedding_client = data.pop("embedding_client")
-        # convenience to pull embedding_client from client if reasonable
-        elif (
-            "client" in data
-            and data["client"] is not None
-            and type(data["client"]) == AsyncOpenAI
-        ):
-            # convenience
-            embedding_client = data["client"]
-        elif "embedding" in data and data["embedding"] != "default":
-            embedding_client = None
-        else:
-            embedding_client = AsyncOpenAI()
         if "client" in data:
             client = data.pop("client")
-        elif "llm_model" in data and data["llm_model"] is not None:
-            # except if it is an OpenAILLMModel
-            client = (
-                AsyncOpenAI() if type(data["llm_model"]) == OpenAILLMModel else None
-            )
-        else:
-            client = AsyncOpenAI()
         # backwards compatibility
         if "doc_index" in data:
             data["docs_index"] = data.pop("doc_index")
         super().__init__(**data)
-        self._client = client
-        self._embedding_client = embedding_client
-        # more convenience
-        if (
-            type(self.texts_index.embedding_model) == OpenAIEmbeddingModel
-            and embedding_client is None
-        ):
-            self._embedding_client = self._client
-
-        # run this here (instead of automatically) so it has access to privates
-        # If I ever figure out a better way of validating privates
-        # I can move this back to the decorator
-        Docs.make_llm_names_consistent(self)
+        self.set_client(client, embedding_client)
 
     @model_validator(mode="before")
     @classmethod
-    def setup_alias_models(cls, data: Any) -> Any:  # noqa: C901, PLR0912
+    def setup_alias_models(cls, data: Any) -> Any:
         if isinstance(data, dict):
             if "llm" in data and data["llm"] != "default":
-                if is_openai_model(data["llm"]):
-                    data["llm_model"] = OpenAILLMModel(config={"model": data["llm"]})
-                elif data["llm"] == "langchain":
-                    data["llm_model"] = LangchainLLMModel()
-                else:
-                    raise ValueError(f"Could not guess model type for {data['llm']}. ")
+                data["llm_model"] = llm_model_factory(data["llm"])
             if "summary_llm" in data and data["summary_llm"] is not None:
-                if is_openai_model(data["summary_llm"]):
-                    data["summary_llm_model"] = OpenAILLMModel(
-                        config={"model": data["summary_llm"]}
-                    )
-                else:
-                    raise ValueError(f"Could not guess model type for {data['llm']}. ")
+                data["summary_llm_model"] = llm_model_factory(data["summary_llm"])
             if "embedding" in data and data["embedding"] != "default":
-                if data["embedding"] == "langchain":
-                    if "texts_index" not in data:
-                        data["texts_index"] = NumpyVectorStore(
-                            embedding_model=LangchainEmbeddingModel()
-                        )
-                    if "docs_index" not in data:
-                        data["docs_index"] = NumpyVectorStore(
-                            embedding_model=LangchainEmbeddingModel()
-                        )
-                elif data["embedding"] == "sentence-transformers":
-                    if "texts_index" not in data:
-                        data["texts_index"] = NumpyVectorStore(
-                            embedding_model=SentenceTransformerEmbeddingModel()
-                        )
-                    if "docs_index" not in data:
-                        data["docs_index"] = NumpyVectorStore(
-                            embedding_model=SentenceTransformerEmbeddingModel()
-                        )
-                else:
-                    # must be an openai model
-                    if "texts_index" not in data:
-                        data["texts_index"] = NumpyVectorStore(
-                            embedding_model=OpenAIEmbeddingModel(name=data["embedding"])
-                        )
-                    if "docs_index" not in data:
-                        data["docs_index"] = NumpyVectorStore(
-                            embedding_model=OpenAIEmbeddingModel(name=data["embedding"])
-                        )
+                if "texts_index" not in data:
+                    data["texts_index"] = vector_store_factory(data["embedding"])
+                if "docs_index" not in data:
+                    data["docs_index"] = vector_store_factory(data["embedding"])
         return data
 
     @model_validator(mode="after")
@@ -255,14 +191,24 @@ class Docs(BaseModel):
 
     def set_client(
         self,
-        client: AsyncOpenAI | None = None,
-        embedding_client: AsyncOpenAI | None = None,
+        client: Any | None = None,
+        embedding_client: Any | None = None,
     ):
-        if client is None:
+        if client is None and isinstance(self.llm_model, OpenAILLMModel):
             client = AsyncOpenAI()
         self._client = client
-        if embedding_client is None:
-            embedding_client = client if type(client) == AsyncOpenAI else AsyncOpenAI()
+        if embedding_client is None:  # noqa: SIM102
+            # check if we have an openai embedding model in use
+            if isinstance(self.texts_index.embedding_model, OpenAIEmbeddingModel) or (
+                isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
+                and any(
+                    isinstance(m, OpenAIEmbeddingModel)
+                    for m in self.texts_index.embedding_model.models
+                )
+            ):
+                embedding_client = (
+                    client if isinstance(client, AsyncOpenAI) else AsyncOpenAI()
+                )
         self._embedding_client = embedding_client
         Docs.make_llm_names_consistent(self)
 
