@@ -1,3 +1,10 @@
+[tool.codespell]
+check-filenames = true
+check-hidden = true
+# SEE: https://github.com/codespell-project/codespell/issues/1212#issuecomment-1744768533
+ignore-regex = ".{1024}|.*codespell-ignore.*"
+ignore-words-list = "aadd,ser"
+
 [tool.mypy]
 # Type-checks the interior of functions without type annotations.
 check_untyped_defs = true
@@ -47,3 +54,89 @@ module = [
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
     "sentence_transformers",  # SEE: https://github.com/UKPLab/sentence-transformers/issues/1723
 ]
+
+[tool.ruff]
+# Line length to use when enforcing long-lines violations (like `E501`).
+line-length = 120
+# Enable application of unsafe fixes.
+unsafe-fixes = true
+
+[tool.ruff.lint]
+# List of rule codes that are unsupported by Ruff, but should be preserved when
+# (e.g.) validating # noqa directives. Useful for retaining # noqa directives
+# that cover plugins not yet implemented by Ruff.
+ignore = [
+    "ANN",  # Don't care to enforce typing
+    "BLE001",  # Don't care to enforce blind exception catching
+    "COM812",  # Trailing comma with black leads to wasting lines
+    "D100",  # D100, D101, D102, D103, D104, D105, D106, D107: don't always need docstrings
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "D203",  # Keep docstring next to the class definition (covered by D211)
+    "D212",  # Summary should be on second line (opposite of D213)
+    "D402",  # It's nice to reuse the method name
+    "D406",  # Google style requires ":" at end
+    "D407",  # We aren't using numpy style
+    "D413",  # Blank line after last section. -> No blank line
+    "DTZ",  # Don't care to have timezone safety
+    "EM",  # Overly pedantic
+    "ERA001",  # Don't care to prevent commented code
+    "FBT001",  # FBT001, FBT002: overly pedantic
+    "FBT002",
+    "FIX",  # Don't care to prevent TODO, FIXME, etc.
+    "FLY002",  # Can be less readable
+    "G004",  # f-strings are convenient
+    "INP001",  # Can use namespace packages
+    "N803",  # Want to use 'N', or 'L',
+    "N806",  # Want to use 'N', or 'L',
+    "PLR0913",
+    "PTH",  # Overly pedantic
+    "S311",  # Ok to use python random
+    "SLF001",  # Overly pedantic
+    "T201",  # Overly pedantic
+    "TCH001",  # TCH001, TCH002, TCH003: don't care to enforce type checking blocks
+    "TCH002",
+    "TCH003",
+    "TD002",  # Don't care for TODO author
+    "TD003",  # Don't care for TODO links
+    "TID252",  # Allow relative imports for packaging
+    "TRY003",  # Overly pedantic
+]
+select = ["ALL"]
+unfixable = [
+    "B007",  # While debugging, unused loop variables can be useful
+    "ERA001",  # While debugging, temporarily commenting code can be useful
+    "F401",  # While debugging, unused imports can be useful
+    "F841",  # While debugging, unused locals can be useful
+]
+
+[tool.ruff.lint.flake8-annotations]
+mypy-init-return = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = [
+    "PLR2004",  # Tests can have magic values
+    "S101",  # Tests can have assertions
+]
+
+[tool.ruff.lint.pycodestyle]
+# The maximum line length to allow for line-length violations within
+# documentation (W505), including standalone comments.
+max-doc-length = 120  # Match line-length
+
+[tool.ruff.lint.pydocstyle]
+# Whether to use Google-style or NumPy-style conventions or the PEP257
+# defaults when analyzing docstring sections.
+convention = "google"
+
+[tool.tomlsort]
+all = true
+in_place = true
+spaces_before_inline_comment = 2  # Match Python PEP 8
+spaces_indent_inline_array = 4  # Match Python PEP 8
+trailing_comma_inline_array = true

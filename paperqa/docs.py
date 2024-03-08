@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import json
 import os
-import pprint
+import pprint  # noqa: F401
 import re
 import tempfile
 from datetime import datetime
@@ -49,12 +51,12 @@ from .utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_callback(result: LLMResult):
+async def empty_callback(result: LLMResult):  # noqa: ARG001
     pass
 
 
-async def print_callback(result: LLMResult):
-    pprint.pprint(result.model_dump())
+async def print_callback(result: LLMResult):  # noqa: ARG001
+    pass
 
 
 class Docs(BaseModel):
@@ -67,7 +69,9 @@ class Docs(BaseModel):
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
-        default=OpenAILLMModel(config=dict(model="gpt-4-0125-preview", temperature=0.1))
+        default=OpenAILLMModel(
+            config={"model": "gpt-4-0125-preview", "temperature": 0.1}
+        )
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
@@ -131,7 +135,7 @@ class Docs(BaseModel):
                 and type(data.llm_model) == OpenAILLMModel
             ):
                 data.summary_llm_model = OpenAILLMModel(
-                    config=dict(model="gpt-3.5-turbo", temperature=0.1)
+                    config={"model": "gpt-3.5-turbo", "temperature": 0.1}
                 )
             elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model
@@ -190,11 +194,10 @@ class Docs(BaseModel):
         client: Any | None = None,
         embedding_client: Any | None = None,
     ):
-        if client is None:
-            if isinstance(self.llm_model, OpenAILLMModel):
-                client = AsyncOpenAI()
+        if client is None and isinstance(self.llm_model, OpenAILLMModel):
+            client = AsyncOpenAI()
         self._client = client
-        if embedding_client is None:
+        if embedding_client is None:  # noqa: SIM102
             # check if we have an openai embedding model in use
             if isinstance(self.texts_index.embedding_model, OpenAIEmbeddingModel) or (
                 isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
@@ -203,22 +206,18 @@ class Docs(BaseModel):
                     for m in self.texts_index.embedding_model.models
                 )
             ):
-                if isinstance(client, AsyncOpenAI):
-                    embedding_client = client
-                else:
-                    embedding_client = AsyncOpenAI()
+                embedding_client = (
+                    client if isinstance(client, AsyncOpenAI) else AsyncOpenAI()
+                )
         self._embedding_client = embedding_client
         Docs.make_llm_names_consistent(self)
 
     def _get_unique_name(self, docname: str) -> str:
-        """Create a unique name given proposed name"""
+        """Create a unique name given proposed name."""
         suffix = ""
         while docname + suffix in self.docnames:
             # move suffix to next letter
-            if suffix == "":
-                suffix = "a"
-            else:
-                suffix = chr(ord(suffix) + 1)
+            suffix = "a" if suffix == "" else chr(ord(suffix) + 1)
         docname += suffix
         return docname
 
@@ -298,7 +297,7 @@ class Docs(BaseModel):
         """Add a document to the collection."""
         import urllib.request
 
-        with urllib.request.urlopen(url) as f:
+        with urllib.request.urlopen(url) as f:  # noqa: ASYNC100, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
             return await self.aadd_file(
@@ -354,9 +353,13 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain(dict(text=texts[0].text), None)
+            chain_result = await cite_chain({"text": texts[0].text}, None)
             citation = chain_result.text
-            if len(citation) < 3 or "Unknown" in citation or "insufficient" in citation:
+            if (
+                len(citation) < 3  # noqa: PLR2004
+                or "Unknown" in citation
+                or "insufficient" in citation
+            ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
         if docname is None:
@@ -382,7 +385,7 @@ class Docs(BaseModel):
         # loose check to see if document was loaded
         if (
             len(texts) == 0
-            or len(texts[0].text) < 10
+            or len(texts[0].text) < 10  # noqa: PLR2004
             or (not disable_check and not maybe_is_text(texts[0].text))
         ):
             raise ValueError(
@@ -463,7 +466,7 @@ class Docs(BaseModel):
         query: str,
         k: int = 25,
         rerank: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
         answer: Answer | None = None,  # used for tracking tokens
     ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
@@ -497,7 +500,7 @@ class Docs(BaseModel):
                 )
                 papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
                 result = await chain(
-                    dict(question=query, papers="\n".join(papers)),
+                    {"question": query, "papers": "\n".join(papers)},
                     get_callbacks("filter"),
                 )
                 if answer:
@@ -506,10 +509,10 @@ class Docs(BaseModel):
                 await self.llm_result_callback(result)
                 if answer:
                     answer.add_tokens(result)
-                return set([d.dockey for d in matched_docs if d.docname in str(result)])
+                return {d.dockey for d in matched_docs if d.docname in str(result)}
         except AttributeError:
             pass
-        return set([d.dockey for d in matched_docs])
+        return {d.dockey for d in matched_docs}
 
     def _build_texts_index(self, keys: set[DocKey] | None = None):
         texts = self.texts
@@ -535,7 +538,7 @@ class Docs(BaseModel):
         answer: Answer,
         k: int = 10,
         max_sources: int = 5,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
     ) -> Answer:
@@ -550,12 +553,12 @@ class Docs(BaseModel):
             )
         )
 
-    async def aget_evidence(
+    async def aget_evidence(  # noqa: C901, PLR0915
         self,
         answer: Answer,
         k: int = 10,  # Number of evidence pieces to retrieve
         max_sources: int = 5,  # Number of scored contexts to use
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
         detailed_citations: bool = False,
         disable_vector_search: bool = False,
     ) -> Answer:
@@ -591,7 +594,7 @@ class Docs(BaseModel):
         # now finally cut down
         matches = matches[:k]
 
-        async def process(match):
+        async def process(match):  # noqa: C901, PLR0912
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
             # needed empties for failures/skips
@@ -624,12 +627,12 @@ class Docs(BaseModel):
                 # http code in the exception
                 try:
                     llm_result = await summary_chain(
-                        dict(
-                            question=answer.question,
-                            citation=citation,
-                            summary_length=answer.summary_length,
-                            text=match.text,
-                        ),
+                        {
+                            "question": answer.question,
+                            "citation": citation,
+                            "summary_length": answer.summary_length,
+                            "text": match.text,
+                        },
                         callbacks,
                     )
                     llm_result.answer_id = answer.id
@@ -639,7 +642,7 @@ class Docs(BaseModel):
                 except Exception as e:
                     if guess_is_4xx(str(e)):
                         return None, llm_result
-                    raise e
+                    raise
                 success = True
                 if self.prompts.summary_json:
                     try:
@@ -720,7 +723,7 @@ class Docs(BaseModel):
         length_prompt="about 100 words",
         answer: Answer | None = None,
         key_filter: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aquery(
@@ -734,7 +737,7 @@ class Docs(BaseModel):
             )
         )
 
-    async def aquery(
+    async def aquery(  # noqa: C901, PLR0912, PLR0915
         self,
         query: str,
         k: int = 10,
@@ -742,7 +745,7 @@ class Docs(BaseModel):
         length_prompt: str = "about 100 words",
         answer: Answer | None = None,
         key_filter: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
@@ -771,7 +774,7 @@ class Docs(BaseModel):
                 prompt=self.prompts.pre,
                 system_prompt=self.prompts.system,
             )
-            pre = await chain(dict(question=answer.question), get_callbacks("pre"))
+            pre = await chain({"question": answer.question}, get_callbacks("pre"))
             pre.name = "pre"
             pre.answer_id = answer.id
             await self.llm_result_callback(pre)
@@ -779,8 +782,8 @@ class Docs(BaseModel):
             answer.context = (
                 answer.context + "\n\nExtra background information:" + str(pre)
             )
-        bib = dict()
-        if len(answer.context) < 10:  # and not self.memory:
+        bib = {}
+        if len(answer.context) < 10:  # and not self.memory:  # noqa: PLR2004
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )
@@ -791,11 +794,11 @@ class Docs(BaseModel):
                 system_prompt=self.prompts.system,
             )
             answer_result = await qa_chain(
-                dict(
-                    context=answer.context,
-                    answer_length=answer.answer_length,
-                    question=answer.question,
-                ),
+                {
+                    "context": answer.context,
+                    "answer_length": answer.answer_length,
+                    "question": answer.question,
+                },
                 get_callbacks("answer"),
             )
             answer_result.name = "answer"

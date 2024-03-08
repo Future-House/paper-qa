@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
 import re
 from abc import ABC, abstractmethod
 from inspect import signature
-from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, Type, cast
+from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, cast
 
 import numpy as np
 import tiktoken
@@ -46,7 +48,7 @@ from .utils import batch_iter, flatten, gather_with_concurrency, is_coroutine_ca
 #     return model_name in model_arr or model_name in complete_model_arr
 
 
-def guess_model_type(model_name: str) -> str:
+def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
     if model_name.startswith("babbage"):
         return "completion"
     if model_name.startswith("davinci"):
@@ -63,20 +65,18 @@ def guess_model_type(model_name: str) -> str:
 
 
 def is_openai_model(model_name) -> bool:
-    return (
-        model_name.startswith("gpt-")
-        or model_name.startswith("babbage")
-        or model_name.startswith("davinci")
-    )
+    return model_name.startswith(("gpt-", "babbage", "davinci"))
 
 
-def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> dict:
-    """Remove model_type and try to set max_tokens"""
+def process_llm_config(
+    llm_config: dict, max_token_name: str = "max_tokens"  # noqa: S107
+) -> dict:
+    """Remove model_type and try to set max_tokens."""
     result = {k: v for k, v in llm_config.items() if k != "model_type"}
     if max_token_name not in result or result[max_token_name] == -1:
         model = llm_config["model"]
         # now we guess - we could use tiktoken to count,
-        # but do have the initative right now
+        # but do have the initiative right now
         if model.startswith("gpt-4") or (
             model.startswith("gpt-3.5") and "1106" in model
         ):
@@ -89,7 +89,7 @@ def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> 
 async def embed_documents(
     client: AsyncOpenAI, texts: list[str], embedding_model: str
 ) -> list[list[float]]:
-    """Embed a list of documents with batching"""
+    """Embed a list of documents with batching."""
     if client is None:
         raise ValueError(
             "Your client is None - did you forget to set it after pickling?"
@@ -116,20 +116,19 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
 
 class SparseEmbeddingModel(EmbeddingModel):
-    """This is a very simple keyword search model - probably best to be mixed with others"""
+    """This is a very simple keyword search model - probably best to be mixed with others."""
 
     name: str = "sparse"
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
-    async def embed_documents(self, client, texts) -> list[list[float]]:
+    async def embed_documents(self, client, texts) -> list[list[float]]:  # noqa: ARG002
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
-        packed = [
+        return [
             np.bincount([xi % self.ndim for xi in x], minlength=self.ndim) / len(x)
             for x in enc_batch
         ]
-        return packed
 
 
 class HybridEmbeddingModel(EmbeddingModel):
@@ -154,7 +153,8 @@ class LLMModel(ABC, BaseModel):
     async def acomplete_iter(self, client: Any, prompt: str) -> Any:
         """Return an async generator that yields chunks of the completion.
 
-        I cannot get mypy to understand the override, so marked as Any"""
+        I cannot get mypy to understand the override, so marked as Any
+        """
         raise NotImplementedError
 
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
@@ -163,16 +163,17 @@ class LLMModel(ABC, BaseModel):
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         """Return an async generator that yields chunks of the completion.
 
-        I cannot get mypy to understand the override, so marked as Any"""
+        I cannot get mypy to understand the override, so marked as Any
+        """
         raise NotImplementedError
 
-    def infer_llm_type(self, client: Any) -> str:
+    def infer_llm_type(self, client: Any) -> str:  # noqa: ARG002
         return "completion"
 
     def count_tokens(self, text: str) -> int:
         return len(text) // 4  # gross approximation
 
-    def make_chain(
+    def make_chain(  # noqa: C901, PLR0915
         self,
         client: Any,
         prompt: str,
@@ -181,7 +182,7 @@ class LLMModel(ABC, BaseModel):
     ) -> Callable[
         [dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, LLMResult]
     ]:
-        """Create a function to execute a batch of prompts
+        """Create a function to execute a batch of prompts.
 
         This replaces the previous use of langchain for combining prompts and LLMs.
 
@@ -201,12 +202,13 @@ class LLMModel(ABC, BaseModel):
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type(client)
         if self.llm_type == "chat":
-            system_message_prompt = dict(role="system", content=system_prompt)
-            human_message_prompt = dict(role="user", content=prompt)
-            if skip_system:
-                chat_prompt = [human_message_prompt]
-            else:
-                chat_prompt = [system_message_prompt, human_message_prompt]
+            system_message_prompt = {"role": "system", "content": system_prompt}
+            human_message_prompt = {"role": "user", "content": prompt}
+            chat_prompt = (
+                [human_message_prompt]
+                if skip_system
+                else [system_message_prompt, human_message_prompt]
+            )
 
             async def execute(
                 data: dict,
@@ -219,8 +221,8 @@ class LLMModel(ABC, BaseModel):
                 )
                 messages = []
                 for m in chat_prompt:
-                    messages.append(
-                        dict(role=m["role"], content=m["content"].format(**data))
+                    messages.append(  # noqa: PERF401
+                        {"role": m["role"], "content": m["content"].format(**data)}
                     )
                 result.prompt = messages
                 result.prompt_count = sum(
@@ -254,11 +256,10 @@ class LLMModel(ABC, BaseModel):
                 return result
 
             return execute
-        elif self.llm_type == "completion":
-            if skip_system:
-                completion_prompt = prompt
-            else:
-                completion_prompt = system_prompt + "\n\n" + prompt
+        elif self.llm_type == "completion":  # noqa: RET505
+            completion_prompt = (
+                prompt if skip_system else system_prompt + "\n\n" + prompt
+            )
 
             async def execute(
                 data: dict, callbacks: list[Callable] | None = None
@@ -306,7 +307,7 @@ class LLMModel(ABC, BaseModel):
 
 
 class OpenAILLMModel(LLMModel):
-    config: dict = Field(default=dict(model="gpt-3.5-turbo", temperature=0.1))
+    config: dict = Field(default={"model": "gpt-3.5-turbo", "temperature": 0.1})
     name: str = "gpt-3.5-turbo"
 
     def _check_client(self, client: Any) -> AsyncOpenAI:
@@ -315,7 +316,7 @@ class OpenAILLMModel(LLMModel):
                 "Your client is None - did you forget to set it after pickling?"
             )
         if not isinstance(client, AsyncOpenAI):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004
                 f"Your client is not a required AsyncOpenAI client. It is a {type(client)}"
             )
         return client
@@ -375,7 +376,7 @@ except ImportError:
 
 class AnthropicLLMModel(LLMModel):
     config: dict = Field(
-        default=dict(model="claude-3-sonnet-20240229", temperature=0.1)
+        default={"model": "claude-3-sonnet-20240229", "temperature": 0.1}
     )
     name: str = "claude-3-sonnet-20240229"
 
@@ -390,7 +391,7 @@ class AnthropicLLMModel(LLMModel):
                 "Your client is None - did you forget to set it after pickling?"
             )
         if not isinstance(client, AsyncAnthropic):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004
                 f"Your client is not a required AsyncAnthropic client. It is a {type(client)}"
             )
         return client
@@ -464,18 +465,21 @@ class LlamaEmbeddingModel(EmbeddingModel):
         cast(AsyncOpenAI, client)
 
         async def process(texts: list[str]) -> list[float]:
-            for i in range(3):
+            for i in range(3):  # noqa: B007
                 # access httpx client directly to avoid type casting
                 response = await client._client.post(
                     client.base_url.join("../embedding"), json={"content": texts}
                 )
                 body = response.json()
                 if len(texts) == 1:
-                    if type(body) != dict or body.get("embedding") is None:
+                    if (
+                        type(body) != dict  # noqa: E721
+                        or body.get("embedding") is None
+                    ):
                         continue
                     return [body["embedding"]]
-                else:
-                    if type(body) != list or body[0] != "results":
+                else:  # noqa: RET505
+                    if type(body) != list or body[0] != "results":  # noqa: E721
                         continue
                     return [e["embedding"] for e in body[1]]
             raise ValueError("Failed to embed documents - response was ", body)
@@ -496,16 +500,19 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
         super().__init__(*args, **kwargs)
         try:
             from sentence_transformers import SentenceTransformer
-        except ImportError:
-            raise ImportError("Please install sentence-transformers to use this model")
+        except ImportError as exc:
+            raise ImportError(
+                "Please install sentence-transformers to use this model"
+            ) from exc
 
         self._model = SentenceTransformer(self.name)
 
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+    async def embed_documents(
+        self, client: Any, texts: list[str]  # noqa: ARG002
+    ) -> list[list[float]]:
         from sentence_transformers import SentenceTransformer
 
-        embeddings = cast(SentenceTransformer, self._model).encode(texts)
-        return embeddings
+        return cast(SentenceTransformer, self._model).encode(texts)
 
 
 def cosine_similarity(a, b):
@@ -514,7 +521,7 @@ def cosine_similarity(a, b):
 
 
 class VectorStore(BaseModel, ABC):
-    """Interface for vector store - very similar to LangChain's VectorStore to be compatible"""
+    """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
     # can be tuned for different tasks
@@ -535,7 +542,7 @@ class VectorStore(BaseModel, ABC):
     def clear(self) -> None:
         pass
 
-    async def max_marginal_relevance_search(
+    async def max_marginal_relevance_search(  # noqa: D417
         self, client: Any, query: str, k: int, fetch_k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
@@ -625,7 +632,7 @@ class NumpyVectorStore(VectorStore):
 
 
 class LangchainLLMModel(LLMModel):
-    """A wrapper around the wrapper langchain"""
+    """A wrapper around the wrapper langchain."""
 
     name: str = "langchain"
 
@@ -673,7 +680,7 @@ class LangchainLLMModel(LLMModel):
 
 
 class LangchainEmbeddingModel(EmbeddingModel):
-    """A wrapper around the wrapper langchain"""
+    """A wrapper around the wrapper langchain."""
 
     name: str = "langchain"
 
@@ -682,7 +689,7 @@ class LangchainEmbeddingModel(EmbeddingModel):
 
 
 class LangchainVectorStore(VectorStore):
-    """A wrapper around the wrapper langchain
+    """A wrapper around the wrapper langchain.
 
     Note that if you this is cleared (e.g., by `Docs` having `jit_texts_index` set to True),
     this will calls the `from_texts` class method on the `store`. This means that any non-default
@@ -692,7 +699,7 @@ class LangchainVectorStore(VectorStore):
     _store_builder: Any | None = None
     _store: Any | None = None
     # JIT Generics - store the class type (Doc or Text)
-    class_type: Type[Embeddable] = Field(default=Embeddable)
+    class_type: type[Embeddable] = Field(default=Embeddable)
     model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
@@ -719,12 +726,12 @@ class LangchainVectorStore(VectorStore):
     def check_store_builder(cls, builder: Any) -> Any:
         # check it is a callable
         if not callable(builder):
-            raise ValueError("store_builder must be callable")
+            raise ValueError("store_builder must be callable")  # noqa: TRY004
         # check it takes two arguments
         # we don't use type hints because it could be
         # a partial
         sig = signature(builder)
-        if len(sig.parameters) != 2:
+        if len(sig.parameters) != 2:  # noqa: PLR2004
             raise ValueError("store_builder must take two arguments")
         return builder
 
@@ -746,13 +753,13 @@ class LangchainVectorStore(VectorStore):
             raise ValueError("You must set store_builder before adding texts")
         self.class_type = type(texts[0])
         if self.class_type == Text:
-            vec_store_text_and_embeddings = list(
-                map(lambda x: (x.text, x.embedding), cast(list[Text], texts))
-            )
+            vec_store_text_and_embeddings = [
+                (x.text, x.embedding) for x in cast(list[Text], texts)
+            ]
         elif self.class_type == Doc:
-            vec_store_text_and_embeddings = list(
-                map(lambda x: (x.citation, x.embedding), cast(list[Doc], texts))
-            )
+            vec_store_text_and_embeddings = [
+                (x.citation, x.embedding) for x in cast(list[Doc], texts)
+            ]
         else:
             raise ValueError("Only embeddings of type Text are supported")
         if self._store is None:
@@ -768,7 +775,7 @@ class LangchainVectorStore(VectorStore):
         )
 
     async def similarity_search(
-        self, client: Any, query: str, k: int
+        self, client: Any, query: str, k: int  # noqa: ARG002
     ) -> tuple[Sequence[Embeddable], list[float]]:
         if self._store is None:
             return [], []
@@ -795,17 +802,17 @@ def get_score(text: str) -> int:
         score = re.search(r"([0-9]+)\w*\/", text)
     if score:
         s = int(score.group(1))
-        if s > 10:
+        if s > 10:  # noqa: PLR2004
             s = int(s / 10)  # sometimes becomes out of 100
         return s
     last_few = text[-15:]
     scores = re.findall(r"([0-9]+)", last_few)
     if scores:
         s = int(scores[-1])
-        if s > 10:
+        if s > 10:  # noqa: PLR2004
             s = int(s / 10)  # sometimes becomes out of 100
         return s
-    if len(text) < 100:
+    if len(text) < 100:  # noqa: PLR2004
         return 1
     return 5
 
@@ -813,11 +820,11 @@ def get_score(text: str) -> int:
 def llm_model_factory(llm: str) -> LLMModel:
     if llm != "default":
         if is_openai_model(llm):
-            return OpenAILLMModel(config=dict(model=llm))
-        elif llm == "langchain":
+            return OpenAILLMModel(config={"model": llm})
+        elif llm == "langchain":  # noqa: RET505
             return LangchainLLMModel()
         elif "claude" in llm:
-            return AnthropicLLMModel(config=dict(model=llm))
+            return AnthropicLLMModel(config={"model": llm})
         else:
             raise ValueError(f"Could not guess model type for {llm}. ")
     return OpenAILLMModel()
@@ -826,7 +833,7 @@ def llm_model_factory(llm: str) -> LLMModel:
 def embedding_model_factory(embedding: str) -> EmbeddingModel:
     if embedding == "langchain":
         return LangchainEmbeddingModel()
-    elif embedding == "sentence-transformers":
+    elif embedding == "sentence-transformers":  # noqa: RET505
         return SentenceTransformerEmbeddingModel()
     elif embedding.startswith("hybrid"):
         embedding_model_name = "-".join(embedding.split("-")[1:])

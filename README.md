@@ -378,7 +378,7 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 ### How is this different from LangChain?
 
-There has been some great work on retrievers in langchain and you could say this is an example of a retreiver.
+There has been some great work on retrievers in langchain and you could say this is an example of a retriever.
 
 ### Can I save or load?
 
