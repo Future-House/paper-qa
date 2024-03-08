@@ -76,7 +76,7 @@ def process_llm_config(llm_config: dict, max_token_name: str = "max_tokens") -> 
     if max_token_name not in result or result[max_token_name] == -1:
         model = llm_config["model"]
         # now we guess - we could use tiktoken to count,
-        # but do have the initative right now
+        # but do have the initiative right now
         if model.startswith("gpt-4") or (
             model.startswith("gpt-3.5") and "1106" in model
         ):

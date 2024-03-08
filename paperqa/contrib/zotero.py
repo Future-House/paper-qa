@@ -282,7 +282,7 @@ class ZoteroDB(zotero.Zotero):
         Returns:
             str: collection id
         """
-        # specfic collection
+        # specific collection
         collections = self.collections()
         collection_id = ""
 

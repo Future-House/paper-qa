@@ -80,7 +80,7 @@ def parse_txt(
     """Parse a document into chunks, based on tiktoken encoding.
 
     NOTE: We get some byte continuation errors.
-    Currnetly ignored, but should explore more to make sure we
+    Currently ignored, but should explore more to make sure we
     don't miss anything.
     """
     try:

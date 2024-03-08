@@ -203,7 +203,7 @@ class Answer(BaseModel):
         return get_citenames(self.formatted_answer)
 
     def get_citation(self, name: str) -> str:
-        """Return the formatted citation for the gien docname."""
+        """Return the formatted citation for the given docname."""
         try:
             doc = next(filter(lambda x: x.text.name == name, self.contexts)).text.doc
         except StopIteration:
