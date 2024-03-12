@@ -4,6 +4,7 @@ import os
 import pickle
 import tempfile
 from io import BytesIO
+from pathlib import Path
 from unittest import IsolatedAsyncioTestCase
 
 import numpy as np
@@ -1220,21 +1221,21 @@ def test_pdf_pypdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     splits1 = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
         overlap=100,
         chunk_chars=3000,
     )
     splits2 = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
         chunk_chars=3000,
     )
     assert (
-        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())  # type: ignore[union-attr]
+        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
         > 0.85
     )
 
@@ -1243,17 +1244,17 @@ def test_parser_only_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     parsed_text = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
         overlap=100,
         chunk_chars=3000,
         parsed_text_only=True,
     )
-    assert parsed_text.metadata.parse_type == "pdf"  # type: ignore[union-attr]
-    assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)  # type: ignore[union-attr]
-    assert parsed_text.metadata.chunk_metadata is None  # type: ignore[union-attr]
-    assert parsed_text.metadata.total_parsed_text_length == sum(  # type: ignore[union-attr]
+    assert parsed_text.metadata.parse_type == "pdf"
+    assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)
+    assert parsed_text.metadata.chunk_metadata is None
+    assert parsed_text.metadata.total_parsed_text_length == sum(
         [len(t) for t in parsed_text.content.values()]  # type: ignore[misc,union-attr]
     )
 
@@ -1262,7 +1263,7 @@ def test_chunk_metadata_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     chunk_text, metadata = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
         overlap=100,
@@ -1290,7 +1291,7 @@ def test_chunk_metadata_reader():
         f.write(r.text)
 
     chunk_text, metadata = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
@@ -1309,7 +1310,7 @@ def test_chunk_metadata_reader():
     doc_path = os.path.abspath(__file__)
 
     chunk_text, metadata = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
