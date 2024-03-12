@@ -62,7 +62,7 @@ def chunk_pdf(
 
     if not isinstance(parsed_text.content, dict):
         raise NotImplementedError(
-            "pdf chunking only implemented per-page, ParsedText.content must be a `dict`."
+            f"ParsedText.content must be a `dict`, not {type(parsed_text.content)}."
         )
 
     for page_num, page_text in parsed_text.content.items():
@@ -141,7 +141,7 @@ def chunk_text(
 
     if not isinstance(parsed_text.content, str):
         raise NotImplementedError(
-            "text chunking only implemented on str, ParsedText.content must be a `str`."
+            f"ParsedText.content must be a `str`, not {type(parsed_text.content)}."
         )
 
     content = parsed_text.content if not use_tiktoken else parsed_text.encode_content()
@@ -180,7 +180,7 @@ def chunk_code_text(
 
     if not isinstance(parsed_text.content, list):
         raise NotImplementedError(
-            "code chunking only implemented for one entry per line, ParsedText.content must be a `list`"
+            f"ParsedText.content must be a `list`, not {type(parsed_text.content)}."
         )
 
     for i, line in enumerate(parsed_text.content):
