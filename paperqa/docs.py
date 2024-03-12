@@ -353,7 +353,7 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain({"text": texts[0].text}, None)  # type: ignore[union-attr]
+            chain_result = await cite_chain({"text": texts[0].text}, None)
             citation = chain_result.text
             if (
                 len(citation) < 3  # noqa: PLR2004
@@ -385,13 +385,13 @@ class Docs(BaseModel):
         # loose check to see if document was loaded
         if (
             len(texts) == 0
-            or len(texts[0].text) < 10  # type: ignore[union-attr] # noqa: PLR2004
-            or (not disable_check and not maybe_is_text(texts[0].text))  # type: ignore[union-attr]
+            or len(texts[0].text) < 10  # noqa: PLR2004
+            or (not disable_check and not maybe_is_text(texts[0].text))
         ):
             raise ValueError(
                 f"This does not look like a text document: {path}. Path disable_check to ignore this error."
             )
-        if await self.aadd_texts(texts, doc):  # type: ignore[arg-type]
+        if await self.aadd_texts(texts, doc):
             return docname
         return None
 

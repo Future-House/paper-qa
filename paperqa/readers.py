@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from math import ceil
 from pathlib import Path
-from typing import List  # noqa: F401
+from typing import List, Literal, overload  # noqa: F401
 
 import html2text
 import tiktoken
@@ -206,14 +206,62 @@ def chunk_code_text(
     return texts
 
 
+@overload
+def read_doc(
+    path: Path,
+    doc: Doc,
+    parsed_text_only: Literal[False],
+    include_metadata: Literal[False],
+    chunk_chars: int = ...,
+    overlap: int = ...,
+    force_pypdf: bool = ...,
+) -> list[Text]: ...
+
+
+@overload
+def read_doc(
+    path: Path,
+    doc: Doc,
+    parsed_text_only: Literal[False] = ...,
+    include_metadata: Literal[False] = ...,
+    chunk_chars: int = ...,
+    overlap: int = ...,
+    force_pypdf: bool = ...,
+) -> list[Text]: ...
+
+
+@overload
+def read_doc(
+    path: Path,
+    doc: Doc,
+    parsed_text_only: Literal[True],
+    include_metadata: bool = ...,
+    chunk_chars: int = ...,
+    overlap: int = ...,
+    force_pypdf: bool = ...,
+) -> ParsedText: ...
+
+
+@overload
+def read_doc(
+    path: Path,
+    doc: Doc,
+    parsed_text_only: Literal[False],
+    include_metadata: Literal[True],
+    chunk_chars: int = ...,
+    overlap: int = ...,
+    force_pypdf: bool = ...,
+) -> tuple[list[Text], ParsedMetadata]: ...
+
+
 def read_doc(  # noqa: PLR0912
     path: Path,
     doc: Doc,
+    parsed_text_only: bool = False,
+    include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
     force_pypdf: bool = False,
-    parsed_text_only: bool = False,
-    include_metadata: bool = False,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
