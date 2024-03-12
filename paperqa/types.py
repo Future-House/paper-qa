@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable
 from uuid import UUID, uuid4
 
+import tiktoken
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -22,6 +23,7 @@ from .prompts import (
     summary_prompt,
 )
 from .utils import get_citenames
+from .version import __version__ as pqa_version
 
 # Just for clarity
 DocKey = Any
@@ -221,3 +223,41 @@ class Answer(BaseModel):
         else:
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
+
+
+class ChunkMetadata(BaseModel):
+    """Metadata for chunking algorithm."""
+
+    chunk_chars: int
+    overlap: int
+    chunk_type: str
+
+
+class ParsedMetadata(BaseModel):
+    """Metadata for parsed text."""
+
+    parsing_libraries: list[str]
+    total_parsed_text_length: int
+    paperqa_version: str = pqa_version
+    parse_type: str | None = None
+    chunk_metadata: ChunkMetadata | None = None
+
+
+class ParsedText(BaseModel):
+    """Parsed text (pre-chunking)."""
+
+    content: dict | str | list[str]
+    metadata: ParsedMetadata
+
+    def encode_content(self):
+        # we tokenize using tiktoken so cuts are in reasonable places
+        # See https://github.com/openai/tiktoken
+        enc = tiktoken.get_encoding("cl100k_base")
+        if isinstance(self.content, str):
+            return enc.encode_ordinary(self.content)
+        elif isinstance(self.content, list):  # noqa: RET505
+            return [enc.encode_ordinary(c) for c in self.content]
+        else:
+            raise NotImplementedError(
+                "Encoding only implemented for str and list[str] content."
+            )

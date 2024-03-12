@@ -1234,9 +1234,46 @@ def test_pdf_pypdf_reader():
         chunk_chars=3000,
     )
     assert (
-        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
+        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())  # type: ignore[union-attr]
         > 0.85
     )
+
+
+def test_parser_only_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    parsed_text = read_doc(
+        doc_path,  # type: ignore[arg-type]
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=True,
+    )
+    assert parsed_text.metadata.parse_type == "pdf"  # type: ignore[union-attr]
+    assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)  # type: ignore[union-attr]
+    assert parsed_text.metadata.chunk_metadata is None  # type: ignore[union-attr]
+    assert parsed_text.metadata.total_parsed_text_length == sum(  # type: ignore[union-attr]
+        [len(t) for t in parsed_text.content.values()]  # type: ignore[misc,union-attr]
+    )
+
+
+def test_chunk_metadata_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    chunk_text, metadata = read_doc(
+        doc_path,  # type: ignore[arg-type]
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    assert metadata.parse_type == "pdf"
+    assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
 
 
 def test_prompt_length():
