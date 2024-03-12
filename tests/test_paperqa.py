@@ -743,6 +743,9 @@ def test_sparse_embedding():
     )
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
+    # check the embeddings are the same size
+    assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
+
     # test alias
     docs = Docs(embedding="sparse")
     assert docs._embedding_client is None
@@ -774,6 +777,9 @@ def test_hybrid_embedding():
         dockey="test",
     )
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
+
+    # check the embeddings are the same size
+    assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # now try via alias
     docs = Docs(
