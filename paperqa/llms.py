@@ -126,7 +126,8 @@ class SparseEmbeddingModel(EmbeddingModel):
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
         return [
-            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim) / len(x)
+            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim).astype(float)
+            / len(x)
             for x in enc_batch
         ]
 
