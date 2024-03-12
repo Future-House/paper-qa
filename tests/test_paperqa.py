@@ -1274,6 +1274,55 @@ def test_chunk_metadata_reader():
     assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"  # type: ignore[union-attr]
     assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
     assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    assert all(
+        chunk_text[i].text[-100:] == chunk_text[i + 1].text[:100]
+        for i in range(len(chunk_text) - 1)
+    )
+
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
+        f.write(r.text)
+
+    chunk_text, metadata = read_doc(
+        doc_path,  # type: ignore[arg-type]
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    # NOTE the use of tiktoken changes the actual char and overlap counts
+    assert metadata.parse_type == "html"
+    assert metadata.chunk_metadata.chunk_type == "overlap"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+
+    doc_path = os.path.abspath(__file__)
+
+    chunk_text, metadata = read_doc(
+        doc_path,  # type: ignore[arg-type]
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    assert metadata.parse_type == "txt"
+    assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
 def test_prompt_length():
