@@ -1,3 +1,7 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools >= 61.0"]
+
 [project]
 authors = [
     {email = "white.d.andrew@gmail.com", name = "Andrew White"},
