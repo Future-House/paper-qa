@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from math import ceil
 from pathlib import Path
-from typing import List, Literal, overload  # noqa: F401
+from typing import Literal, overload
 
 import html2text
 import tiktoken
