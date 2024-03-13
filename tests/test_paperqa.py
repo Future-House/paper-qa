@@ -4,6 +4,7 @@ import os
 import pickle
 import tempfile
 from io import BytesIO
+from pathlib import Path
 from unittest import IsolatedAsyncioTestCase
 
 import numpy as np
@@ -1226,14 +1227,14 @@ def test_pdf_pypdf_reader():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     splits1 = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
         overlap=100,
         chunk_chars=3000,
     )
     splits2 = read_doc(
-        doc_path,  # type: ignore[arg-type]
+        Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
@@ -1243,6 +1244,92 @@ def test_pdf_pypdf_reader():
         strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
         > 0.85
     )
+
+
+def test_parser_only_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    parsed_text = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=True,
+    )
+    assert parsed_text.metadata.parse_type == "pdf"
+    assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)
+    assert parsed_text.metadata.chunk_metadata is None
+    assert parsed_text.metadata.total_parsed_text_length == sum(
+        [len(t) for t in parsed_text.content.values()]  # type: ignore[misc,union-attr]
+    )
+
+
+def test_chunk_metadata_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    chunk_text, metadata = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    assert metadata.parse_type == "pdf"
+    assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    assert all(
+        chunk_text[i].text[-100:] == chunk_text[i + 1].text[:100]
+        for i in range(len(chunk_text) - 1)
+    )
+
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
+        f.write(r.text)
+
+    chunk_text, metadata = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    # NOTE the use of tiktoken changes the actual char and overlap counts
+    assert metadata.parse_type == "html"
+    assert metadata.chunk_metadata.chunk_type == "overlap"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+
+    doc_path = os.path.abspath(__file__)
+
+    chunk_text, metadata = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    assert metadata.parse_type == "txt"
+    assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
 def test_prompt_length():
