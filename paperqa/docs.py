@@ -705,7 +705,7 @@ class Docs(BaseModel):
             [
                 f"{c.text.name}: {c.context}"
                 + "".join([f"\n{k}: {v}" for k, v in c.model_extra.items()])
-                + (f"\n\nBased on {c.text.doc.citation}" if detailed_citations else "")
+                + (f". From {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]
         )

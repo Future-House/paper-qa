@@ -546,7 +546,7 @@ def test_evidence():
         Answer(question="For which state was Bates a governor?"),
         detailed_citations=True,
     )
-    assert "Based on WikiMedia Foundation, 2023, Accessed now" in evidence.context
+    assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
     os.remove(doc_path)
 
 
@@ -581,7 +581,7 @@ def test_json_evidence():
         Answer(question="For which state was Bates a governor?"),
         detailed_citations=True,
     )
-    assert "Based on WikiMedia Foundation, 2023, Accessed now" in evidence.context
+    assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
     os.remove(doc_path)
 
 
