@@ -233,6 +233,13 @@ class Answer(BaseModel):
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
 
+    def get_unique_docs_from_contexts(self, score_threshold: int = 0) -> set[Doc]:
+        """Parse contexts for docs with scores above the input threshold."""
+        return {
+            c.text.doc
+            for c in filter(lambda x: x.score >= score_threshold, self.contexts)
+        }
+
 
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""
