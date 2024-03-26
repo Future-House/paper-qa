@@ -215,9 +215,11 @@ class Answer(BaseModel):
     def get_citation(self, name: str) -> str:
         """Return the formatted citation for the given docname."""
         try:
-            doc = next(filter(lambda x: x.text.name == name, self.contexts)).text.doc
-        except StopIteration:
-            raise ValueError(f"Could not find docname {name} in contexts")  # noqa: B904
+            doc: Doc = next(
+                filter(lambda x: x.text.name == name, self.contexts)
+            ).text.doc
+        except StopIteration as exc:
+            raise ValueError(f"Could not find docname {name} in contexts.") from exc
         return doc.citation
 
     def add_tokens(self, result: LLMResult):
