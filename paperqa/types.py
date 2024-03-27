@@ -215,9 +215,11 @@ class Answer(BaseModel):
     def get_citation(self, name: str) -> str:
         """Return the formatted citation for the given docname."""
         try:
-            doc = next(filter(lambda x: x.text.name == name, self.contexts)).text.doc
-        except StopIteration:
-            raise ValueError(f"Could not find docname {name} in contexts")  # noqa: B904
+            doc: Doc = next(
+                filter(lambda x: x.text.name == name, self.contexts)
+            ).text.doc
+        except StopIteration as exc:
+            raise ValueError(f"Could not find docname {name} in contexts.") from exc
         return doc.citation
 
     def add_tokens(self, result: LLMResult):
@@ -230,6 +232,13 @@ class Answer(BaseModel):
         else:
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
+
+    def get_unique_docs_from_contexts(self, score_threshold: int = 0) -> set[Doc]:
+        """Parse contexts for docs with scores above the input threshold."""
+        return {
+            c.text.doc
+            for c in filter(lambda x: x.score >= score_threshold, self.contexts)
+        }
 
 
 class ChunkMetadata(BaseModel):
