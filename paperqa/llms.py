@@ -87,17 +87,23 @@ def process_llm_config(
 
 
 async def embed_documents(
-    client: AsyncOpenAI, texts: list[str], embedding_model: str
+    client: AsyncOpenAI, texts: list[str], embedding_model: str, batch_size: int = 16
 ) -> list[list[float]]:
     """Embed a list of documents with batching."""
     if client is None:
         raise ValueError(
             "Your client is None - did you forget to set it after pickling?"
         )
-    response = await client.embeddings.create(
-        model=embedding_model, input=texts, encoding_format="float"
-    )
-    return [e.embedding for e in response.data]
+    N = len(texts)
+    embeddings = []
+    for i in range(0, N, batch_size):
+        response = await client.embeddings.create(
+            model=embedding_model,
+            input=texts[i : i + batch_size],
+            encoding_format="float",
+        )
+        embeddings.extend([e.embedding for e in response.data])
+    return embeddings
 
 
 class EmbeddingModel(ABC, BaseModel):
