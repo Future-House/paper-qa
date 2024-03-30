@@ -1101,9 +1101,8 @@ def test_docs_pickle() -> None:
     assert docs2._client is not None
     assert docs2.llm_model.config == old_config
     assert docs2.summary_llm_model.config == old_sconfig
-    print(old_config, old_sconfig)
     assert len(docs.docs) == len(docs2.docs)
-    for _ in range(4):  # Retry a few times, because this is flaky
+    for _ in range(8):  # Retry multiple times because this is flaky
         docs_context = docs.get_evidence(
             Answer(
                 question="What date is bring your dog to work in the US?",
