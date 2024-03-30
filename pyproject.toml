@@ -1,6 +1,7 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools >= 61.0"]
+# Pin to 62.6 for support from reading requirements from requirements.txt
+requires = ["setuptools >= 62.6.0"]
 
 [project]
 authors = [
@@ -28,6 +29,7 @@ dependencies = [
     "tiktoken>=0.4.0",
 ]
 description = "LLM Chain for answering questions from docs"
+dynamic = ["optional-dependencies"]
 keywords = ["question answering"]
 license = {file = "LICENSE"}
 maintainers = [
@@ -182,6 +184,9 @@ max-doc-length = 120  # Match line-length
 # Whether to use Google-style or NumPy-style conventions or the PEP257
 # defaults when analyzing docstring sections.
 convention = "google"
+
+[tool.setuptools.dynamic.optional-dependencies.dev]
+file = ["dev-requirements.txt"]
 
 [tool.setuptools.packages.find]
 include = ["paperqa*"]
