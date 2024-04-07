@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
       - run: pip install .[dev]
       - name: Check pre-commit
         run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
