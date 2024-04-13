@@ -998,25 +998,15 @@ async def test_langchain_vector_store():
         )
     ]
 
-    # checks on builder
-    try:
-        index = LangchainVectorStore()
+    index = LangchainVectorStore()
+    with pytest.raises(ValueError):  # noqa: PT011
         index.add_texts_and_embeddings(some_texts)
-        raise "Failed to check for builder"  # type: ignore[misc]  # noqa: B016
-    except ValueError:
-        pass
 
-    try:
+    with pytest.raises(ValueError):  # noqa: PT011
         index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
-        raise "Failed to count arguments"  # type: ignore[misc]  # noqa: B016
-    except ValueError:
-        pass
 
-    try:
+    with pytest.raises(ValueError):  # noqa: PT011
         index = LangchainVectorStore(store_builder="foo")
-        raise "Failed to check if builder is callable"  # type: ignore[misc]  # noqa: B016
-    except ValueError:
-        pass
 
     # now with real builder
     index = LangchainVectorStore(

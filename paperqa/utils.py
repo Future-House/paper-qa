@@ -186,10 +186,8 @@ def llm_read_json(text: str) -> dict:
     """Read LLM output and extract JSON data from it."""
     # fetch from markdown ```json if present
     text = text.strip().split("```json")[-1].split("```")[0]
-    print(text)
     # split anything before the first {
     text = "{" + text.split("{", 1)[-1]
     # split anything after the last }
     text = text.rsplit("}", 1)[0] + "}"
-    print(text)
     return json.loads(text)
