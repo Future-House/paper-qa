@@ -523,7 +523,7 @@ async def test_anthropic_chain():
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
-    assert type(completion.text) is str  # noqa: E721
+    assert isinstance(completion.text, str)
 
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
