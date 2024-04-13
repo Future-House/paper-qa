@@ -5,7 +5,6 @@ import pickle
 import tempfile
 from io import BytesIO
 from pathlib import Path
-from unittest import IsolatedAsyncioTestCase
 
 import numpy as np
 import pytest
@@ -39,6 +38,7 @@ from paperqa.llms import (
 from paperqa.readers import read_doc
 from paperqa.utils import (
     get_citenames,
+    llm_read_json,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -409,101 +409,137 @@ def test_extract_score():
     assert get_score(sample) == 9
 
 
-class TestChains(IsolatedAsyncioTestCase):
-    async def test_chain_completion(self):
-        client = AsyncOpenAI()
-        llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
-        call = llm.make_chain(
-            client,
-            "The {animal} says",
-            skip_system=True,
-        )
-        outputs = []
+@pytest.mark.parametrize(
+    "example",
+    [
+        """Sure here is the json you asked for!
 
-        def accum(x):
-            outputs.append(x)
+    {
+    "example": "json"
+    }
 
-        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
-        assert completion.seconds_to_first_token > 0
-        assert completion.prompt_count > 0
-        assert completion.completion_count > 0
-        assert str(completion) == "".join(outputs)
+    Did you like it?""",
+        '{"example": "json"}',
+        """
+```json
+{
+    "example": "json"
+}
+```
 
-        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
-        assert completion.seconds_to_first_token == 0
-        assert completion.seconds_to_last_token > 0
+I have written the json you asked for.""",
+        """
 
-    async def test_chain_chat(self):
-        client = AsyncOpenAI()
-        llm = OpenAILLMModel(
-            config={"temperature": 0, "model": "gpt-3.5-turbo", "max_tokens": 56}
-        )
-        call = llm.make_chain(
-            client,
-            "The {animal} says",
-            skip_system=True,
-        )
-        outputs = []
+{
+    "example": "json"
+}
 
-        def accum(x):
-            outputs.append(x)
+""",
+    ],
+)
+def test_llm_read_json(example: str):
+    assert llm_read_json(example) == {"example": "json"}
 
-        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
-        assert completion.seconds_to_first_token > 0
-        assert completion.prompt_count > 0
-        assert completion.completion_count > 0
-        assert str(completion) == "".join(outputs)
 
-        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
-        assert completion.seconds_to_first_token == 0
-        assert completion.seconds_to_last_token > 0
+@pytest.mark.asyncio()
+async def test_chain_completion():
+    client = AsyncOpenAI()
+    llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
+    call = llm.make_chain(
+        client,
+        "The {animal} says",
+        skip_system=True,
+    )
+    outputs = []
 
-        # check with mixed callbacks
-        async def ac(x):  # noqa: ARG001
-            pass
+    def accum(x):
+        outputs.append(x)
 
-        completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count > 0
+    assert completion.completion_count > 0
+    assert str(completion) == "".join(outputs)
 
-    async def test_anthropic_chain(self):
-        try:
-            from anthropic import AsyncAnthropic
-        except ImportError:
-            return
+    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token == 0
+    assert completion.seconds_to_last_token > 0
 
-        client = AsyncAnthropic()
-        llm = AnthropicLLMModel()
-        call = llm.make_chain(
-            client,
-            "The {animal} says",
-            skip_system=True,
-        )
 
-        def accum(x):
-            outputs.append(x)
+@pytest.mark.asyncio()
+async def test_chain_chat():
+    client = AsyncOpenAI()
+    llm = OpenAILLMModel(
+        config={"temperature": 0, "model": "gpt-3.5-turbo", "max_tokens": 56}
+    )
+    call = llm.make_chain(
+        client,
+        "The {animal} says",
+        skip_system=True,
+    )
+    outputs = []
 
-        outputs: list[str] = []
-        completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
-        assert completion.seconds_to_first_token > 0
-        assert completion.prompt_count > 0
-        assert completion.completion_count > 0
-        assert str(completion) == "".join(outputs)
-        assert type(completion.text) is str  # noqa: E721
+    def accum(x):
+        outputs.append(x)
 
-        completion = await call({"animal": "duck"})  # type: ignore[call-arg]
-        assert completion.seconds_to_first_token == 0
-        assert completion.seconds_to_last_token > 0
-        assert type(completion.text) is str  # noqa: E721
+    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count > 0
+    assert completion.completion_count > 0
+    assert str(completion) == "".join(outputs)
 
-        docs = Docs(llm="claude-3-sonnet-20240229", client=client)
-        await docs.aadd_url(
-            "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
-            citation="WikiMedia Foundation, 2023, Accessed now",
-            dockey="test",
-        )
-        answer = await docs.aget_evidence(
-            Answer(question="What is the national flag of Canada?")
-        )
-        await docs.aquery("What is the national flag of Canada?", answer=answer)
+    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token == 0
+    assert completion.seconds_to_last_token > 0
+
+    # check with mixed callbacks
+    async def ac(x):  # noqa: ARG001
+        pass
+
+    completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+
+
+@pytest.mark.asyncio()
+async def test_anthropic_chain():
+    try:
+        from anthropic import AsyncAnthropic
+    except ImportError:
+        return
+
+    client = AsyncAnthropic()
+    llm = AnthropicLLMModel()
+    call = llm.make_chain(
+        client,
+        "The {animal} says",
+        skip_system=True,
+    )
+
+    def accum(x):
+        outputs.append(x)
+
+    outputs: list[str] = []
+    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count > 0
+    assert completion.completion_count > 0
+    assert str(completion) == "".join(outputs)
+    assert type(completion.text) is str  # noqa: E721
+
+    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token == 0
+    assert completion.seconds_to_last_token > 0
+    assert type(completion.text) is str  # noqa: E721
+
+    docs = Docs(llm="claude-3-sonnet-20240229", client=client)
+    await docs.aadd_url(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    answer = await docs.aget_evidence(
+        Answer(question="What is the national flag of Canada?")
+    )
+    await docs.aquery("What is the national flag of Canada?", answer=answer)
 
 
 def test_docs():
@@ -948,126 +984,124 @@ def test_langchain_embeddings():
     )
 
 
-class TestVectorStore(IsolatedAsyncioTestCase):
-    async def test_langchain_vector_store(self):
-        from langchain_community.vectorstores.faiss import FAISS
-        from langchain_openai import OpenAIEmbeddings
+@pytest.mark.asyncio()
+async def test_langchain_vector_store():
+    from langchain_community.vectorstores.faiss import FAISS
+    from langchain_openai import OpenAIEmbeddings
 
-        some_texts = [
-            Text(
-                embedding=OpenAIEmbeddings().embed_query("test"),
-                text="this is a test",
-                name="test",
-                doc=Doc(docname="test", citation="test", dockey="test"),
-            )
-        ]
-
-        # checks on builder
-        try:
-            index = LangchainVectorStore()
-            index.add_texts_and_embeddings(some_texts)
-            raise "Failed to check for builder"  # type: ignore[misc]  # noqa: B016
-        except ValueError:
-            pass
-
-        try:
-            index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
-            raise "Failed to count arguments"  # type: ignore[misc]  # noqa: B016
-        except ValueError:
-            pass
-
-        try:
-            index = LangchainVectorStore(store_builder="foo")
-            raise "Failed to check if builder is callable"  # type: ignore[misc]  # noqa: B016
-        except ValueError:
-            pass
-
-        # now with real builder
-        index = LangchainVectorStore(
-            store_builder=lambda x, y: FAISS.from_embeddings(x, OpenAIEmbeddings(), y)
+    some_texts = [
+        Text(
+            embedding=OpenAIEmbeddings().embed_query("test"),
+            text="this is a test",
+            name="test",
+            doc=Doc(docname="test", citation="test", dockey="test"),
         )
-        assert index._store is None
+    ]
+
+    # checks on builder
+    try:
+        index = LangchainVectorStore()
         index.add_texts_and_embeddings(some_texts)
-        assert index._store is not None
-        # check search returns Text obj
-        data, score = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
-        print(data)
-        assert type(data[0]) == Text
+        raise "Failed to check for builder"  # type: ignore[misc]  # noqa: B016
+    except ValueError:
+        pass
 
-        # now try with convenience
-        index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-        assert index._store is None
-        index.add_texts_and_embeddings(some_texts)
-        assert index._store is not None
+    try:
+        index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
+        raise "Failed to count arguments"  # type: ignore[misc]  # noqa: B016
+    except ValueError:
+        pass
 
-        docs = Docs(
-            texts_index=LangchainVectorStore(
-                cls=FAISS, embedding_model=OpenAIEmbeddings()
-            )
+    try:
+        index = LangchainVectorStore(store_builder="foo")
+        raise "Failed to check if builder is callable"  # type: ignore[misc]  # noqa: B016
+    except ValueError:
+        pass
+
+    # now with real builder
+    index = LangchainVectorStore(
+        store_builder=lambda x, y: FAISS.from_embeddings(x, OpenAIEmbeddings(), y)
+    )
+    assert index._store is None
+    index.add_texts_and_embeddings(some_texts)
+    assert index._store is not None
+    # check search returns Text obj
+    data, score = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
+    print(data)
+    assert type(data[0]) == Text
+
+    # now try with convenience
+    index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+    assert index._store is None
+    index.add_texts_and_embeddings(some_texts)
+    assert index._store is not None
+
+    docs = Docs(
+        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+    )
+    assert docs._embedding_client is not None  # from docs_index default
+
+    await docs.aadd_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    # should be embedded
+
+    # now try with JIT
+    docs = Docs(texts_index=index, jit_texts_index=True)
+    await docs.aadd_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    # should get cleared and rebuilt here
+    ev = await docs.aget_evidence(
+        answer=Answer(question="What is Frederick Bates's greatest accomplishment?")
+    )
+    assert len(ev.context) > 0
+    # now with dockkey filter
+    await docs.aget_evidence(
+        answer=Answer(
+            question="What is Frederick Bates's greatest accomplishment?",
+            dockey_filter=["test"],
         )
-        assert docs._embedding_client is not None  # from docs_index default
+    )
 
-        await docs.aadd_url(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-            citation="WikiMedia Foundation, 2023, Accessed now",
-            dockey="test",
-        )
-        # should be embedded
+    # make sure we can pickle it
+    docs_pickle = pickle.dumps(docs)
+    pickle.loads(docs_pickle)  # noqa: S301
 
-        # now try with JIT
-        docs = Docs(texts_index=index, jit_texts_index=True)
-        await docs.aadd_url(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-            citation="WikiMedia Foundation, 2023, Accessed now",
-            dockey="test",
-        )
-        # should get cleared and rebuilt here
-        ev = await docs.aget_evidence(
-            answer=Answer(question="What is Frederick Bates's greatest accomplishment?")
-        )
-        assert len(ev.context) > 0
-        # now with dockkey filter
-        await docs.aget_evidence(
-            answer=Answer(
-                question="What is Frederick Bates's greatest accomplishment?",
-                dockey_filter=["test"],
-            )
-        )
-
-        # make sure we can pickle it
-        docs_pickle = pickle.dumps(docs)
-        pickle.loads(docs_pickle)  # noqa: S301
-
-        # will not work at this point - have to reset index
+    # will not work at this point - have to reset index
 
 
-class Test(IsolatedAsyncioTestCase):
-    async def test_aquery(self):
-        docs = Docs()
-        await docs.aadd_url(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-            citation="WikiMedia Foundation, 2023, Accessed now",
-            dockey="test",
-        )
-        await docs.aquery("What is Frederick Bates's greatest accomplishment?")
+@pytest.mark.asyncio()
+async def test_aquery():
+    docs = Docs()
+    await docs.aadd_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    await docs.aquery("What is Frederick Bates's greatest accomplishment?")
 
 
-class TestDocMatch(IsolatedAsyncioTestCase):
-    async def test_adoc_match(self):
-        docs = Docs()
-        await docs.aadd_url(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-            citation="WikiMedia Foundation, 2023, Accessed now",
-            dockey="test",
-        )
-        sources = await docs.adoc_match(
-            "What is Frederick Bates's greatest accomplishment?"
-        )
-        assert len(sources) > 0
-        sources = await docs.adoc_match(
-            "What is Frederick Bates's greatest accomplishment?"
-        )
-        assert len(sources) > 0
+@pytest.mark.asyncio()
+async def test_adoc_match():
+    docs = Docs()
+    await docs.aadd_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    sources = await docs.adoc_match(
+        "What is Frederick Bates's greatest accomplishment?"
+    )
+    assert len(sources) > 0
+    sources = await docs.adoc_match(
+        "What is Frederick Bates's greatest accomplishment?"
+    )
+    assert len(sources) > 0
 
 
 def test_docs_pickle() -> None:
