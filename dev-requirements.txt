@@ -14,3 +14,6 @@ pre-commit
 pytest
 types-requests
 types-setuptools
+pytest-asyncio
+pytest-sugar
+pytest-timer
