@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import json
 import math
 import re
 import string
@@ -179,3 +180,14 @@ def is_coroutine_callable(obj):
     elif callable(obj):  # noqa: RET505
         return inspect.iscoroutinefunction(obj.__call__)
     return False
+
+
+def llm_read_json(text: str) -> dict:
+    """Read LLM output and extract JSON data from it."""
+    # fetch from markdown ```json if present
+    text = text.strip().split("```json")[-1].split("```")[0]
+    # split anything before the first {
+    text = "{" + text.split("{", 1)[-1]
+    # split anything after the last }
+    text = text.rsplit("}", 1)[0] + "}"
+    return json.loads(text)
