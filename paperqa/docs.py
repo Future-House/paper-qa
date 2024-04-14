@@ -41,6 +41,7 @@ from .utils import (
     gather_with_concurrency,
     get_loop,
     guess_is_4xx,
+    llm_read_json,
     maybe_is_html,
     maybe_is_pdf,
     maybe_is_text,
@@ -657,9 +658,7 @@ class Docs(BaseModel):
                 success = True
                 if self.prompts.summary_json:
                     try:
-                        # fetch from markdown ```json if present
-                        context = context.split("```json")[-1].split("```")[0]
-                        result_data = json.loads(context)
+                        result_data = llm_read_json(context)
                     except json.decoder.JSONDecodeError:
                         # fallback to string
                         success = False
