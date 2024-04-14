@@ -528,7 +528,7 @@ async def test_anthropic_chain():
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
-    assert type(completion.text) is str  # noqa: E721
+    assert isinstance(completion.text, str)
 
     docs = Docs(llm="claude-3-sonnet-20240229", client=client)
     await docs.aadd_url(
@@ -806,7 +806,7 @@ def test_hybrid_embedding():
         docs_index=NumpyVectorStore(embedding_model=model),
         texts_index=NumpyVectorStore(embedding_model=model),
     )
-    assert type(docs._embedding_client) is AsyncOpenAI
+    assert isinstance(docs._embedding_client, AsyncOpenAI)
     assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
@@ -822,7 +822,7 @@ def test_hybrid_embedding():
     docs = Docs(
         embedding="hybrid-text-embedding-3-small",
     )
-    assert type(docs._embedding_client) is AsyncOpenAI
+    assert isinstance(docs._embedding_client, AsyncOpenAI)
     assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
@@ -903,8 +903,8 @@ def test_langchain_llm():
     from langchain_openai import ChatOpenAI, OpenAI
 
     docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-3.5-turbo"))
-    assert type(docs.llm_model) == LangchainLLMModel
-    assert type(docs.summary_llm_model) == LangchainLLMModel
+    assert isinstance(docs.llm_model, LangchainLLMModel)
+    assert isinstance(docs.summary_llm_model, LangchainLLMModel)
     assert docs.llm == "gpt-3.5-turbo"
     assert docs.summary_llm == "gpt-3.5-turbo"
     docs.add_url(
@@ -913,7 +913,7 @@ def test_langchain_llm():
         dockey="test",
     )
     assert docs._client is not None
-    assert type(docs.llm_model) == LangchainLLMModel
+    assert isinstance(docs.llm_model, LangchainLLMModel)
     assert docs.summary_llm_model == docs.llm_model
 
     docs.get_evidence(
@@ -999,13 +999,13 @@ async def test_langchain_vector_store():
     ]
 
     index = LangchainVectorStore()
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match="You must set store_builder"):
         index.add_texts_and_embeddings(some_texts)
 
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match="store_builder must take two arguments"):
         index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
 
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match="store_builder must be callable"):
         index = LangchainVectorStore(store_builder="foo")
 
     # now with real builder
@@ -1018,7 +1018,7 @@ async def test_langchain_vector_store():
     # check search returns Text obj
     data, score = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
     print(data)
-    assert type(data[0]) == Text
+    assert isinstance(data[0], Text)
 
     # now try with convenience
     index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
@@ -1664,17 +1664,17 @@ def test_embedding_name_consistency():
     docs = Docs(embedding="langchain")
     assert docs.embedding == "langchain"
     assert docs.texts_index.embedding_model.name == "langchain"
-    assert type(docs.texts_index.embedding_model) == LangchainEmbeddingModel
+    assert isinstance(docs.texts_index.embedding_model, LangchainEmbeddingModel)
     docs = Docs(embedding="foo")
     assert docs.embedding == "foo"
-    assert type(docs.texts_index.embedding_model) == OpenAIEmbeddingModel
+    assert isinstance(docs.texts_index.embedding_model, OpenAIEmbeddingModel)
     docs = Docs(
         texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="test"))
     )
     assert docs.embedding == "test"
 
     docs = Docs(embedding="hybrid-text-embedding-ada-002")
-    assert type(docs.docs_index.embedding_model) is HybridEmbeddingModel
+    assert isinstance(docs.docs_index.embedding_model, HybridEmbeddingModel)
     assert docs.docs_index.embedding_model.models[0].name == "text-embedding-ada-002"
     assert docs.docs_index.embedding_model.models[1].name == "sparse"
 
