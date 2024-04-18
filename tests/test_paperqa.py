@@ -571,7 +571,6 @@ def test_evidence():
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
-    print(evidence.context)
     assert "Missouri" in evidence.context
     assert original_doc.embedding is not None, "Embedding should have remained in-tact"
     assert (
@@ -610,7 +609,6 @@ def test_json_evidence():
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
-    print(evidence.context)
     assert "Missouri" in evidence.context
 
     evidence = docs.get_evidence(
@@ -658,7 +656,6 @@ def test_custom_json_props():
     )
     assert "person_name" in evidence.contexts[0].model_extra
     assert "person_name: " in evidence.context
-    print(evidence.context)
     answer = docs.query("What is Frederick Bates's greatest accomplishment?")
     assert "person_name" in answer.context
     os.remove(doc_path)
@@ -779,6 +776,12 @@ def test_sparse_embedding():
         dockey="test",
     )
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
+    assert all(
+        len(np.array(x.embedding).shape) == 1 for x in docs.docs.values()
+    ), "Embeddings should be 1D"
+    assert all(
+        len(np.array(x.embedding).shape) == 1 for x in docs.texts
+    ), "Embeddings should be 1D"
 
     # check the embeddings are the same size
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
@@ -1607,14 +1610,26 @@ def disabled_test_memory():
 
 def test_add_texts():
     llm_config = {"temperature": 0.1, "model": "babbage-02"}
-    docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
+    # want to use keyword embedding because
+    # we get some randomness in the OpenAI embeddings
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=llm_config),
+        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
+        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
+        embedding_client=None,
+    )
+
     docs.add_url(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
 
-    docs2 = Docs()
+    docs2 = Docs(
+        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
+        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
+        embedding_client=None,
+    )
     texts = [Text(**dict(t)) for t in docs.texts]
     for t in texts:
         t.embedding = None
@@ -1622,12 +1637,19 @@ def test_add_texts():
 
     for t1, t2 in zip(docs2.texts, docs.texts):
         assert t1.text == t2.text
+        print(
+            "docs2", np.array(t1.embedding).shape, "docs", np.array(t2.embedding).shape
+        )
         assert np.allclose(t1.embedding, t2.embedding, atol=1e-3)
-
     docs2._build_texts_index()
     # now do it again to test after text index is already built
     llm_config = {"temperature": 0.1, "model": "babbage-02"}
-    docs = Docs(llm_model=OpenAILLMModel(config=llm_config))
+    docs = Docs(
+        llm_model=OpenAILLMModel(config=llm_config),
+        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
+        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
+        embedding_client=None,
+    )
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1686,7 +1708,6 @@ def test_external_texts_index():
         citation="Flag Day of Canada, WikiMedia Foundation, 2023, Accessed now",
     )
     answer = docs.query(query="On which date is flag day annually observed?")
-    print(answer.model_dump())
     assert "February 15" in answer.answer
 
     docs.add_url(
