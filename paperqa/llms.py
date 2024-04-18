@@ -698,7 +698,7 @@ class LangchainEmbeddingModel(EmbeddingModel):
 class LangchainVectorStore(VectorStore):
     """A wrapper around the wrapper langchain.
 
-    Note that if you this is cleared (e.g., by `Docs` having `jit_texts_index` set to True),
+    Note that if this is cleared (e.g., by `Docs` having `jit_texts_index` set to True),
     this will calls the `from_texts` class method on the `store`. This means that any non-default
     constructor arguments will be lost. You can override the clear method on this class.
     """
