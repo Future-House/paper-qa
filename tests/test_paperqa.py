@@ -1610,7 +1610,7 @@ def disabled_test_memory():
 
 def test_add_texts():
     llm_config = {"temperature": 0.1, "model": "babbage-02"}
-    # want to use keyword embedding because
+    # want to use sparse embedding because
     # we get some randomness in the OpenAI embeddings
     docs = Docs(
         llm_model=OpenAILLMModel(config=llm_config),
