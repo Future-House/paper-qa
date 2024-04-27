@@ -40,7 +40,7 @@ select_paper_prompt = (
     "Return a list of keys, separated by commas. "
     'Return "None", if no papers are applicable. '
     "Choose papers that are relevant, from reputable sources, and timely "
-    "(if the question requires timely information). \n\n"
+    "(if the question requires timely information).\n\n"
     "Question: {question}\n\n"
     "Papers: {papers}\n\n"
     "Selected keys:"
