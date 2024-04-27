@@ -837,22 +837,22 @@ def llm_model_factory(llm: str) -> LLMModel:
     return OpenAILLMModel()
 
 
-def embedding_model_factory(embedding: str) -> EmbeddingModel:
+def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
     if embedding == "langchain":
-        return LangchainEmbeddingModel()
-    elif embedding == "sentence-transformers":  # noqa: RET505
-        return SentenceTransformerEmbeddingModel()
-    elif embedding.startswith("hybrid"):
+        return LangchainEmbeddingModel(**kwargs)
+    if embedding == "sentence-transformers":
+        return SentenceTransformerEmbeddingModel(**kwargs)
+    if embedding.startswith("hybrid"):
         embedding_model_name = "-".join(embedding.split("-")[1:])
         return HybridEmbeddingModel(
             models=[
                 OpenAIEmbeddingModel(name=embedding_model_name),
-                SparseEmbeddingModel(),
+                SparseEmbeddingModel(**kwargs),
             ]
         )
-    elif embedding == "sparse":
-        return SparseEmbeddingModel()
-    return OpenAIEmbeddingModel(name=embedding)
+    if embedding == "sparse":
+        return SparseEmbeddingModel(**kwargs)
+    return OpenAIEmbeddingModel(name=embedding, **kwargs)
 
 
 def vector_store_factory(embedding: str) -> NumpyVectorStore:
