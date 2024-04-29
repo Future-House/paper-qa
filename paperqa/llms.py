@@ -893,7 +893,7 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
         dense_model = (
             OpenAIEmbeddingModel(name=embedding_model_name)
             if not embedding_model_name.startswith("voyage")
-            else VoyageAIEmbeddingModel(name=embedding, **kwargs)
+            else VoyageAIEmbeddingModel(name=embedding_model_name, **kwargs)
         )
         return HybridEmbeddingModel(
             models=[
