@@ -149,6 +149,30 @@ class HybridEmbeddingModel(EmbeddingModel):
         return np.concatenate(all_embeds, axis=1)
 
 
+class VoyageAIEmbeddingModel(EmbeddingModel):
+    """A wrapper around Voyage AI's client lib."""
+
+    name: str = Field(default="voyage-large-2")
+    embedding_type: str = Field(default="document")
+    batch_size: int = 10
+
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
+        N = len(texts)
+        embeddings = []
+        for i in range(0, N, self.batch_size):
+            response = await client.embed(
+                texts[i : i + self.batch_size],
+                model=self.name,
+                input_type=self.embedding_type,
+            )
+            embeddings.extend(response.embeddings)
+        return embeddings
+
+
 class LLMModel(ABC, BaseModel):
     llm_type: str | None = None
     name: str
@@ -842,11 +866,18 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
         return LangchainEmbeddingModel(**kwargs)
     if embedding == "sentence-transformers":
         return SentenceTransformerEmbeddingModel(**kwargs)
+    if embedding.startswith("voyage"):
+        return VoyageAIEmbeddingModel(name=embedding, **kwargs)
     if embedding.startswith("hybrid"):
         embedding_model_name = "-".join(embedding.split("-")[1:])
+        dense_model = (
+            OpenAIEmbeddingModel(name=embedding_model_name)
+            if not embedding_model_name.startswith("voyage")
+            else VoyageAIEmbeddingModel(name=embedding, **kwargs)
+        )
         return HybridEmbeddingModel(
             models=[
-                OpenAIEmbeddingModel(name=embedding_model_name),
+                dense_model,
                 SparseEmbeddingModel(**kwargs),
             ]
         )

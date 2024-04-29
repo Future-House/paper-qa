@@ -14,6 +14,14 @@ from uuid import UUID, uuid4
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+try:
+    import voyageai
+
+    USE_VOYAGE = True
+except ImportError:
+    USE_VOYAGE = False
+
+
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -21,6 +29,7 @@ from .llms import (
     OpenAIEmbeddingModel,
     OpenAILLMModel,
     VectorStore,
+    VoyageAIEmbeddingModel,
     get_score,
     llm_model_factory,
     vector_store_factory,
@@ -198,7 +207,7 @@ class Docs(BaseModel):
         if client is None and isinstance(self.llm_model, OpenAILLMModel):
             client = AsyncOpenAI()
         self._client = client
-        if embedding_client is None:  # noqa: SIM102
+        if embedding_client is None:
             # check if we have an openai embedding model in use
             if isinstance(self.texts_index.embedding_model, OpenAIEmbeddingModel) or (
                 isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
@@ -209,6 +218,21 @@ class Docs(BaseModel):
             ):
                 embedding_client = (
                     client if isinstance(client, AsyncOpenAI) else AsyncOpenAI()
+                )
+            elif USE_VOYAGE and (
+                isinstance(self.texts_index.embedding_model, VoyageAIEmbeddingModel)
+                or (
+                    isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
+                    and any(
+                        isinstance(m, VoyageAIEmbeddingModel)
+                        for m in self.texts_index.embedding_model.models
+                    )
+                )
+            ):
+                embedding_client = (
+                    client
+                    if isinstance(client, voyageai.AsyncClient)
+                    else voyageai.AsyncClient()
                 )
         self._embedding_client = embedding_client
         Docs.make_llm_names_consistent(self)
