@@ -109,6 +109,9 @@ async def embed_documents(
 class EmbeddingModel(ABC, BaseModel):
     name: str
 
+    def set_mode(self, mode: str):
+        """Several embedding models have a 'mode' or prompt which affects output."""
+
     @abstractmethod
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         pass
@@ -155,6 +158,16 @@ class VoyageAIEmbeddingModel(EmbeddingModel):
     name: str = Field(default="voyage-large-2")
     embedding_type: str = Field(default="document")
     batch_size: int = 10
+
+    def set_mode(self, mode: str):
+        if mode == "query":
+            self.embedding_type = "query"
+        elif mode == "document":
+            self.embedding_type = "document"
+        else:
+            raise NotImplementedError(
+                f"Mode {mode} is not implemented for VoyageAI embeddings."
+            )
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         if client is None:
@@ -639,9 +652,16 @@ class NumpyVectorStore(VectorStore):
         k = min(k, len(self.texts))
         if k == 0:
             return [], []
+
+        # this will only affect models that embedding prompts
+        self.embedding_model.set_mode("query")
+
         np_query = np.array(
             (await self.embedding_model.embed_documents(client, [query]))[0]
         )
+
+        self.embedding_model.set_mode("document")
+
         similarity_scores = cosine_similarity(
             np_query.reshape(1, -1), self._embeddings_matrix
         )[0]
