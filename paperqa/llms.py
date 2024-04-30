@@ -109,7 +109,7 @@ async def embed_documents(
 class EmbeddingModel(ABC, BaseModel):
     name: str
 
-    def set_mode(self, mode: str):
+    def set_mode(self, mode: str) -> None:
         """Several embedding models have a 'mode' or prompt which affects output."""
 
     @abstractmethod
