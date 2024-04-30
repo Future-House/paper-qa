@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import re
 from abc import ABC, abstractmethod
+from enum import Enum
 from inspect import signature
 from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, cast
 
@@ -106,8 +107,16 @@ async def embed_documents(
     return embeddings
 
 
+class EmbeddingModes(str, Enum):
+    DOCUMENT = "document"
+    QUERY = "query"
+
+
 class EmbeddingModel(ABC, BaseModel):
     name: str
+
+    def set_mode(self, mode: EmbeddingModes) -> None:
+        """Several embedding models have a 'mode' or prompt which affects output."""
 
     @abstractmethod
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
@@ -147,6 +156,33 @@ class HybridEmbeddingModel(EmbeddingModel):
             *[m.embed_documents(client, texts) for m in self.models]
         )
         return np.concatenate(all_embeds, axis=1)
+
+
+class VoyageAIEmbeddingModel(EmbeddingModel):
+    """A wrapper around Voyage AI's client lib."""
+
+    name: str = Field(default="voyage-large-2")
+    embedding_type: EmbeddingModes = Field(default=EmbeddingModes.DOCUMENT)
+    batch_size: int = 10
+
+    def set_mode(self, mode: EmbeddingModes):
+        self.embedding_type = mode
+
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+        if client is None:
+            raise ValueError(
+                "Your client is None - did you forget to set it after pickling?"
+            )
+        N = len(texts)
+        embeddings = []
+        for i in range(0, N, self.batch_size):
+            response = await client.embed(
+                texts[i : i + self.batch_size],
+                model=self.name,
+                input_type=self.embedding_type.value,
+            )
+            embeddings.extend(response.embeddings)
+        return embeddings
 
 
 class LLMModel(ABC, BaseModel):
@@ -615,9 +651,16 @@ class NumpyVectorStore(VectorStore):
         k = min(k, len(self.texts))
         if k == 0:
             return [], []
+
+        # this will only affect models that embedding prompts
+        self.embedding_model.set_mode(EmbeddingModes.QUERY)
+
         np_query = np.array(
             (await self.embedding_model.embed_documents(client, [query]))[0]
         )
+
+        self.embedding_model.set_mode(EmbeddingModes.DOCUMENT)
+
         similarity_scores = cosine_similarity(
             np_query.reshape(1, -1), self._embeddings_matrix
         )[0]
@@ -842,11 +885,18 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
         return LangchainEmbeddingModel(**kwargs)
     if embedding == "sentence-transformers":
         return SentenceTransformerEmbeddingModel(**kwargs)
+    if embedding.startswith("voyage"):
+        return VoyageAIEmbeddingModel(name=embedding, **kwargs)
     if embedding.startswith("hybrid"):
         embedding_model_name = "-".join(embedding.split("-")[1:])
+        dense_model = (
+            OpenAIEmbeddingModel(name=embedding_model_name)
+            if not embedding_model_name.startswith("voyage")
+            else VoyageAIEmbeddingModel(name=embedding_model_name, **kwargs)
+        )
         return HybridEmbeddingModel(
             models=[
-                OpenAIEmbeddingModel(name=embedding_model_name),
+                dense_model,
                 SparseEmbeddingModel(**kwargs),
             ]
         )

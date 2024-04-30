@@ -31,6 +31,7 @@ from paperqa.llms import (
     OpenAIEmbeddingModel,
     OpenAILLMModel,
     SparseEmbeddingModel,
+    VoyageAIEmbeddingModel,
     get_score,
     guess_model_type,
     is_openai_model,
@@ -985,6 +986,34 @@ def test_langchain_embeddings():
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
+
+
+@pytest.mark.skipif(
+    not os.environ.get("VOYAGE_API_KEY"),
+    reason="Voyage embeddings require a VOYAGE_API_KEY",
+)
+def test_voyage_embeddings():
+    from voyageai import AsyncClient
+
+    docs = Docs(
+        texts_index=NumpyVectorStore(
+            embedding_model=VoyageAIEmbeddingModel(name="voyage-2")
+        ),
+        docs_index=NumpyVectorStore(
+            embedding_model=VoyageAIEmbeddingModel(name="voyage-2")
+        ),
+        embedding_client=AsyncClient(),
+    )
+    assert docs._embedding_client is not None
+
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+    assert docs.docs["test"].embedding, "Embedding should not be None"
+    assert any(docs.docs["test"].embedding), "Embeddings are not present"
+    assert len(docs.docs["test"].embedding) == 1024, "Wrong voyage-2 embedding shape"
 
 
 @pytest.mark.asyncio()
