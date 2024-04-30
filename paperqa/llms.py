@@ -115,7 +115,7 @@ class EmbeddingModes(str, Enum):
 class EmbeddingModel(ABC, BaseModel):
     name: str
 
-    def set_mode(self, mode: EmbeddingModes):
+    def set_mode(self, mode: EmbeddingModes) -> None:
         """Several embedding models have a 'mode' or prompt which affects output."""
 
     @abstractmethod
