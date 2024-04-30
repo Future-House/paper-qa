@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import re
 from abc import ABC, abstractmethod
+from enum import Enum
 from inspect import signature
 from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, cast
 
@@ -106,10 +107,15 @@ async def embed_documents(
     return embeddings
 
 
+class EmbeddingModes(str, Enum):
+    DOCUMENT = "document"
+    QUERY = "query"
+
+
 class EmbeddingModel(ABC, BaseModel):
     name: str
 
-    def set_mode(self, mode: str):
+    def set_mode(self, mode: EmbeddingModes):
         """Several embedding models have a 'mode' or prompt which affects output."""
 
     @abstractmethod
@@ -156,18 +162,11 @@ class VoyageAIEmbeddingModel(EmbeddingModel):
     """A wrapper around Voyage AI's client lib."""
 
     name: str = Field(default="voyage-large-2")
-    embedding_type: str = Field(default="document")
+    embedding_type: EmbeddingModes = Field(default=EmbeddingModes.DOCUMENT)
     batch_size: int = 10
 
-    def set_mode(self, mode: str):
-        if mode == "query":
-            self.embedding_type = "query"
-        elif mode == "document":
-            self.embedding_type = "document"
-        else:
-            raise NotImplementedError(
-                f"Mode {mode} is not implemented for VoyageAI embeddings."
-            )
+    def set_mode(self, mode: EmbeddingModes):
+        self.embedding_type = mode
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         if client is None:
@@ -180,7 +179,7 @@ class VoyageAIEmbeddingModel(EmbeddingModel):
             response = await client.embed(
                 texts[i : i + self.batch_size],
                 model=self.name,
-                input_type=self.embedding_type,
+                input_type=self.embedding_type.value,
             )
             embeddings.extend(response.embeddings)
         return embeddings
@@ -654,13 +653,13 @@ class NumpyVectorStore(VectorStore):
             return [], []
 
         # this will only affect models that embedding prompts
-        self.embedding_model.set_mode("query")
+        self.embedding_model.set_mode(EmbeddingModes.QUERY)
 
         np_query = np.array(
             (await self.embedding_model.embed_documents(client, [query]))[0]
         )
 
-        self.embedding_model.set_mode("document")
+        self.embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
         similarity_scores = cosine_similarity(
             np_query.reshape(1, -1), self._embeddings_matrix
