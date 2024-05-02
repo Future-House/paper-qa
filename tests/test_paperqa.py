@@ -53,6 +53,7 @@ def test_is_openai_model():
     assert is_openai_model("babbage-002")
     assert is_openai_model("gpt-4-1106-preview")
     assert is_openai_model("davinci-002")
+    assert is_openai_model("ft:gpt-3.5-turbo-0125:my-org::ABC123")
     assert not is_openai_model("llama")
     assert not is_openai_model("labgpt")
     assert not is_openai_model("mixtral-7B")
