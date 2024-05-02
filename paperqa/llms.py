@@ -66,7 +66,7 @@ def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
 
 
 def is_openai_model(model_name) -> bool:
-    return model_name.startswith(("gpt-", "babbage", "davinci"))
+    return model_name.startswith(("gpt-", "babbage", "davinci", "ft:gpt-"))
 
 
 def process_llm_config(
