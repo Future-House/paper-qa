@@ -47,6 +47,7 @@ select_paper_prompt = (
 )
 citation_prompt = (
     "Provide the citation for the following text in MLA Format. "
+    "Do not write an introductory sentence. "
     "If reporting date accessed, the current year is 2024\n\n"
     "{text}\n\n"
     "Citation:"
