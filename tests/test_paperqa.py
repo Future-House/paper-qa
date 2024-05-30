@@ -587,13 +587,14 @@ def test_evidence():
     os.remove(doc_path)
 
 
-def test_json_evidence():
+def test_json_evidence() -> None:
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
         # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        r = requests.get(
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)", timeout=30.0
         )
+        r.raise_for_status()
         f.write(r.text)
     summary_llm = OpenAILLMModel(
         config={
