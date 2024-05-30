@@ -55,9 +55,10 @@ citation_prompt = (
 default_system_prompt = (
     "Answer in a direct and concise tone. "
     "Your audience is an expert, so be highly specific. "
-    "If there are ambiguous terms or acronyms, first define them. "
+    "If there are ambiguous terms or acronyms, first define them."
 )
 
+# NOTE: we use double curly braces here so it's not considered an f-string template
 summary_json_system_prompt = """\
 Provide a summary of the relevant information that could help answer the question based on the excerpt. Respond with the following JSON format:
 
@@ -66,5 +67,5 @@ Provide a summary of the relevant information that could help answer the questio
   "relevance_score": "..."
 }}
 
-where `summary` is relevant information from text - {summary_length} words and `relevance_score` is the relevance of `summary` to answer question (out of 10)
+where `summary` is relevant information from text - {summary_length} words and `relevance_score` is the relevance of `summary` to answer question (out of 10).
 """  # noqa: E501
