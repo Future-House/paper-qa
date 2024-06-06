@@ -459,7 +459,7 @@ class AnthropicLLMModel(LLMModel):
         sys_message = next(
             (m["content"] for m in messages if m["role"] == "system"), None
         )
-        # BECAUISE THEY DO NOT USE NONE TO INDICATE SENTINEL
+        # BECAUSE THEY DO NOT USE NONE TO INDICATE SENTINEL
         # LIKE ANY SANE PERSON
         if sys_message:
             completion = await aclient.messages.create(
@@ -675,15 +675,10 @@ class NumpyVectorStore(VectorStore):
         )
 
 
-# All the langchain stuff is below
-# Many confusing woes here because langchain
-# is not serializable and so we have to
-# do some gymnastics to make it work
-
-
 class LangchainLLMModel(LLMModel):
     """A wrapper around the wrapper langchain."""
 
+    config: dict = Field(default={"temperature": 0.1})
     name: str = "langchain"
 
     def infer_llm_type(self, client: Any) -> str:
@@ -695,10 +690,10 @@ class LangchainLLMModel(LLMModel):
         return "completion"
 
     async def acomplete(self, client: Any, prompt: str) -> str:
-        return await client.ainvoke(prompt)
+        return await client.ainvoke(prompt, **self.config)
 
     async def acomplete_iter(self, client: Any, prompt: str) -> Any:
-        async for chunk in cast(AsyncGenerator, client.astream(prompt)):
+        async for chunk in cast(AsyncGenerator, client.astream(prompt, **self.config)):
             yield chunk
 
     async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
@@ -712,7 +707,7 @@ class LangchainLLMModel(LLMModel):
                 lc_messages.append(SystemMessage(content=m["content"]))
             else:
                 raise ValueError(f"Unknown role: {m['role']}")
-        return (await client.ainvoke(lc_messages)).content
+        return (await client.ainvoke(lc_messages, **self.config)).content
 
     async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
         from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
@@ -725,7 +720,7 @@ class LangchainLLMModel(LLMModel):
                 lc_messages.append(SystemMessage(content=m["content"]))
             else:
                 raise ValueError(f"Unknown role: {m['role']}")
-        async for chunk in client.astream(lc_messages):
+        async for chunk in client.astream(lc_messages, **self.config):
             yield chunk.content
 
 
@@ -871,7 +866,7 @@ def llm_model_factory(llm: str) -> LLMModel:
     if llm != "default":
         if is_openai_model(llm):
             return OpenAILLMModel(config={"model": llm})
-        elif llm == "langchain":  # noqa: RET505
+        elif llm.startswith("langchain"):  # noqa: RET505
             return LangchainLLMModel()
         elif "claude" in llm:
             return AnthropicLLMModel(config={"model": llm})
