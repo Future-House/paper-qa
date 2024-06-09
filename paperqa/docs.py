@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, BinaryIO, Callable, Coroutine, cast
 from uuid import UUID, uuid4
 
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, OpenAIError
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 try:
@@ -58,6 +58,23 @@ from .utils import (
     name_in_text,
     strip_citations,
 )
+
+
+# Define custom exception types for easier handling
+class APIError(Exception):
+    """Base class for API errors."""
+
+
+class RateLimitError(APIError):
+    """Exception raised when API rate limit is exceeded."""
+
+
+class AuthenticationError(APIError):
+    """Exception raised when API authentication fails."""
+
+
+class OtherAPIError(APIError):
+    """Catch-all exception for other API errors."""
 
 
 # this is just to reduce None checks/type checks
@@ -138,7 +155,7 @@ class Docs(BaseModel):
     def config_summary_llm_config(cls, data: Any) -> Any:
         if isinstance(data, Docs):
             # check our default gpt-4/3.5-turbo config
-            # default check is hard - becauise either llm is set or llm_model is set
+            # default check is hard - because either llm is set or llm_model is set
             if (
                 data.summary_llm_model is None
                 and data.llm == "default"
@@ -378,8 +395,19 @@ class Docs(BaseModel):
             texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain({"text": texts[0].text}, None)
-            citation = chain_result.text
+            try:
+                chain_result = await cite_chain({"text": texts[0].text}, None)
+                citation = chain_result.text
+            except OpenAIError as e:
+                if "Rate limit" in str(e):
+                    raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+                elif "Authentication" in str(e):
+                    raise AuthenticationError(
+                        f"OpenAI authentication failed: {e}"
+                    ) from e
+                else:
+                    raise OtherAPIError(f"OpenAI API error: {e}") from e
+
             if (
                 len(citation) < 3  # noqa: PLR2004
                 or "Unknown" in citation
@@ -444,20 +472,38 @@ class Docs(BaseModel):
         # 1. Calculate text embeddings if not already present, but don't set them into
         # the texts until we've set up the Doc's embedding, so callers can retry upon
         # OpenAI rate limit errors
-        text_embeddings: list[list[float]] | None = (
-            await self.texts_index.embedding_model.embed_documents(
-                self._embedding_client, texts=[t.text for t in texts]
+        try:
+            text_embeddings: list[list[float]] | None = (
+                await self.texts_index.embedding_model.embed_documents(
+                    self._embedding_client, texts=[t.text for t in texts]
+                )
+                if texts[0].embedding is None
+                else None
             )
-            if texts[0].embedding is None
-            else None
-        )
+        except OpenAIError as e:
+            if "Rate limit" in str(e):
+                raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+            elif "Authentication" in str(e):
+                raise AuthenticationError(f"OpenAI authentication failed: {e}") from e
+            else:
+                raise OtherAPIError(f"OpenAI API error: {e}") from e
         # 2. Set the Doc's embedding to be the Doc's citation embedded
         if doc.embedding is None:
-            doc.embedding = (
-                await self.docs_index.embedding_model.embed_documents(
-                    self._embedding_client, texts=[doc.citation]
-                )
-            )[0]
+            try:
+                doc.embedding = (
+                    await self.docs_index.embedding_model.embed_documents(
+                        self._embedding_client, texts=[doc.citation]
+                    )
+                )[0]
+            except OpenAIError as e:
+                if "Rate limit" in str(e):
+                    raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+                elif "Authentication" in str(e):
+                    raise AuthenticationError(
+                        f"OpenAI authentication failed: {e}"
+                    ) from e
+                else:
+                    raise OtherAPIError(f"OpenAI API error: {e}") from e
         # 3. Now we can set the text embeddings
         if text_embeddings is not None:
             for t, t_embedding in zip(texts, text_embeddings, strict=True):
@@ -506,12 +552,20 @@ class Docs(BaseModel):
         answer: Answer | None = None,  # used for tracking tokens
     ) -> set[DocKey]:
         """Return a list of dockeys that match the query."""
-        matches, _ = await self.docs_index.max_marginal_relevance_search(
-            self._embedding_client,
-            query,
-            k=k + len(self.deleted_dockeys),
-            fetch_k=5 * (k + len(self.deleted_dockeys)),
-        )
+        try:
+            matches, _ = await self.docs_index.max_marginal_relevance_search(
+                self._embedding_client,
+                query,
+                k=k + len(self.deleted_dockeys),
+                fetch_k=5 * (k + len(self.deleted_dockeys)),
+            )
+        except OpenAIError as e:
+            if "Rate limit" in str(e):
+                raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+            elif "Authentication" in str(e):
+                raise AuthenticationError(f"OpenAI authentication failed: {e}") from e
+            else:
+                raise OtherAPIError(f"OpenAI API error: {e}") from e
         # filter the matches
         matched_docs = [
             m for m in cast(list[Doc], matches) if m.dockey not in self.deleted_dockeys
@@ -608,14 +662,27 @@ class Docs(BaseModel):
         if disable_vector_search:
             matches = self.texts
         else:
-            matches = cast(
-                list[Text],
-                (
-                    await self.texts_index.max_marginal_relevance_search(
-                        self._embedding_client, answer.question, k=_k, fetch_k=5 * _k
-                    )
-                )[0],
-            )
+            try:
+                matches = cast(
+                    list[Text],
+                    (
+                        await self.texts_index.max_marginal_relevance_search(
+                            self._embedding_client,
+                            answer.question,
+                            k=_k,
+                            fetch_k=5 * _k,
+                        )
+                    )[0],
+                )
+            except OpenAIError as e:
+                if "Rate limit" in str(e):
+                    raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+                elif "Authentication" in str(e):
+                    raise AuthenticationError(
+                        f"OpenAI authentication failed: {e}"
+                    ) from e
+                else:
+                    raise OtherAPIError(f"OpenAI API error: {e}") from e
         # ok now filter (like ones from adoc_match)
         if answer.dockey_filter is not None:
             matches = [m for m in matches if m.doc.dockey in answer.dockey_filter]
@@ -779,7 +846,7 @@ class Docs(BaseModel):
         length_prompt: str = "about 100 words",
         answer: Answer | None = None,
         key_filter: bool | None = None,
-        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
+        get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG        005
     ) -> Answer:
         if k < max_sources:
             raise ValueError("k should be greater than max_sources")
@@ -808,7 +875,17 @@ class Docs(BaseModel):
                 prompt=self.prompts.pre,
                 system_prompt=self.prompts.system,
             )
-            pre = await chain({"question": answer.question}, get_callbacks("pre"))
+            try:
+                pre = await chain({"question": answer.question}, get_callbacks("pre"))
+            except OpenAIError as e:
+                if "Rate limit" in str(e):
+                    raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+                elif "Authentication" in str(e):
+                    raise AuthenticationError(
+                        f"OpenAI authentication failed: {e}"
+                    ) from e
+                else:
+                    raise OtherAPIError(f"OpenAI API error: {e}") from e
             pre.name = "pre"
             pre.answer_id = answer.id
             await self.llm_result_callback(pre)
@@ -827,14 +904,24 @@ class Docs(BaseModel):
                 prompt=self.prompts.qa,
                 system_prompt=self.prompts.system,
             )
-            answer_result = await qa_chain(
-                {
-                    "context": answer.context,
-                    "answer_length": answer.answer_length,
-                    "question": answer.question,
-                },
-                get_callbacks("answer"),
-            )
+            try:
+                answer_result = await qa_chain(
+                    {
+                        "context": answer.context,
+                        "answer_length": answer.answer_length,
+                        "question": answer.question,
+                    },
+                    get_callbacks("answer"),
+                )
+            except OpenAIError as e:
+                if "Rate limit" in str(e):
+                    raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+                elif "Authentication" in str(e):
+                    raise AuthenticationError(
+                        f"OpenAI authentication failed: {e}"
+                    ) from e
+                else:
+                    raise OtherAPIError(f"OpenAI API error: {e}") from e
             answer_result.name = "answer"
             answer_result.answer_id = answer.id
             await self.llm_result_callback(answer_result)
@@ -865,7 +952,17 @@ class Docs(BaseModel):
                 prompt=self.prompts.post,
                 system_prompt=self.prompts.system,
             )
-            post = await chain(answer.model_dump(), get_callbacks("post"))
+            try:
+                post = await chain(answer.model_dump(), get_callbacks("post"))
+            except OpenAIError as e:
+                if "Rate limit" in str(e):
+                    raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
+                elif "Authentication" in str(e):
+                    raise AuthenticationError(
+                        f"OpenAI authentication failed: {e}"
+                    ) from e
+                else:
+                    raise OtherAPIError(f"OpenAI API error: {e}") from e
             post.name = "post"
             post.answer_id = answer.id
             await self.llm_result_callback(post)
