@@ -205,7 +205,15 @@ class Docs(BaseModel):
         embedding_client: Any | None = None,
     ):
         if client is None and isinstance(self.llm_model, OpenAILLMModel):
-            client = AsyncOpenAI()
+            if (api_key := os.environ.get("ANYSCALE_API_KEY")) and (
+                base_url := os.environ.get("ANYSCALE_BASE_URL")
+            ):
+                client = AsyncOpenAI(
+                    api_key=api_key,
+                    base_url=base_url,
+                )
+            else:
+                client = AsyncOpenAI()
         self._client = client
         if embedding_client is None:
             # check if we have an openai embedding model in use

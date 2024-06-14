@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime
+import os
 import re
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -54,6 +55,18 @@ def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
         return "completion"
     if model_name.startswith("davinci"):
         return "completion"
+    if (
+        os.environ.get("ANYSCALE_API_KEY")
+        and os.environ.get("ANYSCALE_BASE_URL")
+        and model_name.startswith("meta-llama/Meta-Llama-3-")
+    ):
+        return "chat"
+    if (
+        os.environ.get("ANYSCALE_API_KEY")
+        and os.environ.get("ANYSCALE_BASE_URL")
+        and (model_name.startswith(("mistralai/Mistral-", "mistralai/Mixtral-")))
+    ):
+        return "chat"
     if "instruct" in model_name:
         return "completion"
     if model_name.startswith("gpt-4"):
@@ -66,7 +79,16 @@ def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
 
 
 def is_openai_model(model_name) -> bool:
-    return model_name.startswith(("gpt-", "babbage", "davinci", "ft:gpt-"))
+    open_ai_model_prefixes = {"gpt-", "babbage", "davinci", "ft:gpt-"}
+    # add special prefixes if the user has anyscale models
+    # https://docs.anyscale.com/endpoints/text-generation/query-a-model/
+    if os.environ.get("ANYSCALE_API_KEY") and os.environ.get("ANYSCALE_BASE_URL"):
+        open_ai_model_prefixes |= {
+            "meta-llama/Meta-Llama-3-",
+            "mistralai/Mistral-",
+            "mistralai/Mixtral-",
+        }
+    return model_name.startswith(tuple(open_ai_model_prefixes))
 
 
 def process_llm_config(
