@@ -57,6 +57,14 @@ def test_is_openai_model():
     assert not is_openai_model("llama")
     assert not is_openai_model("labgpt")
     assert not is_openai_model("mixtral-7B")
+    os.environ["ANYSCALE_API_KEY"] = "abc123"
+    os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
+    assert is_openai_model("meta-llama/Meta-Llama-3-70B-Instruct")
+    assert is_openai_model("mistralai/Mixtral-8x22B-Instruct-v0.1")
+    os.environ.pop("ANYSCALE_API_KEY")
+    os.environ.pop("ANYSCALE_BASE_URL")
+    assert not is_openai_model("meta-llama/Meta-Llama-3-70B-Instruct")
+    assert not is_openai_model("mistralai/Mixtral-8x22B-Instruct-v0.1")
 
 
 def test_guess_model_type():
@@ -65,6 +73,10 @@ def test_guess_model_type():
     assert guess_model_type("gpt-4-1106-preview") == "chat"
     assert guess_model_type("gpt-3.5-turbo-instruct") == "completion"
     assert guess_model_type("davinci-002") == "completion"
+    os.environ["ANYSCALE_API_KEY"] = "abc123"
+    os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
+    assert guess_model_type("meta-llama/Meta-Llama-3-70B-Instruct") == "chat"
+    assert guess_model_type("mistralai/Mixtral-8x22B-Instruct-v0.1") == "chat"
 
 
 def test_get_citations():
