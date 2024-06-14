@@ -580,11 +580,7 @@ async def test_anyscale_chain():
         skip_system=True,
     )
     outputs = []
-
-    def accum(x):
-        outputs.append(x)
-
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
