@@ -571,7 +571,7 @@ async def test_anyscale_chain():
         config={
             "temperature": 0,
             "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-            "max_tokens": 56,
+            "max_tokens": 56,  # matches openAI chat test
         }
     )
     call = llm.make_chain(
