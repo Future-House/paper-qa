@@ -556,6 +556,49 @@ async def test_anthropic_chain():
     await docs.aquery("What is the national flag of Canada?", answer=answer)
 
 
+@pytest.mark.skipif(
+    not (os.environ.get("ANYSCALE_BASE_URL") and os.environ.get("ANYSCALE_API_KEY")),
+    reason="Anyscale URL and keys are not set",
+)
+@pytest.mark.asyncio()
+async def test_anyscale_chain():
+    client = AsyncOpenAI(
+        base_url=os.environ["ANYSCALE_BASE_URL"], api_key=os.environ["ANYSCALE_API_KEY"]
+    )
+    llm = OpenAILLMModel(
+        config={
+            "temperature": 0,
+            "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+            "max_tokens": 56,
+        }
+    )
+    call = llm.make_chain(
+        client,
+        "The {animal} says",
+        skip_system=True,
+    )
+    outputs = []
+
+    def accum(x):
+        outputs.append(x)
+
+    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count > 0
+    assert completion.completion_count > 0
+    assert str(completion) == "".join(outputs)
+
+    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token == 0
+    assert completion.seconds_to_last_token > 0
+
+    # check with mixed callbacks
+    async def ac(x):  # noqa: ARG001
+        pass
+
+    completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+
+
 def test_docs():
     docs = Docs(llm="babbage-002")
     docs.add_url(
