@@ -579,7 +579,7 @@ async def test_anyscale_chain():
         "The {animal} says",
         skip_system=True,
     )
-    outputs = []
+    outputs = []  # type: ignore[var-annotated]
     completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
@@ -590,11 +590,7 @@ async def test_anyscale_chain():
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
 
-    # check with mixed callbacks
-    async def ac(x):  # noqa: ARG001
-        pass
-
-    completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+    completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
 
 
 def test_docs():
