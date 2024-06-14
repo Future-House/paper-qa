@@ -77,6 +77,8 @@ def test_guess_model_type():
     os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
     assert guess_model_type("meta-llama/Meta-Llama-3-70B-Instruct") == "chat"
     assert guess_model_type("mistralai/Mixtral-8x22B-Instruct-v0.1") == "chat"
+    os.environ.pop("ANYSCALE_API_KEY")
+    os.environ.pop("ANYSCALE_BASE_URL")
 
 
 def test_get_citations():
