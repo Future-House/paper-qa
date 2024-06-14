@@ -57,6 +57,14 @@ def test_is_openai_model():
     assert not is_openai_model("llama")
     assert not is_openai_model("labgpt")
     assert not is_openai_model("mixtral-7B")
+    os.environ["ANYSCALE_API_KEY"] = "abc123"
+    os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
+    assert is_openai_model("meta-llama/Meta-Llama-3-70B-Instruct")
+    assert is_openai_model("mistralai/Mixtral-8x22B-Instruct-v0.1")
+    os.environ.pop("ANYSCALE_API_KEY")
+    os.environ.pop("ANYSCALE_BASE_URL")
+    assert not is_openai_model("meta-llama/Meta-Llama-3-70B-Instruct")
+    assert not is_openai_model("mistralai/Mixtral-8x22B-Instruct-v0.1")
 
 
 def test_guess_model_type():
@@ -65,6 +73,12 @@ def test_guess_model_type():
     assert guess_model_type("gpt-4-1106-preview") == "chat"
     assert guess_model_type("gpt-3.5-turbo-instruct") == "completion"
     assert guess_model_type("davinci-002") == "completion"
+    os.environ["ANYSCALE_API_KEY"] = "abc123"
+    os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
+    assert guess_model_type("meta-llama/Meta-Llama-3-70B-Instruct") == "chat"
+    assert guess_model_type("mistralai/Mixtral-8x22B-Instruct-v0.1") == "chat"
+    os.environ.pop("ANYSCALE_API_KEY")
+    os.environ.pop("ANYSCALE_BASE_URL")
 
 
 def test_get_citations():
@@ -542,6 +556,41 @@ async def test_anthropic_chain():
         Answer(question="What is the national flag of Canada?")
     )
     await docs.aquery("What is the national flag of Canada?", answer=answer)
+
+
+@pytest.mark.skipif(
+    not (os.environ.get("ANYSCALE_BASE_URL") and os.environ.get("ANYSCALE_API_KEY")),
+    reason="Anyscale URL and keys are not set",
+)
+@pytest.mark.asyncio()
+async def test_anyscale_chain():
+    client = AsyncOpenAI(
+        base_url=os.environ["ANYSCALE_BASE_URL"], api_key=os.environ["ANYSCALE_API_KEY"]
+    )
+    llm = OpenAILLMModel(
+        config={
+            "temperature": 0,
+            "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+            "max_tokens": 56,  # matches openAI chat test
+        }
+    )
+    call = llm.make_chain(
+        client,
+        "The {animal} says",
+        skip_system=True,
+    )
+    outputs = []  # type: ignore[var-annotated]
+    completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count > 0
+    assert completion.completion_count > 0
+    assert str(completion) == "".join(outputs)
+
+    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    assert completion.seconds_to_first_token == 0
+    assert completion.seconds_to_last_token > 0
+
+    completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
 
 
 def test_docs():
