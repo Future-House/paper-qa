@@ -31,6 +31,7 @@ from .llms import (
     VectorStore,
     VoyageAIEmbeddingModel,
     get_score,
+    is_anyscale_model,
     llm_model_factory,
     vector_store_factory,
 )
@@ -205,12 +206,10 @@ class Docs(BaseModel):
         embedding_client: Any | None = None,
     ):
         if client is None and isinstance(self.llm_model, OpenAILLMModel):
-            if (api_key := os.environ.get("ANYSCALE_API_KEY")) and (
-                base_url := os.environ.get("ANYSCALE_BASE_URL")
-            ):
+            if is_anyscale_model(self.llm_model.name):
                 client = AsyncOpenAI(
-                    api_key=api_key,
-                    base_url=base_url,
+                    api_key=os.environ["ANYSCALE_API_KEY"],
+                    base_url=os.environ["ANYSCALE_BASE_URL"],
                 )
             else:
                 client = AsyncOpenAI()
