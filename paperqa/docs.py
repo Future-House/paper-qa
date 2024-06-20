@@ -22,6 +22,7 @@ except ImportError:
     USE_VOYAGE = False
 
 
+from .core import retrieve
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -608,34 +609,26 @@ class Docs(BaseModel):
         if len(self.docs) == 0 and self.docs_index is None:
             # do we have no docs?
             return answer  # type: ignore[unreachable]
-        self._build_texts_index(keys=answer.dockey_filter)
-        _k = k
-        if answer.dockey_filter is not None:
-            _k = k * 10  # heuristic - get enough so we can downselect
         if disable_vector_search:
             matches = self.texts
         else:
-            matches = cast(
-                list[Text],
-                (
-                    await self.texts_index.max_marginal_relevance_search(
-                        self._embedding_client, answer.question, k=_k, fetch_k=5 * _k
-                    )
-                )[0],
-            )
-        # ok now filter (like ones from adoc_match)
-        if answer.dockey_filter is not None:
-            matches = [m for m in matches if m.doc.dockey in answer.dockey_filter]
+            self._build_texts_index(keys=answer.dockey_filter)
 
         # check if it is deleted
-        matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
+        exclude_dockey_filter = self.deleted_dockeys
 
         # check if it is already in answer
-        cur_names = [c.text.name for c in answer.contexts]
-        matches = [m for m in matches if m.name not in cur_names]
+        exclude_text_filter = {c.text.name for c in answer.contexts}
 
-        # now finally cut down
-        matches = matches[:k]
+        matches = await retrieve(
+            answer.question,
+            self.texts_index,
+            self._embedding_client,
+            k=k,
+            include_dockey_filter=answer.dockey_filter,
+            exclude_dockey_filter=exclude_dockey_filter,
+            exclude_text_filter=exclude_text_filter,
+        )
 
         async def process(match):  # noqa: C901, PLR0912
             callbacks = get_callbacks("evidence:" + match.name)
