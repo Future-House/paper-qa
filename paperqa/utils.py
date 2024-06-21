@@ -91,17 +91,42 @@ async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
     return await asyncio.gather(*(sem_coro(c) for c in coros))
 
 
-def guess_is_4xx(msg: str) -> bool:
-    if re.search(r"4\d\d", msg):
-        return True
-    return False
-
-
 def strip_citations(text: str) -> str:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
     # Remove the citations from the text
     return re.sub(citation_regex, "", text, flags=re.MULTILINE)
+
+
+def get_score(text: str) -> int:
+    # check for N/A
+    last_line = text.split("\n")[-1]
+    if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
+        return 0
+    # check for not applicable, not relevant in summary
+    if "not applicable" in text.lower or "not relevant" in text.lower():
+        return 0
+
+    score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
+    if not score:
+        score = re.search(r"\(([0-9])\w*\/", text)
+    if not score:
+        score = re.search(r"([0-9]+)\w*\/", text)
+    if score:
+        s = int(score.group(1))
+        if s > 10:  # noqa: PLR2004
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    last_few = text[-15:]
+    scores = re.findall(r"([0-9]+)", last_few)
+    if scores:
+        s = int(scores[-1])
+        if s > 10:  # noqa: PLR2004
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    if len(text) < 100:  # noqa: PLR2004
+        return 1
+    return 5
 
 
 def get_citenames(text: str) -> set[str]:

@@ -55,6 +55,10 @@ ANYSCALE_MODEL_PREFIXES: tuple[str, ...] = (
     "mistralai/Mixtral-",
 )
 
+Chain = Callable[
+    [dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, LLMResult]
+]
+
 
 def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
     if model_name.startswith("babbage"):
@@ -860,33 +864,6 @@ class LangchainVectorStore(VectorStore):
     def clear(self) -> None:
         del self._store  # be explicit, because it could be large
         self._store = None
-
-
-def get_score(text: str) -> int:
-    # check for N/A
-    last_line = text.split("\n")[-1]
-    if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
-        return 0
-    score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
-    if not score:
-        score = re.search(r"\(([0-9])\w*\/", text)
-    if not score:
-        score = re.search(r"([0-9]+)\w*\/", text)
-    if score:
-        s = int(score.group(1))
-        if s > 10:  # noqa: PLR2004
-            s = int(s / 10)  # sometimes becomes out of 100
-        return s
-    last_few = text[-15:]
-    scores = re.findall(r"([0-9]+)", last_few)
-    if scores:
-        s = int(scores[-1])
-        if s > 10:  # noqa: PLR2004
-            s = int(s / 10)  # sometimes becomes out of 100
-        return s
-    if len(text) < 100:  # noqa: PLR2004
-        return 1
-    return 5
 
 
 def llm_model_factory(llm: str) -> LLMModel:
