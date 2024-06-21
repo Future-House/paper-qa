@@ -91,12 +91,6 @@ async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
     return await asyncio.gather(*(sem_coro(c) for c in coros))
 
 
-def guess_is_4xx(msg: str) -> bool:
-    if re.search(r"4\d\d", msg):
-        return True
-    return False
-
-
 def strip_citations(text: str) -> str:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
