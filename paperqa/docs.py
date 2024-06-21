@@ -50,7 +50,6 @@ from .types import (
 from .utils import (
     gather_with_concurrency,
     get_loop,
-    guess_is_4xx,
     llm_read_json,
     maybe_is_html,
     maybe_is_pdf,
@@ -662,30 +661,19 @@ class Docs(BaseModel):
                         prompt=self.prompts.summary,
                         system_prompt=self.prompts.system,
                     )
-                # This is dangerous because it
-                # could mask errors that are important- like auth errors
-                # I also cannot know what the exception
-                # type is because any model could be used
-                # my best idea is see if there is a 4XX
-                # http code in the exception
-                try:
-                    llm_result = await summary_chain(
-                        {
-                            "question": answer.question,
-                            "citation": citation,
-                            "summary_length": answer.summary_length,
-                            "text": match.text,
-                        },
-                        callbacks,
-                    )
-                    llm_result.answer_id = answer.id
-                    llm_result.name = "evidence:" + match.name
-                    await self.llm_result_callback(llm_result)
-                    context = llm_result.text
-                except Exception as e:
-                    if guess_is_4xx(str(e)):
-                        return None, llm_result
-                    raise
+                llm_result = await summary_chain(
+                    {
+                        "question": answer.question,
+                        "citation": citation,
+                        "summary_length": answer.summary_length,
+                        "text": match.text,
+                    },
+                    callbacks,
+                )
+                llm_result.answer_id = answer.id
+                llm_result.name = "evidence:" + match.name
+                await self.llm_result_callback(llm_result)
+                context = llm_result.text
                 success = True
                 if self.prompts.summary_json:
                     try:
