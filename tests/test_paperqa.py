@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import pickle
 import tempfile
+import textwrap
 from io import BytesIO
 from pathlib import Path
 
@@ -455,6 +456,23 @@ I have written the json you asked for.""",
 )
 def test_llm_read_json(example: str):
     assert llm_read_json(example) == {"example": "json"}
+
+
+def test_llm_read_json_newlines():
+    """Make sure that newlines in json are preserved and escaped."""
+    example = textwrap.dedent(
+        """
+        {
+        "summary": "A line
+
+        Another line",
+        "relevance_score": 7
+        }"""
+    )
+    assert llm_read_json(example) == {
+        "summary": "A line\n\nAnother line",
+        "relevance_score": 7,
+    }
 
 
 @pytest.mark.asyncio()
