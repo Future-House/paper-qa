@@ -186,9 +186,12 @@ def llm_read_json(text: str) -> dict:
     text = text.rsplit("}", 1)[0] + "}"
 
     # escape new lines within strings
-    def replace_newlines(match):
+    def replace_newlines(match: re.Match) -> str:
         return match.group(0).replace("\n", "\\n")
 
+    # Match anything between double quotes
+    # including escaped quotes and other escaped characters.
+    # https://regex101.com/r/VFcDmB/1
     pattern = r'"(?:[^"\\]|\\.)*"'
     text = re.sub(pattern, replace_newlines, text)
 

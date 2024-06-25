@@ -459,6 +459,7 @@ def test_llm_read_json(example: str):
 
 
 def test_llm_read_json_newlines():
+    """Make sure that newlines in json are preserved and escaped."""
     example = textwrap.dedent(
         """
         {
