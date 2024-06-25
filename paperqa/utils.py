@@ -184,4 +184,12 @@ def llm_read_json(text: str) -> dict:
     text = "{" + text.split("{", 1)[-1]
     # split anything after the last }
     text = text.rsplit("}", 1)[0] + "}"
+
+    # escape new lines within strings
+    def replace_newlines(match):
+        return match.group(0).replace("\n", "\\n")
+
+    pattern = r'"(?:[^"\\]|\\.)*"'
+    text = re.sub(pattern, replace_newlines, text)
+
     return json.loads(text)
