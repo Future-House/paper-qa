@@ -81,13 +81,11 @@ def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
 def is_anyscale_model(model_name: str) -> bool:
     # compares prefixes with anyscale models
     # https://docs.anyscale.com/endpoints/text-generation/query-a-model/
-    if (
+    return bool(
         os.environ.get("ANYSCALE_API_KEY")
         and os.environ.get("ANYSCALE_BASE_URL")
         and model_name.startswith(ANYSCALE_MODEL_PREFIXES)
-    ):
-        return True
-    return False
+    )
 
 
 def is_openai_model(model_name: str) -> bool:
@@ -296,8 +294,8 @@ class LLMModel(ABC, BaseModel):
                     )
                 result.prompt = messages
                 result.prompt_count = sum(
-                    [self.count_tokens(m["content"]) for m in messages]
-                ) + sum([self.count_tokens(m["role"]) for m in messages])
+                    self.count_tokens(m["content"]) for m in messages
+                ) + sum(self.count_tokens(m["role"]) for m in messages)
 
                 if callbacks is None:
                     output = await self.achat(client, messages)
@@ -612,14 +610,16 @@ class VectorStore(BaseModel, ABC):
     def clear(self) -> None:
         pass
 
-    async def max_marginal_relevance_search(  # noqa: D417
+    async def max_marginal_relevance_search(
         self, client: Any, query: str, k: int, fetch_k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:
+            client: TODOC.
             query: Query vector.
             k: Number of results to return.
+            fetch_k: Number of results to fetch from the vector store.
 
         Returns:
             List of tuples (doc, score) of length k.
