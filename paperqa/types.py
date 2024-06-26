@@ -163,12 +163,10 @@ class PromptCollection(BaseModel):
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
-    context: str
+    context: str = Field(description="Summary of the text with respect to a question.")
     text: Text
     score: int = 5
-    model_config = ConfigDict(
-        extra="allow",
-    )
+    model_config = ConfigDict(extra="allow")
 
 
 def __str__(self) -> str:  # noqa: N807
