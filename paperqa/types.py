@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Callable
 from uuid import UUID, uuid4
 
@@ -44,7 +45,7 @@ class LLMResult(BaseModel):
     prompt_count: int = 0
     completion_count: int = 0
     model: str
-    date: str
+    date: str = Field(default_factory=datetime.now().isoformat)
     seconds_to_first_token: float = Field(
         default=0.0, description="Delta time (sec) to first response token's arrival."
     )

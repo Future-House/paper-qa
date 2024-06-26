@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import datetime
 import os
 import re
 from abc import ABC, abstractmethod
@@ -285,10 +284,7 @@ class LLMModel(ABC, BaseModel):
                 callbacks: list[Callable] | None = None,
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
-                result = LLMResult(
-                    model=self.name,
-                    date=datetime.datetime.now().isoformat(),
-                )
+                result = LLMResult(model=self.name)
                 messages = []
                 for m in chat_prompt:
                     messages.append(  # noqa: PERF401
@@ -335,10 +331,7 @@ class LLMModel(ABC, BaseModel):
                 data: dict, callbacks: list[Callable] | None = None
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
-                result = LLMResult(
-                    model=self.name,
-                    date=datetime.datetime.now().isoformat(),
-                )
+                result = LLMResult(model=self.name)
                 formatted_prompt = completion_prompt.format(**data)
                 result.prompt_count = self.count_tokens(formatted_prompt)
                 result.prompt = formatted_prompt
