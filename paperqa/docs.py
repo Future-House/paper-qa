@@ -808,9 +808,7 @@ class Docs(BaseModel):
             pre.answer_id = answer.id
             await self.llm_result_callback(pre)
             answer.add_tokens(pre)
-            answer.context = (
-                answer.context + "\n\nExtra background information:" + str(pre)
-            )
+            answer.context += f"\n\nExtra background information:\n{pre}"
         bib = {}
         if len(answer.context) < 10:  # and not self.memory:  # noqa: PLR2004
             answer_text = (
