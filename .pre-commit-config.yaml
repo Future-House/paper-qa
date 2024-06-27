@@ -45,3 +45,9 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: [".[toml]"]
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.18
+    hooks:
+      - id: validate-pyproject
+        additional_dependencies:
+          - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
