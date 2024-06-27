@@ -328,7 +328,7 @@ class Docs(BaseModel):
         """Add a document to the collection."""
         import urllib.request
 
-        with urllib.request.urlopen(url) as f:  # noqa: ASYNC100, S310
+        with urllib.request.urlopen(url) as f:  # noqa: ASYNC210, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
             return await self.aadd_file(
