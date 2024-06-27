@@ -31,7 +31,12 @@ repos:
     hooks:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
-        additional_dependencies: [types-requests, types-setuptools]
+        additional_dependencies:
+          - numpy
+          - openai>=1 # Match pyproject.toml
+          - pydantic~=2.0 # Match pyproject.toml
+          - types-requests
+          - types-setuptools
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.3.2
     hooks:
