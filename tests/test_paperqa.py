@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import os
 import pickle
 import tempfile
@@ -1580,15 +1581,12 @@ def test_query_filter():
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
-def test_zotera():
+def test_zotero() -> None:
     from paperqa.contrib import ZoteroDB
 
     Docs()
-    try:
+    with contextlib.suppress(ValueError):  # Close enough
         ZoteroDB(library_type="user")  # "group" if group library
-    except ValueError:
-        # close enough
-        return
 
 
 def test_too_much_evidence():
