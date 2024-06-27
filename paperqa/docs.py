@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import pprint  # noqa: F401
 import re
 import tempfile
 from datetime import datetime
@@ -640,7 +639,7 @@ class Docs(BaseModel):
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
             # needed empties for failures/skips
-            llm_result = LLMResult(model="", date="")
+            llm_result = LLMResult(model="")
             extras: dict[str, Any] = {}
             if detailed_citations:
                 citation = match.name + ": " + citation
