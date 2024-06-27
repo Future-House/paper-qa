@@ -17,9 +17,7 @@ StrPath = Union[str, Path]
 def name_in_text(name: str, text: str) -> bool:
     sname = name.strip()
     pattern = rf"\b({re.escape(sname)})\b(?!\w)"
-    if re.search(pattern, text):
-        return True
-    return False
+    return bool(re.search(pattern, text))
 
 
 def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
@@ -33,9 +31,7 @@ def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
             entropy += -p * math.log2(p)
 
     # Check if the entropy is within a reasonable range for text
-    if entropy > thresh:
-        return True
-    return False
+    return entropy > thresh
 
 
 def maybe_is_pdf(file: BinaryIO) -> bool:
@@ -47,7 +43,7 @@ def maybe_is_pdf(file: BinaryIO) -> bool:
 def maybe_is_html(file: BinaryIO) -> bool:
     magic_number = file.read(4)
     file.seek(0)
-    return magic_number in (b"<htm", b"<!DO", b"<xsl", b"<!X")
+    return magic_number in {b"<htm", b"<!DO", b"<xsl", b"<!X"}
 
 
 def strings_similarity(s1: str, s2: str) -> float:
