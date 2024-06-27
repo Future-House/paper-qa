@@ -45,8 +45,6 @@ version = "4.8.1"
 [tool.codespell]
 check-filenames = true
 check-hidden = true
-# SEE: https://github.com/codespell-project/codespell/issues/1212#issuecomment-1744768533
-ignore-regex = ".{1024}|.*codespell-ignore.*"
 ignore-words-list = "aadd,ser"
 
 [tool.mypy]
@@ -113,9 +111,49 @@ line-length = 120
 unsafe-fixes = true
 
 [tool.ruff.lint]
+explicit-preview-rules = true
+extend-select = [
+    "FURB105",
+    "FURB110",
+    "FURB113",
+    "FURB116",
+    "FURB118",
+    "FURB129",
+    "FURB131",
+    "FURB132",
+    "FURB136",
+    "FURB140",
+    "FURB142",
+    "FURB145",
+    "FURB148",
+    "FURB152",
+    "FURB154",
+    "FURB157",
+    "FURB161",
+    "FURB163",
+    "FURB164",
+    "FURB166",
+    "FURB167",
+    "FURB168",
+    "FURB169",
+    "FURB171",
+    "FURB177",
+    "FURB180",
+    "FURB181",
+    "FURB187",
+    "FURB192",
+    "PLR6104",
+    "PLR6201",
+    "PLW0108",
+    "RUF022",
+    "RUF025",
+]
 # List of rule codes that are unsupported by Ruff, but should be preserved when
 # (e.g.) validating # noqa directives. Useful for retaining # noqa directives
 # that cover plugins not yet implemented by Ruff.
+external = [
+    "FURB",  # refurb
+]
 ignore = [
     "ANN",  # Don't care to enforce typing
     "BLE001",  # Don't care to enforce blind exception catching
@@ -158,6 +196,7 @@ ignore = [
     "TID252",  # Allow relative imports for packaging
     "TRY003",  # Overly pedantic
 ]
+preview = true
 select = ["ALL"]
 unfixable = [
     "B007",  # While debugging, unused loop variables can be useful

@@ -116,7 +116,7 @@ def parse_text(
         "parsing_libraries": ["tiktoken (cl100k_base)"] if use_tiktoken else [],
         "paperqa_version": str(pqa_version),
         "total_parsed_text_length": (
-            len(text) if isinstance(text, str) else sum([len(t) for t in text])
+            len(text) if isinstance(text, str) else sum(len(t) for t in text)
         ),
         "parse_type": "txt" if not html else "html",
     }
@@ -254,7 +254,7 @@ def read_doc(
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
-def read_doc(  # noqa: PLR0912
+def read_doc(
     path: Path,
     doc: Doc,
     parsed_text_only: bool = False,

@@ -142,7 +142,7 @@ class Docs(BaseModel):
             if (
                 data.summary_llm_model is None
                 and data.llm == "default"
-                and type(data.llm_model) == OpenAILLMModel
+                and isinstance(data.llm_model, OpenAILLMModel)
             ):
                 data.summary_llm_model = OpenAILLMModel(
                     config={"model": "gpt-3.5-turbo", "temperature": 0.1}
@@ -530,8 +530,8 @@ class Docs(BaseModel):
             if (
                 rerank is None
                 and (
-                    type(self.llm_model) == OpenAILLMModel
-                    and cast(OpenAILLMModel, self).config["model"].startswith("gpt-4")
+                    isinstance(self.llm_model, OpenAILLMModel)
+                    and self.config["model"].startswith("gpt-4")
                 )
                 or rerank is True
             ):
@@ -703,19 +703,21 @@ class Docs(BaseModel):
                 if self.strip_citations:
                     # remove citations that collide with our grounded citations (for the answer LLM)
                     context = strip_citations(context)
-            c = Context(
-                context=context,
-                text=Text(
-                    text=match.text,
-                    name=match.name,
-                    doc=match.doc.__class__(
-                        **match.doc.model_dump(exclude="embedding")
+            return (
+                Context(
+                    context=context,
+                    text=Text(
+                        text=match.text,
+                        name=match.name,
+                        doc=match.doc.__class__(
+                            **match.doc.model_dump(exclude="embedding")
+                        ),
                     ),
+                    score=score,
+                    **extras,
                 ),
-                score=score,
-                **extras,
+                llm_result,
             )
-            return c, llm_result
 
         results = await gather_with_concurrency(
             self.max_concurrent, [process(m) for m in matches]
@@ -723,13 +725,12 @@ class Docs(BaseModel):
         # update token counts
         [answer.add_tokens(r[1]) for r in results]
 
-        # filter out failures
-        contexts = [c for c, r in results if c is not None]
-
+        # filter out failures, sort by score, limit to max_sources
         answer.contexts = sorted(
-            contexts + answer.contexts, key=lambda x: x.score, reverse=True
-        )
-        answer.contexts = answer.contexts[:max_sources]
+            [c for c, r in results if c is not None] + answer.contexts,
+            key=lambda x: x.score,
+            reverse=True,
+        )[:max_sources]
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
@@ -808,9 +809,7 @@ class Docs(BaseModel):
             pre.answer_id = answer.id
             await self.llm_result_callback(pre)
             answer.add_tokens(pre)
-            answer.context = (
-                answer.context + "\n\nExtra background information:" + str(pre)
-            )
+            answer.context += f"\n\nExtra background information:{pre}"
         bib = {}
         if len(answer.context) < 10:  # and not self.memory:  # noqa: PLR2004
             answer_text = (
