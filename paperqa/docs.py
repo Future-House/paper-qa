@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
@@ -526,7 +527,7 @@ class Docs(BaseModel):
         if len(matched_docs) == 0:
             return set()
         # this only works for gpt-4 (in my testing)
-        try:
+        with contextlib.suppress(AttributeError):
             if (
                 rerank is None
                 and (
@@ -552,8 +553,6 @@ class Docs(BaseModel):
                 if answer:
                     answer.add_tokens(result)
                 return {d.dockey for d in matched_docs if d.docname in str(result)}
-        except AttributeError:
-            pass
         return {d.dockey for d in matched_docs}
 
     def _build_texts_index(self, keys: set[DocKey] | None = None):

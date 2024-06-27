@@ -1185,17 +1185,17 @@ async def test_adoc_match() -> None:
     docs = Docs()
     await docs.aadd_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
+        citation=(
+            'Wikipedia contributors. "Frederick Bates (politician)."'
+            " Wikipedia, The Free Encyclopedia. Wikipedia, The Free Encyclopedia,"
+            " Accessed now"
+        ),
         dockey="test",
     )
-    sources = await docs.adoc_match(
-        "What is Frederick Bates's greatest accomplishment?"
-    )
-    assert len(sources) > 0
-    sources = await docs.adoc_match(
-        "What is Frederick Bates's greatest accomplishment?"
-    )
-    assert len(sources) > 0
+    for _ in range(2):  # Check calling 2+ times doesn't wipe the Docs
+        assert await docs.adoc_match(
+            "What is Frederick Bates's greatest accomplishment?"
+        )
 
 
 def test_docs_pickle() -> None:
