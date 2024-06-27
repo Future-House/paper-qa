@@ -535,11 +535,12 @@ async def test_chain_chat():
 
 
 @pytest.mark.asyncio()
-async def test_anthropic_chain():
+async def test_anthropic_chain() -> None:
+
     try:
         from anthropic import AsyncAnthropic
     except ImportError:
-        return
+        pytest.skip("Test requires anthropic to be installed.")
 
     client = AsyncAnthropic()
     llm = AnthropicLLMModel()
