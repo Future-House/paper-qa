@@ -97,7 +97,16 @@ class PromptCollection(BaseModel):
     qa: str = qa_prompt
     select: str = select_paper_prompt
     cite: str = citation_prompt
-    pre: str | None = None
+    pre: str | None = Field(
+        default=None,
+        description=(
+            "Opt-in pre-prompt (templated with just the original question) to append"
+            " information before a qa prompt. For example:"
+            " 'Summarize all scientific terms in the following question:\n{question}'."
+            " This pre-prompt can enable injection of question-specific guidance later"
+            " used by the qa prompt, without changing the qa prompt's template."
+        ),
+    )
     post: str | None = None
     system: str = default_system_prompt
     skip_summary: bool = False
