@@ -6,7 +6,7 @@ import re
 from abc import ABC, abstractmethod
 from enum import Enum
 from inspect import signature
-from typing import Any, AsyncGenerator, Callable, Coroutine, Sequence, cast
+from typing import Any, AsyncGenerator, Callable, Coroutine, Iterable, Sequence, cast
 
 import numpy as np
 import tiktoken
@@ -16,6 +16,13 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .prompts import default_system_prompt
 from .types import Doc, Embeddable, LLMResult, Text
 from .utils import batch_iter, flatten, gather_with_concurrency, is_coroutine_callable
+
+try:
+    from anthropic import AsyncAnthropic
+    from anthropic.types import ContentBlockDeltaEvent
+except ImportError:
+    AsyncAnthropic = Any
+    ContentBlockDeltaEvent = Any
 
 # only works for python 3.11
 # def guess_model_type(model_name: str) -> str:
@@ -165,7 +172,7 @@ class SparseEmbeddingModel(EmbeddingModel):
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
         return [
-            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim).astype(float)
+            np.bincount([xi % self.ndim for xi in x], minlength=self.ndim).astype(float)  # type: ignore[misc]
             / len(x)
             for x in enc_batch
         ]
@@ -210,9 +217,10 @@ class VoyageAIEmbeddingModel(EmbeddingModel):
 
 
 class LLMModel(ABC, BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     llm_type: str | None = None
     name: str
-    model_config = ConfigDict(extra="forbid")
 
     async def acomplete(self, client: Any, prompt: str) -> str:
         raise NotImplementedError
@@ -224,10 +232,10 @@ class LLMModel(ABC, BaseModel):
         """
         raise NotImplementedError
 
-    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
         raise NotImplementedError
 
-    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
         """Return an async generator that yields chunks of the completion.
 
         I cannot get mypy to understand the override, so marked as Any
@@ -411,28 +419,20 @@ class OpenAILLMModel(LLMModel):
         async for chunk in completion:
             yield chunk.choices[0].text
 
-    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
         aclient = self._check_client(client)
         completion = await aclient.chat.completions.create(
-            messages=messages, **process_llm_config(self.config)
+            messages=messages, **process_llm_config(self.config)  # type: ignore[arg-type]
         )
         return completion.choices[0].message.content or ""
 
-    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
         aclient = self._check_client(client)
         completion = await aclient.chat.completions.create(
-            messages=messages, **process_llm_config(self.config), stream=True
+            messages=messages, **process_llm_config(self.config), stream=True  # type: ignore[arg-type]
         )
         async for chunk in cast(AsyncGenerator, completion):
             yield chunk.choices[0].delta.content
-
-
-try:
-    from anthropic import AsyncAnthropic
-    from anthropic.types import ContentBlockDeltaEvent
-except ImportError:
-    AsyncAnthropic = Any
-    ContentBlockDeltaEvent = Any
 
 
 class AnthropicLLMModel(LLMModel):
@@ -452,8 +452,9 @@ class AnthropicLLMModel(LLMModel):
                 "Your client is None - did you forget to set it after pickling?"
             )
         if not isinstance(client, AsyncAnthropic):
-            raise ValueError(  # noqa: TRY004
-                f"Your client is not a required AsyncAnthropic client. It is a {type(client)}"
+            raise TypeError(
+                f"Your client is not a required {AsyncAnthropic.__name__} client. It is"
+                f" a {type(client)}."
             )
         return client
 
@@ -471,7 +472,7 @@ class AnthropicLLMModel(LLMModel):
         m.name = m.config["model"]
         return m
 
-    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
         aclient = self._check_client(client)
         # filter out system
         sys_message = next(
@@ -492,7 +493,7 @@ class AnthropicLLMModel(LLMModel):
             )
         return str(completion.content) or ""
 
-    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
         aclient = self._check_client(client)
         sys_message = next(
             (m["content"] for m in messages if m["role"] == "system"), None
@@ -716,7 +717,7 @@ class LangchainLLMModel(LLMModel):
         async for chunk in cast(AsyncGenerator, client.astream(prompt, **self.config)):
             yield chunk
 
-    async def achat(self, client: Any, messages: list[dict[str, str]]) -> str:
+    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
         from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
         lc_messages: list[BaseMessage] = []
@@ -729,7 +730,7 @@ class LangchainLLMModel(LLMModel):
                 raise ValueError(f"Unknown role: {m['role']}")
         return (await client.ainvoke(lc_messages, **self.config)).content
 
-    async def achat_iter(self, client: Any, messages: list[dict[str, str]]) -> Any:
+    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
         from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
         lc_messages: list[BaseMessage] = []

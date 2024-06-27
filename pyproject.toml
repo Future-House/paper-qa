@@ -24,7 +24,7 @@ dependencies = [
     "html2text",
     "numpy",
     "openai>=1",
-    "pydantic>=2",
+    "pydantic~=2.0",
     "pypdf",
     "tiktoken>=0.4.0",
 ]
@@ -66,6 +66,8 @@ enable_error_code = [
 ]
 # Shows a short summary line after error messages.
 error_summary = false
+# Comma-separated list of mypy plugins.
+plugins = ["pydantic.mypy"]
 # Use visually nicer output in error messages: use soft word wrap, show source
 # code snippets, and show error location markers.
 pretty = true
@@ -95,6 +97,7 @@ module = [
     "fitz",
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
     "sentence_transformers",  # SEE: https://github.com/UKPLab/sentence-transformers/issues/1723
+    "voyageai.*",  # SEE: https://github.com/voyage-ai/voyageai-python/issues/8
 ]
 
 [tool.pytest.ini_options]
@@ -113,15 +116,12 @@ unsafe-fixes = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
-    "FURB105",
     "FURB110",
     "FURB113",
     "FURB116",
     "FURB118",
-    "FURB129",
     "FURB131",
     "FURB132",
-    "FURB136",
     "FURB140",
     "FURB142",
     "FURB145",
@@ -129,18 +129,10 @@ extend-select = [
     "FURB152",
     "FURB154",
     "FURB157",
-    "FURB161",
-    "FURB163",
     "FURB164",
     "FURB166",
-    "FURB167",
-    "FURB168",
-    "FURB169",
     "FURB171",
-    "FURB177",
     "FURB180",
-    "FURB181",
-    "FURB187",
     "FURB192",
     "PLR6104",
     "PLR6201",
