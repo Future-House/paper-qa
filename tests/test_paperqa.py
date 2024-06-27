@@ -1030,7 +1030,7 @@ def test_langchain_llm():
     assert docs2.summary_llm == "babbage-002"
     docs2.get_evidence(
         Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y)],  # noqa: ARG005
+        get_callbacks=lambda x: [print],  # noqa: ARG005
     )
 
 
@@ -1117,8 +1117,7 @@ async def test_langchain_vector_store():
     index.add_texts_and_embeddings(some_texts)
     assert index._store is not None
     # check search returns Text obj
-    data, score = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
-    print(data)
+    data, _ = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
     assert isinstance(data[0], Text)
 
     # now try with convenience
@@ -1386,7 +1385,7 @@ def test_parser_only_reader():
     assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)
     assert parsed_text.metadata.chunk_metadata is None
     assert parsed_text.metadata.total_parsed_text_length == sum(
-        [len(t) for t in parsed_text.content.values()]  # type: ignore[misc,union-attr]
+        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
     )
 
 
@@ -1491,12 +1490,12 @@ def test_citation():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path)  # type: ignore[arg-type]
-    assert next(iter(docs.docs.values())).docname in (
+    assert next(iter(docs.docs.values())).docname in {
         "Wikipedia2024",
         "Frederick2024",
         "Wikipedia",
         "Frederick",
-    )
+    }
 
 
 def test_dockey_filter():

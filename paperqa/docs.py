@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import pprint  # noqa: F401
 import re
 import tempfile
 from datetime import datetime
@@ -142,7 +141,7 @@ class Docs(BaseModel):
             if (
                 data.summary_llm_model is None
                 and data.llm == "default"
-                and type(data.llm_model) == OpenAILLMModel
+                and isinstance(data.llm_model, OpenAILLMModel)
             ):
                 data.summary_llm_model = OpenAILLMModel(
                     config={"model": "gpt-3.5-turbo", "temperature": 0.1}
@@ -530,8 +529,8 @@ class Docs(BaseModel):
             if (
                 rerank is None
                 and (
-                    type(self.llm_model) == OpenAILLMModel
-                    and cast(OpenAILLMModel, self).config["model"].startswith("gpt-4")
+                    isinstance(self.llm_model, OpenAILLMModel)
+                    and self.config["model"].startswith("gpt-4")
                 )
                 or rerank is True
             ):
@@ -640,7 +639,7 @@ class Docs(BaseModel):
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
             # needed empties for failures/skips
-            llm_result = LLMResult(model="", date="")
+            llm_result = LLMResult(model="")
             extras: dict[str, Any] = {}
             if detailed_citations:
                 citation = match.name + ": " + citation
@@ -703,19 +702,21 @@ class Docs(BaseModel):
                 if self.strip_citations:
                     # remove citations that collide with our grounded citations (for the answer LLM)
                     context = strip_citations(context)
-            c = Context(
-                context=context,
-                text=Text(
-                    text=match.text,
-                    name=match.name,
-                    doc=match.doc.__class__(
-                        **match.doc.model_dump(exclude="embedding")
+            return (
+                Context(
+                    context=context,
+                    text=Text(
+                        text=match.text,
+                        name=match.name,
+                        doc=match.doc.__class__(
+                            **match.doc.model_dump(exclude="embedding")
+                        ),
                     ),
+                    score=score,
+                    **extras,
                 ),
-                score=score,
-                **extras,
+                llm_result,
             )
-            return c, llm_result
 
         results = await gather_with_concurrency(
             self.max_concurrent, [process(m) for m in matches]
@@ -723,13 +724,12 @@ class Docs(BaseModel):
         # update token counts
         [answer.add_tokens(r[1]) for r in results]
 
-        # filter out failures
-        contexts = [c for c, r in results if c is not None]
-
+        # filter out failures, sort by score, limit to max_sources
         answer.contexts = sorted(
-            contexts + answer.contexts, key=lambda x: x.score, reverse=True
-        )
-        answer.contexts = answer.contexts[:max_sources]
+            [c for c, r in results if c is not None] + answer.contexts,
+            key=lambda x: x.score,
+            reverse=True,
+        )[:max_sources]
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Callable
 from uuid import UUID, uuid4
 
@@ -44,7 +45,7 @@ class LLMResult(BaseModel):
     prompt_count: int = 0
     completion_count: int = 0
     model: str
-    date: str
+    date: str = Field(default_factory=datetime.now().isoformat)
     seconds_to_first_token: float = Field(
         default=0.0, description="Delta time (sec) to first response token's arrival."
     )
@@ -97,7 +98,16 @@ class PromptCollection(BaseModel):
     qa: str = qa_prompt
     select: str = select_paper_prompt
     cite: str = citation_prompt
-    pre: str | None = None
+    pre: str | None = Field(
+        default=None,
+        description=(
+            "Opt-in pre-prompt (templated with just the original question) to append"
+            " information before a qa prompt. For example:"
+            " 'Summarize all scientific terms in the following question:\n{question}'."
+            " This pre-prompt can enable injection of question-specific guidance later"
+            " used by the qa prompt, without changing the qa prompt's template."
+        ),
+    )
     post: str | None = None
     system: str = default_system_prompt
     skip_summary: bool = False
@@ -162,12 +172,10 @@ class PromptCollection(BaseModel):
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
-    context: str
+    context: str = Field(description="Summary of the text with respect to a question.")
     text: Text
     score: int = 5
-    model_config = ConfigDict(
-        extra="allow",
-    )
+    model_config = ConfigDict(extra="allow")
 
 
 def __str__(self) -> str:  # noqa: N807
