@@ -133,3 +133,6 @@ dmypy.json
 
 *.ipynb
 env
+
+# Matching pyproject.toml
+paperqa/version.py

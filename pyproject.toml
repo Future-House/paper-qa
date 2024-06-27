@@ -1,7 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-# Pin to 62.6 for support from reading requirements from requirements.txt
-requires = ["setuptools >= 62.6.0"]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
 
 [project]
 authors = [
@@ -29,7 +28,7 @@ dependencies = [
     "tiktoken>=0.4.0",
 ]
 description = "LLM Chain for answering questions from docs"
-dynamic = ["optional-dependencies"]
+dynamic = ["optional-dependencies", "version"]
 keywords = ["question answering"]
 license = {file = "LICENSE"}
 maintainers = [
@@ -40,7 +39,6 @@ name = "paper-qa"
 readme = "README.md"
 requires-python = ">=3.8"
 urls = {repository = "https://github.com/whitead/paper-qa"}
-version = "4.8.1"
 
 [tool.codespell]
 check-filenames = true
@@ -221,6 +219,9 @@ file = ["dev-requirements.txt"]
 
 [tool.setuptools.packages.find]
 include = ["paperqa*"]
+
+[tool.setuptools_scm]
+version_file = "paperqa/version.py"
 
 [tool.tomlsort]
 all = true
