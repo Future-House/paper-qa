@@ -18,7 +18,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.10
+    rev: v0.5.0
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -31,7 +31,12 @@ repos:
     hooks:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
-        additional_dependencies: [types-requests, types-setuptools]
+        additional_dependencies:
+          - numpy
+          - openai>=1 # Match pyproject.toml
+          - pydantic~=2.0 # Match pyproject.toml
+          - types-requests
+          - types-setuptools
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.3.2
     hooks:
@@ -45,3 +50,9 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: [".[toml]"]
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.18
+    hooks:
+      - id: validate-pyproject
+        additional_dependencies:
+          - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
@@ -71,6 +72,8 @@ async def print_callback(result: LLMResult):  # noqa: ARG001
 class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
+    model_config = ConfigDict(extra="forbid")
+
     # ephemeral vars that should not be pickled (_things)
     _client: Any | None = None
     _embedding_client: Any | None = None
@@ -101,7 +104,6 @@ class Docs(BaseModel):
     llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
         default=empty_callback
     )
-    model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
         # We do it here because we need to move things to private attributes
@@ -327,7 +329,7 @@ class Docs(BaseModel):
         """Add a document to the collection."""
         import urllib.request
 
-        with urllib.request.urlopen(url) as f:  # noqa: ASYNC100, S310
+        with urllib.request.urlopen(url) as f:  # noqa: ASYNC210, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
             return await self.aadd_file(
@@ -525,12 +527,12 @@ class Docs(BaseModel):
         if len(matched_docs) == 0:
             return set()
         # this only works for gpt-4 (in my testing)
-        try:
+        with contextlib.suppress(AttributeError):
             if (
                 rerank is None
                 and (
                     isinstance(self.llm_model, OpenAILLMModel)
-                    and self.config["model"].startswith("gpt-4")
+                    and self.llm_model.config["model"].startswith("gpt-4")
                 )
                 or rerank is True
             ):
@@ -551,8 +553,6 @@ class Docs(BaseModel):
                 if answer:
                     answer.add_tokens(result)
                 return {d.dockey for d in matched_docs if d.docname in str(result)}
-        except AttributeError:
-            pass
         return {d.dockey for d in matched_docs}
 
     def _build_texts_index(self, keys: set[DocKey] | None = None):
@@ -733,7 +733,7 @@ class Docs(BaseModel):
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
-                + "".join([f"\n{k}: {v}" for k, v in c.model_extra.items()])
+                + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
                 + (f"\nFrom {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]

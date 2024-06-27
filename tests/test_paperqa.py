@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import contextlib
 import os
 import pickle
 import tempfile
 import textwrap
 from io import BytesIO
 from pathlib import Path
+from typing import cast, no_type_check
 
 import numpy as np
 import pytest
@@ -534,11 +536,12 @@ async def test_chain_chat():
 
 
 @pytest.mark.asyncio()
-async def test_anthropic_chain():
+async def test_anthropic_chain() -> None:
+
     try:
         from anthropic import AsyncAnthropic
     except ImportError:
-        return
+        pytest.skip("Test requires anthropic to be installed.")
 
     client = AsyncAnthropic()
     llm = AnthropicLLMModel()
@@ -724,7 +727,7 @@ def test_custom_json_props():
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
-    assert "person_name" in evidence.contexts[0].model_extra
+    assert "person_name" in cast(dict, evidence.contexts[0].model_extra)
     assert "person_name: " in evidence.context
     answer = docs.query("What is Frederick Bates's greatest accomplishment?")
     assert "person_name" in answer.context
@@ -832,7 +835,7 @@ def test_custom_embedding():
     assert docs.docs["test"].embedding == [1, 2, 3]
 
 
-def test_sparse_embedding():
+def test_sparse_embedding() -> None:
     docs = Docs(
         docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
@@ -854,6 +857,8 @@ def test_sparse_embedding():
     ), "Embeddings should be 1D"
 
     # check the embeddings are the same size
+    assert docs.texts[0].embedding is not None
+    assert docs.texts[1].embedding is not None
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # test alias
@@ -868,12 +873,9 @@ def test_sparse_embedding():
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
 
-def test_hybrid_embedding():
+def test_hybrid_embedding() -> None:
     model = HybridEmbeddingModel(
-        models=[
-            OpenAIEmbeddingModel(),
-            SparseEmbeddingModel(),
-        ]
+        models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
     )
     docs = Docs(
         docs_index=NumpyVectorStore(embedding_model=model),
@@ -889,6 +891,8 @@ def test_hybrid_embedding():
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
     # check the embeddings are the same size
+    assert docs.texts[0].embedding is not None
+    assert docs.texts[1].embedding is not None
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # now try via alias
@@ -1177,21 +1181,21 @@ async def test_aquery():
 
 
 @pytest.mark.asyncio()
-async def test_adoc_match():
+async def test_adoc_match() -> None:
     docs = Docs()
     await docs.aadd_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
+        citation=(
+            'Wikipedia contributors. "Frederick Bates (politician)."'
+            " Wikipedia, The Free Encyclopedia. Wikipedia, The Free Encyclopedia,"
+            " Accessed now"
+        ),
         dockey="test",
     )
-    sources = await docs.adoc_match(
-        "What is Frederick Bates's greatest accomplishment?"
-    )
-    assert len(sources) > 0
-    sources = await docs.adoc_match(
-        "What is Frederick Bates's greatest accomplishment?"
-    )
-    assert len(sources) > 0
+    for _ in range(2):  # Check calling 2+ times doesn't wipe the Docs
+        assert await docs.adoc_match(
+            "What is Frederick Bates's greatest accomplishment?"
+        )
 
 
 def test_docs_pickle() -> None:
@@ -1212,7 +1216,7 @@ def test_docs_pickle() -> None:
             ),
         )
         assert docs._client is not None
-        old_config = docs.llm_model.config
+        old_config = cast(OpenAILLMModel, docs.llm_model).config
         old_sconfig = docs.summary_llm_model.config  # type: ignore[union-attr]
         docs.add(f.name, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)  # type: ignore[arg-type]
 
@@ -1577,15 +1581,12 @@ def test_query_filter():
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
-def test_zotera():
+def test_zotero() -> None:
     from paperqa.contrib import ZoteroDB
 
     Docs()
-    try:
+    with contextlib.suppress(ValueError):  # Close enough
         ZoteroDB(library_type="user")  # "group" if group library
-    except ValueError:
-        # close enough
-        return
 
 
 def test_too_much_evidence():
@@ -1675,7 +1676,9 @@ def test_post_prompt():
     docs.query("What country is Bates from?")
 
 
-def disabled_test_memory():
+@pytest.mark.skip("TODO: bring this back")
+@no_type_check  # TODO: remove this when restored
+def test_memory() -> None:
     # Not sure why, but gpt-3.5 cannot do this anymore.
     docs = Docs(memory=True, k=3, max_sources=1, llm="gpt-4", key_filter=False)
     docs.add_url(
@@ -1734,9 +1737,8 @@ def test_add_texts():
 
     for t1, t2 in zip(docs2.texts, docs.texts):
         assert t1.text == t2.text
-        print(
-            "docs2", np.array(t1.embedding).shape, "docs", np.array(t2.embedding).shape
-        )
+        assert t1.embedding is not None
+        assert t2.embedding is not None
         assert np.allclose(t1.embedding, t2.embedding, atol=1e-3)
     docs2._build_texts_index()
     # now do it again to test after text index is already built

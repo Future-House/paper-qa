@@ -11,10 +11,11 @@ voyageai
 
 # Code QA dependencies
 build
+mypy
 pre-commit
 pytest
-types-requests
-types-setuptools
 pytest-asyncio
 pytest-sugar
 pytest-timer
+types-requests
+types-setuptools
