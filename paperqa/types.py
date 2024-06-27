@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 from uuid import UUID, uuid4
 
 import tiktoken
@@ -58,7 +58,7 @@ class LLMResult(BaseModel):
 
 
 class Embeddable(BaseModel):
-    embedding: list[float] | None = Field(default=None, repr=False)
+    embedding: Sequence[float] | None = Field(default=None, repr=False)
 
 
 class Doc(Embeddable):
@@ -172,10 +172,11 @@ class PromptCollection(BaseModel):
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
+    model_config = ConfigDict(extra="allow")
+
     context: str = Field(description="Summary of the text with respect to a question.")
     text: Text
     score: int = 5
-    model_config = ConfigDict(extra="allow")
 
 
 def __str__(self) -> str:  # noqa: N807

@@ -7,7 +7,7 @@ import tempfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, Callable, Coroutine, cast
+from typing import Any, BinaryIO, Callable, Coroutine, Sequence, cast
 from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
@@ -71,6 +71,8 @@ async def print_callback(result: LLMResult):  # noqa: ARG001
 class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
 
+    model_config = ConfigDict(extra="forbid")
+
     # ephemeral vars that should not be pickled (_things)
     _client: Any | None = None
     _embedding_client: Any | None = None
@@ -101,7 +103,6 @@ class Docs(BaseModel):
     llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
         default=empty_callback
     )
-    model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
         # We do it here because we need to move things to private attributes
@@ -449,7 +450,7 @@ class Docs(BaseModel):
         # 1. Calculate text embeddings if not already present, but don't set them into
         # the texts until we've set up the Doc's embedding, so callers can retry upon
         # OpenAI rate limit errors
-        text_embeddings: list[list[float]] | None = (
+        text_embeddings: list[Sequence[float]] | None = (
             await self.texts_index.embedding_model.embed_documents(
                 self._embedding_client, texts=[t.text for t in texts]
             )
@@ -530,7 +531,7 @@ class Docs(BaseModel):
                 rerank is None
                 and (
                     isinstance(self.llm_model, OpenAILLMModel)
-                    and self.config["model"].startswith("gpt-4")
+                    and self.llm_model.config["model"].startswith("gpt-4")
                 )
                 or rerank is True
             ):
@@ -733,7 +734,7 @@ class Docs(BaseModel):
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
-                + "".join([f"\n{k}: {v}" for k, v in c.model_extra.items()])
+                + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
                 + (f"\nFrom {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]
