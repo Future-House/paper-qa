@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Callable, Sequence
+from typing import Any, Callable
 from uuid import UUID, uuid4
 
 import tiktoken
@@ -58,7 +58,7 @@ class LLMResult(BaseModel):
 
 
 class Embeddable(BaseModel):
-    embedding: Sequence[float] | None = Field(default=None, repr=False)
+    embedding: list[float] | None = Field(default=None, repr=False)
 
 
 class Doc(Embeddable):

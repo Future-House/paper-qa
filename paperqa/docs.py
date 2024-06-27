@@ -7,7 +7,7 @@ import tempfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, Callable, Coroutine, Sequence, cast
+from typing import Any, BinaryIO, Callable, Coroutine, cast
 from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
@@ -450,7 +450,7 @@ class Docs(BaseModel):
         # 1. Calculate text embeddings if not already present, but don't set them into
         # the texts until we've set up the Doc's embedding, so callers can retry upon
         # OpenAI rate limit errors
-        text_embeddings: list[Sequence[float]] | None = (
+        text_embeddings: list[list[float]] | None = (
             await self.texts_index.embedding_model.embed_documents(
                 self._embedding_client, texts=[t.text for t in texts]
             )

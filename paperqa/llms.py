@@ -120,14 +120,14 @@ def process_llm_config(
 
 async def embed_documents(
     client: AsyncOpenAI, texts: list[str], embedding_model: str, batch_size: int = 16
-) -> list[Sequence[float]]:
+) -> list[list[float]]:
     """Embed a list of documents with batching."""
     if client is None:
         raise ValueError(
             "Your client is None - did you forget to set it after pickling?"
         )
     N = len(texts)
-    embeddings: list[Sequence[float]] = []
+    embeddings = []
     for i in range(0, N, batch_size):
         response = await client.embeddings.create(
             model=embedding_model,
@@ -150,18 +150,14 @@ class EmbeddingModel(ABC, BaseModel):
         """Several embedding models have a 'mode' or prompt which affects output."""
 
     @abstractmethod
-    async def embed_documents(
-        self, client: Any, texts: list[str]
-    ) -> list[Sequence[float]]:
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         pass
 
 
 class OpenAIEmbeddingModel(EmbeddingModel):
     name: str = Field(default="text-embedding-ada-002")
 
-    async def embed_documents(
-        self, client: Any, texts: list[str]
-    ) -> list[Sequence[float]]:
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
 
 
@@ -172,9 +168,7 @@ class SparseEmbeddingModel(EmbeddingModel):
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
-    async def embed_documents(
-        self, client, texts  # noqa: ARG002
-    ) -> list[Sequence[float]]:
+    async def embed_documents(self, client, texts) -> list[list[float]]:  # noqa: ARG002
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
         return [
@@ -205,9 +199,7 @@ class VoyageAIEmbeddingModel(EmbeddingModel):
     def set_mode(self, mode: EmbeddingModes):
         self.embedding_type = mode
 
-    async def embed_documents(
-        self, client: Any, texts: list[str]
-    ) -> list[Sequence[float]]:
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         if client is None:
             raise ValueError(
                 "Your client is None - did you forget to set it after pickling?"
@@ -531,9 +523,7 @@ class LlamaEmbeddingModel(EmbeddingModel):
     batch_size: int = Field(default=4)
     concurrency: int = Field(default=1)
 
-    async def embed_documents(
-        self, client: Any, texts: list[str]
-    ) -> list[Sequence[float]]:
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         cast(AsyncOpenAI, client)
 
         async def process(texts: list[str]) -> list[float]:
@@ -581,7 +571,7 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
 
     async def embed_documents(
         self, client: Any, texts: list[str]  # noqa: ARG002
-    ) -> list[Sequence[float]]:
+    ) -> list[list[float]]:
         from sentence_transformers import SentenceTransformer
 
         return cast(SentenceTransformer, self._model).encode(texts)
@@ -760,9 +750,7 @@ class LangchainEmbeddingModel(EmbeddingModel):
 
     name: str = "langchain"
 
-    async def embed_documents(
-        self, client: Any, texts: list[str]
-    ) -> list[Sequence[float]]:
+    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await client.aembed_documents(texts)
 
 
