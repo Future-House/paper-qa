@@ -125,7 +125,6 @@ from anthropic import AsyncAnthropic
 docs = Docs(llm='claude-3-5-sonnet-20240620',
             summary_llm='claude-3-5-sonnet-20240620',
             client=AsyncAnthropic())
-
 ```
 
 Or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
@@ -171,7 +170,8 @@ local_client = AsyncOpenAI(
 docs = Docs(client=local_client,
             docs_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
             texts_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
-            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)),
+        )
 ```
 
 ### Changing Embedding Model
@@ -182,7 +182,6 @@ paper-qa defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has
 from paperqa import Docs
 
 docs = Docs(embedding="text-embedding-3-large")
-
 ```
 
 `embedding` accepts:
@@ -199,8 +198,8 @@ For deeper embedding customization, embedding models and vector stores can be bu
 from paperqa import Docs, NumpyVectorStore, OpenAIEmbeddingModel
 
 docs = Docs(docs_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")),
-            texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")))
-
+            texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")),
+        )
 ```
 
 Note that embedding models are specified as attributes of paper-qa's `VectorStore` base class. `NumpyVectorStore` is the best place to start, it's a simple in-memory store, without an index. If a larger-than-memory vector store is needed, you can use the `LangchainVectorStore` like this:
@@ -212,9 +211,8 @@ from paperqa import Docs, LangchainVectorStore
 
 docs = Docs(
         docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
-        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
     )
-
 ```
 
 We support both local langchain embedding models and the [SentenceTransformer](https://www.sbert.net/) models. For example:
@@ -233,7 +231,8 @@ local_client = AsyncOpenAI(
 docs = Docs(client=local_client,
             docs_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
             texts_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
-            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)),
+        )
 ```
 
 We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
@@ -247,7 +246,7 @@ model = HybridEmbeddingModel(
 docs = Docs(
     docs_index=NumpyVectorStore(embedding_model=model),
     texts_index=NumpyVectorStore(embedding_model=model),
-)
+    )
 ```
 
 The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
