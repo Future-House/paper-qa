@@ -86,7 +86,7 @@ paper-qa is written to be used asynchronously. The synchronous API is just a wra
 | ------------------- | -------------------- |
 | `Docs.add`          | `Docs.aadd`          |
 | `Docs.add_file`     | `Docs.aadd_file`     |
-| `Docs.add_url`      | `Docs.add_url`       |
+| `Docs.add_url`      | `Docs.aadd_url`      |
 | `Docs.get_evidence` | `Docs.aget_evidence` |
 | `Docs.query`        | `Docs.aquery`        |
 
