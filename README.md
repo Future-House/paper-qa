@@ -15,7 +15,7 @@ paper-qa uses the process shown below:
 2. embed query into vector
 3. search for top k passages in docs
 4. create summary of each passage relevant to query
-5. score and select only relevant summaries
+5. use an LLM to re-score and select only relevant summaries
 6. put summaries into prompt
 7. generate answer with prompt
 
@@ -110,13 +110,25 @@ answer = await docs.aquery("What manufacturing challenges are unique to bispecif
 
 ### Choosing Model
 
-By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4-turbo`. You can adjust this:
+By default, it uses OpenAI models with a hybrid of `gpt-4o-mini` (for the re-ranking and summary step, `summary_llm` argument) and `gpt-4-turbo` (for the answering step, `llm` argument). You can adjust this:
 
 ```py
-docs = Docs(llm='gpt-3.5-turbo')
+docs = Docs(llm='gpt-4o-mini', summary_llm='gpt-4o')
 ```
 
-or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
+You can use Anthropic models by specifying an Anthropic client:
+
+```py
+from paperqa import Docs
+from anthropic import AsyncAnthropic
+
+docs = Docs(llm='claude-3-5-sonnet-20240620',
+            summary_llm='claude-3-5-sonnet-20240620',
+            client=AsyncAnthropic())
+
+```
+
+Or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
 
 ```py
 from paperqa import Docs
@@ -137,6 +149,8 @@ docs = pickle.loads(model_str)
 docs.set_client(ChatAnthropic())
 ```
 
+We also support using [Anyscale](https://docs.anyscale.com/examples/work-with-openai/#call-the-openai-endpoint-with-an-openai-api-key) to utilized hosted open source models. To use it, you only need to set your `ANYSCALE_API_KEY` and `ANYSCALE_BASE_URL` environment variables or use an OpenAI client initialized with your `api_key` and `base_url` arguments from Anyscale.
+
 #### Locally Hosted
 
 You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because paper-qa requires following a lot of instructions. You won't get good performance with 7B models.
@@ -155,13 +169,55 @@ local_client = AsyncOpenAI(
 )
 
 docs = Docs(client=local_client,
-            embedding_model=LlamaEmbeddingModel(),
+            docs_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
+            texts_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
             llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
 ```
 
 ### Changing Embedding Model
 
-You can use langchain embedding models, or the [SentenceTransformer](https://www.sbert.net/) models. For example
+paper-qa defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Docs` object constructor:
+
+```py
+from paperqa import Docs
+
+docs = Docs(embedding="text-embedding-3-large")
+
+```
+
+`embedding` accepts:
+
+- Any OpenAI embedding model name
+- [VoyageAI](https://docs.voyageai.com/docs/embeddings) model names (usable if `voyageai` is installed and `VOYAGE_API_KEY` is set)
+- `"sentence-transformers"` to use `multi-qa-MiniLM-L6-cos-v1` via [Sentence Transformers](https://huggingface.co/sentence-transformers)
+- `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, any OpenAI or VoyageAI model can be used in the dense model name
+- `"sparse"` to use a sparse keyword embedding only
+
+For deeper embedding customization, embedding models and vector stores can be built separately and passed into the `Docs` object. Embedding models are used to create both paper-qa's index of document citation embedding vectors (`docs_index` argument) as well as the full-text embedding vectors (`texts_index` argument). They can both be specified as arguments when you create a new `Docs` object. You can use use any embedding model which implements paper-qa's `EmbeddingModel` class. For example, to use `text-embedding-3-large`:
+
+```py
+from paperqa import Docs, NumpyVectorStore, OpenAIEmbeddingModel
+
+docs = Docs(docs_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")),
+            texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")))
+
+```
+
+Note that embedding models are specified as attributes of paper-qa's `VectorStore` base class. `NumpyVectorStore` is the best place to start, it's a simple in-memory store, without an index. If a larger-than-memory vector store is needed, you can use the `LangchainVectorStore` like this:
+
+```py
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import OpenAIEmbeddings
+from paperqa import Docs, LangchainVectorStore
+
+docs = Docs(
+        docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
+        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+    )
+
+```
+
+We support both local langchain embedding models and the [SentenceTransformer](https://www.sbert.net/) models. For example:
 
 ```py
 from paperqa import Docs, SentenceTransformerEmbeddingModel
@@ -175,18 +231,26 @@ local_client = AsyncOpenAI(
 )
 
 docs = Docs(client=local_client,
-            embedding_model=SentenceTransformerEmbeddingModel(),
+            docs_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
+            texts_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
             llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
 ```
 
-Just like in the above examples, we have to split the Langchain model into a client and model to keep `Docs` serializable.
+We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
 
 ```py
+from paperqa import Docs, HybridEmbeddingModel, SparseEmbeddingModel, NumpyVectorStore
 
-from paperqa import Docs, LangchainEmbeddingModel
-
-docs = Docs(embedding_model=LangchainEmbeddingModel(), embedding_client=OpenAIEmbeddings())
+model = HybridEmbeddingModel(
+        models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
+    )
+docs = Docs(
+    docs_index=NumpyVectorStore(embedding_model=model),
+    texts_index=NumpyVectorStore(embedding_model=model),
+)
 ```
+
+The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
 
 ### Adjusting number of sources
 
@@ -235,8 +299,8 @@ from paperqa import LangchainVectorStore, Docs
 from langchain_community.vector_store import FAISS
 from langchain_openai import OpenAIEmbeddings
 
-my_index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-docs = Docs(texts_index=my_index)
+docs = Docs(texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
+            docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()))
 
 ```
 
@@ -378,7 +442,7 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 ### How is this different from LangChain?
 
-There has been some great work on retrievers in langchain and you could say this is an example of a retriever.
+There has been some great work on retrievers in langchain and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
 
 ### Can I save or load?
 
