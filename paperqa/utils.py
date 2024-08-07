@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime
+import hashlib
 import inspect
 import json
 import math
@@ -8,6 +10,7 @@ import re
 import string
 from pathlib import Path
 from typing import Any, BinaryIO, Coroutine, Iterator, Union
+from uuid import UUID
 
 import pypdf
 
@@ -192,3 +195,18 @@ def llm_read_json(text: str) -> dict:
     text = re.sub(pattern, replace_newlines, text)
 
     return json.loads(text)
+
+
+def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
+    """Encode a value (e.g. a DOI) optionally with a max length."""
+    if isinstance(value, UUID):
+        value = str(value)
+    if isinstance(value, str):
+        value = value.lower().encode()
+    return hashlib.md5(value).hexdigest()[:maxsize]  # noqa: S324
+
+def get_year(ts: datetime | None = None) -> str:
+    """Get the year from the input datetime, otherwise using the current datetime."""
+    if ts is None:
+        ts = datetime.now()
+    return ts.strftime("%Y")

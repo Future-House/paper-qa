@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Callable
+import logging
+import re
+from typing import Any, Callable, ClassVar, Collection
 from uuid import UUID, uuid4
 
+import aiohttp
+from networkx import volume
 import tiktoken
 from pydantic import (
     BaseModel,
@@ -23,13 +27,14 @@ from .prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
-from .utils import get_citenames
+from .utils import encode_id, get_citenames
 from .version import __version__ as pqa_version
 
 # Just for clarity
 DocKey = Any
 CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
+logger = logging.getLogger(__name__)
 
 class LLMResult(BaseModel):
     """A class to hold the result of a LLM completion."""
@@ -65,6 +70,7 @@ class Doc(Embeddable):
     docname: str
     citation: str
     dockey: DocKey
+    details: PaperDetails
 
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
@@ -286,3 +292,259 @@ class ParsedText(BaseModel):
             raise NotImplementedError(
                 "Encoding only implemented for str and list[str] content."
             )
+
+
+# We use these integer values
+# as defined in https://jfp.csc.fi/en/web/haku/kayttoohje
+# which is a recommended ranking system
+SOURCE_QUALITY_MESSAGES = {
+    0: "poor quality or predatory journal",
+    1: "peer-reviewed journal",
+    2: "domain leading peer-reviewed journal",
+    3: "highest quality peer-reviewed journal",
+}
+
+
+class PaperDetails(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
+
+    citation: str | None = None
+    key: str | None = None
+    bibtex: str | None = None #TODO: may be able to build this via method
+    authors: list[str] | None = None
+    publication_date: datetime | None = None
+    year: int | None = None
+    volume: str | None = None
+    issue: str | None = None
+    pages: str | None = None
+    journal: str | None = None
+    year: int | None = None
+    url: str | None = Field(
+        default=None,
+        description=(
+            "Optional URL to the paper, which can lead to a Semantic Scholar page,"
+            " arXiv abstract, etc. As of version 0.67 on 5/10/2024, we don't use this"
+            " URL anywhere in the source code."
+        ),
+    )
+    title: str | None = None
+    citation_count: int | None = None  # noqa: N815
+
+    source_quality: int | None = Field(
+        default=None,
+        description="Quality of journal/venue of paper. "
+        " We use None as a sentinel for unset values (like for determining hydration) "
+        " So, we use -1 means unknown quality and None means it needs to be hydrated.",
+    )
+
+    doi: str | None = None
+    paper_id: str | None = None  # noqa: N815
+    other: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Other metadata besides the above standardized fields.",
+    )
+    UNDEFINED_JOURNAL_QUALITY: ClassVar[int] = -1
+
+    @field_validator("key")
+    @classmethod
+    def clean_key(cls, value: str) -> str:
+        # Replace HTML tags with empty string
+        return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
+
+    def __getitem__(self, item: str):
+        """Allow for dictionary-like access, falling back on other."""
+        try:
+            return getattr(self, item)
+        except AttributeError:
+            return self.other[item]
+
+    @classmethod
+    async def get_source_quality(cls, bibtex: str) -> int:
+        # extract journal name (or None)
+        match = re.search(r"journal\s*=\s*{([^}]+)}", bibtex)
+        journal_name = match.group(1) if match else None
+        # TODO: implement JournalQualityDB
+        # if journal_name:
+        #     record = await JournalQualityDB.filter(
+        #         journal=journal_name.casefold()
+        #     ).first()
+        #     if record:
+        #         return record.quality
+        #     logger.warning(
+        #         f"Failed to find journal {journal_name!r} in JournalQualityDB."
+        #     )
+        return cls.UNDEFINED_JOURNAL_QUALITY
+
+    @property
+    def formatted_citation(self) -> str:
+        if (
+            self.citation is None
+            or self.citation_count is None
+            or self.source_quality is None
+        ):
+            raise ValueError(
+                "Citation, citationCount, and sourceQuality are not set -- do you need to call `hydrate`?"
+            )
+        quality = (
+            SOURCE_QUALITY_MESSAGES[self.source_quality]
+            if self.source_quality >= 0
+            else None
+        )
+        if quality is None:
+            return f"{self.citation} This article has {self.citation_count} citations."
+        return (
+            f"{self.citation} This article has {self.citation_count} citations and is from a "
+            f"{quality}."
+        )
+
+    @property
+    def docname(self) -> str | None:
+        """Alias for key."""
+        return self.key
+
+    OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
+
+    def is_hydration_needed(  # pylint: disable=dangerous-default-value
+        self, exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS
+    ) -> bool:
+        """Determine if we have unfilled attributes."""
+        return any(
+            v is None for k, v in self.model_dump().items() if k not in exclusion
+        )
+    
+    async def populate_paper_id(self) -> None:
+        #TODO: should this be a hash of the doi?
+        if self.paper_id is None:
+            self.paper_id = encode_id(uuid4())
+
+    async def metadata_from_crossref(self, **kwargs) -> dict[str, Any]:
+        """Crossref metadata returned in the format expected by scraper parse funcs."""
+        return await get_paper_details(doi=self.doi, title=self.title, **kwargs)
+
+    # NOTE: export CROSSREF_MAILTO with a real email address for better experience
+    async def _hydrate_from_crossref_metadata(
+        self,
+        force_overwrite: bool = False,
+        session: aiohttp.ClientSession | None = None,
+        other_keys_overrides: Collection[str] | None = None,
+    ) -> PaperDetails:
+        """Populate attributes in-place using Crossref then Google Scholar."""
+        if not self.is_hydration_needed() and not force_overwrite:
+            return self
+
+        async def parse(session_: aiohttp.ClientSession) -> PaperDetails:
+            cr_metadata = await self.metadata_from_crossref(session=session_)
+            other_keys = set(cr_metadata.keys())
+            for k, v in (
+                # NOTE: shared rate limits between gs/crossref
+                await parse_google_scholar_metadata(cr_metadata, session_)
+            ).items():
+                if not other_keys_overrides or k not in other_keys_overrides:
+                    other_keys.discard(k)
+                    setattr(self, k, v)
+                elif k in cr_metadata:
+                    other_keys.add(k)
+            # Preserve remaining metadata (e.g. externalIds) for scraping
+            self.other |= {k: cr_metadata[k] for k in other_keys}
+            return self
+
+        if session is not None:
+            return await parse(session)
+        async with ThrottledClientSession(
+            headers=get_header(), rate_limit=RateLimits.CROSSREF.value
+        ) as session:  # noqa: PLR1704
+            return await parse(session)
+
+    async def hydrate(
+        self, no_db_cache: bool = False, **crossref_hydration_kwargs
+    ) -> PaperDetails:
+        if "force_overwrite" in crossref_hydration_kwargs:
+            raise NotImplementedError("Didn't yet handle force overwrite in logic.")
+        if not no_db_cache:
+            with contextlib.suppress(
+                AttributeError  # Suppress failures and fall back on Crossref
+            ):
+                await self._hydrate_from_db()
+        await self._hydrate_from_crossref_metadata(**crossref_hydration_kwargs)
+        if self.bibtex:
+            self.source_quality = await PaperDetails.get_source_quality(self.bibtex)
+        else:
+            raise ValueError("Bibtex was not set from hydration")
+        return self
+
+    async def safe_hydrate(
+        self, required: Collection[str] | None = None, **hydrate_kwargs
+    ) -> PaperDetails:
+        """
+        Hydrate while suppressing common hydration exceptions.
+
+        Use this over vanilla hydrate when tolerant to missing information.
+        """
+        try:
+            return await self.hydrate(**hydrate_kwargs)
+        except (RuntimeError, DOINotFoundError) as exc:
+            if required and (
+                missing := {field for field in required if getattr(self, field) is None}
+            ):
+                raise RuntimeError(
+                    f"Missing required fields {missing} in safe hydration of paper"
+                    f" details {self}."
+                ) from exc
+            # RuntimeError: Failed to follow citations link
+            # DOINotFoundError: Failed to fall back on Google Scholar
+            logger.warning(f"Safe failure to hydrate paper details {self}.")
+            return self
+
+    @classmethod
+    def from_crossref(cls, metadata: dict[str, Any]) -> PaperDetails:
+        """Convert a Crossref reference into PaperDetails."""
+        doi: str | None = metadata.pop("DOI", None)
+        details = cls(
+            year=int(metadata.pop("year")) if "year" in metadata else None,
+            title=metadata.pop("article-title", None),
+            doi=doi.lower() if doi else None,
+            other=metadata | {"source": "Crossref"},
+        )
+        if details.doi is details.title is None:
+            raise ValueError(
+                f"Paper details {details} has no DOI or title, so it's useless."
+            )
+        return details
+
+    @classmethod
+    def from_google_scholar(cls, metadata: dict[str, Any]) -> PaperDetails:
+        """Convert a Google Scholar organic result into PaperDetails."""
+        doi: str | None = find_doi(metadata.get("link", ""))
+        return cls(
+            title=metadata.pop("title"),
+            citationCount=(
+                metadata.get("inline_links", {}).get("cited_by", {}).get("total")
+            ),
+            doi=doi.lower() if doi else None,
+            other=metadata | {"source": "Google Scholar"},
+        )
+
+    @classmethod
+    def from_semantic_scholar(cls, metadata: dict[str, Any]) -> PaperDetails:
+        """Convert a Semantic Scholar result into PaperDetails."""
+        # TODO: combine with paperscraper parse_semantic_scholar_metadata for
+        # key and citation
+        bibtex = metadata.pop("bibtex", None) or (
+            metadata.get("citationStyles") or {}
+        ).get("bibtex")
+        doi: str | None = (metadata.get("externalIds") or {}).get("DOI")
+        return cls(
+            bibtex=(clean_upbibtex(bibtex) if bibtex is not None else None),
+            year=metadata.pop("year"),
+            url=metadata.pop("url"),
+            title=metadata.pop("title"),
+            citationCount=metadata.pop("citationCount"),
+            doi=doi.lower() if doi else None,
+            paper_id=metadata.pop("paper_id"),
+            other=metadata | {"source": "Semantic Scholar"},
+        )
+
+    def to_scrape_metadata(self) -> dict[str, Any]:
+        """Convert to a format ingestible by scraper functions."""
+        return self.other | self.model_dump(exclude={"other"})
+    
