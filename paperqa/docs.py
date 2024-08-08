@@ -146,7 +146,7 @@ class Docs(BaseModel):
                 and isinstance(data.llm_model, OpenAILLMModel)
             ):
                 data.summary_llm_model = OpenAILLMModel(
-                    config={"model": "gpt-3.5-turbo", "temperature": 0.1}
+                    config={"model": "gpt-4o-mini", "temperature": 0.1}
                 )
             elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model

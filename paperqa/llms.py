@@ -155,7 +155,7 @@ class EmbeddingModel(ABC, BaseModel):
 
 
 class OpenAIEmbeddingModel(EmbeddingModel):
-    name: str = Field(default="text-embedding-ada-002")
+    name: str = Field(default="text-embedding-3-small")
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
@@ -376,8 +376,8 @@ class LLMModel(ABC, BaseModel):
 
 
 class OpenAILLMModel(LLMModel):
-    config: dict = Field(default={"model": "gpt-3.5-turbo", "temperature": 0.1})
-    name: str = "gpt-3.5-turbo"
+    config: dict = Field(default={"model": "gpt-4o-mini", "temperature": 0.1})
+    name: str = "gpt-4o-mini"
 
     def _check_client(self, client: Any) -> AsyncOpenAI:
         if client is None:
