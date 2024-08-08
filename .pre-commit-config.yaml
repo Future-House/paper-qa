@@ -57,7 +57,7 @@ repos:
         additional_dependencies:
           - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/adamchainz/blacken-docs
-    rev: "v1.12.1"
+    rev: v1.12.1
     hooks:
       - id: blacken-docs
         additional_dependencies:
