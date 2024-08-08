@@ -52,7 +52,7 @@ from paperqa.utils import (
 
 
 def test_is_openai_model():
-    assert is_openai_model("gpt-3.5-turbo")
+    assert is_openai_model("gpt-4o-mini")
     assert is_openai_model("babbage-002")
     assert is_openai_model("gpt-4-1106-preview")
     assert is_openai_model("davinci-002")
@@ -506,7 +506,7 @@ async def test_chain_completion():
 async def test_chain_chat():
     client = AsyncOpenAI()
     llm = OpenAILLMModel(
-        config={"temperature": 0, "model": "gpt-3.5-turbo", "max_tokens": 56}
+        config={"temperature": 0, "model": "gpt-4o-mini", "max_tokens": 56}
     )
     call = llm.make_chain(
         client,
@@ -668,7 +668,7 @@ def test_json_evidence() -> None:
         f.write(r.text)
     summary_llm = OpenAILLMModel(
         config={
-            "model": "gpt-3.5-turbo-1106",
+            "model": "gpt-4o-mini",
             "response_format": {"type": "json_object"},
             "temperature": 0.0,
         }
@@ -702,7 +702,7 @@ def test_custom_json_props():
         f.write(r.text)
     summary_llm = OpenAILLMModel(
         config={
-            "model": "gpt-3.5-turbo-0125",
+            "model": "gpt-4o-mini",
             "response_format": {"type": "json_object"},
             "temperature": 0.0,
         }
@@ -979,11 +979,11 @@ def test_custom_llm_stream():
 def test_langchain_llm():
     from langchain_openai import ChatOpenAI, OpenAI
 
-    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-3.5-turbo"))
+    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-4o-mini"))
     assert isinstance(docs.llm_model, LangchainLLMModel)
     assert isinstance(docs.summary_llm_model, LangchainLLMModel)
-    assert docs.llm == "gpt-3.5-turbo"
-    assert docs.summary_llm == "gpt-3.5-turbo"
+    assert docs.llm == "gpt-4o-mini"
+    assert docs.summary_llm == "gpt-4o-mini"
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1209,10 +1209,10 @@ def test_docs_pickle() -> None:
         f.write(r.text)
         docs = Docs(
             llm_model=OpenAILLMModel(
-                config={"temperature": 0.0, "model": "gpt-3.5-turbo"}
+                config={"temperature": 0.0, "model": "gpt-4o-mini"}
             ),
             summary_llm_model=OpenAILLMModel(
-                config={"temperature": 0.0, "model": "gpt-3.5-turbo"}
+                config={"temperature": 0.0, "model": "gpt-4o-mini"}
             ),
         )
         assert docs._client is not None
@@ -1595,7 +1595,7 @@ def test_too_much_evidence():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")  # noqa: S113
         f.write(r.text)
-    docs = Docs(llm="gpt-3.5-turbo", summary_llm="gpt-3.5-turbo")
+    docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
@@ -1780,8 +1780,8 @@ def test_external_doc_index():
 
 def test_embedding_name_consistency():
     docs = Docs()
-    assert docs.embedding == "text-embedding-ada-002"
-    assert docs.texts_index.embedding_model.name == "text-embedding-ada-002"
+    assert docs.embedding == "text-embedding-3-small"
+    assert docs.texts_index.embedding_model.name == "text-embedding-3-small"
     docs = Docs(embedding="langchain")
     assert docs.embedding == "langchain"
     assert docs.texts_index.embedding_model.name == "langchain"
@@ -1794,9 +1794,9 @@ def test_embedding_name_consistency():
     )
     assert docs.embedding == "test"
 
-    docs = Docs(embedding="hybrid-text-embedding-ada-002")
+    docs = Docs(embedding="hybrid-text-embedding-3-small")
     assert isinstance(docs.docs_index.embedding_model, HybridEmbeddingModel)
-    assert docs.docs_index.embedding_model.models[0].name == "text-embedding-ada-002"
+    assert docs.docs_index.embedding_model.models[0].name == "text-embedding-3-small"
     assert docs.docs_index.embedding_model.models[1].name == "sparse"
 
 

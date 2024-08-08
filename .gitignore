@@ -136,3 +136,4 @@ env
 
 # Matching pyproject.toml
 paperqa/version.py
+tests/example*
