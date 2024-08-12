@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
 import hashlib
 import inspect
 import json
 import math
 import re
 import string
+from datetime import datetime
 from pathlib import Path
-from typing import Any, BinaryIO, Coroutine, Iterator, Union
+from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
 from uuid import UUID
 
 import pypdf
@@ -205,8 +205,161 @@ def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
         value = value.lower().encode()
     return hashlib.md5(value).hexdigest()[:maxsize]  # noqa: S324
 
+
 def get_year(ts: datetime | None = None) -> str:
     """Get the year from the input datetime, otherwise using the current datetime."""
     if ts is None:
         ts = datetime.now()
     return ts.strftime("%Y")
+
+
+class CitationConversionError(Exception):
+    """Exception to throw when we can't process a citation from a BibTeX."""
+
+
+def clean_upbibtex(bibtex: str) -> str:
+
+    if not bibtex:
+        return bibtex
+
+    # WTF Semantic Scholar?
+    mapping = {
+        "None": "article",
+        "Article": "article",
+        "JournalArticle": "article",
+        "Review": "article",
+        "Book": "book",
+        "BookSection": "inbook",
+        "ConferencePaper": "inproceedings",
+        "Conference": "inproceedings",
+        "Dataset": "misc",
+        "Dissertation": "phdthesis",
+        "Journal": "article",
+        "Patent": "patent",
+        "Preprint": "article",
+        "Report": "techreport",
+        "Thesis": "phdthesis",
+        "WebPage": "misc",
+        "Plain": "article",
+    }
+    if "@None" in bibtex:
+        return bibtex.replace("@None", "@article")
+    # new format check
+    match = re.findall(r"@\['(.*)'\]", bibtex)
+    if not match:
+        match = re.findall(r"@(\w+)\{", bibtex)
+        bib_type = match[0]
+        current = f"@{match[0]}"
+    else:
+        bib_type = match[0]
+        current = f"@['{bib_type}']"
+    for k, v in mapping.items():
+        # can have multiple
+        if k in bib_type:
+            bibtex = bibtex.replace(current, f"@{v}")
+            break
+    return bibtex
+
+
+def format_bibtex(  # noqa: C901
+    bibtex: str,
+    key: str | None = None,
+    clean: bool = True,
+    missing_replacements: dict[str, str] | None = None,
+) -> str:
+    """Transform bibtex entry into a citation, potentially adding missing fields."""
+    # WOWOW This is hard to use
+    from pybtex.database import Person, parse_string
+    from pybtex.database.input.bibtex import Parser
+    from pybtex.style.formatting import unsrtalpha
+    from pybtex.style.template import FieldIsMissing
+
+    if missing_replacements is None:
+        missing_replacements = {}
+    if key is None:
+        key = bibtex.split("{")[1].split(",")[0]
+    style = unsrtalpha.Style()
+    try:
+        bd = parse_string(clean_upbibtex(bibtex) if clean else bibtex, "bibtex")
+    except Exception:
+        return "Ref " + key
+    try:
+        entry = bd.entries[key]
+    except KeyError as exc:  # Let's check if key is a non-empty prefix
+        try:
+            entry = next(
+                iter(v for k, v in bd.entries.items() if k.startswith(key) and key)
+            )
+        except StopIteration:
+            raise CitationConversionError(
+                f"Failed to process{' and clean up' if clean else ''} bibtex {bibtex}"
+                f" due to failed lookup of key {key}."
+            ) from exc
+    try:
+        # see if we can insert missing fields
+        for field, replacement_value in missing_replacements.items():
+            # Deal with special case for author, since it needs to be parsed
+            # into Person objects. This reorganizes the names automatically.
+            if field == "author" and "author" not in entry.persons:
+                tmp_author_bibtex = f"@misc{{tmpkey, author={{{replacement_value}}}}}"
+                authors: list[Person] = (
+                    Parser()
+                    .parse_string(tmp_author_bibtex)
+                    .entries["tmpkey"]
+                    .persons["author"]
+                )
+                for a in authors:
+                    entry.add_person(a, "author")
+            elif field not in entry.fields:
+                entry.fields.update({field: replacement_value})
+        entry = style.format_entry(label="1", entry=entry)
+        return entry.text.render_as("text")
+    except (FieldIsMissing, UnicodeDecodeError):
+        try:
+            return entry.fields["title"]
+        except KeyError as exc:
+            raise CitationConversionError(
+                f"Failed to process{' and clean up' if clean else ''} bibtex {bibtex}"
+                " due to missing a 'title' field."
+            ) from exc
+
+
+def remove_substrings(target: str, substr_removal_list: Collection[str]) -> str:
+    """Remove substrings from a target string."""
+    if all(len(w) == 1 for w in substr_removal_list):
+        return target.translate(str.maketrans("", "", "".join(substr_removal_list)))
+
+    for substr in substr_removal_list:
+        target = target.replace(substr, "")
+    return target
+
+
+def bibtex_field_extract(
+    bibtex: str, field: str, missing_replacements: dict[str, str] | None = None
+) -> str:
+    """Get a field from a bibtex entry.
+
+    Args:
+        bibtex: bibtex entry
+        field: field to extract
+        missing_replacements: replacement extract for field if not present in the bibtex string
+    """
+    if missing_replacements is None:
+        missing_replacements = {}
+    try:
+        return bibtex.split(field + "={")[1].split("}")[0].split()[0].strip()
+    except IndexError:
+        return missing_replacements.get(field, "")
+
+
+def create_bibtex_key(author: list[str], year: str, title: str) -> str:
+    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":"}
+    author_rep = (
+        author[0].split()[-1].casefold()
+        if "Unknown" not in author[0]
+        else "unknownauthors"
+    )
+    key = (
+        f"{author_rep}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
+    )
+    return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)

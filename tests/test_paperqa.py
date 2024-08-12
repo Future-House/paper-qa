@@ -1324,6 +1324,46 @@ def test_pdf_reader():
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
+def test_pdf_reader_w_no_match_doc_details():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023", use_doc_details=True)  # type: ignore[arg-type]
+    # doc will be a DocDetails object, but nothing can be found
+    # thus, we retain the prior citation data
+    assert (
+        next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
+    )
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_pdf_reader_match_doc_details():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
+    docs.add(
+        doc_path,  # type: ignore[arg-type]
+        "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
+        use_doc_details=True,
+        fields=["author", "journal"],
+    )
+    doc_details = next(iter(docs.docs.values()))
+    assert doc_details.dockey == "d7763485f06aabde"
+    # note year is unknown because citation string is only parsed for authors/title/doi
+    # AND we do not request it back from the metadata sources
+    assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
+    assert set(doc_details.authors) == {  # type: ignore[attr-defined]
+        "Geemi P. Wellawatte",
+        "Heta A. Gandhi",
+        "Aditi Seshadri",
+        "Andrew D. White",
+    }
+    assert doc_details.journal == "Journal of Chemical Theory and Computation"  # type: ignore[attr-defined]
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
+
+
 def test_fileio_reader_pdf():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")

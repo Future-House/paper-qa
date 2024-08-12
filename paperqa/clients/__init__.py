@@ -1,108 +1,104 @@
+from __future__ import annotations
 
-from typing import Any
+import copy
+import logging
+from typing import Any, Collection, Coroutine
 
 import aiohttp
 
-from crossref import get_paper_details_from_crossref
-from paperqa.clients.exceptions import DOINotFoundError
-from semantic_scholar import get_paper_details_from_s2
+from ..types import Doc, DocDetails
+from ..utils import gather_with_concurrency
+from .client_models import MetadataPostProcessor, MetadataProvider
+from .crossref import CrossrefProvider
+from .journal_quality import JournalQualityPostProcessor
+from .semantic_scholar import SemanticScholarProvider
 
-from paperqa.types import PaperDetails
+logger = logging.getLogger(__name__)
 
-class PaperMetadataClient():
-    def __init__(self, session: aiohttp.ClientSession) -> None:
-        self.session = session
+ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
+    CrossrefProvider,
+    SemanticScholarProvider,
+    JournalQualityPostProcessor,
+}
 
-    def query(self, doi: str | None = None, title: str | None = None) -> PaperDetails:
-        # TODO: proper validation here
-        if title is doi is None:
-            raise ValueError("Either title or DOI must be provided.")
-        
-        try:
-            return get_paper_details_from_crossref(doi=doi, title=title, session=self.session)
-        except DOINotFoundError:
-            return get_paper_details_from_s2(doi=doi, title=title, session=self.session)
-    
-    
-# this is what take incomplete paperdetails data from gscholar and fills it in
-# async def parse_google_scholar_metadata(  # noqa: C901
-#     paper: dict[str, Any], session: ClientSession | None = None
-# ) -> dict[str, Any]:
-#     """Parse pre-processed paper metadata from Google Scholar into a richer format."""
-#     if session is None:
-#         session = await CACHED_METADATA_SESSION.get_session()
 
-#     doi: str | None = (paper.get("externalIds") or {}).get("DOI")
-#     citation: str | None = None
-#     if doi:
-#         try:
-#             missing_replacements = {
-#                 "author": "Unknown authors",
-#                 "year": str(paper.get("year", "Unknown year")),
-#                 "title": paper.get("title", "Unknown title"),
-#             }
-#             bibtex = await doi_to_bibtex(
-#                 doi, session, missing_replacements=missing_replacements
-#             )
-#             citation = format_bibtex(
-#                 bibtex, clean=False, missing_replacements=missing_replacements
-#             )
-#         except DOINotFoundError:
-#             doi = None
-#         except CitationConversionError:
-#             citation = None
-#     if (not doi or not citation) and "inline_links" in paper:
-#         # get citation by following link
-#         # SLOW SLOW Using SerpAPI for this
-#         async with session.get(
-#             paper["inline_links"]["serpapi_cite_link"],
-#             params={"api_key": os.environ["SERPAPI_API_KEY"]},
-#         ) as r:
-#             # we raise here, because something really is wrong.
-#             r.raise_for_status()
-#             data = await r.json()
-#         citation = next(c["snippet"] for c in data["citations"] if c["title"] == "MLA")
-#         bibtex_link = next(c["link"] for c in data["links"] if c["name"] == "BibTeX")
-#         async with session.get(bibtex_link) as r:
-#             try:
-#                 r.raise_for_status()
-#             except ClientResponseError as exc:
-#                 # we may have a 443 - link expired
-#                 msg = (
-#                     "Google scholar blocked"
-#                     if r.status == 443
-#                     else "Unexpected failure to follow"
-#                 )
-#                 raise RuntimeError(
-#                     f"{msg} bibtex link {bibtex_link} for paper {paper}."
-#                 ) from exc
-#             bibtex = await r.text()
-#             if not bibtex.strip().startswith("@"):
-#                 raise RuntimeError(
-#                     f"Google scholar ip block bibtex link {bibtex_link} for paper {paper}."
-#                 )
-#     # will have bibtex by now
-#     key = bibtex.split("{")[1].split(",")[0]
+class DocMetadataClient:
+    def __init__(
+        self,
+        session: aiohttp.ClientSession | None,
+        clients: Collection[
+            type[MetadataPostProcessor | MetadataProvider]
+        ] = ALL_CLIENTS,
+    ) -> None:
+        self.session = aiohttp.ClientSession() if session is None else session
+        self.providers = [c() for c in clients if issubclass(c, MetadataProvider)]
+        self.processors = [c() for c in clients if issubclass(c, MetadataPostProcessor)]
+        if not self.providers:
+            raise ValueError("At least one MetadataProvider must be provided.")
 
-#     if not citation:
-#         raise RuntimeError(
-#             f"Exhausted all options for citation retrieval for {paper!r}"
-#         )
-#     # TODO: PaperDetails object??
-#     if "citationCount" not in paper:
-#         raise RuntimeError("citationCount not in paper metadata")
+    def provider_queries(
+        self, query: dict
+    ) -> list[Coroutine[Any, Any, DocDetails | None]]:
+        return [p.query(query) for p in self.providers]
 
-#     if "year" not in paper:
-#         raise RuntimeError("year not in paper metadata")
+    def processor_queries(
+        self, doc_details: DocDetails
+    ) -> list[Coroutine[Any, Any, DocDetails]]:
+        return [
+            p.process(copy.copy(doc_details), session=self.session)
+            for p in self.processors
+        ]
 
-#     return {
-#         "citation": citation,
-#         "key": key,
-#         "bibtex": bibtex,
-#         "year": paper["year"],
-#         "url": paper.get("link"),
-#         "paper_id": paper["paper_id"],
-#         "doi": paper["externalIds"].get("DOI"),
-#         "citationCount": paper["citationCount"],
-#         "title": paper["title"],
-#     }
+    async def query(self, **kwargs) -> DocDetails | None:
+
+        query_args = (
+            kwargs if "session" in kwargs else kwargs | {"session": self.session}
+        )
+
+        # first query all client_models and aggregate the results
+        doc_details: DocDetails | None = (
+            sum(
+                p
+                for p in (
+                    await gather_with_concurrency(
+                        len(self.providers), self.provider_queries(query_args)
+                    )
+                )
+                if p
+            )
+            or None
+        )
+
+        # then process and re-aggregate the results
+        if doc_details and self.processors:
+            doc_details = sum(
+                await gather_with_concurrency(
+                    len(self.processors), self.processor_queries(doc_details)
+                )
+            )
+
+        return doc_details
+
+    async def bulk_query(
+        self, queries: Collection[dict[str, Any]], concurrency: int = 10
+    ) -> list[DocDetails]:
+        return await gather_with_concurrency(
+            concurrency, [self.query(**kwargs) for kwargs in queries]
+        )
+
+    async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
+        if doc_details := await self.query(**kwargs):
+            if doc.overwrite_fields_from_metadata:
+                return doc_details
+            # hard overwrite the details from the prior object
+            doc_details.dockey = doc.dockey
+            doc_details.doc_id = doc.dockey
+            doc_details.docname = doc.docname
+            doc_details.key = doc.docname
+            doc_details.citation = doc.citation
+            return doc_details
+
+        # if we can't get metadata, just return the doc, but don't overwrite any fields
+        prior_doc = doc.model_dump()
+        prior_doc["overwrite_fields_from_metadata"] = False
+        return DocDetails(**prior_doc)

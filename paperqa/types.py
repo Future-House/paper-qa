@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime
 import logging
 import re
+from datetime import datetime
 from typing import Any, Callable, ClassVar, Collection
 from uuid import UUID, uuid4
 
-import aiohttp
-from networkx import volume
 import tiktoken
+from pybtex.database import BibliographyData, Entry, Person
+from pybtex.database.input.bibtex import Parser
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -23,11 +23,17 @@ from .prompts import (
     default_system_prompt,
     qa_prompt,
     select_paper_prompt,
+    structured_citation_prompt,
     summary_json_prompt,
     summary_json_system_prompt,
     summary_prompt,
 )
-from .utils import encode_id, get_citenames
+from .utils import (
+    create_bibtex_key,
+    encode_id,
+    format_bibtex,
+    get_citenames,
+)
 from .version import __version__ as pqa_version
 
 # Just for clarity
@@ -35,6 +41,7 @@ DocKey = Any
 CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
 logger = logging.getLogger(__name__)
+
 
 class LLMResult(BaseModel):
     """A class to hold the result of a LLM completion."""
@@ -70,7 +77,10 @@ class Doc(Embeddable):
     docname: str
     citation: str
     dockey: DocKey
-    details: PaperDetails
+    overwrite_fields_from_metadata: bool = Field(
+        default=True,
+        description="flag to overwrite fields from metadata when upgrading to a DocDetails",
+    )
 
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
@@ -104,6 +114,7 @@ class PromptCollection(BaseModel):
     qa: str = qa_prompt
     select: str = select_paper_prompt
     cite: str = citation_prompt
+    structured_cite: str = structured_citation_prompt
     pre: str | None = Field(
         default=None,
         description=(
@@ -304,21 +315,30 @@ SOURCE_QUALITY_MESSAGES = {
     3: "highest quality peer-reviewed journal",
 }
 
+CITATION_FALLBACK_DATA = {
+    "authors": ["Unknown authors"],
+    "author": "Unknown author(s)",
+    "year": "Unknown year",
+    "title": "Unknown title",
+    "journal": "Unknown journal",
+}
 
-class PaperDetails(BaseModel):
+
+class DocDetails(Doc):
     model_config = ConfigDict(validate_assignment=True)
 
-    citation: str | None = None
+    citation: str
     key: str | None = None
-    bibtex: str | None = None #TODO: may be able to build this via method
+    bibtex: str | None = None  # TODO: may be able to build this via method
     authors: list[str] | None = None
     publication_date: datetime | None = None
     year: int | None = None
     volume: str | None = None
-    issue: str | None = None
+    issue: str | None = None  # TODO: in bibtex this may be "number"
+    issn: str | None = None
     pages: str | None = None
     journal: str | None = None
-    year: int | None = None
+    publisher: str | None = None
     url: str | None = Field(
         default=None,
         description=(
@@ -328,7 +348,8 @@ class PaperDetails(BaseModel):
         ),
     )
     title: str | None = None
-    citation_count: int | None = None  # noqa: N815
+    citation_count: int | None = None
+    bibtex_type: str | None = None
 
     source_quality: int | None = Field(
         default=None,
@@ -338,7 +359,7 @@ class PaperDetails(BaseModel):
     )
 
     doi: str | None = None
-    paper_id: str | None = None  # noqa: N815
+    doc_id: str | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
@@ -351,6 +372,129 @@ class PaperDetails(BaseModel):
         # Replace HTML tags with empty string
         return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
 
+    @model_validator(mode="before")
+    @classmethod
+    def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if doi := data.get("doi"):
+            data["doi"] = doi.lower()
+            data["doc_id"] = encode_id(doi.lower())
+        else:
+            data["doc_id"] = encode_id(uuid4())
+
+        if data.get("overwrite_fields_from_metadata", True):
+            data["dockey"] = data["doc_id"]
+
+        return data
+
+    @staticmethod
+    def is_bibtex_complete(bibtex: str, fields: list[str] | None = None) -> bool:
+        """Validate bibtex entries have certain fields."""
+        if fields is None:
+            fields = ["doi", "title"]
+        return all(field + "=" in bibtex for field in fields)
+
+    @staticmethod
+    def merge_bibtex_entries(entry1: Entry, entry2: Entry) -> Entry:
+        """Merge two bibtex entries into one, preferring entry2 fields."""
+        merged_entry = Entry(entry1.type)
+
+        for field, value in entry1.fields.items():
+            merged_entry.fields[field] = value
+        for field, value in entry2.fields.items():
+            merged_entry.fields[field] = value
+
+        return merged_entry
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_bibtex_key_citation(  # noqa: C901, PLR0912
+        cls, data: dict[str, Any]
+    ) -> dict[str, Any]:
+
+        # we try to regenerate the key if unknowns are present, maybe they have been found
+        if not data.get("key") or "unknown" in data["key"].lower():
+            data["key"] = create_bibtex_key(
+                data.get("authors") or CITATION_FALLBACK_DATA["authors"],  # type: ignore[arg-type]
+                data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]
+                data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
+            )
+            if data.get("overwrite_fields_from_metadata", True):
+                data["docname"] = data["key"]
+
+        # even if we have a bibtex, it may not be complete, thus we need to add to it
+        if not data.get("bibtex") or not cls.is_bibtex_complete(data["bibtex"]):
+
+            existing_entry = None
+            # if our bibtex already exists, but is incomplete, we add self_generated to metadata
+            if data.get("bibtex"):
+                if data.get("other"):
+                    if (
+                        "bibtex_source" in data["other"]
+                        and "self_generated" not in data["other"]["bibtex_source"]
+                    ):
+                        data["other"]["bibtex_source"].append("self_generated")
+                    else:
+                        data["other"]["bibtex_source"] = ["self_generated"]
+                else:
+                    data["other"] = {"bibtex_source": ["self_generated"]}
+
+                existing_entry = next(
+                    iter(Parser().parse_string(data["bibtex"]).entries.values())
+                )
+
+            entry_data = {
+                "title": data.get("title", CITATION_FALLBACK_DATA["title"]),
+                "year": str(data.get("year", CITATION_FALLBACK_DATA["year"])),
+                "journal": data.get("journal", CITATION_FALLBACK_DATA["journal"]),
+                "volume": data.get("volume"),
+                "pages": data.get("pages"),
+                "month": (
+                    None
+                    if not data.get("publication_date")
+                    else data["publication_date"].strftime("%b")
+                ),
+                "doi": data.get("doi"),
+                "url": data.get("url"),
+                "publisher": data.get("publisher"),
+                "issue": data.get("issue"),
+                "issn": data.get("issn"),
+            }
+            entry_data = {k: v for k, v in entry_data.items() if v}
+            try:
+                new_entry = Entry(data.get("bibtex_type", "article"), fields=entry_data)
+                if existing_entry:
+                    new_entry = cls.merge_bibtex_entries(existing_entry, new_entry)
+                # add in authors manually into the entry
+                authors = [Person(a) for a in data.get("authors", ["Unknown authors"])]
+                for a in authors:
+                    new_entry.add_person(a, "author")
+                data["bibtex"] = BibliographyData(
+                    entries={data["key"]: new_entry}
+                ).to_string("bibtex")
+                # clear out the citation, since it will be regenerated
+                if data.get("overwrite_fields_from_metadata", True):
+                    data["citation"] = None
+            except Exception:
+                logger.exception(f"Failed to generate bibtex for {data}")
+
+        if not data.get("citation"):
+            data["citation"] = format_bibtex(
+                data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
+            )
+
+        return data
+
+    @model_validator(mode="before")
+    @classmethod
+    def backwards_compatibility_w_doc(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Overwrite fields from metadata if specified."""
+        overwrite_fields = {"key": "docname", "doc_id": "dockey"}
+        if data.get("overwrite_fields_from_metadata", True):
+            for field, old_field in overwrite_fields.items():
+                if data.get(field):
+                    data[old_field] = data[field]
+        return data
+
     def __getitem__(self, item: str):
         """Allow for dictionary-like access, falling back on other."""
         try:
@@ -358,27 +502,10 @@ class PaperDetails(BaseModel):
         except AttributeError:
             return self.other[item]
 
-    @classmethod
-    async def get_source_quality(cls, bibtex: str) -> int:
-        # extract journal name (or None)
-        match = re.search(r"journal\s*=\s*{([^}]+)}", bibtex)
-        journal_name = match.group(1) if match else None
-        # TODO: implement JournalQualityDB
-        # if journal_name:
-        #     record = await JournalQualityDB.filter(
-        #         journal=journal_name.casefold()
-        #     ).first()
-        #     if record:
-        #         return record.quality
-        #     logger.warning(
-        #         f"Failed to find journal {journal_name!r} in JournalQualityDB."
-        #     )
-        return cls.UNDEFINED_JOURNAL_QUALITY
-
     @property
     def formatted_citation(self) -> str:
         if (
-            self.citation is None
+            self.citation is None  # type: ignore[redundant-expr]
             or self.citation_count is None
             or self.source_quality is None
         ):
@@ -397,11 +524,6 @@ class PaperDetails(BaseModel):
             f"{quality}."
         )
 
-    @property
-    def docname(self) -> str | None:
-        """Alias for key."""
-        return self.key
-
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
 
     def is_hydration_needed(  # pylint: disable=dangerous-default-value
@@ -411,140 +533,84 @@ class PaperDetails(BaseModel):
         return any(
             v is None for k, v in self.model_dump().items() if k not in exclusion
         )
-    
-    async def populate_paper_id(self) -> None:
-        #TODO: should this be a hash of the doi?
-        if self.paper_id is None:
-            self.paper_id = encode_id(uuid4())
 
-    async def metadata_from_crossref(self, **kwargs) -> dict[str, Any]:
-        """Crossref metadata returned in the format expected by scraper parse funcs."""
-        return await get_paper_details(doi=self.doi, title=self.title, **kwargs)
+    def repopulate_doc_id_from_doi(self) -> None:
+        # TODO: should this be a hash of the doi?
+        if self.doi:
+            self.doc_id = encode_id(self.doi)
 
-    # NOTE: export CROSSREF_MAILTO with a real email address for better experience
-    async def _hydrate_from_crossref_metadata(
-        self,
-        force_overwrite: bool = False,
-        session: aiohttp.ClientSession | None = None,
-        other_keys_overrides: Collection[str] | None = None,
-    ) -> PaperDetails:
-        """Populate attributes in-place using Crossref then Google Scholar."""
-        if not self.is_hydration_needed() and not force_overwrite:
+    def __add__(self, other: DocDetails | int) -> DocDetails:
+        """Merge two DocDetails objects together."""
+        # control for usage w. Python's sum() function
+        if isinstance(other, int):
             return self
 
-        async def parse(session_: aiohttp.ClientSession) -> PaperDetails:
-            cr_metadata = await self.metadata_from_crossref(session=session_)
-            other_keys = set(cr_metadata.keys())
-            for k, v in (
-                # NOTE: shared rate limits between gs/crossref
-                await parse_google_scholar_metadata(cr_metadata, session_)
-            ).items():
-                if not other_keys_overrides or k not in other_keys_overrides:
-                    other_keys.discard(k)
-                    setattr(self, k, v)
-                elif k in cr_metadata:
-                    other_keys.add(k)
-            # Preserve remaining metadata (e.g. externalIds) for scraping
-            self.other |= {k: cr_metadata[k] for k in other_keys}
-            return self
+        merged_data = {}
+        for field in self.model_fields:
+            self_value = getattr(self, field)
+            other_value = getattr(other, field)
 
-        if session is not None:
-            return await parse(session)
-        async with ThrottledClientSession(
-            headers=get_header(), rate_limit=RateLimits.CROSSREF.value
-        ) as session:  # noqa: PLR1704
-            return await parse(session)
+            if field == "other":
+                # Merge 'other' dictionaries
+                merged_data[field] = {**self.other, **other.other}
+                # handle the bibtex / sources as special fields
+                for field_to_combine in ["bibtex_source", "client_source"]:
+                    if self.other.get(field_to_combine) and other.other.get(
+                        field_to_combine
+                    ):
+                        # Note: these should always be lists
+                        merged_data[field][field_to_combine] = (
+                            self.other[field_to_combine] + other.other[field_to_combine]
+                        )
 
-    async def hydrate(
-        self, no_db_cache: bool = False, **crossref_hydration_kwargs
-    ) -> PaperDetails:
-        if "force_overwrite" in crossref_hydration_kwargs:
-            raise NotImplementedError("Didn't yet handle force overwrite in logic.")
-        if not no_db_cache:
-            with contextlib.suppress(
-                AttributeError  # Suppress failures and fall back on Crossref
+            elif field == "authors" and self_value and other_value:
+                # Combine authors lists, removing duplicates
+                # Choose whichever author list is longer
+                best_authors = (
+                    self.authors
+                    if (
+                        sum(len(a) for a in (self.authors or []))
+                        >= sum(len(a) for a in (other.authors or []))
+                    )
+                    else other.authors
+                )
+                merged_data[field] = best_authors or None  # type: ignore[assignment]
+
+            elif field == "key" and self_value is not None and other_value is not None:
+                # if we have multiple keys, we wipe them and allow regeneration
+                merged_data[field] = None  # type: ignore[assignment]
+
+            elif (
+                field in {"citation_count", "year", "publication_date"}
+                and self_value is not None
+                and other_value is not None
             ):
-                await self._hydrate_from_db()
-        await self._hydrate_from_crossref_metadata(**crossref_hydration_kwargs)
-        if self.bibtex:
-            self.source_quality = await PaperDetails.get_source_quality(self.bibtex)
-        else:
-            raise ValueError("Bibtex was not set from hydration")
-        return self
+                # get the max citation count
+                merged_data[field] = max(self_value, other_value)
 
-    async def safe_hydrate(
-        self, required: Collection[str] | None = None, **hydrate_kwargs
-    ) -> PaperDetails:
-        """
-        Hydrate while suppressing common hydration exceptions.
+            else:
+                # Prefer non-null values, with preference to 'other' object
+                merged_data[field] = (
+                    other_value if other_value is not None else self_value
+                )
 
-        Use this over vanilla hydrate when tolerant to missing information.
-        """
-        try:
-            return await self.hydrate(**hydrate_kwargs)
-        except (RuntimeError, DOINotFoundError) as exc:
-            if required and (
-                missing := {field for field in required if getattr(self, field) is None}
-            ):
-                raise RuntimeError(
-                    f"Missing required fields {missing} in safe hydration of paper"
-                    f" details {self}."
-                ) from exc
-            # RuntimeError: Failed to follow citations link
-            # DOINotFoundError: Failed to fall back on Google Scholar
-            logger.warning(f"Safe failure to hydrate paper details {self}.")
-            return self
-
-    @classmethod
-    def from_crossref(cls, metadata: dict[str, Any]) -> PaperDetails:
-        """Convert a Crossref reference into PaperDetails."""
-        doi: str | None = metadata.pop("DOI", None)
-        details = cls(
-            year=int(metadata.pop("year")) if "year" in metadata else None,
-            title=metadata.pop("article-title", None),
-            doi=doi.lower() if doi else None,
-            other=metadata | {"source": "Crossref"},
-        )
-        if details.doi is details.title is None:
-            raise ValueError(
-                f"Paper details {details} has no DOI or title, so it's useless."
+        # Recalculate doc_id if doi has changed
+        if merged_data["doi"] != self.doi:
+            merged_data["doc_id"] = (
+                encode_id(merged_data["doi"].lower()) if merged_data["doi"] else None  # type: ignore[attr-defined,assignment]
             )
-        return details
 
-    @classmethod
-    def from_google_scholar(cls, metadata: dict[str, Any]) -> PaperDetails:
-        """Convert a Google Scholar organic result into PaperDetails."""
-        doi: str | None = find_doi(metadata.get("link", ""))
-        return cls(
-            title=metadata.pop("title"),
-            citationCount=(
-                metadata.get("inline_links", {}).get("cited_by", {}).get("total")
-            ),
-            doi=doi.lower() if doi else None,
-            other=metadata | {"source": "Google Scholar"},
-        )
+        # Create and return new DocDetails instance
+        return DocDetails(**merged_data)
 
-    @classmethod
-    def from_semantic_scholar(cls, metadata: dict[str, Any]) -> PaperDetails:
-        """Convert a Semantic Scholar result into PaperDetails."""
-        # TODO: combine with paperscraper parse_semantic_scholar_metadata for
-        # key and citation
-        bibtex = metadata.pop("bibtex", None) or (
-            metadata.get("citationStyles") or {}
-        ).get("bibtex")
-        doi: str | None = (metadata.get("externalIds") or {}).get("DOI")
-        return cls(
-            bibtex=(clean_upbibtex(bibtex) if bibtex is not None else None),
-            year=metadata.pop("year"),
-            url=metadata.pop("url"),
-            title=metadata.pop("title"),
-            citationCount=metadata.pop("citationCount"),
-            doi=doi.lower() if doi else None,
-            paper_id=metadata.pop("paper_id"),
-            other=metadata | {"source": "Semantic Scholar"},
-        )
+    def __radd__(self, other: DocDetails | int) -> DocDetails:
+        # other == 0 captures the first call of sum()
+        if isinstance(other, int) and other == 0:
+            return self
+        return self.__add__(other)
 
-    def to_scrape_metadata(self) -> dict[str, Any]:
-        """Convert to a format ingestible by scraper functions."""
-        return self.other | self.model_dump(exclude={"other"})
-    
+    def __iadd__(self, other: DocDetails | int) -> DocDetails:  # noqa: PYI034
+        # only includes int to align with __radd__ and __add__
+        if isinstance(other, int):
+            return self
+        return self.__add__(other)

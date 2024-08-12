@@ -1,36 +1,44 @@
-import contextlib
-from datetime import datetime
-from enum import IntEnum, auto
-from itertools import starmap
+from __future__ import annotations
+
 import logging
 import os
-from typing import Any
-from wsgiref import headers
+from datetime import datetime
+from enum import IntEnum, auto
+from http import HTTPStatus
+from itertools import starmap
+from typing import Any, Collection
+
 import aiohttp
 
-from paperqa.clients.crossref import doi_to_bibtex
-from paperqa.clients.exceptions import DOINotFoundError
-from paperqa.clients.utils import _get_with_retrying, clean_upbibtex, format_bibtex
-from paperqa.types import PaperDetails
+from ..types import DocDetails
+from ..utils import clean_upbibtex, strings_similarity
+from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
+from .crossref import doi_to_bibtex
+from .exceptions import DOINotFoundError
+from .utils import TITLE_SET_SIMILARITY_THRESHOLD, _get_with_retrying
 
 logger = logging.getLogger(__name__)
 
-SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join([
-    "citationStyles",
-    "externalIds",
-    "url",
-    "openAccessPdf",
-    "year",
-    "isOpenAccess",
-    "influentialCitationCount",
-    "citationCount",
-    "publicationDate",
-    "journal",
-    "publicationTypes"
-    "title",
-    "authors",
-    "venue"
-])
+# map from S2 fields to those in the DocDetails model
+# allows users to specify which fields to include in the response
+SEMANTIC_SCHOLAR_API_MAPPING: dict[str, str | None] = {
+    "citationStyles": "bibtex",
+    "externalIds": "doi",
+    "url": "url",
+    "openAccessPdf": "url",
+    "year": "year",
+    "isOpenAccess": None,
+    "influentialCitationCount": None,
+    "citationCount": "citation_count",
+    "publicationDate": "publication_date",
+    "journal": "journal",
+    "publicationTypes": None,
+    "title": "title",
+    "authors": "authors",
+    "venue": None,
+}
+
+SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(list(SEMANTIC_SCHOLAR_API_MAPPING.keys()))
 SEMANTIC_SCHOLAR_BASE_URL = "https://api.semanticscholar.org"
 
 
@@ -93,12 +101,14 @@ class SematicScholarSearchType(IntEnum):
 
 def s2_authors_match(authors: list[str], data: dict):
     """Check if the authors in the data match the authors in the paper."""
+    AUTHOR_NAME_MIN_LENGTH = 2
     s2_authors_noinit = [
-        " ".join([w for w in a["name"].split() if len(w) > 2])
+        " ".join([w for w in a["name"].split() if len(w) > AUTHOR_NAME_MIN_LENGTH])
         for a in data["authors"]
     ]
     authors_noinit = [
-        " ".join([w for w in a.split() if len(w) > 2]) for a in authors
+        " ".join([w for w in a.split() if len(w) > AUTHOR_NAME_MIN_LENGTH])
+        for a in authors
     ]
     # Note: we expect the number of authors to be possibly different
     return any(
@@ -109,56 +119,78 @@ def s2_authors_match(authors: list[str], data: dict):
     )
 
 
-async def parse_s2_to_paper_details(data: dict, session: aiohttp.ClientSession) -> PaperDetails:
-    
-    paper_data = data['data'][0]
+async def parse_s2_to_doc_details(
+    paper_data: dict, session: aiohttp.ClientSession
+) -> DocDetails:
 
-    if "ArXiv" in paper_data['externalIds']:
-        doi = "10.48550/arXiv." + paper_data['externalIds']["ArXiv"]
-    elif "DOI" in paper_data['externalIds']:
-        doi = paper_data['externalIds']['DOI']
+    bibtex_source = "self_generated"
+
+    if "data" in paper_data:
+        paper_data = paper_data["data"][0]
+
+    if "ArXiv" in paper_data["externalIds"]:
+        doi = "10.48550/arXiv." + paper_data["externalIds"]["ArXiv"]
+    elif "DOI" in paper_data["externalIds"]:
+        doi = paper_data["externalIds"]["DOI"]
     else:
-        raise DOINotFoundError(f"Could not find DOI for {data}.")
+        raise DOINotFoundError(f"Could not find DOI for {paper_data}.")
 
-    bibtex = await doi_to_bibtex(doi, session)
+    # Should we give preference to auto-generation?
+    if not (
+        bibtex := clean_upbibtex(paper_data.get("citationStyles", {}).get("bibtex", ""))
+    ):
+        try:
+            bibtex = await doi_to_bibtex(doi, session)
+            bibtex_source = "crossref"
+        except DOINotFoundError:
+            bibtex = None
+    else:
+        bibtex_source = "semantic_scholar"
 
-    # Parse publication date
     publication_date = None
-    if paper_data.get('publicationDate'):
-        publication_date = datetime.strptime(paper_data['publicationDate'], '%Y-%m-%d')
+    if paper_data.get("publicationDate"):
+        publication_date = datetime.strptime(paper_data["publicationDate"], "%Y-%m-%d")
 
-    # Create PaperDetails object
-    paper_details = PaperDetails(
-        citation=format_bibtex(bibtex),
-        key=bibtex.split("{")[1].split(",")[0],
+    doc_details = DocDetails(  # type: ignore[call-arg]
+        key=None if not bibtex else bibtex.split("{")[1].split(",")[0],
+        bibtex_type="article",  # s2 should be basically all articles
         bibtex=bibtex,
-        authors=[author['name'] for author in paper_data.get('authors', [])],
+        authors=[author["name"] for author in paper_data.get("authors", [])],
         publication_date=publication_date,
-        year=paper_data.get('year'),
-        volume=paper_data.get('journal', {}).get('volume'),
-        issue=None,  # Not provided in this JSON format
-        pages=paper_data.get('journal', {}).get('pages'),
-        journal=paper_data.get('journal', {}).get('name'),
+        year=paper_data.get("year"),
+        volume=paper_data.get("journal", {}).get("volume"),
+        pages=paper_data.get("journal", {}).get("pages"),
+        journal=paper_data.get("journal", {}).get("name"),
         url=None,  # URL is not provided in this JSON format
-        title=paper_data.get('title'),
-        citation_count=paper_data.get('citationCount'),
-        doi=paper_data.get('externalIds', {}).get('DOI'),
-        other={}  # Initialize empty dict for other fields
+        title=paper_data.get("title"),
+        citation_count=paper_data.get("citationCount"),
+        doi=paper_data.get("externalIds", {}).get("DOI"),
+        other={},  # Initialize empty dict for other fields
     )
 
     # Add any additional fields to the 'other' dict
-    for key, value in paper_data.items():
-        if key not in paper_details.model_fields:
-            paper_details.other[key] = value
+    for key, value in (
+        paper_data
+        | {"client_source": ["semantic_scholar"], "bibtex_source": [bibtex_source]}
+    ).items():
+        if key not in doc_details.model_fields:
+            doc_details.other[key] = value
 
-    return paper_details
+    return doc_details
+
 
 async def s2_title_search(
-    title: str, authors: list[str], session: aiohttp.ClientSession
-) -> str:
+    title: str,
+    session: aiohttp.ClientSession,
+    authors: list[str] | None = None,
+    title_similarity_threshold: float = TITLE_SET_SIMILARITY_THRESHOLD,
+    fields: str = SEMANTIC_SCHOLAR_API_FIELDS,
+) -> DocDetails:
     """Reconcile DOI from Semantic Scholar - which only checks title. So we manually check authors."""
+    if authors is None:
+        authors = []
     endpoint, params = SematicScholarSearchType.MATCH.make_url_params(
-        params={"query": title, "fields": SEMANTIC_SCHOLAR_API_FIELDS}
+        params={"query": title, "fields": fields}
     )
     header = {}
     try:
@@ -169,38 +201,104 @@ async def s2_title_search(
         )
     async with session.get(url=endpoint, params=params, headers=header) as response:
         # check for 404 ( = no results)
-        if response.status == 404:
+        if response.status == HTTPStatus.NOT_FOUND:
             raise DOINotFoundError(f"Could not find DOI for {title}.")
         data = await response.json()
 
-        if authors is not None and not s2_authors_match(authors, data["data"][0]):
+        if authors and not s2_authors_match(authors, data["data"][0]):
             raise DOINotFoundError(
                 f"Could not find DOI for {title} - author disagreement."
             )
-        return parse_s2_to_paper_details(data, session)
+        # need to check if nested under a 'data' key or not (depends on filtering)
+        if (
+            strings_similarity(
+                data.get("title") if "data" not in data else data["data"][0]["title"],
+                title,
+            )
+            < title_similarity_threshold
+        ):
+            raise DOINotFoundError(
+                f"Semantic scholar results did not match for title {title!r}."
+            )
+        return await parse_s2_to_doc_details(data, session)
 
 
-async def get_paper_details_from_s2(
-    title: str | None = None,
-    doi: str | None = None,
-    session: aiohttp.ClientSession | None = None,
-) -> PaperDetails:
-    """Get paper details from Semantic Scholar given a Semantic Scholar ID or a DOI."""
-    if title is doi is None:
-        raise ValueError("Either title or DOI must be provided.")
-    if doi:
-        end = f"DOI:{doi}"
+async def get_s2_doc_details_from_doi(
+    doi: str | None,
+    session: aiohttp.ClientSession,
+    fields: Collection[str] | None = None,
+) -> DocDetails:
+    """Get paper details from Semantic Scholar given a DOI."""
+    # should always be string, runtime error catch
+    if doi is None:
+        raise ValueError("Valid DOI must be provided.")
 
-    async def get_parse(session_: aiohttp.ClientSession) -> PaperDetails:
+    if fields:
+        valid_fields = {v: k for k, v in SEMANTIC_SCHOLAR_API_MAPPING.items() if v}
+        s2_fields = ",".join(valid_fields[f] for f in fields if f in valid_fields)
+    else:
+        s2_fields = SEMANTIC_SCHOLAR_API_FIELDS
+
+    async def get_parse(session_: aiohttp.ClientSession) -> DocDetails:
         details = await _get_with_retrying(
-            url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/{end}",
-            params={"fields": SEMANTIC_SCHOLAR_API_FIELDS},
+            url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/DOI:{doi}",
+            params={"fields": s2_fields},
             session=session_,
-            headers={'x-api-key': os.environ["SEMANTIC_SCHOLAR_API_KEY"]}
+            headers={"x-api-key": os.environ["SEMANTIC_SCHOLAR_API_KEY"]},
         )
-        return parse_s2_to_paper_details(details, session_)
+        return await parse_s2_to_doc_details(details, session_)
 
-    if doi:
-        return await get_parse(session)
-    
-    return await s2_title_search(title, session)
+    return await get_parse(session)
+
+
+async def get_s2_doc_details_from_title(
+    title: str | None,
+    session: aiohttp.ClientSession,
+    authors: list[str] | None = None,
+    fields: Collection[str] | None = None,
+    title_similarity_threshold: float = TITLE_SET_SIMILARITY_THRESHOLD,
+) -> DocDetails:
+    """Get paper details from Semantic Scholar given a title.
+
+    Optionally match against authors if provided.
+    """
+    if title is None:
+        raise ValueError("Valid title must be provided.")
+    if authors is None:
+        authors = []
+    if fields:
+        valid_fields = {v: k for k, v in SEMANTIC_SCHOLAR_API_MAPPING.items() if v}
+        s2_fields = ",".join(valid_fields[f] for f in fields if f in valid_fields)
+    else:
+        s2_fields = SEMANTIC_SCHOLAR_API_FIELDS
+
+    return await s2_title_search(
+        title,
+        authors=authors,
+        session=session,
+        title_similarity_threshold=title_similarity_threshold,
+        fields=s2_fields,
+    )
+
+
+class SemanticScholarProvider(DOIOrTitleBasedProvider):
+    async def _query(self, query: TitleAuthorQuery | DOIQuery) -> DocDetails | None:
+        try:
+            if isinstance(query, DOIQuery):
+                return await get_s2_doc_details_from_doi(
+                    doi=query.doi, session=query.session, fields=query.fields
+                )
+            if isinstance(query, TitleAuthorQuery):
+                return await get_s2_doc_details_from_title(
+                    title=query.title,
+                    authors=query.authors,
+                    session=query.session,
+                    title_similarity_threshold=query.title_similarity_threshold,
+                    fields=query.fields,
+                )
+        except DOINotFoundError:
+            logger.exception(
+                f"Metadata not found for {query.doi if isinstance(query, DOIQuery) else query.title}"
+                " in Semantic Scholar."
+            )
+            return None
