@@ -24,7 +24,7 @@ CROSSREF_API_MAPPING: dict[str, str] = {
     "title": "title",
     "DOI": "doi",
     "author": "authors",
-    "published": "publication_date",
+    "published": "publication_date",  # also provides year
     "volume": "volume",
     "issue": "issue",
     "publisher": "publisher",
@@ -32,6 +32,7 @@ CROSSREF_API_MAPPING: dict[str, str] = {
     "page": "pages",
     "container-title": "journal",
     "URL": "url",
+    "bibtex": "bibtex",
     "is-referenced-by-count": "citation_count",
 }
 CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING = {
@@ -61,7 +62,7 @@ CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING = {
     "dissertation": "phdthesis",  # Dissertations are usually PhD thesis
     "posted-content": "misc",  # No direct equivalent, so 'misc' is used
     "peer-review": "misc",  # No direct equivalent, so 'misc' is used
-    "other": "misc",  # Catch-all for other types
+    "other": "article",  # Assume an article if we don't know the type
 }
 
 
@@ -117,12 +118,14 @@ async def doi_to_bibtex(
     return data.replace(key, new_key, 1)
 
 
-async def parse_crossref_to_doc_details(
+async def parse_crossref_to_doc_details(  # noqa: C901
     message: dict[str, Any],
     session: aiohttp.ClientSession,
+    query_bibtex: bool = True,
 ) -> DocDetails:
 
     bibtex_source = "self_generated"
+    bibtex = None
 
     try:
         # get the title from the message, if it exists
@@ -132,13 +135,17 @@ async def parse_crossref_to_doc_details(
             None if not message.get("title") else message.get("title", [None])[0]
         ):
             fallback_data["title"] = title
-        bibtex = await doi_to_bibtex(
-            message["DOI"], session, missing_replacements=fallback_data  # type: ignore[arg-type]
-        )
-        # track the origin of the bibtex entry for debugging
-        bibtex_source = "crossref"
+
+        # TODO: we keep this for robustness, but it's likely not needed anymore.
+        if query_bibtex:
+            bibtex = await doi_to_bibtex(
+                message["DOI"], session, missing_replacements=fallback_data  # type: ignore[arg-type]
+            )
+            # track the origin of the bibtex entry for debugging
+            bibtex_source = "crossref"
+
     except DOINotFoundError:
-        bibtex = None
+        pass
 
     authors = [
         f"{author.get('given', '')} {author.get('family', '')}".strip()
@@ -232,12 +239,23 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
             {"query.author": " ".join([a.strip() for a in authors if len(a) > 1])}
         )
 
+    query_bibtex = True
+
     if fields:
         field_map = {v: k for k, v in CROSSREF_API_MAPPING.items()}
+        # crossref has a special endpoint for bibtex, so we don't need to request it here
+        if "bibtex" not in fields:
+            query_bibtex = False
         params.update(
             {
                 "select": ",".join(
-                    sorted([field_map[field] for field in fields if field in field_map])
+                    sorted(
+                        [
+                            field_map[field]
+                            for field in fields
+                            if field in field_map and field != "bibtex"
+                        ]
+                    )
                 )
             }
         )
@@ -285,7 +303,7 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
     if doi is not None and message["DOI"] != doi:
         raise DOINotFoundError(f"DOI ({inputs_msg}) not found in Crossref")
 
-    return await parse_crossref_to_doc_details(message, session)
+    return await parse_crossref_to_doc_details(message, session, query_bibtex)
 
 
 class CrossrefProvider(DOIOrTitleBasedProvider):

@@ -407,6 +407,14 @@ class DocDetails(Doc):
 
     @model_validator(mode="before")
     @classmethod
+    def string_cleaning(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Clean strings before the enter the validation process."""
+        if pages := data.get("pages"):
+            data["pages"] = pages.replace("--", "-").replace(" ", "")
+        return data
+
+    @model_validator(mode="before")
+    @classmethod
     def populate_bibtex_key_citation(  # noqa: C901, PLR0912
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
@@ -423,7 +431,6 @@ class DocDetails(Doc):
 
         # even if we have a bibtex, it may not be complete, thus we need to add to it
         if not data.get("bibtex") or not cls.is_bibtex_complete(data["bibtex"]):
-
             existing_entry = None
             # if our bibtex already exists, but is incomplete, we add self_generated to metadata
             if data.get("bibtex"):
@@ -443,9 +450,13 @@ class DocDetails(Doc):
                 )
 
             entry_data = {
-                "title": data.get("title", CITATION_FALLBACK_DATA["title"]),
-                "year": str(data.get("year", CITATION_FALLBACK_DATA["year"])),
-                "journal": data.get("journal", CITATION_FALLBACK_DATA["journal"]),
+                "title": data.get("title") or CITATION_FALLBACK_DATA["title"],
+                "year": (
+                    CITATION_FALLBACK_DATA["year"]
+                    if not data.get("year")
+                    else str(data["year"])
+                ),
+                "journal": data.get("journal") or CITATION_FALLBACK_DATA["journal"],
                 "volume": data.get("volume"),
                 "pages": data.get("pages"),
                 "month": (
@@ -476,7 +487,6 @@ class DocDetails(Doc):
                     data["citation"] = None
             except Exception:
                 logger.exception(f"Failed to generate bibtex for {data}")
-
         if not data.get("citation"):
             data["citation"] = format_bibtex(
                 data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]

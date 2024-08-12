@@ -30,7 +30,7 @@ SEMANTIC_SCHOLAR_API_MAPPING: dict[str, str | None] = {
     "isOpenAccess": None,
     "influentialCitationCount": None,
     "citationCount": "citation_count",
-    "publicationDate": "publication_date",
+    "publicationDate": "publication_date",  # also provides year
     "journal": "journal",
     "publicationTypes": None,
     "title": "title",

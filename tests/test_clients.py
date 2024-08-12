@@ -69,7 +69,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
             "formatted_citation": (
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and "
                 "Philippe Schwaller. Augmenting large language models with chemistry tools. Nature "
-                "Machine Intelligence, 6:525 - 535, May 2024. URL: http://dx.doi.org/10.1038/s42256-024-00832-8, "
+                "Machine Intelligence, 6:525-535, May 2024. URL: http://dx.doi.org/10.1038/s42256-024-00832-8, "
                 "doi:10.1038/s42256-024-00832-8. This article has 187 citations and is from a "
                 "domain leading peer-reviewed journal."
             ),
@@ -160,7 +160,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
             "authors": [],
             "formatted_citation": (
                 "Unknown author(s). Convalescent-anti-sars-cov-2-plasma/immune-globulin. Reactions Weekly, "
-                "1962:145 - 145, Jun 2023. URL: http://dx.doi.org/10.1007/s40278-023-41815-2, "
+                "1962:145-145, Jun 2023. URL: http://dx.doi.org/10.1007/s40278-023-41815-2, "
                 "doi:10.1007/s40278-023-41815-2. This article has 0 citations and is from a peer-reviewed journal."
             ),
         },
@@ -265,7 +265,7 @@ async def test_minimal_fields_filtering():
         assert not details.authors, "Authors should not be populated"  # type: ignore[union-attr]
         assert details.citation == (  # type: ignore[union-attr]
             "Unknown author(s). Augmenting large language models with chemistry tools."
-            " Unknown journal, None. doi:10.1038/s42256-024-00832-8."
+            " Unknown journal, Unknown year. doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
         assert set(details.other["client_source"]) == {  # type: ignore[union-attr]
             "semantic_scholar",
@@ -289,7 +289,7 @@ async def test_s2_only_fields_filtering():
         assert s2_details.citation == (  # type: ignore[union-attr]
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, "
             "and P. Schwaller. Augmenting large language models with chemistry tools. "
-            "Unknown journal, None. doi:10.1038/s42256-024-00832-8."
+            "Unknown journal, Unknown year. doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
@@ -312,7 +312,7 @@ async def test_crossref_journalquality_fields_filtering():
         assert crossref_details.citation == (  # type: ignore[union-attr]
             "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, "
             "and Philippe Schwaller. Augmenting large language models with chemistry tools. "
-            "Nature Machine Intelligence, None. doi:10.1038/s42256-024-00832-8."
+            "Nature Machine Intelligence, Unknown year. doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
 
 
