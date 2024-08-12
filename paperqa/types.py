@@ -329,7 +329,7 @@ class DocDetails(Doc):
 
     citation: str
     key: str | None = None
-    bibtex: str | None = None  # TODO: may be able to build this via method
+    bibtex: str | None = None
     authors: list[str] | None = None
     publication_date: datetime | None = None
     year: int | None = None

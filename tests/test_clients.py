@@ -256,12 +256,10 @@ async def test_bad_dois():
 async def test_minimal_fields_filtering():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
-        # TODO: this will always fail without DOI -- perhaps we require it?
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
             fields=["title", "doi"],
         )
-        # TODO: Add a test for filtering fields
         assert not details.journal, "Journal should not be populated"  # type: ignore[union-attr]
         assert not details.year, "Year should not be populated"  # type: ignore[union-attr]
         assert not details.authors, "Authors should not be populated"  # type: ignore[union-attr]
@@ -318,13 +316,6 @@ async def test_crossref_journalquality_fields_filtering():
         ), "Citation should be populated"
 
 
-# TODO: catch scenario where any field is required but not found
-# ONE example is when you have authors as an argument, but don't request it.
-# 2nd example is when you have no DOI?
-# 3rd (maybe) can you do a title search without requesting a title back?
-# catch scenario where the requested clients don't overlap in types of data they can query
-
-
 @pytest.mark.vcr()
 @pytest.mark.asyncio()
 async def test_author_matching():
@@ -352,3 +343,51 @@ async def test_author_matching():
         assert not crossref_details_bad_author, "Should return None for bad author"
         assert not s2_details_bad_author, "Should return None for bad author"
         assert s2_details_w_author, "Should return results for good author"
+
+
+@pytest.mark.vcr()
+@pytest.mark.asyncio()
+async def test_odd_client_requests():
+    # try querying using an authors match, but not requesting authors back
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(session)
+        details = await client.query(
+            title="Augmenting large language models with chemistry tools",
+            authors=["Andres M. Bran", "Sam Cox"],
+            fields=["title", "doi"],
+        )
+        assert (
+            details.authors  # type: ignore[union-attr]
+        ), "Should return correct author results"
+
+    # try querying using a title, asking for no DOI back
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(session)
+        details = await client.query(
+            title="Augmenting large language models with chemistry tools",
+            fields=["title"],
+        )
+        assert (
+            details.doi  # type: ignore[union-attr]
+        ), "Should return a doi even though we don't ask for it"
+
+    # try querying using a title, asking for no title back
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(session)
+        details = await client.query(
+            title="Augmenting large language models with chemistry tools",
+            fields=["doi"],
+        )
+        assert (
+            details.title  # type: ignore[union-attr]
+        ), "Should return a title even though we don't ask for it"
+
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(session)
+        details = await client.query(
+            doi="10.1007/s40278-023-41815-2",
+            fields=["doi", "title", "gibberish-field", "no-field"],
+        )
+        assert (
+            details.title  # type: ignore[union-attr]
+        ), "Should return title even though we asked for some bad fields"
