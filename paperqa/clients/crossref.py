@@ -136,7 +136,8 @@ async def parse_crossref_to_doc_details(  # noqa: C901
         ):
             fallback_data["title"] = title
 
-        # TODO: we keep this for robustness, but it's likely not needed anymore.
+        # TODO: we keep this for robustness, but likely not needed anymore,
+        # since we now create the bibtex from scratch
         if query_bibtex:
             bibtex = await doi_to_bibtex(
                 message["DOI"], session, missing_replacements=fallback_data  # type: ignore[arg-type]
