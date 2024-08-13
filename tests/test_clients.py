@@ -3,6 +3,7 @@ from __future__ import annotations
 import aiohttp
 import pytest
 
+import paperqa
 from paperqa.clients import CrossrefProvider, DocMetadataClient, SemanticScholarProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 
@@ -395,3 +396,20 @@ async def test_odd_client_requests():
         assert (
             details.title  # type: ignore[union-attr]
         ), "Should return title even though we asked for some bad fields"
+
+
+@pytest.mark.asyncio()
+async def test_ensure_robust_to_timeouts(monkeypatch):
+    # 0.15 should be short enough to not get a response in time.
+    monkeypatch.setattr(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.15)
+    monkeypatch.setattr(
+        paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.15
+    )
+
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(session)
+        details = await client.query(
+            doi="10.1007/s40278-023-41815-2",
+            fields=["doi", "title"],
+        )
+    assert details is None, "Should return None for timeout"

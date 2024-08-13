@@ -345,4 +345,9 @@ class CrossrefProvider(DOIOrTitleBasedProvider):
                 f"Metadata not found for {query.doi if isinstance(query, DOIQuery) else query.title}"
                 " in Crossref."
             )
-            return None
+        except TimeoutError:
+            logger.exception(
+                f"Request to Crossref for {query.doi if isinstance(query, DOIQuery) else query.title}"
+                " timed out."
+            )
+        return None

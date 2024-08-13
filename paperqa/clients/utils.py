@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from functools import reduce
+from http import HTTPStatus
 from typing import Any
 
 import aiohttp
@@ -39,17 +40,23 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: int = 10,
+    timeout: float = 10.0,
+    http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
-    """Get from a Semantic Scholar API, with retrying protection."""
-    async with session.get(
-        url,
-        params=params,
-        headers=headers,
-        timeout=aiohttp.ClientTimeout(timeout),
-    ) as response:
-        response.raise_for_status()
-        return await response.json()
+    """Get from a URL with retrying protection."""
+    try:
+        async with session.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(timeout),
+        ) as response:
+            response.raise_for_status()
+            return await response.json()
+    except aiohttp.ClientResponseError as e:
+        if http_exception_mappings and e.status in http_exception_mappings:
+            raise http_exception_mappings[e.status] from e
+        raise
 
 
 def union_collections_to_ordered_list(collections: Iterable) -> list:

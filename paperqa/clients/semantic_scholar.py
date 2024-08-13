@@ -209,33 +209,32 @@ async def s2_title_search(
     endpoint, params = SematicScholarSearchType.MATCH.make_url_params(
         params={"query": title, "fields": fields}
     )
-    async with session.get(
+
+    data = await _get_with_retrying(
         url=endpoint,
         params=params,
+        session=session,
         headers=semantic_scholar_headers(),
-        timeout=aiohttp.ClientTimeout(SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT),
-    ) as response:
-        # check for 404 ( = no results)
-        if response.status == HTTPStatus.NOT_FOUND:
-            raise DOINotFoundError(f"Could not find DOI for {title}.")
-        data = await response.json()
+        timeout=SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT,
+        http_exception_mappings={
+            HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {title}.")
+        },
+    )
 
-        if authors and not s2_authors_match(authors, data["data"][0]):
-            raise DOINotFoundError(
-                f"Could not find DOI for {title} - author disagreement."
-            )
-        # need to check if nested under a 'data' key or not (depends on filtering)
-        if (
-            strings_similarity(
-                data.get("title") if "data" not in data else data["data"][0]["title"],
-                title,
-            )
-            < title_similarity_threshold
-        ):
-            raise DOINotFoundError(
-                f"Semantic scholar results did not match for title {title!r}."
-            )
-        return await parse_s2_to_doc_details(data, session)
+    if authors and not s2_authors_match(authors, data["data"][0]):
+        raise DOINotFoundError(f"Could not find DOI for {title} - author disagreement.")
+    # need to check if nested under a 'data' key or not (depends on filtering)
+    if (
+        strings_similarity(
+            data.get("title") if "data" not in data else data["data"][0]["title"],
+            title,
+        )
+        < title_similarity_threshold
+    ):
+        raise DOINotFoundError(
+            f"Semantic scholar results did not match for title {title!r}."
+        )
+    return await parse_s2_to_doc_details(data, session)
 
 
 async def get_s2_doc_details_from_doi(
@@ -259,16 +258,15 @@ async def get_s2_doc_details_from_doi(
     else:
         s2_fields = SEMANTIC_SCHOLAR_API_FIELDS
 
-    async def get_parse(session_: aiohttp.ClientSession) -> DocDetails:
-        details = await _get_with_retrying(
-            url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/DOI:{doi}",
-            params={"fields": s2_fields},
-            session=session_,
-            headers=semantic_scholar_headers(),
-        )
-        return await parse_s2_to_doc_details(details, session_)
+    details = await _get_with_retrying(
+        url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/DOI:{doi}",
+        params={"fields": s2_fields},
+        session=session,
+        headers=semantic_scholar_headers(),
+        timeout=SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT,
+    )
 
-    return await get_parse(session)
+    return await parse_s2_to_doc_details(details, session)
 
 
 async def get_s2_doc_details_from_title(
@@ -321,9 +319,17 @@ class SemanticScholarProvider(DOIOrTitleBasedProvider):
                     title_similarity_threshold=query.title_similarity_threshold,
                     fields=query.fields,
                 )
+        # We allow graceful failures, i.e. return "None" for both DOI errors and timeout errors
+        # DOINotFoundError means the paper doesn't exist in the source, the timeout is to prevent
+        # this service from failing us when it's down or slow.
         except DOINotFoundError:
             logger.exception(
                 f"Metadata not found for {query.doi if isinstance(query, DOIQuery) else query.title}"
                 " in Semantic Scholar."
             )
-            return None
+        except TimeoutError:
+            logger.exception(
+                f"Request to Semantic Scholar for {query.doi if isinstance(query, DOIQuery) else query.title}"
+                " timed out."
+            )
+        return None
