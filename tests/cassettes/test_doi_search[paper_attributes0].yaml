@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366?mailto=api@futurehouse.org
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366?mailto=test@example.com
     response:
       body:
         string:

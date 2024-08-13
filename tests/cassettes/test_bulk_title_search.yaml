@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
     response:
       body:
         string:
@@ -415,7 +415,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string:
@@ -548,7 +548,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
     response:
       body:
         string:
@@ -893,7 +893,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
     response:
       body:
         string:
@@ -1090,7 +1090,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&rows=1
     response:
       body:
         string:
@@ -1218,7 +1218,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&rows=1
     response:
       body:
         string:

@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string:

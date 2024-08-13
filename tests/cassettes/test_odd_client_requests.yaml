@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Andres+M.+Bran+Sam+Cox&select=DOI,author,title
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Andres+M.+Bran+Sam+Cox&select=DOI,author,title
     response:
       body:
         string:
@@ -192,7 +192,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
     response:
       body:
         string:
@@ -371,7 +371,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=api@futurehouse.org&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
     response:
       body:
         string:
@@ -550,7 +550,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=api@futurehouse.org&select=DOI,title
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=test@example.com&select=DOI,title
     response:
       body:
         string:

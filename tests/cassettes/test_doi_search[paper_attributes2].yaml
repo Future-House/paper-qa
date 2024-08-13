@@ -57,7 +57,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=api@futurehouse.org
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=test@example.com
     response:
       body:
         string:
