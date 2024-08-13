@@ -5,7 +5,10 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
-        args: ["--maxkb=1500"]
+        exclude: |
+          (?x)^(
+            paperqa/clients/client_data.*
+          )$
       - id: check-byte-order-marker
       - id: check-case-conflict
       - id: check-merge-conflict

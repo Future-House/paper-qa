@@ -40,6 +40,7 @@ SEMANTIC_SCHOLAR_API_MAPPING: dict[str, str | None] = {
 
 SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(list(SEMANTIC_SCHOLAR_API_MAPPING.keys()))
 SEMANTIC_SCHOLAR_BASE_URL = "https://api.semanticscholar.org"
+SEMANTIC_SCHOLAR_HEADER_KEY = "x-api-key"
 
 
 class SematicScholarSearchType(IntEnum):
@@ -179,6 +180,16 @@ async def parse_s2_to_doc_details(
     return doc_details
 
 
+def semantic_scholar_headers() -> dict[str, str]:
+    """Semantic Scholar API key if available, otherwise nothing."""
+    if api_key := os.environ.get("SEMANTIC_SCHOLAR_API_KEY"):
+        return {SEMANTIC_SCHOLAR_HEADER_KEY: api_key}
+    logger.warning(
+        "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API rate limits may apply."
+    )
+    return {}
+
+
 async def s2_title_search(
     title: str,
     session: aiohttp.ClientSession,
@@ -192,14 +203,9 @@ async def s2_title_search(
     endpoint, params = SematicScholarSearchType.MATCH.make_url_params(
         params={"query": title, "fields": fields}
     )
-    header = {}
-    try:
-        header["x-api-key"] = os.environ["SEMANTIC_SCHOLAR_API_KEY"]
-    except KeyError:
-        logger.warning(
-            "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API rate limits may apply."
-        )
-    async with session.get(url=endpoint, params=params, headers=header) as response:
+    async with session.get(
+        url=endpoint, params=params, headers=semantic_scholar_headers()
+    ) as response:
         # check for 404 ( = no results)
         if response.status == HTTPStatus.NOT_FOUND:
             raise DOINotFoundError(f"Could not find DOI for {title}.")
@@ -244,7 +250,7 @@ async def get_s2_doc_details_from_doi(
             url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/DOI:{doi}",
             params={"fields": s2_fields},
             session=session_,
-            headers={"x-api-key": os.environ["SEMANTIC_SCHOLAR_API_KEY"]},
+            headers=semantic_scholar_headers(),
         )
         return await parse_s2_to_doc_details(details, session_)
 

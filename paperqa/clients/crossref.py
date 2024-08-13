@@ -19,6 +19,7 @@ from .utils import TITLE_SET_SIMILARITY_THRESHOLD
 logger = logging.getLogger(__name__)
 
 CROSSREF_BASE_URL = "https://api.crossref.org"
+CROSSREF_HEADER_KEY = "Crossref-Plus-API-Token"
 CROSSREF_API_REQUEST_TIMEOUT = 5.0
 CROSSREF_API_MAPPING: dict[str, str] = {
     "title": "title",
@@ -66,10 +67,10 @@ CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING = {
 }
 
 
-def crossref_headers():
+def crossref_headers() -> dict[str, str]:
     """Crossref API key if available, otherwise nothing."""
     if api_key := os.environ.get("CROSSREF_API_KEY"):
-        return {"Crossref-Plus-API-Token": f"Bearer {api_key}"}
+        return {CROSSREF_HEADER_KEY: f"Bearer {api_key}"}
     logger.warning(
         "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may apply."
     )

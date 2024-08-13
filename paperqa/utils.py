@@ -13,6 +13,10 @@ from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
 from uuid import UUID
 
 import pypdf
+from pybtex.database import Person, parse_string
+from pybtex.database.input.bibtex import Parser
+from pybtex.style.formatting import unsrtalpha
+from pybtex.style.template import FieldIsMissing
 
 StrPath = Union[str, Path]
 
@@ -244,7 +248,6 @@ def clean_upbibtex(bibtex: str) -> str:
     }
     if "@None" in bibtex:
         return bibtex.replace("@None", "@article")
-    # new format check
     match = re.findall(r"@\['(.*)'\]", bibtex)
     if not match:
         match = re.findall(r"@(\w+)\{", bibtex)
@@ -268,12 +271,6 @@ def format_bibtex(  # noqa: C901
     missing_replacements: dict[str, str] | None = None,
 ) -> str:
     """Transform bibtex entry into a citation, potentially adding missing fields."""
-    # WOWOW This is hard to use
-    from pybtex.database import Person, parse_string
-    from pybtex.database.input.bibtex import Parser
-    from pybtex.style.formatting import unsrtalpha
-    from pybtex.style.template import FieldIsMissing
-
     if missing_replacements is None:
         missing_replacements = {}
     if key is None:
