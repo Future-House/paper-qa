@@ -23,6 +23,7 @@ from paperqa import (
     Text,
     print_callback,
 )
+from paperqa.clients import CrossrefProvider
 from paperqa.llms import (
     AnthropicLLMModel,
     EmbeddingModel,
@@ -1342,14 +1343,16 @@ def test_pdf_reader_match_doc_details():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
+    # we limit to only crossref since s2 is too flaky
     docs.add(
         doc_path,  # type: ignore[arg-type]
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
         use_doc_details=True,
+        clients={CrossrefProvider},
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
-    assert doc_details.dockey == "d7763485f06aabde"
+    assert doc_details.dockey == "5300ef1d5fb960d7"
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
     assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
@@ -1359,7 +1362,7 @@ def test_pdf_reader_match_doc_details():
         "Aditi Seshadri",
         "Andrew D. White",
     }
-    assert doc_details.journal == "Journal of Chemical Theory and Computation"  # type: ignore[attr-defined]
+    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"  # type: ignore[attr-defined]
     answer = docs.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 

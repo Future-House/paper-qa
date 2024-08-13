@@ -569,11 +569,16 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(self, other: DocDetails | int) -> DocDetails:
+    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: C901
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
             return self
+
+        # first see if one of the entries is newer, which we will prefer
+        PREFER_OTHER = True
+        if self.publication_date and other.publication_date:
+            PREFER_OTHER = self.publication_date <= other.publication_date
 
         merged_data = {}
         for field in self.model_fields:
@@ -615,13 +620,18 @@ class DocDetails(Doc):
                 and self_value is not None
                 and other_value is not None
             ):
-                # get the max citation count
+                # get the latest data
                 merged_data[field] = max(self_value, other_value)
 
             else:
-                # Prefer non-null values, with preference to 'other' object
+                # Prefer non-null values, default preference for 'other' object.
+                # Note: if PREFER_OTHER = False then even if 'other' data exists
+                # we will use 'self' data. This is to control for when we have
+                # pre-prints / arXiv versions of papers that are not as up-to-date
                 merged_data[field] = (
-                    other_value if other_value is not None else self_value
+                    other_value
+                    if (other_value is not None and PREFER_OTHER)
+                    else self_value
                 )
 
         # Recalculate doc_id if doi has changed
