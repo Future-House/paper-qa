@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from functools import reduce
 from typing import Any
 
 import aiohttp
@@ -48,3 +50,7 @@ async def _get_with_retrying(
     ) as response:
         response.raise_for_status()
         return await response.json()
+
+
+def union_collections_to_ordered_list(collections: Iterable) -> list:
+    return sorted(reduce(lambda x, y: set(x) | set(y), collections))

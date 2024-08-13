@@ -71,7 +71,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 20:57:52 GMT
+          - Tue, 13 Aug 2024 18:51:22 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -95,7 +95,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.04.01.587366?fields=citationStyles,externalIds,url,openAccessPdf,year,isOpenAccess,influentialCitationCount,citationCount,publicationDate,journal,publicationTypes,title,authors,venue
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.04.01.587366?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
@@ -126,27 +126,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 20:57:52 GMT
+          - Tue, 13 Aug 2024 18:51:22 GMT
         Via:
-          - 1.1 b285fdc0da95c54b3ea5b2d16104bc8c.cloudfront.net (CloudFront)
+          - 1.1 d1dad7d3c339d87d553c26a84c9ca5d2.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - xkWZPaFf5Z0_7-P-3ilw0fTordPcLwifyrCB56OqPwEtistpkewPRA==
+          - YdElWpMCzPZBBVcmqso_pKXH0JZf-c3i0htHXzE-jvK940UiDB0TfQ==
         X-Amz-Cf-Pop:
-          - ORD52-C2
+          - IAD55-P4
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cQlgmHeUPHcES-w=
+          - cdeutGf0PHcEffA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1325"
         x-amzn-Remapped-Date:
-          - Fri, 09 Aug 2024 20:57:52 GMT
+          - Tue, 13 Aug 2024 18:51:22 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 27d2198b-0f2b-4892-9f59-47710574fe5a
+          - 62d15057-610f-4f42-be58-3d85daa4834e
       status:
         code: 200
         message: OK
@@ -176,7 +176,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 09 Aug 2024 20:57:52 GMT
+          - Tue, 13 Aug 2024 18:51:23 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

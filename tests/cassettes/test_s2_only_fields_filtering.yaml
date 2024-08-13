@@ -15,7 +15,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 175.84378}]}
+          "P. Schwaller"}], "matchScore": 175.55591}]}
 
           '
       headers:
@@ -28,27 +28,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sun, 11 Aug 2024 17:40:27 GMT
+          - Tue, 13 Aug 2024 18:34:42 GMT
         Via:
-          - 1.1 d3c4d86ebfc7b99674cd13f38b108cba.cloudfront.net (CloudFront)
+          - 1.1 4091abb8cac392d8bc54145a27288bc6.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - fAASnWwt6f6K7LV3aE52wJNMPf90e88ky-nhrT3AizVDDThc4xYS-w==
+          - oXXxkNUAoOhnGqIJ65jMPzRAR-ZUWgk-HxktvqS9AXRgUObCB8NJzA==
         X-Amz-Cf-Pop:
-          - FOR50-P2
+          - IAD55-P4
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cWudyG_TPHcEncA=
+          - cdcRvEGfPHcEQ-A=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Sun, 11 Aug 2024 17:40:27 GMT
+          - Tue, 13 Aug 2024 18:34:42 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 6e3615c9-a9c9-4c8b-9c35-43f673a6686e
+          - 5e02b89c-edc3-40c7-b308-3d5aee0b439a
       status:
         code: 200
         message: OK
@@ -73,7 +73,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Sun, 11 Aug 2024 17:40:28 GMT
+          - Tue, 13 Aug 2024 18:34:43 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

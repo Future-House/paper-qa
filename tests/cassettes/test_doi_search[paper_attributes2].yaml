@@ -3,60 +3,6 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=citationStyles,externalIds,url,openAccessPdf,year,isOpenAccess,influentialCitationCount,citationCount,publicationDate,journal,publicationTypes,title,authors,venue
-    response:
-      body:
-        string:
-          '{"paperId": "e0d2719e49ad216f98ed640864cdacd1c20f53e6", "externalIds":
-          {"DOI": "10.1007/s40278-023-41815-2", "CorpusId": 259225376}, "url": "https://www.semanticscholar.org/paper/e0d2719e49ad216f98ed640864cdacd1c20f53e6",
-          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
-          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
-          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-06-01", "journal": {"name": "Reactions Weekly", "pages":
-          "145 - 145", "volume": "1962"}, "citationStyles": {"bibtex": "@Article{None,\n
-          booktitle = {Reactions weekly},\n journal = {Reactions Weekly},\n pages =
-          {145 - 145},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
-          volume = {1962},\n year = {2023}\n}\n"}, "authors": []}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "837"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 09 Aug 2024 21:16:44 GMT
-        Via:
-          - 1.1 0b6269442410aef6754183c357281644.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - Cms3VLeaelJgrkbbTkQQVu-B4YVCK0kYE3utT3o5Wsy9ZJZb2TpPNQ==
-        X-Amz-Cf-Pop:
-          - BOS50-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cQoRiGwzvHcEFsA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "837"
-        x-amzn-Remapped-Date:
-          - Fri, 09 Aug 2024 21:16:44 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 8f849ba8-09c9-4950-b19a-18ac3feddb0f
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
       uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=test@example.com
     response:
       body:
@@ -88,7 +34,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 21:16:44 GMT
+          - Tue, 13 Aug 2024 18:34:02 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -105,6 +51,60 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "e0d2719e49ad216f98ed640864cdacd1c20f53e6", "externalIds":
+          {"DOI": "10.1007/s40278-023-41815-2", "CorpusId": 259225376}, "url": "https://www.semanticscholar.org/paper/e0d2719e49ad216f98ed640864cdacd1c20f53e6",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
+          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
+          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-06-01", "journal": {"name": "Reactions Weekly", "pages":
+          "145 - 145", "volume": "1962"}, "citationStyles": {"bibtex": "@Article{None,\n
+          booktitle = {Reactions weekly},\n journal = {Reactions Weekly},\n pages =
+          {145 - 145},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
+          volume = {1962},\n year = {2023}\n}\n"}, "authors": []}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "837"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:34:02 GMT
+        Via:
+          - 1.1 ddd3d8441374ce62d11d031216138152.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - pNq8XNMTPxZyPVVrRe1N7igInqU9ADvOVppmBatkSrtTJM4qVmgHxA==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cdcMQHBhvHcEd-g=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "837"
+        x-amzn-Remapped-Date:
+          - Tue, 13 Aug 2024 18:34:02 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - e0ccacc5-3403-42dc-a0f4-c33a60337aa0
       status:
         code: 200
         message: OK
@@ -131,7 +131,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 09 Aug 2024 21:16:45 GMT
+          - Tue, 13 Aug 2024 18:34:03 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

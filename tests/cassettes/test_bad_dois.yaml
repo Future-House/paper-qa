@@ -20,7 +20,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 22:49:08 GMT
+          - Tue, 13 Aug 2024 18:34:24 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -44,7 +44,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=abs12032jsdafn&fields=citationStyles,externalIds,url,openAccessPdf,year,isOpenAccess,influentialCitationCount,citationCount,publicationDate,journal,publicationTypes,title,authors,venue
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=abs12032jsdafn&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string: '{"error":"Title match not found"}
@@ -60,27 +60,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 22:49:10 GMT
+          - Tue, 13 Aug 2024 18:34:27 GMT
         Via:
-          - 1.1 224a6b751b8322609af7fa7d59c0303e.cloudfront.net (CloudFront)
+          - 1.1 4ce044af637284f41cd11c7043e8eaaa.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - hjQcpgwK11HjffYF_Wb9gTeESha3x_MHVl1KMFntgSrkpWvxSoiI8A==
+          - Pj6xus9b-JNlnpYo1jLekS_3APln9I04bTZOxIT2DhpsFLgZma7cPg==
         X-Amz-Cf-Pop:
-          - BOS50-P4
+          - IAD55-P4
         X-Cache:
           - Error from cloudfront
         x-amz-apigw-id:
-          - cQ1z1F17vHcEWSQ=
+          - cdcPmEmUPHcESHw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "34"
         x-amzn-Remapped-Date:
-          - Fri, 09 Aug 2024 22:49:10 GMT
+          - Tue, 13 Aug 2024 18:34:27 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 5cce8696-7244-4efe-82eb-2485e1af3663
+          - 07203930-ceca-432e-a916-d83cb392223a
       status:
         code: 404
         message: Not Found

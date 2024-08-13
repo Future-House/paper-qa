@@ -14,27 +14,45 @@ from ..clients.exceptions import DOINotFoundError
 from ..types import CITATION_FALLBACK_DATA, DocDetails
 from ..utils import bibtex_field_extract, remove_substrings, strings_similarity
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
-from .utils import TITLE_SET_SIMILARITY_THRESHOLD
+from .utils import TITLE_SET_SIMILARITY_THRESHOLD, union_collections_to_ordered_list
 
 logger = logging.getLogger(__name__)
 
 CROSSREF_BASE_URL = "https://api.crossref.org"
 CROSSREF_HEADER_KEY = "Crossref-Plus-API-Token"
 CROSSREF_API_REQUEST_TIMEOUT = 5.0
-CROSSREF_API_MAPPING: dict[str, str] = {
-    "title": "title",
-    "DOI": "doi",
-    "author": "authors",
-    "published": "publication_date",  # also provides year
-    "volume": "volume",
-    "issue": "issue",
-    "publisher": "publisher",
-    "ISSN": "issn",
-    "page": "pages",
-    "container-title": "journal",
-    "URL": "url",
-    "bibtex": "bibtex",
-    "is-referenced-by-count": "citation_count",
+CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
+    "title": {"title"},
+    "doi": {"DOI"},
+    "authors": {"author"},
+    "publication_date": {"published"},
+    "year": {"published"},
+    "volume": {"volume"},
+    "issue": {"issue"},
+    "publisher": {"publisher"},
+    "issn": {"ISSN"},
+    "pages": {"page"},
+    "journal": {"container-title"},
+    "doi_url": {"URL"},
+    "url": {"URL"},
+    "bibtex": {"bibtex", "type"},
+    "citation_count": {"is-referenced-by-count"},
+    "bibtex_type": {"type"},
+    "citation": {
+        "title",
+        "DOI",
+        "published",
+        "volume",
+        "issue",
+        "publisher",
+        "ISSN",
+        "page",
+        "container-title",
+        "is-referenced-by-count",
+        "type",
+    },
+    "source_quality": {"container-title"},
+    "doc_id": {"DOI"},
 }
 CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING = {
     "journal-article": "article",
@@ -244,18 +262,17 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
     query_bibtex = True
 
     if fields:
-        field_map = {v: k for k, v in CROSSREF_API_MAPPING.items()}
         # crossref has a special endpoint for bibtex, so we don't need to request it here
         if "bibtex" not in fields:
             query_bibtex = False
         params.update(
             {
                 "select": ",".join(
-                    sorted(
+                    union_collections_to_ordered_list(
                         [
-                            field_map[field]
+                            CROSSREF_API_MAPPING[field]
                             for field in fields
-                            if field in field_map and field != "bibtex"
+                            if field in CROSSREF_API_MAPPING and field != "bibtex"
                         ]
                     )
                 )

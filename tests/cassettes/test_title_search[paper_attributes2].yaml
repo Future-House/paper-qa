@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2282319,"items":[{"indexed":{"date-parts":[[2024,8,9]],"date-time":"2024-08-09T17:10:06Z","timestamp":1723223406992},"reference-count":103,"publisher":"Springer
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2283974,"items":[{"indexed":{"date-parts":[[2024,8,9]],"date-time":"2024-08-09T17:10:06Z","timestamp":1723223406992},"reference-count":103,"publisher":"Springer
           Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
           Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"]},{"DOI":"10.13039\/100000001","name":"National
           Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
@@ -313,7 +313,7 @@ interactions:
           (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
           A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
           Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.78314,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.864754,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
           September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
@@ -338,7 +338,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 20:57:51 GMT
+          - Tue, 13 Aug 2024 18:33:59 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -355,69 +355,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=citationStyles,externalIds,url,openAccessPdf,year,isOpenAccess,influentialCitationCount,citationCount,publicationDate,journal,publicationTypes,title,authors,venue
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
-          "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 187, "influentialCitationCount":
-          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
-          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
-          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
-          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
-          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
-          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
-          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
-          {Augmenting large language models with chemistry tools},\n volume = {6},\n
-          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
-          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
-          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
-          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 176.86871}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1551"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 09 Aug 2024 20:57:51 GMT
-        Via:
-          - 1.1 b0269df93790acb24b691aaeb1850a5e.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - 6qP5KTOBJCjI9rKhwJ7kYV2qZIt4OfHbYwvtaMQ67g2VIfzQHVylng==
-        X-Amz-Cf-Pop:
-          - ORD52-C2
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cQlgZFEOvHcEYnA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1551"
-        x-amzn-Remapped-Date:
-          - Fri, 09 Aug 2024 20:57:51 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - b4a8a69c-13c3-48fa-8b52-a6b97e2d8514
       status:
         code: 200
         message: OK
@@ -447,7 +384,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 09 Aug 2024 20:57:52 GMT
+          - Tue, 13 Aug 2024 18:33:59 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -464,6 +401,69 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
+          "title": "Augmenting large language models with chemistry tools", "venue":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 187, "influentialCitationCount":
+          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
+          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
+          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
+          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
+          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
+          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
+          {Augmenting large language models with chemistry tools},\n volume = {6},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
+          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
+          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
+          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
+          "name": "P. Schwaller"}], "matchScore": 181.37788}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1551"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:34:01 GMT
+        Via:
+          - 1.1 2896f6be77233cf3f24b7a1aaae1c6f2.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - jArWyr3rFLmJjudRoMU1SmrmySKA3uObh6sqBSPt_3sUKPl5Rxam4A==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cdcLsGaQvHcEOxA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1551"
+        x-amzn-Remapped-Date:
+          - Tue, 13 Aug 2024 18:34:01 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 2347c943-5dab-4e0f-b1e3-d3d152e38b92
       status:
         code: 200
         message: OK

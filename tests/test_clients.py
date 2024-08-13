@@ -26,7 +26,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Michael D. Skarlinski and David J. Quesnel. Effect of native "
                 "oxide layers on copper thin-film tensile properties: a reactive"
                 " molecular dynamics study. Journal of Applied Physics, 118:235306, "
-                "Dec 2015. URL: http://dx.doi.org/10.1063/1.4938384, doi:10.1063/1.4938384. "
+                "Dec 2015. URL: https://doi.org/10.1063/1.4938384, doi:10.1063/1.4938384. "
                 "This article has 8 citations and is from a peer-reviewed journal."
             ),
         },
@@ -48,7 +48,8 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
             "formatted_citation": (
                 "Jakub L'ala, Odhran O'Donoghue, Aleksandar Shtedritski, Sam Cox, Samuel G. Rodriques,"
                 " and Andrew D. White. Paperqa: retrieval-augmented generative agent for scientific "
-                "research. ArXiv, Dec 2023. doi:10.48550/arxiv.2312.07559. This article has 21 citations."
+                "research. ArXiv, Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559, "
+                "doi:10.48550/arxiv.2312.07559. This article has 21 citations."
             ),
         },
         {
@@ -69,7 +70,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
             "formatted_citation": (
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and "
                 "Philippe Schwaller. Augmenting large language models with chemistry tools. Nature "
-                "Machine Intelligence, 6:525-535, May 2024. URL: http://dx.doi.org/10.1038/s42256-024-00832-8, "
+                "Machine Intelligence, 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8, "
                 "doi:10.1038/s42256-024-00832-8. This article has 187 citations and is from a "
                 "domain leading peer-reviewed journal."
             ),
@@ -122,7 +123,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
             "formatted_citation": (
                 "Michael Herger, Christina M. Kajba, Megan Buckley, Ana Cunha, Molly Strom, "
                 "and Gregory M. Findlay. High-throughput screening of human genetic variants "
-                "by pooled prime editing. bioRxiv, Apr 2024. URL: http://dx.doi.org/10.1101/2024.04.01.587366, "
+                "by pooled prime editing. bioRxiv, Apr 2024. URL: https://doi.org/10.1101/2024.04.01.587366, "
                 "doi:10.1101/2024.04.01.587366. This article has 1 citations."
             ),
         },
@@ -146,7 +147,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "Subrata Adak, Debashis Bandyopadhyay, Uday Bandyopadhyay, and Ranajit K. Banerjee. "
                 "An essential role of active site arginine residue in iodide binding and histidine residue "
                 "in electron transfer for iodide oxidation by horseradish peroxidase. Molecular and Cellular "
-                "Biochemistry, 218:1-11, Feb 2001. URL: http://dx.doi.org/10.1023/a:1007154515475, "
+                "Biochemistry, 218:1-11, Feb 2001. URL: https://doi.org/10.1023/a:1007154515475, "
                 "doi:10.1023/a:1007154515475. This article has 7 citations and is from a peer-reviewed journal."
             ),
         },
@@ -160,7 +161,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
             "authors": [],
             "formatted_citation": (
                 "Unknown author(s). Convalescent-anti-sars-cov-2-plasma/immune-globulin. Reactions Weekly, "
-                "1962:145-145, Jun 2023. URL: http://dx.doi.org/10.1007/s40278-023-41815-2, "
+                "1962:145-145, Jun 2023. URL: https://doi.org/10.1007/s40278-023-41815-2, "
                 "doi:10.1007/s40278-023-41815-2. This article has 0 citations and is from a peer-reviewed journal."
             ),
         },
@@ -265,7 +266,8 @@ async def test_minimal_fields_filtering():
         assert not details.authors, "Authors should not be populated"  # type: ignore[union-attr]
         assert details.citation == (  # type: ignore[union-attr]
             "Unknown author(s). Augmenting large language models with chemistry tools."
-            " Unknown journal, Unknown year. doi:10.1038/s42256-024-00832-8."
+            " Unknown journal, Unknown year. URL: https://doi.org/10.1038/s42256-024-00832-8, "
+            "doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
         assert set(details.other["client_source"]) == {  # type: ignore[union-attr]
             "semantic_scholar",
@@ -289,7 +291,8 @@ async def test_s2_only_fields_filtering():
         assert s2_details.citation == (  # type: ignore[union-attr]
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, "
             "and P. Schwaller. Augmenting large language models with chemistry tools. "
-            "Unknown journal, Unknown year. doi:10.1038/s42256-024-00832-8."
+            "Unknown journal, Unknown year. URL: https://doi.org/10.1038/s42256-024-00832-8, "
+            "doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
@@ -312,7 +315,8 @@ async def test_crossref_journalquality_fields_filtering():
         assert crossref_details.citation == (  # type: ignore[union-attr]
             "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, "
             "and Philippe Schwaller. Augmenting large language models with chemistry tools. "
-            "Nature Machine Intelligence, Unknown year. doi:10.1038/s42256-024-00832-8."
+            "Nature Machine Intelligence, Unknown year. URL: https://doi.org/10.1038/s42256-024-00832-8, "
+            "doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
 
 

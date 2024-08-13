@@ -357,8 +357,8 @@ class DocDetails(Doc):
         " We use None as a sentinel for unset values (like for determining hydration) "
         " So, we use -1 means unknown quality and None means it needs to be hydrated.",
     )
-
     doi: str | None = None
+    doi_url: str | None = None
     doc_id: str | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
@@ -372,9 +372,8 @@ class DocDetails(Doc):
         # Replace HTML tags with empty string
         return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
 
-    @model_validator(mode="before")
-    @classmethod
-    def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def lowercase_doi_and_populate_doc_id(data: dict[str, Any]) -> dict[str, Any]:
         if doi := data.get("doi"):
             data["doi"] = doi.lower()
             data["doc_id"] = encode_id(doi.lower())
@@ -405,20 +404,44 @@ class DocDetails(Doc):
 
         return merged_entry
 
-    @model_validator(mode="before")
-    @classmethod
-    def string_cleaning(cls, data: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def misc_string_cleaning(data: dict[str, Any]) -> dict[str, Any]:
         """Clean strings before the enter the validation process."""
         if pages := data.get("pages"):
             data["pages"] = pages.replace("--", "-").replace(" ", "")
         return data
 
-    @model_validator(mode="before")
+    @staticmethod
+    def inject_clean_doi_url_into_data(data: dict[str, Any]) -> dict[str, Any]:
+        """Ensure doi_url is present in data (since non-default arguments are not included)."""
+        doi_url, doi = data.get("doi_url"), data.get("doi")
+
+        if doi and not doi_url:
+            doi_url = "https://doi.org/" + doi
+
+        if doi_url:
+            data["doi_url"] = doi_url.replace(
+                "http://dx.doi.org/", "https://doi.org/"
+            ).lower()
+
+        return data
+
+    @staticmethod
+    def overwrite_docname_dockey_for_compatibility_w_doc(
+        data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Overwrite fields from metadata if specified."""
+        overwrite_fields = {"key": "docname", "doc_id": "dockey"}
+        if data.get("overwrite_fields_from_metadata", True):
+            for field, old_field in overwrite_fields.items():
+                if data.get(field):
+                    data[old_field] = data[field]
+        return data
+
     @classmethod
     def populate_bibtex_key_citation(  # noqa: C901, PLR0912
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
-
         # we try to regenerate the key if unknowns are present, maybe they have been found
         if not data.get("key") or "unknown" in data["key"].lower():
             data["key"] = create_bibtex_key(
@@ -465,7 +488,7 @@ class DocDetails(Doc):
                     else data["publication_date"].strftime("%b")
                 ),
                 "doi": data.get("doi"),
-                "url": data.get("url"),
+                "url": data.get("doi_url"),
                 "publisher": data.get("publisher"),
                 "issue": data.get("issue"),
                 "issn": data.get("issn"),
@@ -491,19 +514,16 @@ class DocDetails(Doc):
             data["citation"] = format_bibtex(
                 data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
-
         return data
 
     @model_validator(mode="before")
     @classmethod
-    def backwards_compatibility_w_doc(cls, data: dict[str, Any]) -> dict[str, Any]:
-        """Overwrite fields from metadata if specified."""
-        overwrite_fields = {"key": "docname", "doc_id": "dockey"}
-        if data.get("overwrite_fields_from_metadata", True):
-            for field, old_field in overwrite_fields.items():
-                if data.get(field):
-                    data[old_field] = data[field]
-        return data
+    def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
+        data = cls.lowercase_doi_and_populate_doc_id(data)
+        data = cls.misc_string_cleaning(data)
+        data = cls.inject_clean_doi_url_into_data(data)
+        data = cls.populate_bibtex_key_citation(data)
+        return cls.overwrite_docname_dockey_for_compatibility_w_doc(data)
 
     def __getitem__(self, item: str):
         """Allow for dictionary-like access, falling back on other."""

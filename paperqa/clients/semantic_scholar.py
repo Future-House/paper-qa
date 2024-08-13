@@ -15,30 +15,36 @@ from ..utils import clean_upbibtex, strings_similarity
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .crossref import doi_to_bibtex
 from .exceptions import DOINotFoundError
-from .utils import TITLE_SET_SIMILARITY_THRESHOLD, _get_with_retrying
+from .utils import (
+    TITLE_SET_SIMILARITY_THRESHOLD,
+    _get_with_retrying,
+    union_collections_to_ordered_list,
+)
 
 logger = logging.getLogger(__name__)
 
 # map from S2 fields to those in the DocDetails model
 # allows users to specify which fields to include in the response
-SEMANTIC_SCHOLAR_API_MAPPING: dict[str, str | None] = {
-    "citationStyles": "bibtex",
-    "externalIds": "doi",
-    "url": "url",
-    "openAccessPdf": "url",
-    "year": "year",
-    "isOpenAccess": None,
-    "influentialCitationCount": None,
-    "citationCount": "citation_count",
-    "publicationDate": "publication_date",  # also provides year
-    "journal": "journal",
-    "publicationTypes": None,
-    "title": "title",
-    "authors": "authors",
-    "venue": None,
+SEMANTIC_SCHOLAR_API_MAPPING: dict[str, Collection[str]] = {
+    "title": {"title"},
+    "doi": {"externalIds"},
+    "authors": {"authors"},
+    "publication_date": {"publicationDate"},
+    "year": {"year"},
+    "volume": {"journal"},
+    "pages": {"journal"},
+    "journal": {"journal"},
+    "url": {"url", "openAccessPdf"},
+    "bibtex": {"citationStyles"},
+    "doi_url": {"url"},
+    "other": {"isOpenAccess", "influentialCitationCount", "publicationTypes", "venue"},
+    "citation_count": {"citationCount"},
+    "source_quality": {"journal"},
 }
-
-SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(list(SEMANTIC_SCHOLAR_API_MAPPING.keys()))
+SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT = 10.0
+SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(
+    union_collections_to_ordered_list(SEMANTIC_SCHOLAR_API_MAPPING.values())
+)
 SEMANTIC_SCHOLAR_BASE_URL = "https://api.semanticscholar.org"
 SEMANTIC_SCHOLAR_HEADER_KEY = "x-api-key"
 
@@ -162,7 +168,7 @@ async def parse_s2_to_doc_details(
         volume=paper_data.get("journal", {}).get("volume"),
         pages=paper_data.get("journal", {}).get("pages"),
         journal=paper_data.get("journal", {}).get("name"),
-        url=None,  # URL is not provided in this JSON format
+        url=(paper_data.get("openAccessPdf") or {}).get("url"),
         title=paper_data.get("title"),
         citation_count=paper_data.get("citationCount"),
         doi=paper_data.get("externalIds", {}).get("DOI"),
@@ -204,7 +210,10 @@ async def s2_title_search(
         params={"query": title, "fields": fields}
     )
     async with session.get(
-        url=endpoint, params=params, headers=semantic_scholar_headers()
+        url=endpoint,
+        params=params,
+        headers=semantic_scholar_headers(),
+        timeout=aiohttp.ClientTimeout(SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT),
     ) as response:
         # check for 404 ( = no results)
         if response.status == HTTPStatus.NOT_FOUND:
@@ -240,8 +249,13 @@ async def get_s2_doc_details_from_doi(
         raise ValueError("Valid DOI must be provided.")
 
     if fields:
-        valid_fields = {v: k for k, v in SEMANTIC_SCHOLAR_API_MAPPING.items() if v}
-        s2_fields = ",".join(valid_fields[f] for f in fields if f in valid_fields)
+        s2_fields = ",".join(
+            union_collections_to_ordered_list(
+                SEMANTIC_SCHOLAR_API_MAPPING[f]
+                for f in fields
+                if f in SEMANTIC_SCHOLAR_API_MAPPING
+            )
+        )
     else:
         s2_fields = SEMANTIC_SCHOLAR_API_FIELDS
 
@@ -273,8 +287,13 @@ async def get_s2_doc_details_from_title(
     if authors is None:
         authors = []
     if fields:
-        valid_fields = {v: k for k, v in SEMANTIC_SCHOLAR_API_MAPPING.items() if v}
-        s2_fields = ",".join(valid_fields[f] for f in fields if f in valid_fields)
+        s2_fields = ",".join(
+            union_collections_to_ordered_list(
+                SEMANTIC_SCHOLAR_API_MAPPING[f]
+                for f in fields
+                if f in SEMANTIC_SCHOLAR_API_MAPPING
+            )
+        )
     else:
         s2_fields = SEMANTIC_SCHOLAR_API_FIELDS
 

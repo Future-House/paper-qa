@@ -20,7 +20,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 22:43:35 GMT
+          - Tue, 13 Aug 2024 18:34:05 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -44,7 +44,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=askldjrq3rjaw938h&fields=citationStyles,externalIds,url,openAccessPdf,year,isOpenAccess,influentialCitationCount,citationCount,publicationDate,journal,publicationTypes,title,authors,venue
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=askldjrq3rjaw938h&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string: '{"error":"Title match not found"}
@@ -60,27 +60,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 22:43:36 GMT
+          - Tue, 13 Aug 2024 18:34:07 GMT
         Via:
-          - 1.1 2509c74f5f6cfb0d8a2f556b68170b28.cloudfront.net (CloudFront)
+          - 1.1 b3169f8fae0104e39a0a9728b6537e08.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - ZE4_eLirk6hXj61U-rRndjEMRcD7ny9wbfZtnlyf3ltG5Sj7n-7XEw==
+          - njac2dCY2mYDBr9kpqMw07vocYKj5bqWdB3gjSS35BKQnXDemHVPdw==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - IAD55-P4
         X-Cache:
           - Error from cloudfront
         x-amz-apigw-id:
-          - cQ0_mEm2PHcEFRg=
+          - cdcMuFLwPHcEjHQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "34"
         x-amzn-Remapped-Date:
-          - Fri, 09 Aug 2024 22:43:36 GMT
+          - Tue, 13 Aug 2024 18:34:07 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 9b9fcafc-23b4-43bb-aa10-fad1b216f029
+          - c9ee1896-0b67-4677-b6ed-dd3c7c274fd1
       status:
         code: 404
         message: Not Found
@@ -92,7 +92,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10267965,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10275318,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
           Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
           of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
           layers are likely to be present on metallic nano-structures due to either
@@ -186,7 +186,7 @@ interactions:
           Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
           Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
           Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.400696,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.39564,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -200,11 +200,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3929"
+          - "3928"
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 22:43:37 GMT
+          - Tue, 13 Aug 2024 18:34:08 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -251,7 +251,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 09 Aug 2024 22:43:38 GMT
+          - Tue, 13 Aug 2024 18:34:09 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -275,7 +275,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&fields=citationStyles,externalIds,url,openAccessPdf,year,isOpenAccess,influentialCitationCount,citationCount,publicationDate,journal,publicationTypes,title,authors,venue
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
@@ -293,7 +293,7 @@ interactions:
           tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
           year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
           Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          208.26749}]}
+          208.29527}]}
 
           '
       headers:
@@ -306,27 +306,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 09 Aug 2024 22:43:38 GMT
+          - Tue, 13 Aug 2024 18:34:23 GMT
         Via:
-          - 1.1 2509c74f5f6cfb0d8a2f556b68170b28.cloudfront.net (CloudFront)
+          - 1.1 b3169f8fae0104e39a0a9728b6537e08.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 6llZ74LKUqsp31poXDFktTSsJiZ7SUCtcdAZ021BPRnegFVx9xRJIA==
+          - DsETikbOnDFtYsX-08CvPI_WjGnGoJnPTVHA97MsDkpnNNTns7nDmA==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - IAD55-P4
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cQ0_5GcaPHcEOJw=
+          - cdcNCFJZvHcEnsA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1109"
         x-amzn-Remapped-Date:
-          - Fri, 09 Aug 2024 22:43:38 GMT
+          - Tue, 13 Aug 2024 18:34:23 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 9457859b-b84f-41f2-903b-f0bbeb418adc
+          - c85f8443-7411-47f0-ba6f-2a023b2b2b7c
       status:
         code: 200
         message: OK
