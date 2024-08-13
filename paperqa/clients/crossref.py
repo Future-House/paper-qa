@@ -54,7 +54,7 @@ CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
     "source_quality": {"container-title"},
     "doc_id": {"DOI"},
 }
-CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING = {
+CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING: dict[str, str] = {
     "journal-article": "article",
     "journal-issue": "misc",  # No direct equivalent, so 'misc' is used
     "journal-volume": "misc",  # No direct equivalent, so 'misc' is used
@@ -327,27 +327,14 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
 
 class CrossrefProvider(DOIOrTitleBasedProvider):
     async def _query(self, query: TitleAuthorQuery | DOIQuery) -> DocDetails | None:
-        try:
-            if isinstance(query, DOIQuery):
-                return await get_doc_details_from_crossref(
-                    doi=query.doi, session=query.session, fields=query.fields
-                )
-            if isinstance(query, TitleAuthorQuery):
-                return await get_doc_details_from_crossref(
-                    title=query.title,
-                    authors=query.authors,
-                    session=query.session,
-                    title_similarity_threshold=query.title_similarity_threshold,
-                    fields=query.fields,
-                )
-        except DOINotFoundError:
-            logger.exception(
-                f"Metadata not found for {query.doi if isinstance(query, DOIQuery) else query.title}"
-                " in Crossref."
+        if isinstance(query, DOIQuery):
+            return await get_doc_details_from_crossref(
+                doi=query.doi, session=query.session, fields=query.fields
             )
-        except TimeoutError:
-            logger.exception(
-                f"Request to Crossref for {query.doi if isinstance(query, DOIQuery) else query.title}"
-                " timed out."
-            )
-        return None
+        return await get_doc_details_from_crossref(
+            title=query.title,
+            authors=query.authors,
+            session=query.session,
+            title_similarity_threshold=query.title_similarity_threshold,
+            fields=query.fields,
+        )

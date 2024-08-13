@@ -306,30 +306,14 @@ async def get_s2_doc_details_from_title(
 
 class SemanticScholarProvider(DOIOrTitleBasedProvider):
     async def _query(self, query: TitleAuthorQuery | DOIQuery) -> DocDetails | None:
-        try:
-            if isinstance(query, DOIQuery):
-                return await get_s2_doc_details_from_doi(
-                    doi=query.doi, session=query.session, fields=query.fields
-                )
-            if isinstance(query, TitleAuthorQuery):
-                return await get_s2_doc_details_from_title(
-                    title=query.title,
-                    authors=query.authors,
-                    session=query.session,
-                    title_similarity_threshold=query.title_similarity_threshold,
-                    fields=query.fields,
-                )
-        # We allow graceful failures, i.e. return "None" for both DOI errors and timeout errors
-        # DOINotFoundError means the paper doesn't exist in the source, the timeout is to prevent
-        # this service from failing us when it's down or slow.
-        except DOINotFoundError:
-            logger.exception(
-                f"Metadata not found for {query.doi if isinstance(query, DOIQuery) else query.title}"
-                " in Semantic Scholar."
+        if isinstance(query, DOIQuery):
+            return await get_s2_doc_details_from_doi(
+                doi=query.doi, session=query.session, fields=query.fields
             )
-        except TimeoutError:
-            logger.exception(
-                f"Request to Semantic Scholar for {query.doi if isinstance(query, DOIQuery) else query.title}"
-                " timed out."
-            )
-        return None
+        return await get_s2_doc_details_from_title(
+            title=query.title,
+            authors=query.authors,
+            session=query.session,
+            title_similarity_threshold=query.title_similarity_threshold,
+            fields=query.fields,
+        )

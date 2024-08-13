@@ -13,6 +13,9 @@ from .client_models import JournalQuery, MetadataPostProcessor
 logger = logging.getLogger(__name__)
 
 
+# TODO: refresh script for journal quality data
+
+
 class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
     def __init__(self, journal_quality_path: os.PathLike | str | None = None) -> None:
         if journal_quality_path is None:
@@ -52,5 +55,3 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
                 "Must have a valid journal name to query journal quality data."
             )
             return None
-
-    # TODO: refresh script for journal quality data

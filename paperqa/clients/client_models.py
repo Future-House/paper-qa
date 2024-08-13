@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Collection, Generic, TypeVar
 
@@ -13,7 +14,11 @@ from pydantic import (
     model_validator,
 )
 
+from paperqa.clients.exceptions import DOINotFoundError
+
 from ..types import DocDetails
+
+logger = logging.getLogger(__name__)
 
 
 # ClientQuery is a base class for all queries to the client_models
@@ -88,9 +93,38 @@ class MetadataProvider(ABC, Generic[ClientQueryType]):
 
 class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
 
+    async def query(self, query: dict) -> DocDetails | None:
+        try:
+            client_query = self.query_transformer(query)
+            return await self._query(client_query)
+        # We allow graceful failures, i.e. return "None" for both DOI errors and timeout errors
+        # DOINotFoundError means the paper doesn't exist in the source, the timeout is to prevent
+        # this service from failing us when it's down or slow.
+        except DOINotFoundError:
+            logger.exception(
+                f"Metadata not found for "
+                f"{client_query.doi if isinstance(client_query, DOIQuery) else client_query.title}"
+                " in Crossref."
+            )
+        except TimeoutError:
+            logger.exception(
+                f"Request to Crossref for "
+                f"{client_query.doi if isinstance(client_query, DOIQuery) else client_query.title}"
+                " timed out."
+            )
+        return None
+
     @abstractmethod
     async def _query(self, query: DOIQuery | TitleAuthorQuery) -> DocDetails | None:
-        pass
+        """
+        Query the source using either a DOI or title/author search.
+
+        None should be returned if the DOI or title is not a good match.
+
+        Raises:
+            DOINotFoundError: This is when the DOI or title is not found in the sources
+            TimeoutError: When the request takes too long on the client side
+        """
 
     def query_transformer(self, query: dict) -> DOIQuery | TitleAuthorQuery:
         try:
