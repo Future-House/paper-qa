@@ -11,15 +11,15 @@ from typing import Any, Collection
 import aiohttp
 
 from ..types import DocDetails
-from ..utils import clean_upbibtex, strings_similarity
+from ..utils import (
+    _get_with_retrying,
+    clean_upbibtex,
+    strings_similarity,
+    union_collections_to_ordered_list,
+)
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .crossref import doi_to_bibtex
 from .exceptions import DOINotFoundError
-from .utils import (
-    TITLE_SET_SIMILARITY_THRESHOLD,
-    _get_with_retrying,
-    union_collections_to_ordered_list,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -200,7 +200,7 @@ async def s2_title_search(
     title: str,
     session: aiohttp.ClientSession,
     authors: list[str] | None = None,
-    title_similarity_threshold: float = TITLE_SET_SIMILARITY_THRESHOLD,
+    title_similarity_threshold: float = 0.75,
     fields: str = SEMANTIC_SCHOLAR_API_FIELDS,
 ) -> DocDetails:
     """Reconcile DOI from Semantic Scholar - which only checks title. So we manually check authors."""
@@ -274,7 +274,7 @@ async def get_s2_doc_details_from_title(
     session: aiohttp.ClientSession,
     authors: list[str] | None = None,
     fields: Collection[str] | None = None,
-    title_similarity_threshold: float = TITLE_SET_SIMILARITY_THRESHOLD,
+    title_similarity_threshold: float = 0.75,
 ) -> DocDetails:
     """Get paper details from Semantic Scholar given a title.
 

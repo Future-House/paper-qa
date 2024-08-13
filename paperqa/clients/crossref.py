@@ -12,9 +12,13 @@ import aiohttp
 
 from ..clients.exceptions import DOINotFoundError
 from ..types import CITATION_FALLBACK_DATA, DocDetails
-from ..utils import bibtex_field_extract, remove_substrings, strings_similarity
+from ..utils import (
+    bibtex_field_extract,
+    remove_substrings,
+    strings_similarity,
+    union_collections_to_ordered_list,
+)
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
-from .utils import TITLE_SET_SIMILARITY_THRESHOLD, union_collections_to_ordered_list
 
 logger = logging.getLogger(__name__)
 
@@ -226,7 +230,7 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
     doi: str | None = None,
     authors: list[str] | None = None,
     title: str | None = None,
-    title_similarity_threshold: float = TITLE_SET_SIMILARITY_THRESHOLD,
+    title_similarity_threshold: float = 0.75,
     fields: Collection[str] | None = None,
 ) -> DocDetails | None:
     """
