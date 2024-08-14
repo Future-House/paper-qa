@@ -567,9 +567,15 @@ class DocDetails(Doc):
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
 
     def is_hydration_needed(  # pylint: disable=dangerous-default-value
-        self, exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS
+        self,
+        exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS,
+        inclusion: Collection[str] = [],
     ) -> bool:
         """Determine if we have unfilled attributes."""
+        if inclusion:
+            return any(
+                v is None for k, v in self.model_dump().items() if k in inclusion
+            )
         return any(
             v is None for k, v in self.model_dump().items() if k not in exclusion
         )

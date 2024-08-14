@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+import logging
+from typing import Any, Collection, Sequence, cast
+
 import aiohttp
 import pytest
 
 import paperqa
-from paperqa.clients import CrossrefProvider, DocMetadataClient, SemanticScholarProvider
+from paperqa.clients import (
+    CrossrefProvider,
+    DocMetadataClient,
+    SemanticScholarProvider,
+)
+from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 
 
@@ -281,7 +289,13 @@ async def test_s2_only_fields_filtering():
 async def test_crossref_journalquality_fields_filtering():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
-            session, clients=[CrossrefProvider, JournalQualityPostProcessor]
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                [CrossrefProvider, JournalQualityPostProcessor],
+            ),
         )
         crossref_details = await crossref_client.query(
             title="Augmenting large language models with chemistry tools",
@@ -391,3 +405,85 @@ async def test_ensure_robust_to_timeouts(monkeypatch):
             fields=["doi", "title"],
         )
     assert details is None, "Should return None for timeout"
+
+
+@pytest.mark.asyncio()
+async def test_bad_init():
+    with pytest.raises(
+        ValueError, match="At least one MetadataProvider must be provided."
+    ):
+        client = DocMetadataClient(clients=[])  # noqa: F841
+
+
+@pytest.mark.vcr()
+@pytest.mark.asyncio()
+async def test_ensure_sequential_run(caplog):
+    caplog.set_level(logging.DEBUG)
+    # were using a DOI that is NOT in crossref, but running the crossref client first
+    # we will ensure that both are run sequentially
+
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(
+            session=session,
+            clients=cast(
+                Sequence[
+                    Collection[
+                        type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                    ]
+                ],
+                [[CrossrefProvider], [SemanticScholarProvider]],
+            ),
+        )
+        details = await client.query(
+            doi="10.48550/arxiv.2312.07559",
+            fields=["doi", "title"],
+        )
+        assert details, "Should find the right DOI in the second client"
+        record_indices = {"crossref": -1, "semantic_scholar": -1}
+        for n, record in enumerate(caplog.records):
+            if "CrossrefProvider" in record.msg:
+                record_indices["crossref"] = n
+            if "SemanticScholarProvider" in record.msg:
+                record_indices["semantic_scholar"] = n
+        assert (
+            record_indices["crossref"] < record_indices["semantic_scholar"]
+        ), "Crossref should run first"
+
+
+@pytest.mark.vcr()
+@pytest.mark.asyncio()
+async def test_ensure_sequential_run_early_stop(caplog):
+    caplog.set_level(logging.DEBUG)
+    # now we should stop after hitting s2
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(
+            session=session,
+            clients=cast(
+                Sequence[
+                    Collection[
+                        type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                    ]
+                ],
+                [[SemanticScholarProvider], [CrossrefProvider]],
+            ),
+        )
+        details = await client.query(
+            doi="10.48550/arxiv.2312.07559",
+            fields=["doi", "title"],
+        )
+        assert details, "Should find the right DOI in the second client"
+        record_indices = {"crossref": -1, "semantic_scholar": -1, "early_stop": -1}
+        for n, record in enumerate(caplog.records):
+            if "CrossrefProvider" in record.msg:
+                record_indices["crossref"] = n
+            if "SemanticScholarProvider" in record.msg:
+                record_indices["semantic_scholar"] = n
+            if "stopping early." in record.msg:
+                record_indices["early_stop"] = n
+        assert (
+            record_indices["crossref"] == -1
+        ), "Crossref should be index -1 i.e. not found"
+        assert (
+            record_indices["semantic_scholar"] != -1
+        ), "Semantic Scholar should be found"
+        assert record_indices["early_stop"] != -1, "We should stop early."

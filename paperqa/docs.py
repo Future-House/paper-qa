@@ -506,7 +506,7 @@ class Docs(BaseModel):
         loop = get_loop()
         return loop.run_until_complete(self.aadd_texts(texts, doc))
 
-    async def aadd_texts(self, texts: list[Text], doc: Doc | DocDetails) -> bool:
+    async def aadd_texts(self, texts: list[Text], doc: Doc) -> bool:
         """
         Add chunked texts to the collection.
 

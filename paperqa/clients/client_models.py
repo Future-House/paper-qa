@@ -141,7 +141,12 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
 
 
 class MetadataPostProcessor(ABC, Generic[ClientQueryType]):
-    """Post-process metadata from a query."""
+    """Post-process metadata from a query.
+
+    MetadataPostProcessor should be idempotent and not order-dependent, i.e.
+    all MetadataPostProcessor instances should be able to run in parallel.
+
+    """
 
     async def process(self, doc_details: DocDetails, **kwargs) -> DocDetails:
         if query := self.query_creator(doc_details, **kwargs):
