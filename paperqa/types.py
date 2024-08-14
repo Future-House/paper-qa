@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import logging
+import re
 from datetime import datetime
-from typing import Any, Callable
+from typing import Any, Callable, ClassVar, Collection
 from uuid import UUID, uuid4
 
 import tiktoken
+from pybtex.database import BibliographyData, Entry, Person
+from pybtex.database.input.bibtex import Parser
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -19,16 +23,24 @@ from .prompts import (
     default_system_prompt,
     qa_prompt,
     select_paper_prompt,
+    structured_citation_prompt,
     summary_json_prompt,
     summary_json_system_prompt,
     summary_prompt,
 )
-from .utils import get_citenames
+from .utils import (
+    create_bibtex_key,
+    encode_id,
+    format_bibtex,
+    get_citenames,
+)
 from .version import __version__ as pqa_version
 
 # Just for clarity
 DocKey = Any
 CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
+
+logger = logging.getLogger(__name__)
 
 
 class LLMResult(BaseModel):
@@ -65,6 +77,10 @@ class Doc(Embeddable):
     docname: str
     citation: str
     dockey: DocKey
+    overwrite_fields_from_metadata: bool = Field(
+        default=True,
+        description="flag to overwrite fields from metadata when upgrading to a DocDetails",
+    )
 
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
@@ -98,6 +114,7 @@ class PromptCollection(BaseModel):
     qa: str = qa_prompt
     select: str = select_paper_prompt
     cite: str = citation_prompt
+    structured_cite: str = structured_citation_prompt
     pre: str | None = Field(
         default=None,
         description=(
@@ -286,3 +303,370 @@ class ParsedText(BaseModel):
             raise NotImplementedError(
                 "Encoding only implemented for str and list[str] content."
             )
+
+
+# We use these integer values
+# as defined in https://jfp.csc.fi/en/web/haku/kayttoohje
+# which is a recommended ranking system
+SOURCE_QUALITY_MESSAGES = {
+    0: "poor quality or predatory journal",
+    1: "peer-reviewed journal",
+    2: "domain leading peer-reviewed journal",
+    3: "highest quality peer-reviewed journal",
+}
+
+CITATION_FALLBACK_DATA = {
+    "authors": ["Unknown authors"],
+    "author": "Unknown author(s)",
+    "year": "Unknown year",
+    "title": "Unknown title",
+    "journal": "Unknown journal",
+}
+
+
+class DocDetails(Doc):
+    model_config = ConfigDict(validate_assignment=True)
+
+    citation: str
+    key: str | None = None
+    bibtex: str | None = None
+    authors: list[str] | None = None
+    publication_date: datetime | None = None
+    year: int | None = None
+    volume: str | None = None
+    issue: str | None = None  # TODO: in bibtex this may be "number"
+    issn: str | None = None
+    pages: str | None = None
+    journal: str | None = None
+    publisher: str | None = None
+    url: str | None = Field(
+        default=None,
+        description=(
+            "Optional URL to the paper, which can lead to a Semantic Scholar page,"
+            " arXiv abstract, etc. As of version 0.67 on 5/10/2024, we don't use this"
+            " URL anywhere in the source code."
+        ),
+    )
+    title: str | None = None
+    citation_count: int | None = None
+    bibtex_type: str | None = None
+
+    source_quality: int | None = Field(
+        default=None,
+        description="Quality of journal/venue of paper. "
+        " We use None as a sentinel for unset values (like for determining hydration) "
+        " So, we use -1 means unknown quality and None means it needs to be hydrated.",
+    )
+    doi: str | None = None
+    doi_url: str | None = None
+    doc_id: str | None = None
+    other: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Other metadata besides the above standardized fields.",
+    )
+    UNDEFINED_JOURNAL_QUALITY: ClassVar[int] = -1
+
+    @field_validator("key")
+    @classmethod
+    def clean_key(cls, value: str) -> str:
+        # Replace HTML tags with empty string
+        return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
+
+    @staticmethod
+    def lowercase_doi_and_populate_doc_id(data: dict[str, Any]) -> dict[str, Any]:
+        if doi := data.get("doi"):
+            data["doi"] = doi.lower()
+            data["doc_id"] = encode_id(doi.lower())
+        else:
+            data["doc_id"] = encode_id(uuid4())
+
+        if data.get("overwrite_fields_from_metadata", True):
+            data["dockey"] = data["doc_id"]
+
+        return data
+
+    @staticmethod
+    def is_bibtex_complete(bibtex: str, fields: list[str] | None = None) -> bool:
+        """Validate bibtex entries have certain fields."""
+        if fields is None:
+            fields = ["doi", "title"]
+        return all(field + "=" in bibtex for field in fields)
+
+    @staticmethod
+    def merge_bibtex_entries(entry1: Entry, entry2: Entry) -> Entry:
+        """Merge two bibtex entries into one, preferring entry2 fields."""
+        merged_entry = Entry(entry1.type)
+
+        for field, value in entry1.fields.items():
+            merged_entry.fields[field] = value
+        for field, value in entry2.fields.items():
+            merged_entry.fields[field] = value
+
+        return merged_entry
+
+    @staticmethod
+    def misc_string_cleaning(data: dict[str, Any]) -> dict[str, Any]:
+        """Clean strings before the enter the validation process."""
+        if pages := data.get("pages"):
+            data["pages"] = pages.replace("--", "-").replace(" ", "")
+        return data
+
+    @staticmethod
+    def inject_clean_doi_url_into_data(data: dict[str, Any]) -> dict[str, Any]:
+        """Ensure doi_url is present in data (since non-default arguments are not included)."""
+        doi_url, doi = data.get("doi_url"), data.get("doi")
+
+        if doi and not doi_url:
+            doi_url = "https://doi.org/" + doi
+
+        if doi_url:
+            data["doi_url"] = doi_url.replace(
+                "http://dx.doi.org/", "https://doi.org/"
+            ).lower()
+
+        return data
+
+    @staticmethod
+    def overwrite_docname_dockey_for_compatibility_w_doc(
+        data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Overwrite fields from metadata if specified."""
+        overwrite_fields = {"key": "docname", "doc_id": "dockey"}
+        if data.get("overwrite_fields_from_metadata", True):
+            for field, old_field in overwrite_fields.items():
+                if data.get(field):
+                    data[old_field] = data[field]
+        return data
+
+    @classmethod
+    def populate_bibtex_key_citation(  # noqa: C901, PLR0912
+        cls, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Add or modify bibtex, key, and citation fields.
+
+        Missing values, 'unknown' keys, and incomplete bibtex entries are regenerated.
+
+        When overwrite_fields_from_metadata:
+            If bibtex is regenerated, the citation field is also regenerated.
+
+            Otherwise we keep the citation field as is.
+
+        """
+        # we try to regenerate the key if unknowns are present, maybe they have been found
+        if not data.get("key") or "unknown" in data["key"].lower():
+            data["key"] = create_bibtex_key(
+                data.get("authors") or CITATION_FALLBACK_DATA["authors"],  # type: ignore[arg-type]
+                data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]
+                data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
+            )
+            if data.get("overwrite_fields_from_metadata", True):
+                data["docname"] = data["key"]
+
+        # even if we have a bibtex, it may not be complete, thus we need to add to it
+        if not data.get("bibtex") or not cls.is_bibtex_complete(data["bibtex"]):
+            existing_entry = None
+            # if our bibtex already exists, but is incomplete, we add self_generated to metadata
+            if data.get("bibtex"):
+                if data.get("other"):
+                    if (
+                        "bibtex_source" in data["other"]
+                        and "self_generated" not in data["other"]["bibtex_source"]
+                    ):
+                        data["other"]["bibtex_source"].append("self_generated")
+                    else:
+                        data["other"]["bibtex_source"] = ["self_generated"]
+                else:
+                    data["other"] = {"bibtex_source": ["self_generated"]}
+
+                existing_entry = next(
+                    iter(Parser().parse_string(data["bibtex"]).entries.values())
+                )
+
+            entry_data = {
+                "title": data.get("title") or CITATION_FALLBACK_DATA["title"],
+                "year": (
+                    CITATION_FALLBACK_DATA["year"]
+                    if not data.get("year")
+                    else str(data["year"])
+                ),
+                "journal": data.get("journal") or CITATION_FALLBACK_DATA["journal"],
+                "volume": data.get("volume"),
+                "pages": data.get("pages"),
+                "month": (
+                    None
+                    if not data.get("publication_date")
+                    else data["publication_date"].strftime("%b")
+                ),
+                "doi": data.get("doi"),
+                "url": data.get("doi_url"),
+                "publisher": data.get("publisher"),
+                "issue": data.get("issue"),
+                "issn": data.get("issn"),
+            }
+            entry_data = {k: v for k, v in entry_data.items() if v}
+            try:
+                new_entry = Entry(data.get("bibtex_type", "article"), fields=entry_data)
+                if existing_entry:
+                    new_entry = cls.merge_bibtex_entries(existing_entry, new_entry)
+                # add in authors manually into the entry
+                authors = [Person(a) for a in data.get("authors", ["Unknown authors"])]
+                for a in authors:
+                    new_entry.add_person(a, "author")
+                data["bibtex"] = BibliographyData(
+                    entries={data["key"]: new_entry}
+                ).to_string("bibtex")
+                # clear out the citation, since it will be regenerated
+                if data.get("overwrite_fields_from_metadata", True):
+                    data["citation"] = None
+            except Exception:
+                logger.exception(f"Failed to generate bibtex for {data}")
+        if not data.get("citation"):
+            data["citation"] = format_bibtex(
+                data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
+            )
+        return data
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
+        data = cls.lowercase_doi_and_populate_doc_id(data)
+        data = cls.misc_string_cleaning(data)
+        data = cls.inject_clean_doi_url_into_data(data)
+        data = cls.populate_bibtex_key_citation(data)
+        return cls.overwrite_docname_dockey_for_compatibility_w_doc(data)
+
+    def __getitem__(self, item: str):
+        """Allow for dictionary-like access, falling back on other."""
+        try:
+            return getattr(self, item)
+        except AttributeError:
+            return self.other[item]
+
+    @property
+    def formatted_citation(self) -> str:
+        if (
+            self.citation is None  # type: ignore[redundant-expr]
+            or self.citation_count is None
+            or self.source_quality is None
+        ):
+            raise ValueError(
+                "Citation, citationCount, and sourceQuality are not set -- do you need to call `hydrate`?"
+            )
+        quality = (
+            SOURCE_QUALITY_MESSAGES[self.source_quality]
+            if self.source_quality >= 0
+            else None
+        )
+        if quality is None:
+            return f"{self.citation} This article has {self.citation_count} citations."
+        return (
+            f"{self.citation} This article has {self.citation_count} citations and is from a "
+            f"{quality}."
+        )
+
+    OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
+
+    def is_hydration_needed(  # pylint: disable=dangerous-default-value
+        self,
+        exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS,
+        inclusion: Collection[str] = [],
+    ) -> bool:
+        """Determine if we have unfilled attributes."""
+        if inclusion:
+            return any(
+                v is None for k, v in self.model_dump().items() if k in inclusion
+            )
+        return any(
+            v is None for k, v in self.model_dump().items() if k not in exclusion
+        )
+
+    def repopulate_doc_id_from_doi(self) -> None:
+        # TODO: should this be a hash of the doi?
+        if self.doi:
+            self.doc_id = encode_id(self.doi)
+
+    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: C901
+        """Merge two DocDetails objects together."""
+        # control for usage w. Python's sum() function
+        if isinstance(other, int):
+            return self
+
+        # first see if one of the entries is newer, which we will prefer
+        PREFER_OTHER = True
+        if self.publication_date and other.publication_date:
+            PREFER_OTHER = self.publication_date <= other.publication_date
+
+        merged_data = {}
+        for field in self.model_fields:
+            self_value = getattr(self, field)
+            other_value = getattr(other, field)
+
+            if field == "other":
+                # Merge 'other' dictionaries
+                merged_data[field] = {**self.other, **other.other}
+                # handle the bibtex / sources as special fields
+                for field_to_combine in ["bibtex_source", "client_source"]:
+                    if self.other.get(field_to_combine) and other.other.get(
+                        field_to_combine
+                    ):
+                        # Note: these should always be lists
+                        merged_data[field][field_to_combine] = (
+                            self.other[field_to_combine] + other.other[field_to_combine]
+                        )
+
+            elif field == "authors" and self_value and other_value:
+                # Combine authors lists, removing duplicates
+                # Choose whichever author list is longer
+                best_authors = (
+                    self.authors
+                    if (
+                        sum(len(a) for a in (self.authors or []))
+                        >= sum(len(a) for a in (other.authors or []))
+                    )
+                    else other.authors
+                )
+                merged_data[field] = best_authors or None  # type: ignore[assignment]
+
+            elif field == "key" and self_value is not None and other_value is not None:
+                # if we have multiple keys, we wipe them and allow regeneration
+                merged_data[field] = None  # type: ignore[assignment]
+
+            elif (
+                field in {"citation_count", "year", "publication_date"}
+                and self_value is not None
+                and other_value is not None
+            ):
+                # get the latest data
+                merged_data[field] = max(self_value, other_value)
+
+            else:
+                # Prefer non-null values, default preference for 'other' object.
+                # Note: if PREFER_OTHER = False then even if 'other' data exists
+                # we will use 'self' data. This is to control for when we have
+                # pre-prints / arXiv versions of papers that are not as up-to-date
+                merged_data[field] = (
+                    other_value
+                    if (other_value is not None and PREFER_OTHER)
+                    else self_value
+                )
+
+        # Recalculate doc_id if doi has changed
+        if merged_data["doi"] != self.doi:
+            merged_data["doc_id"] = (
+                encode_id(merged_data["doi"].lower()) if merged_data["doi"] else None  # type: ignore[attr-defined,assignment]
+            )
+
+        # Create and return new DocDetails instance
+        return DocDetails(**merged_data)
+
+    def __radd__(self, other: DocDetails | int) -> DocDetails:
+        # other == 0 captures the first call of sum()
+        if isinstance(other, int) and other == 0:
+            return self
+        return self.__add__(other)
+
+    def __iadd__(self, other: DocDetails | int) -> DocDetails:  # noqa: PYI034
+        # only includes int to align with __radd__ and __add__
+        if isinstance(other, int):
+            return self
+        return self.__add__(other)

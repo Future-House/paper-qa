@@ -1,15 +1,38 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import inspect
 import json
+import logging
 import math
 import re
 import string
+from collections.abc import Iterable
+from datetime import datetime
+from functools import reduce
+from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, Coroutine, Iterator, Union
+from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
+from uuid import UUID
 
+import aiohttp
+import httpx
 import pypdf
+from pybtex.database import Person, parse_string
+from pybtex.database.input.bibtex import Parser
+from pybtex.style.formatting import unsrtalpha
+from pybtex.style.template import FieldIsMissing
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_incrementing,
+)
+
+logger = logging.getLogger(__name__)
+
 
 StrPath = Union[str, Path]
 
@@ -192,3 +215,207 @@ def llm_read_json(text: str) -> dict:
     text = re.sub(pattern, replace_newlines, text)
 
     return json.loads(text)
+
+
+def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
+    """Encode a value (e.g. a DOI) optionally with a max length."""
+    if isinstance(value, UUID):
+        value = str(value)
+    if isinstance(value, str):
+        value = value.lower().encode()
+    return hashlib.md5(value).hexdigest()[:maxsize]  # noqa: S324
+
+
+def get_year(ts: datetime | None = None) -> str:
+    """Get the year from the input datetime, otherwise using the current datetime."""
+    if ts is None:
+        ts = datetime.now()
+    return ts.strftime("%Y")
+
+
+class CitationConversionError(Exception):
+    """Exception to throw when we can't process a citation from a BibTeX."""
+
+
+def clean_upbibtex(bibtex: str) -> str:
+
+    if not bibtex:
+        return bibtex
+
+    mapping = {
+        "None": "article",
+        "Article": "article",
+        "JournalArticle": "article",
+        "Review": "article",
+        "Book": "book",
+        "BookSection": "inbook",
+        "ConferencePaper": "inproceedings",
+        "Conference": "inproceedings",
+        "Dataset": "misc",
+        "Dissertation": "phdthesis",
+        "Journal": "article",
+        "Patent": "patent",
+        "Preprint": "article",
+        "Report": "techreport",
+        "Thesis": "phdthesis",
+        "WebPage": "misc",
+        "Plain": "article",
+    }
+    if "@None" in bibtex:
+        return bibtex.replace("@None", "@article")
+    match = re.findall(r"@\['(.*)'\]", bibtex)
+    if not match:
+        match = re.findall(r"@(\w+)\{", bibtex)
+        bib_type = match[0]
+        current = f"@{match[0]}"
+    else:
+        bib_type = match[0]
+        current = f"@['{bib_type}']"
+    for k, v in mapping.items():
+        # can have multiple
+        if k in bib_type:
+            bibtex = bibtex.replace(current, f"@{v}")
+            break
+    return bibtex
+
+
+def format_bibtex(  # noqa: C901
+    bibtex: str,
+    key: str | None = None,
+    clean: bool = True,
+    missing_replacements: dict[str, str] | None = None,
+) -> str:
+    """Transform bibtex entry into a citation, potentially adding missing fields."""
+    if missing_replacements is None:
+        missing_replacements = {}
+    if key is None:
+        key = bibtex.split("{")[1].split(",")[0]
+    style = unsrtalpha.Style()
+    try:
+        bd = parse_string(clean_upbibtex(bibtex) if clean else bibtex, "bibtex")
+    except Exception:
+        return "Ref " + key
+    try:
+        entry = bd.entries[key]
+    except KeyError as exc:  # Let's check if key is a non-empty prefix
+        try:
+            entry = next(
+                iter(v for k, v in bd.entries.items() if k.startswith(key) and key)
+            )
+        except StopIteration:
+            raise CitationConversionError(
+                f"Failed to process{' and clean up' if clean else ''} bibtex {bibtex}"
+                f" due to failed lookup of key {key}."
+            ) from exc
+    try:
+        # see if we can insert missing fields
+        for field, replacement_value in missing_replacements.items():
+            # Deal with special case for author, since it needs to be parsed
+            # into Person objects. This reorganizes the names automatically.
+            if field == "author" and "author" not in entry.persons:
+                tmp_author_bibtex = f"@misc{{tmpkey, author={{{replacement_value}}}}}"
+                authors: list[Person] = (
+                    Parser()
+                    .parse_string(tmp_author_bibtex)
+                    .entries["tmpkey"]
+                    .persons["author"]
+                )
+                for a in authors:
+                    entry.add_person(a, "author")
+            elif field not in entry.fields:
+                entry.fields.update({field: replacement_value})
+        entry = style.format_entry(label="1", entry=entry)
+        return entry.text.render_as("text")
+    except (FieldIsMissing, UnicodeDecodeError):
+        try:
+            return entry.fields["title"]
+        except KeyError as exc:
+            raise CitationConversionError(
+                f"Failed to process{' and clean up' if clean else ''} bibtex {bibtex}"
+                " due to missing a 'title' field."
+            ) from exc
+
+
+def remove_substrings(target: str, substr_removal_list: Collection[str]) -> str:
+    """Remove substrings from a target string."""
+    if all(len(w) == 1 for w in substr_removal_list):
+        return target.translate(str.maketrans("", "", "".join(substr_removal_list)))
+
+    for substr in substr_removal_list:
+        target = target.replace(substr, "")
+    return target
+
+
+def bibtex_field_extract(
+    bibtex: str, field: str, missing_replacements: dict[str, str] | None = None
+) -> str:
+    """Get a field from a bibtex entry.
+
+    Args:
+        bibtex: bibtex entry
+        field: field to extract
+        missing_replacements: replacement extract for field if not present in the bibtex string
+    """
+    if missing_replacements is None:
+        missing_replacements = {}
+    try:
+        pattern = rf"{field}\s*=\s*{{(.*?)}},"
+        # note: we intentionally have an attribute error if no match
+        return re.search(pattern, bibtex, re.IGNORECASE).group(1).strip()  # type: ignore[union-attr]
+    except AttributeError:
+        return missing_replacements.get(field, "")
+
+
+def create_bibtex_key(author: list[str], year: str, title: str) -> str:
+    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":"}
+    author_rep = (
+        author[0].split()[-1].casefold()
+        if "Unknown" not in author[0]
+        else "unknownauthors"
+    )
+    key = (
+        f"{author_rep}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
+    )
+    return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
+
+
+@retry(
+    retry=retry_if_exception(
+        lambda x: isinstance(x, aiohttp.ServerDisconnectedError)
+        or isinstance(x, aiohttp.ClientResponseError)
+        and x.status
+        in {
+            httpx.codes.INTERNAL_SERVER_ERROR.value,
+            httpx.codes.GATEWAY_TIMEOUT.value,
+        }
+    ),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    stop=stop_after_attempt(5),
+    wait=wait_incrementing(0.1, 0.1),
+)
+async def _get_with_retrying(
+    url: str,
+    params: dict[str, Any],
+    session: aiohttp.ClientSession,
+    headers: dict[str, str] | None = None,
+    timeout: float = 10.0,
+    http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
+) -> dict[str, Any]:
+    """Get from a URL with retrying protection."""
+    try:
+        async with session.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(timeout),
+        ) as response:
+            response.raise_for_status()
+            return await response.json()
+    except aiohttp.ClientResponseError as e:
+        if http_exception_mappings and e.status in http_exception_mappings:
+            raise http_exception_mappings[e.status] from e
+        raise
+
+
+def union_collections_to_ordered_list(collections: Iterable) -> list:
+    return sorted(reduce(lambda x, y: set(x) | set(y), collections))

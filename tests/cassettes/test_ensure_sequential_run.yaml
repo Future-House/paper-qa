@@ -1,0 +1,136 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2Farxiv.2312.07559?mailto=test@example.com&select=DOI,title
+    response:
+      body:
+        string:
+          '{"status":"failed","message-type":"validation-failure","message":[{"type":"parameter-not-allowed","value":"select","message":"This
+          route does not support select"}]}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json;charset=utf-8
+        Date:
+          - Wed, 14 Aug 2024 19:20:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        Vary:
+          - Accept
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.48550/arxiv.2312.07559?fields=externalIds,title
+    response:
+      body:
+        string:
+          '{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "title": "PaperQA: Retrieval-Augmented Generative
+          Agent for Scientific Research"}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "277"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 14 Aug 2024 19:20:22 GMT
+        Via:
+          - 1.1 4ce044af637284f41cd11c7043e8eaaa.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - XAy8Bc-bjjHFQpgqiH4rdAA1BOrUsXSpjmrKxH3bk3daL7NMAGDi2A==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cg16mEksPHcEoiQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "277"
+        x-amzn-Remapped-Date:
+          - Wed, 14 Aug 2024 19:20:22 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 1b02bab8-e592-429d-9272-23531aa671c5
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2312.07559/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Wed, 14 Aug 2024 19:20:23 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+version: 1

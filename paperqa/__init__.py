@@ -18,6 +18,7 @@ from .llms import (
     llm_model_factory,
     vector_store_factory,
 )
+from .types import DocDetails
 from .version import __version__
 
 __all__ = [
@@ -25,6 +26,7 @@ __all__ = [
     "AnthropicLLMModel",
     "Context",
     "Doc",
+    "DocDetails",
     "Docs",
     "EmbeddingModel",
     "HybridEmbeddingModel",

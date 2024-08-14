@@ -21,7 +21,7 @@ try:
 except ImportError:
     USE_VOYAGE = False
 
-
+from .clients import ALL_CLIENTS, DocMetadataClient
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -42,6 +42,7 @@ from .types import (
     CallbackFactory,
     Context,
     Doc,
+    DocDetails,
     DocKey,
     LLMResult,
     PromptCollection,
@@ -87,7 +88,7 @@ class Docs(BaseModel):
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
-    docs: dict[DocKey, Doc] = {}
+    docs: dict[DocKey, Doc | DocDetails] = {}
     texts: list[Text] = []
     docnames: set[str] = set()
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
@@ -279,6 +280,11 @@ class Docs(BaseModel):
         docname: str | None = None,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        title: str | None = None,
+        doi: str | None = None,
+        authors: list[str] | None = None,
+        use_doc_details: bool = False,
+        **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
         # just put in temp file and use existing method
@@ -297,6 +303,11 @@ class Docs(BaseModel):
                 docname=docname,
                 dockey=dockey,
                 chunk_chars=chunk_chars,
+                title=title,
+                doi=doi,
+                authors=authors,
+                use_doc_details=use_doc_details,
+                **kwargs,
             )
 
     def add_url(
@@ -348,6 +359,11 @@ class Docs(BaseModel):
         disable_check: bool = False,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        title: str | None = None,
+        doi: str | None = None,
+        authors: list[str] | None = None,
+        use_doc_details: bool = False,
+        **kwargs,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -358,10 +374,15 @@ class Docs(BaseModel):
                 disable_check=disable_check,
                 dockey=dockey,
                 chunk_chars=chunk_chars,
+                title=title,
+                doi=doi,
+                authors=authors,
+                use_doc_details=use_doc_details,
+                **kwargs,
             )
         )
 
-    async def aadd(
+    async def aadd(  # noqa: C901, PLR0912, PLR0915
         self,
         path: Path,
         citation: str | None = None,
@@ -369,6 +390,11 @@ class Docs(BaseModel):
         disable_check: bool = False,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        title: str | None = None,
+        doi: str | None = None,
+        authors: list[str] | None = None,
+        use_doc_details: bool = False,
+        **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
         if dockey is None:
@@ -412,7 +438,52 @@ class Docs(BaseModel):
                 year = match.group(1)
             docname = f"{author}{year}"
         docname = self._get_unique_name(docname)
+
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
+
+        # try to extract DOI / title from the citation
+        if (doi is title is None) and use_doc_details:
+            structured_cite_chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=self.prompts.structured_cite,
+                skip_system=True,
+            )
+            chain_result = await structured_cite_chain({"citation": citation}, None)
+            with contextlib.suppress(json.JSONDecodeError):
+                citation_json = json.loads(chain_result.text)
+                if citation_title := citation_json.get("title"):
+                    title = citation_title
+                if citation_doi := citation_json.get("doi"):
+                    doi = citation_doi
+                if citation_author := citation_json.get("authors"):
+                    authors = citation_author
+
+        # see if we can upgrade to DocDetails
+        # if not, we can progress with a normal Doc
+        # if "overwrite_fields_from_metadata" is used:
+        # will map "docname" to "key", and "dockey" to "doc_id"
+        if (title or doi) and use_doc_details:
+            if kwargs.get("metadata_client"):
+                metadata_client = kwargs["metadata_client"]
+            else:
+                metadata_client = DocMetadataClient(
+                    session=kwargs.pop("session", None),
+                    clients=kwargs.pop("clients", ALL_CLIENTS),
+                )
+
+            query_kwargs: dict[str, Any] = {}
+
+            if doi:
+                query_kwargs["doi"] = doi
+            if authors:
+                query_kwargs["authors"] = authors
+            if title:
+                query_kwargs["title"] = title
+
+            doc = await metadata_client.upgrade_doc_to_doc_details(
+                doc, **(query_kwargs | kwargs)
+            )
+
         texts = read_doc(path, doc, chunk_chars=chunk_chars, overlap=100)
         # loose check to see if document was loaded
         if (

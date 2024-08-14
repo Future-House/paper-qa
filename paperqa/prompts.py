@@ -53,6 +53,14 @@ citation_prompt = (
     "Citation:"
 )
 
+structured_citation_prompt = (
+    "Extract the title, authors, and doi as a JSON from this MLA citation. "
+    "If any field can not be found, return it as null. "
+    "Use title, authors, and doi as keys, author's value should be a list of authors. "
+    "{citation}\n\n"
+    "Citation JSON:"
+)
+
 default_system_prompt = (
     "Answer in a direct and concise tone. "
     "Your audience is an expert, so be highly specific. "
