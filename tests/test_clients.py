@@ -86,20 +86,9 @@ async def test_title_search(paper_attributes: dict[str, str]):
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
-        assert details.key == paper_attributes["key"], "Should have the correct key"  # type: ignore[union-attr]
-        assert details.doi == paper_attributes["doi"], "Should have the correct DOI"  # type: ignore[union-attr]
-        assert (
-            details.doc_id == paper_attributes["doc_id"]  # type: ignore[union-attr]
-        ), "Should have the correct paper ID"
-        assert (
-            details.journal == paper_attributes["journal"]  # type: ignore[union-attr]
-        ), "Should have the correct journal"
-        assert (
-            details.authors == paper_attributes["authors"]  # type: ignore[union-attr]
-        ), "Should have the correct authors"
-        assert (
-            details.formatted_citation == paper_attributes["formatted_citation"]  # type: ignore[union-attr]
-        ), "Should have the correct formatted_citation"
+        for key, value in paper_attributes.items():
+            if key != "source":
+                assert getattr(details, key) == value, f"Should have the correct {key}"
 
 
 @pytest.mark.vcr()
@@ -176,20 +165,9 @@ async def test_doi_search(paper_attributes: dict[str, str]):
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
-        assert details.key == paper_attributes["key"], "Should have the correct key"  # type: ignore[union-attr]
-        assert details.doi == paper_attributes["doi"], "Should have the correct DOI"  # type: ignore[union-attr]
-        assert (
-            details.doc_id == paper_attributes["doc_id"]  # type: ignore[union-attr]
-        ), "Should have the correct paper ID"
-        assert (
-            details.journal == paper_attributes["journal"]  # type: ignore[union-attr]
-        ), "Should have the correct journal"
-        assert (
-            details.authors == paper_attributes["authors"]  # type: ignore[union-attr]
-        ), "Should have the correct authors"
-        assert (
-            details.formatted_citation == paper_attributes["formatted_citation"]  # type: ignore[union-attr]
-        ), "Should have the correct formatted_citation"
+        for key, value in paper_attributes.items():
+            if key != "source":
+                assert getattr(details, key) == value, f"Should have the correct {key}"
 
 
 @pytest.mark.vcr()
