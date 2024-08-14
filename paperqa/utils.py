@@ -242,7 +242,6 @@ def clean_upbibtex(bibtex: str) -> str:
     if not bibtex:
         return bibtex
 
-    # WTF Semantic Scholar?
     mapping = {
         "None": "article",
         "Article": "article",
@@ -360,8 +359,10 @@ def bibtex_field_extract(
     if missing_replacements is None:
         missing_replacements = {}
     try:
-        return bibtex.split(field + "={")[1].split("}")[0].split()[0].strip()
-    except IndexError:
+        pattern = rf"{field}\s*=\s*{{(.*?)}},"
+        # note: we intentionally have an attribute error if no match
+        return re.search(pattern, bibtex, re.IGNORECASE).group(1).strip()  # type: ignore[union-attr]
+    except AttributeError:
         return missing_replacements.get(field, "")
 
 

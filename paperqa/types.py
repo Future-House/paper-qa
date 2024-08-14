@@ -442,6 +442,16 @@ class DocDetails(Doc):
     def populate_bibtex_key_citation(  # noqa: C901, PLR0912
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
+        """Add or modify bibtex, key, and citation fields.
+
+        Missing values, 'unknown' keys, and incomplete bibtex entries are regenerated.
+
+        When overwrite_fields_from_metadata:
+            If bibtex is regenerated, the citation field is also regenerated.
+
+            Otherwise we keep the citation field as is.
+
+        """
         # we try to regenerate the key if unknowns are present, maybe they have been found
         if not data.get("key") or "unknown" in data["key"].lower():
             data["key"] = create_bibtex_key(

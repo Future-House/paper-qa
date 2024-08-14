@@ -379,9 +379,9 @@ async def test_odd_client_requests():
 @pytest.mark.asyncio()
 async def test_ensure_robust_to_timeouts(monkeypatch):
     # 0.15 should be short enough to not get a response in time.
-    monkeypatch.setattr(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.15)
+    monkeypatch.setattr(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.05)
     monkeypatch.setattr(
-        paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.15
+        paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.05
     )
 
     async with aiohttp.ClientSession() as session:
