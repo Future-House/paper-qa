@@ -1,0 +1,3 @@
+# ignore test-generated files
+example.*
+example2.*

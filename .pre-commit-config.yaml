@@ -5,6 +5,10 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
+        exclude: |
+          (?x)^(
+            paperqa/clients/client_data.*
+          )$
       - id: check-byte-order-marker
       - id: check-case-conflict
       - id: check-merge-conflict
@@ -50,6 +54,11 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: [".[toml]"]
+        exclude: |
+          (?x)^(
+            tests/cassettes.*|
+            paperqa/clients/client_data.*
+          )$
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.18
     hooks:

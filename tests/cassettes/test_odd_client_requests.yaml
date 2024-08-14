@@ -1,0 +1,545 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Andres+M.+Bran+Sam+Cox&select=DOI,author,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5526,"items":[{"DOI":"10.1038\/s42256-024-00832-8","author":[{"given":"Andres","family":"M.
+          Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
+          D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "450"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:34:56 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
+          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
+          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
+          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
+          "P. Schwaller"}], "matchScore": 175.55591}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "684"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:35:12 GMT
+        Via:
+          - 1.1 d1dad7d3c339d87d553c26a84c9ca5d2.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - jR4en8rFQR1kLKWLt8yREaFgiVbxyV3Bfsu1UfA6EUk5U1DaosU6_A==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cdcUlEPKvHcEVtA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "684"
+        x-amzn-Remapped-Date:
+          - Tue, 13 Aug 2024 18:35:12 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 57a3817d-a6a8-4bc2-bc7b-781977962682
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Tue, 13 Aug 2024 18:35:12 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2283974,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:35:13 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "matchScore": 181.37788}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "348"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:35:19 GMT
+        Via:
+          - 1.1 5a0e8b615e213d3d5cc20b095e088b16.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - xPUd91qaqbhIVuKSveghxDni1dbLiULD94fqrTUnVZNi8MKuDzRiPA==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cdcXOFbhPHcEVtA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "348"
+        x-amzn-Remapped-Date:
+          - Tue, 13 Aug 2024 18:35:19 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - f987b3c4-dbaf-44b3-8e1d-c5dc8c821658
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Tue, 13 Aug 2024 18:35:19 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2283974,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:35:20 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "matchScore": 181.37788}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "348"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:35:30 GMT
+        Via:
+          - 1.1 170caffbbbc9abe2c5fd15f4f58b75b4.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - ZTE52QH0cvC-EQoaxr6Eld61DOWduPUYH5XunbuAzqJ89FeSfkePDw==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cdcYTFtAvHcEffA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "348"
+        x-amzn-Remapped-Date:
+          - Tue, 13 Aug 2024 18:35:30 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 1b823d40-9ea2-4f0b-b405-3fa6984154c4
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Tue, 13 Aug 2024 18:35:30 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=test@example.com&select=DOI,title
+    response:
+      body:
+        string:
+          '{"status":"failed","message-type":"validation-failure","message":[{"type":"parameter-not-allowed","value":"select","message":"This
+          route does not support select"}]}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json;charset=utf-8
+        Date:
+          - Tue, 13 Aug 2024 18:35:30 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        Vary:
+          - Accept
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=externalIds,title
+    response:
+      body:
+        string:
+          '{"paperId": "e0d2719e49ad216f98ed640864cdacd1c20f53e6", "externalIds":
+          {"DOI": "10.1007/s40278-023-41815-2", "CorpusId": 259225376}, "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin"}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "197"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 13 Aug 2024 18:35:30 GMT
+        Via:
+          - 1.1 b3169f8fae0104e39a0a9728b6537e08.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - BMX9JmQMQSa_4OWVgqZz3d2oDuamu6qnA6eTt087wqu-kvspzMk4-A==
+        X-Amz-Cf-Pop:
+          - IAD55-P4
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - cdcZ9F1TPHcEYkQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "197"
+        x-amzn-Remapped-Date:
+          - Tue, 13 Aug 2024 18:35:30 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 74d91639-902f-4321-9e57-cb8301b2f50b
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
+          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
+          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
+          pages={145\u2013145} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Tue, 13 Aug 2024 18:35:31 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1
