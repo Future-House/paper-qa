@@ -57,7 +57,7 @@ structured_citation_prompt = (
     "Extract the title, authors, and doi as a JSON from this MLA citation. "
     "If any field can not be found, return them as null. "
     "Use title, authors, and doi as keys, author's value should be a list of authors. "
-    "{text}\n\n"
+    "{citation}\n\n"
     "Citation JSON:"
 )
 

@@ -448,7 +448,7 @@ class Docs(BaseModel):
                 prompt=self.prompts.structured_cite,
                 skip_system=True,
             )
-            chain_result = await structured_cite_chain({"text": citation}, None)
+            chain_result = await structured_cite_chain({"citation": citation}, None)
             with contextlib.suppress(json.JSONDecodeError):
                 citation_json = json.loads(chain_result.text)
                 if citation_title := citation_json.get("title"):
