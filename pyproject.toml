@@ -217,11 +217,11 @@ max-doc-length = 120  # Match line-length
 # defaults when analyzing docstring sections.
 convention = "google"
 
-[tool.setuptools.dynamic.optional-dependencies.agents]
-file = ["agent-requirements.txt"]
-
-[tool.setuptools.dynamic.optional-dependencies.dev]
-file = ["dev-requirements.txt"]
+[tool.setuptools.dynamic.optional-dependencies]
+agents = {file = ["agent-requirements.txt"]}
+all = {file = ["agent-requirements.txt", "dev-requirements.txt", "google-requirements.txt"]}
+dev = {file = ["dev-requirements.txt"]}
+google = {file = ["google-requirements.txt"]}
 
 [tool.setuptools.packages.find]
 include = ["paperqa*"]

@@ -99,6 +99,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
 
 
 @pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
+@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.asyncio()
 async def test_agent_types(agent_index_dir, agent_type):
 

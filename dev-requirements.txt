@@ -8,8 +8,6 @@ pyzotero
 requests
 sentence_transformers
 voyageai
-langchain-google-vertexai
-vertexai
 
 # Code QA dependencies
 build

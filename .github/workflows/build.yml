@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: 3.11
           cache: pip
-      - run: pip install .[dev]
+      - run: pip install .[all]
       - name: Build a binary wheel and a source tarball
         run: |
           python -m build --sdist --wheel --outdir dist/ .
