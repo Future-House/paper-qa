@@ -8,6 +8,8 @@ pyzotero
 requests
 sentence_transformers
 voyageai
+langchain-google-vertexai
+vertexai
 
 # Code QA dependencies
 build
@@ -15,8 +17,10 @@ mypy
 pre-commit
 pytest
 pytest-asyncio
+pytest-subtests
 pytest-sugar
 pytest-vcr
 pytest-timer
 types-requests
 types-setuptools
+types-PyYAML

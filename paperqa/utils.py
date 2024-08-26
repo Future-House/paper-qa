@@ -6,6 +6,7 @@ import inspect
 import json
 import logging
 import math
+import os
 import re
 import string
 from collections.abc import Iterable
@@ -367,15 +368,13 @@ def bibtex_field_extract(
 
 
 def create_bibtex_key(author: list[str], year: str, title: str) -> str:
-    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":"}
+    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
     author_rep = (
         author[0].split()[-1].casefold()
         if "Unknown" not in author[0]
         else "unknownauthors"
     )
-    key = (
-        f"{author_rep}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
-    )
+    key = f"{author_rep[:50]}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
     return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
 
 
@@ -419,3 +418,13 @@ async def _get_with_retrying(
 
 def union_collections_to_ordered_list(collections: Iterable) -> list:
     return sorted(reduce(lambda x, y: set(x) | set(y), collections))
+
+
+def pqa_directory(name: str) -> str:
+    directory = (
+        os.path.join(os.environ.get("PQA_HOME", ""), ".pqa", name)
+        if os.environ.get("PQA_HOME")
+        else os.path.join(os.path.expanduser("~"), ".pqa", name)
+    )
+    os.makedirs(directory, exist_ok=True)
+    return directory

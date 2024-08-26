@@ -390,6 +390,7 @@ class Docs(BaseModel):
         disable_check: bool = False,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        overlap: int = 250,
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
@@ -408,7 +409,7 @@ class Docs(BaseModel):
             )
             # peak first chunk
             fake_doc = Doc(docname="", citation="", dockey=dockey)
-            texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
+            texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=overlap)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
             chain_result = await cite_chain({"text": texts[0].text}, None)
@@ -450,7 +451,10 @@ class Docs(BaseModel):
             )
             chain_result = await structured_cite_chain({"citation": citation}, None)
             with contextlib.suppress(json.JSONDecodeError):
-                citation_json = json.loads(chain_result.text)
+                clean_text = chain_result.text.strip("`")
+                if clean_text.startswith("json"):
+                    clean_text = clean_text.replace("json", "", 1)
+                citation_json = json.loads(clean_text)
                 if citation_title := citation_json.get("title"):
                     title = citation_title
                 if citation_doi := citation_json.get("doi"):
@@ -492,7 +496,7 @@ class Docs(BaseModel):
             or (not disable_check and not maybe_is_text(texts[0].text))
         ):
             raise ValueError(
-                f"This does not look like a text document: {path}. Path disable_check to ignore this error."
+                f"This does not look like a text document: {path}. Pass disable_check to ignore this error."
             )
         if await self.aadd_texts(texts, doc):
             return docname

@@ -887,7 +887,7 @@ def llm_model_factory(llm: str) -> LLMModel:
     if llm != "default":
         if is_openai_model(llm):
             return OpenAILLMModel(config={"model": llm})
-        elif llm.startswith("langchain"):  # noqa: RET505
+        elif llm.startswith("langchain") or "gemini" in llm:  # noqa: RET505
             return LangchainLLMModel()
         elif "claude" in llm:
             return AnthropicLLMModel(config={"model": llm})

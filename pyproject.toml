@@ -41,6 +41,9 @@ readme = "README.md"
 requires-python = ">=3.8"
 urls = {repository = "https://github.com/whitead/paper-qa"}
 
+[project.scripts]
+pqa = "paperqa.agents:app"
+
 [tool.codespell]
 check-filenames = true
 check-hidden = true
@@ -137,7 +140,6 @@ extend-select = [
     "PLR6201",
     "PLW0108",
     "RUF022",
-    "RUF025",
 ]
 # List of rule codes that are unsupported by Ruff, but should be preserved when
 # (e.g.) validating # noqa directives. Useful for retaining # noqa directives
@@ -214,6 +216,9 @@ max-doc-length = 120  # Match line-length
 # Whether to use Google-style or NumPy-style conventions or the PEP257
 # defaults when analyzing docstring sections.
 convention = "google"
+
+[tool.setuptools.dynamic.optional-dependencies.agents]
+file = ["agent-requirements.txt"]
 
 [tool.setuptools.dynamic.optional-dependencies.dev]
 file = ["dev-requirements.txt"]

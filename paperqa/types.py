@@ -9,6 +9,7 @@ from uuid import UUID, uuid4
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
+from pybtex.scanner import PybtexSyntaxError
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -360,6 +361,7 @@ class DocDetails(Doc):
     doi: str | None = None
     doi_url: str | None = None
     doc_id: str | None = None
+    file_location: str | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
@@ -375,6 +377,10 @@ class DocDetails(Doc):
     @staticmethod
     def lowercase_doi_and_populate_doc_id(data: dict[str, Any]) -> dict[str, Any]:
         if doi := data.get("doi"):
+            remove_urls = ["https://doi.org/", "http://dx.doi.org/"]
+            for url in remove_urls:
+                if doi.startswith(url):
+                    doi = doi.replace(url, "")
             data["doi"] = doi.lower()
             data["doc_id"] = encode_id(doi.lower())
         else:
@@ -423,6 +429,16 @@ class DocDetails(Doc):
             data["doi_url"] = doi_url.replace(
                 "http://dx.doi.org/", "https://doi.org/"
             ).lower()
+
+        return data
+
+    @staticmethod
+    def remove_invalid_authors(data: dict[str, Any]) -> dict[str, Any]:
+        """Capture and cull strange author names."""
+        if authors := data.get("authors"):
+            data["authors"] = [
+                a for a in authors if a.lower() not in {"et al", "et al."}
+            ]
 
         return data
 
@@ -477,10 +493,13 @@ class DocDetails(Doc):
                         data["other"]["bibtex_source"] = ["self_generated"]
                 else:
                     data["other"] = {"bibtex_source": ["self_generated"]}
-
-                existing_entry = next(
-                    iter(Parser().parse_string(data["bibtex"]).entries.values())
-                )
+                try:
+                    existing_entry = next(
+                        iter(Parser().parse_string(data["bibtex"]).entries.values())
+                    )
+                except PybtexSyntaxError:
+                    logger.warning(f"Failed to parse bibtex for {data['bibtex']}")
+                    existing_entry = None
 
             entry_data = {
                 "title": data.get("title") or CITATION_FALLBACK_DATA["title"],
@@ -505,7 +524,9 @@ class DocDetails(Doc):
             }
             entry_data = {k: v for k, v in entry_data.items() if v}
             try:
-                new_entry = Entry(data.get("bibtex_type", "article"), fields=entry_data)
+                new_entry = Entry(
+                    data.get("bibtex_type", "article") or "article", fields=entry_data
+                )
                 if existing_entry:
                     new_entry = cls.merge_bibtex_entries(existing_entry, new_entry)
                 # add in authors manually into the entry
@@ -519,7 +540,9 @@ class DocDetails(Doc):
                 if data.get("overwrite_fields_from_metadata", True):
                     data["citation"] = None
             except Exception:
-                logger.exception(f"Failed to generate bibtex for {data}")
+                logger.warning(
+                    f"Failed to generate bibtex for {data.get('docname') or data.get('citation')}"
+                )
         if not data.get("citation"):
             data["citation"] = format_bibtex(
                 data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
@@ -530,6 +553,7 @@ class DocDetails(Doc):
     @classmethod
     def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
         data = cls.lowercase_doi_and_populate_doc_id(data)
+        data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
         data = cls.inject_clean_doi_url_into_data(data)
         data = cls.populate_bibtex_key_citation(data)
@@ -646,7 +670,9 @@ class DocDetails(Doc):
                 # pre-prints / arXiv versions of papers that are not as up-to-date
                 merged_data[field] = (
                     other_value
-                    if (other_value is not None and PREFER_OTHER)
+                    if (
+                        (other_value is not None and other_value != []) and PREFER_OTHER
+                    )
                     else self_value
                 )
 

@@ -1,0 +1,9 @@
+anyio
+tenacity
+tantivy
+typer
+typing_extensions
+langchain-community
+langchain-openai
+pymupdf
+requests

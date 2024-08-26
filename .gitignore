@@ -137,3 +137,5 @@ env
 # Matching pyproject.toml
 paperqa/version.py
 tests/example*
+tests/test_index/*
+.DS_Store

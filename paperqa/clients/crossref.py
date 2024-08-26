@@ -14,6 +14,7 @@ from ..clients.exceptions import DOINotFoundError
 from ..types import CITATION_FALLBACK_DATA, DocDetails
 from ..utils import (
     bibtex_field_extract,
+    create_bibtex_key,
     remove_substrings,
     strings_similarity,
     union_collections_to_ordered_list,
@@ -136,7 +137,9 @@ async def doi_to_bibtex(
     ]
     # replace the key if all the fragments are present
     if all(fragments):
-        new_key = remove_substrings(("".join(fragments)), FORBIDDEN_KEY_CHARACTERS)
+        new_key = create_bibtex_key(
+            author=fragments[0].split(), year=fragments[1], title=fragments[2]
+        )
     # we use the count parameter below to ensure only the 1st entry is replaced
     return data.replace(key, new_key, 1)
 
