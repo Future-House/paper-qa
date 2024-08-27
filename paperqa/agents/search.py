@@ -235,47 +235,37 @@ class SearchIndex:
 
         # Success
 
-    async def remove_from_index(
-        self, file_location: str, semaphore: anyio.Semaphore, max_retries: int = 1000
-    ):
-        @retry(
-            stop=stop_after_attempt(max_retries),
-            wait=wait_random_exponential(multiplier=0.25, max=60),
-            retry=retry_if_exception_type(AsyncRetryError),
-            reraise=True,
-        )
-        async def _remove_from_index_with_retry():
-            index_files = await self.index_files
-            if index_files.get(file_location):
-                try:
-                    index = await self.index
-                    writer = index.writer()
-                    writer.delete_documents("file_location", file_location)
-                    writer.commit()
+    @staticmethod
+    @retry(
+        stop=stop_after_attempt(1000),
+        wait=wait_random_exponential(multiplier=0.25, max=60),
+        retry=retry_if_exception_type(AsyncRetryError),
+        reraise=True,
+    )
+    def delete_document(index: Index, file_location: str):
+        try:
+            writer = index.writer()
+            writer.delete_documents("file_location", file_location)
+            writer.commit()
+        except ValueError as e:
+            if "Failed to acquire Lockfile: LockBusy." in str(e):
+                raise AsyncRetryError("Failed to acquire lock") from e
+            raise
 
-                    filehash = index_files.pop(file_location)
-                    docs_index_dir = await self.docs_index_directory
-                    await (
-                        docs_index_dir / f"{filehash}.{self.storage.extension()}"
-                    ).unlink()
+    async def remove_from_index(self, file_location: str):
+        index_files = await self.index_files
+        if index_files.get(file_location):
+            index = await self.index
+            self.delete_document(index, file_location)
+            filehash = index_files.pop(file_location)
+            docs_index_dir = await self.docs_index_directory
+            # TODO: since the directory is part of the filehash these
+            # are always missing. Unsure of how to get around this.
+            await (docs_index_dir / f"{filehash}.{self.storage.extension()}").unlink(
+                missing_ok=True
+            )
 
-                    self.changed = True
-                except ValueError as e:
-                    if "Failed to acquire Lockfile: LockBusy." in str(e):
-                        raise AsyncRetryError("Failed to acquire lock") from e
-                    raise
-
-        async with semaphore:
-            try:
-                await _remove_from_index_with_retry()
-            except RetryError:
-                logger.exception(
-                    f"Failed to remove document from index after {max_retries} attempts: {file_location}"
-                )
-                raise
-
-            # Success
-            return
+            self.changed = True
 
     async def save_index(self):
         file_index_path = await self.file_index_filename
@@ -465,14 +455,12 @@ async def get_directory_index(
 
     if missing := (set(index_files.keys()) - {str(f) for f in valid_files}):
         if sync_index_w_directory:
-            async with anyio.create_task_group() as tg:
-                for missing_file in missing:
-                    logger.warning(
-                        f"[bold red]Removing {missing_file} from index.[/bold red]"
-                    )
-                    tg.start_soon(
-                        search_index.remove_from_index, missing_file, semaphore
-                    )
+            for missing_file in missing:
+                logger.warning(
+                    f"[bold red]Removing {missing_file} from index.[/bold red]"
+                )
+                await search_index.remove_from_index(missing_file)
+            logger.warning("[bold red]Files removed![/bold red]")
         else:
             logger.warning(
                 f"[bold red]Indexed files are missing from index folder ({directory}).[/bold red]"

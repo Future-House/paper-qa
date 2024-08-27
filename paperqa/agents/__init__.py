@@ -20,7 +20,7 @@ try:
     from rich.console import Console
     from rich.logging import RichHandler
 
-    from .main import aagent_query, asearch
+    from .main import aagent_query, asearch, configure_agent_logging
     from .models import AnswerResponse, MismatchedModelsError, QueryRequest
     from .search import SearchIndex, get_directory_index
 
@@ -273,8 +273,10 @@ def clear(
     ],
     index: Annotated[
         bool,
-        typer.Argument(
-            help="index flag to indicate that this index name should be cleared."
+        typer.Option(
+            "--index",
+            is_flag=True,
+            help="index flag to indicate that this index name should be cleared.",
         ),
     ] = False,
 ) -> None:
@@ -433,6 +435,9 @@ def build_index(
             )
         ),
     ] = None,
+    verbosity: Annotated[
+        int, typer.Argument(help=("Level of verbosity from 0->2 (inclusive)"))
+    ] = 0,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
     to_merge = {}
@@ -451,6 +456,8 @@ def build_index(
             to_merge = {"agent_tools": {"manifest_file": manifest_file}}
         else:
             to_merge["agent_tools"].update({"manifest_file": manifest_file})
+
+    configure_agent_logging(verbosity)
 
     request_settings = QueryRequest(
         query="",
