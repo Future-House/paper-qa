@@ -339,11 +339,10 @@ async def run_langchain_agent(
     async with profiler.timer("agent-accounting"):
         # TODO: move agent trace to LangChain callback
         if "Agent stopped" in call_response["output"]:
-            # Log that this agent has gone over timeout
+            # Log that this agent has gone over timeout, and then answer directly
             logger.warning(
                 f"Agent timeout after {query.agent_tools.timeout}-sec, just answering."
             )
-            # just call the tool
             await answer_tool.arun(answer.question)
             agent_status = AgentStatus.TIMEOUT
 
