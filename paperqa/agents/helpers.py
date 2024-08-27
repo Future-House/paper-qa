@@ -12,7 +12,7 @@ from .tools import get_year
 logger = logging.getLogger(__name__)
 
 
-async def search_chain(
+async def openai_get_search_query(
     question: str,
     count: int,
     template: str | None = None,

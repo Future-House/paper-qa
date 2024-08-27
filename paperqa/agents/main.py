@@ -17,8 +17,8 @@ from rich.table import Table
 from ..docs import Docs
 from ..types import Answer
 from ..utils import pqa_directory
-from .chains import search_chain
 from .docs import update_doc_models
+from .helpers import openai_get_search_query
 from .models import (
     AgentCallback,
     AgentStatus,
@@ -216,7 +216,9 @@ async def run_fake_agent(
         ),
     )
     # seed docs with keyword search
-    for search in await search_chain(answer.question, llm=query.llm, count=3):
+    for search in await openai_get_search_query(
+        answer.question, llm=query.llm, count=3
+    ):
         await search_tool.arun(search)
 
     await gather_evidence_tool.arun(tool_input=answer.question)
