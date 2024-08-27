@@ -7,7 +7,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import Enum
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Collection, assert_never
 from uuid import UUID, uuid4
 
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -79,7 +79,7 @@ class AgentStatus(str, Enum):
 class AgentPromptCollection(BaseModel):
     """Configuration for the agent."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     agent_system_prompt: str | None = Field(
         # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215
@@ -126,7 +126,7 @@ class AgentPromptCollection(BaseModel):
     search_count: int = 8
     wipe_context_on_answer_failure: bool = True
     timeout: float = Field(
-        default=500,
+        default=500.0,
         description=(
             "Matches LangChain AgentExecutor.max_execution_time (seconds), the timeout"
             " on agent execution."
@@ -140,7 +140,7 @@ class AgentPromptCollection(BaseModel):
         default=None,
         description="Optional keyword argument configuration for the agent.",
     )
-    tool_names: set[str] | list[str] | None = Field(
+    tool_names: Collection[str] | None = Field(
         default=None,
         description=(
             "Optional override on the tools to provide the agent. Leaving as the"
@@ -174,7 +174,7 @@ class ParsingOptions(str, Enum):
     def get_parse_type(self, config: ParsingConfiguration) -> str:
         if self == ParsingOptions.PAPERQA_DEFAULT:
             return config.parser_version_string
-        return None  # type: ignore[unreachable]
+        assert_never()
 
 
 class ChunkingOptions(str, Enum):
@@ -213,7 +213,7 @@ class ParsingConfiguration(BaseModel):
                 f"{self.parser_version_string}|{chunking_selection.value}"
                 f"|tokens={self.chunksize}|overlap={self.overlap}"
             )
-        return None  # type: ignore[unreachable]
+        assert_never()
 
     @property
     def parser_version_string(self) -> str:
@@ -277,8 +277,7 @@ class QueryRequest(BaseModel):
     _docs_name: str | None = PrivateAttr(default=None)
 
     # strict validation for now
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
     @computed_field  # type: ignore[misc]
     @property
@@ -289,7 +288,7 @@ class QueryRequest(BaseModel):
     def llm_models_must_match(self) -> QueryRequest:
         llm = llm_model_factory(self.llm)
         summary_llm = llm_model_factory(self.summary_llm)
-        if type(llm) != type(summary_llm):
+        if type(llm) is not type(summary_llm):
             raise MismatchedModelsError(
                 f"Answer LLM and summary LLM types must match: {type(llm)} != {type(summary_llm)}"
             )

@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import shutil
 from pathlib import Path
+from typing import Generator
 
 import pytest
 from dotenv import load_dotenv
@@ -25,24 +26,24 @@ def vcr_config():
     }
 
 
-@pytest.fixture()
-def unique_tmp_subfolder(tmp_path):
+@pytest.fixture
+def tmp_path_cleanup(tmp_path: Path) -> Generator[Path, None, None]:
     yield tmp_path
     # Cleanup after the test
     if tmp_path.exists():
         shutil.rmtree(tmp_path, ignore_errors=True)
 
 
-@pytest.fixture()
-def agent_module_dir(unique_tmp_subfolder, monkeypatch):
+@pytest.fixture
+def agent_module_dir(tmp_path_cleanup, monkeypatch) -> Path:
     """Set up a unique temporary folder for the agent module."""
-    monkeypatch.setenv("PQA_HOME", str(unique_tmp_subfolder))
-    importlib.reload(paperqa.agents)
-    return unique_tmp_subfolder
+    monkeypatch.setenv("PQA_HOME", str(tmp_path_cleanup))
+    importlib.reload(paperqa.agents)  # type: ignore[attr-defined]
+    return tmp_path_cleanup
 
 
-@pytest.fixture()
-def agent_index_dir(agent_module_dir):
+@pytest.fixture
+def agent_index_dir(agent_module_dir: Path) -> str:
     return str(agent_module_dir / ".pqa/indexes")
 
 

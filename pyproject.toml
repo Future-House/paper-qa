@@ -29,17 +29,59 @@ dependencies = [
     "tiktoken>=0.4.0",
 ]
 description = "LLM Chain for answering questions from docs"
-dynamic = ["optional-dependencies", "version"]
+dynamic = ["version"]
 keywords = ["question answering"]
 license = {file = "LICENSE"}
 maintainers = [
     {email = "jamesbraza@gmail.com", name = "James Braza"},
+    {email = "michael.skarlinski@gmail.com", name = "Michael Skarlinski"},
     {email = "white.d.andrew@gmail.com", name = "Andrew White"},
 ]
 name = "paper-qa"
 readme = "README.md"
 requires-python = ">=3.8"
 urls = {repository = "https://github.com/whitead/paper-qa"}
+
+[project.optional-dependencies]
+agents = [
+    "anyio",
+    "langchain-community",
+    "langchain-openai",
+    "pymupdf",
+    "requests",
+    "tantivy",
+    "tenacity",
+    "typer",
+    "typing_extensions",
+]
+dev = [
+    "anthropic",
+    "build",
+    "faiss-cpu",
+    "langchain-community",
+    "langchain-openai",
+    "mypy",
+    "pre-commit",
+    "pymupdf",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-subtests",
+    "pytest-sugar",
+    "pytest-timer",
+    "pytest-vcr",
+    "python-dotenv",
+    "pyzotero",
+    "requests",
+    "sentence_transformers",
+    "types-PyYAML",
+    "types-requests",
+    "types-setuptools",
+    "voyageai",
+]
+google = [
+    "langchain-google-vertexai",
+    "vertexai",
+]
 
 [project.scripts]
 pqa = "paperqa.agents:app"
@@ -118,6 +160,7 @@ unsafe-fixes = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
+    "C420",
     "FURB110",
     "FURB113",
     "FURB116",
@@ -216,12 +259,6 @@ max-doc-length = 120  # Match line-length
 # Whether to use Google-style or NumPy-style conventions or the PEP257
 # defaults when analyzing docstring sections.
 convention = "google"
-
-[tool.setuptools.dynamic.optional-dependencies]
-agents = {file = ["agent-requirements.txt"]}
-all = {file = ["agent-requirements.txt", "dev-requirements.txt", "google-requirements.txt"]}
-dev = {file = ["dev-requirements.txt"]}
-google = {file = ["google-requirements.txt"]}
 
 [tool.setuptools.packages.find]
 include = ["paperqa*"]
