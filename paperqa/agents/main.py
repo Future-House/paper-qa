@@ -239,6 +239,7 @@ async def run_langchain_agent(
     docs: Docs,
     agent_type: str,
     profiler: SimpleProfiler,
+    timeout: float | None = None,  # noqa: ASYNC109
 ) -> tuple[Answer, AgentStatus]:
     answer = Answer(question=query.query, dockey_filter=set(), id=query.id)
     shared_callbacks: list[BaseCallbackHandler] = [
@@ -276,7 +277,9 @@ async def run_langchain_agent(
         logger.debug("Skipping search tool before agent choice.")
 
     llm = ChatOpenAI(
-        model=query.agent_llm, request_timeout=300, temperature=query.temperature
+        model=query.agent_llm,
+        request_timeout=timeout or query.agent_tools.timeout / 2.0,
+        temperature=query.temperature,
     )
     agent_status = AgentStatus.SUCCESS
     cost_callback = OpenAICallbackHandler()
