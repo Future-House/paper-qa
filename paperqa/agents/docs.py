@@ -21,9 +21,9 @@ from .models import (
     QueryRequest,
 )
 
-USE_VERTEX = True
 try:
     from langchain_google_vertexai import ChatVertexAI, HarmBlockThreshold, HarmCategory
+    USE_VERTEX = True
 except ImportError:
     USE_VERTEX = False
 
