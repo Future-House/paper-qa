@@ -51,11 +51,8 @@ class RobustEncoder(json.JSONEncoder):
 
 
 class SearchDocumentStorage(str, Enum):
-    # FAIL - no answer could be generated
     JSON_MODEL_DUMP = "json_model_dump"
-    # SUCCESS - answer was generated
     PICKLE_COMPRESSED = "pickle_compressed"
-    # TIMEOUT - agent took too long, but an answer was generated
     PICKLE_UNCOMPRESSED = "pickle_uncompressed"
 
     def extension(self) -> str:
