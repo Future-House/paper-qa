@@ -72,6 +72,7 @@ async def test_get_directory_index(agent_index_dir):
     ], "Incorrect fields in index"
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
+    # added docs.keys come from md5 hash of the file location
     assert results[0].docs.keys() == {"dab5b86dea3bd4c7ffe05a9f33ae95f7"}
 
 
@@ -89,6 +90,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
         "body",
         "year",
     ], "Incorrect fields in index"
+    # 4 = example.txt + example2.txt + paper.pdf + example.html
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Barack Obama?")
     top_result = next(iter(results[0].docs.values()))
