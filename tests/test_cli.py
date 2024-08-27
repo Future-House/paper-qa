@@ -125,11 +125,11 @@ def test_cli_ask(agent_index_dir: Path):
 
 def test_cli_index(agent_index_dir: Path, caplog):
 
-    _ = build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
+    build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
 
     caplog.clear()
 
-    _ = ask(
+    ask(
         "How can you use XAI for chemical property prediction?",
         directory=Path(__file__).parent,
         index_directory=agent_index_dir,
