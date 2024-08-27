@@ -28,7 +28,7 @@ try:
 
     from paperqa.agents import aagent_query
     from paperqa.agents.docs import (
-        compute_cost,
+        compute_total_model_token_cost,
         stream_answer,
         stream_evidence,
         stream_filter,
@@ -58,7 +58,7 @@ if SKIP_AGENT_TESTS:
 PAPER_DIRECTORY = str(Path(__file__).parent)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_get_directory_index(agent_index_dir):
     index = await get_directory_index(
         directory=anyio.Path(PAPER_DIRECTORY),
@@ -76,7 +76,7 @@ async def test_get_directory_index(agent_index_dir):
     assert results[0].docs.keys() == {"dab5b86dea3bd4c7ffe05a9f33ae95f7"}
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_get_directory_index_w_manifest(agent_index_dir):
     index = await get_directory_index(
         directory=anyio.Path(PAPER_DIRECTORY),
@@ -100,7 +100,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
 
 @pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_agent_types(agent_index_dir, agent_type):
 
     question = "How can you use XAI for chemical property prediction?"
@@ -124,7 +124,7 @@ async def test_agent_types(agent_index_dir, agent_type):
     assert response.answer.question == question
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_timeout(agent_index_dir):
     response = await aagent_query(
         QueryRequest(
@@ -146,7 +146,7 @@ async def test_timeout(agent_index_dir):
     assert "I cannot answer" in response.answer.answer
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_propagate_options(agent_index_dir) -> None:
     llm_name = "gpt-4o-mini"
     default_llm_names = {
@@ -200,7 +200,7 @@ async def test_propagate_options(agent_index_dir) -> None:
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_mixing_langchain_clients(caplog, agent_index_dir) -> None:
     docs = Docs()
     query = QueryRequest(
@@ -222,7 +222,7 @@ async def test_mixing_langchain_clients(caplog, agent_index_dir) -> None:
     ], "Expected clean logs"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_gather_evidence_rejects_empty_docs() -> None:
     # Patch GenerateAnswerTool._arun so that if this tool is chosen first, we
     # don't give a 'cannot answer' response. A 'cannot answer' response can
@@ -245,7 +245,7 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_agent_sharing_state(
     agent_test_kit, subtests: SubTests, agent_index_dir
 ) -> None:
@@ -386,7 +386,7 @@ def test_functions() -> None:
     ]
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_stream_filter(
     stub_paper_path_with_details: tuple[Path, dict],
 ) -> None:
@@ -406,7 +406,7 @@ async def test_stream_filter(
             assert len(result.dockey_filter) > 0, "Stream Filter: result not correct"  # type: ignore[arg-type]
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_stream_filter_custom_name(
     stub_paper_path_with_details: tuple[Path, dict],
 ) -> None:
@@ -420,7 +420,7 @@ async def test_stream_filter_custom_name(
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_stream_evidence(
     stub_paper_path_with_details: tuple[Path, dict],
 ) -> None:
@@ -471,7 +471,7 @@ def test_anthropic_model():
     answer = docs.query("Are COVID-19 vaccines effective?")
 
     # make sure we can compute cost with this model.
-    compute_cost(answer.token_counts)
+    compute_total_model_token_cost(answer.token_counts)
 
 
 def test_embeddings_anthropic():
@@ -495,7 +495,7 @@ def test_embeddings_anthropic():
     _ = docs.query("Are COVID-19 vaccines effective?")
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_gemini_model_construction(
     stub_paper_path_with_details: tuple[Path, dict],
 ) -> None:
@@ -518,7 +518,7 @@ async def test_gemini_model_construction(
     assert answer.contexts, "Gemini Model: no contexts returned"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_stream_answer(subtests: SubTests) -> None:
     request = QueryRequest(filter_extra_background=True)
     answer_txt = (

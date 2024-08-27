@@ -23,6 +23,7 @@ from .models import (
 
 try:
     from langchain_google_vertexai import ChatVertexAI, HarmBlockThreshold, HarmCategory
+
     USE_VERTEX = True
 except ImportError:
     USE_VERTEX = False
@@ -66,7 +67,7 @@ costs: dict[str, tuple[float, float]] = {
 }
 
 
-def get_cost(model: str, tokens: int, is_completion: bool) -> float:
+def compute_model_token_cost(model: str, tokens: int, is_completion: bool) -> float:
     if model in costs:  # Prefer our internal costs model
         model_costs: tuple[float, float] = costs[model]
     else:
@@ -75,14 +76,14 @@ def get_cost(model: str, tokens: int, is_completion: bool) -> float:
     return tokens * model_costs[int(is_completion)]
 
 
-def compute_cost(token_counts: dict[str, list[int]]) -> float:
+def compute_total_model_token_cost(token_counts: dict[str, list[int]]) -> float:
     """Sum the token counts for each model and return the total cost."""
     cost = 0.0
     for model, tokens in token_counts.items():
         if sum(tokens) > 0:
-            cost += get_cost(model, tokens=tokens[0], is_completion=False) + get_cost(
-                model, tokens=tokens[1], is_completion=True
-            )
+            cost += compute_model_token_cost(
+                model, tokens=tokens[0], is_completion=False
+            ) + compute_model_token_cost(model, tokens=tokens[1], is_completion=True)
     return cost
 
 
@@ -200,7 +201,7 @@ async def stream_cost(
                 token_counts[k][1] += v[1]
             else:
                 token_counts[k] = v
-    answer.cost = compute_cost(token_counts)
+    answer.cost = compute_total_model_token_cost(token_counts)
     return answer
 
 

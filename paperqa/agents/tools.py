@@ -20,7 +20,7 @@ from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to 
 )
 
 from .docs import (
-    compute_cost,
+    compute_total_model_token_cost,
     stream_answer,
     stream_evidence,
     stream_filter,
@@ -40,7 +40,7 @@ def get_year(ts: datetime | None = None) -> str:
 
 async def status(docs: Docs, answer: Answer, relevant_score_cutoff: int = 5) -> str:
     """Create a string that provides a summary of the input doc/answer."""
-    answer.cost = compute_cost(answer.token_counts)
+    answer.cost = compute_total_model_token_cost(answer.token_counts)
     return (
         f"Status: Paper Count={len(docs.docs)}"
         f" | Relevant Papers={len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
