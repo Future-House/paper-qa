@@ -371,7 +371,6 @@ async def asearch(
     ]
 
     if results:
-        # Create a Console object
         console = Console(record=True)
         # Render the table to a string
         console.print(table_formatter(results))
