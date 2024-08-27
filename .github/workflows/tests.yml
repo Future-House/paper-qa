@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: pip install .[agents,google,dev]
+      - run: pip install .[agents,google,dev,llms]
       - name: Check pre-commit
         run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
       - name: Run Test

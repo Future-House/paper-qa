@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: 3.11
           cache: pip
-      - run: pip install .[agents,google,dev]
+      - run: pip install .[agents,google,dev,llms]
       - name: Build a binary wheel and a source tarball
         run: |
           python -m build --sdist --wheel --outdir dist/ .

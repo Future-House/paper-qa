@@ -55,14 +55,9 @@ agents = [
     "typing_extensions",
 ]
 dev = [
-    "anthropic",
     "build",
-    "faiss-cpu",
-    "langchain-community",
-    "langchain-openai",
     "mypy",
     "pre-commit",
-    "pymupdf",
     "pytest",
     "pytest-asyncio",
     "pytest-subtests",
@@ -72,15 +67,22 @@ dev = [
     "python-dotenv",
     "pyzotero",
     "requests",
-    "sentence_transformers",
     "types-PyYAML",
     "types-requests",
     "types-setuptools",
-    "voyageai",
 ]
 google = [
     "langchain-google-vertexai",
     "vertexai",
+]
+llms = [
+    "anthropic",
+    "faiss-cpu",
+    "langchain-community",
+    "langchain-openai",
+    "pymupdf",
+    "sentence_transformers",
+    "voyageai",
 ]
 
 [project.scripts]
