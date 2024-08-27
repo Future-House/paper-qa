@@ -26,7 +26,7 @@ try:
 
 except ImportError as e:
     raise ImportError(
-        '"agents" module is not installed please install it using "pip install paperqa[agents]"'
+        '"agents" module is not installed please install it using "pip install paper-qa[agents]"'
     ) from e
 
 app = typer.Typer()
