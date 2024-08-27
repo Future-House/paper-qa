@@ -66,15 +66,6 @@ costs: dict[str, tuple[float, float]] = {
 }
 
 
-def get_llm_name(llm: Any) -> str:
-    if isinstance(llm, str):
-        return llm
-    try:
-        return llm.model_name
-    except AttributeError:
-        return llm.model
-
-
 def get_cost(model: str, tokens: int, is_completion: bool) -> float:
     if model in costs:  # Prefer our internal costs model
         model_costs: tuple[float, float] = costs[model]
