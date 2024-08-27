@@ -498,7 +498,7 @@ class DocDetails(Doc):
                         iter(Parser().parse_string(data["bibtex"]).entries.values())
                     )
                 except PybtexSyntaxError:
-                    logger.warning(f"Failed to parse bibtex for {data['bibtex']}")
+                    logger.warning(f"Failed to parse bibtex for {data['bibtex']}.")
                     existing_entry = None
 
             entry_data = {
