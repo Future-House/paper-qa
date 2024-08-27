@@ -16,7 +16,7 @@ async def search_chain(
     question: str,
     count: int,
     template: str | None = None,
-    llm: str = "gpt-3.5-turbo",
+    llm: str = "gpt-4o-mini",
     temperature: float = 1.0,
 ) -> list[str]:
     if isinstance(template, str):
