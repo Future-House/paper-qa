@@ -19,8 +19,6 @@ from paperqa.llms import LangchainLLMModel
 from paperqa.types import Answer, Context, Doc, PromptCollection, Text
 from paperqa.utils import get_year
 
-SKIP_AGENT_TESTS = False
-
 try:
     from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
     from langchain_openai import ChatOpenAI
@@ -48,6 +46,8 @@ try:
         PaperSearchTool,
         SharedToolState,
     )
+
+    SKIP_AGENT_TESTS = False
 except ImportError:
     SKIP_AGENT_TESTS = True
 
