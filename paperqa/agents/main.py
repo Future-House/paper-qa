@@ -230,7 +230,6 @@ async def run_fake_agent(
 LANGCHAIN_AGENT_TYPES: dict[str, type[BaseSingleActionAgent]] = {
     "ReactAgent": ZeroShotAgent,
     "OpenAIFunctionsAgent": OpenAIFunctionsAgent,
-    # "AutoGPT": AutoGPT can run forever so don't use now
 }
 
 
