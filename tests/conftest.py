@@ -35,7 +35,7 @@ def tmp_path_cleanup(tmp_path: Path) -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def agent_module_dir(tmp_path_cleanup, monkeypatch) -> Path:
+def agent_module_dir(tmp_path_cleanup: Path, monkeypatch) -> Path:
     """Set up a unique temporary folder for the agent module."""
     monkeypatch.setenv("PQA_HOME", str(tmp_path_cleanup))
     importlib.reload(paperqa.agents)
