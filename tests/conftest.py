@@ -38,13 +38,13 @@ def tmp_path_cleanup(tmp_path: Path) -> Generator[Path, None, None]:
 def agent_module_dir(tmp_path_cleanup, monkeypatch) -> Path:
     """Set up a unique temporary folder for the agent module."""
     monkeypatch.setenv("PQA_HOME", str(tmp_path_cleanup))
-    importlib.reload(paperqa.agents)  # type: ignore[attr-defined]
+    importlib.reload(paperqa.agents)
     return tmp_path_cleanup
 
 
 @pytest.fixture
-def agent_index_dir(agent_module_dir: Path) -> str:
-    return str(agent_module_dir / ".pqa/indexes")
+def agent_index_dir(agent_module_dir: Path) -> Path:
+    return agent_module_dir / ".pqa" / "indexes"
 
 
 @pytest.fixture(name="agent_test_kit")

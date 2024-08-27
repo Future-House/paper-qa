@@ -54,7 +54,7 @@ except ImportError:
 if SKIP_AGENT_TESTS:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
-PAPER_DIRECTORY = str(Path(__file__).parent)
+PAPER_DIRECTORY = Path(__file__).parent
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
         directory=anyio.Path(PAPER_DIRECTORY),
         index_name="pqa_index_0",
         index_directory=agent_index_dir,
-        manifest_file=anyio.Path(PAPER_DIRECTORY) / "test_manifest.csv",
+        manifest_file=anyio.Path(PAPER_DIRECTORY) / "stub_manifest.csv",
     )
     assert index.fields == [
         "title",
@@ -97,8 +97,8 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
     assert top_result.title == "Barack Obama (Wikipedia article)"
 
 
-@pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
+@pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
 @pytest.mark.asyncio
 async def test_agent_types(agent_index_dir, agent_type):
 

@@ -6,6 +6,7 @@ import operator
 import os
 import shutil
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -107,10 +108,12 @@ def pop_nested_dict_recursive(d: dict[str, Any], path: str) -> tuple[Any, bool]:
     return value, len(d) == 0
 
 
-def get_current_settings(settings_path: str | None = None) -> dict[str, Any]:
+def get_current_settings(
+    settings_path: str | os.PathLike | None = None,
+) -> dict[str, Any]:
 
     if settings_path is None:
-        settings_path = os.path.join(pqa_directory("settings"), "settings.yaml")
+        settings_path = pqa_directory("settings") / "settings.yaml"
 
     if os.path.exists(settings_path):
         with open(settings_path) as f:
@@ -140,11 +143,11 @@ def merge_dicts(dict_a: dict, dict_b: dict) -> dict:
 
 
 def get_merged_settings(
-    settings: dict[str, Any], settings_path: str | None = None
+    settings: dict[str, Any], settings_path: Path | None = None
 ) -> dict[str, Any]:
     """Merges a new settings with the current settings saved to file."""
     if settings_path is None:
-        settings_path = os.path.join(pqa_directory("settings"), "settings.yaml")
+        settings_path = pqa_directory("settings") / "settings.yaml"
 
     current_settings = get_current_settings(settings_path)
 
@@ -173,7 +176,7 @@ def set_setting(
     ],
 ) -> bool:
     """Set a persistent PaperQA setting."""
-    settings_path = os.path.join(pqa_directory("settings"), "settings.yaml")
+    settings_path = pqa_directory("settings") / "settings.yaml"
 
     current_settings = get_merged_settings(
         parse_dot_to_dict(variable, value), settings_path=settings_path
@@ -217,13 +220,13 @@ def show(
     # handle special case when user wants to see indexes
     if variable == "indexes":
         for index in os.listdir(pqa_directory("indexes")):
-            index_times = get_file_times(os.path.join(pqa_directory("indexes"), index))
+            index_times = get_file_times(pqa_directory("indexes") / index)
             logger.info(f"{index}, {index_times}")
         return os.listdir(pqa_directory("indexes"))
 
     if variable == "answers":
         all_answers = []
-        answer_file_location = pqa_directory("indexes") + "/answers/docs"
+        answer_file_location = pqa_directory("indexes") / "answers" / "docs"
         if os.path.exists(answer_file_location):
             for answer_file in os.listdir(answer_file_location):
                 all_answers.append(
@@ -241,9 +244,7 @@ def show(
                 )
         return all_answers
 
-    current_settings = get_current_settings(
-        os.path.join(pqa_directory("settings"), "settings.yaml")
-    )
+    current_settings = get_current_settings(pqa_directory("settings") / "settings.yaml")
 
     if variable == "all":
         logger.info(current_settings)
@@ -281,7 +282,7 @@ def clear(
     ] = False,
 ) -> None:
     """Clear a persistent PaperQA setting, include the --index flag to remove an index."""
-    settings_path = os.path.join(pqa_directory("settings"), "settings.yaml")
+    settings_path = pqa_directory("settings") / "settings.yaml"
 
     current_settings = get_current_settings(settings_path)
 
@@ -292,7 +293,7 @@ def clear(
         logger.info(f"{variable} cleared!")
 
     elif variable in os.listdir(pqa_directory("indexes")):
-        shutil.rmtree(os.path.join(pqa_directory("indexes"), variable))
+        shutil.rmtree(pqa_directory("indexes") / variable)
         logger.info(f"Index {variable} cleared!")
     else:
         logger.info(f"Index {variable} not found!")
@@ -315,11 +316,11 @@ def ask(
         int, typer.Argument(help=("Level of verbosity from 0->2 (inclusive)"))
     ] = 0,
     directory: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(help=("Directory of papers or documents to run PaperQA over.")),
     ] = None,
     index_directory: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(
             help=(
                 "Index directory to store paper index and answers. Default will be `~/.pqa`"
@@ -327,7 +328,7 @@ def ask(
         ),
     ] = None,
     manifest_file: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(
             help=(
                 "Optional manifest file (CSV) location to map relative a "
@@ -363,7 +364,7 @@ def ask(
         query=query,
         **get_merged_settings(
             to_merge,
-            settings_path=os.path.join(pqa_directory("settings"), "settings.yaml"),
+            settings_path=pqa_directory("settings") / "settings.yaml",
         ),
     )
 
@@ -391,7 +392,7 @@ def search_query(
         ),
     ] = "answers",
     index_directory: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(
             help=(
                 "Index directory to store paper index and answers. Default will be `~/.pqa`"
@@ -413,11 +414,11 @@ def search_query(
 @app.command("index")
 def build_index(
     directory: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(help=("Directory of papers or documents to run PaperQA over.")),
     ] = None,
     index_directory: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(
             help=(
                 "Index directory to store paper index and answers. Default will be `~/.pqa`"
@@ -425,7 +426,7 @@ def build_index(
         ),
     ] = None,
     manifest_file: Annotated[
-        str | None,
+        Path | None,
         typer.Argument(
             help=(
                 "Optional manifest file (CSV) location to map relative a "
@@ -463,7 +464,7 @@ def build_index(
         query="",
         **get_merged_settings(
             to_merge,
-            settings_path=os.path.join(pqa_directory("settings"), "settings.yaml"),
+            settings_path=pqa_directory("settings") / "settings.yaml",
         ),
     )
 

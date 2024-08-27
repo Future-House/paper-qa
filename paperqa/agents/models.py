@@ -3,10 +3,12 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Any, ClassVar, Collection, assert_never
 from uuid import UUID, uuid4
 
@@ -104,19 +106,19 @@ class AgentPromptCollection(BaseModel):
         "so you do not need to restate the answer and can simply terminate if the answer looks sufficient. "
         "The current status of evidence/papers/cost is {status}"
     )
-    paper_directory: str = Field(
-        default=".",
+    paper_directory: str | os.PathLike = Field(
+        default=Path("."),
         description=(
             "Local directory which contains the papers to be indexed and searched."
         ),
     )
-    index_directory: str | None = Field(
+    index_directory: str | os.PathLike | None = Field(
         default=None,
         description=(
             "Directory to store the PQA generated search index, configuration, and answer indexes."
         ),
     )
-    manifest_file: str | None = Field(
+    manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(
             "Optional manifest CSV, containing columns which are attributes for a DocDetails object. "
@@ -320,14 +322,14 @@ class QueryRequest(BaseModel):
 
     @staticmethod
     def get_index_name(
-        paper_directory: str,
+        paper_directory: str | os.PathLike,
         embedding: str,
         parsing_configuration: ParsingConfiguration,
     ) -> str:
 
         index_fields = "|".join(
             [
-                paper_directory,
+                str(paper_directory),
                 embedding,
                 str(parsing_configuration.chunksize),
                 str(parsing_configuration.overlap),

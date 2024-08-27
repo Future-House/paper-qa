@@ -87,7 +87,7 @@ class SearchIndex:
         self,
         fields: list[str] | None = None,
         index_name: str = "pqa_index",
-        index_directory: str | None = None,
+        index_directory: str | os.PathLike | None = None,
         storage: SearchDocumentStorage = SearchDocumentStorage.PICKLE_COMPRESSED,
     ):
         if fields is None:
@@ -331,7 +331,7 @@ async def maybe_get_manifest(filename: anyio.Path | None) -> dict[str, DocDetail
                 content = await file.read()
                 reader = csv.DictReader(StringIO(content))
                 records = [DocDetails(**row) for row in reader]
-                return {r.file_location: r for r in records if r.file_location}
+                return {str(r.file_location): r for r in records if r.file_location}
         except FileNotFoundError:
             logging.warning(f"Manifest file at {filename} could not be found.")
         except Exception:
@@ -411,7 +411,7 @@ async def get_directory_index(
     directory: anyio.Path,
     manifest_file: anyio.Path | None = None,
     index_name: str = "pqa_index",
-    index_directory: str | None = None,
+    index_directory: str | os.PathLike | None = None,
     sync_index_w_directory: bool = True,
     use_absolute_directory_path: bool = PQA_INDEX_ABSOLUTE_PATHS,
     max_concurrency: int = 30,

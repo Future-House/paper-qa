@@ -397,7 +397,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,
+    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
@@ -420,11 +420,11 @@ def union_collections_to_ordered_list(collections: Iterable) -> list:
     return sorted(reduce(lambda x, y: set(x) | set(y), collections))
 
 
-def pqa_directory(name: str) -> str:
-    directory = (
-        os.path.join(os.environ.get("PQA_HOME", ""), ".pqa", name)
-        if os.environ.get("PQA_HOME")
-        else os.path.join(os.path.expanduser("~"), ".pqa", name)
-    )
-    os.makedirs(directory, exist_ok=True)
+def pqa_directory(name: str) -> Path:
+    if pqa_home := os.environ.get("PQA_HOME"):
+        directory = Path(pqa_home) / ".pqa" / name
+    else:
+        directory = Path.home() / ".pqa" / name
+
+    directory.mkdir(parents=True, exist_ok=True)
     return directory

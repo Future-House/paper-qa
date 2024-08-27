@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 from datetime import datetime
 from typing import Any, Callable, ClassVar, Collection
@@ -361,12 +362,17 @@ class DocDetails(Doc):
     doi: str | None = None
     doi_url: str | None = None
     doc_id: str | None = None
-    file_location: str | None = None
+    file_location: str | os.PathLike | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
     )
     UNDEFINED_JOURNAL_QUALITY: ClassVar[int] = -1
+    DOI_URL_FORMATS: ClassVar[Collection[str]] = {
+        "https://doi.org/",
+        "http://dx.doi.org/",
+    }
+    AUTHOR_NAMES_TO_REMOVE: ClassVar[Collection[str]] = {"et al", "et al."}
 
     @field_validator("key")
     @classmethod
@@ -374,10 +380,10 @@ class DocDetails(Doc):
         # Replace HTML tags with empty string
         return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
 
-    @staticmethod
-    def lowercase_doi_and_populate_doc_id(data: dict[str, Any]) -> dict[str, Any]:
+    @classmethod
+    def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
         if doi := data.get("doi"):
-            remove_urls = ["https://doi.org/", "http://dx.doi.org/"]
+            remove_urls = cls.DOI_URL_FORMATS
             for url in remove_urls:
                 if doi.startswith(url):
                     doi = doi.replace(url, "")
@@ -425,6 +431,7 @@ class DocDetails(Doc):
         if doi and not doi_url:
             doi_url = "https://doi.org/" + doi
 
+        # ensure the modern doi url is used
         if doi_url:
             data["doi_url"] = doi_url.replace(
                 "http://dx.doi.org/", "https://doi.org/"
@@ -432,12 +439,12 @@ class DocDetails(Doc):
 
         return data
 
-    @staticmethod
-    def remove_invalid_authors(data: dict[str, Any]) -> dict[str, Any]:
+    @classmethod
+    def remove_invalid_authors(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Capture and cull strange author names."""
         if authors := data.get("authors"):
             data["authors"] = [
-                a for a in authors if a.lower() not in {"et al", "et al."}
+                a for a in authors if a.lower() not in cls.AUTHOR_NAMES_TO_REMOVE
             ]
 
         return data

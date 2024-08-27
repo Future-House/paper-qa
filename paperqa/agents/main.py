@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any, cast
 from unittest.mock import patch
 
@@ -86,7 +87,7 @@ async def aagent_query(
     docs: Docs | None = None,
     agent_type: str = "OpenAIFunctionsAgent",
     verbosity: int = 0,
-    index_directory: str | None = None,
+    index_directory: str | os.PathLike | None = None,
 ) -> AnswerResponse:
 
     configure_agent_logging(verbosity=verbosity)
@@ -351,7 +352,7 @@ async def run_langchain_agent(
 async def asearch(
     query: str,
     index_name: str = "answers",
-    index_directory: str | None = None,
+    index_directory: str | os.PathLike | None = None,
     verbosity: int = 0,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
 

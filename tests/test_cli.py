@@ -15,7 +15,7 @@ if SKIP_AGENT_TESTS:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
-def test_cli_set(agent_index_dir):  # noqa: ARG001
+def test_cli_set(agent_index_dir: Path):  # noqa: ARG001
 
     set_setting("temperature", "0.5")
     assert show("temperature") == "0.5", "Temperature not properly set"
@@ -44,8 +44,8 @@ def test_cli_set(agent_index_dir):  # noqa: ARG001
     ], "List setting not properly set"
 
 
-@pytest.mark.asyncio()
-async def test_cli_show(agent_index_dir):
+@pytest.mark.asyncio
+async def test_cli_show(agent_index_dir: Path):
 
     # make empty index
     assert show("indexes") == [], "No indexes should be present"
@@ -71,8 +71,8 @@ async def test_cli_show(agent_index_dir):
     assert show("answers") == [], "Answers should be empty"
 
 
-@pytest.mark.asyncio()
-async def test_cli_clear(agent_index_dir):
+@pytest.mark.asyncio
+async def test_cli_clear(agent_index_dir: Path):
 
     set_setting("temperature", "0.5")
     assert show("temperature") == "0.5", "Temperature not properly set"
@@ -95,14 +95,14 @@ async def test_cli_clear(agent_index_dir):
     assert show("indexes") == [], "Index not properly cleared"
 
 
-def test_cli_ask(agent_index_dir):
+def test_cli_ask(agent_index_dir: Path):
     set_setting("consider_sources", "10")
     set_setting("max_sources", "2")
     set_setting("embedding", "sparse")
     set_setting("agent_tools.search_count", "1")
     answer = ask(
         "How can you use XAI for chemical property prediction?",
-        directory=str(Path(__file__).parent),
+        directory=Path(__file__).parent,
         index_directory=agent_index_dir,
     )
     assert isinstance(answer, AnswerResponse), "Answer not properly returned"
@@ -123,17 +123,15 @@ def test_cli_ask(agent_index_dir):
     assert len(show("answers")) == 1, "An answer should be returned"
 
 
-def test_cli_index(agent_index_dir, caplog):
+def test_cli_index(agent_index_dir: Path, caplog):
 
-    _ = build_index(
-        directory=str(Path(__file__).parent), index_directory=agent_index_dir
-    )
+    _ = build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
 
     caplog.clear()
 
     _ = ask(
         "How can you use XAI for chemical property prediction?",
-        directory=str(Path(__file__).parent),
+        directory=Path(__file__).parent,
         index_directory=agent_index_dir,
     )
 
@@ -147,9 +145,7 @@ def test_cli_index(agent_index_dir, caplog):
     caplog.clear()
 
     # running again should not trigger any indexing
-    _ = build_index(
-        directory=str(Path(__file__).parent), index_directory=agent_index_dir
-    )
+    build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
 
     assert not caplog.records, "Indexing should not be triggered again"
 
@@ -157,8 +153,6 @@ def test_cli_index(agent_index_dir, caplog):
     set_setting("embedding", "sparse")
 
     # running again should now re-trigger an indexing
-    _ = build_index(
-        directory=str(Path(__file__).parent), index_directory=agent_index_dir
-    )
+    build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
 
     assert caplog.records, "Indexing should be triggered again"

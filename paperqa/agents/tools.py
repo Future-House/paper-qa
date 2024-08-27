@@ -2,6 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 import inspect
 import logging
+import os
 import re
 import sys
 from typing import ClassVar
@@ -95,9 +96,9 @@ class PaperSearchTool(BaseTool):
             )
         )
 
-    paper_directory: str = "."
-    index_directory: str | None = None
-    manifest_file: str | None = None
+    paper_directory: str | os.PathLike = "."
+    index_directory: str | os.PathLike | None = None
+    manifest_file: str | os.PathLike | None = None
     name: str = "paper_search"
     args_schema: type[BaseModelV1] | None = InputSchema
     description: str = (
