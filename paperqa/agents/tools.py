@@ -21,7 +21,6 @@ from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to 
 
 from .docs import (
     compute_total_model_token_cost,
-    stream_answer,
     stream_evidence,
     stream_filter,
 )
@@ -287,11 +286,22 @@ class GenerateAnswerTool(BaseTool):
         logger.info(f"Generating answer for '{question}'.")
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
-        self.shared_state.answer = await stream_answer(
-            self.shared_state.docs,
-            self.query,
-            self.shared_state.answer,
+        self.shared_state.answer.answer_length = self.query.length
+        self.shared_state.answer = await self.shared_state.docs.aquery(
+            self.query.query,
+            k=self.query.consider_sources,
+            max_sources=self.query.max_sources,
+            answer=self.shared_state.answer,
         )
+
+        if self.query.filter_extra_background:
+            # filter out "(Extra Background Information)" from the answer
+            self.shared_state.answer.answer = re.sub(
+                r"\([Ee]xtra [Bb]ackground [Ii]nformation\)",
+                "",
+                self.shared_state.answer.answer,
+            )
+
         if "cannot answer" in self.shared_state.answer.answer.lower():
             if self.wipe_context_on_answer_failure:
                 self.shared_state.answer.contexts = []

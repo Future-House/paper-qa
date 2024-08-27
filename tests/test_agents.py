@@ -29,7 +29,6 @@ try:
     from paperqa.agents import aagent_query
     from paperqa.agents.docs import (
         compute_total_model_token_cost,
-        stream_answer,
         stream_evidence,
         stream_filter,
         update_doc_models,
@@ -516,33 +515,6 @@ async def test_gemini_model_construction(
         Answer(question="Are COVID-19 vaccines effective?")
     )
     assert answer.contexts, "Gemini Model: no contexts returned"
-
-
-@pytest.mark.asyncio
-async def test_stream_answer(subtests: SubTests) -> None:
-    request = QueryRequest(filter_extra_background=True)
-    answer_txt = (
-        "This is a test answer (foo et al). "
-        "It sure is greaet (Extra background information).\n"
-    )
-    mock_answer = Answer(question="", answer=answer_txt)
-
-    with patch.object(Docs, "aquery", return_value=mock_answer):
-        docs = Docs(name="tmp")
-        with subtests.test(msg="filter-background-info"):
-            _ = await stream_answer(docs, request, mock_answer)
-            assert (
-                "(Extra background information)" not in mock_answer.answer
-            ), "Extra background information not filtered out"
-            assert "()" not in mock_answer.answer, "Garbage characters not filtered out"
-
-        with subtests.test(msg="no-filter-background-info"):
-            request = QueryRequest(filter_extra_background=False)
-            mock_answer.answer = answer_txt
-            _ = await stream_answer(docs, request, mock_answer)
-            assert (
-                "(Extra background information)" in mock_answer.answer
-            ), "Extra background information filtered out"
 
 
 def test_query_request_summary():

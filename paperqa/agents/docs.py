@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-import re
 from typing import Any
 
 from anthropic import AsyncAnthropic
@@ -85,29 +84,6 @@ def compute_total_model_token_cost(token_counts: dict[str, list[int]]) -> float:
                 model, tokens=tokens[0], is_completion=False
             ) + compute_model_token_cost(model, tokens=tokens[1], is_completion=True)
     return cost
-
-
-async def stream_answer(
-    docs: Docs,
-    request: QueryRequest,
-    answer: Answer,
-) -> Answer:
-    """Stream the answer to the socket and do post-processing on the answer."""
-    # ensure length is set correctly (it can be set in two ways)
-    answer.answer_length = request.length
-    answer = await docs.aquery(
-        request.query,
-        k=request.consider_sources,
-        max_sources=request.max_sources,
-        answer=answer,
-    )
-
-    if request.filter_extra_background:
-        # filter out "(Extra Background Information)" from the answer
-        answer.answer = re.sub(
-            r"\([Ee]xtra [Bb]ackground [Ii]nformation\)", "", answer.answer
-        )
-    return answer
 
 
 async def stream_filter(
