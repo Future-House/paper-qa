@@ -12,13 +12,12 @@ from langchain_core.callbacks import BaseCallbackHandler, BaseCallbackManager, C
 from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 from rich.console import Console
-from rich.table import Table
 
 from ..docs import Docs
 from ..types import Answer
 from ..utils import pqa_directory
 from .docs import update_doc_models
-from .helpers import openai_get_search_query
+from .helpers import openai_get_search_query, table_formatter
 from .models import (
     AgentCallback,
     AgentStatus,
@@ -349,34 +348,6 @@ async def run_langchain_agent(
             agent_status = AgentStatus.TIMEOUT
 
     return answer, agent_status
-
-
-def table_formatter(
-    objects: list[tuple[AnswerResponse | Docs, str]], max_chars_per_column: int = 2000
-) -> Table:
-    example_object, _ = objects[0]
-    if isinstance(example_object, AnswerResponse):
-        table = Table(title="Prior Answers")
-        table.add_column("Question", style="cyan")
-        table.add_column("Answer", style="magenta")
-        for obj, _ in objects:
-            table.add_row(
-                cast(AnswerResponse, obj).answer.question[:max_chars_per_column],
-                cast(AnswerResponse, obj).answer.answer[:max_chars_per_column],
-            )
-        return table
-    if isinstance(example_object, Docs):
-        table = Table(title="PDF Search")
-        table.add_column("Title", style="cyan")
-        table.add_column("File", style="magenta")
-        for obj, filename in objects:
-            table.add_row(
-                cast(Docs, obj).texts[0].doc.title[:max_chars_per_column], filename  # type: ignore[attr-defined]
-            )
-        return table
-    raise NotImplementedError(
-        f"Object type {type(example_object)} can not be converted to table."
-    )
 
 
 async def asearch(
