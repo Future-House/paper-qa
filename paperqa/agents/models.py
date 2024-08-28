@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import logging
 import os
 import time
@@ -28,16 +27,16 @@ from pydantic import (
 )
 from typing_extensions import Protocol
 
-import paperqa
-from paperqa import (
+from .. import (
     Answer,
     Context,
+    Doc,
     OpenAILLMModel,
     PromptCollection,
     Text,
     llm_model_factory,
 )
-
+from ..utils import hexdigest
 from ..version import __version__
 from .prompts import STATIC_PROMPTS
 
@@ -61,7 +60,7 @@ def strip_answer(answer: Answer):
             text=Text(
                 text="",
                 **c.text.model_dump(exclude={"text", "embedding", "doc"}),
-                doc=paperqa.Doc(**c.text.doc.model_dump(exclude={"embedding"})),
+                doc=Doc(**c.text.doc.model_dump(exclude={"embedding"})),
             ),
         )
         for c in answer.contexts
@@ -184,9 +183,9 @@ class ParsingOptions(str, Enum):
 class ChunkingOptions(str, Enum):
     SIMPLE_OVERLAP = "simple_overlap"
 
-    # Note that SIMPLE_OVERLAP must be valid for all by default
     @property
     def valid_parsings(self) -> list[ParsingOptions]:
+        # Note that SIMPLE_OVERLAP must be valid for all by default
         # TODO: implement for future parsing options
         valid_parsing_dict: dict[str, list[ParsingOptions]] = {}
         return valid_parsing_dict.get(self.value, [])
@@ -221,7 +220,7 @@ class ParsingConfiguration(BaseModel):
 
     @property
     def parser_version_string(self) -> str:
-        return f"paperqa-{paperqa.__version__}"
+        return f"paperqa-{__version__}"
 
     def is_chunking_valid_for_parsing(self, parsing: str):
         # must map the parsings because they won't include versions by default
@@ -242,8 +241,10 @@ class MismatchedModelsError(Exception):
 
 class QueryRequest(BaseModel):
     query: str = ""
-    # will be propagated to Answer
-    id: UUID = Field(default_factory=uuid4)
+    id: UUID = Field(
+        default_factory=uuid4,
+        description="Identifier which will be propagated to the Answer object.",
+    )
     llm: str = "gpt-4o-2024-08-06"
     agent_llm: str = Field(
         default="gpt-4o-2024-08-06",
@@ -339,9 +340,7 @@ class QueryRequest(BaseModel):
             ]
         )
 
-        return (
-            f"pqa_index_{hashlib.md5(index_fields.encode()).hexdigest()}"  # noqa: S324
-        )
+        return f"pqa_index_{hexdigest(index_fields)}"
 
 
 class AnswerResponse(BaseModel):

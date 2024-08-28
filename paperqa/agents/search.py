@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 import json
 import logging
 import os
@@ -26,7 +25,7 @@ from tenacity import (
 
 from ..docs import Docs
 from ..types import DocDetails
-from ..utils import pqa_directory
+from ..utils import hexdigest, pqa_directory
 from .models import SupportsPickle
 
 logger = logging.getLogger(__name__)
@@ -178,7 +177,7 @@ class SearchIndex:
 
     @staticmethod
     def filehash(body: str) -> str:
-        return hashlib.md5(body.encode("utf-8")).hexdigest()  # noqa: S324
+        return hexdigest(body)
 
     async def filecheck(self, filename: str, body: str | None = None):
         filehash = None

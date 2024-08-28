@@ -93,11 +93,15 @@ def count_pdf_pages(file_path: StrPath) -> int:
     return num_pages
 
 
-def md5sum(file_path: StrPath) -> str:
-    import hashlib
+def hexdigest(data: str | bytes) -> str:
+    if isinstance(data, str):
+        return hashlib.md5(data.encode("utf-8")).hexdigest()  # noqa: S324
+    return hashlib.md5(data).hexdigest()  # noqa: S324
 
+
+def md5sum(file_path: StrPath) -> str:
     with open(file_path, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()  # noqa: S324
+        return hexdigest(f.read())
 
 
 async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
