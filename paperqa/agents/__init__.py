@@ -224,7 +224,7 @@ def set_setting(
     )
 
     try:
-        _ = QueryRequest(**current_settings)
+        QueryRequest(**current_settings)
     except MismatchedModelsError:
         pass
     except ValueError as e:
