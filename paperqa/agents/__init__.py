@@ -124,7 +124,7 @@ def parse_dot_to_dict(str_w_dots: str, value: str) -> dict[str, Any]:
 
 def pop_nested_dict_recursive(d: dict[str, Any], path: str) -> tuple[Any, bool]:
     """
-    Pop a value from a nested dictionary using a period-separated path.
+    Pop a value from a nested dictionary (in-place) using a period-separated path.
 
     Recursively remove empty dictionaries after popping.
     """
