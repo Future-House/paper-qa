@@ -138,6 +138,7 @@ class AgentPromptCollection(BaseModel):
     def validate_tool_names(cls, v: set[str] | None) -> set[str] | None:
         if v is None:
             return None
+        # imported here to avoid circular imports
         from .main import GenerateAnswerTool
 
         answer_tool_name = GenerateAnswerTool.__fields__["name"].default
