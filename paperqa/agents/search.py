@@ -8,9 +8,9 @@ import os
 import pathlib
 import pickle
 import zlib
-from enum import Enum
+from enum import Enum, auto
 from io import StringIO
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Collection
 from uuid import UUID
 
 import anyio
@@ -37,10 +37,12 @@ PQA_INDEX_ABSOLUTE_PATHS = (
 
 
 class AsyncRetryError(Exception):
-    pass
+    """Flags a retry for another tenacity attempt."""
 
 
 class RobustEncoder(json.JSONEncoder):
+    """JSON encoder that can handle UUID and set objects."""
+
     def default(self, obj):
         if isinstance(obj, UUID):
             # if the obj is uuid, we simply return the value of uuid
@@ -51,9 +53,9 @@ class RobustEncoder(json.JSONEncoder):
 
 
 class SearchDocumentStorage(str, Enum):
-    JSON_MODEL_DUMP = "json_model_dump"
-    PICKLE_COMPRESSED = "pickle_compressed"
-    PICKLE_UNCOMPRESSED = "pickle_uncompressed"
+    JSON_MODEL_DUMP = auto()
+    PICKLE_COMPRESSED = auto()
+    PICKLE_UNCOMPRESSED = auto()
 
     def extension(self) -> str:
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
@@ -81,17 +83,17 @@ class SearchDocumentStorage(str, Enum):
 
 class SearchIndex:
 
-    REQUIRED_FIELDS: ClassVar[list[str]] = ["file_location", "body"]
+    REQUIRED_FIELDS: ClassVar[set[str]] = {"file_location", "body"}
 
     def __init__(
         self,
-        fields: list[str] | None = None,
+        fields: Collection[str] | None = None,
         index_name: str = "pqa_index",
         index_directory: str | os.PathLike | None = None,
         storage: SearchDocumentStorage = SearchDocumentStorage.PICKLE_COMPRESSED,
     ):
         if fields is None:
-            fields = ["file_location", "body"]
+            fields = self.REQUIRED_FIELDS
         self.fields = fields
         if not all(f in self.fields for f in self.REQUIRED_FIELDS):
             raise ValueError(

@@ -33,7 +33,7 @@ async def openai_get_search_query(
 
         else:
             # partial formatting
-            search_prompt = template.replace(r"{date}", get_year())
+            search_prompt = template.replace("{date}", get_year())
 
     if template is None:
         search_prompt = (
@@ -58,7 +58,7 @@ async def openai_get_search_query(
     result = await chain({"question": question, "count": count})  # type: ignore[call-arg]
     search_query = result.text
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004
-    # remove 2., 3. from queries
+    # remove "2.", "3.", etc. -- https://regex101.com/r/W2f7F1/1
     queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
     # remove quotes
     return [re.sub(r"\"", "", q) for q in queries]

@@ -395,10 +395,10 @@ def test_functions() -> None:
 
 @pytest.mark.asyncio
 async def test_stream_filter(
-    stub_paper_path: tuple[Path, dict],
+    stub_paper_path: Path,
 ) -> None:
     docs = paperqa.Docs(llm="gpt-4")
-    await docs.aadd(stub_paper_path[0])
+    await docs.aadd(stub_paper_path)
 
     for attempt in Retrying(
         stop=stop_after_attempt(3), retry=retry_if_exception_type(AssertionError)
@@ -415,10 +415,10 @@ async def test_stream_filter(
 
 @pytest.mark.asyncio
 async def test_stream_filter_custom_name(
-    stub_paper_path: tuple[Path, dict],
+    stub_paper_path: Path,
 ) -> None:
     docs = paperqa.Docs(llm="gpt-4o", name="tmp")
-    await docs.aadd(stub_paper_path[0])
+    await docs.aadd(stub_paper_path)
 
     result = await stream_filter(
         docs, "What is a chemical counterfactual?", Answer(question="")
@@ -429,10 +429,10 @@ async def test_stream_filter_custom_name(
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.asyncio
 async def test_stream_evidence(
-    stub_paper_path: tuple[Path, dict],
+    stub_paper_path: Path,
 ) -> None:
     docs = paperqa.Docs(llm="gpt-4")
-    await docs.aadd(stub_paper_path[0])
+    await docs.aadd(stub_paper_path)
 
     result = await stream_evidence(
         docs,
@@ -504,7 +504,7 @@ def test_embeddings_anthropic():
 
 @pytest.mark.asyncio
 async def test_gemini_model_construction(
-    stub_paper_path: tuple[Path, dict],
+    stub_paper_path: Path,
 ) -> None:
     docs = Docs(name="tmp")
     query = QueryRequest(
@@ -518,7 +518,7 @@ async def test_gemini_model_construction(
     assert "model" not in docs.llm_model.config, "model should not be in config"
 
     # now try using it
-    await docs.aadd(stub_paper_path[0])
+    await docs.aadd(stub_paper_path)
     answer = await docs.aget_evidence(
         Answer(question="Are COVID-19 vaccines effective?")
     )

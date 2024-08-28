@@ -74,10 +74,10 @@ async def agent_query(
     response = await run_agent(docs, query, agent_type)
 
     agent_logger.debug(f"agent_response: {response}")
-    truncation_max = 1_000_000 if verbosity > 1 else 1500 * (verbosity + 1)
+    truncation_chars = 1_000_000 if verbosity > 1 else 1500 * (verbosity + 1)
     agent_logger.info(
-        f"[bold blue]Answer: {response.answer.answer[:truncation_max]}"
-        f'{"...(truncated)" if len(response.answer.answer) > truncation_max else ""}[/bold blue]'
+        f"[bold blue]Answer: {response.answer.answer[:truncation_chars]}"
+        f'{"...(truncated)" if len(response.answer.answer) > truncation_chars else ""}[/bold blue]'
     )
 
     await search_index.add_document(
