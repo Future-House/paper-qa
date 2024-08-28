@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 from typing import Generator
@@ -26,7 +27,9 @@ def vcr_config():
 
 
 @pytest.fixture
-def tmp_path_cleanup(tmp_path: Path) -> Generator[Path, None, None]:
+def tmp_path_cleanup(
+    tmp_path: Path,
+) -> Generator[Path, None, None]:
     yield tmp_path
     # Cleanup after the test
     if tmp_path.exists():
@@ -34,7 +37,9 @@ def tmp_path_cleanup(tmp_path: Path) -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def agent_home_dir(tmp_path_cleanup: Path) -> Generator[Path, None, None]:
+def agent_home_dir(
+    tmp_path_cleanup: str | os.PathLike,
+) -> Generator[str | os.PathLike, None, None]:
     """Set up a unique temporary folder for the agent module."""
     with patch.dict("os.environ", {"PQA_HOME": str(tmp_path_cleanup)}):
         yield tmp_path_cleanup
