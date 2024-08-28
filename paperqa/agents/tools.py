@@ -1,5 +1,4 @@
 from __future__ import annotations
-from datetime import datetime
 import inspect
 import logging
 import os
@@ -20,22 +19,11 @@ from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to 
     Field as FieldV1,
 )
 
-from .docs import (
-    compute_total_model_token_cost,
-    stream_evidence,
-    stream_filter,
-)
+from .helpers import compute_total_model_token_cost, get_year
 from .search import get_directory_index
 from .models import ParsingConfiguration, QueryRequest, SimpleProfiler
 
 logger = logging.getLogger(__name__)
-
-
-def get_year(ts: datetime | None = None) -> str:
-    """Get the year from the input datetime, otherwise using the current datetime."""
-    if ts is None:
-        ts = datetime.now()
-    return ts.strftime("%Y")
 
 
 async def status(docs: Docs, answer: Answer, relevant_score_cutoff: int = 5) -> str:
@@ -225,22 +213,37 @@ class GatherEvidenceTool(BaseTool):
 
         logger.info(f"Gathering and ranking evidence for '{question}'.")
 
-        self.shared_state.answer = await stream_filter(
-            self.shared_state.docs,
-            question,
-            self.shared_state.answer,
-            adoc_match_threshold=self.query.adoc_match_threshold,
-        )
+        # first we see if we'd like to filter any docs for relevance
+        # at the citation level
+        if len(self.shared_state.docs.docs) >= self.query.adoc_match_threshold:
+            doc_keys_to_keep = await self.shared_state.docs.adoc_match(
+                question,
+                rerank=True,  # want to set it explicitly
+                answer=self.shared_state.answer,
+            )
+        else:
+            doc_keys_to_keep = set(self.shared_state.docs.docs.keys())
+
+        self.shared_state.answer.dockey_filter = doc_keys_to_keep
 
         # swap out the question
+        # TODO: evaluate how often does the agent changes the question
         old = self.shared_state.answer.question
         self.shared_state.answer.question = question
+
         # generator, so run it
         l0 = len(self.shared_state.answer.contexts)
-        self.shared_state.answer = await stream_evidence(
-            self.shared_state.docs,
-            self.query,
+
+        # set jit so that the index is rebuilt; helps if the texts have changed
+        self.shared_state.docs.jit_texts_index = True
+        # ensure length is set correctly
+        self.shared_state.answer.summary_length = self.query.summary_length
+        # TODO: refactor answer out of this...
+        self.shared_state.answer = await self.shared_state.docs.aget_evidence(
             answer=self.shared_state.answer,
+            max_sources=self.query.max_sources,
+            k=self.query.consider_sources,
+            detailed_citations=True,
         )
         l1 = len(self.shared_state.answer.contexts)
         self.shared_state.answer.question = old

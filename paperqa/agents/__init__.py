@@ -39,7 +39,7 @@ def configure_agent_logging(
     """Default to INFO level, but suppress loquacious loggers."""
     verbosity_map = {
         0: {
-            "paperqa.agents.docs": logging.WARNING,
+            "paperqa.agents.helpers": logging.WARNING,
             "paperqa.agents.main": logging.WARNING,
             "anthropic": logging.WARNING,
             "openai": logging.WARNING,
@@ -54,7 +54,7 @@ def configure_agent_logging(
     }
 
     verbosity_map[2] = verbosity_map[1] | {
-        "paperqa.agents.docs": logging.DEBUG,
+        "paperqa.agents.helpers": logging.DEBUG,
         "paperqa.agents.main": logging.DEBUG,
         "paperqa.agents.main.agent_callers": logging.DEBUG,
         "paperqa.models": logging.DEBUG,
@@ -185,9 +185,6 @@ def get_merged_settings(
     settings: dict[str, Any], settings_path: Path | None = None
 ) -> dict[str, Any]:
     """Merges a new settings with the current settings saved to file."""
-    if settings_path is None:
-        settings_path = pqa_directory("settings") / "settings.yaml"
-
     current_settings = get_settings(settings_path)
 
     # deal with the nested key case

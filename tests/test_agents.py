@@ -13,7 +13,6 @@ import pytest
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
-import paperqa
 from paperqa.docs import Docs
 from paperqa.llms import LangchainLLMModel
 from paperqa.types import Answer, Context, Doc, PromptCollection, Text
@@ -25,10 +24,8 @@ try:
     from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
     from paperqa.agents import agent_query
-    from paperqa.agents.docs import (
+    from paperqa.agents.helpers import (
         compute_total_model_token_cost,
-        stream_evidence,
-        stream_filter,
         update_doc_models,
     )
     from paperqa.agents.models import (
@@ -46,13 +43,9 @@ try:
         PaperSearchTool,
         SharedToolState,
     )
-
-    SKIP_AGENT_TESTS = False
 except ImportError:
-    SKIP_AGENT_TESTS = True
-
-if SKIP_AGENT_TESTS:
     pytest.skip("agents module is not installed", allow_module_level=True)
+
 
 PAPER_DIRECTORY = Path(__file__).parent
 
@@ -391,65 +384,6 @@ def test_functions() -> None:
             },
         },
     ]
-
-
-@pytest.mark.asyncio
-async def test_stream_filter(
-    stub_paper_path: Path,
-) -> None:
-    docs = paperqa.Docs(llm="gpt-4")
-    await docs.aadd(stub_paper_path)
-
-    for attempt in Retrying(
-        stop=stop_after_attempt(3), retry=retry_if_exception_type(AssertionError)
-    ):
-        with attempt:
-            result = await stream_filter(
-                docs,
-                "What is a chemical counterfactual?",
-                Answer(question=""),
-                adoc_match_threshold=1,
-            )
-            assert len(result.dockey_filter) > 0, "Stream Filter: result not correct"  # type: ignore[arg-type]
-
-
-@pytest.mark.asyncio
-async def test_stream_filter_custom_name(
-    stub_paper_path: Path,
-) -> None:
-    docs = paperqa.Docs(llm="gpt-4o", name="tmp")
-    await docs.aadd(stub_paper_path)
-
-    result = await stream_filter(
-        docs, "What is a chemical counterfactual?", Answer(question="")
-    )
-    assert len(result.dockey_filter) > 0, "Stream Filter: result not correct"  # type: ignore[arg-type]
-
-
-@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
-@pytest.mark.asyncio
-async def test_stream_evidence(
-    stub_paper_path: Path,
-) -> None:
-    docs = paperqa.Docs(llm="gpt-4")
-    await docs.aadd(stub_paper_path)
-
-    result = await stream_evidence(
-        docs,
-        request=QueryRequest(query="what is a molecular counterfactual explanation?"),
-    )
-
-    assert result.contexts, "Stream Evidence: no contexts returned"
-
-    # try with answer specified - make sure it's uniqued
-    answer2 = await stream_evidence(
-        docs,
-        request=QueryRequest(query="what is a molecular counterfactual explanation?"),
-        answer=result,
-    )
-    assert len({c.text.name for c in answer2.contexts}) == len(
-        answer2.contexts
-    ), "Stream Evidence: contexts not uniqued"
 
 
 def test_instruct_model():

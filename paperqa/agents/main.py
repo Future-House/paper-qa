@@ -17,8 +17,7 @@ from rich.console import Console
 from ..docs import Docs
 from ..types import Answer
 from ..utils import pqa_directory
-from .docs import update_doc_models
-from .helpers import openai_get_search_query, table_formatter
+from .helpers import openai_get_search_query, table_formatter, update_doc_models
 from .models import (
     AgentCallback,
     AgentStatus,

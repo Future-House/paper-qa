@@ -26,6 +26,7 @@ dependencies = [
     "pybtex",
     "pydantic~=2.0",
     "pypdf",
+    "tenacity",
     "tiktoken>=0.4.0",
 ]
 description = "LLM Chain for answering questions from docs"
@@ -50,7 +51,6 @@ agents = [
     "pymupdf",
     "requests",
     "tantivy",
-    "tenacity",
     "typer",
     "typing_extensions",
 ]

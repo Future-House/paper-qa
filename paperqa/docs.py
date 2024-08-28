@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from tenacity import retry, stop_after_attempt
 
 try:
     import voyageai
@@ -62,11 +63,11 @@ from .utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_callback(result: LLMResult):  # noqa: ARG001
+async def empty_callback(result: LLMResult):
     pass
 
 
-async def print_callback(result: LLMResult):  # noqa: ARG001
+async def print_callback(result: LLMResult):
     pass
 
 
@@ -579,6 +580,11 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
+    # no state modifications in adoc_match--only answer is changed
+    @retry(
+        stop=stop_after_attempt(3),
+        reraise=True,
+    )
     async def adoc_match(
         self,
         query: str,
