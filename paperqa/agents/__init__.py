@@ -21,7 +21,7 @@ try:
     from rich.console import Console
     from rich.logging import RichHandler
 
-    from .main import aagent_query, asearch, configure_agent_logging
+    from .main import agent_query, search
     from .models import AnswerResponse, MismatchedModelsError, QueryRequest
     from .search import SearchIndex, get_directory_index
 
@@ -32,20 +32,59 @@ except ImportError as e:
 
 app = typer.Typer()
 
-logging.basicConfig(
-    level="INFO",
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[
-        RichHandler(
-            rich_tracebacks=True,
-            markup=True,
-            show_path=False,
-            show_level=False,
-            console=Console(force_terminal=True),
+
+def configure_agent_logging(
+    verbosity: int = 0, default_level: int = logging.INFO
+) -> None:
+    """Default to INFO level, but suppress loquacious loggers."""
+    verbosity_map = {
+        0: {
+            "paperqa.agents.docs": logging.WARNING,
+            "paperqa.agents.main": logging.WARNING,
+            "anthropic": logging.WARNING,
+            "openai": logging.WARNING,
+            "httpx": logging.WARNING,
+            "paperqa.agents.models": logging.WARNING,
+        }
+    }
+
+    verbosity_map[1] = verbosity_map[0] | {
+        "paperqa.agents.main": logging.INFO,
+        "paperqa.models": logging.INFO,
+    }
+
+    verbosity_map[2] = verbosity_map[1] | {
+        "paperqa.agents.docs": logging.DEBUG,
+        "paperqa.agents.main": logging.DEBUG,
+        "paperqa.agents.main.agent_callers": logging.DEBUG,
+        "paperqa.models": logging.DEBUG,
+        "paperqa.agents.search": logging.DEBUG,
+    }
+
+    rich_handler = RichHandler(
+        rich_tracebacks=True,
+        markup=True,
+        show_path=False,
+        show_level=False,
+        console=Console(force_terminal=True),
+    )
+
+    rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(default_level)
+    if not root_logger.handlers:
+        root_logger.addHandler(rich_handler)
+
+    for logger_name in logging.Logger.manager.loggerDict:
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(
+            verbosity_map.get(min(verbosity, 2), {}).get(logger_name, default_level)
         )
-    ],
-)
+        # fallback to the rich hangler
+        logger.handlers.clear()
+        logger.propagate = True
+
 
 logger = logging.getLogger(__name__)
 
@@ -176,6 +215,8 @@ def set_setting(
     ],
 ) -> bool:
     """Set a persistent PaperQA setting."""
+    configure_agent_logging(verbosity=0)
+
     settings_path = pqa_directory("settings") / "settings.yaml"
 
     current_settings = get_merged_settings(
@@ -217,6 +258,8 @@ def show(
     ] = 5,
 ) -> Any:
     """Show a persistent PaperQA setting, special inputs include `indexes`, `answers` and `all`."""
+    configure_agent_logging(verbosity=0)
+
     # handle special case when user wants to see indexes
     if variable == "indexes":
         for index in os.listdir(pqa_directory("indexes")):
@@ -282,6 +325,8 @@ def clear(
     ] = False,
 ) -> None:
     """Clear a persistent PaperQA setting, include the --index flag to remove an index."""
+    configure_agent_logging(verbosity=0)
+
     settings_path = pqa_directory("settings") / "settings.yaml"
 
     current_settings = get_current_settings(settings_path)
@@ -340,6 +385,8 @@ def ask(
     ] = None,
 ) -> AnswerResponse:
     """Query PaperQA via an agent."""
+    configure_agent_logging(verbosity=verbosity)
+
     loop = get_loop()
 
     # override settings file if requested directly
@@ -369,7 +416,7 @@ def ask(
     )
 
     return loop.run_until_complete(
-        aagent_query(
+        agent_query(
             request,
             docs=None,
             verbosity=verbosity,
@@ -401,9 +448,11 @@ def search_query(
     ] = None,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
     """Search using a pre-built PaperQA index."""
+    configure_agent_logging(verbosity=0)
+
     loop = get_loop()
     return loop.run_until_complete(
-        asearch(
+        search(
             query,
             index_name=index_name,
             index_directory=index_directory or pqa_directory("indexes"),
@@ -441,6 +490,8 @@ def build_index(
     ] = 0,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
+    configure_agent_logging(verbosity=verbosity)
+
     to_merge = {}
 
     if directory is not None:
@@ -493,6 +544,7 @@ def build_index(
 
 @app.command()
 def version():
+    configure_agent_logging(verbosity=0)
     logger.info(f"PaperQA version: {__version__}")
 
 

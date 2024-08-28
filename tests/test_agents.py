@@ -24,7 +24,7 @@ try:
     from langchain_openai import ChatOpenAI
     from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
-    from paperqa.agents import aagent_query
+    from paperqa.agents import agent_query
     from paperqa.agents.docs import (
         compute_total_model_token_cost,
         stream_evidence,
@@ -117,7 +117,7 @@ async def test_agent_types(agent_index_dir, agent_type):
             index_directory=agent_index_dir,
         ),
     )
-    response = await aagent_query(
+    response = await agent_query(
         request, agent_type=agent_type, index_directory=agent_index_dir
     )
     assert response.answer.answer != "I cannot answer", "Answer not generated"
@@ -127,7 +127,7 @@ async def test_agent_types(agent_index_dir, agent_type):
 
 @pytest.mark.asyncio
 async def test_timeout(agent_index_dir):
-    response = await aagent_query(
+    response = await agent_query(
         QueryRequest(
             query="Are COVID-19 vaccines effective?",
             llm="gpt-4o-mini",
@@ -192,7 +192,7 @@ async def test_propagate_options(agent_index_dir) -> None:
         with attempt:
             docs = Docs(llm=llm_name, summary_llm=llm_name)
             docs.prompts = query.prompts  # this line happens in main
-            response = await aagent_query(query, docs, agent_type="fake")
+            response = await agent_query(query, docs, agent_type="fake")
             assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
     result = response.answer
     assert len(result.answer) > 200, "Answer did not return any results"
@@ -216,7 +216,7 @@ async def test_mixing_langchain_clients(caplog, agent_index_dir) -> None:
     )
     update_doc_models(docs, query)
     with caplog.at_level(logging.WARNING):
-        response = await aagent_query(query, docs)
+        response = await agent_query(query, docs)
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
     assert not [
         msg for (*_, msg) in caplog.record_tuples if "error" in msg.lower()
@@ -233,7 +233,7 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
     with patch.object(
         GenerateAnswerTool, "_arun", return_value="Failed to answer question."
     ):
-        response = await aagent_query(
+        response = await agent_query(
             query=QueryRequest(
                 query="Are COVID-19 vaccines effective?",
                 agent_tools=AgentPromptCollection(
@@ -248,13 +248,12 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
-    agent_test_kit, subtests: SubTests, agent_index_dir
+    fixture_stub_answer, subtests: SubTests, agent_index_dir
 ) -> None:
-    answer = agent_test_kit
-    tool_state = SharedToolState(docs=Docs(), answer=answer)
+    tool_state = SharedToolState(docs=Docs(), answer=fixture_stub_answer)
     search_count = 3  # Keep low for speed
     query = QueryRequest(
-        query=answer.question,
+        query=fixture_stub_answer.question,
         consider_sources=2,
         max_sources=1,
         agent_tools=AgentPromptCollection(
@@ -279,25 +278,32 @@ async def test_agent_sharing_state(
         ), "Document type or DOI propagation failure"
 
     with subtests.test(msg=GatherEvidenceTool.__name__):
-        assert not answer.contexts, "No contexts is required for a later assertion"
+        assert (
+            not fixture_stub_answer.contexts
+        ), "No contexts is required for a later assertion"
 
         tool = GatherEvidenceTool(shared_state=tool_state, query=query)
-        await tool.arun(answer.question)
-        assert len(answer.dockey_filter) > 0, "Filter did not preserve reference"
-        assert answer.contexts, "Evidence did not return any results"
+        await tool.arun(fixture_stub_answer.question)
+        assert (
+            len(fixture_stub_answer.dockey_filter) > 0
+        ), "Filter did not preserve reference"
+        assert fixture_stub_answer.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswerTool.__name__} working"):
         tool = GenerateAnswerTool(shared_state=tool_state, query=query)
-        result = await tool.arun(answer.question)
+        result = await tool.arun(fixture_stub_answer.question)
         assert re.search(
             pattern=SharedToolState.STATUS_SEARCH_REGEX_PATTERN, string=result
         )
-        assert len(answer.answer) > 200, "Answer did not return any results"
         assert (
-            GenerateAnswerTool.extract_answer_from_message(result) == answer.answer
+            len(fixture_stub_answer.answer) > 200
+        ), "Answer did not return any results"
+        assert (
+            GenerateAnswerTool.extract_answer_from_message(result)
+            == fixture_stub_answer.answer
         ), "Failed to regex extract answer from result"
         assert (
-            len(answer.contexts) <= query.max_sources
+            len(fixture_stub_answer.contexts) <= query.max_sources
         ), "Answer has more sources than expected"
 
     with subtests.test(msg=f"{GenerateAnswerTool.__name__} misconfigured query"):
@@ -389,10 +395,10 @@ def test_functions() -> None:
 
 @pytest.mark.asyncio
 async def test_stream_filter(
-    stub_paper_path_with_details: tuple[Path, dict],
+    stub_paper_path: tuple[Path, dict],
 ) -> None:
     docs = paperqa.Docs(llm="gpt-4")
-    await docs.aadd(stub_paper_path_with_details[0])
+    await docs.aadd(stub_paper_path[0])
 
     for attempt in Retrying(
         stop=stop_after_attempt(3), retry=retry_if_exception_type(AssertionError)
@@ -409,10 +415,10 @@ async def test_stream_filter(
 
 @pytest.mark.asyncio
 async def test_stream_filter_custom_name(
-    stub_paper_path_with_details: tuple[Path, dict],
+    stub_paper_path: tuple[Path, dict],
 ) -> None:
     docs = paperqa.Docs(llm="gpt-4o", name="tmp")
-    await docs.aadd(stub_paper_path_with_details[0])
+    await docs.aadd(stub_paper_path[0])
 
     result = await stream_filter(
         docs, "What is a chemical counterfactual?", Answer(question="")
@@ -423,10 +429,10 @@ async def test_stream_filter_custom_name(
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.asyncio
 async def test_stream_evidence(
-    stub_paper_path_with_details: tuple[Path, dict],
+    stub_paper_path: tuple[Path, dict],
 ) -> None:
     docs = paperqa.Docs(llm="gpt-4")
-    await docs.aadd(stub_paper_path_with_details[0])
+    await docs.aadd(stub_paper_path[0])
 
     result = await stream_evidence(
         docs,
@@ -498,7 +504,7 @@ def test_embeddings_anthropic():
 
 @pytest.mark.asyncio
 async def test_gemini_model_construction(
-    stub_paper_path_with_details: tuple[Path, dict],
+    stub_paper_path: tuple[Path, dict],
 ) -> None:
     docs = Docs(name="tmp")
     query = QueryRequest(
@@ -512,7 +518,7 @@ async def test_gemini_model_construction(
     assert "model" not in docs.llm_model.config, "model should not be in config"
 
     # now try using it
-    await docs.aadd(stub_paper_path_with_details[0])
+    await docs.aadd(stub_paper_path[0])
     answer = await docs.aget_evidence(
         Answer(question="Are COVID-19 vaccines effective?")
     )

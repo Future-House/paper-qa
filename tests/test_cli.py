@@ -16,7 +16,6 @@ if SKIP_AGENT_TESTS:
 
 
 def test_cli_set(agent_index_dir: Path):  # noqa: ARG001
-
     set_setting("temperature", "0.5")
     assert show("temperature") == "0.5", "Temperature not properly set"
 

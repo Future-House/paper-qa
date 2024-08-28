@@ -38,59 +38,16 @@ from .tools import (
 )
 
 logger = logging.getLogger(__name__)
-agent_logger = logging.getLogger("agent_callers")
+agent_logger = logging.getLogger(__name__ + ".agent_callers")
 
 
-def configure_agent_logging(verbosity: int = 0, default_level: int = logging.INFO):
-    """Default to INFO level, but suppress loquacious loggers."""
-    verbosity_map = {
-        0: {
-            "paperqa.agents.docs": logging.WARNING,
-            "paperqa.agents.main": logging.WARNING,
-            "anthropic": logging.WARNING,
-            "openai": logging.WARNING,
-            "httpx": logging.WARNING,
-            "agent_callers": logging.INFO,
-            "paperqa.agents.models": logging.WARNING,
-            "paperqa.agents.search": logging.INFO,
-        },
-        1: {
-            "paperqa.agents.docs": logging.INFO,
-            "paperqa.agents.main": logging.WARNING,
-            "anthropic": logging.WARNING,
-            "openai": logging.WARNING,
-            "httpx": logging.WARNING,
-            "agent_callers": logging.INFO,
-            "paperqa.models": logging.INFO,
-            "paperqa.agents.search": logging.INFO,
-        },
-        2: {
-            "paperqa.agents.docs": logging.DEBUG,
-            "paperqa.agents.main": logging.DEBUG,
-            "anthropic": logging.INFO,
-            "httpx": logging.INFO,
-            "openai": logging.INFO,
-            "agent_callers": logging.DEBUG,
-            "paperqa.models": logging.DEBUG,
-            "paperqa.agents.search": logging.DEBUG,
-        },
-    }
-    for logger_name in logging.Logger.manager.loggerDict:
-        logger = logging.getLogger(logger_name)
-        logger.setLevel(
-            verbosity_map.get(min(verbosity, 2), {}).get(logger_name, default_level)
-        )
-
-
-async def aagent_query(
+async def agent_query(
     query: str | QueryRequest,
     docs: Docs | None = None,
     agent_type: str = "OpenAIFunctionsAgent",
     verbosity: int = 0,
     index_directory: str | os.PathLike | None = None,
 ) -> AnswerResponse:
-
-    configure_agent_logging(verbosity=verbosity)
 
     if isinstance(query, str):
         query = QueryRequest(query=query)
@@ -352,14 +309,11 @@ async def run_langchain_agent(
     return answer, agent_status
 
 
-async def asearch(
+async def search(
     query: str,
     index_name: str = "answers",
     index_directory: str | os.PathLike | None = None,
-    verbosity: int = 0,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
-
-    configure_agent_logging(verbosity=verbosity)
 
     search_index = SearchIndex(
         ["file_location", "body", "question"],
