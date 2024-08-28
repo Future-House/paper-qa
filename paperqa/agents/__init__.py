@@ -89,7 +89,7 @@ def configure_agent_logging(
 logger = logging.getLogger(__name__)
 
 
-def get_file_times(path: os.PathLike | str) -> dict[str, str]:
+def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
     # Get the stats for the file/directory
     stats = os.stat(path)
 
