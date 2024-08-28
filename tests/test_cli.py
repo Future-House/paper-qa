@@ -2,16 +2,11 @@ from pathlib import Path
 
 import pytest
 
-SKIP_AGENT_TESTS = False
-
 try:
     from paperqa.agents import ask, build_index, clear, search_query, set_setting, show
     from paperqa.agents.models import AnswerResponse
     from paperqa.agents.search import SearchIndex
 except ImportError:
-    SKIP_AGENT_TESTS = True
-
-if SKIP_AGENT_TESTS:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
