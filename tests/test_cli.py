@@ -42,7 +42,7 @@ def test_cli_set(agent_index_dir: Path):  # noqa: ARG001
 async def test_cli_show(agent_index_dir: Path):
 
     # make empty index
-    assert show("indexes") == [], "No indexes should be present"
+    assert not show("indexes"), "No indexes should be present"
 
     # creates a new index/file
     si = SearchIndex(index_directory=agent_index_dir)
