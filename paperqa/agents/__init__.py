@@ -30,6 +30,8 @@ except ImportError as e:
         '"agents" module is not installed please install it using "pip install paper-qa[agents]"'
     ) from e
 
+logger = logging.getLogger(__name__)
+
 app = typer.Typer()
 
 
@@ -71,18 +73,22 @@ def configure_agent_logging(
 
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
-    for logger_name in logging.Logger.manager.loggerDict:
-        logger = logging.getLogger(logger_name)
-        logger.setLevel(
-            verbosity_map.get(min(verbosity, 2), {}).get(logger_name, default_level)
-        )
-        # fallback to the rich hangler
-        logger.handlers.clear()
-        logger.addHandler(rich_handler)
-        logger.propagate = False
+    def is_paperqa_related(logger_name: str) -> bool:
+        return logger_name.startswith("paperqa") or logger_name in {
+            "anthropic",
+            "openai",
+            "httpx",
+        }
 
-
-logger = logging.getLogger(__name__)
+    for logger_name, logger in logging.Logger.manager.loggerDict.items():
+        if isinstance(logger, logging.Logger) and is_paperqa_related(logger_name):
+            logger.setLevel(
+                verbosity_map.get(min(verbosity, 2), {}).get(logger_name, default_level)
+            )
+            # fallback to the rich hangler
+            logger.handlers.clear()
+            logger.addHandler(rich_handler)
+            logger.propagate = False
 
 
 def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
