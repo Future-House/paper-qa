@@ -268,7 +268,8 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
 
     query_bibtex = True
 
-    if fields:
+    # note we only do field selection if querying on title
+    if fields and title:
         # crossref has a special endpoint for bibtex, so we don't need to request it here
         if "bibtex" not in fields:
             query_bibtex = False
