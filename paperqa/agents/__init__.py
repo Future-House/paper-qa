@@ -71,11 +71,6 @@ def configure_agent_logging(
 
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
-    root_logger = logging.getLogger()
-    root_logger.setLevel(default_level)
-    if not root_logger.handlers:
-        root_logger.addHandler(rich_handler)
-
     for logger_name in logging.Logger.manager.loggerDict:
         logger = logging.getLogger(logger_name)
         logger.setLevel(
@@ -83,7 +78,8 @@ def configure_agent_logging(
         )
         # fallback to the rich hangler
         logger.handlers.clear()
-        logger.propagate = True
+        logger.addHandler(rich_handler)
+        logger.propagate = False
 
 
 logger = logging.getLogger(__name__)
