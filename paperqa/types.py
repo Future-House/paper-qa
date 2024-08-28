@@ -268,6 +268,21 @@ class Answer(BaseModel):
             for c in filter(lambda x: x.score >= score_threshold, self.contexts)
         }
 
+    def filter_content_for_user(self) -> None:
+        """Filter out extra items (inplace) that do not need to be returned to the user."""
+        self.contexts = [
+            Context(
+                context=c.context,
+                score=c.score,
+                text=Text(
+                    text="",
+                    **c.text.model_dump(exclude={"text", "embedding", "doc"}),
+                    doc=Doc(**c.text.doc.model_dump(exclude={"embedding"})),
+                ),
+            )
+            for c in self.contexts
+        ]
+
 
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""

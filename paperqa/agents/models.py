@@ -29,11 +29,8 @@ from typing_extensions import Protocol
 
 from .. import (
     Answer,
-    Context,
-    Doc,
     OpenAILLMModel,
     PromptCollection,
-    Text,
     llm_model_factory,
 )
 from ..utils import hexdigest
@@ -49,23 +46,6 @@ class SupportsPickle(Protocol):
     def __reduce__(self) -> str | tuple[Any, ...]: ...
     def __getstate__(self) -> object: ...
     def __setstate__(self, state: object) -> None: ...
-
-
-def strip_answer(answer: Answer):
-    """Filter out extra items that do not need to be returned to the user. Modifies in place."""
-    new_contexts = [
-        Context(
-            context=c.context,
-            score=c.score,
-            text=Text(
-                text="",
-                **c.text.model_dump(exclude={"text", "embedding", "doc"}),
-                doc=Doc(**c.text.doc.model_dump(exclude={"embedding"})),
-            ),
-        )
-        for c in answer.contexts
-    ]
-    answer.contexts = new_contexts
 
 
 class AgentStatus(str, Enum):
@@ -358,11 +338,10 @@ class AnswerResponse(BaseModel):
     def strip_answer(
         cls, v: Answer, info: ValidationInfo  # noqa: ARG002, N805
     ) -> Answer:
-        # This modifies in place, and thus
-        # the underlying Answer. This is fine
+        # This modifies in place, this is fine
         # because when a response is being constructed,
         # we should be done with the Answer object
-        strip_answer(v)
+        v.filter_content_for_user()
         return v
 
     async def get_summary(self, llm_model="gpt-4-turbo") -> str:
