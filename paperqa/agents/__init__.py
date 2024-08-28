@@ -263,7 +263,7 @@ def show(
     # handle special case when user wants to see indexes
     if variable == "indexes":
         for index in os.listdir(pqa_directory("indexes")):
-            index_times = get_file_times(pqa_directory("indexes") / index)
+            index_times = get_file_timestamps(pqa_directory("indexes") / index)
             logger.info(f"{index}, {index_times}")
         return os.listdir(pqa_directory("indexes"))
 
@@ -273,7 +273,7 @@ def show(
         if os.path.exists(answer_file_location):
             for answer_file in os.listdir(answer_file_location):
                 all_answers.append(
-                    get_file_times(os.path.join(answer_file_location, answer_file))
+                    get_file_timestamps(os.path.join(answer_file_location, answer_file))
                 )
                 with open(os.path.join(answer_file_location, answer_file)) as f:
                     answer = yaml.safe_load(f)

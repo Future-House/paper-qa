@@ -20,13 +20,6 @@ from .models import (
     QueryRequest,
 )
 
-try:
-    from langchain_google_vertexai import ChatVertexAI, HarmBlockThreshold, HarmCategory
-
-    USE_VERTEX = True
-except ImportError:
-    USE_VERTEX = False
-
 logger = logging.getLogger(__name__)
 
 
@@ -211,7 +204,13 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
             client = AsyncOpenAI()
     elif isinstance(doc.llm_model, AnthropicLLMModel):
         client = AsyncAnthropic()
-    elif isinstance(doc.llm_model, LangchainLLMModel) and USE_VERTEX:
+    elif isinstance(doc.llm_model, LangchainLLMModel):
+        from langchain_google_vertexai import (
+            ChatVertexAI,
+            HarmBlockThreshold,
+            HarmCategory,
+        )
+
         # we have to convert system to human because system is unsupported
         # Also we do get blocked content, so adjust thresholds
         client = ChatVertexAI(
@@ -225,7 +224,7 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
             convert_system_message_to_human=True,
         )
     else:
-        raise ValueError(f"Unsupported LLM model: {doc.llm_model}")
+        raise TypeError(f"Unsupported LLM model: {doc.llm_model}")
 
     doc._client = client  # set client, since could be just unpickled.
     doc._embedding_client = AsyncOpenAI()  # hard coded to OpenAI for now
