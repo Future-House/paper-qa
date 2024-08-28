@@ -147,7 +147,7 @@ def pop_nested_dict_recursive(d: dict[str, Any], path: str) -> tuple[Any, bool]:
     return value, len(d) == 0
 
 
-def get_current_settings(
+def get_settings(
     settings_path: str | os.PathLike | None = None,
 ) -> dict[str, Any]:
 
@@ -188,7 +188,7 @@ def get_merged_settings(
     if settings_path is None:
         settings_path = pqa_directory("settings") / "settings.yaml"
 
-    current_settings = get_current_settings(settings_path)
+    current_settings = get_settings(settings_path)
 
     # deal with the nested key case
     return merge_dicts(current_settings, settings)
@@ -285,7 +285,7 @@ def show(
                 )
         return all_answers
 
-    current_settings = get_current_settings(pqa_directory("settings") / "settings.yaml")
+    current_settings = get_settings(pqa_directory("settings") / "settings.yaml")
 
     if variable == "all":
         logger.info(current_settings)
@@ -327,7 +327,7 @@ def clear(
 
     settings_path = pqa_directory("settings") / "settings.yaml"
 
-    current_settings = get_current_settings(settings_path)
+    current_settings = get_settings(settings_path)
 
     if not index:
         _ = pop_nested_dict_recursive(current_settings, variable)
