@@ -251,7 +251,7 @@ def show(
         ),
     ],
     limit: Annotated[
-        int, typer.Argument(help="limit results, only used for 'answers'.")
+        int, typer.Option(help="limit results, only used for 'answers'.")
     ] = 5,
 ) -> Any:
     """Show a persistent PaperQA setting, special inputs include `indexes`, `answers` and `all`."""
@@ -346,7 +346,7 @@ def ask(
     query: Annotated[str, typer.Argument(help=("Question or task ask of PaperQA"))],
     agent_type: Annotated[
         str,
-        typer.Argument(
+        typer.Option(
             help=(
                 "Type of agent to use, for now either "
                 "`OpenAIFunctionsAgent` or `fake`. `fake` uses "
@@ -355,15 +355,15 @@ def ask(
         ),
     ] = "fake",
     verbosity: Annotated[
-        int, typer.Argument(help=("Level of verbosity from 0->2 (inclusive)"))
+        int, typer.Option(help=("Level of verbosity from 0->2 (inclusive)"))
     ] = 0,
     directory: Annotated[
         Path | None,
-        typer.Argument(help=("Directory of papers or documents to run PaperQA over.")),
+        typer.Option(help=("Directory of papers or documents to run PaperQA over.")),
     ] = None,
     index_directory: Annotated[
         Path | None,
-        typer.Argument(
+        typer.Option(
             help=(
                 "Index directory to store paper index and answers. Default will be `~/.pqa`"
             )
@@ -371,7 +371,7 @@ def ask(
     ] = None,
     manifest_file: Annotated[
         Path | None,
-        typer.Argument(
+        typer.Option(
             help=(
                 "Optional manifest file (CSV) location to map relative a "
                 "`file_location` column to `doi` or `title` columns. "
@@ -437,7 +437,7 @@ def search_query(
     ] = "answers",
     index_directory: Annotated[
         Path | None,
-        typer.Argument(
+        typer.Option(
             help=(
                 "Index directory to store paper index and answers. Default will be `~/.pqa`"
             )
@@ -465,7 +465,7 @@ def build_index(
     ] = None,
     index_directory: Annotated[
         Path | None,
-        typer.Argument(
+        typer.Option(
             help=(
                 "Index directory to store paper index and answers. Default will be `~/.pqa`"
             )
@@ -473,7 +473,7 @@ def build_index(
     ] = None,
     manifest_file: Annotated[
         Path | None,
-        typer.Argument(
+        typer.Option(
             help=(
                 "Optional manifest file (CSV) location to map relative a "
                 "`file_location` column to `doi` or `title` columns. "
@@ -483,7 +483,7 @@ def build_index(
         ),
     ] = None,
     verbosity: Annotated[
-        int, typer.Argument(help=("Level of verbosity from 0->2 (inclusive)"))
+        int, typer.Option(help=("Level of verbosity from 0->2 (inclusive)"))
     ] = 0,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""

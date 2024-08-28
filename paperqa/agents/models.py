@@ -311,9 +311,15 @@ class QueryRequest(BaseModel):
         parsing_configuration: ParsingConfiguration,
     ) -> str:
 
+        # index name should use an absolute path
+        # this way two different folders where the
+        # user locally uses '.' will make different indexes
+        if isinstance(paper_directory, Path):
+            paper_directory = str(paper_directory.absolute())
+
         index_fields = "|".join(
             [
-                str(paper_directory),
+                str(paper_directory),  # cast for typing
                 embedding,
                 str(parsing_configuration.chunksize),
                 str(parsing_configuration.overlap),
