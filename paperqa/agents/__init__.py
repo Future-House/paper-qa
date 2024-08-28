@@ -213,7 +213,7 @@ def set_setting(
             )
         ),
     ],
-) -> bool:
+) -> None:
     """Set a persistent PaperQA setting."""
     configure_agent_logging(verbosity=0)
 
@@ -236,8 +236,6 @@ def set_setting(
 
     with open(settings_path, "w") as f:
         yaml.dump(current_settings, f)
-
-    return True
 
 
 @app.command()
