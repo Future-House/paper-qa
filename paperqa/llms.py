@@ -221,6 +221,7 @@ class LLMModel(ABC, BaseModel):
 
     llm_type: str | None = None
     name: str
+    config: dict = Field(default={})
 
     async def acomplete(self, client: Any, prompt: str) -> str:
         raise NotImplementedError
@@ -889,10 +890,9 @@ def llm_model_factory(llm: str) -> LLMModel:
             return OpenAILLMModel(config={"model": llm})
         if llm.startswith("langchain") or "gemini" in llm:
             return LangchainLLMModel()
-        elif "claude" in llm:
+        if "claude" in llm:
             return AnthropicLLMModel(config={"model": llm})
-        else:
-            raise ValueError(f"Could not guess model type for {llm}. ")
+        raise ValueError(f"Could not guess model type for {llm}. ")
     return OpenAILLMModel()
 
 

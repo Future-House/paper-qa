@@ -188,8 +188,8 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
         doc.summary_llm_model = llm_model_factory(request.summary_llm)
 
     # set temperatures
-    doc.llm_model.config["temperature"] = request.temperature  # type: ignore[attr-defined]
-    doc.summary_llm_model.config["temperature"] = request.temperature  # type: ignore[attr-defined]
+    doc.llm_model.config["temperature"] = request.temperature
+    doc.summary_llm_model.config["temperature"] = request.temperature
 
     if isinstance(doc.llm_model, OpenAILLMModel):
         if request.llm.startswith(
@@ -244,6 +244,6 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
 
     logger.debug(
         f"update_doc_models: {doc.name}"
-        f" | {(doc.llm_model.config)} | {(doc.summary_llm_model.config)}"  # type: ignore[attr-defined]
+        f" | {(doc.llm_model.config)} | {(doc.summary_llm_model.config)}"
         f" | {doc.docs_index.__class__}"
     )
