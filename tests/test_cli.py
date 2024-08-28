@@ -2,16 +2,11 @@ from pathlib import Path
 
 import pytest
 
-SKIP_AGENT_TESTS = False
-
 try:
     from paperqa.agents import ask, build_index, clear, search_query, set_setting, show
     from paperqa.agents.models import AnswerResponse
     from paperqa.agents.search import SearchIndex
 except ImportError:
-    SKIP_AGENT_TESTS = True
-
-if SKIP_AGENT_TESTS:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
@@ -47,7 +42,7 @@ def test_cli_set(agent_index_dir: Path):  # noqa: ARG001
 async def test_cli_show(agent_index_dir: Path):
 
     # make empty index
-    assert show("indexes") == [], "No indexes should be present"
+    assert not show("indexes"), "No indexes should be present"
 
     # creates a new index/file
     si = SearchIndex(index_directory=agent_index_dir)
