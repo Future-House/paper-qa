@@ -437,7 +437,7 @@ async def get_directory_index(
         directory = await directory.absolute()
 
     search_index = SearchIndex(
-        fields=["title", "file_location", "body", "year"],
+        fields=SearchIndex.REQUIRED_FIELDS | {"title", "year"},
         index_name=index_name,
         index_directory=index_directory or pqa_directory("indexes"),
     )

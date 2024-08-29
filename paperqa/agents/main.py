@@ -64,7 +64,7 @@ async def agent_query(
     )
 
     search_index = SearchIndex(
-        fields=["file_location", "body", "question"],
+        fields=SearchIndex.REQUIRED_FIELDS | {"question"},
         index_name="answers",
         index_directory=index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
