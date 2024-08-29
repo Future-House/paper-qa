@@ -60,7 +60,7 @@ async def openai_get_search_query(
             "Make some searches broad and some narrow. "
             "Use this format: [keyword search], [start year]-[end year]. "
             "where end year is optional. "
-            f"The current year is {get_year()}\n\n"
+            f"The current year is {get_year()}."
         )
 
     if "gpt" not in llm:
