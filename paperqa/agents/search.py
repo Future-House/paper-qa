@@ -240,7 +240,7 @@ class SearchIndex:
         retry=retry_if_exception_type(AsyncRetryError),
         reraise=True,
     )
-    def delete_document(index: Index, file_location: str):
+    def delete_document(index: Index, file_location: str) -> None:
         try:
             writer = index.writer()
             writer.delete_documents("file_location", file_location)
