@@ -265,7 +265,7 @@ class SearchIndex:
 
             self.changed = True
 
-    async def save_index(self):
+    async def save_index(self) -> None:
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
