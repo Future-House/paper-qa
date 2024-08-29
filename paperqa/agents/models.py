@@ -88,7 +88,7 @@ class AgentPromptCollection(BaseModel):
         "The current status of evidence/papers/cost is {status}"
     )
     paper_directory: str | os.PathLike = Field(
-        default=Path("."),
+        default=Path.cwd(),
         description=(
             "Local directory which contains the papers to be indexed and searched."
         ),
@@ -245,7 +245,7 @@ class QueryRequest(BaseModel):
     agent_tools: AgentPromptCollection = Field(default_factory=AgentPromptCollection)
     texts_index_mmr_lambda: float = 1.0
     texts_index_embedding_config: dict[str, Any] | None = None
-    docs_index_mmr_lambda: float = 0.5
+    docs_index_mmr_lambda: float = 1.0
     docs_index_embedding_config: dict[str, Any] | None = None
     parsing_configuration: ParsingConfiguration = ParsingConfiguration()
     embedding: str = "text-embedding-3-small"
@@ -365,10 +365,7 @@ class AnswerResponse(BaseModel):
 
 
 class TimerData(BaseModel):
-    # NOTE: use lambda because asyncio.get_running_loop can throw: RuntimeError: no running event loop
-    start_time: float = Field(
-        default_factory=lambda: asyncio.get_running_loop().time()  # noqa: FURB111
-    )
+    start_time: float = Field(default_factory=time.time)  # noqa: FURB111
     durations: list[float] = Field(default_factory=list)
 
 

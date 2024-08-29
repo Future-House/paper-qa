@@ -140,7 +140,6 @@ def test_cli_index(agent_index_dir: Path, caplog):
 
     # running again should not trigger any indexing
     build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
-
     assert not caplog.records, "Indexing should not be triggered again"
 
     # now we want to change the settings
