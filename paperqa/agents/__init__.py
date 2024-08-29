@@ -85,10 +85,8 @@ def configure_agent_logging(
             logger.setLevel(
                 verbosity_map.get(min(verbosity, 2), {}).get(logger_name, default_level)
             )
-            # fallback to the rich hangler
-            logger.handlers.clear()
-            logger.addHandler(rich_handler)
-            logger.propagate = False
+            if not any(isinstance(h, RichHandler) for h in logger.handlers):
+                logger.addHandler(rich_handler)
 
 
 def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
