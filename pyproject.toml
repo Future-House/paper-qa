@@ -26,20 +26,67 @@ dependencies = [
     "pybtex",
     "pydantic~=2.0",
     "pypdf",
+    "tenacity",
     "tiktoken>=0.4.0",
 ]
 description = "LLM Chain for answering questions from docs"
-dynamic = ["optional-dependencies", "version"]
+dynamic = ["version"]
 keywords = ["question answering"]
 license = {file = "LICENSE"}
 maintainers = [
     {email = "jamesbraza@gmail.com", name = "James Braza"},
+    {email = "michael.skarlinski@gmail.com", name = "Michael Skarlinski"},
     {email = "white.d.andrew@gmail.com", name = "Andrew White"},
 ]
 name = "paper-qa"
 readme = "README.md"
 requires-python = ">=3.8"
 urls = {repository = "https://github.com/whitead/paper-qa"}
+
+[project.optional-dependencies]
+agents = [
+    "anyio",
+    "langchain-community",
+    "langchain-openai",
+    "pymupdf",
+    "requests",
+    "tantivy",
+    "typer",
+    "typing_extensions",
+]
+dev = [
+    "build",
+    "mypy",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-subtests",
+    "pytest-sugar",
+    "pytest-timer",
+    "pytest-vcr",
+    "python-dotenv",
+    "pyzotero",
+    "requests",
+    "types-PyYAML",
+    "types-requests",
+    "types-setuptools",
+]
+google = [
+    "langchain-google-vertexai",
+    "vertexai",
+]
+llms = [
+    "anthropic",
+    "faiss-cpu",
+    "langchain-community",
+    "langchain-openai",
+    "pymupdf",
+    "sentence_transformers",
+    "voyageai",
+]
+
+[project.scripts]
+pqa = "paperqa.agents:app"
 
 [tool.codespell]
 check-filenames = true
@@ -115,6 +162,7 @@ unsafe-fixes = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
+    "C420",
     "FURB110",
     "FURB113",
     "FURB116",
@@ -137,7 +185,6 @@ extend-select = [
     "PLR6201",
     "PLW0108",
     "RUF022",
-    "RUF025",
 ]
 # List of rule codes that are unsupported by Ruff, but should be preserved when
 # (e.g.) validating # noqa directives. Useful for retaining # noqa directives
@@ -214,9 +261,6 @@ max-doc-length = 120  # Match line-length
 # Whether to use Google-style or NumPy-style conventions or the PEP257
 # defaults when analyzing docstring sections.
 convention = "google"
-
-[tool.setuptools.dynamic.optional-dependencies.dev]
-file = ["dev-requirements.txt"]
 
 [tool.setuptools.packages.find]
 include = ["paperqa*"]

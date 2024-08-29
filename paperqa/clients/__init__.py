@@ -150,6 +150,9 @@ class DocMetadataClient:
                 )
                 break
 
+        if self._session is None:
+            await session.close()
+
         return doc_details
 
     async def bulk_query(
@@ -160,18 +163,31 @@ class DocMetadataClient:
         )
 
     async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
+
+        # note we have some extra fields which may have come from reading the doc text,
+        # but aren't in the doc object, we add them here too.
+        extra_fields = {
+            k: v for k, v in kwargs.items() if k in {"title", "authors", "doi"}
+        }
+        # abuse our doc_details object to be an int if it's empty
+        # our __add__ operation supports int by doing nothing
+        extra_doc: int | DocDetails = (
+            0 if not extra_fields else DocDetails(**extra_fields)
+        )
+
         if doc_details := await self.query(**kwargs):
             if doc.overwrite_fields_from_metadata:
-                return doc_details
+                return extra_doc + doc_details
+
             # hard overwrite the details from the prior object
             doc_details.dockey = doc.dockey
             doc_details.doc_id = doc.dockey
             doc_details.docname = doc.docname
             doc_details.key = doc.docname
             doc_details.citation = doc.citation
-            return doc_details
+            return extra_doc + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
         prior_doc = doc.model_dump()
         prior_doc["overwrite_fields_from_metadata"] = False
-        return DocDetails(**prior_doc)
+        return DocDetails(**(prior_doc | extra_fields))

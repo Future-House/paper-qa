@@ -6,6 +6,7 @@ import inspect
 import json
 import logging
 import math
+import os
 import re
 import string
 from collections.abc import Iterable
@@ -92,11 +93,15 @@ def count_pdf_pages(file_path: StrPath) -> int:
     return num_pages
 
 
-def md5sum(file_path: StrPath) -> str:
-    import hashlib
+def hexdigest(data: str | bytes) -> str:
+    if isinstance(data, str):
+        return hashlib.md5(data.encode("utf-8")).hexdigest()  # noqa: S324
+    return hashlib.md5(data).hexdigest()  # noqa: S324
 
+
+def md5sum(file_path: StrPath) -> str:
     with open(file_path, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()  # noqa: S324
+        return hexdigest(f.read())
 
 
 async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
@@ -367,15 +372,17 @@ def bibtex_field_extract(
 
 
 def create_bibtex_key(author: list[str], year: str, title: str) -> str:
-    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":"}
+    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
     author_rep = (
         author[0].split()[-1].casefold()
         if "Unknown" not in author[0]
         else "unknownauthors"
     )
-    key = (
-        f"{author_rep}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
-    )
+    # we don't want a bibtex-parsing induced line break in the key
+    # so we cap it to 100+50+4 = 154 characters max
+    # 50 for the author, 100 for the first three title words, 4 for the year
+    # the first three title words are just emulating the s2 convention
+    key = f"{author_rep[:50]}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
     return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
 
 
@@ -398,7 +405,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,
+    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
@@ -419,3 +426,13 @@ async def _get_with_retrying(
 
 def union_collections_to_ordered_list(collections: Iterable) -> list:
     return sorted(reduce(lambda x, y: set(x) | set(y), collections))
+
+
+def pqa_directory(name: str) -> Path:
+    if pqa_home := os.environ.get("PQA_HOME"):
+        directory = Path(pqa_home) / ".pqa" / name
+    else:
+        directory = Path.home() / ".pqa" / name
+
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
