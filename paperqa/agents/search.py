@@ -250,7 +250,7 @@ class SearchIndex:
                 raise AsyncRetryError("Failed to acquire lock") from e
             raise
 
-    async def remove_from_index(self, file_location: str):
+    async def remove_from_index(self, file_location: str) -> None:
         index_files = await self.index_files
         if index_files.get(file_location):
             index = await self.index
