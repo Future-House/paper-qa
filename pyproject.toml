@@ -1,7 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-# Pin to 62.6 for support from reading requirements from requirements.txt
-requires = ["setuptools >= 62.6.0"]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
 
 [project]
 authors = [
@@ -24,29 +23,74 @@ dependencies = [
     "html2text",
     "numpy",
     "openai>=1",
-    "pydantic>=2",
+    "pybtex",
+    "pydantic~=2.0",
     "pypdf",
+    "tenacity",
     "tiktoken>=0.4.0",
 ]
 description = "LLM Chain for answering questions from docs"
-dynamic = ["optional-dependencies"]
+dynamic = ["version"]
 keywords = ["question answering"]
 license = {file = "LICENSE"}
 maintainers = [
     {email = "jamesbraza@gmail.com", name = "James Braza"},
+    {email = "michael.skarlinski@gmail.com", name = "Michael Skarlinski"},
     {email = "white.d.andrew@gmail.com", name = "Andrew White"},
 ]
 name = "paper-qa"
 readme = "README.md"
 requires-python = ">=3.8"
 urls = {repository = "https://github.com/whitead/paper-qa"}
-version = "4.8.1"
+
+[project.optional-dependencies]
+agents = [
+    "anyio",
+    "langchain-community",
+    "langchain-openai",
+    "pymupdf",
+    "requests",
+    "tantivy",
+    "typer",
+    "typing_extensions",
+]
+dev = [
+    "build",
+    "mypy",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-subtests",
+    "pytest-sugar",
+    "pytest-timer",
+    "pytest-vcr",
+    "python-dotenv",
+    "pyzotero",
+    "requests",
+    "types-PyYAML",
+    "types-requests",
+    "types-setuptools",
+]
+google = [
+    "langchain-google-vertexai",
+    "vertexai",
+]
+llms = [
+    "anthropic",
+    "faiss-cpu",
+    "langchain-community",
+    "langchain-openai",
+    "pymupdf",
+    "sentence_transformers",
+    "voyageai",
+]
+
+[project.scripts]
+pqa = "paperqa.agents:app"
 
 [tool.codespell]
 check-filenames = true
 check-hidden = true
-# SEE: https://github.com/codespell-project/codespell/issues/1212#issuecomment-1744768533
-ignore-regex = ".{1024}|.*codespell-ignore.*"
 ignore-words-list = "aadd,ser"
 
 [tool.mypy]
@@ -68,6 +112,8 @@ enable_error_code = [
 ]
 # Shows a short summary line after error messages.
 error_summary = false
+# Comma-separated list of mypy plugins.
+plugins = ["pydantic.mypy"]
 # Use visually nicer output in error messages: use soft word wrap, show source
 # code snippets, and show error location markers.
 pretty = true
@@ -97,6 +143,7 @@ module = [
     "fitz",
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
     "sentence_transformers",  # SEE: https://github.com/UKPLab/sentence-transformers/issues/1723
+    "voyageai.*",  # SEE: https://github.com/voyage-ai/voyageai-python/issues/8
 ]
 
 [tool.pytest.ini_options]
@@ -113,9 +160,38 @@ line-length = 120
 unsafe-fixes = true
 
 [tool.ruff.lint]
+explicit-preview-rules = true
+extend-select = [
+    "C420",
+    "FURB110",
+    "FURB113",
+    "FURB116",
+    "FURB118",
+    "FURB131",
+    "FURB132",
+    "FURB140",
+    "FURB142",
+    "FURB145",
+    "FURB148",
+    "FURB152",
+    "FURB154",
+    "FURB157",
+    "FURB164",
+    "FURB166",
+    "FURB171",
+    "FURB180",
+    "FURB192",
+    "PLR6104",
+    "PLR6201",
+    "PLW0108",
+    "RUF022",
+]
 # List of rule codes that are unsupported by Ruff, but should be preserved when
 # (e.g.) validating # noqa directives. Useful for retaining # noqa directives
 # that cover plugins not yet implemented by Ruff.
+external = [
+    "FURB",  # refurb
+]
 ignore = [
     "ANN",  # Don't care to enforce typing
     "BLE001",  # Don't care to enforce blind exception catching
@@ -158,6 +234,7 @@ ignore = [
     "TID252",  # Allow relative imports for packaging
     "TRY003",  # Overly pedantic
 ]
+preview = true
 select = ["ALL"]
 unfixable = [
     "B007",  # While debugging, unused loop variables can be useful
@@ -185,11 +262,11 @@ max-doc-length = 120  # Match line-length
 # defaults when analyzing docstring sections.
 convention = "google"
 
-[tool.setuptools.dynamic.optional-dependencies.dev]
-file = ["dev-requirements.txt"]
-
 [tool.setuptools.packages.find]
 include = ["paperqa*"]
+
+[tool.setuptools_scm]
+version_file = "paperqa/version.py"
 
 [tool.tomlsort]
 all = true

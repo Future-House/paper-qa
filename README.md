@@ -15,7 +15,7 @@ paper-qa uses the process shown below:
 2. embed query into vector
 3. search for top k passages in docs
 4. create summary of each passage relevant to query
-5. score and select only relevant summaries
+5. use an LLM to re-score and select only relevant summaries
 6. put summaries into prompt
 7. generate answer with prompt
 
@@ -63,16 +63,17 @@ You need to have an LLM to use paper-qa. You can use OpenAI, llama.cpp (via Serv
 To use paper-qa, you need to have a list of paths/files/urls (valid extensions include: .pdf, .txt). You can then use the `Docs` class to add the documents and then query them. `Docs` will try to guess citation formats from the content of the files, but you can also provide them yourself.
 
 ```python
-
 from paperqa import Docs
 
-my_docs = ...# get a list of paths
+my_docs = ...  # get a list of paths
 
 docs = Docs()
 for d in my_docs:
     docs.add(d)
 
-answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
+answer = docs.query(
+    "What manufacturing challenges are unique to bispecific antibodies?"
+)
 print(answer.formatted_answer)
 ```
 
@@ -86,22 +87,24 @@ paper-qa is written to be used asynchronously. The synchronous API is just a wra
 | ------------------- | -------------------- |
 | `Docs.add`          | `Docs.aadd`          |
 | `Docs.add_file`     | `Docs.aadd_file`     |
-| `Docs.add_url`      | `Docs.add_url`       |
+| `Docs.add_url`      | `Docs.aadd_url`      |
 | `Docs.get_evidence` | `Docs.aget_evidence` |
 | `Docs.query`        | `Docs.aquery`        |
 
 The synchronous version just call the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
 
-```py
+```python
 from paperqa import Docs
 
-my_docs = ...# get a list of paths
+my_docs = ...  # get a list of paths
 
 docs = Docs()
 for d in my_docs:
     await docs.aadd(d)
 
-answer = await docs.aquery("What manufacturing challenges are unique to bispecific antibodies?")
+answer = await docs.aquery(
+    "What manufacturing challenges are unique to bispecific antibodies?"
+)
 ```
 
 ### Adding Documents
@@ -110,32 +113,47 @@ answer = await docs.aquery("What manufacturing challenges are unique to bispecif
 
 ### Choosing Model
 
-By default, it uses a hybrid of `gpt-3.5-turbo` and `gpt-4-turbo`. You can adjust this:
+By default, it uses OpenAI models with a hybrid of `gpt-4o-mini` (for the re-ranking and summary step, `summary_llm` argument) and `gpt-4-turbo` (for the answering step, `llm` argument). You can adjust this:
 
-```py
-docs = Docs(llm='gpt-3.5-turbo')
+```python
+docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o")
 ```
 
-or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
+You can use Anthropic models by specifying an Anthropic client:
 
-```py
+```python
+from paperqa import Docs
+from anthropic import AsyncAnthropic
+
+docs = Docs(
+    llm="claude-3-5-sonnet-20240620",
+    summary_llm="claude-3-5-sonnet-20240620",
+    client=AsyncAnthropic(),
+)
+```
+
+Or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
+
+```python
 from paperqa import Docs
 from langchain_community.chat_models import ChatAnthropic
-docs = Docs(llm="langchain",
-            client=ChatAnthropic())
+
+docs = Docs(llm="langchain", client=ChatAnthropic())
 ```
 
 Note we split the model into the wrapper and `client`, which is `ChatAnthropic` here. This is because `client` stores the non-pickleable part and langchain LLMs are only sometimes serializable/pickleable. The paper-qa `Docs` must always serializable. Thus, we split the model into two parts.
 
-```py
+```python
 import pickle
-docs = Docs(llm="langchain",
-            client=ChatAnthropic())
+
+docs = Docs(llm="langchain", client=ChatAnthropic())
 model_str = pickle.dumps(docs)
 docs = pickle.loads(model_str)
 # but you have to set the client after loading
 docs.set_client(ChatAnthropic())
 ```
+
+We also support using [Anyscale](https://docs.anyscale.com/examples/work-with-openai/#call-the-openai-endpoint-with-an-openai-api-key) to utilized hosted open source models. To use it, you only need to set your `ANYSCALE_API_KEY` and `ANYSCALE_BASE_URL` environment variables or use an OpenAI client initialized with your `api_key` and `base_url` arguments from Anyscale.
 
 #### Locally Hosted
 
@@ -143,57 +161,122 @@ You can use llama.cpp to be the LLM. Note that you should be using relatively la
 
 The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
-```py
+```python
 from paperqa import Docs, LlamaEmbeddingModel
 from openai import AsyncOpenAI
 
 # start llamap.cpp client with
 
 local_client = AsyncOpenAI(
-    base_url="http://localhost:8080/v1",
-    api_key = "sk-no-key-required"
+    base_url="http://localhost:8080/v1", api_key="sk-no-key-required"
 )
 
-docs = Docs(client=local_client,
-            embedding_model=LlamaEmbeddingModel(),
-            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+docs = Docs(
+    client=local_client,
+    docs_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
+    texts_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
+    llm_model=OpenAILLMModel(
+        config=dict(
+            model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512
+        )
+    ),
+)
 ```
 
 ### Changing Embedding Model
 
-You can use langchain embedding models, or the [SentenceTransformer](https://www.sbert.net/) models. For example
+paper-qa defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Docs` object constructor:
 
-```py
+```python
+from paperqa import Docs
+
+docs = Docs(embedding="text-embedding-3-large")
+```
+
+`embedding` accepts:
+
+- Any OpenAI embedding model name
+- [VoyageAI](https://docs.voyageai.com/docs/embeddings) model names (usable if `voyageai` is installed and `VOYAGE_API_KEY` is set)
+- `"sentence-transformers"` to use `multi-qa-MiniLM-L6-cos-v1` via [Sentence Transformers](https://huggingface.co/sentence-transformers)
+- `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, any OpenAI or VoyageAI model can be used in the dense model name
+- `"sparse"` to use a sparse keyword embedding only
+
+For deeper embedding customization, embedding models and vector stores can be built separately and passed into the `Docs` object. Embedding models are used to create both paper-qa's index of document citation embedding vectors (`docs_index` argument) as well as the full-text embedding vectors (`texts_index` argument). They can both be specified as arguments when you create a new `Docs` object. You can use use any embedding model which implements paper-qa's `EmbeddingModel` class. For example, to use `text-embedding-3-large`:
+
+```python
+from paperqa import Docs, NumpyVectorStore, OpenAIEmbeddingModel
+
+docs = Docs(
+    docs_index=NumpyVectorStore(
+        embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")
+    ),
+    texts_index=NumpyVectorStore(
+        embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")
+    ),
+)
+```
+
+Note that embedding models are specified as attributes of paper-qa's `VectorStore` base class. `NumpyVectorStore` is the best place to start, it's a simple in-memory store, without an index. If a larger-than-memory vector store is needed, you can use the `LangchainVectorStore` like this:
+
+```python
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import OpenAIEmbeddings
+from paperqa import Docs, LangchainVectorStore
+
+docs = Docs(
+    docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
+    texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
+)
+```
+
+We support both local langchain embedding models and the [SentenceTransformer](https://www.sbert.net/) models. For example:
+
+```python
 from paperqa import Docs, SentenceTransformerEmbeddingModel
 from openai import AsyncOpenAI
 
 # start llamap.cpp client with
 
 local_client = AsyncOpenAI(
-    base_url="http://localhost:8080/v1",
-    api_key = "sk-no-key-required"
+    base_url="http://localhost:8080/v1", api_key="sk-no-key-required"
 )
 
-docs = Docs(client=local_client,
-            embedding_model=SentenceTransformerEmbeddingModel(),
-            llm_model=OpenAILLMModel(config=dict(model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+docs = Docs(
+    client=local_client,
+    docs_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
+    texts_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
+    llm_model=OpenAILLMModel(
+        config=dict(
+            model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512
+        )
+    ),
+)
 ```
 
-Just like in the above examples, we have to split the Langchain model into a client and model to keep `Docs` serializable.
+We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
 
-```py
+```python
+from paperqa import Docs, HybridEmbeddingModel, SparseEmbeddingModel, NumpyVectorStore
 
-from paperqa import Docs, LangchainEmbeddingModel
-
-docs = Docs(embedding_model=LangchainEmbeddingModel(), embedding_client=OpenAIEmbeddings())
+model = HybridEmbeddingModel(models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()])
+docs = Docs(
+    docs_index=NumpyVectorStore(embedding_model=model),
+    texts_index=NumpyVectorStore(embedding_model=model),
+)
 ```
+
+The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
 
 ### Adjusting number of sources
 
 You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources` and `max_sources` is the number of sources used in the final answer.
 
-```py
-docs.query("What manufacturing challenges are unique to bispecific antibodies?", k = 5, max_sources = 2)
+```python
+docs.query(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    k=5,
+    max_sources=2,
+)
 ```
 
 ### Using Code or HTML
@@ -201,15 +284,14 @@ docs.query("What manufacturing challenges are unique to bispecific antibodies?",
 You do not need to use papers -- you can use code or raw HTML. Note that this tool is focused on answering questions, so it won't do well at writing code. One note is that the tool cannot infer citations from code, so you will need to provide them yourself.
 
 ```python
-
 import glob
 
-source_files = glob.glob('**/*.js')
+source_files = glob.glob("**/*.js")
 
 docs = Docs()
 for f in source_files:
     # this assumes the file names are unique in code
-    docs.add(f, citation='File ' + os.path.name(f), docname=os.path.name(f))
+    docs.add(f, citation="File " + os.path.name(f), docname=os.path.name(f))
 answer = docs.query("Where is the search bar in the header defined?")
 print(answer)
 ```
@@ -218,26 +300,26 @@ print(answer)
 
 You may want to cache parsed texts and embeddings in an external database or file. You can then build a Docs object from those directly:
 
-```py
-
+```python
 docs = Docs()
 
 for ... in my_docs:
-    doc = Doc(docname=...,  citation=..., dockey=..., citation=...)
+    doc = Doc(docname=..., citation=..., dockey=..., citation=...)
     texts = [Text(text=..., name=..., doc=doc) for ... in my_texts]
     docs.add_texts(texts, doc)
 ```
 
 If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) vector store from langchain:
 
-```py
+```python
 from paperqa import LangchainVectorStore, Docs
 from langchain_community.vector_store import FAISS
 from langchain_openai import OpenAIEmbeddings
 
-my_index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-docs = Docs(texts_index=my_index)
-
+docs = Docs(
+    texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
+    docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
+)
 ```
 
 ## Where do I get papers?
@@ -272,7 +354,7 @@ To download papers, you need to get an API key for your account.
 
 With this, we can download papers from our library and add them to `paperqa`:
 
-```py
+```python
 from paperqa.contrib import ZoteroDB
 
 docs = paperqa.Docs()
@@ -289,13 +371,13 @@ them to the `Docs` object.
 
 We can also do specific queries of our Zotero library and iterate over the results:
 
-```py
+```python
 for item in zotero.iterate(
-        q="large language models",
-        qmode="everything",
-        sort="date",
-        direction="desc",
-        limit=100,
+    q="large language models",
+    qmode="everything",
+    sort="date",
+    direction="desc",
+    limit=100,
 ):
     print("Adding", item.title)
     docs.add(item.pdf, docname=item.key)
@@ -308,17 +390,19 @@ You can read more about the search syntax by typing `zotero.iterate?` in IPython
 If you want to search for papers outside of your own collection, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
 like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
 
-```py
-keyword_search = 'bispecific antibody manufacture'
+```python
+keyword_search = "bispecific antibody manufacture"
 papers = paperscraper.search_papers(keyword_search)
 docs = paperqa.Docs()
-for path,data in papers.items():
+for path, data in papers.items():
     try:
         docs.add(path)
     except ValueError as e:
         # sometimes this happens if PDFs aren't downloaded or readable
-        print('Could not read', path, e)
-answer = docs.query("What manufacturing challenges are unique to bispecific antibodies?")
+        print("Could not read", path, e)
+answer = docs.query(
+    "What manufacturing challenges are unique to bispecific antibodies?"
+)
 print(answer)
 ```
 
@@ -338,9 +422,15 @@ To execute a function on each chunk of LLM completions, you need to provide a fu
 def make_typewriter(step_name):
     def typewriter(chunk):
         print(chunk, end="")
-    return [typewriter] # <- note that this is a list of functions
+
+    return [typewriter]  # <- note that this is a list of functions
+
+
 ...
-docs.query("What manufacturing challenges are unique to bispecific antibodies?", get_callbacks=make_typewriter)
+docs.query(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    get_callbacks=make_typewriter,
+)
 ```
 
 ### Caching Embeddings
@@ -354,14 +444,16 @@ You can customize any of the prompts, using the `PromptCollection` class. For ex
 ```python
 from paperqa import Docs, Answer, PromptCollection
 
-my_qaprompt = "Answer the question '{question}' "
+my_qaprompt = (
+    "Answer the question '{question}' "
     "Use the context below if helpful. "
     "You can cite the context using the key "
     "like (Example2012). "
     "If there is insufficient context, write a poem "
     "about how you cannot answer.\n\n"
     "Context: {context}\n\n"
-prompts=PromptCollection(qa=my_qaprompt)
+)
+prompts = PromptCollection(qa=my_qaprompt)
 docs = Docs(prompts=prompts)
 ```
 
@@ -378,7 +470,7 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 ### How is this different from LangChain?
 
-There has been some great work on retrievers in langchain and you could say this is an example of a retriever.
+There has been some great work on retrievers in langchain and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
 
 ### Can I save or load?
 
@@ -395,5 +487,5 @@ with open("my_docs.pkl", "wb") as f:
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
 
-docs.set_client() #defaults to OpenAI
+docs.set_client()  # defaults to OpenAI
 ```

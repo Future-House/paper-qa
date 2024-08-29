@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import contextlib
 import os
 import pickle
 import tempfile
 import textwrap
 from io import BytesIO
 from pathlib import Path
+from typing import cast, no_type_check
 
 import numpy as np
 import pytest
@@ -21,6 +23,7 @@ from paperqa import (
     Text,
     print_callback,
 )
+from paperqa.clients import CrossrefProvider
 from paperqa.llms import (
     AnthropicLLMModel,
     EmbeddingModel,
@@ -50,7 +53,7 @@ from paperqa.utils import (
 
 
 def test_is_openai_model():
-    assert is_openai_model("gpt-3.5-turbo")
+    assert is_openai_model("gpt-4o-mini")
     assert is_openai_model("babbage-002")
     assert is_openai_model("gpt-4-1106-preview")
     assert is_openai_model("davinci-002")
@@ -504,7 +507,7 @@ async def test_chain_completion():
 async def test_chain_chat():
     client = AsyncOpenAI()
     llm = OpenAILLMModel(
-        config={"temperature": 0, "model": "gpt-3.5-turbo", "max_tokens": 56}
+        config={"temperature": 0, "model": "gpt-4o-mini", "max_tokens": 56}
     )
     call = llm.make_chain(
         client,
@@ -534,11 +537,12 @@ async def test_chain_chat():
 
 
 @pytest.mark.asyncio()
-async def test_anthropic_chain():
+async def test_anthropic_chain() -> None:
+
     try:
         from anthropic import AsyncAnthropic
     except ImportError:
-        return
+        pytest.skip("Test requires anthropic to be installed.")
 
     client = AsyncAnthropic()
     llm = AnthropicLLMModel()
@@ -665,7 +669,7 @@ def test_json_evidence() -> None:
         f.write(r.text)
     summary_llm = OpenAILLMModel(
         config={
-            "model": "gpt-3.5-turbo-1106",
+            "model": "gpt-4o-mini",
             "response_format": {"type": "json_object"},
             "temperature": 0.0,
         }
@@ -699,7 +703,7 @@ def test_custom_json_props():
         f.write(r.text)
     summary_llm = OpenAILLMModel(
         config={
-            "model": "gpt-3.5-turbo-0125",
+            "model": "gpt-4o-mini",
             "response_format": {"type": "json_object"},
             "temperature": 0.0,
         }
@@ -724,7 +728,7 @@ def test_custom_json_props():
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
-    assert "person_name" in evidence.contexts[0].model_extra
+    assert "person_name" in cast(dict, evidence.contexts[0].model_extra)
     assert "person_name: " in evidence.context
     answer = docs.query("What is Frederick Bates's greatest accomplishment?")
     assert "person_name" in answer.context
@@ -832,7 +836,7 @@ def test_custom_embedding():
     assert docs.docs["test"].embedding == [1, 2, 3]
 
 
-def test_sparse_embedding():
+def test_sparse_embedding() -> None:
     docs = Docs(
         docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
@@ -854,6 +858,8 @@ def test_sparse_embedding():
     ), "Embeddings should be 1D"
 
     # check the embeddings are the same size
+    assert docs.texts[0].embedding is not None
+    assert docs.texts[1].embedding is not None
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # test alias
@@ -868,12 +874,9 @@ def test_sparse_embedding():
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
 
-def test_hybrid_embedding():
+def test_hybrid_embedding() -> None:
     model = HybridEmbeddingModel(
-        models=[
-            OpenAIEmbeddingModel(),
-            SparseEmbeddingModel(),
-        ]
+        models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
     )
     docs = Docs(
         docs_index=NumpyVectorStore(embedding_model=model),
@@ -889,6 +892,8 @@ def test_hybrid_embedding():
     assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
     # check the embeddings are the same size
+    assert docs.texts[0].embedding is not None
+    assert docs.texts[1].embedding is not None
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # now try via alias
@@ -975,11 +980,11 @@ def test_custom_llm_stream():
 def test_langchain_llm():
     from langchain_openai import ChatOpenAI, OpenAI
 
-    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-3.5-turbo"))
+    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-4o-mini"))
     assert isinstance(docs.llm_model, LangchainLLMModel)
     assert isinstance(docs.summary_llm_model, LangchainLLMModel)
-    assert docs.llm == "gpt-3.5-turbo"
-    assert docs.summary_llm == "gpt-3.5-turbo"
+    assert docs.llm == "gpt-4o-mini"
+    assert docs.summary_llm == "gpt-4o-mini"
     docs.add_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1030,7 +1035,7 @@ def test_langchain_llm():
     assert docs2.summary_llm == "babbage-002"
     docs2.get_evidence(
         Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y)],  # noqa: ARG005
+        get_callbacks=lambda x: [print],  # noqa: ARG005
     )
 
 
@@ -1117,8 +1122,7 @@ async def test_langchain_vector_store():
     index.add_texts_and_embeddings(some_texts)
     assert index._store is not None
     # check search returns Text obj
-    data, score = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
-    print(data)
+    data, _ = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
     assert isinstance(data[0], Text)
 
     # now try with convenience
@@ -1178,21 +1182,21 @@ async def test_aquery():
 
 
 @pytest.mark.asyncio()
-async def test_adoc_match():
+async def test_adoc_match() -> None:
     docs = Docs()
     await docs.aadd_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
+        citation=(
+            'Wikipedia contributors. "Frederick Bates (politician)."'
+            " Wikipedia, The Free Encyclopedia. Wikipedia, The Free Encyclopedia,"
+            " Accessed now"
+        ),
         dockey="test",
     )
-    sources = await docs.adoc_match(
-        "What is Frederick Bates's greatest accomplishment?"
-    )
-    assert len(sources) > 0
-    sources = await docs.adoc_match(
-        "What is Frederick Bates's greatest accomplishment?"
-    )
-    assert len(sources) > 0
+    for _ in range(2):  # Check calling 2+ times doesn't wipe the Docs
+        assert await docs.adoc_match(
+            "What is Frederick Bates's greatest accomplishment?"
+        )
 
 
 def test_docs_pickle() -> None:
@@ -1206,14 +1210,14 @@ def test_docs_pickle() -> None:
         f.write(r.text)
         docs = Docs(
             llm_model=OpenAILLMModel(
-                config={"temperature": 0.0, "model": "gpt-3.5-turbo"}
+                config={"temperature": 0.0, "model": "gpt-4o-mini"}
             ),
             summary_llm_model=OpenAILLMModel(
-                config={"temperature": 0.0, "model": "gpt-3.5-turbo"}
+                config={"temperature": 0.0, "model": "gpt-4o-mini"}
             ),
         )
         assert docs._client is not None
-        old_config = docs.llm_model.config
+        old_config = cast(OpenAILLMModel, docs.llm_model).config
         old_sconfig = docs.summary_llm_model.config  # type: ignore[union-attr]
         docs.add(f.name, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)  # type: ignore[arg-type]
 
@@ -1321,6 +1325,48 @@ def test_pdf_reader():
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
+def test_pdf_reader_w_no_match_doc_details():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023", use_doc_details=True)  # type: ignore[arg-type]
+    # doc will be a DocDetails object, but nothing can be found
+    # thus, we retain the prior citation data
+    assert (
+        next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
+    )
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_pdf_reader_match_doc_details():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
+    # we limit to only crossref since s2 is too flaky
+    docs.add(
+        doc_path,  # type: ignore[arg-type]
+        "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
+        use_doc_details=True,
+        clients={CrossrefProvider},
+        fields=["author", "journal"],
+    )
+    doc_details = next(iter(docs.docs.values()))
+    assert doc_details.dockey == "5300ef1d5fb960d7"
+    # note year is unknown because citation string is only parsed for authors/title/doi
+    # AND we do not request it back from the metadata sources
+    assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
+    assert set(doc_details.authors) == {  # type: ignore[attr-defined]
+        "Geemi P. Wellawatte",
+        "Heta A. Gandhi",
+        "Aditi Seshadri",
+        "Andrew D. White",
+    }
+    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"  # type: ignore[attr-defined]
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
+
+
 def test_fileio_reader_pdf():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
@@ -1386,7 +1432,7 @@ def test_parser_only_reader():
     assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)
     assert parsed_text.metadata.chunk_metadata is None
     assert parsed_text.metadata.total_parsed_text_length == sum(
-        [len(t) for t in parsed_text.content.values()]  # type: ignore[misc,union-attr]
+        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
     )
 
 
@@ -1491,12 +1537,12 @@ def test_citation():
         f.write(r.text)
     docs = Docs()
     docs.add(doc_path)  # type: ignore[arg-type]
-    assert next(iter(docs.docs.values())).docname in (
+    assert next(iter(docs.docs.values())).docname in {
         "Wikipedia2024",
         "Frederick2024",
         "Wikipedia",
         "Frederick",
-    )
+    }
 
 
 def test_dockey_filter():
@@ -1578,15 +1624,12 @@ def test_query_filter():
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
-def test_zotera():
+def test_zotero() -> None:
     from paperqa.contrib import ZoteroDB
 
     Docs()
-    try:
+    with contextlib.suppress(ValueError):  # Close enough
         ZoteroDB(library_type="user")  # "group" if group library
-    except ValueError:
-        # close enough
-        return
 
 
 def test_too_much_evidence():
@@ -1595,7 +1638,7 @@ def test_too_much_evidence():
         # get wiki page about politician
         r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")  # noqa: S113
         f.write(r.text)
-    docs = Docs(llm="gpt-3.5-turbo", summary_llm="gpt-3.5-turbo")
+    docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
     # add with new dockey
     with open("example.txt", "w", encoding="utf-8") as f:
@@ -1676,7 +1719,9 @@ def test_post_prompt():
     docs.query("What country is Bates from?")
 
 
-def disabled_test_memory():
+@pytest.mark.skip("TODO: bring this back")
+@no_type_check  # TODO: remove this when restored
+def test_memory() -> None:
     # Not sure why, but gpt-3.5 cannot do this anymore.
     docs = Docs(memory=True, k=3, max_sources=1, llm="gpt-4", key_filter=False)
     docs.add_url(
@@ -1735,9 +1780,8 @@ def test_add_texts():
 
     for t1, t2 in zip(docs2.texts, docs.texts):
         assert t1.text == t2.text
-        print(
-            "docs2", np.array(t1.embedding).shape, "docs", np.array(t2.embedding).shape
-        )
+        assert t1.embedding is not None
+        assert t2.embedding is not None
         assert np.allclose(t1.embedding, t2.embedding, atol=1e-3)
     docs2._build_texts_index()
     # now do it again to test after text index is already built
@@ -1779,8 +1823,8 @@ def test_external_doc_index():
 
 def test_embedding_name_consistency():
     docs = Docs()
-    assert docs.embedding == "text-embedding-ada-002"
-    assert docs.texts_index.embedding_model.name == "text-embedding-ada-002"
+    assert docs.embedding == "text-embedding-3-small"
+    assert docs.texts_index.embedding_model.name == "text-embedding-3-small"
     docs = Docs(embedding="langchain")
     assert docs.embedding == "langchain"
     assert docs.texts_index.embedding_model.name == "langchain"
@@ -1793,9 +1837,9 @@ def test_embedding_name_consistency():
     )
     assert docs.embedding == "test"
 
-    docs = Docs(embedding="hybrid-text-embedding-ada-002")
+    docs = Docs(embedding="hybrid-text-embedding-3-small")
     assert isinstance(docs.docs_index.embedding_model, HybridEmbeddingModel)
-    assert docs.docs_index.embedding_model.models[0].name == "text-embedding-ada-002"
+    assert docs.docs_index.embedding_model.models[0].name == "text-embedding-3-small"
     assert docs.docs_index.embedding_model.models[1].name == "sparse"
 
 

@@ -19,8 +19,7 @@ qa_prompt = (
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
-    "If the context provides insufficient information and "
-    "the question cannot be directly answered, reply "
+    "If the context provides insufficient information reply "
     '"I cannot answer."'
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
@@ -51,6 +50,14 @@ citation_prompt = (
     "If reporting date accessed, the current year is 2024\n\n"
     "{text}\n\n"
     "Citation:"
+)
+
+structured_citation_prompt = (
+    "Extract the title, authors, and doi as a JSON from this MLA citation. "
+    "If any field can not be found, return it as null. "
+    "Use title, authors, and doi as keys, author's value should be a list of authors. "
+    "{citation}\n\n"
+    "Citation JSON:"
 )
 
 default_system_prompt = (

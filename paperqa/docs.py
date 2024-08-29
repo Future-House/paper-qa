@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
-import pprint  # noqa: F401
 import re
 import tempfile
 from datetime import datetime
@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from tenacity import retry, stop_after_attempt
 
 try:
     import voyageai
@@ -21,8 +22,7 @@ try:
 except ImportError:
     USE_VOYAGE = False
 
-
-from .core import retrieve
+from .clients import ALL_CLIENTS, DocMetadataClient
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -43,6 +43,7 @@ from .types import (
     CallbackFactory,
     Context,
     Doc,
+    DocDetails,
     DocKey,
     LLMResult,
     PromptCollection,
@@ -62,16 +63,18 @@ from .utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_callback(result: LLMResult):  # noqa: ARG001
+async def empty_callback(result: LLMResult):
     pass
 
 
-async def print_callback(result: LLMResult):  # noqa: ARG001
+async def print_callback(result: LLMResult):
     pass
 
 
 class Docs(BaseModel):
     """A collection of documents to be used for answering questions."""
+
+    model_config = ConfigDict(extra="forbid")
 
     # ephemeral vars that should not be pickled (_things)
     _client: Any | None = None
@@ -86,7 +89,7 @@ class Docs(BaseModel):
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
     embedding: str | None = "default"
-    docs: dict[DocKey, Doc] = {}
+    docs: dict[DocKey, Doc | DocDetails] = {}
     texts: list[Text] = []
     docnames: set[str] = set()
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
@@ -103,7 +106,6 @@ class Docs(BaseModel):
     llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
         default=empty_callback
     )
-    model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
         # We do it here because we need to move things to private attributes
@@ -143,10 +145,10 @@ class Docs(BaseModel):
             if (
                 data.summary_llm_model is None
                 and data.llm == "default"
-                and type(data.llm_model) == OpenAILLMModel
+                and isinstance(data.llm_model, OpenAILLMModel)
             ):
                 data.summary_llm_model = OpenAILLMModel(
-                    config={"model": "gpt-3.5-turbo", "temperature": 0.1}
+                    config={"model": "gpt-4o-mini", "temperature": 0.1}
                 )
             elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model
@@ -279,6 +281,11 @@ class Docs(BaseModel):
         docname: str | None = None,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        title: str | None = None,
+        doi: str | None = None,
+        authors: list[str] | None = None,
+        use_doc_details: bool = False,
+        **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
         # just put in temp file and use existing method
@@ -297,6 +304,11 @@ class Docs(BaseModel):
                 docname=docname,
                 dockey=dockey,
                 chunk_chars=chunk_chars,
+                title=title,
+                doi=doi,
+                authors=authors,
+                use_doc_details=use_doc_details,
+                **kwargs,
             )
 
     def add_url(
@@ -329,7 +341,7 @@ class Docs(BaseModel):
         """Add a document to the collection."""
         import urllib.request
 
-        with urllib.request.urlopen(url) as f:  # noqa: ASYNC100, S310
+        with urllib.request.urlopen(url) as f:  # noqa: ASYNC210, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
             return await self.aadd_file(
@@ -348,6 +360,11 @@ class Docs(BaseModel):
         disable_check: bool = False,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        title: str | None = None,
+        doi: str | None = None,
+        authors: list[str] | None = None,
+        use_doc_details: bool = False,
+        **kwargs,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -358,10 +375,15 @@ class Docs(BaseModel):
                 disable_check=disable_check,
                 dockey=dockey,
                 chunk_chars=chunk_chars,
+                title=title,
+                doi=doi,
+                authors=authors,
+                use_doc_details=use_doc_details,
+                **kwargs,
             )
         )
 
-    async def aadd(
+    async def aadd(  # noqa: C901, PLR0912, PLR0915
         self,
         path: Path,
         citation: str | None = None,
@@ -369,6 +391,12 @@ class Docs(BaseModel):
         disable_check: bool = False,
         dockey: DocKey | None = None,
         chunk_chars: int = 3000,
+        overlap: int = 250,
+        title: str | None = None,
+        doi: str | None = None,
+        authors: list[str] | None = None,
+        use_doc_details: bool = False,
+        **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
         if dockey is None:
@@ -382,7 +410,7 @@ class Docs(BaseModel):
             )
             # peak first chunk
             fake_doc = Doc(docname="", citation="", dockey=dockey)
-            texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=100)
+            texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=overlap)
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
             chain_result = await cite_chain({"text": texts[0].text}, None)
@@ -412,7 +440,55 @@ class Docs(BaseModel):
                 year = match.group(1)
             docname = f"{author}{year}"
         docname = self._get_unique_name(docname)
+
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
+
+        # try to extract DOI / title from the citation
+        if (doi is title is None) and use_doc_details:
+            structured_cite_chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=self.prompts.structured_cite,
+                skip_system=True,
+            )
+            chain_result = await structured_cite_chain({"citation": citation}, None)
+            with contextlib.suppress(json.JSONDecodeError):
+                clean_text = chain_result.text.strip("`")
+                if clean_text.startswith("json"):
+                    clean_text = clean_text.replace("json", "", 1)
+                citation_json = json.loads(clean_text)
+                if citation_title := citation_json.get("title"):
+                    title = citation_title
+                if citation_doi := citation_json.get("doi"):
+                    doi = citation_doi
+                if citation_author := citation_json.get("authors"):
+                    authors = citation_author
+
+        # see if we can upgrade to DocDetails
+        # if not, we can progress with a normal Doc
+        # if "overwrite_fields_from_metadata" is used:
+        # will map "docname" to "key", and "dockey" to "doc_id"
+        if (title or doi) and use_doc_details:
+            if kwargs.get("metadata_client"):
+                metadata_client = kwargs["metadata_client"]
+            else:
+                metadata_client = DocMetadataClient(
+                    session=kwargs.pop("session", None),
+                    clients=kwargs.pop("clients", ALL_CLIENTS),
+                )
+
+            query_kwargs: dict[str, Any] = {}
+
+            if doi:
+                query_kwargs["doi"] = doi
+            if authors:
+                query_kwargs["authors"] = authors
+            if title:
+                query_kwargs["title"] = title
+
+            doc = await metadata_client.upgrade_doc_to_doc_details(
+                doc, **(query_kwargs | kwargs)
+            )
+
         texts = read_doc(path, doc, chunk_chars=chunk_chars, overlap=100)
         # loose check to see if document was loaded
         if (
@@ -421,7 +497,7 @@ class Docs(BaseModel):
             or (not disable_check and not maybe_is_text(texts[0].text))
         ):
             raise ValueError(
-                f"This does not look like a text document: {path}. Path disable_check to ignore this error."
+                f"This does not look like a text document: {path}. Pass disable_check to ignore this error."
             )
         if await self.aadd_texts(texts, doc):
             return docname
@@ -504,6 +580,11 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
+    # no state modifications in adoc_match--only answer is changed
+    @retry(
+        stop=stop_after_attempt(3),
+        reraise=True,
+    )
     async def adoc_match(
         self,
         query: str,
@@ -527,12 +608,12 @@ class Docs(BaseModel):
         if len(matched_docs) == 0:
             return set()
         # this only works for gpt-4 (in my testing)
-        try:
+        with contextlib.suppress(AttributeError):
             if (
                 rerank is None
                 and (
-                    type(self.llm_model) == OpenAILLMModel
-                    and cast(OpenAILLMModel, self).config["model"].startswith("gpt-4")
+                    isinstance(self.llm_model, OpenAILLMModel)
+                    and self.llm_model.config["model"].startswith("gpt-4")
                 )
                 or rerank is True
             ):
@@ -553,8 +634,6 @@ class Docs(BaseModel):
                 if answer:
                     answer.add_tokens(result)
                 return {d.dockey for d in matched_docs if d.docname in str(result)}
-        except AttributeError:
-            pass
         return {d.dockey for d in matched_docs}
 
     def _build_texts_index(self, keys: set[DocKey] | None = None):
@@ -633,7 +712,7 @@ class Docs(BaseModel):
             callbacks = get_callbacks("evidence:" + match.name)
             citation = match.doc.citation
             # needed empties for failures/skips
-            llm_result = LLMResult(model="", date="")
+            llm_result = LLMResult(model="")
             extras: dict[str, Any] = {}
             if detailed_citations:
                 citation = match.name + ": " + citation
@@ -696,19 +775,21 @@ class Docs(BaseModel):
                 if self.strip_citations:
                     # remove citations that collide with our grounded citations (for the answer LLM)
                     context = strip_citations(context)
-            c = Context(
-                context=context,
-                text=Text(
-                    text=match.text,
-                    name=match.name,
-                    doc=match.doc.__class__(
-                        **match.doc.model_dump(exclude="embedding")
+            return (
+                Context(
+                    context=context,
+                    text=Text(
+                        text=match.text,
+                        name=match.name,
+                        doc=match.doc.__class__(
+                            **match.doc.model_dump(exclude="embedding")
+                        ),
                     ),
+                    score=score,
+                    **extras,
                 ),
-                score=score,
-                **extras,
+                llm_result,
             )
-            return c, llm_result
 
         results = await gather_with_concurrency(
             self.max_concurrent, [process(m) for m in matches]
@@ -716,17 +797,16 @@ class Docs(BaseModel):
         # update token counts
         [answer.add_tokens(r[1]) for r in results]
 
-        # filter out failures
-        contexts = [c for c, r in results if c is not None]
-
+        # filter out failures, sort by score, limit to max_sources
         answer.contexts = sorted(
-            contexts + answer.contexts, key=lambda x: x.score, reverse=True
-        )
-        answer.contexts = answer.contexts[:max_sources]
+            [c for c, r in results if c is not None] + answer.contexts,
+            key=lambda x: x.score,
+            reverse=True,
+        )[:max_sources]
         context_str = "\n\n".join(
             [
                 f"{c.text.name}: {c.context}"
-                + "".join([f"\n{k}: {v}" for k, v in c.model_extra.items()])
+                + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
                 + (f"\nFrom {c.text.doc.citation}" if detailed_citations else "")
                 for c in answer.contexts
             ]
@@ -801,9 +881,7 @@ class Docs(BaseModel):
             pre.answer_id = answer.id
             await self.llm_result_callback(pre)
             answer.add_tokens(pre)
-            answer.context = (
-                answer.context + "\n\nExtra background information:" + str(pre)
-            )
+            answer.context += f"\n\nExtra background information: {pre}"
         bib = {}
         if len(answer.context) < 10:  # and not self.memory:  # noqa: PLR2004
             answer_text = (
