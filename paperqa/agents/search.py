@@ -240,7 +240,7 @@ class SearchIndex:
         retry=retry_if_exception_type(AsyncRetryError),
         reraise=True,
     )
-    def delete_document(index: Index, file_location: str):
+    def delete_document(index: Index, file_location: str) -> None:
         try:
             writer = index.writer()
             writer.delete_documents("file_location", file_location)
@@ -250,7 +250,7 @@ class SearchIndex:
                 raise AsyncRetryError("Failed to acquire lock") from e
             raise
 
-    async def remove_from_index(self, file_location: str):
+    async def remove_from_index(self, file_location: str) -> None:
         index_files = await self.index_files
         if index_files.get(file_location):
             index = await self.index
@@ -265,7 +265,7 @@ class SearchIndex:
 
             self.changed = True
 
-    async def save_index(self):
+    async def save_index(self) -> None:
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -286,8 +286,8 @@ class SearchIndex:
                 return self.storage.read_from_string(content)
         return None
 
-    def clean_query(self, query: str):
-        for replace in ["*", "[", "]"]:
+    def clean_query(self, query: str) -> str:
+        for replace in {"*", "[", "]"}:
             query = query.replace(replace, "")
         return query
 

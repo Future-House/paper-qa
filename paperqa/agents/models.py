@@ -418,13 +418,11 @@ class SimpleProfiler(BaseModel):
     def results(self) -> dict[str, dict[str, float]]:
         result = {}
         for name, durations in self.timers.items():
-            low = min(durations)
             mean = sum(durations) / len(durations)
-            max_ = max(durations)
             result[name] = {
-                "low": low,
+                "low": min(durations),
                 "mean": mean,
-                "max": max_,
+                "max": max(durations),
                 "total": sum(durations),
             }
         return result
