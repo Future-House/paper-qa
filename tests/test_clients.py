@@ -8,6 +8,7 @@ import pytest
 
 import paperqa
 from paperqa.clients import (
+    ALL_CLIENTS,
     CrossrefProvider,
     DocMetadataClient,
     SemanticScholarProvider,
@@ -16,7 +17,7 @@ from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvide
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     ("paper_attributes"),
     [
@@ -38,6 +39,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Dec 2015. URL: https://doi.org/10.1063/1.4938384, doi:10.1063/1.4938384. "
                 "This article has 8 citations and is from a peer-reviewed journal."
             ),
+            "is_oa": False,
         },
         {
             "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
@@ -58,8 +60,9 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Jakub L'ala, Odhran O'Donoghue, Aleksandar Shtedritski, Sam Cox, Samuel G. Rodriques,"
                 " and Andrew D. White. Paperqa: retrieval-augmented generative agent for scientific "
                 "research. ArXiv, Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559, "
-                "doi:10.48550/arxiv.2312.07559. This article has 21 citations."
+                "doi:10.48550/arxiv.2312.07559. This article has 23 citations."
             ),
+            "is_oa": None,
         },
         {
             "title": "Augmenting large language models with chemistry tools",
@@ -80,26 +83,31 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and "
                 "Philippe Schwaller. Augmenting large language models with chemistry tools. Nature "
                 "Machine Intelligence, 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8, "
-                "doi:10.1038/s42256-024-00832-8. This article has 187 citations and is from a "
+                "doi:10.1038/s42256-024-00832-8. This article has 190 citations and is from a "
                 "domain leading peer-reviewed journal."
             ),
+            "is_oa": True,
         },
     ],
 )
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+        client = DocMetadataClient(session, clients=ALL_CLIENTS)
         details = await client.query(title=paper_attributes["title"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
-            if key != "source":
+            if key not in {"is_oa", "source"}:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
+            elif key == "is_oa":
+                assert (
+                    details.other.get("is_oa") == value  # type: ignore[union-attr]
+                ), "Open access data should match"
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     ("paper_attributes"),
     [
@@ -124,6 +132,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "by pooled prime editing. bioRxiv, Apr 2024. URL: https://doi.org/10.1101/2024.04.01.587366, "
                 "doi:10.1101/2024.04.01.587366. This article has 1 citations."
             ),
+            "is_oa": True,
         },
         {
             "title": (
@@ -148,6 +157,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "Biochemistry, 218:1-11, Feb 2001. URL: https://doi.org/10.1023/a:1007154515475, "
                 "doi:10.1023/a:1007154515475. This article has 7 citations and is from a peer-reviewed journal."
             ),
+            "is_oa": False,
         },
         {
             "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin",
@@ -162,24 +172,29 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "1962:145-145, Jun 2023. URL: https://doi.org/10.1007/s40278-023-41815-2, "
                 "doi:10.1007/s40278-023-41815-2. This article has 0 citations and is from a peer-reviewed journal."
             ),
+            "is_oa": False,
         },
     ],
 )
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+        client = DocMetadataClient(session, clients=ALL_CLIENTS)
         details = await client.query(doi=paper_attributes["doi"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
-            if key != "source":
+            if key not in {"is_oa", "source"}:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
+            elif key == "is_oa":
+                assert (
+                    details.other.get("is_oa") == value  # type: ignore[union-attr]
+                ), "Open access data should match"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bulk_doi_search():
     dois = [
         "10.1063/1.4938384",
@@ -196,8 +211,8 @@ async def test_bulk_doi_search():
         assert all(d for d in details), "All results should be non-None"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bulk_title_search():
     titles = [
         "Effect of native oxide layers on copper thin-film tensile properties: A reactive molecular dynamics study",
@@ -217,8 +232,8 @@ async def test_bulk_title_search():
         assert all(d for d in details), "All results should be non-None"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bad_titles():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -230,8 +245,8 @@ async def test_bad_titles():
         assert details, "Should find a similar title"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bad_dois():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -239,8 +254,8 @@ async def test_bad_dois():
         assert not details, "Should return None for bad doi"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_minimal_fields_filtering():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -263,8 +278,8 @@ async def test_minimal_fields_filtering():
         assert not details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_s2_only_fields_filtering():
     async with aiohttp.ClientSession() as session:
         # now get with authors just from one source
@@ -284,8 +299,8 @@ async def test_s2_only_fields_filtering():
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_crossref_journalquality_fields_filtering():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
@@ -313,8 +328,8 @@ async def test_crossref_journalquality_fields_filtering():
         ), "Citation should be populated"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_author_matching():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(session, clients=[CrossrefProvider])
@@ -342,8 +357,8 @@ async def test_author_matching():
         assert s2_details_w_author, "Should return results for good author"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_odd_client_requests():
     # try querying using an authors match, but not requesting authors back
     async with aiohttp.ClientSession() as session:
@@ -390,7 +405,7 @@ async def test_odd_client_requests():
         ), "Should return title even though we asked for some bad fields"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_ensure_robust_to_timeouts(monkeypatch):
     # 0.15 should be short enough to not get a response in time.
     monkeypatch.setattr(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.05)
@@ -407,7 +422,7 @@ async def test_ensure_robust_to_timeouts(monkeypatch):
     assert details is None, "Should return None for timeout"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_bad_init():
     with pytest.raises(
         ValueError, match="At least one MetadataProvider must be provided."
@@ -415,8 +430,8 @@ async def test_bad_init():
         client = DocMetadataClient(clients=[])  # noqa: F841
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog):
     caplog.set_level(logging.DEBUG)
     # were using a DOI that is NOT in crossref, but running the crossref client first
@@ -450,8 +465,8 @@ async def test_ensure_sequential_run(caplog):
         ), "Crossref should run first"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(caplog):
     caplog.set_level(logging.DEBUG)
     # now we should stop after hitting s2
