@@ -1,4 +1,4 @@
-from .docs import Answer, Context, Doc, Docs, PromptCollection, Text, print_callback
+from .docs import Answer, Docs, PromptCollection, print_callback
 from .llms import (
     AnthropicLLMModel,
     EmbeddingModel,
@@ -18,7 +18,7 @@ from .llms import (
     llm_model_factory,
     vector_store_factory,
 )
-from .types import DocDetails
+from .types import Context, Doc, DocDetails, Text
 from .version import __version__
 
 __all__ = [

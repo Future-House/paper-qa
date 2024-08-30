@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import inspect
-import json
 import logging
 import math
 import os
@@ -128,7 +127,7 @@ def get_score(text: str) -> int:
     if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
         return 0
     # check for not applicable, not relevant in summary
-    if "not applicable" in text.lower or "not relevant" in text.lower():
+    if "not applicable" in text.lower() or "not relevant" in text.lower():
         return 0
 
     score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
@@ -229,28 +228,6 @@ def is_coroutine_callable(obj):
     elif callable(obj):  # noqa: RET505
         return inspect.iscoroutinefunction(obj.__call__)
     return False
-
-
-def llm_read_json(text: str) -> dict:
-    """Read LLM output and extract JSON data from it."""
-    # fetch from markdown ```json if present
-    text = text.strip().split("```json")[-1].split("```")[0]
-    # split anything before the first {
-    text = "{" + text.split("{", 1)[-1]
-    # split anything after the last }
-    text = text.rsplit("}", 1)[0] + "}"
-
-    # escape new lines within strings
-    def replace_newlines(match: re.Match) -> str:
-        return match.group(0).replace("\n", "\\n")
-
-    # Match anything between double quotes
-    # including escaped quotes and other escaped characters.
-    # https://regex101.com/r/VFcDmB/1
-    pattern = r'"(?:[^"\\]|\\.)*"'
-    text = re.sub(pattern, replace_newlines, text)
-
-    return json.loads(text)
 
 
 def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:

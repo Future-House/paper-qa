@@ -23,6 +23,7 @@ except ImportError:
     USE_VOYAGE = False
 
 from .clients import ALL_CLIENTS, DocMetadataClient
+from .core import llm_parse_json, map_fxn_summary, retrieve
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -31,7 +32,6 @@ from .llms import (
     OpenAILLMModel,
     VectorStore,
     VoyageAIEmbeddingModel,
-    get_score,
     is_anyscale_model,
     llm_model_factory,
     vector_store_factory,
@@ -41,7 +41,6 @@ from .readers import read_doc
 from .types import (
     Answer,
     CallbackFactory,
-    Context,
     Doc,
     DocDetails,
     DocKey,
@@ -52,13 +51,11 @@ from .types import (
 from .utils import (
     gather_with_concurrency,
     get_loop,
-    llm_read_json,
     maybe_is_html,
     maybe_is_pdf,
     maybe_is_text,
     md5sum,
     name_in_text,
-    strip_citations,
 )
 
 
@@ -101,8 +98,6 @@ class Docs(BaseModel):
     deleted_dockeys: set[DocKey] = set()
     prompts: PromptCollection = PromptCollection()
     jit_texts_index: bool = False
-    # This is used to strip indirect citations that come up from the summary llm
-    strip_citations: bool = True
     llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
         default=empty_callback
     )
@@ -675,7 +670,7 @@ class Docs(BaseModel):
             )
         )
 
-    async def aget_evidence(  # noqa: C901, PLR0915
+    async def aget_evidence(
         self,
         answer: Answer,
         k: int = 10,  # Number of evidence pieces to retrieve
@@ -708,98 +703,42 @@ class Docs(BaseModel):
             exclude_text_filter=exclude_text_filter,
         )
 
-        async def process(match):  # noqa: C901, PLR0912
-            callbacks = get_callbacks("evidence:" + match.name)
-            citation = match.doc.citation
-            # needed empties for failures/skips
-            llm_result = LLMResult(model="")
-            extras: dict[str, Any] = {}
-            if detailed_citations:
-                citation = match.name + ": " + citation
-
-            if self.prompts.skip_summary:
-                context = match.text
-                score = 5
-            else:
-                if self.prompts.json_summary:
-                    summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
-                        client=self._client,
-                        prompt=self.prompts.summary_json,
-                        system_prompt=self.prompts.summary_json_system,
-                    )
-                else:
-                    summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
-                        client=self._client,
-                        prompt=self.prompts.summary,
-                        system_prompt=self.prompts.system,
-                    )
-                llm_result = await summary_chain(
-                    {
-                        "question": answer.question,
-                        "citation": citation,
-                        "summary_length": answer.summary_length,
-                        "text": match.text,
-                    },
-                    callbacks,
-                )
-                llm_result.answer_id = answer.id
-                llm_result.name = "evidence:" + match.name
-                await self.llm_result_callback(llm_result)
-                context = llm_result.text
-                success = True
-                if self.prompts.summary_json:
-                    try:
-                        result_data = llm_read_json(context)
-                    except json.decoder.JSONDecodeError:
-                        # fallback to string
-                        success = False
-                    else:
-                        success = isinstance(result_data, dict)
-                    if success:
-                        try:
-                            context = result_data.pop("summary")
-                            score = result_data.pop("relevance_score")
-                            result_data.pop("question", None)
-                            extras = result_data
-                        except KeyError:
-                            success = False
-                # fallback to string (or json mode not enabled)
-                if not success or not self.prompts.summary_json:
-                    # Process as string
-                    if (
-                        "not applicable" in context.lower()
-                        or "not relevant" in context.lower()
-                    ):
-                        return None, llm_result
-                    score = get_score(context)
-                if self.strip_citations:
-                    # remove citations that collide with our grounded citations (for the answer LLM)
-                    context = strip_citations(context)
-            return (
-                Context(
-                    context=context,
-                    text=Text(
-                        text=match.text,
-                        name=match.name,
-                        doc=match.doc.__class__(
-                            **match.doc.model_dump(exclude="embedding")
-                        ),
-                    ),
-                    score=score,
-                    **extras,
-                ),
-                llm_result,
+        if self.prompts.json_summary:
+            summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
+                client=self._client,
+                prompt=self.prompts.summary_json,
+                system_prompt=self.prompts.summary_json_system,
+            )
+        else:
+            summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
+                client=self._client,
+                prompt=self.prompts.summary,
+                system_prompt=self.prompts.system,
             )
 
         results = await gather_with_concurrency(
-            self.max_concurrent, [process(m) for m in matches]
+            self.max_concurrent,
+            [
+                map_fxn_summary(
+                    m,
+                    answer,
+                    summary_chain,
+                    llm_parse_json if self.prompts.json_summary else None,
+                    get_callbacks("evidence:" + m.name),
+                )
+                for m in matches
+            ],
         )
-        # update token counts
-        [answer.add_tokens(r[1]) for r in results]
 
-        # filter out failures, sort by score, limit to max_sources
+        # apply callbacks
+        [await self.llm_result_callback(r) for _, r in results]  # type: ignore[func-returns-value]
+
+        # update token counts
+        [answer.add_tokens(r) for _, r in results]
+
+        # filter out failures (score = 0), sort by score, limit to max_sources
         answer.contexts = sorted(
-            [c for c, r in results if c is not None] + answer.contexts,
+            [c for c, _ in results if c.score > 0] + answer.contexts,
             key=lambda x: x.score,
             reverse=True,
         )[:max_sources]
