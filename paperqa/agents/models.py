@@ -111,8 +111,7 @@ class AgentPromptCollection(BaseModel):
     timeout: float = Field(
         default=500.0,
         description=(
-            "Matches LangChain AgentExecutor.max_execution_time (seconds), the timeout"
-            " on agent execution."
+            "Matches LangChain AgentExecutor.max_execution_time (seconds), the timeout on agent execution."
         ),
     )
     should_pre_search: bool = Field(
@@ -170,12 +169,6 @@ class ChunkingOptions(str, Enum):
         # TODO: implement for future parsing options
         valid_parsing_dict: dict[str, list[ParsingOptions]] = {}
         return valid_parsing_dict.get(self.value, [])
-
-
-class ImpossibleParsingError(Exception):
-    """Error to throw when a parsing is impossible."""
-
-    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 class ParsingConfiguration(BaseModel):
@@ -310,7 +303,6 @@ class QueryRequest(BaseModel):
         embedding: str,
         parsing_configuration: ParsingConfiguration,
     ) -> str:
-
         # index name should use an absolute path
         # this way two different folders where the
         # user locally uses '.' will make different indexes
@@ -343,7 +335,9 @@ class AnswerResponse(BaseModel):
 
     @field_validator("answer")
     def strip_answer(
-        cls, v: Answer, info: ValidationInfo  # noqa: ARG002, N805
+        self,
+        v: Answer,
+        info: ValidationInfo,  # noqa: ARG002
     ) -> Answer:
         # This modifies in place, this is fine
         # because when a response is being constructed,
@@ -354,6 +348,7 @@ class AnswerResponse(BaseModel):
     async def get_summary(self, llm_model="gpt-4-turbo") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
+            # Force two lines to keep ruff and black happy
             "Use abbreviations or emojis if necessary."
         )
         model = OpenAILLMModel(config={"model": llm_model, "temperature": 0.1})

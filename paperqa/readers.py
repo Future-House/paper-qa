@@ -8,6 +8,7 @@ import html2text
 import tiktoken
 
 from .types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from .utils import ImpossibleParsingError
 from .version import __version__ as pqa_version
 
 
@@ -64,6 +65,10 @@ def chunk_pdf(
         raise NotImplementedError(
             f"ParsedText.content must be a `dict`, not {type(parsed_text.content)}."
         )
+
+    if not parsed_text.content:
+        # did not parse any text - an empty or (more likely) corrupted document
+        raise ImpossibleParsingError("No text was parsed from the document.")
 
     for page_num, page_text in parsed_text.content.items():
         split += page_text
@@ -301,6 +306,7 @@ def read_doc(
 
     # next chunk the parsed text
     if str_path.endswith(".pdf"):
+        print(str_path)
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )

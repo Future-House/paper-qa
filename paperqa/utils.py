@@ -14,7 +14,7 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
+from typing import Any, BinaryIO, ClassVar, Collection, Coroutine, Iterator, Union
 from uuid import UUID
 
 import aiohttp
@@ -68,6 +68,12 @@ def maybe_is_html(file: BinaryIO) -> bool:
     magic_number = file.read(4)
     file.seek(0)
     return magic_number in {b"<htm", b"<!DO", b"<xsl", b"<!X"}
+
+
+class ImpossibleParsingError(Exception):
+    """Error to throw when a parsing is impossible."""
+
+    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 def strings_similarity(s1: str, s2: str) -> float:
@@ -243,7 +249,6 @@ class CitationConversionError(Exception):
 
 
 def clean_upbibtex(bibtex: str) -> str:
-
     if not bibtex:
         return bibtex
 

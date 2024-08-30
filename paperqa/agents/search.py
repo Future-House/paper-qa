@@ -25,7 +25,7 @@ from tenacity import (
 
 from ..docs import Docs
 from ..types import DocDetails
-from ..utils import hexdigest, pqa_directory
+from ..utils import ImpossibleParsingError, hexdigest, pqa_directory
 from .models import SupportsPickle
 
 logger = logging.getLogger(__name__)
@@ -376,7 +376,7 @@ async def process_file(
                     fields=["title", "author", "journal", "year"],
                     use_doc_details=True,
                 )
-            except ValueError:
+            except (ValueError, ImpossibleParsingError):
                 logger.exception(
                     f"Error parsing {file_name}, skipping index for this file."
                 )
