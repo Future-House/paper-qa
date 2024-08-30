@@ -76,7 +76,7 @@ def llm_parse_json(text: str) -> dict:
 async def map_fxn_summary(
     text: Text,
     answer: Answer,
-    chain: Chain,
+    chain: Chain | None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: list[Callable[[str], None]] | None = None,
 ) -> tuple[Context, LLMResult]:
@@ -101,33 +101,40 @@ async def map_fxn_summary(
     llm_result = LLMResult(model="", date="")
     extras: dict[str, Any] = {}
     citation = text.name + ": " + text.doc.citation
-    llm_result = await chain(
-        {
-            "question": answer.question,
-            "citation": citation,
-            "summary_length": answer.summary_length,
-            "text": text.text,
-        },
-        callbacks,
-    )
-    llm_result.answer_id = answer.id
-    llm_result.name = "evidence:" + text.name
-    context = llm_result.text
-    result_data = parser(context) if parser else {}
-    success = bool(result_data)
-    if success:
-        try:
-            context = result_data.pop("summary")
-            score = (
-                result_data.pop("relevance_score")
-                if "relevance_score" in result_data
-                else get_score(context)
-            )
-            # just in case question was present
-            result_data.pop("question", None)
-            extras = result_data
-        except KeyError:
-            success = False
+    success = False
+
+    if chain:
+        llm_result = await chain(
+            {
+                "question": answer.question,
+                "citation": citation,
+                "summary_length": answer.summary_length,
+                "text": text.text,
+            },
+            callbacks,
+        )
+        llm_result.answer_id = answer.id
+        llm_result.name = "evidence:" + text.name
+        context = llm_result.text
+        result_data = parser(context) if parser else {}
+        success = bool(result_data)
+        if success:
+            try:
+                context = result_data.pop("summary")
+                score = (
+                    result_data.pop("relevance_score")
+                    if "relevance_score" in result_data
+                    else get_score(context)
+                )
+                # just in case question was present
+                result_data.pop("question", None)
+                extras = result_data
+            except KeyError:
+                success = False
+    else:
+        context = text.text
+        score = 5
+        success = True
     # remove citations that collide with our grounded citations (for the answer LLM)
     context = strip_citations(context)
     if not success:

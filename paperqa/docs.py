@@ -12,7 +12,14 @@ from typing import Any, BinaryIO, Callable, Coroutine, cast
 from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 from tenacity import retry, stop_after_attempt
 
 try:
@@ -91,15 +98,19 @@ class Docs(BaseModel):
     docnames: set[str] = set()
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
     docs_index: VectorStore = Field(default_factory=NumpyVectorStore)
-    name: str = "default"
-    index_path: Path | None = PAPERQA_DIR / name
+    name: str = Field(default="default", description="Name of this docs collection")
+    index_path: Path | None = Field(
+        default=PAPERQA_DIR, description="Path to save index", validate_default=True
+    )
     batch_size: int = 1
     max_concurrent: int = 4
     deleted_dockeys: set[DocKey] = set()
     prompts: PromptCollection = PromptCollection()
     jit_texts_index: bool = False
     llm_result_callback: Callable[[LLMResult], Coroutine[Any, Any, None]] = Field(
-        default=empty_callback
+        default=empty_callback,
+        description="A callback to be executed on all LLM results."
+        " Useful for tracking tokens/cost.",
     )
 
     def __init__(self, **data):
@@ -115,6 +126,13 @@ class Docs(BaseModel):
             data["docs_index"] = data.pop("doc_index")
         super().__init__(**data)
         self.set_client(client, embedding_client)
+
+    @field_validator("index_path")
+    @classmethod
+    def handle_default(cls, value: Path | None, info: ValidationInfo) -> Path | None:
+        if value == PAPERQA_DIR:
+            return PAPERQA_DIR / info.data["name"]
+        return value
 
     @model_validator(mode="before")
     @classmethod
@@ -703,18 +721,21 @@ class Docs(BaseModel):
             exclude_text_filter=exclude_text_filter,
         )
 
-        if self.prompts.json_summary:
-            summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
-                client=self._client,
-                prompt=self.prompts.summary_json,
-                system_prompt=self.prompts.summary_json_system,
-            )
-        else:
-            summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
-                client=self._client,
-                prompt=self.prompts.summary,
-                system_prompt=self.prompts.system,
-            )
+        summary_chain = None
+
+        if not self.prompts.skip_summary:
+            if self.prompts.json_summary:
+                summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
+                    client=self._client,
+                    prompt=self.prompts.summary_json,
+                    system_prompt=self.prompts.summary_json_system,
+                )
+            else:
+                summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
+                    client=self._client,
+                    prompt=self.prompts.summary,
+                    system_prompt=self.prompts.system,
+                )
 
         results = await gather_with_concurrency(
             self.max_concurrent,

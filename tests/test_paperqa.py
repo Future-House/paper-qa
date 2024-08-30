@@ -24,6 +24,7 @@ from paperqa import (
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
+from paperqa.core import llm_parse_json
 from paperqa.llms import (
     AnthropicLLMModel,
     EmbeddingModel,
@@ -36,14 +37,13 @@ from paperqa.llms import (
     OpenAILLMModel,
     SparseEmbeddingModel,
     VoyageAIEmbeddingModel,
-    get_score,
     guess_model_type,
     is_openai_model,
 )
 from paperqa.readers import read_doc
 from paperqa.utils import (
     get_citenames,
-    llm_read_json,
+    get_score,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -457,11 +457,11 @@ I have written the json you asked for.""",
 """,
     ],
 )
-def test_llm_read_json(example: str):
-    assert llm_read_json(example) == {"example": "json"}
+def test_llm_parse_json(example: str):
+    assert llm_parse_json(example) == {"example": "json"}
 
 
-def test_llm_read_json_newlines():
+def test_llm_parse_json_newlines():
     """Make sure that newlines in json are preserved and escaped."""
     example = textwrap.dedent(
         """
@@ -472,13 +472,13 @@ def test_llm_read_json_newlines():
         "relevance_score": 7
         }"""
     )
-    assert llm_read_json(example) == {
+    assert llm_parse_json(example) == {
         "summary": "A line\n\nAnother line",
         "relevance_score": 7,
     }
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_chain_completion():
     client = AsyncOpenAI()
     llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
@@ -503,7 +503,7 @@ async def test_chain_completion():
     assert completion.seconds_to_last_token > 0
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_chain_chat():
     client = AsyncOpenAI()
     llm = OpenAILLMModel(
@@ -530,13 +530,13 @@ async def test_chain_chat():
     assert completion.seconds_to_last_token > 0
 
     # check with mixed callbacks
-    async def ac(x):  # noqa: ARG001
+    async def ac(x):
         pass
 
     completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_anthropic_chain() -> None:
 
     try:
@@ -584,7 +584,7 @@ async def test_anthropic_chain() -> None:
     not (os.environ.get("ANYSCALE_BASE_URL") and os.environ.get("ANYSCALE_API_KEY")),
     reason="Anyscale URL and keys are not set",
 )
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_anyscale_chain():
     client = AsyncOpenAI(
         base_url=os.environ["ANYSCALE_BASE_URL"], api_key=os.environ["ANYSCALE_API_KEY"]
@@ -1090,7 +1090,7 @@ def test_voyage_embeddings():
     assert len(docs.docs["test"].embedding) == 1024, "Wrong voyage-2 embedding shape"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_langchain_vector_store():
     from langchain_community.vectorstores.faiss import FAISS
     from langchain_openai import OpenAIEmbeddings
@@ -1170,7 +1170,7 @@ async def test_langchain_vector_store():
     # will not work at this point - have to reset index
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_aquery():
     docs = Docs()
     await docs.aadd_url(
@@ -1181,7 +1181,7 @@ async def test_aquery():
     await docs.aquery("What is Frederick Bates's greatest accomplishment?")
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_adoc_match() -> None:
     docs = Docs()
     await docs.aadd_url(
