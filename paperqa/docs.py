@@ -22,7 +22,7 @@ try:
 except ImportError:
     USE_VOYAGE = False
 
-from .clients import ALL_CLIENTS, DocMetadataClient
+from .clients import DEFAULT_CLIENTS, DocMetadataClient
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -473,7 +473,7 @@ class Docs(BaseModel):
             else:
                 metadata_client = DocMetadataClient(
                     session=kwargs.pop("session", None),
-                    clients=kwargs.pop("clients", ALL_CLIENTS),
+                    clients=kwargs.pop("clients", DEFAULT_CLIENTS),
                 )
 
             query_kwargs: dict[str, Any] = {}

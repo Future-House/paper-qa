@@ -565,10 +565,12 @@ class DocDetails(Doc):
                 logger.warning(
                     f"Failed to generate bibtex for {data.get('docname') or data.get('citation')}"
                 )
-        if not data.get("citation"):
+        if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
                 data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
+        elif not data.get("citation"):
+            data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
     @model_validator(mode="before")

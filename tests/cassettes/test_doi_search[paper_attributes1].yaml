@@ -28,7 +28,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:01 GMT
+          - Thu, 29 Aug 2024 23:53:21 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -87,27 +87,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:02 GMT
+          - Thu, 29 Aug 2024 23:53:21 GMT
         Via:
-          - 1.1 ef066a0102f66b719933dbbef3bc5968.cloudfront.net (CloudFront)
+          - 1.1 4eed67f4be7da2537d3407735b8962a8.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - UTYNrOWx6hAF2oDHtNJriKFUfyI5WuhHnu6OER07rQycY9GGvhAXhg==
+          - HhLiN8GUWQnUBfgzuFDoxWgAwpeJpGSlYo40a5MygT1sZ2ZwjldeuA==
         X-Amz-Cf-Pop:
           - IAD55-P4
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cdcMHEwsvHcEB4w=
+          - dS59xGSjvHcEgbg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1446"
         x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:34:02 GMT
+          - Thu, 29 Aug 2024 23:53:21 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 1c51e9d8-caf7-4a06-ad5d-815a80bd1356
+          - fd8f8dfb-d4c9-428c-9892-8221b5fe69c1
       status:
         code: 200
         message: OK
@@ -135,7 +135,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 18:34:02 GMT
+          - Thu, 29 Aug 2024 23:53:21 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -152,6 +152,58 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=test@example.com
+    response:
+      body:
+        string:
+          '{"doi": "10.1023/a:1007154515475", "doi_url": "https://doi.org/10.1023/a:1007154515475",
+          "title": null, "genre": "journal-article", "is_paratext": false, "published_date":
+          "2001-01-01", "year": 2001, "journal_name": "Molecular and Cellular Biochemistry",
+          "journal_issns": "0300-8177", "journal_issn_l": "0300-8177", "journal_is_oa":
+          false, "journal_is_in_doaj": false, "publisher": "Springer Science and Business
+          Media LLC", "is_oa": false, "oa_status": "closed", "has_repository_copy":
+          false, "best_oa_location": null, "first_oa_location": null, "oa_locations":
+          [], "oa_locations_embargoed": [], "updated": "2021-01-15T22:46:04.723698",
+          "data_standard": 2, "z_authors": [{"given": "Subrata", "family": "Adak", "sequence":
+          "first"}, {"given": "Debashis", "family": "Bandyopadhyay", "sequence": "additional"},
+          {"given": "Uday", "family": "Bandyopadhyay", "sequence": "additional"}, {"given":
+          "Ranajit K.", "family": "Banerjee", "sequence": "additional"}]}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "453"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 29 Aug 2024 23:53:25 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1724975601&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=SKOqofjb3lZ5bzUOfi%2FzYH760JagHx8mAzVkqq6WQiM%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1724975601&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=SKOqofjb3lZ5bzUOfi%2FzYH760JagHx8mAzVkqq6WQiM%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
       status:
         code: 200
         message: OK
