@@ -413,6 +413,7 @@ async def get_directory_index(
     sync_index_w_directory: bool = True,
     use_absolute_directory_path: bool = PQA_INDEX_ABSOLUTE_PATHS,
     max_concurrency: int = 30,
+    recursive: bool = True,
     **docs_kwargs,
 ) -> SearchIndex:
     """
@@ -427,6 +428,7 @@ async def get_directory_index(
         use_absolute_directory_path: Use the absolute path for the directory.
         docs_kwargs: Keyword arguments for the Docs object.
         max_concurrency: maximum number of files to be simultaneously indexed.
+        recursive: Recursively search the directory for files.
     """
     semaphore = anyio.Semaphore(max_concurrency)
 
@@ -443,9 +445,13 @@ async def get_directory_index(
 
     valid_files = [
         file
-        async for file in directory.iterdir()
+        async for file in (directory.rglob("*") if recursive else directory.iterdir())
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
+    if len(valid_files) > 999:  # noqa: PLR2004
+        logger.warning(
+            f"Indexing {len(valid_files)} files. This may take several minutes."
+        )
     index_files = await search_index.index_files
 
     if missing := (set(index_files.keys()) - {str(f) for f in valid_files}):
