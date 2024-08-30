@@ -50,7 +50,7 @@ def agent_index_dir(agent_home_dir: Path) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
 
 
-@pytest.fixture(name="agent_test_kit")
+@pytest.fixture(name="agent_stub_answer")
 def fixture_stub_answer() -> Answer:
     return Answer(question="What is is a self-explanatory model?")
 

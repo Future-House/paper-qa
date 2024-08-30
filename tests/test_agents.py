@@ -65,7 +65,7 @@ async def test_get_directory_index(agent_index_dir):
     ], "Incorrect fields in index"
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
-    # added docs.keys come from md5 hash of the file location
+    # docs.keys come from md5 hash of the file contents
     assert results[0].docs.keys() == {
         md5sum((PAPER_DIRECTORY / "example.txt").absolute())
     }
@@ -242,12 +242,12 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
-    fixture_stub_answer, subtests: SubTests, agent_index_dir
+    agent_stub_answer, subtests: SubTests, agent_index_dir
 ) -> None:
-    tool_state = SharedToolState(docs=Docs(), answer=fixture_stub_answer)
+    tool_state = SharedToolState(docs=Docs(), answer=agent_stub_answer)
     search_count = 3  # Keep low for speed
     query = QueryRequest(
-        query=fixture_stub_answer.question,
+        query=agent_stub_answer.question,
         consider_sources=2,
         max_sources=1,
         agent_tools=AgentPromptCollection(
@@ -273,31 +273,29 @@ async def test_agent_sharing_state(
 
     with subtests.test(msg=GatherEvidenceTool.__name__):
         assert (
-            not fixture_stub_answer.contexts
+            not agent_stub_answer.contexts
         ), "No contexts is required for a later assertion"
 
         tool = GatherEvidenceTool(shared_state=tool_state, query=query)
-        await tool.arun(fixture_stub_answer.question)
+        await tool.arun(agent_stub_answer.question)
         assert (
-            len(fixture_stub_answer.dockey_filter) > 0
+            len(agent_stub_answer.dockey_filter) > 0
         ), "Filter did not preserve reference"
-        assert fixture_stub_answer.contexts, "Evidence did not return any results"
+        assert agent_stub_answer.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswerTool.__name__} working"):
         tool = GenerateAnswerTool(shared_state=tool_state, query=query)
-        result = await tool.arun(fixture_stub_answer.question)
+        result = await tool.arun(agent_stub_answer.question)
         assert re.search(
             pattern=SharedToolState.STATUS_SEARCH_REGEX_PATTERN, string=result
         )
-        assert (
-            len(fixture_stub_answer.answer) > 200
-        ), "Answer did not return any results"
+        assert len(agent_stub_answer.answer) > 200, "Answer did not return any results"
         assert (
             GenerateAnswerTool.extract_answer_from_message(result)
-            == fixture_stub_answer.answer
+            == agent_stub_answer.answer
         ), "Failed to regex extract answer from result"
         assert (
-            len(fixture_stub_answer.contexts) <= query.max_sources
+            len(agent_stub_answer.contexts) <= query.max_sources
         ), "Answer has more sources than expected"
 
     with subtests.test(msg=f"{GenerateAnswerTool.__name__} misconfigured query"):
