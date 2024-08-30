@@ -61,6 +61,7 @@ dev = [
     "pre-commit",
     "pytest",
     "pytest-asyncio",
+    "pytest-rerunfailures",
     "pytest-subtests",
     "pytest-sugar",
     "pytest-timer",

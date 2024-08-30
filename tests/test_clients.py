@@ -430,7 +430,7 @@ async def test_bad_init():
         client = DocMetadataClient(clients=[])  # noqa: F841
 
 
-@pytest.mark.vcr
+@pytest.mark.vcr(match_on=["host", "path"])
 @pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog):
     caplog.set_level(logging.DEBUG)
@@ -465,7 +465,7 @@ async def test_ensure_sequential_run(caplog):
         ), "Crossref should run first"
 
 
-@pytest.mark.vcr
+@pytest.mark.vcr(match_on=["host", "path"])
 @pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(caplog):
     caplog.set_level(logging.DEBUG)
