@@ -3,6 +3,55 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.unpaywall.org/v2/10.1007/s40278-023-41815-2?email=test@example.com
+    response:
+      body:
+        string:
+          '{"doi": "10.1007/s40278-023-41815-2", "doi_url": "https://doi.org/10.1007/s40278-023-41815-2",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "genre": "journal-article",
+          "is_paratext": false, "published_date": "2023-06-24", "year": 2023, "journal_name":
+          "Reactions Weekly", "journal_issns": "1179-2051", "journal_issn_l": "0114-9954",
+          "journal_is_oa": false, "journal_is_in_doaj": false, "publisher": "Springer
+          Science and Business Media LLC", "is_oa": false, "oa_status": "closed", "has_repository_copy":
+          false, "best_oa_location": null, "first_oa_location": null, "oa_locations":
+          [], "oa_locations_embargoed": [], "updated": "2023-06-24T05:46:22.445497",
+          "data_standard": 2, "z_authors": null}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "396"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 29 Aug 2024 23:58:47 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1724975927&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=05j3DY7YmOZ7W%2FQPmQcYH%2FJ2uhYRk9AoOgBPnOXbGes%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1724975927&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=05j3DY7YmOZ7W%2FQPmQcYH%2FJ2uhYRk9AoOgBPnOXbGes%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=test@example.com
     response:
       body:
@@ -34,7 +83,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:02 GMT
+          - Thu, 29 Aug 2024 23:58:47 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -84,27 +133,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:02 GMT
+          - Thu, 29 Aug 2024 23:58:47 GMT
         Via:
-          - 1.1 ddd3d8441374ce62d11d031216138152.cloudfront.net (CloudFront)
+          - 1.1 4091abb8cac392d8bc54145a27288bc6.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - pNq8XNMTPxZyPVVrRe1N7igInqU9ADvOVppmBatkSrtTJM4qVmgHxA==
+          - uLvuDYnS9NBsxAfeATF3zYEQp3Tjj48hzpuzKeWEEM4PG9K-S-UA4g==
         X-Amz-Cf-Pop:
           - IAD55-P4
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cdcMQHBhvHcEd-g=
+          - dS6wpEAUPHcEJgg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "837"
         x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:34:02 GMT
+          - Thu, 29 Aug 2024 23:58:47 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - e0ccacc5-3403-42dc-a0f4-c33a60337aa0
+          - c980f66a-63cf-4008-baea-97fbfa52358c
       status:
         code: 200
         message: OK
@@ -131,7 +180,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 18:34:03 GMT
+          - Thu, 29 Aug 2024 23:58:47 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

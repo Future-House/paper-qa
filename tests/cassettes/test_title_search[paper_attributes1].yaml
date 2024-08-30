@@ -3,15 +3,53 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=test@example.com
+    response:
+      body:
+        string: '{"elapsed_seconds":0.011,"results":[]}
+
+          '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "39"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 29 Aug 2024 23:22:33 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1724973753&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=7Ap4m1YZ4aLbo3b2Q9yXXrUrKhUit1f%2FFJGuK7MkyDg%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1724973753&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=7Ap4m1YZ4aLbo3b2Q9yXXrUrKhUit1f%2FFJGuK7MkyDg%3D
+        Server:
+          - gunicorn
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=test@example.com&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2004346,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2013144,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
           University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
-          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"]},{"DOI":"10.13039\/100006108","name":"National
-          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"]},{"DOI":"10.13039\/100000002","name":"National
-          Institutes of Health","doi-asserted-by":"publisher"}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
+          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
+          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
+          Institutes of Health","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100000002","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
           automate scientific claim verification using PubMed abstracts.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Materials
           and Methods<\/jats:title>\n                  <jats:p>We developed CliVER,
           an end-to-end scientific Claim VERification system that leverages retrieval-augmented
@@ -94,7 +132,7 @@ interactions:
           gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
           Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
           Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
-          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":28.253725,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":28.277683,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -108,11 +146,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "4472"
+          - "4502"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:33:57 GMT
+          - Thu, 29 Aug 2024 23:22:33 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -144,7 +182,7 @@ interactions:
           {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
           "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
           "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 21, "influentialCitationCount":
+          "venue": "arXiv.org", "year": 2023, "citationCount": 23, "influentialCitationCount":
           1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
           "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
           "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
@@ -156,7 +194,7 @@ interactions:
           "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
           Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
           "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}], "matchScore": 245.13031}]}
+          "Andrew D. White"}], "matchScore": 245.03687}]}
 
           '
       headers:
@@ -169,27 +207,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:33:58 GMT
+          - Thu, 29 Aug 2024 23:22:33 GMT
         Via:
-          - 1.1 4f3476fc0ed69f4f9209b2ccb91b0050.cloudfront.net (CloudFront)
+          - 1.1 e18d3804375a86d48383ad266efc5b0a.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - CwsOIjMLqJMdElsyLdeS2wwxKXgCRhX8CmKCRqs0eqpUoxdjaDKKdw==
+          - ACfvWEQwtTn9OWE8v_ItFnmDiKM4OAIYWKREPthcdTiaBAVnwRbfYw==
         X-Amz-Cf-Pop:
-          - IAD55-P4
+          - LAX50-P5
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cdcLUHkfPHcEbNA=
+          - dS1c9HJNvHcEu0Q=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1386"
         x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:33:58 GMT
+          - Thu, 29 Aug 2024 23:22:33 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 644ea493-688c-42a3-bfbf-e4778f4a1711
+          - 3ff3fb6b-1892-444c-963f-103bcff4fd87
       status:
         code: 200
         message: OK

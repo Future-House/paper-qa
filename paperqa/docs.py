@@ -486,7 +486,7 @@ class Docs(BaseModel):
             else:
                 metadata_client = DocMetadataClient(
                     session=kwargs.pop("session", None),
-                    clients=kwargs.pop("clients", ALL_CLIENTS),
+                    clients=kwargs.pop("clients", DEFAULT_CLIENTS),
                 )
 
             query_kwargs: dict[str, Any] = {}

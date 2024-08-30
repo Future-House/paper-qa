@@ -71,7 +71,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:51:22 GMT
+          - Thu, 29 Aug 2024 23:53:20 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -88,6 +88,79 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1101/2024.04.01.587366?email=test@example.com
+    response:
+      body:
+        string:
+          '{"doi": "10.1101/2024.04.01.587366", "doi_url": "https://doi.org/10.1101/2024.04.01.587366",
+          "title": "High-throughput screening of human genetic variants by pooled prime
+          editing", "genre": "posted-content", "is_paratext": false, "published_date":
+          "2024-04-01", "year": 2024, "journal_name": null, "journal_issns": null, "journal_issn_l":
+          null, "journal_is_oa": false, "journal_is_in_doaj": false, "publisher": "Cold
+          Spring Harbor Laboratory", "is_oa": true, "oa_status": "green", "has_repository_copy":
+          true, "best_oa_location": {"updated": "2024-04-03T02:38:26.107690", "url":
+          "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_pdf": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_landing_page": "https://doi.org/10.1101/2024.04.01.587366", "evidence":
+          "oa repository (via page says license)", "license": "cc-by", "version": "submittedVersion",
+          "host_type": "repository", "is_best": true, "pmh_id": null, "endpoint_id":
+          null, "repository_institution": null, "oa_date": "2024-04-01"}, "first_oa_location":
+          {"updated": "2024-04-03T02:38:26.107690", "url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_pdf": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_landing_page": "https://doi.org/10.1101/2024.04.01.587366", "evidence":
+          "oa repository (via page says license)", "license": "cc-by", "version": "submittedVersion",
+          "host_type": "repository", "is_best": true, "pmh_id": null, "endpoint_id":
+          null, "repository_institution": null, "oa_date": "2024-04-01"}, "oa_locations":
+          [{"updated": "2024-04-03T02:38:26.107690", "url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_pdf": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_landing_page": "https://doi.org/10.1101/2024.04.01.587366", "evidence":
+          "oa repository (via page says license)", "license": "cc-by", "version": "submittedVersion",
+          "host_type": "repository", "is_best": true, "pmh_id": null, "endpoint_id":
+          null, "repository_institution": null, "oa_date": "2024-04-01"}], "oa_locations_embargoed":
+          [], "updated": "2024-04-03T02:38:52.695109", "data_standard": 2, "z_authors":
+          [{"given": "Michael", "family": "Herger", "sequence": "first"}, {"given":
+          "Christina M.", "family": "Kajba", "sequence": "additional"}, {"given": "Megan",
+          "family": "Buckley", "sequence": "additional"}, {"given": "Ana", "family":
+          "Cunha", "sequence": "additional"}, {"given": "Molly", "family": "Strom",
+          "sequence": "additional"}, {"ORCID": "http://orcid.org/0000-0002-7767-8608",
+          "given": "Gregory M.", "family": "Findlay", "sequence": "additional", "authenticated-orcid":
+          false}]}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "736"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 29 Aug 2024 23:53:20 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1724975600&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=laj3cS8sKKbpeuiCyR8Z43p8pXOEJ%2FH0eYIUZai%2F3E8%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1724975600&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=laj3cS8sKKbpeuiCyR8Z43p8pXOEJ%2FH0eYIUZai%2F3E8%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
       status:
         code: 200
         message: OK
@@ -126,27 +199,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:51:22 GMT
+          - Thu, 29 Aug 2024 23:53:20 GMT
         Via:
-          - 1.1 d1dad7d3c339d87d553c26a84c9ca5d2.cloudfront.net (CloudFront)
+          - 1.1 4eed67f4be7da2537d3407735b8962a8.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - YdElWpMCzPZBBVcmqso_pKXH0JZf-c3i0htHXzE-jvK940UiDB0TfQ==
+          - nig_lPlTPDSDKegJrzZ6-Sxayalq9V9nQ6fBN9I7seV2KYmQ04KeWg==
         X-Amz-Cf-Pop:
           - IAD55-P4
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cdeutGf0PHcEffA=
+          - dS59qEVsPHcETfQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1325"
         x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:51:22 GMT
+          - Thu, 29 Aug 2024 23:53:20 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 62d15057-610f-4f42-be58-3d85daa4834e
+          - ebe78919-23a8-4c6e-802a-e1bf4b585e05
       status:
         code: 200
         message: OK
@@ -176,7 +249,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 18:51:23 GMT
+          - Thu, 29 Aug 2024 23:53:21 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

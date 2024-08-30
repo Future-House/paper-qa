@@ -45,6 +45,7 @@ urls = {repository = "https://github.com/whitead/paper-qa"}
 
 [project.optional-dependencies]
 agents = [
+    "anthropic",
     "anyio",
     "langchain-community",
     "langchain-openai",
