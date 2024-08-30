@@ -8,6 +8,7 @@ import pytest
 
 import paperqa
 from paperqa.clients import (
+    ALL_CLIENTS,
     CrossrefProvider,
     DocMetadataClient,
     SemanticScholarProvider,
@@ -38,6 +39,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Dec 2015. URL: https://doi.org/10.1063/1.4938384, doi:10.1063/1.4938384. "
                 "This article has 8 citations and is from a peer-reviewed journal."
             ),
+            "is_oa": False,
         },
         {
             "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
@@ -58,8 +60,9 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Jakub L'ala, Odhran O'Donoghue, Aleksandar Shtedritski, Sam Cox, Samuel G. Rodriques,"
                 " and Andrew D. White. Paperqa: retrieval-augmented generative agent for scientific "
                 "research. ArXiv, Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559, "
-                "doi:10.48550/arxiv.2312.07559. This article has 21 citations."
+                "doi:10.48550/arxiv.2312.07559. This article has 23 citations."
             ),
+            "is_oa": None,
         },
         {
             "title": "Augmenting large language models with chemistry tools",
@@ -80,23 +83,28 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and "
                 "Philippe Schwaller. Augmenting large language models with chemistry tools. Nature "
                 "Machine Intelligence, 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8, "
-                "doi:10.1038/s42256-024-00832-8. This article has 187 citations and is from a "
+                "doi:10.1038/s42256-024-00832-8. This article has 190 citations and is from a "
                 "domain leading peer-reviewed journal."
             ),
+            "is_oa": True,
         },
     ],
 )
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+        client = DocMetadataClient(session, clients=ALL_CLIENTS)
         details = await client.query(title=paper_attributes["title"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
-            if key != "source":
+            if key not in {"is_oa", "source"}:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
+            elif key == "is_oa":
+                assert (
+                    details.other.get("is_oa") == value  # type: ignore[union-attr]
+                ), "Open access data should match"
 
 
 @pytest.mark.vcr
@@ -124,6 +132,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "by pooled prime editing. bioRxiv, Apr 2024. URL: https://doi.org/10.1101/2024.04.01.587366, "
                 "doi:10.1101/2024.04.01.587366. This article has 1 citations."
             ),
+            "is_oa": True,
         },
         {
             "title": (
@@ -148,6 +157,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "Biochemistry, 218:1-11, Feb 2001. URL: https://doi.org/10.1023/a:1007154515475, "
                 "doi:10.1023/a:1007154515475. This article has 7 citations and is from a peer-reviewed journal."
             ),
+            "is_oa": False,
         },
         {
             "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin",
@@ -162,20 +172,25 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 "1962:145-145, Jun 2023. URL: https://doi.org/10.1007/s40278-023-41815-2, "
                 "doi:10.1007/s40278-023-41815-2. This article has 0 citations and is from a peer-reviewed journal."
             ),
+            "is_oa": False,
         },
     ],
 )
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+        client = DocMetadataClient(session, clients=ALL_CLIENTS)
         details = await client.query(doi=paper_attributes["doi"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
-            if key != "source":
+            if key not in {"is_oa", "source"}:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
+            elif key == "is_oa":
+                assert (
+                    details.other.get("is_oa") == value  # type: ignore[union-attr]
+                ), "Open access data should match"
 
 
 @pytest.mark.vcr
