@@ -67,8 +67,9 @@ def chunk_pdf(
         )
 
     if not parsed_text.content:
-        # did not parse any text - an empty or (more likely) corrupted document
-        raise ImpossibleParsingError("No text was parsed from the document.")
+        raise ImpossibleParsingError(
+            "No text was parsed from the PDF: either empty or corrupted."
+        )
 
     for page_num, page_text in parsed_text.content.items():
         split += page_text

@@ -35,6 +35,9 @@ PQA_INDEX_ABSOLUTE_PATHS = (
 )
 
 
+INDEXING_WARNING_THRESHOLD = 999
+
+
 class AsyncRetryError(Exception):
     """Flags a retry for another tenacity attempt."""
 
@@ -448,7 +451,7 @@ async def get_directory_index(
         async for file in (directory.rglob("*") if recursive else directory.iterdir())
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
-    if len(valid_files) > 999:  # noqa: PLR2004
+    if len(valid_files) > INDEXING_WARNING_THRESHOLD:
         logger.warning(
             f"Indexing {len(valid_files)} files. This may take several minutes."
         )
