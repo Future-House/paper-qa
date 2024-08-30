@@ -274,8 +274,9 @@ class QueryRequest(BaseModel):
         return self
 
     @field_validator("prompts")
+    @classmethod
     def update_prompts(
-        cls,  # noqa: N805
+        cls,
         v: PromptCollection,
         info: ValidationInfo,
     ) -> PromptCollection:
@@ -334,9 +335,8 @@ class AnswerResponse(BaseModel):
     stats: dict[str, str] | None = None
 
     @field_validator("answer")
-    def strip_answer(
-        cls, v: Answer, info: ValidationInfo
-    ) -> Answer:  # noqa: ARG002, N805
+    @classmethod
+    def strip_answer(cls, v: Answer, info: ValidationInfo) -> Answer:  # noqa: ARG003
         # This modifies in place, this is fine
         # because when a response is being constructed,
         # we should be done with the Answer object
@@ -346,7 +346,6 @@ class AnswerResponse(BaseModel):
     async def get_summary(self, llm_model="gpt-4-turbo") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
-            # Force two lines to keep ruff and black happy
             "Use abbreviations or emojis if necessary."
         )
         model = OpenAILLMModel(config={"model": llm_model, "temperature": 0.1})
