@@ -58,9 +58,9 @@ async def test_get_directory_index(agent_index_dir):
         index_directory=agent_index_dir,
     )
     assert index.fields == [
-        "title",
         "file_location",
         "body",
+        "title",
         "year",
     ], "Incorrect fields in index"
     assert len(await index.index_files) == 4, "Incorrect number of index files"
@@ -78,9 +78,9 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
         manifest_file=anyio.Path(PAPER_DIRECTORY) / "stub_manifest.csv",
     )
     assert index.fields == [
-        "title",
         "file_location",
         "body",
+        "title",
         "year",
     ], "Incorrect fields in index"
     # 4 = example.txt + example2.txt + paper.pdf + example.html
@@ -96,7 +96,6 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
 @pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
 @pytest.mark.asyncio
 async def test_agent_types(agent_index_dir, agent_type):
-
     question = "How can you use XAI for chemical property prediction?"
 
     request = QueryRequest(
