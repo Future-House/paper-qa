@@ -89,14 +89,14 @@ async def test_cli_clear(agent_index_dir: Path):
     assert show("indexes") == [], "Index not properly cleared"
 
 
-def test_cli_ask(agent_index_dir: Path):
+def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path):
     set_setting("consider_sources", "10")
     set_setting("max_sources", "2")
     set_setting("embedding", "sparse")
     set_setting("agent_tools.search_count", "1")
     answer = ask(
         "How can you use XAI for chemical property prediction?",
-        directory=Path(__file__).parent,
+        directory=stub_data_dir,
         index_directory=agent_index_dir,
     )
     assert isinstance(answer, AnswerResponse), "Answer not properly returned"
@@ -117,15 +117,15 @@ def test_cli_ask(agent_index_dir: Path):
     assert len(show("answers")) == 1, "An answer should be returned"
 
 
-def test_cli_index(agent_index_dir: Path, caplog):
+def test_cli_index(agent_index_dir: Path, stub_data_dir: Path, caplog):
 
-    build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
+    build_index(directory=stub_data_dir, index_directory=agent_index_dir)
 
     caplog.clear()
 
     ask(
         "How can you use XAI for chemical property prediction?",
-        directory=Path(__file__).parent,
+        directory=stub_data_dir,
         index_directory=agent_index_dir,
     )
 
@@ -139,13 +139,13 @@ def test_cli_index(agent_index_dir: Path, caplog):
     caplog.clear()
 
     # running again should not trigger any indexing
-    build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
+    build_index(directory=stub_data_dir, index_directory=agent_index_dir)
     assert not caplog.records, "Indexing should not be triggered again"
 
     # now we want to change the settings
     set_setting("embedding", "sparse")
 
     # running again should now re-trigger an indexing
-    build_index(directory=Path(__file__).parent, index_directory=agent_index_dir)
+    build_index(directory=stub_data_dir, index_directory=agent_index_dir)
 
     assert caplog.records, "Indexing should be triggered again"

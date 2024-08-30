@@ -186,7 +186,7 @@ def test_citations_with_nonstandard_chars():
     )
 
 
-def test_ablations(stub_data_dir):
+def test_ablations(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     with open(doc_path, "rb") as f:
         docs = Docs(prompts=PromptCollection(skip_summary=True))
@@ -209,7 +209,7 @@ def test_ablations(stub_data_dir):
         )
 
 
-def test_location_awareness(stub_data_dir):
+def test_location_awareness(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     with open(doc_path, "rb") as f:
         docs = Docs()
@@ -625,7 +625,7 @@ def test_docs():
     assert docs.summary_llm == "babbage-002"
 
 
-def test_evidence(stub_data_dir):
+def test_evidence(stub_data_dir: Path):
     doc_path = stub_data_dir / "example.html"
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -649,7 +649,7 @@ def test_evidence(stub_data_dir):
     assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
 
 
-def test_json_evidence(stub_data_dir) -> None:
+def test_json_evidence(stub_data_dir: Path) -> None:
     doc_path = stub_data_dir / "example.html"
 
     summary_llm = OpenAILLMModel(
@@ -677,7 +677,7 @@ def test_json_evidence(stub_data_dir) -> None:
     assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
 
 
-def test_custom_json_props(stub_data_dir):
+def test_custom_json_props(stub_data_dir: Path):
     doc_path = stub_data_dir / "example.html"
 
     summary_llm = OpenAILLMModel(
@@ -1243,7 +1243,7 @@ def test_docs_pickle() -> None:
     )
 
 
-def test_bad_context(stub_data_dir):
+def test_bad_context(stub_data_dir: Path):
     doc_path = stub_data_dir / "example.html"
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -1251,7 +1251,7 @@ def test_bad_context(stub_data_dir):
     assert "cannot answer" in answer.answer
 
 
-def test_repeat_keys(stub_data_dir):
+def test_repeat_keys(stub_data_dir: Path):
     doc_path = stub_data_dir / "example.txt"
     docs = Docs(
         llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
@@ -1274,7 +1274,7 @@ def test_repeat_keys(stub_data_dir):
     assert ds[1].docname == "Wiki2023a"
 
 
-def test_pdf_reader(stub_data_dir):
+def test_pdf_reader(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
@@ -1282,7 +1282,7 @@ def test_pdf_reader(stub_data_dir):
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_w_no_match_doc_details(stub_data_dir):
+def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023", use_doc_details=True)
@@ -1295,7 +1295,7 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir):
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_match_doc_details(stub_data_dir):
+def test_pdf_reader_match_doc_details(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
     # we limit to only crossref since s2 is too flaky
@@ -1322,7 +1322,7 @@ def test_pdf_reader_match_doc_details(stub_data_dir):
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_pdf(stub_data_dir):
+def test_fileio_reader_pdf(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     with open(doc_path, "rb") as f:
         docs = Docs()
@@ -1331,7 +1331,7 @@ def test_fileio_reader_pdf(stub_data_dir):
         assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_txt(stub_data_dir):
+def test_fileio_reader_txt(stub_data_dir: Path):
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
     with open(stub_data_dir / "example.txt", "rb") as file:
@@ -1346,7 +1346,7 @@ def test_fileio_reader_txt(stub_data_dir):
     assert "United States" in answer.answer
 
 
-def test_pdf_pypdf_reader(stub_data_dir):
+def test_pdf_pypdf_reader(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     splits1 = read_doc(
         Path(doc_path),
@@ -1368,7 +1368,7 @@ def test_pdf_pypdf_reader(stub_data_dir):
     )
 
 
-def test_parser_only_reader(stub_data_dir):
+def test_parser_only_reader(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     parsed_text = read_doc(
         Path(doc_path),
@@ -1386,7 +1386,7 @@ def test_parser_only_reader(stub_data_dir):
     )
 
 
-def test_chunk_metadata_reader(stub_data_dir):
+def test_chunk_metadata_reader(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     chunk_text, metadata = read_doc(
         Path(doc_path),
@@ -1427,10 +1427,10 @@ def test_chunk_metadata_reader(stub_data_dir):
     assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
-    doc_path = os.path.abspath(__file__)
+    doc_path = Path(os.path.abspath(__file__))
 
     chunk_text, metadata = read_doc(
-        Path(doc_path),
+        doc_path,
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
@@ -1446,7 +1446,7 @@ def test_chunk_metadata_reader(stub_data_dir):
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
-def test_prompt_length(stub_data_dir):
+def test_prompt_length(stub_data_dir: Path):
     doc_path = stub_data_dir / "example.txt"
     docs = Docs()
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -1464,7 +1464,7 @@ def test_code():
     docs.query("What function tests the preview?")
 
 
-def test_citation(stub_data_dir):
+def test_citation(stub_data_dir: Path):
     doc_path = stub_data_dir / "example.txt"
     docs = Docs()
     docs.add(doc_path)
@@ -1476,7 +1476,7 @@ def test_citation(stub_data_dir):
     }
 
 
-def test_dockey_filter(stub_data_dir, stub_data_dir_w_near_dupes):
+def test_dockey_filter(stub_data_dir: Path, stub_data_dir_w_near_dupes):
     """Test that we can filter evidence with dockeys."""
     doc_path = stub_data_dir / "example.txt"
     docs = Docs()
@@ -1491,7 +1491,7 @@ def test_dockey_filter(stub_data_dir, stub_data_dir_w_near_dupes):
     docs.get_evidence(answer)
 
 
-def test_dockey_delete(stub_data_dir, stub_data_dir_w_near_dupes):
+def test_dockey_delete(stub_data_dir: Path, stub_data_dir_w_near_dupes):
     """Test that we can filter evidence with dockeys."""
     doc_path = stub_data_dir / "example.txt"
     docs = Docs()
@@ -1522,7 +1522,7 @@ def test_dockey_delete(stub_data_dir, stub_data_dir_w_near_dupes):
     assert len(keys) == 1
 
 
-def test_query_filter(stub_data_dir, stub_data_dir_w_near_dupes):
+def test_query_filter(stub_data_dir: Path, stub_data_dir_w_near_dupes):
     """Test that we can filter evidence with in query."""
     doc_path = stub_data_dir / "example.txt"
     docs = Docs()
@@ -1548,7 +1548,7 @@ def test_zotero() -> None:
         ZoteroDB(library_type="user")  # "group" if group library
 
 
-def test_too_much_evidence(stub_data_dir, stub_data_dir_w_near_dupes):
+def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
     doc_path = stub_data_dir / "example2.txt"
     docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
     docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
@@ -1562,7 +1562,7 @@ def test_too_much_evidence(stub_data_dir, stub_data_dir_w_near_dupes):
     docs.query("What is Barrack's greatest accomplishment?", max_sources=10, k=10)
 
 
-def test_custom_prompts(stub_data_dir):
+def test_custom_prompts(stub_data_dir: Path):
     my_qaprompt = (
         "Answer the question '{question}' "
         "using the country name alone. For example: "
@@ -1577,7 +1577,7 @@ def test_custom_prompts(stub_data_dir):
     assert "United States" in answer.answer
 
 
-def test_pre_prompt(stub_data_dir):
+def test_pre_prompt(stub_data_dir: Path):
     pre = "Provide context you have memorized that could help answer '{question}'. "
 
     docs = Docs(prompts=PromptCollection(pre=pre))
@@ -1587,7 +1587,7 @@ def test_pre_prompt(stub_data_dir):
     docs.query("What country is Bates from?")
 
 
-def test_post_prompt(stub_data_dir):
+def test_post_prompt(stub_data_dir: Path):
     post = (
         "We are trying to answer the question below "
         "and have an answer provided. "

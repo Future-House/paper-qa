@@ -68,7 +68,7 @@ def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[
         if not (tmp_path / f"{filename}_modified.txt").exists():
             with open(stub_data_dir / filename) as f:
                 content = f.read()
-            with open(tmp_path / f"{filename}_modified.txt", "w") as f:
+            with open(tmp_path / f"{Path(filename).stem}_modified.txt", "w") as f:
                 f.write(content)
                 f.write("## MODIFIED FOR HASH")
 
