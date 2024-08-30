@@ -107,11 +107,6 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
 
         return self._create_doc_details(results)
 
-    @staticmethod
-    def clean_query(query: str) -> str:
-        """Toss out any word in the query that has a forbidden character."""
-        return query
-
     async def search_by_title(
         self,
         query: str,
@@ -123,8 +118,8 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
                 **(
                     await _get_with_retrying(
                         url=(
-                            f"{UNPAYWALL_BASE_URL}search?query={quote(self.clean_query(query))}"
-                            '&email={os.environ.get("UNPAYWALL_EMAIL", "test@example.com")}'
+                            f"{UNPAYWALL_BASE_URL}search?query={quote(query)}"
+                            f'&email={os.environ.get("UNPAYWALL_EMAIL", "test@example.com")}'
                         ),
                         params={},
                         session=session,

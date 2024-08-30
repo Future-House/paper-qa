@@ -159,7 +159,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=api@futurehouse.org
+      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=test@example.com
     response:
       body:
         string:

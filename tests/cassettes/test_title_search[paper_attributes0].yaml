@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.unpaywall.org/v2/search?query=Effect%20of%20native%20oxide%20layers%20on%20copper%20thin-film%20tensile%20properties:%20A%20reactive%20molecular%20dynamics%20study&email=api@futurehouse.org
+      uri: https://api.unpaywall.org/v2/search?query=Effect%20of%20native%20oxide%20layers%20on%20copper%20thin-film%20tensile%20properties:%20A%20reactive%20molecular%20dynamics%20study&email=test@example.com
     response:
       body:
         string:
