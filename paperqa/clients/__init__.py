@@ -13,16 +13,24 @@ from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor
 from .semantic_scholar import SemanticScholarProvider
+from .unpaywall import UnpaywallProvider
 
 logger = logging.getLogger(__name__)
 
-ALL_CLIENTS: (
+DEFAULT_CLIENTS: (
     Collection[type[MetadataPostProcessor | MetadataProvider]]
     | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
 ) = {
     CrossrefProvider,
     SemanticScholarProvider,
     JournalQualityPostProcessor,
+}
+
+ALL_CLIENTS: (
+    Collection[type[MetadataPostProcessor | MetadataProvider]]
+    | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
+) = DEFAULT_CLIENTS | {  # type: ignore[operator]
+    UnpaywallProvider,
 }
 
 
@@ -59,7 +67,7 @@ class DocMetadataClient:
         clients: (
             Collection[type[MetadataPostProcessor | MetadataProvider]]
             | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
-        ) = ALL_CLIENTS,
+        ) = DEFAULT_CLIENTS,
     ) -> None:
         """Metadata client for querying multiple metadata providers and processors.
 
