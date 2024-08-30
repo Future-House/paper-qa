@@ -186,9 +186,8 @@ def test_citations_with_nonstandard_chars():
     )
 
 
-def test_ablations():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_ablations(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     with open(doc_path, "rb") as f:
         docs = Docs(prompts=PromptCollection(skip_summary=True))
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
@@ -210,9 +209,8 @@ def test_ablations():
         )
 
 
-def test_location_awareness():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_location_awareness(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     with open(doc_path, "rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
@@ -627,16 +625,10 @@ def test_docs():
     assert docs.summary_llm == "babbage-002"
 
 
-def test_evidence():
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+def test_evidence(stub_data_dir):
+    doc_path = stub_data_dir / "example.html"
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     original_doc = next(iter(docs.docs.values()))
     assert (
         original_doc.embedding is not None
@@ -655,18 +647,11 @@ def test_evidence():
         detailed_citations=True,
     )
     assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
-    os.remove(doc_path)
 
 
-def test_json_evidence() -> None:
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)", timeout=30.0
-        )
-        r.raise_for_status()
-        f.write(r.text)
+def test_json_evidence(stub_data_dir) -> None:
+    doc_path = stub_data_dir / "example.html"
+
     summary_llm = OpenAILLMModel(
         config={
             "model": "gpt-4o-mini",
@@ -679,7 +664,7 @@ def test_json_evidence() -> None:
         summary_llm_model=summary_llm,
         llm_result_callback=print_callback,
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
@@ -690,17 +675,11 @@ def test_json_evidence() -> None:
         detailed_citations=True,
     )
     assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
-    os.remove(doc_path)
 
 
-def test_custom_json_props():
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+def test_custom_json_props(stub_data_dir):
+    doc_path = stub_data_dir / "example.html"
+
     summary_llm = OpenAILLMModel(
         config={
             "model": "gpt-4o-mini",
@@ -724,7 +703,7 @@ def test_custom_json_props():
         summary_llm_model=summary_llm,
         llm_result_callback=print_callback,
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     evidence = docs.get_evidence(
         Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
     )
@@ -732,7 +711,6 @@ def test_custom_json_props():
     assert "person_name: " in evidence.context
     answer = docs.query("What is Frederick Bates's greatest accomplishment?")
     assert "person_name" in answer.context
-    os.remove(doc_path)
 
 
 def test_query():
@@ -1265,46 +1243,29 @@ def test_docs_pickle() -> None:
     )
 
 
-def test_bad_context():
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+def test_bad_context(stub_data_dir):
+    doc_path = stub_data_dir / "example.html"
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What is the radius of Jupyter?")
     assert "cannot answer" in answer.answer
-    os.remove(doc_path)
 
 
-def test_repeat_keys():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+def test_repeat_keys(stub_data_dir):
+    doc_path = stub_data_dir / "example.txt"
     docs = Docs(
         llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     try:  # noqa: SIM105
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     except ValueError:
         pass
     assert len(docs.docs) == 1
 
     # now with different paths
-    doc_path2 = "example2.txt"
-    with open(doc_path2, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        f.write(r.text)
-        f.write("\n")  # so we don't have same hash
-    docs.add(doc_path2, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    doc_path2 = stub_data_dir / "example2.txt"
+    docs.add(doc_path2, "WikiMedia Foundation, 2023, Accessed now")
     assert len(docs.docs) == 2
 
     # check keys
@@ -1312,24 +1273,19 @@ def test_repeat_keys():
     assert ds[0].docname == "Wiki2023"
     assert ds[1].docname == "Wiki2023a"
 
-    os.remove(doc_path)
-    os.remove(doc_path2)
 
-
-def test_pdf_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_pdf_reader(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
-    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")  # type: ignore[arg-type]
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     answer = docs.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_w_no_match_doc_details():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_pdf_reader_w_no_match_doc_details(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
-    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023", use_doc_details=True)  # type: ignore[arg-type]
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023", use_doc_details=True)
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
     assert (
@@ -1339,13 +1295,12 @@ def test_pdf_reader_w_no_match_doc_details():
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_match_doc_details():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_pdf_reader_match_doc_details(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
     # we limit to only crossref since s2 is too flaky
     docs.add(
-        doc_path,  # type: ignore[arg-type]
+        doc_path,
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
         use_doc_details=True,
         clients={CrossrefProvider},
@@ -1367,9 +1322,8 @@ def test_pdf_reader_match_doc_details():
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_pdf():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_fileio_reader_pdf(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     with open(doc_path, "rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
@@ -1377,16 +1331,14 @@ def test_fileio_reader_pdf():
         assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_txt():
+def test_fileio_reader_txt(stub_data_dir):
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
-    r = requests.get(  # noqa: S113
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-    )
-    if r.status_code != 200:
-        raise ValueError("Could not download wikipedia page")
+    with open(stub_data_dir / "example.txt", "rb") as file:
+        file_content = file.read()
+
     docs.add_file(
-        BytesIO(r.text.encode()),
+        BytesIO(file_content),
         "WikiMedia Foundation, 2023, Accessed now",
         chunk_chars=1000,
     )
@@ -1394,9 +1346,8 @@ def test_fileio_reader_txt():
     assert "United States" in answer.answer
 
 
-def test_pdf_pypdf_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_pdf_pypdf_reader(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     splits1 = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
@@ -1417,9 +1368,8 @@ def test_pdf_pypdf_reader():
     )
 
 
-def test_parser_only_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_parser_only_reader(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     parsed_text = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
@@ -1436,9 +1386,8 @@ def test_parser_only_reader():
     )
 
 
-def test_chunk_metadata_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_chunk_metadata_reader(stub_data_dir):
+    doc_path = stub_data_dir / "paper.pdf"
     chunk_text, metadata = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
@@ -1459,13 +1408,7 @@ def test_chunk_metadata_reader():
         for i in range(len(chunk_text) - 1)
     )
 
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+    doc_path = stub_data_dir / "example.html"
 
     chunk_text, metadata = read_doc(
         Path(doc_path),
@@ -1503,16 +1446,10 @@ def test_chunk_metadata_reader():
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
-def test_prompt_length():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+def test_prompt_length(stub_data_dir):
+    doc_path = stub_data_dir / "example.txt"
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What is the name of the politician?")
 
 
@@ -1527,16 +1464,10 @@ def test_code():
     docs.query("What function tests the preview?")
 
 
-def test_citation():
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+def test_citation(stub_data_dir):
+    doc_path = stub_data_dir / "example.txt"
     docs = Docs()
-    docs.add(doc_path)  # type: ignore[arg-type]
+    docs.add(doc_path)
     assert next(iter(docs.docs.values())).docname in {
         "Wikipedia2024",
         "Frederick2024",
@@ -1545,42 +1476,32 @@ def test_citation():
     }
 
 
-def test_dockey_filter():
+def test_dockey_filter(stub_data_dir, stub_data_dir_w_near_dupes):
     """Test that we can filter evidence with dockeys."""
-    doc_path = "example2.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+    doc_path = stub_data_dir / "example.txt"
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     # add with new dockey
-    with open("example.txt", "w", encoding="utf-8") as f:
-        f.write(r.text)
-        f.write("\n")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")  # type: ignore[arg-type]
+    docs.add(
+        stub_data_dir_w_near_dupes / "example_modified.txt",
+        "WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
     answer = Answer(question="What country is Bates from?", dockey_filter=["test"])
     docs.get_evidence(answer)
 
 
-def test_dockey_delete():
+def test_dockey_delete(stub_data_dir, stub_data_dir_w_near_dupes):
     """Test that we can filter evidence with dockeys."""
-    doc_path = "example2.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+    doc_path = stub_data_dir / "example.txt"
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     # add with new dockey
-    with open("example.txt", "w", encoding="utf-8") as f:
-        f.write(r.text)
-        f.write("\n\nBates could be from Angola")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", docname="test")  # type: ignore[arg-type]
+    docs.add(
+        stub_data_dir_w_near_dupes / "example_modified.txt",
+        "WikiMedia Foundation, 2023, Accessed now",
+        docname="test",
+    )
     answer = Answer(question="What country was Bates born in?")
     answer = docs.get_evidence(
         answer, max_sources=25, k=30
@@ -1601,25 +1522,20 @@ def test_dockey_delete():
     assert len(keys) == 1
 
 
-def test_query_filter():
+def test_query_filter(stub_data_dir, stub_data_dir_w_near_dupes):
     """Test that we can filter evidence with in query."""
-    doc_path = "example2.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+    doc_path = stub_data_dir / "example.txt"
     docs = Docs()
     docs.add(
-        doc_path,  # type: ignore[arg-type]
+        doc_path,
         "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
     )
     # add with new dockey
-    with open("example.txt", "w", encoding="utf-8") as f:
-        f.write(r.text)
-        f.write("\n")  # so we don't have same hash
-    docs.add("example.txt", "WikiMedia Foundation, 2023, Accessed now", dockey="test")  # type: ignore[arg-type]
+    docs.add(
+        stub_data_dir_w_near_dupes / "example_modified.txt",
+        "WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
     docs.query("What country is Bates from?", key_filter=True)
     # the filter shouldn't trigger, so just checking that it doesn't crash
 
@@ -1632,20 +1548,13 @@ def test_zotero() -> None:
         ZoteroDB(library_type="user")  # "group" if group library
 
 
-def test_too_much_evidence():
-    doc_path = "example2.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get("https://en.wikipedia.org/wiki/Barack_Obama")  # noqa: S113
-        f.write(r.text)
+def test_too_much_evidence(stub_data_dir, stub_data_dir_w_near_dupes):
+    doc_path = stub_data_dir / "example2.txt"
     docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     # add with new dockey
-    with open("example.txt", "w", encoding="utf-8") as f:
-        f.write(r.text)
-        f.write("\n")  # so we don't have same hash
     docs.add(
-        "example.txt",  # type: ignore[arg-type]
+        stub_data_dir_w_near_dupes / "example2_modified.txt",
         "WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
         chunk_chars=4000,
@@ -1653,7 +1562,7 @@ def test_too_much_evidence():
     docs.query("What is Barrack's greatest accomplishment?", max_sources=10, k=10)
 
 
-def test_custom_prompts():
+def test_custom_prompts(stub_data_dir):
     my_qaprompt = (
         "Answer the question '{question}' "
         "using the country name alone. For example: "
@@ -1662,35 +1571,23 @@ def test_custom_prompts():
 
     docs = Docs(prompts=PromptCollection(qa=my_qaprompt))
 
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    doc_path = stub_data_dir / "example.html"
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country is Frederick Bates from?")
     assert "United States" in answer.answer
 
 
-def test_pre_prompt():
+def test_pre_prompt(stub_data_dir):
     pre = "Provide context you have memorized that could help answer '{question}'. "
 
     docs = Docs(prompts=PromptCollection(pre=pre))
 
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    doc_path = stub_data_dir / "example.txt"
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What country is Bates from?")
 
 
-def test_post_prompt():
+def test_post_prompt(stub_data_dir):
     post = (
         "We are trying to answer the question below "
         "and have an answer provided. "
@@ -1701,14 +1598,8 @@ def test_post_prompt():
 
     docs = Docs(prompts=PromptCollection(post=post))
 
-    doc_path = "example.txt"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    doc_path = stub_data_dir / "example.txt"
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
     docs.query("What country is Bates from?")
 
     docs = Docs(

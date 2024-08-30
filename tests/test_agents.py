@@ -47,13 +47,10 @@ except ImportError:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
-PAPER_DIRECTORY = Path(__file__).parent
-
-
 @pytest.mark.asyncio
-async def test_get_directory_index(agent_index_dir):
+async def test_get_directory_index(agent_index_dir, stub_data_dir):
     index = await get_directory_index(
-        directory=anyio.Path(PAPER_DIRECTORY),
+        directory=anyio.Path(stub_data_dir),
         index_name="pqa_index_0",
         index_directory=agent_index_dir,
     )
@@ -67,17 +64,17 @@ async def test_get_directory_index(agent_index_dir):
     results = await index.query(query="who is Frederick Bates?")
     # docs.keys come from md5 hash of the file contents
     assert results[0].docs.keys() == {
-        md5sum((PAPER_DIRECTORY / "example.txt").absolute())
+        md5sum((stub_data_dir / "example.txt").absolute())
     }
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index_w_manifest(agent_index_dir):
+async def test_get_directory_index_w_manifest(agent_index_dir, stub_data_dir):
     index = await get_directory_index(
-        directory=anyio.Path(PAPER_DIRECTORY),
+        directory=anyio.Path(stub_data_dir),
         index_name="pqa_index_0",
         index_directory=agent_index_dir,
-        manifest_file=anyio.Path(PAPER_DIRECTORY) / "stub_manifest.csv",
+        manifest_file=anyio.Path(stub_data_dir) / "stub_manifest.csv",
     )
     assert index.fields == [
         "file_location",
@@ -89,7 +86,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Barack Obama?")
     top_result = next(iter(results[0].docs.values()))
-    assert top_result.dockey == md5sum((PAPER_DIRECTORY / "example2.txt").absolute())
+    assert top_result.dockey == md5sum((stub_data_dir / "example2.txt").absolute())
     # note: this title comes from the manifest, so we know it worked
     assert top_result.title == "Barack Obama (Wikipedia article)"
 
@@ -97,7 +94,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
 @pytest.mark.asyncio
-async def test_agent_types(agent_index_dir, agent_type):
+async def test_agent_types(agent_index_dir, agent_type, stub_data_dir):
     question = "How can you use XAI for chemical property prediction?"
 
     request = QueryRequest(
@@ -107,7 +104,7 @@ async def test_agent_types(agent_index_dir, agent_type):
         embedding="sparse",
         agent_tools=AgentPromptCollection(
             search_count=2,
-            paper_directory=PAPER_DIRECTORY,
+            paper_directory=stub_data_dir,
             index_directory=agent_index_dir,
         ),
     )
@@ -120,7 +117,7 @@ async def test_agent_types(agent_index_dir, agent_type):
 
 
 @pytest.mark.asyncio
-async def test_timeout(agent_index_dir):
+async def test_timeout(agent_index_dir, stub_data_dir):
     response = await agent_query(
         QueryRequest(
             query="Are COVID-19 vaccines effective?",
@@ -130,7 +127,7 @@ async def test_timeout(agent_index_dir):
             agent_tools=AgentPromptCollection(
                 timeout=0.001,
                 tool_names={"gen_answer"},
-                paper_directory=PAPER_DIRECTORY,
+                paper_directory=stub_data_dir,
                 index_directory=agent_index_dir,
             ),
         ),
@@ -142,7 +139,7 @@ async def test_timeout(agent_index_dir):
 
 
 @pytest.mark.asyncio
-async def test_propagate_options(agent_index_dir) -> None:
+async def test_propagate_options(agent_index_dir, stub_data_dir) -> None:
     llm_name = "gpt-4o-mini"
     default_llm_names = {
         cls.model_fields[name].default  # type: ignore[attr-defined]
@@ -164,7 +161,7 @@ async def test_propagate_options(agent_index_dir) -> None:
         # NOTE: this is testing that if our prompt forgets template fields (e.g. status),
         # the code still runs, despite the presence of extra keyword arguments to format
         agent_tools=AgentPromptCollection(
-            paper_directory=PAPER_DIRECTORY,
+            paper_directory=stub_data_dir,
             index_directory=agent_index_dir,
             agent_prompt=(
                 "Answer question: {question}. Search for papers, gather evidence, and"
@@ -196,7 +193,7 @@ async def test_propagate_options(agent_index_dir) -> None:
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
-async def test_mixing_langchain_clients(caplog, agent_index_dir) -> None:
+async def test_mixing_langchain_clients(caplog, agent_index_dir, stub_data_dir) -> None:
     docs = Docs()
     query = QueryRequest(
         query="What is is a self-explanatory model?",
@@ -205,7 +202,7 @@ async def test_mixing_langchain_clients(caplog, agent_index_dir) -> None:
         llm="gemini-1.5-flash",
         summary_llm="gemini-1.5-flash",
         agent_tools=AgentPromptCollection(
-            paper_directory=PAPER_DIRECTORY, index_directory=agent_index_dir
+            paper_directory=stub_data_dir, index_directory=agent_index_dir
         ),
     )
     update_doc_models(docs, query)
@@ -242,7 +239,7 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
-    agent_stub_answer, subtests: SubTests, agent_index_dir
+    agent_stub_answer, subtests: SubTests, agent_index_dir, stub_data_dir
 ) -> None:
     tool_state = SharedToolState(docs=Docs(), answer=agent_stub_answer)
     search_count = 3  # Keep low for speed
@@ -253,7 +250,7 @@ async def test_agent_sharing_state(
         agent_tools=AgentPromptCollection(
             search_count=search_count,
             index_directory=agent_index_dir,
-            paper_directory=PAPER_DIRECTORY,
+            paper_directory=stub_data_dir,
         ),
     )
 
@@ -262,7 +259,7 @@ async def test_agent_sharing_state(
             shared_state=tool_state,
             search_count=search_count,
             index_directory=agent_index_dir,
-            paper_directory=PAPER_DIRECTORY,
+            paper_directory=stub_data_dir,
         )
         await tool.arun("XAI self explanatory model")
         assert tool_state.docs.docs, "Search did not save any papers"
@@ -437,7 +434,7 @@ def test_embeddings_anthropic():
 
 @pytest.mark.asyncio
 async def test_gemini_model_construction(
-    stub_paper_path: Path,
+    stub_data_dir: Path,
 ) -> None:
     docs = Docs(name="tmp")
     query = QueryRequest(
@@ -451,7 +448,7 @@ async def test_gemini_model_construction(
     assert "model" not in docs.llm_model.config, "model should not be in config"
 
     # now try using it
-    await docs.aadd(stub_paper_path)
+    await docs.aadd(stub_data_dir / "paper.pdf")
     answer = await docs.aget_evidence(
         Answer(question="Are COVID-19 vaccines effective?")
     )
