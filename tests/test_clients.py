@@ -16,7 +16,7 @@ from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvide
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     ("paper_attributes"),
     [
@@ -86,7 +86,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
         },
     ],
 )
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -99,7 +99,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
                 assert getattr(details, key) == value, f"Should have the correct {key}"
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     ("paper_attributes"),
     [
@@ -165,7 +165,7 @@ async def test_title_search(paper_attributes: dict[str, str]):
         },
     ],
 )
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -178,8 +178,8 @@ async def test_doi_search(paper_attributes: dict[str, str]):
                 assert getattr(details, key) == value, f"Should have the correct {key}"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bulk_doi_search():
     dois = [
         "10.1063/1.4938384",
@@ -196,8 +196,8 @@ async def test_bulk_doi_search():
         assert all(d for d in details), "All results should be non-None"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bulk_title_search():
     titles = [
         "Effect of native oxide layers on copper thin-film tensile properties: A reactive molecular dynamics study",
@@ -217,8 +217,8 @@ async def test_bulk_title_search():
         assert all(d for d in details), "All results should be non-None"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bad_titles():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -230,8 +230,8 @@ async def test_bad_titles():
         assert details, "Should find a similar title"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_bad_dois():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -239,8 +239,8 @@ async def test_bad_dois():
         assert not details, "Should return None for bad doi"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_minimal_fields_filtering():
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -263,8 +263,8 @@ async def test_minimal_fields_filtering():
         assert not details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_s2_only_fields_filtering():
     async with aiohttp.ClientSession() as session:
         # now get with authors just from one source
@@ -284,8 +284,8 @@ async def test_s2_only_fields_filtering():
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_crossref_journalquality_fields_filtering():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
@@ -313,8 +313,8 @@ async def test_crossref_journalquality_fields_filtering():
         ), "Citation should be populated"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_author_matching():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(session, clients=[CrossrefProvider])
@@ -342,8 +342,8 @@ async def test_author_matching():
         assert s2_details_w_author, "Should return results for good author"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_odd_client_requests():
     # try querying using an authors match, but not requesting authors back
     async with aiohttp.ClientSession() as session:
@@ -390,7 +390,7 @@ async def test_odd_client_requests():
         ), "Should return title even though we asked for some bad fields"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_ensure_robust_to_timeouts(monkeypatch):
     # 0.15 should be short enough to not get a response in time.
     monkeypatch.setattr(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.05)
@@ -407,7 +407,7 @@ async def test_ensure_robust_to_timeouts(monkeypatch):
     assert details is None, "Should return None for timeout"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_bad_init():
     with pytest.raises(
         ValueError, match="At least one MetadataProvider must be provided."
@@ -415,8 +415,8 @@ async def test_bad_init():
         client = DocMetadataClient(clients=[])  # noqa: F841
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog):
     caplog.set_level(logging.DEBUG)
     # were using a DOI that is NOT in crossref, but running the crossref client first
@@ -450,8 +450,8 @@ async def test_ensure_sequential_run(caplog):
         ), "Crossref should run first"
 
 
-@pytest.mark.vcr()
-@pytest.mark.asyncio()
+@pytest.mark.vcr
+@pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(caplog):
     caplog.set_level(logging.DEBUG)
     # now we should stop after hitting s2

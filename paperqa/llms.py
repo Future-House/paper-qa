@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import os
-import re
 from abc import ABC, abstractmethod
 from enum import Enum
 from inspect import signature
