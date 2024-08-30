@@ -16,7 +16,7 @@ from pytest_subtests import SubTests
 from paperqa.docs import Docs
 from paperqa.llms import LangchainLLMModel
 from paperqa.types import Answer, Context, Doc, PromptCollection, Text
-from paperqa.utils import get_year
+from paperqa.utils import get_year, md5sum
 
 try:
     from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
@@ -66,7 +66,9 @@ async def test_get_directory_index(agent_index_dir):
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     # added docs.keys come from md5 hash of the file location
-    assert results[0].docs.keys() == {"dab5b86dea3bd4c7ffe05a9f33ae95f7"}
+    assert results[0].docs.keys() == {
+        md5sum((PAPER_DIRECTORY / "example.txt").absolute())
+    }
 
 
 @pytest.mark.asyncio
@@ -87,7 +89,7 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Barack Obama?")
     top_result = next(iter(results[0].docs.values()))
-    assert top_result.dockey == "af2c9acf6018e62398fc6efc4f0a04b4"
+    assert top_result.dockey == md5sum((PAPER_DIRECTORY / "example2.txt").absolute())
     # note: this title comes from the manifest, so we know it worked
     assert top_result.title == "Barack Obama (Wikipedia article)"
 
