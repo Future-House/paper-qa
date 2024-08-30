@@ -335,10 +335,8 @@ class AnswerResponse(BaseModel):
 
     @field_validator("answer")
     def strip_answer(
-        self,
-        v: Answer,
-        info: ValidationInfo,  # noqa: ARG002
-    ) -> Answer:
+        cls, v: Answer, info: ValidationInfo
+    ) -> Answer:  # noqa: ARG002, N805
         # This modifies in place, this is fine
         # because when a response is being constructed,
         # we should be done with the Answer object
