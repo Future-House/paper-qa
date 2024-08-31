@@ -2,16 +2,15 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Callable, cast
+from typing import Any, Callable, cast, TypeVar
 
 from .llms import Chain, VectorStore
-from .types import Answer, Context, DocKey, LLMResult, Text
+from .types import Answer, Context, DocKey, LLMResult, Text, Doc, CallbackFactory
 from .utils import get_score, strip_citations
 
-
-async def retrieve(
+async def retrieve_texts(
     query: str,
-    texts_index: VectorStore,
+    index: VectorStore[Text],
     client: Any,
     k: int = 10,  # Number of evidence pieces to retrieve
     include_dockey_filter: set[DocKey] | None = None,  # by dockey
@@ -33,7 +32,7 @@ async def retrieve(
     matches = cast(
         list[Text],
         (
-            await texts_index.max_marginal_relevance_search(
+            await index.max_marginal_relevance_search(
                 client, query, k=_k, fetch_k=5 * _k
             )
         )[0],
@@ -49,6 +48,29 @@ async def retrieve(
         matches = [m for m in matches if m.text not in exclude_text_filter]
 
     return matches[:k]
+
+# no state modifications in adoc_match--only answer is changed
+async def rerank_docs(
+    query: str, 
+    k: int,
+    matched_docs: list[Doc],
+    chain: Chain,
+    client: Any,
+    get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
+) -> list[Doc]:
+    """Return a list of dockeys that match the query."""
+
+    if len(matched_docs) == 0:
+        return set()
+
+    papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
+    result = await chain(
+        {"question": query, "papers": "\n".join(papers)},
+        get_callbacks("filter"),
+    )
+    result.name = "filter"
+    return {d.dockey for d in matched_docs if d.docname in str(result)}
+    return {d.dockey for d in matched_docs}
 
 
 def llm_parse_json(text: str) -> dict:
@@ -75,8 +97,9 @@ def llm_parse_json(text: str) -> dict:
 
 async def map_fxn_summary(
     text: Text,
-    answer: Answer,
+    question: str,
     chain: Chain | None,
+    extra_chain_kwargs: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: list[Callable[[str], None]] | None = None,
 ) -> tuple[Context, LLMResult]:
@@ -88,15 +111,14 @@ async def map_fxn_summary(
 
     Args:
         text: The text to parse.
-        answer: Used to fill in some of the chain fields
+        query: The query to use for the chain.
         chain: The chain to execute - should have question, citation, summary_length, and text fields.
         parser: The parser to use for parsing - return empty dict on Failure to fallback to text parsing.
         callbacks: LLM callbacks to execute in chain
 
-    Returns:
+    Returns:    
         The context object and LLMResult to get stats/info
     """
-    callbacks = callbacks or []
     # needed empties for failures/skips
     llm_result = LLMResult(model="", date="")
     extras: dict[str, Any] = {}
@@ -106,15 +128,13 @@ async def map_fxn_summary(
     if chain:
         llm_result = await chain(
             {
-                "question": answer.question,
+                "question": question,
                 "citation": citation,
-                "summary_length": answer.summary_length,
                 "text": text.text,
-            },
+            } | (extra_chain_kwargs or {}),
             callbacks,
+            name = "evidence:" + text.name
         )
-        llm_result.answer_id = answer.id
-        llm_result.name = "evidence:" + text.name
         context = llm_result.text
         result_data = parser(context) if parser else {}
         success = bool(result_data)
@@ -151,3 +171,6 @@ async def map_fxn_summary(
         **extras,
     )
     return c, llm_result
+
+
+

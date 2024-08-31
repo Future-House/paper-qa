@@ -30,7 +30,7 @@ from typing_extensions import Protocol
 from .. import (
     Answer,
     OpenAILLMModel,
-    PromptCollection,
+    PromptSettings,
     llm_model_factory,
 )
 from ..utils import hexdigest
@@ -239,7 +239,7 @@ class QueryRequest(BaseModel):
     named_prompt: str | None = None
     # if you change this to something other than default
     # modify code below in update_prompts
-    prompts: PromptCollection = Field(
+    prompts: PromptSettings = Field(
         default=STATIC_PROMPTS["default"], validate_default=True
     )
     agent_tools: AgentPromptCollection = Field(default_factory=AgentPromptCollection)
@@ -283,9 +283,9 @@ class QueryRequest(BaseModel):
     @field_validator("prompts")
     def update_prompts(
         cls,  # noqa: N805
-        v: PromptCollection,
+        v: PromptSettings,
         info: ValidationInfo,
-    ) -> PromptCollection:
+    ) -> PromptSettings:
         values = info.data
         if values["named_prompt"] is not None:
             if values["named_prompt"] not in STATIC_PROMPTS:

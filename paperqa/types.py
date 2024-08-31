@@ -6,7 +6,8 @@ import re
 from datetime import datetime
 from typing import Any, Callable, ClassVar, Collection
 from uuid import UUID, uuid4
-
+import contextvars
+from contextlib import contextmanager
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
@@ -20,16 +21,6 @@ from pydantic import (
     model_validator,
 )
 
-from .prompts import (
-    citation_prompt,
-    default_system_prompt,
-    qa_prompt,
-    select_paper_prompt,
-    structured_citation_prompt,
-    summary_json_prompt,
-    summary_json_system_prompt,
-    summary_prompt,
-)
 from .utils import (
     create_bibtex_key,
     encode_id,
@@ -44,12 +35,37 @@ CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
 
 logger = logging.getLogger(__name__)
 
+# A context var that will be unique to threads/processes
+cvar_answer_id = contextvars.ContextVar('answer_id', default=None)
+
+@contextmanager
+def set_llm_answer_ids(answer_id: UUID):
+    token = cvar_answer_id.set(answer_id)
+    try:
+        yield
+    finally:
+        cvar_answer_id.reset(token)
 
 class LLMResult(BaseModel):
-    """A class to hold the result of a LLM completion."""
+    """A class to hold the result of a LLM completion.
+    
+    To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
+
+    ```python
+    my_answer_id = uuid4()
+    with set_llm_answer_ids(my_answer_id):
+        ...code that generates LLMResults...
+    ```
+
+    and all the LLMResults generated within the context will have the same `answer_id`. 
+    Thi can be combined with LLMModels `llm_result_callback` to store all LLMResults.
+    """
 
     id: UUID = Field(default_factory=uuid4)
-    answer_id: UUID | None = None
+    answer_id: UUID | None = Field(
+        default_factory=lambda: cvar_answer_id.get(),
+        description="A persistent ID to associate a group of LLMResults"
+    )
     name: str | None = None
     prompt: str | list[dict] | None = Field(
         default=None,
@@ -93,101 +109,6 @@ class Text(Embeddable):
     name: str
     doc: Doc
 
-
-# Mock a dictionary and store any missing items
-class _FormatDict(dict):
-    def __init__(self) -> None:
-        self.key_set: set[str] = set()
-
-    def __missing__(self, key: str) -> str:
-        self.key_set.add(key)
-        return key
-
-
-def get_formatted_variables(s: str) -> set[str]:
-    """Returns the set of variables implied by the format string."""
-    format_dict = _FormatDict()
-    s.format_map(format_dict)
-    return format_dict.key_set
-
-
-class PromptCollection(BaseModel):
-    summary: str = summary_prompt
-    qa: str = qa_prompt
-    select: str = select_paper_prompt
-    cite: str = citation_prompt
-    structured_cite: str = structured_citation_prompt
-    pre: str | None = Field(
-        default=None,
-        description=(
-            "Opt-in pre-prompt (templated with just the original question) to append"
-            " information before a qa prompt. For example:"
-            " 'Summarize all scientific terms in the following question:\n{question}'."
-            " This pre-prompt can enable injection of question-specific guidance later"
-            " used by the qa prompt, without changing the qa prompt's template."
-        ),
-    )
-    post: str | None = None
-    system: str = default_system_prompt
-    skip_summary: bool = False
-    json_summary: bool = False
-    # Not thrilled about this model,
-    # but need to split out the system/summary
-    # to get JSON
-    summary_json: str = summary_json_prompt
-    summary_json_system: str = summary_json_system_prompt
-
-    @field_validator("summary")
-    @classmethod
-    def check_summary(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(summary_prompt))
-        ):
-            raise ValueError(
-                f"Summary prompt can only have variables: {get_formatted_variables(summary_prompt)}"
-            )
-        return v
-
-    @field_validator("qa")
-    @classmethod
-    def check_qa(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(qa_prompt))
-        ):
-            raise ValueError(
-                f"QA prompt can only have variables: {get_formatted_variables(qa_prompt)}"
-            )
-        return v
-
-    @field_validator("select")
-    @classmethod
-    def check_select(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(select_paper_prompt))
-        ):
-            raise ValueError(
-                f"Select prompt can only have variables: {get_formatted_variables(select_paper_prompt)}"
-            )
-        return v
-
-    @field_validator("pre")
-    @classmethod
-    def check_pre(cls, v: str | None) -> str | None:
-        if v is not None and set(get_formatted_variables(v)) != {"question"}:
-            raise ValueError("Pre prompt must have input variables: question")
-        return v
-
-    @field_validator("post")
-    @classmethod
-    def check_post(cls, v: str | None) -> str | None:
-        if v is not None:
-            # kind of a hack to get list of attributes in answer
-            attrs = set(Answer.model_fields.keys())
-            if not set(get_formatted_variables(v)).issubset(attrs):
-                raise ValueError(f"Post prompt must have input variables: {attrs}")
-        return v
-
-
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
@@ -197,10 +118,9 @@ class Context(BaseModel):
     text: Text
     score: int = 5
 
-
-def __str__(self) -> str:  # noqa: N807
-    """Return the context as a string."""
-    return self.context
+    def __str__(self) -> str:  # noqa: N807
+        """Return the context as a string."""
+        return self.context
 
 
 class Answer(BaseModel):
@@ -213,9 +133,6 @@ class Answer(BaseModel):
     contexts: list[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    dockey_filter: set[DocKey] | None = None
-    summary_length: str = "about 100 words"
-    answer_length: str = "about 100 words"
     # just for convenience you can override this
     cost: float | None = None
     # Map model name to a two-item list of LLM prompt token counts

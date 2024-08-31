@@ -5,12 +5,13 @@ import os
 from abc import ABC, abstractmethod
 from enum import Enum
 from inspect import signature
-from typing import Any, AsyncGenerator, Callable, Coroutine, Iterable, Sequence, cast
+from typing import Any, AsyncGenerator, TypeVar, Generic, Callable, Coroutine, Iterable, Sequence, cast
 
 import numpy as np
 import tiktoken
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
 
 from .prompts import default_system_prompt
 from .types import Doc, Embeddable, LLMResult, Text
@@ -121,6 +122,23 @@ def process_llm_config(
     return result
 
 
+def expects_name_kwarg(func: Callable) -> bool:
+    return "name" in signature(func).parameters
+
+def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
+    if expects_name_kwarg(func):
+        return (chunk,), {"name": name}
+    return (chunk,), {}
+
+async def do_callbacks(async_callbacks: list[Callable], sync_callbacks: list[Callable], chunk: str, name: str | None) -> None:
+    for f in async_callbacks:
+        args, kwargs = prepare_args(f, chunk, name)
+        await f(*args, **kwargs)
+    for f in sync_callbacks:
+        args, kwargs = prepare_args(f, chunk, name)
+        f(*args, **kwargs)
+
+
 async def embed_documents(
     client: AsyncOpenAI, texts: list[str], embedding_model: str, batch_size: int = 16
 ) -> list[list[float]]:
@@ -224,6 +242,9 @@ class LLMModel(ABC, BaseModel):
 
     llm_type: str | None = None
     name: str
+    llm_result_callback: Callable[[LLMResult], None] | Coroutine[Any, Any, LLMResult] | None = Field(
+        default=None, 
+        description="An async callback that will be executed on each LLMResult (different than callbacks that execute on each chunk)")
     config: dict = Field(default={})
 
     async def acomplete(self, client: Any, prompt: str) -> str:
@@ -270,7 +291,6 @@ class LLMModel(ABC, BaseModel):
             prompt: The prompt to use
             skip_system: Whether to skip the system prompt
             system_prompt: The system prompt to use
-
         Returns:
             A function to execute a prompt. Its signature is:
             execute(data: dict, callbacks: list[Callable[[str], None]]] | None = None) -> LLMResult
@@ -292,6 +312,7 @@ class LLMModel(ABC, BaseModel):
             async def execute(
                 data: dict,
                 callbacks: list[Callable] | None = None,
+                name: str | None = None
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(model=self.name)
@@ -321,14 +342,19 @@ class LLMModel(ABC, BaseModel):
                                     asyncio.get_running_loop().time() - start_clock
                                 )
                             text_result.append(chunk)
-                            [await f(chunk) for f in async_callbacks]
-                            [f(chunk) for f in sync_callbacks]
+                            await do_callbacks(async_callbacks, sync_callbacks, chunk, name)
                     output = "".join(text_result)
                 result.completion_count = self.count_tokens(output)
                 result.text = output
+                result.name = name
                 result.seconds_to_last_token = (
                     asyncio.get_running_loop().time() - start_clock
                 )
+                if self.llm_result_callback:
+                    if is_coroutine_callable(self.llm_result_callback):
+                        await self.llm_result_callback(result)
+                    else:
+                        self.llm_result_callback(result)
                 return result
 
             return execute
@@ -338,7 +364,7 @@ class LLMModel(ABC, BaseModel):
             )
 
             async def execute(
-                data: dict, callbacks: list[Callable] | None = None
+                data: dict, callbacks: list[Callable] | None = None, name: str | None  = None
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(model=self.name)
@@ -365,14 +391,19 @@ class LLMModel(ABC, BaseModel):
                                     asyncio.get_running_loop().time() - start_clock
                                 )
                             text_result.append(chunk)
-                            [await f(chunk) for f in async_callbacks]
-                            [f(chunk) for f in sync_callbacks]
+                            await do_callbacks(async_callbacks, sync_callbacks, chunk, name)
                     output = "".join(text_result)
                 result.completion_count = self.count_tokens(output)
                 result.text = output
+                result.name = name
                 result.seconds_to_last_token = (
                     asyncio.get_running_loop().time() - start_clock
                 )
+                if self.llm_result_callback:
+                    if is_coroutine_callable(self.llm_result_callback):
+                        await self.llm_result_callback(result)
+                    else:
+                        self.llm_result_callback(result)
                 return result
 
             return execute
@@ -586,7 +617,8 @@ def cosine_similarity(a, b):
     return a @ b.T / norm_product
 
 
-class VectorStore(BaseModel, ABC):
+T = TypeVar('T', bound=Embeddable)
+class VectorStore(Generic[T], BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
@@ -595,13 +627,13 @@ class VectorStore(BaseModel, ABC):
     model_config = ConfigDict(extra="forbid")
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
+    def add_texts_and_embeddings(self, texts: Sequence[T]) -> None:
         pass
 
     @abstractmethod
     async def similarity_search(
         self, client: Any, query: str, k: int
-    ) -> tuple[Sequence[Embeddable], list[float]]:
+    ) -> tuple[Sequence[T], list[float]]:
         pass
 
     @abstractmethod
@@ -610,7 +642,7 @@ class VectorStore(BaseModel, ABC):
 
     async def max_marginal_relevance_search(
         self, client: Any, query: str, k: int, fetch_k: int
-    ) -> tuple[Sequence[Embeddable], list[float]]:
+    ) -> tuple[Sequence[T], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:

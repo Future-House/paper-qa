@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from paperqa import PromptCollection
+from paperqa import PromptSettings
 
 # I wanted to to make this an Enum
 # but there is a metaclass conflict
 # so we must instead have some logic here
 # and some logic on named_prompt in the QueryRequest model
 # https://github.com/pydantic/pydantic/issues/2173
-STATIC_PROMPTS: dict[str, PromptCollection] = {
-    "default": PromptCollection(
+STATIC_PROMPTS: dict[str, PromptSettings] = {
+    "default": PromptSettings(
         qa=(
             "Answer the question below with the context.\n\n"
             "Context:\n\n{context}\n\n----\n\n"
@@ -65,7 +65,7 @@ STATIC_PROMPTS: dict[str, PromptCollection] = {
         "and `relevance_score` is "
         "the relevance of `summary` to answer the question (integer out of 10).",
     ),
-    "wikicrow": PromptCollection(
+    "wikicrow": PromptSettings(
         qa=(
             "Answer the question below with the context.\n\n"
             "Context:\n\n{context}\n\n----\n\n"

@@ -15,7 +15,7 @@ from pytest_subtests import SubTests
 
 from paperqa.docs import Docs
 from paperqa.llms import LangchainLLMModel
-from paperqa.types import Answer, Context, Doc, PromptCollection, Text
+from paperqa.types import Answer, Context, Doc, PromptSettings, Text
 from paperqa.utils import get_year
 
 try:
@@ -124,7 +124,7 @@ async def test_timeout(agent_index_dir):
         QueryRequest(
             query="Are COVID-19 vaccines effective?",
             llm="gpt-4o-mini",
-            prompts=PromptCollection(pre=None),
+            prompts=PromptSettings(pre=None),
             # We just need one tool to test the timeout, gen_answer is not that fast
             agent_tools=AgentPromptCollection(
                 timeout=0.001,
@@ -157,7 +157,7 @@ async def test_propagate_options(agent_index_dir) -> None:
         max_sources=5,
         consider_sources=6,
         length="400 words",
-        prompts=PromptCollection(
+        prompts=PromptSettings(
             pre=None, system="End all responses with ###", skip_summary=True
         ),
         # NOTE: this is testing that if our prompt forgets template fields (e.g. status),
@@ -470,7 +470,7 @@ def test_query_request_preset_prompts():
     """Test that we can set the prompt using our preset prompts."""
     request = QueryRequest(
         query="Are COVID-19 vaccines effective?",
-        prompts=PromptCollection(
+        prompts=PromptSettings(
             summary_json_system=r"{gene_name} {summary} {relevance_score}"
         ),
     )
@@ -539,7 +539,7 @@ def test_answers_are_striped():
 def test_prompts_are_set():
     assert (
         STATIC_PROMPTS["json"].summary_json_system
-        != PromptCollection().summary_json_system
+        != PromptSettings().summary_json_system
     )
 
 

@@ -19,7 +19,7 @@ from paperqa import (
     Doc,
     Docs,
     NumpyVectorStore,
-    PromptCollection,
+    PromptSettings,
     Text,
     print_callback,
 )
@@ -190,7 +190,7 @@ def test_ablations():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
     doc_path = os.path.join(tests_dir, "paper.pdf")
     with open(doc_path, "rb") as f:
-        docs = Docs(prompts=PromptCollection(skip_summary=True))
+        docs = Docs(prompts=PromptSettings(skip_summary=True))
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.get_evidence(
             Answer(
@@ -675,7 +675,7 @@ def test_json_evidence() -> None:
         }
     )
     docs = Docs(
-        prompts=PromptCollection(json_summary=True),
+        prompts=PromptSettings(json_summary=True),
         summary_llm_model=summary_llm,
         llm_result_callback=print_callback,
     )
@@ -708,7 +708,7 @@ def test_custom_json_props():
             "temperature": 0.0,
         }
     )
-    my_prompts = PromptCollection(
+    my_prompts = PromptSettings(
         json_summary=True,
         summary_json_system="Provide a summary of the excerpt that could help answer the question based on the excerpt.  "  # noqa: E501
         "The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. "
@@ -1660,7 +1660,7 @@ def test_custom_prompts():
         "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: "
     )
 
-    docs = Docs(prompts=PromptCollection(qa=my_qaprompt))
+    docs = Docs(prompts=PromptSettings(qa=my_qaprompt))
 
     doc_path = "example.html"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -1677,7 +1677,7 @@ def test_custom_prompts():
 def test_pre_prompt():
     pre = "Provide context you have memorized that could help answer '{question}'. "
 
-    docs = Docs(prompts=PromptCollection(pre=pre))
+    docs = Docs(prompts=PromptSettings(pre=pre))
 
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -1699,7 +1699,7 @@ def test_post_prompt():
         "Q: {question}\nA: {answer}\n\n"
     )
 
-    docs = Docs(prompts=PromptCollection(post=post))
+    docs = Docs(prompts=PromptSettings(post=post))
 
     doc_path = "example.txt"
     with open(doc_path, "w", encoding="utf-8") as f:
@@ -1712,7 +1712,7 @@ def test_post_prompt():
     docs.query("What country is Bates from?")
 
     docs = Docs(
-        prompts=PromptCollection(
+        prompts=PromptSettings(
             system="Answer all questions with as few words as possible"
         )
     )
