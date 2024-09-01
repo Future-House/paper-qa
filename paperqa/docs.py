@@ -196,7 +196,7 @@ class Docs(BaseModel):
         # model_dump - will not drop private attributes.
         # So - this getstate/setstate removes private attributes for pickling
         # and Pydantic will handle removing private attributes for other
-        # serialization methods (like model_dump)
+        # serialization methods (like model_dump_json)
         state = super().__getstate__()
         # remove client from private attributes
         del state["__pydantic_private__"]["_client"]
@@ -608,6 +608,14 @@ class Docs(BaseModel):
             self.texts_index.clear()
             self.texts_index.add_texts_and_embeddings(texts)
 
+    async def retrieve_texts(self, query: str, k: int) -> list[Text]:
+        _k = k + len(self.deleted_dockeys)
+        matches = await self.index.max_marginal_relevance_search(
+                    self._embedding_client, query, k=_k, fetch_k=2 * _k)[0]
+        matches = [m for m in matches if m.text.doc.dockey not in self.deleted_dockeys]
+        return matches[:k]
+        
+
     def get_evidence(
         self,
         query: str,
@@ -628,7 +636,7 @@ class Docs(BaseModel):
 
     async def aget_evidence(
         self,
-        query: str,
+        answer: Answer,
         exclude_text_filter: set[str] | None = None,
         answer_config: AnswerSettings | None = None,
         prompt_config: PromptSettings | None = None,
@@ -646,14 +654,7 @@ class Docs(BaseModel):
         if exclude_text_filter:
             _k = answer_config.doc_match_k + len(exclude_text_filter)  # heuristic - get enough so we can downselect
 
-        matches = cast(
-            list[Text],
-            (
-                await self.index.max_marginal_relevance_search(
-                    self._embedding_client, query, k=_k, fetch_k=5 * _k
-                )
-            )[0],
-        )
+        matches = await self.retrieve_texts(answer.query, _k)
 
         if exclude_text_filter:
             matches = [m for m in matches if m.text not in exclude_text_filter]
@@ -674,20 +675,24 @@ class Docs(BaseModel):
                     system_prompt=prompt_config.system,
                 )
 
-        results = await gather_with_concurrency(
-            self.max_concurrent,
-            [
-                map_fxn_summary(
-                    m,
-                    query,
-                    summary_chain,
-                    {"summary_length": answer_config.evidence_summary_length},
-                    llm_parse_json if prompt_config.json_summary else None,
-                    callbacks
-                )
-                for m in matches
-            ],
-        )
+        with set_llm_answer_ids(answer.id):
+            results = await gather_with_concurrency(
+                self.max_concurrent,
+                [
+                    map_fxn_summary(
+                        m,
+                        answer.query,
+                        summary_chain,
+                        {"summary_length": answer_config.evidence_summary_length},
+                        llm_parse_json if prompt_config.json_summary else None,
+                        callbacks
+                    )
+                    for m in matches
+                ],
+            )
+
+        for _,llm_result in results:
+            answer.add_tokens(llm_result)
 
         # add non-zero
         contexts = [r for r, _ in results if r is not None and r.score > 0]
@@ -718,36 +723,34 @@ class Docs(BaseModel):
 
     async def aquery(  # noqa: C901, PLR0912, PLR0915
         self,
-        query: str,
+        answer: Answer,
         contexts: list[Context] | None = None,
         answer_config: AnswerSettings | None = None,
         prompt_config: PromptSettings | None = None,
         callbacks: list[Callable] | None = None,
     ) -> Answer:
         
-        
-        answer = Answer(question=query)
-        with set_llm_answer_ids(answer.id):
-            if not contexts:
-                contexts = await self.aget_evidence(
-                    query,
-                    answer_config=answer_config,
-                    prompt_config=prompt_config,
-                    callbacks=callbacks,
-                )
-            if prompt_config.pre is not None:
-                chain = self.llm_model.make_chain(
-                    client=self._client,
-                    prompt=prompt_config.pre,
-                    system_prompt=prompt_config.system,
-                )
+        if not contexts:
+            contexts = await self.aget_evidence(
+                answer.question,
+                answer_config=answer_config,
+                prompt_config=prompt_config,
+                callbacks=callbacks,
+            )
+        if prompt_config.pre is not None:
+            chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=prompt_config.pre,
+                system_prompt=prompt_config.system,
+            )
+            with set_llm_answer_ids(answer.id):
                 pre = await chain({"question": answer.question}, callbacks, name="pre")
-                answer.add_tokens(pre)
-                answer.context += f"\n\nExtra background information: {pre}"
+            answer.add_tokens(pre)
+            answer.context += f"\n\nExtra background information: {pre}"
 
-            filtered_contexts = sorted(answer.contexts,
-                key=lambda x: x.score, reverse=True,
-            )[:max_sources]
+        filtered_contexts = sorted(answer.contexts,
+            key=lambda x: x.score, reverse=True,
+        )[:answer_config.answer_max_sources]
 
 
             context_str = "\n\n".join(

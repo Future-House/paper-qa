@@ -145,7 +145,7 @@ async def embed_documents(
     """Embed a list of documents with batching."""
     if client is None:
         raise ValueError(
-            "Your client is None - did you forget to set it after pickling?"
+            "Client is None"
         )
     N = len(texts)
     embeddings = []

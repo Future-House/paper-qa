@@ -33,6 +33,10 @@ class AnswerSettings(BaseModel):
             raise ValueError("answer_max_sources should be less than or equal to doc_match_k")
         return v
     
+class ParsingSettings(BaseModel):
+    chunk_chars: int = Field(default=3000, description="Number of characters per chunk")
+    use_doc_details: bool = Field(default=True, description="Whether to try to get metadata details for a Doc")
+    
 
 
 # Mock a dictionary and store any missing items

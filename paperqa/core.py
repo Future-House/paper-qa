@@ -107,7 +107,7 @@ async def map_fxn_summary(
 
     The parser should at least return a dict with `summary`. A `relevant_score` will be used and any
     extra fields except `question` will be added to the context object. `question` is stripped
-    because it can be incorrectly parsed from LLM outputs.
+    because it can be incorrectly parsed from LLM outputs when parsing them as JSON.
 
     Args:
         text: The text to parse.
