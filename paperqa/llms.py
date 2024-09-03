@@ -3,17 +3,19 @@ from __future__ import annotations
 import asyncio
 import os
 from abc import ABC, abstractmethod
-from enum import Enum
-from inspect import signature
-from typing import (
-    Any,
+from collections.abc import (
     AsyncGenerator,
     Awaitable,
     Callable,
     Coroutine,
-    Generic,
     Iterable,
     Sequence,
+)
+from enum import Enum
+from inspect import signature
+from typing import (
+    Any,
+    Generic,
     TypeVar,
     cast,
 )
@@ -254,7 +256,7 @@ class VoyageAIEmbeddingModel(EmbeddingModel):
 
 
 class LLMModel(ABC, BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     llm_type: str | None = None
     name: str
@@ -264,6 +266,7 @@ class LLMModel(ABC, BaseModel):
         default=None,
         description="An async callback that will be executed on each"
         " LLMResult (different than callbacks that execute on each chunk)",
+        exclude=True,
     )
     config: dict = Field(default={})
 
@@ -644,7 +647,7 @@ def cosine_similarity(a, b):
 T = TypeVar("T", bound=Embeddable)
 
 
-class VectorStore(Generic[T], BaseModel, ABC):
+class VectorStore(BaseModel, Generic[T], ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())

@@ -14,8 +14,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python",
 ]
 dependencies = [
@@ -24,6 +22,7 @@ dependencies = [
     "numpy",
     "openai>=1",
     "pybtex",
+    "pydantic-settings",
     "pydantic~=2.0",
     "pypdf",
     "tenacity",
@@ -40,7 +39,7 @@ maintainers = [
 ]
 name = "paper-qa"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 urls = {repository = "https://github.com/whitead/paper-qa"}
 
 [project.optional-dependencies]
@@ -262,6 +261,9 @@ max-doc-length = 120  # Match line-length
 # Whether to use Google-style or NumPy-style conventions or the PEP257
 # defaults when analyzing docstring sections.
 convention = "google"
+
+[tool.setuptools.package-data]
+paperqa = ["configs/**json"]
 
 [tool.setuptools.packages.find]
 include = ["paperqa*"]

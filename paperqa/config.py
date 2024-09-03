@@ -1,9 +1,13 @@
-from __future__ import annotations
-
-from typing import ClassVar
+import importlib.resources
+from pathlib import Path
+from typing import ClassVar, cast
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic_settings import (
+    BaseSettings,
+)
 
+from .paths import PAPERQA_DIR
 from .prompts import (
     citation_prompt,
     default_system_prompt,
@@ -17,26 +21,7 @@ from .prompts import (
 from .types import Answer
 
 
-class GeneralSettings(BaseModel):
-    llm: str = Field(
-        default="openai/gpt-4o-2024-08-06",
-        description="Default LLM for most things, including answers. Should be 'best' LLM",
-    )
-    summary_llm: str = Field(
-        default="openai/gpt-4o-2024-08-06",
-        description="Default LLM for summaries and parsing citations",
-    )
-    batch_size: int = Field(default=1, description="Batch size for calling LLMs")
-
-
 class AnswerSettings(BaseModel):
-    doc_match_k: int = Field(
-        default=25, description="Number of documents to consider if filtering"
-    )
-    doc_match_rerank: bool | None = Field(
-        default=None,
-        description="Use LLM reranking for doc_match. If None, chooses based on llm.",
-    )
     evidence_k: int = Field(
         default=10, description="Number of evidence pieces to retrieve"
     )
@@ -63,7 +48,7 @@ class AnswerSettings(BaseModel):
     @field_validator("answer_max_sources")
     @classmethod
     def k_should_be_greater_than_max_sources(cls, v: int, info: ValidationInfo) -> int:
-        if v > info.data["doc_match_k"]:
+        if v > info.data["evidence_k"]:
             raise ValueError(
                 "answer_max_sources should be less than or equal to doc_match_k"
             )
@@ -126,7 +111,7 @@ class PromptSettings(BaseModel):
     post: str | None = None
     system: str = default_system_prompt
     skip_summary: bool = False
-    json_summary: bool = False
+    json_summary: bool = True
     # Not thrilled about this model,
     # but need to split out the system/summary
     # to get JSON
@@ -183,3 +168,47 @@ class PromptSettings(BaseModel):
             if not set(get_formatted_variables(v)).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
         return v
+
+
+class Settings(BaseSettings):
+    llm: str = Field(
+        default="openai/gpt-4o-2024-08-06",
+        description="Default LLM for most things, including answers. Should be 'best' LLM",
+    )
+    summary_llm: str = Field(
+        default="openai/gpt-4o-2024-08-06",
+        description="Default LLM for summaries and parsing citations",
+    )
+    batch_size: int = Field(default=1, description="Batch size for calling LLMs")
+    answer: AnswerSettings = AnswerSettings()
+    parsing: ParsingSettings = ParsingSettings()
+    prompts: PromptSettings = PromptSettings()
+
+
+def get_named_settings(config_name: str | None = None) -> Settings:
+    if config_name is None:
+        return Settings()
+
+    json_path: Path | None = None
+
+    # First, try to find the config file in the user's .config directory
+    user_config_path = PAPERQA_DIR / f"{config_name}.json"
+
+    if user_config_path.exists():
+        json_path = user_config_path
+
+    # If not found, fall back to the package's default config
+    try:
+        # Use importlib.resources.files() which is recommended for Python 3.9+
+        pkg_config_path = (
+            importlib.resources.files("paperqa.configs") / f"{config_name}.json"
+        )
+        if pkg_config_path.is_file():
+            json_path = cast(Path, pkg_config_path)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"No configuration file found for {config_name}") from e
+
+    if json_path:
+        return Settings.model_validate_json(json_path.read_text())
+
+    raise FileNotFoundError(f"No configuration file found for {config_name}")

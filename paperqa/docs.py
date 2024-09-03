@@ -5,10 +5,11 @@ import json
 import os
 import re
 import tempfile
+from collections.abc import Callable
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, Callable
+from typing import Any, BinaryIO
 from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
@@ -651,7 +652,7 @@ class Docs(BaseModel):
             prompt_config = PromptSettings()
 
         if exclude_text_filter:
-            _k = answer_config.doc_match_k + len(
+            _k = answer_config.evidence_k + len(
                 exclude_text_filter
             )  # heuristic - get enough so we can downselect
 
