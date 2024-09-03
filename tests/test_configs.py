@@ -1,0 +1,59 @@
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
+from paperqa.config import (
+    AnswerSettings,
+    PromptSettings,
+    Settings,
+    get_formatted_variables,
+    get_settings,
+)
+
+
+def test_answer_settings_validation():
+    with pytest.raises(ValidationError):
+        AnswerSettings(evidence_k=5, answer_max_sources=6)
+
+    valid_settings = AnswerSettings(evidence_k=10, answer_max_sources=5)
+    assert valid_settings.answer_max_sources == 5
+
+
+def test_prompt_settings_validation():
+    with pytest.raises(ValidationError):
+        PromptSettings(summary="Invalid {variable}")
+
+    valid_settings = PromptSettings(
+        summary="{citation} {question} {summary_length} {text}"
+    )
+    assert valid_settings.summary == "{citation} {question} {summary_length} {text}"
+
+    with pytest.raises(ValidationError):
+        PromptSettings(pre="Invalid {var}")
+
+    valid_pre_settings = PromptSettings(pre="{question}")
+    assert valid_pre_settings.pre == "{question}"
+
+
+def test_get_formatted_variables():
+    template = "This is a test {variable} with {another_variable}"
+    variables = get_formatted_variables(template)
+    assert variables == {"variable", "another_variable"}
+
+
+def test_get_settings_with_valid_config():
+    settings = get_settings("fast")
+    assert not settings.parsing.use_doc_details
+
+
+def test_get_settings_missing_file(mocker):
+    mocker.patch("importlib.resources.files", side_effect=FileNotFoundError)
+    with pytest.raises(FileNotFoundError):
+        get_settings("missing_config")
+
+
+def test_settings_default_instantiation():
+    settings = Settings()
+    assert settings.llm == "openai/gpt-4o-2024-08-06"
+    assert settings.answer.evidence_k == 10

@@ -1,4 +1,5 @@
-from .docs import Answer, Docs, PromptSettings, print_callback
+from .config import Settings, get_settings
+from .docs import Answer, Docs, print_callback
 from .llms import (
     AnthropicLLMModel,
     EmbeddingModel,
@@ -39,12 +40,13 @@ __all__ = [
     "NumpyVectorStore",
     "OpenAIEmbeddingModel",
     "OpenAILLMModel",
-    "PromptSettings",
     "SentenceTransformerEmbeddingModel",
+    "Settings",
     "SparseEmbeddingModel",
     "Text",
     "__version__",
     "embedding_model_factory",
+    "get_settings",
     "llm_model_factory",
     "print_callback",
     "vector_store_factory",

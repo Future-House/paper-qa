@@ -30,7 +30,7 @@ except ImportError:
     USE_VOYAGE = False
 
 from .clients import DEFAULT_CLIENTS, DocMetadataClient
-from .config import AnswerSettings, ParsingSettings, PromptSettings
+from .config import MaybeSettings, Settings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     HybridEmbeddingModel,
@@ -265,7 +265,7 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        parse_config: ParsingSettings | None = None,
+        settings: MaybeSettings = None,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -274,7 +274,7 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                parse_config=parse_config,
+                settings=settings,
             )
         )
 
@@ -287,7 +287,7 @@ class Docs(BaseModel):
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
-        parse_config: ParsingSettings | None = None,
+        settings: MaybeSettings = None,
         **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
@@ -309,7 +309,7 @@ class Docs(BaseModel):
                 title=title,
                 doi=doi,
                 authors=authors,
-                parse_config=parse_config,
+                settings=settings,
                 **kwargs,
             )
 
@@ -319,7 +319,7 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        parse_config: ParsingSettings | None = None,
+        settings: MaybeSettings = None,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -328,7 +328,7 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                parse_config=parse_config,
+                settings=settings,
             )
         )
 
@@ -338,7 +338,7 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        parse_config: ParsingSettings | None = None,
+        settings: MaybeSettings = None,
     ) -> str | None:
         """Add a document to the collection."""
         import urllib.request
@@ -351,7 +351,7 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                parse_config=parse_config,
+                settings=settings,
             )
 
     def add(
@@ -363,7 +363,7 @@ class Docs(BaseModel):
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
-        parse_config: ParsingSettings | None = None,
+        settings: MaybeSettings = None,
         **kwargs,
     ) -> str | None:
         loop = get_loop()
@@ -376,7 +376,7 @@ class Docs(BaseModel):
                 title=title,
                 doi=doi,
                 authors=authors,
-                parse_config=parse_config,
+                settings=settings,
                 **kwargs,
             )
         )
@@ -390,12 +390,11 @@ class Docs(BaseModel):
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
-        parse_config: ParsingSettings | None = None,
+        settings: MaybeSettings = None,
         **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
-        if parse_config is None:
-            parse_config = ParsingSettings()
+        parse_config = get_settings(settings).parsing
         if dockey is None:
             dockey = md5sum(path)
         if citation is None:
@@ -615,28 +614,25 @@ class Docs(BaseModel):
 
     def get_evidence(
         self,
-        answer: Answer,
+        query: Answer | str,
         exclude_text_filter: set[str] | None = None,
-        answer_config: AnswerSettings | None = None,
-        prompt_config: PromptSettings | None = None,
+        settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
     ) -> list[Context]:
         return get_loop().run_until_complete(
             self.aget_evidence(
-                answer=answer,
+                query=query,
                 exclude_text_filter=exclude_text_filter,
-                answer_config=answer_config,
-                prompt_config=prompt_config,
+                settings=settings,
                 callbacks=callbacks,
             )
         )
 
     async def aget_evidence(
         self,
-        answer: Answer,
+        query: Answer | str,
         exclude_text_filter: set[str] | None = None,
-        answer_config: AnswerSettings | None = None,
-        prompt_config: PromptSettings | None = None,
+        settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
     ) -> list[Context]:
 
@@ -645,18 +641,22 @@ class Docs(BaseModel):
         if len(self.docs) == 0:
             return []
 
-        if answer_config is None:
-            answer_config = AnswerSettings()
+        answer = Answer(question=query) if isinstance(query, str) else query
 
-        if prompt_config is None:
-            prompt_config = PromptSettings()
+        _settings = get_settings(settings)
+        answer_config = _settings.answer
+        prompt_config = _settings.prompts
 
+        _k = answer_config.evidence_k
         if exclude_text_filter:
-            _k = answer_config.evidence_k + len(
+            _k += len(
                 exclude_text_filter
             )  # heuristic - get enough so we can downselect
 
-        matches = await self.retrieve_texts(answer.question, _k)
+        if answer_config.evidence_retrieval:
+            matches = await self.retrieve_texts(answer.question, _k)
+        else:
+            matches = self.texts
 
         if exclude_text_filter:
             matches = [m for m in matches if m.text not in exclude_text_filter]
@@ -701,36 +701,31 @@ class Docs(BaseModel):
 
     def query(
         self,
-        answer: Answer | str,
-        answer_config: AnswerSettings | None = None,
-        prompt_config: PromptSettings | None = None,
+        query: Answer | str,
+        settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aquery(
-                answer,
-                answer_config=answer_config,
-                prompt_config=prompt_config,
+                query,
+                settings=settings,
                 callbacks=callbacks,
             )
         )
 
-    async def aquery(  # noqa: C901, PLR0912, PLR0915
+    async def aquery(  # noqa: C901, PLR0915
         self,
-        answer: Answer | str,
-        answer_config: AnswerSettings | None = None,
-        prompt_config: PromptSettings | None = None,
+        query: Answer | str,
+        settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
     ) -> Answer:
 
         if isinstance(answer, str):
             answer = Answer(question=answer)
 
-        if answer_config is None:
-            answer_config = AnswerSettings()
-
-        if prompt_config is None:
-            prompt_config = PromptSettings()
+        _settings = get_settings(settings)
+        answer_config = _settings.answer
+        prompt_config = _settings.prompts
 
         contexts = answer.contexts
 
@@ -795,7 +790,7 @@ class Docs(BaseModel):
                         "context": context_str,
                         "answer_length": answer_config.answer_length,
                         "question": answer.question,
-                        "example_citation": PromptSettings.EXAMPLE_CITATION,
+                        "example_citation": prompt_config.EXAMPLE_CITATION,
                     },
                     callbacks,
                     "answer",
@@ -803,8 +798,8 @@ class Docs(BaseModel):
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
         # it still happens
-        if PromptSettings.EXAMPLE_CITATION in answer_text:
-            answer_text = answer_text.replace(PromptSettings.EXAMPLE_CITATION, "")
+        if prompt_config.EXAMPLE_CITATION in answer_text:
+            answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
         for c in filtered_contexts:
             name = c.text.name
             citation = c.text.doc.citation

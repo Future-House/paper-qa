@@ -184,31 +184,43 @@ class Settings(BaseSettings):
     parsing: ParsingSettings = ParsingSettings()
     prompts: PromptSettings = PromptSettings()
 
+    @classmethod
+    def from_name(cls, config_name: str) -> "Settings":
+        json_path: Path | None = None
 
-def get_named_settings(config_name: str | None = None) -> Settings:
-    if config_name is None:
+        # First, try to find the config file in the user's .config directory
+        user_config_path = PAPERQA_DIR / f"{config_name}.json"
+
+        if user_config_path.exists():
+            json_path = user_config_path
+
+        # If not found, fall back to the package's default config
+        try:
+            # Use importlib.resources.files() which is recommended for Python 3.9+
+            pkg_config_path = (
+                importlib.resources.files("paperqa.configs") / f"{config_name}.json"
+            )
+            if pkg_config_path.is_file():
+                json_path = cast(Path, pkg_config_path)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(
+                f"No configuration file found for {config_name}"
+            ) from e
+
+        if json_path:
+            return Settings.model_validate_json(json_path.read_text())
+
+        raise FileNotFoundError(f"No configuration file found for {config_name}")
+
+
+MaybeSettings = Settings | str | None
+
+
+def get_settings(config_or_name: MaybeSettings = None) -> Settings:
+    if isinstance(config_or_name, Settings):
+        return config_or_name
+    if config_or_name is None:
         return Settings()
 
-    json_path: Path | None = None
-
-    # First, try to find the config file in the user's .config directory
-    user_config_path = PAPERQA_DIR / f"{config_name}.json"
-
-    if user_config_path.exists():
-        json_path = user_config_path
-
-    # If not found, fall back to the package's default config
-    try:
-        # Use importlib.resources.files() which is recommended for Python 3.9+
-        pkg_config_path = (
-            importlib.resources.files("paperqa.configs") / f"{config_name}.json"
-        )
-        if pkg_config_path.is_file():
-            json_path = cast(Path, pkg_config_path)
-    except FileNotFoundError as e:
-        raise FileNotFoundError(f"No configuration file found for {config_name}") from e
-
-    if json_path:
-        return Settings.model_validate_json(json_path.read_text())
-
-    raise FileNotFoundError(f"No configuration file found for {config_name}")
+    config_name = config_or_name
+    return Settings.from_name(config_name)
