@@ -822,7 +822,6 @@ def test_custom_embedding():
             return [[1, 2, 3] for _ in texts]
 
     docs = Docs(
-        docs_index=NumpyVectorStore(embedding_model=MyEmbeds()),
         texts_index=NumpyVectorStore(embedding_model=MyEmbeds()),
         embedding_client=None,
     )
@@ -838,7 +837,6 @@ def test_custom_embedding():
 
 def test_sparse_embedding() -> None:
     docs = Docs(
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         embedding_client=None,
     )
@@ -879,7 +877,6 @@ def test_hybrid_embedding() -> None:
         models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
     )
     docs = Docs(
-        docs_index=NumpyVectorStore(embedding_model=model),
         texts_index=NumpyVectorStore(embedding_model=model),
     )
     assert isinstance(docs._embedding_client, AsyncOpenAI)
@@ -1044,7 +1041,6 @@ def test_langchain_embeddings():
 
     docs = Docs(
         texts_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
-        docs_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
         embedding_client=OpenAIEmbeddings(),
     )
     assert docs._embedding_client is not None
@@ -1071,9 +1067,6 @@ def test_voyage_embeddings():
 
     docs = Docs(
         texts_index=NumpyVectorStore(
-            embedding_model=VoyageAIEmbeddingModel(name="voyage-2")
-        ),
-        docs_index=NumpyVectorStore(
             embedding_model=VoyageAIEmbeddingModel(name="voyage-2")
         ),
         embedding_client=AsyncClient(),
@@ -1134,7 +1127,7 @@ async def test_langchain_vector_store():
     docs = Docs(
         texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
     )
-    assert docs._embedding_client is not None  # from docs_index default
+    assert docs._embedding_client is not None  # from default
 
     await docs.aadd_url(
         "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
@@ -1757,7 +1750,6 @@ def test_add_texts():
     # we get some randomness in the OpenAI embeddings
     docs = Docs(
         llm_model=OpenAILLMModel(config=llm_config),
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         embedding_client=None,
     )
@@ -1769,7 +1761,6 @@ def test_add_texts():
     )
 
     docs2 = Docs(
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         embedding_client=None,
     )
@@ -1788,7 +1779,6 @@ def test_add_texts():
     llm_config = {"temperature": 0.1, "model": "babbage-02"}
     docs = Docs(
         llm_model=OpenAILLMModel(config=llm_config),
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         embedding_client=None,
     )
@@ -1815,7 +1805,7 @@ def test_external_doc_index():
         dockey="test",
     )
     evidence = docs.query(query="What is the date of flag day?", key_filter=True)
-    docs2 = Docs(docs_index=docs.docs_index, texts_index=docs.texts_index)
+    docs2 = Docs(texts_index=docs.texts_index)
     assert len(docs2.docs) == 0
     evidence = docs2.query("What is the date of flag day?", key_filter=True)
     assert "February 15" in evidence.context
@@ -1838,9 +1828,9 @@ def test_embedding_name_consistency():
     assert docs.embedding == "test"
 
     docs = Docs(embedding="hybrid-text-embedding-3-small")
-    assert isinstance(docs.docs_index.embedding_model, HybridEmbeddingModel)
-    assert docs.docs_index.embedding_model.models[0].name == "text-embedding-3-small"
-    assert docs.docs_index.embedding_model.models[1].name == "sparse"
+    assert isinstance(docs.texts_index.embedding_model, HybridEmbeddingModel)
+    assert docs.texts_index.embedding_model.models[0].name == "text-embedding-3-small"
+    assert docs.texts_index.embedding_model.models[1].name == "sparse"
 
 
 def test_external_texts_index():

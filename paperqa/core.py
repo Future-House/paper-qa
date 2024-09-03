@@ -71,7 +71,7 @@ async def map_fxn_summary(
             }
             | (extra_chain_kwargs or {}),
             callbacks,
-            name="evidence:" + text.name,
+            "evidence:" + text.name,
         )
         context = llm_result.text
         result_data = parser(context) if parser else {}

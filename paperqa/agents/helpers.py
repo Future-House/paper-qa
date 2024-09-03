@@ -221,11 +221,7 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
     doc.texts_index.embedding_model = embedding_model_factory(
         request.embedding, **(request.texts_index_embedding_config or {})
     )
-    doc.docs_index.embedding_model = embedding_model_factory(
-        request.embedding, **(request.docs_index_embedding_config or {})
-    )
     doc.texts_index.mmr_lambda = request.texts_index_mmr_lambda
-    doc.docs_index.mmr_lambda = request.docs_index_mmr_lambda
     doc.embedding = request.embedding
     doc.max_concurrent = request.max_concurrent
     doc.prompts = request.prompts
@@ -234,5 +230,4 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
     logger.debug(
         f"update_doc_models: {doc.name}"
         f" | {(doc.llm_model.config)} | {(doc.summary_llm_model.config)}"
-        f" | {doc.docs_index.__class__}"
     )

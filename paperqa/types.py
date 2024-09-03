@@ -37,7 +37,7 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 # A context var that will be unique to threads/processes
-cvar_answer_id = contextvars.ContextVar("answer_id", default=None)
+cvar_answer_id = contextvars.ContextVar[UUID | None]("answer_id", default=None)
 
 
 @contextmanager
@@ -57,11 +57,11 @@ class LLMResult(BaseModel):
     ```python
     my_answer_id = uuid4()
     with set_llm_answer_ids(my_answer_id):
-        ...code that generates LLMResults...
+        # code that generates LLMResults
     ```
 
     and all the LLMResults generated within the context will have the same `answer_id`.
-    Thi can be combined with LLMModels `llm_result_callback` to store all LLMResults.
+    This can be combined with LLMModels `llm_result_callback` to store all LLMResults.
     """
 
     id: UUID = Field(default_factory=uuid4)

@@ -29,7 +29,7 @@ except ImportError:
     USE_VOYAGE = False
 
 from .clients import DEFAULT_CLIENTS, DocMetadataClient
-from .config import AnswerSettings, PromptSettings
+from .config import AnswerSettings, ParsingSettings, PromptSettings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     HybridEmbeddingModel,
@@ -97,7 +97,6 @@ class Docs(BaseModel):
     texts: list[Text] = []
     docnames: set[str] = set()
     texts_index: VectorStore[Text] = Field(default_factory=NumpyVectorStore)
-    docs_index: VectorStore[Docs] = Field(default_factory=NumpyVectorStore)
     name: str = Field(default="default", description="Name of this docs collection")
     index_path: Path | None = Field(
         default=PAPERQA_DIR, description="Path to save index", validate_default=True
@@ -114,8 +113,6 @@ class Docs(BaseModel):
         if "client" in data:
             client = data.pop("client")
         # backwards compatibility
-        if "doc_index" in data:
-            data["docs_index"] = data.pop("doc_index")
         super().__init__(**data)
         self.set_client(client, embedding_client)
 
@@ -134,11 +131,12 @@ class Docs(BaseModel):
                 data["llm_model"] = llm_model_factory(data["llm"])
             if "summary_llm" in data and data["summary_llm"] is not None:
                 data["summary_llm_model"] = llm_model_factory(data["summary_llm"])
-            if "embedding" in data and data["embedding"] != "default":
-                if "texts_index" not in data:
-                    data["texts_index"] = vector_store_factory(data["embedding"])
-                if "docs_index" not in data:
-                    data["docs_index"] = vector_store_factory(data["embedding"])
+            if (
+                "embedding" in data
+                and data["embedding"] != "default"
+                and "texts_index" not in data
+            ):
+                data["texts_index"] = vector_store_factory(data["embedding"])
         return data
 
     @model_validator(mode="after")
@@ -266,7 +264,7 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        chunk_chars: int = 3000,
+        parse_config: ParsingSettings | None = None,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -275,7 +273,7 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                chunk_chars=chunk_chars,
+                parse_config=parse_config,
             )
         )
 
@@ -285,11 +283,10 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        chunk_chars: int = 3000,
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
-        use_doc_details: bool = False,
+        parse_config: ParsingSettings | None = None,
         **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
@@ -308,11 +305,10 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                chunk_chars=chunk_chars,
                 title=title,
                 doi=doi,
                 authors=authors,
-                use_doc_details=use_doc_details,
+                parse_config=parse_config,
                 **kwargs,
             )
 
@@ -322,7 +318,7 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        chunk_chars: int = 3000,
+        parse_config: ParsingSettings | None = None,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -331,7 +327,7 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                chunk_chars=chunk_chars,
+                parse_config=parse_config,
             )
         )
 
@@ -341,7 +337,7 @@ class Docs(BaseModel):
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
-        chunk_chars: int = 3000,
+        parse_config: ParsingSettings | None = None,
     ) -> str | None:
         """Add a document to the collection."""
         import urllib.request
@@ -354,7 +350,7 @@ class Docs(BaseModel):
                 citation=citation,
                 docname=docname,
                 dockey=dockey,
-                chunk_chars=chunk_chars,
+                parse_config=parse_config,
             )
 
     def add(
@@ -362,13 +358,11 @@ class Docs(BaseModel):
         path: Path,
         citation: str | None = None,
         docname: str | None = None,
-        disable_check: bool = False,
         dockey: DocKey | None = None,
-        chunk_chars: int = 3000,
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
-        use_doc_details: bool = False,
+        parse_config: ParsingSettings | None = None,
         **kwargs,
     ) -> str | None:
         loop = get_loop()
@@ -377,13 +371,11 @@ class Docs(BaseModel):
                 path,
                 citation=citation,
                 docname=docname,
-                disable_check=disable_check,
                 dockey=dockey,
-                chunk_chars=chunk_chars,
                 title=title,
                 doi=doi,
                 authors=authors,
-                use_doc_details=use_doc_details,
+                parse_config=parse_config,
                 **kwargs,
             )
         )
@@ -393,32 +385,36 @@ class Docs(BaseModel):
         path: Path,
         citation: str | None = None,
         docname: str | None = None,
-        disable_check: bool = False,
         dockey: DocKey | None = None,
-        chunk_chars: int = 3000,
-        overlap: int = 250,
         title: str | None = None,
         doi: str | None = None,
         authors: list[str] | None = None,
-        use_doc_details: bool = False,
+        parse_config: ParsingSettings | None = None,
         **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
+        if parse_config is None:
+            parse_config = ParsingSettings()
         if dockey is None:
             dockey = md5sum(path)
         if citation is None:
             # skip system because it's too hesitant to answer
             cite_chain = self.llm_model.make_chain(
                 client=self._client,
-                prompt=self.prompts.cite,
+                prompt=parse_config.citation_prompt,
                 skip_system=True,
             )
             # peak first chunk
             fake_doc = Doc(docname="", citation="", dockey=dockey)
-            texts = read_doc(path, fake_doc, chunk_chars=chunk_chars, overlap=overlap)
+            texts = read_doc(
+                path,
+                fake_doc,
+                chunk_chars=parse_config.chunk_chars,
+                overlap=parse_config.overlap,
+            )
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain({"text": texts[0].text}, None)
+            chain_result = await cite_chain({"text": texts[0].text}, None, None)
             citation = chain_result.text
             if (
                 len(citation) < 3  # noqa: PLR2004
@@ -449,13 +445,15 @@ class Docs(BaseModel):
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
 
         # try to extract DOI / title from the citation
-        if (doi is title is None) and use_doc_details:
+        if (doi is title is None) and parse_config.use_doc_details:
             structured_cite_chain = self.llm_model.make_chain(
                 client=self._client,
-                prompt=self.prompts.structured_cite,
+                prompt=parse_config.structured_citation_prompt,
                 skip_system=True,
             )
-            chain_result = await structured_cite_chain({"citation": citation}, None)
+            chain_result = await structured_cite_chain(
+                {"citation": citation}, None, None
+            )
             with contextlib.suppress(json.JSONDecodeError):
                 clean_text = chain_result.text.strip("`")
                 if clean_text.startswith("json"):
@@ -472,7 +470,7 @@ class Docs(BaseModel):
         # if not, we can progress with a normal Doc
         # if "overwrite_fields_from_metadata" is used:
         # will map "docname" to "key", and "dockey" to "doc_id"
-        if (title or doi) and use_doc_details:
+        if (title or doi) and parse_config.use_doc_details:
             if kwargs.get("metadata_client"):
                 metadata_client = kwargs["metadata_client"]
             else:
@@ -494,12 +492,20 @@ class Docs(BaseModel):
                 doc, **(query_kwargs | kwargs)
             )
 
-        texts = read_doc(path, doc, chunk_chars=chunk_chars, overlap=100)
+        texts = read_doc(
+            path,
+            doc,
+            chunk_chars=parse_config.chunk_chars,
+            overlap=parse_config.overlap,
+        )
         # loose check to see if document was loaded
         if (
             len(texts) == 0
             or len(texts[0].text) < 10  # noqa: PLR2004
-            or (not disable_check and not maybe_is_text(texts[0].text))
+            or (
+                not parse_config.disable_doc_valid_check
+                and not maybe_is_text(texts[0].text)
+            )
         ):
             raise ValueError(
                 f"This does not look like a text document: {path}. Pass disable_check to ignore this error."
@@ -539,14 +545,7 @@ class Docs(BaseModel):
             if texts[0].embedding is None
             else None
         )
-        # 2. Set the Doc's embedding to be the Doc's citation embedded
-        if doc.embedding is None:
-            doc.embedding = (
-                await self.docs_index.embedding_model.embed_documents(
-                    self._embedding_client, texts=[doc.citation]
-                )
-            )[0]
-        # 3. Now we can set the text embeddings
+        # 2. Now we can set the text embeddings
         if text_embeddings is not None:
             for t, t_embedding in zip(texts, text_embeddings, strict=True):
                 t.embedding = t_embedding
@@ -559,7 +558,6 @@ class Docs(BaseModel):
         # 5. Index remaining updates
         if not self.jit_texts_index:
             self.texts_index.add_texts_and_embeddings(texts)
-        self.docs_index.add_texts_and_embeddings([doc])
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
@@ -606,15 +604,17 @@ class Docs(BaseModel):
 
     async def retrieve_texts(self, query: str, k: int) -> list[Text]:
         _k = k + len(self.deleted_dockeys)
-        matches = await self.index.max_marginal_relevance_search(
-            self._embedding_client, query, k=_k, fetch_k=2 * _k
+        matches = (
+            await self.texts_index.max_marginal_relevance_search(
+                self._embedding_client, query, k=_k, fetch_k=2 * _k
+            )
         )[0]
-        matches = [m for m in matches if m.text.doc.dockey not in self.deleted_dockeys]
+        matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
         return matches[:k]
 
     def get_evidence(
         self,
-        query: str,
+        answer: Answer,
         exclude_text_filter: set[str] | None = None,
         answer_config: AnswerSettings | None = None,
         prompt_config: PromptSettings | None = None,
@@ -622,7 +622,7 @@ class Docs(BaseModel):
     ) -> list[Context]:
         return get_loop().run_until_complete(
             self.aget_evidence(
-                query,
+                answer=answer,
                 exclude_text_filter=exclude_text_filter,
                 answer_config=answer_config,
                 prompt_config=prompt_config,
@@ -647,12 +647,15 @@ class Docs(BaseModel):
         if answer_config is None:
             answer_config = AnswerSettings()
 
+        if prompt_config is None:
+            prompt_config = PromptSettings()
+
         if exclude_text_filter:
             _k = answer_config.doc_match_k + len(
                 exclude_text_filter
             )  # heuristic - get enough so we can downselect
 
-        matches = await self.retrieve_texts(answer.query, _k)
+        matches = await self.retrieve_texts(answer.question, _k)
 
         if exclude_text_filter:
             matches = [m for m in matches if m.text not in exclude_text_filter]
@@ -675,11 +678,11 @@ class Docs(BaseModel):
 
         with set_llm_answer_ids(answer.id):
             results = await gather_with_concurrency(
-                self.max_concurrent,
+                answer_config.max_concurrent_requests,
                 [
                     map_fxn_summary(
                         m,
-                        answer.query,
+                        answer.question,
                         summary_chain,
                         {"summary_length": answer_config.evidence_summary_length},
                         llm_parse_json if prompt_config.json_summary else None,
@@ -732,7 +735,7 @@ class Docs(BaseModel):
 
         if not contexts:
             contexts = await self.aget_evidence(
-                answer.question,
+                answer,
                 answer_config=answer_config,
                 prompt_config=prompt_config,
                 callbacks=callbacks,
@@ -745,7 +748,7 @@ class Docs(BaseModel):
                 system_prompt=prompt_config.system,
             )
             with set_llm_answer_ids(answer.id):
-                pre = await chain({"question": answer.question}, callbacks, name="pre")
+                pre = await chain({"question": answer.question}, callbacks, "pre")
             answer.add_tokens(pre)
             pre_str = pre.text
 
@@ -789,11 +792,12 @@ class Docs(BaseModel):
                 answer_result = await qa_chain(
                     {
                         "context": context_str,
-                        "answer_length": answer.answer_length,
+                        "answer_length": answer_config.answer_length,
                         "question": answer.question,
                         "example_citation": PromptSettings.EXAMPLE_CITATION,
                     },
-                    name="answer",
+                    callbacks,
+                    "answer",
                 )
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
@@ -820,7 +824,7 @@ class Docs(BaseModel):
                 system_prompt=prompt_config.system,
             )
             with set_llm_answer_ids(answer.id):
-                post = await chain(answer.model_dump(), name="post")
+                post = await chain(answer.model_dump(), callbacks, "post")
             answer_text = post.text
             answer.add_tokens(post)
             formatted_answer = f"Question: {answer.question}\n\n{post}\n"

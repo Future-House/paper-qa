@@ -27,9 +27,6 @@ class GeneralSettings(BaseModel):
         description="Default LLM for summaries and parsing citations",
     )
     batch_size: int = Field(default=1, description="Batch size for calling LLMs")
-    max_concurrent_requests: int = Field(
-        default=4, description="Max concurrent requests to LLMs"
-    )
 
 
 class AnswerSettings(BaseModel):
@@ -56,6 +53,12 @@ class AnswerSettings(BaseModel):
     answer_max_sources: int = Field(
         default=5, description="Max number of sources to use for an answer"
     )
+    answer_length: str = Field(
+        "about 200 words, but can be longer", description="Length of final answer"
+    )
+    max_concurrent_requests: int = Field(
+        default=4, description="Max concurrent requests to LLMs"
+    )
 
     @field_validator("answer_max_sources")
     @classmethod
@@ -71,6 +74,21 @@ class ParsingSettings(BaseModel):
     chunk_chars: int = Field(default=3000, description="Number of characters per chunk")
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
+    )
+    overlap: int = Field(
+        default=100, description="Number of characters to overlap chunks"
+    )
+    citation_prompt: str = Field(
+        default=citation_prompt,
+        description="Prompt that tries to create citation from peeking one page",
+    )
+    structured_citation_prompt: str = Field(
+        default=structured_citation_prompt,
+        description="Prompt that tries to creates a citation in JSON from peeking one page",
+    )
+    disable_doc_valid_check: bool = Field(
+        default=False,
+        description="Whether to disable checking if a document looks like text (was parsed correctly)",
     )
 
 
@@ -95,8 +113,6 @@ class PromptSettings(BaseModel):
     summary: str = summary_prompt
     qa: str = qa_prompt
     select: str = select_paper_prompt
-    cite: str = citation_prompt
-    structured_cite: str = structured_citation_prompt
     pre: str | None = Field(
         default=None,
         description=(

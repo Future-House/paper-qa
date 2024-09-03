@@ -8,6 +8,7 @@ from inspect import signature
 from typing import (
     Any,
     AsyncGenerator,
+    Awaitable,
     Callable,
     Coroutine,
     Generic,
@@ -71,7 +72,8 @@ ANYSCALE_MODEL_PREFIXES: tuple[str, ...] = (
 )
 
 Chain = Callable[
-    [dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, LLMResult]
+    [dict, list[Callable[[str], None]] | None, str | None],
+    Awaitable[LLMResult],
 ]
 
 
@@ -297,9 +299,7 @@ class LLMModel(ABC, BaseModel):
         prompt: str,
         skip_system: bool = False,
         system_prompt: str = default_system_prompt,
-    ) -> Callable[
-        [dict, list[Callable[[str], None]] | None], Coroutine[Any, Any, LLMResult]
-    ]:
+    ) -> Chain:
         """Create a function to execute a batch of prompts.
 
         This replaces the previous use of langchain for combining prompts and LLMs.
@@ -372,9 +372,9 @@ class LLMModel(ABC, BaseModel):
                 )
                 if self.llm_result_callback:
                     if is_coroutine_callable(self.llm_result_callback):
-                        await self.llm_result_callback(result)
+                        await self.llm_result_callback(result)  # type: ignore[misc, operator]
                     else:
-                        self.llm_result_callback(result)
+                        self.llm_result_callback(result)  # type: ignore[operator]
                 return result
 
             return execute
@@ -425,9 +425,9 @@ class LLMModel(ABC, BaseModel):
                 )
                 if self.llm_result_callback:
                     if is_coroutine_callable(self.llm_result_callback):
-                        await self.llm_result_callback(result)
+                        await self.llm_result_callback(result)  # type: ignore[misc, operator]
                     else:
-                        self.llm_result_callback(result)
+                        self.llm_result_callback(result)  # type: ignore[operator]
                 return result
 
             return execute

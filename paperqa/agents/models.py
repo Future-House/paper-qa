@@ -245,8 +245,6 @@ class QueryRequest(BaseModel):
     agent_tools: AgentPromptCollection = Field(default_factory=AgentPromptCollection)
     texts_index_mmr_lambda: float = 1.0
     texts_index_embedding_config: dict[str, Any] | None = None
-    docs_index_mmr_lambda: float = 1.0
-    docs_index_embedding_config: dict[str, Any] | None = None
     parsing_configuration: ParsingConfiguration = ParsingConfiguration()
     embedding: str = "text-embedding-3-small"
     # concurrent number of summary calls to use inside Doc object
