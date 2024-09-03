@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import contextvars
 import logging
 import os
 import re
-from datetime import datetime
-from typing import Any, Callable, ClassVar, Collection
-from uuid import UUID, uuid4
-import contextvars
 from contextlib import contextmanager
+from datetime import datetime
+from typing import Any, ClassVar, Collection
+from uuid import UUID, uuid4
+
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
@@ -30,13 +31,14 @@ from .utils import (
 from .version import __version__ as pqa_version
 
 # Just for clarity
+# also in case one day we want to narrow
+# the type
 DocKey = Any
-CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
-
 logger = logging.getLogger(__name__)
 
 # A context var that will be unique to threads/processes
-cvar_answer_id = contextvars.ContextVar('answer_id', default=None)
+cvar_answer_id = contextvars.ContextVar("answer_id", default=None)
+
 
 @contextmanager
 def set_llm_answer_ids(answer_id: UUID):
@@ -46,9 +48,10 @@ def set_llm_answer_ids(answer_id: UUID):
     finally:
         cvar_answer_id.reset(token)
 
+
 class LLMResult(BaseModel):
     """A class to hold the result of a LLM completion.
-    
+
     To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
 
     ```python
@@ -57,14 +60,14 @@ class LLMResult(BaseModel):
         ...code that generates LLMResults...
     ```
 
-    and all the LLMResults generated within the context will have the same `answer_id`. 
+    and all the LLMResults generated within the context will have the same `answer_id`.
     Thi can be combined with LLMModels `llm_result_callback` to store all LLMResults.
     """
 
     id: UUID = Field(default_factory=uuid4)
     answer_id: UUID | None = Field(
-        default_factory=lambda: cvar_answer_id.get(),
-        description="A persistent ID to associate a group of LLMResults"
+        default_factory=cvar_answer_id.get,
+        description="A persistent ID to associate a group of LLMResults",
     )
     name: str | None = None
     prompt: str | list[dict] | None = Field(
@@ -109,6 +112,7 @@ class Text(Embeddable):
     name: str
     doc: Doc
 
+
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
@@ -118,7 +122,7 @@ class Context(BaseModel):
     text: Text
     score: int = 5
 
-    def __str__(self) -> str:  # noqa: N807
+    def __str__(self) -> str:
         """Return the context as a string."""
         return self.context
 

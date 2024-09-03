@@ -88,7 +88,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
             results = UnpaywallResponse(
                 **(
                     await _get_with_retrying(
-                        url=f"{UNPAYWALL_BASE_URL}{doi}?email={os.environ.get("UNPAYWALL_EMAIL", "test@example.com")}",
+                        url=f"{UNPAYWALL_BASE_URL}{doi}?email={os.environ.get('UNPAYWALL_EMAIL', 'test@example.com')}",
                         params={},
                         session=session,
                         timeout=UNPAYWALL_TIMEOUT,

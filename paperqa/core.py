@@ -47,13 +47,14 @@ async def map_fxn_summary(
 
     Args:
         text: The text to parse.
-        query: The query to use for the chain.
+        question: The question to use for the chain.
         chain: The chain to execute - should have question, citation, summary_length, and text fields.
+        extra_chain_kwargs: Extra kwargs to pass to the chain.
         parser: The parser to use for parsing - return empty dict on Failure to fallback to text parsing.
         callbacks: LLM callbacks to execute in chain
 
     Returns:
-        The context object and LLMResult to get stats/info
+        The context object and LLMResult to get info about the LLM execution.
     """
     # needed empties for failures/skips
     llm_result = LLMResult(model="", date="")

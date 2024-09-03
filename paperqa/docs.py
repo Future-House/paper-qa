@@ -8,7 +8,7 @@ import tempfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, Callable, Coroutine, cast
+from typing import Any, BinaryIO, Callable
 from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
@@ -20,7 +20,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from tenacity import retry, stop_after_attempt
 
 try:
     import voyageai
@@ -29,9 +28,9 @@ try:
 except ImportError:
     USE_VOYAGE = False
 
-from .clients import ALL_CLIENTS, DocMetadataClient
+from .clients import DEFAULT_CLIENTS, DocMetadataClient
 from .config import AnswerSettings, PromptSettings
-from .core import llm_parse_json, map_fxn_summary, retrieve_texts
+from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     HybridEmbeddingModel,
     LLMModel,
@@ -48,7 +47,6 @@ from .paths import PAPERQA_DIR
 from .readers import read_doc
 from .types import (
     Answer,
-    CallbackFactory,
     Context,
     Doc,
     DocDetails,

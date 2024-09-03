@@ -5,13 +5,22 @@ import os
 from abc import ABC, abstractmethod
 from enum import Enum
 from inspect import signature
-from typing import Any, AsyncGenerator, TypeVar, Generic, Callable, Coroutine, Iterable, Sequence, cast
+from typing import (
+    Any,
+    AsyncGenerator,
+    Callable,
+    Coroutine,
+    Generic,
+    Iterable,
+    Sequence,
+    TypeVar,
+    cast,
+)
 
 import numpy as np
 import tiktoken
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 
 from .prompts import default_system_prompt
 from .types import Doc, Embeddable, LLMResult, Text
@@ -125,12 +134,19 @@ def process_llm_config(
 def expects_name_kwarg(func: Callable) -> bool:
     return "name" in signature(func).parameters
 
+
 def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
     if expects_name_kwarg(func):
         return (chunk,), {"name": name}
     return (chunk,), {}
 
-async def do_callbacks(async_callbacks: list[Callable], sync_callbacks: list[Callable], chunk: str, name: str | None) -> None:
+
+async def do_callbacks(
+    async_callbacks: list[Callable],
+    sync_callbacks: list[Callable],
+    chunk: str,
+    name: str | None,
+) -> None:
     for f in async_callbacks:
         args, kwargs = prepare_args(f, chunk, name)
         await f(*args, **kwargs)
@@ -144,9 +160,7 @@ async def embed_documents(
 ) -> list[list[float]]:
     """Embed a list of documents with batching."""
     if client is None:
-        raise ValueError(
-            "Client is None"
-        )
+        raise ValueError("Client is None")
     N = len(texts)
     embeddings = []
     for i in range(0, N, batch_size):
@@ -242,9 +256,13 @@ class LLMModel(ABC, BaseModel):
 
     llm_type: str | None = None
     name: str
-    llm_result_callback: Callable[[LLMResult], None] | Coroutine[Any, Any, LLMResult] | None = Field(
-        default=None, 
-        description="An async callback that will be executed on each LLMResult (different than callbacks that execute on each chunk)")
+    llm_result_callback: (
+        Callable[[LLMResult], None] | Coroutine[Any, Any, LLMResult] | None
+    ) = Field(
+        default=None,
+        description="An async callback that will be executed on each"
+        " LLMResult (different than callbacks that execute on each chunk)",
+    )
     config: dict = Field(default={})
 
     async def acomplete(self, client: Any, prompt: str) -> str:
@@ -312,7 +330,7 @@ class LLMModel(ABC, BaseModel):
             async def execute(
                 data: dict,
                 callbacks: list[Callable] | None = None,
-                name: str | None = None
+                name: str | None = None,
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(model=self.name)
@@ -342,7 +360,9 @@ class LLMModel(ABC, BaseModel):
                                     asyncio.get_running_loop().time() - start_clock
                                 )
                             text_result.append(chunk)
-                            await do_callbacks(async_callbacks, sync_callbacks, chunk, name)
+                            await do_callbacks(
+                                async_callbacks, sync_callbacks, chunk, name
+                            )
                     output = "".join(text_result)
                 result.completion_count = self.count_tokens(output)
                 result.text = output
@@ -364,7 +384,9 @@ class LLMModel(ABC, BaseModel):
             )
 
             async def execute(
-                data: dict, callbacks: list[Callable] | None = None, name: str | None  = None
+                data: dict,
+                callbacks: list[Callable] | None = None,
+                name: str | None = None,
             ) -> LLMResult:
                 start_clock = asyncio.get_running_loop().time()
                 result = LLMResult(model=self.name)
@@ -391,7 +413,9 @@ class LLMModel(ABC, BaseModel):
                                     asyncio.get_running_loop().time() - start_clock
                                 )
                             text_result.append(chunk)
-                            await do_callbacks(async_callbacks, sync_callbacks, chunk, name)
+                            await do_callbacks(
+                                async_callbacks, sync_callbacks, chunk, name
+                            )
                     output = "".join(text_result)
                 result.completion_count = self.count_tokens(output)
                 result.text = output
@@ -617,7 +641,9 @@ def cosine_similarity(a, b):
     return a @ b.T / norm_product
 
 
-T = TypeVar('T', bound=Embeddable)
+T = TypeVar("T", bound=Embeddable)
+
+
 class VectorStore(Generic[T], BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
