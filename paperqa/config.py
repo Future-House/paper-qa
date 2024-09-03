@@ -111,7 +111,7 @@ class PromptSettings(BaseModel):
     post: str | None = None
     system: str = default_system_prompt
     skip_summary: bool = False
-    json_summary: bool = True
+    use_json: bool = False
     # Not thrilled about this model,
     # but need to split out the system/summary
     # to get JSON

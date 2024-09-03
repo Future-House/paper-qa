@@ -9,7 +9,7 @@ from collections.abc import Callable
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
@@ -97,7 +97,7 @@ class Docs(BaseModel):
     docs: dict[DocKey, Doc | DocDetails] = {}
     texts: list[Text] = []
     docnames: set[str] = set()
-    texts_index: VectorStore[Text] = Field(default_factory=NumpyVectorStore)
+    texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = Field(default="default", description="Name of this docs collection")
     index_path: Path | None = Field(
         default=PAPERQA_DIR, description="Path to save index", validate_default=True
@@ -604,10 +604,13 @@ class Docs(BaseModel):
 
     async def retrieve_texts(self, query: str, k: int) -> list[Text]:
         _k = k + len(self.deleted_dockeys)
-        matches = (
-            await self.texts_index.max_marginal_relevance_search(
-                self._embedding_client, query, k=_k, fetch_k=2 * _k
-            )
+        matches = cast(
+            Text,
+            (
+                await self.texts_index.max_marginal_relevance_search(
+                    self._embedding_client, query, k=_k, fetch_k=2 * _k
+                )
+            ),
         )[0]
         matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
         return matches[:k]
@@ -661,10 +664,16 @@ class Docs(BaseModel):
         if exclude_text_filter:
             matches = [m for m in matches if m.text not in exclude_text_filter]
 
+        matches = (
+            matches[: answer_config.evidence_k]
+            if answer_config.evidence_retrieval
+            else matches
+        )
+
         summary_chain = None
 
         if not prompt_config.skip_summary:
-            if prompt_config.json_summary:
+            if prompt_config.use_json:
                 summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
                     client=self._client,
                     prompt=prompt_config.summary_json,
@@ -685,8 +694,11 @@ class Docs(BaseModel):
                         m,
                         answer.question,
                         summary_chain,
-                        {"summary_length": answer_config.evidence_summary_length},
-                        llm_parse_json if prompt_config.json_summary else None,
+                        {
+                            "summary_length": answer_config.evidence_summary_length,
+                            "citation": f"{m.name}: {m.doc.citation}",
+                        },
+                        llm_parse_json if prompt_config.use_json else None,
                         callbacks,
                     )
                     for m in matches

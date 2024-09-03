@@ -346,7 +346,6 @@ class LLMModel(ABC, BaseModel):
                 result.prompt_count = sum(
                     self.count_tokens(m["content"]) for m in messages
                 ) + sum(self.count_tokens(m["role"]) for m in messages)
-
                 if callbacks is None:
                     output = await self.achat(client, messages)
                 else:
@@ -644,10 +643,7 @@ def cosine_similarity(a, b):
     return a @ b.T / norm_product
 
 
-T = TypeVar("T", bound=Embeddable)
-
-
-class VectorStore(BaseModel, Generic[T], ABC):
+class VectorStore(BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
     embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
@@ -656,13 +652,13 @@ class VectorStore(BaseModel, Generic[T], ABC):
     model_config = ConfigDict(extra="forbid")
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: Sequence[T]) -> None:
+    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
         pass
 
     @abstractmethod
     async def similarity_search(
         self, client: Any, query: str, k: int
-    ) -> tuple[Sequence[T], list[float]]:
+    ) -> tuple[Sequence[Embeddable], list[float]]:
         pass
 
     @abstractmethod
@@ -671,7 +667,7 @@ class VectorStore(BaseModel, Generic[T], ABC):
 
     async def max_marginal_relevance_search(
         self, client: Any, query: str, k: int, fetch_k: int
-    ) -> tuple[Sequence[T], list[float]]:
+    ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:

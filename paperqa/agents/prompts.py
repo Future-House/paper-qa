@@ -52,7 +52,7 @@ STATIC_PROMPTS: dict[str, PromptSettings] = {
             "If there are ambiguous terms or acronyms, be explicit."
         ),
         skip_summary=False,
-        json_summary=True,
+        use_json=True,
         summary_json=(
             "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\n"
             "Query: {question}\n\n"
@@ -111,7 +111,7 @@ STATIC_PROMPTS: dict[str, PromptSettings] = {
             "If there are ambiguous terms or acronyms, be explicit."
         ),
         skip_summary=False,
-        json_summary=True,
+        use_json=True,
         summary_json=(
             "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\n"
             "Query: {question}\n\n"
