@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+from typing import ClassVar
+
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
+
 from .prompts import (
     citation_prompt,
     default_system_prompt,
@@ -11,32 +16,62 @@ from .prompts import (
 )
 from .types import Answer
 
+
 class GeneralSettings(BaseModel):
-    llm: str = Field(default="openai/gpt-4o-2024-08-06", description="Default LLM for most things, including answers. Should be 'best' LLM")
-    summary_llm: str = Field(default="openai/gpt-4o-2024-08-06", description="Default LLM for summaries and parsing citations")
+    llm: str = Field(
+        default="openai/gpt-4o-2024-08-06",
+        description="Default LLM for most things, including answers. Should be 'best' LLM",
+    )
+    summary_llm: str = Field(
+        default="openai/gpt-4o-2024-08-06",
+        description="Default LLM for summaries and parsing citations",
+    )
     batch_size: int = Field(default=1, description="Batch size for calling LLMs")
-    max_concurrent_requests: int = Field(default=4, description="Max concurrent requests to LLMs")
+    max_concurrent_requests: int = Field(
+        default=4, description="Max concurrent requests to LLMs"
+    )
+
 
 class AnswerSettings(BaseModel):
-    doc_match_k: int = Field(default=25, description="Number of documents to consider if filtering")
-    doc_match_rerank: bool | None = Field(default=None, description="Use LLM reranking for doc_match. If None, chooses based on llm.")
-    evidence_k: int = Field(default=10, description="Number of evidence pieces to retrieve")
-    evidence_detailed_citations: bool = Field(default=True, description="Whether to include detailed citations in summaries")
-    evidence_retrieval: bool = Field(default=True, description="Whether to use retrieval instead of processing all docs")
-    evidence_summary_length: str = Field(default="about 100 words", description="Length of evidence summary")
-    answer_max_sources: int = Field(default=5, description="Max number of sources to use for an answer")
+    doc_match_k: int = Field(
+        default=25, description="Number of documents to consider if filtering"
+    )
+    doc_match_rerank: bool | None = Field(
+        default=None,
+        description="Use LLM reranking for doc_match. If None, chooses based on llm.",
+    )
+    evidence_k: int = Field(
+        default=10, description="Number of evidence pieces to retrieve"
+    )
+    evidence_detailed_citations: bool = Field(
+        default=True, description="Whether to include detailed citations in summaries"
+    )
+    evidence_retrieval: bool = Field(
+        default=True,
+        description="Whether to use retrieval instead of processing all docs",
+    )
+    evidence_summary_length: str = Field(
+        default="about 100 words", description="Length of evidence summary"
+    )
+    answer_max_sources: int = Field(
+        default=5, description="Max number of sources to use for an answer"
+    )
 
     @field_validator("answer_max_sources")
     @classmethod
     def k_should_be_greater_than_max_sources(cls, v: int, info: ValidationInfo) -> int:
-        if v > info.data['doc_match_k']:
-            raise ValueError("answer_max_sources should be less than or equal to doc_match_k")
+        if v > info.data["doc_match_k"]:
+            raise ValueError(
+                "answer_max_sources should be less than or equal to doc_match_k"
+            )
         return v
-    
+
+
 class ParsingSettings(BaseModel):
     chunk_chars: int = Field(default=3000, description="Number of characters per chunk")
-    use_doc_details: bool = Field(default=True, description="Whether to try to get metadata details for a Doc")
-    
+    use_doc_details: bool = Field(
+        default=True, description="Whether to try to get metadata details for a Doc"
+    )
 
 
 # Mock a dictionary and store any missing items
@@ -81,6 +116,7 @@ class PromptSettings(BaseModel):
     # to get JSON
     summary_json: str = summary_json_prompt
     summary_json_system: str = summary_json_system_prompt
+    EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
 
     @field_validator("summary")
     @classmethod

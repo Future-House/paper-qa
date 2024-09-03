@@ -30,6 +30,7 @@ except ImportError:
     USE_VOYAGE = False
 
 from .clients import ALL_CLIENTS, DocMetadataClient
+from .config import AnswerSettings, PromptSettings
 from .core import llm_parse_json, map_fxn_summary, retrieve_texts
 from .llms import (
     HybridEmbeddingModel,
@@ -54,9 +55,8 @@ from .types import (
     DocKey,
     LLMResult,
     Text,
-    set_llm_answer_ids
+    set_llm_answer_ids,
 )
-from .config import AnswerSettings, PromptSettings
 from .utils import (
     gather_with_concurrency,
     get_loop,
@@ -587,8 +587,6 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
-
-
     def _build_texts_index(self, keys: set[DocKey] | None = None):
         texts = self.texts
         if keys is not None and self.jit_texts_index:
@@ -611,10 +609,10 @@ class Docs(BaseModel):
     async def retrieve_texts(self, query: str, k: int) -> list[Text]:
         _k = k + len(self.deleted_dockeys)
         matches = await self.index.max_marginal_relevance_search(
-                    self._embedding_client, query, k=_k, fetch_k=2 * _k)[0]
+            self._embedding_client, query, k=_k, fetch_k=2 * _k
+        )[0]
         matches = [m for m in matches if m.text.doc.dockey not in self.deleted_dockeys]
         return matches[:k]
-        
 
     def get_evidence(
         self,
@@ -642,7 +640,7 @@ class Docs(BaseModel):
         prompt_config: PromptSettings | None = None,
         callbacks: list[Callable] | None = None,
     ) -> list[Context]:
-        
+
         # Stuff we're missing:
         # JIT
         if len(self.docs) == 0:
@@ -652,13 +650,15 @@ class Docs(BaseModel):
             answer_config = AnswerSettings()
 
         if exclude_text_filter:
-            _k = answer_config.doc_match_k + len(exclude_text_filter)  # heuristic - get enough so we can downselect
+            _k = answer_config.doc_match_k + len(
+                exclude_text_filter
+            )  # heuristic - get enough so we can downselect
 
         matches = await self.retrieve_texts(answer.query, _k)
 
         if exclude_text_filter:
             matches = [m for m in matches if m.text not in exclude_text_filter]
-    
+
         summary_chain = None
 
         if not prompt_config.skip_summary:
@@ -685,51 +685,53 @@ class Docs(BaseModel):
                         summary_chain,
                         {"summary_length": answer_config.evidence_summary_length},
                         llm_parse_json if prompt_config.json_summary else None,
-                        callbacks
+                        callbacks,
                     )
                     for m in matches
                 ],
             )
 
-        for _,llm_result in results:
+        for _, llm_result in results:
             answer.add_tokens(llm_result)
 
         # add non-zero
-        contexts = [r for r, _ in results if r is not None and r.score > 0]
-
-        return contexts
+        return [r for r, _ in results if r is not None and r.score > 0]
 
     def query(
         self,
-        query: str,
-        k: int = 10,
-        max_sources: int = 5,
-        length_prompt="about 100 words",
-        answer: Answer | None = None,
-        key_filter: bool | None = None,
-        callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
+        answer: Answer | str,
+        answer_config: AnswerSettings | None = None,
+        prompt_config: PromptSettings | None = None,
+        callbacks: list[Callable] | None = None,
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aquery(
-                query,
-                k=k,
-                max_sources=max_sources,
-                length_prompt=length_prompt,
-                answer=answer,
-                key_filter=key_filter,
-                get_callbacks=get_callbacks,
+                answer,
+                answer_config=answer_config,
+                prompt_config=prompt_config,
+                callbacks=callbacks,
             )
         )
 
     async def aquery(  # noqa: C901, PLR0912, PLR0915
         self,
-        answer: Answer,
-        contexts: list[Context] | None = None,
+        answer: Answer | str,
         answer_config: AnswerSettings | None = None,
         prompt_config: PromptSettings | None = None,
         callbacks: list[Callable] | None = None,
     ) -> Answer:
-        
+
+        if isinstance(answer, str):
+            answer = Answer(question=answer)
+
+        if answer_config is None:
+            answer_config = AnswerSettings()
+
+        if prompt_config is None:
+            prompt_config = PromptSettings()
+
+        contexts = answer.contexts
+
         if not contexts:
             contexts = await self.aget_evidence(
                 answer.question,
@@ -737,6 +739,7 @@ class Docs(BaseModel):
                 prompt_config=prompt_config,
                 callbacks=callbacks,
             )
+        pre_str = None
         if prompt_config.pre is not None:
             chain = self.llm_model.make_chain(
                 client=self._client,
@@ -746,82 +749,90 @@ class Docs(BaseModel):
             with set_llm_answer_ids(answer.id):
                 pre = await chain({"question": answer.question}, callbacks, name="pre")
             answer.add_tokens(pre)
-            answer.context += f"\n\nExtra background information: {pre}"
+            pre_str = pre.text
 
-        filtered_contexts = sorted(answer.contexts,
-            key=lambda x: x.score, reverse=True,
-        )[:answer_config.answer_max_sources]
+        filtered_contexts = sorted(
+            contexts,
+            key=lambda x: x.score,
+            reverse=True,
+        )[: answer_config.answer_max_sources]
 
+        context_str = "\n\n".join(
+            [
+                f"{c.text.name}: {c.context}"
+                + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
+                + (
+                    f"\nFrom {c.text.doc.citation}"
+                    if answer_config.evidence_detailed_citations
+                    else ""
+                )
+                for c in filtered_contexts
+            ]
+            + [f"Extra background information: {pre_str}"]
+            if pre_str
+            else []
+        )
 
-            context_str = "\n\n".join(
-                [
-                    f"{c.text.name}: {c.context}"
-                    + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
-                    + (f"\nFrom {c.text.doc.citation}" if detailed_citations else "")
-                    for c in filtered_contexts
-                ]
+        valid_names = [c.text.name for c in filtered_contexts]
+        context_str += "\n\nValid keys: " + ", ".join(valid_names)
+
+        bib = {}
+        if len(context_str) < 10:  # noqa: PLR2004
+            answer_text = (
+                "I cannot answer this question due to insufficient information."
             )
-
-            valid_names = [c.text.name for c in filtered_contexts]
-            context_str += "\n\nValid keys: " + ", ".join(valid_names)
-
-        
-            bib = {}
-            if len(context_str) < 10: # noqa: PLR2004
-                answer_text = (
-                    "I cannot answer this question due to insufficient information."
-                )
-            else:
-                qa_chain = self.llm_model.make_chain(
-                    client=self._client,
-                    prompt=prompt_config.qa,
-                    system_prompt=prompt_config.system,
-                )
+        else:
+            qa_chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=prompt_config.qa,
+                system_prompt=prompt_config.system,
+            )
+            with set_llm_answer_ids(answer.id):
                 answer_result = await qa_chain(
                     {
                         "context": context_str,
                         "answer_length": answer.answer_length,
                         "question": answer.question,
+                        "example_citation": PromptSettings.EXAMPLE_CITATION,
                     },
-                    get_callbacks("answer"),
+                    name="answer",
                 )
-                answer_result.name = "answer"
-                answer_result.answer_id = answer.id
-                await self.llm_result_callback(answer_result)
-                answer_text = answer_result.text
-                answer.add_tokens(answer_result)
-            # it still happens
-            if "(Example2012Example pages 3-4)" in answer_text:
-                answer_text = answer_text.replace("(Example2012Example pages 3-4)", "")
-            for c in filtered_contexts:
-                name = c.text.name
-                citation = c.text.doc.citation
-                # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
-                if name_in_text(name, answer_text):
-                    bib[name] = citation
-            bib_str = "\n\n".join(
-                [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
+            answer_text = answer_result.text
+            answer.add_tokens(answer_result)
+        # it still happens
+        if PromptSettings.EXAMPLE_CITATION in answer_text:
+            answer_text = answer_text.replace(PromptSettings.EXAMPLE_CITATION, "")
+        for c in filtered_contexts:
+            name = c.text.name
+            citation = c.text.doc.citation
+            # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
+            if name_in_text(name, answer_text):
+                bib[name] = citation
+        bib_str = "\n\n".join(
+            [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
+        )
+        formatted_answer = f"Question: {answer.question}\n\n{answer_text}\n"
+        if len(bib) > 0:
+            formatted_answer += f"\nReferences\n\n{bib_str}\n"
+
+        if prompt_config.post is not None:
+            chain = self.llm_model.make_chain(
+                client=self._client,
+                prompt=prompt_config.post,
+                system_prompt=prompt_config.system,
             )
-            formatted_answer = f"Question: {answer.question}\n\n{answer_text}\n"
+            with set_llm_answer_ids(answer.id):
+                post = await chain(answer.model_dump(), name="post")
+            answer_text = post.text
+            answer.add_tokens(post)
+            formatted_answer = f"Question: {answer.question}\n\n{post}\n"
             if len(bib) > 0:
                 formatted_answer += f"\nReferences\n\n{bib_str}\n"
-            answer.answer = answer_text
-            answer.formatted_answer = formatted_answer
-            answer.references = bib_str
 
-            if prompt_config.post is not None:
-                chain = self.llm_model.make_chain(
-                    client=self._client,
-                    prompt=prompt_config.post,
-                    system_prompt=prompt_config.system,
-                )
-                post = await chain(answer.model_dump(), get_callbacks("post"))
-                post.name = "post"
-                post.answer_id = answer.id
-                await self.llm_result_callback(post)
-                answer.answer = post.text
-                answer.add_tokens(post)
-                answer.formatted_answer = f"Question: {answer.question}\n\n{post}\n"
-                if len(bib) > 0:
-                    answer.formatted_answer += f"\nReferences\n\n{bib_str}\n"
+        # now at end we modify, so we could have retried earlier
+        answer.answer = answer_text
+        answer.formatted_answer = formatted_answer
+        answer.references = bib_str
+        answer.contexts = contexts
+
         return answer

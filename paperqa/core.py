@@ -2,75 +2,11 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Callable, cast, TypeVar
+from typing import Any, Callable
 
-from .llms import Chain, VectorStore
-from .types import Answer, Context, DocKey, LLMResult, Text, Doc, CallbackFactory
+from .llms import Chain
+from .types import Context, LLMResult, Text
 from .utils import get_score, strip_citations
-
-async def retrieve_texts(
-    query: str,
-    index: VectorStore[Text],
-    client: Any,
-    k: int = 10,  # Number of evidence pieces to retrieve
-    include_dockey_filter: set[DocKey] | None = None,  # by dockey
-    exclude_dockey_filter: set[DocKey] | None = None,
-    include_text_filter: set[str] | None = None,  # by text
-    exclude_text_filter: set[str] | None = None,
-) -> list[Text]:
-    _k = k
-    if any(
-        [
-            include_dockey_filter,
-            exclude_dockey_filter,
-            include_text_filter,
-            exclude_text_filter,
-        ]
-    ):
-        _k = k * 10  # shitty heuristic - get enough so we can downselect
-    # retrieve
-    matches = cast(
-        list[Text],
-        (
-            await index.max_marginal_relevance_search(
-                client, query, k=_k, fetch_k=5 * _k
-            )
-        )[0],
-    )
-    # apply filters
-    if include_dockey_filter:
-        matches = [m for m in matches if m.doc.dockey in include_dockey_filter]
-    if exclude_dockey_filter:
-        matches = [m for m in matches if m.doc.dockey not in exclude_dockey_filter]
-    if include_text_filter:
-        matches = [m for m in matches if m.text in include_text_filter]
-    if exclude_text_filter:
-        matches = [m for m in matches if m.text not in exclude_text_filter]
-
-    return matches[:k]
-
-# no state modifications in adoc_match--only answer is changed
-async def rerank_docs(
-    query: str, 
-    k: int,
-    matched_docs: list[Doc],
-    chain: Chain,
-    client: Any,
-    get_callbacks: CallbackFactory = lambda x: None,  # noqa: ARG005
-) -> list[Doc]:
-    """Return a list of dockeys that match the query."""
-
-    if len(matched_docs) == 0:
-        return set()
-
-    papers = [f"{d.docname}: {d.citation}" for d in matched_docs]
-    result = await chain(
-        {"question": query, "papers": "\n".join(papers)},
-        get_callbacks("filter"),
-    )
-    result.name = "filter"
-    return {d.dockey for d in matched_docs if d.docname in str(result)}
-    return {d.dockey for d in matched_docs}
 
 
 def llm_parse_json(text: str) -> dict:
@@ -116,7 +52,7 @@ async def map_fxn_summary(
         parser: The parser to use for parsing - return empty dict on Failure to fallback to text parsing.
         callbacks: LLM callbacks to execute in chain
 
-    Returns:    
+    Returns:
         The context object and LLMResult to get stats/info
     """
     # needed empties for failures/skips
@@ -131,9 +67,10 @@ async def map_fxn_summary(
                 "question": question,
                 "citation": citation,
                 "text": text.text,
-            } | (extra_chain_kwargs or {}),
+            }
+            | (extra_chain_kwargs or {}),
             callbacks,
-            name = "evidence:" + text.name
+            name="evidence:" + text.name,
         )
         context = llm_result.text
         result_data = parser(context) if parser else {}
@@ -171,6 +108,3 @@ async def map_fxn_summary(
         **extras,
     )
     return c, llm_result
-
-
-

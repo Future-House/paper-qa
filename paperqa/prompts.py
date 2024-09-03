@@ -23,7 +23,7 @@ qa_prompt = (
     '"I cannot answer."'
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
-    "like (Example2012Example pages 3-4). Only cite from the context "
+    "like {example_citation}. Only cite from the context "
     "below and only use the valid keys. Write in the style of a "
     "Wikipedia article, with concise sentences and coherent paragraphs. "
     "The context comes from a variety of sources and is only a summary, "
