@@ -34,4 +34,5 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
           CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
+          UNPAYWALL_EMAIL: api@futurehouse.org
         run: pytest
