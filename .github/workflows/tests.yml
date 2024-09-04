@@ -28,9 +28,6 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
-      - name: Ensure cassette directory permissions
-        run: |
-          chmod -R 755 tests/cassettes
       - name: Run Test
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
