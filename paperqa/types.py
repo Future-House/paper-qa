@@ -4,9 +4,10 @@ import contextvars
 import logging
 import os
 import re
+from collections.abc import Collection
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, ClassVar, Collection
+from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
 import tiktoken
@@ -111,6 +112,9 @@ class Text(Embeddable):
     text: str
     name: str
     doc: Doc
+
+    def __hash__(self) -> int:
+        return hash(self.text)
 
 
 class Context(BaseModel):

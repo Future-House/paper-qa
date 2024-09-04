@@ -541,7 +541,7 @@ async def test_anthropic_chain(flag_day_fixture) -> None:
 
 def test_make_docs(flag_day_fixture):
     docs = Docs()
-    docs.add_file(
+    docs.add(
         flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now", dockey="test"
     )
     assert docs.docs["test"].docname == "Wiki2023"
@@ -816,3 +816,382 @@ def test_langchain_embeddings(bates_fixture):
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
+
+
+@pytest.mark.skip(
+    "Langchain updated vector stores and I haven't yet updated the implementation"
+)
+@pytest.mark.asyncio
+async def test_langchain_vector_store(bates_fixture):
+    from langchain_community.vectorstores.faiss import FAISS
+    from langchain_openai import OpenAIEmbeddings
+
+    some_texts = [
+        Text(
+            embedding=OpenAIEmbeddings().embed_query("test"),
+            text="this is a test",
+            name="test",
+            doc=Doc(docname="test", citation="test", dockey="test"),
+        )
+    ]
+
+    index = LangchainVectorStore()
+    with pytest.raises(ValueError, match="You must set store_builder"):
+        index.add_texts_and_embeddings(some_texts)
+
+    with pytest.raises(ValueError, match="store_builder must take two arguments"):
+        index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
+
+    with pytest.raises(ValueError, match="store_builder must be callable"):
+        index = LangchainVectorStore(store_builder="foo")
+
+    # now with real builder
+    index = LangchainVectorStore(
+        store_builder=lambda x, y: FAISS.from_embeddings(x, OpenAIEmbeddings(), y)
+    )
+    assert index._store is None
+    index.add_texts_and_embeddings(some_texts)
+    assert index._store is not None
+    # check search returns Text obj
+    data, _ = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
+    assert isinstance(data[0], Text)
+
+    # now try with convenience
+    index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+    assert index._store is None
+    index.add_texts_and_embeddings(some_texts)
+    assert index._store is not None
+
+    docs = Docs(
+        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
+    )
+    assert docs._embedding_client is not None  # from default
+
+    await docs.aadd(
+        bates_fixture,
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
+    )
+
+    # will not be embedded until we ask something
+    fast_settings = Settings.from_name("fast")
+    _ = await docs.aget_evidence(
+        "What is Frederick Bates's greatest accomplishment?", settings=fast_settings
+    )
+    assert docs.texts[0].embedding is not None
+    # make sure we can pickle it
+    docs_pickle = pickle.dumps(docs)
+    dp = pickle.loads(docs_pickle)
+
+    assert dp.texts
+
+
+def test_docs_pickle(flag_day_fixture) -> None:
+    """Ensure that Docs object can be pickled and unpickled correctly."""
+    docs = Docs()
+    docs.add(
+        flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now", dockey="test"
+    )
+
+    # Pickle the Docs object
+    docs_pickle = pickle.dumps(docs)
+    unpickled_docs = pickle.loads(docs_pickle)
+
+    assert unpickled_docs.docs["test"].docname == "Wiki2023"
+    assert len(unpickled_docs.docs) == 1
+
+
+def test_bad_context(bates_fixture):
+    docs = Docs()
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    answer = docs.query(
+        "What do scientist estimate as the planetary composition of Jupyter?"
+    )
+    assert "cannot answer" in answer.answer
+
+
+def test_repeat_keys(bates_fixture, flag_day_fixture):
+    docs = Docs()
+    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    assert result
+    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    assert not result
+    assert len(docs.docs) == 1
+
+    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    assert len(docs.docs) == 2
+
+    # check keys
+    ds = list(docs.docs.values())
+    assert ds[0].docname == "Wiki2023"
+    assert ds[1].docname == "Wiki2023a"
+
+
+def test_can_read_normal_pdf_reader(docs_fixture):
+    answer = docs_fixture.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_pdf_reader_w_no_match_doc_details():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = Docs()
+    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
+    # doc will be a DocDetails object, but nothing can be found
+    # thus, we retain the prior citation data
+    assert (
+        next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
+    )
+
+
+def test_pdf_reader_match_doc_details():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    docs = Docs()
+    # we limit to only crossref since s2 is too flaky
+    docs.add(
+        doc_path,  # type: ignore[arg-type]
+        "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
+        use_doc_details=True,
+        clients={CrossrefProvider},
+        fields=["author", "journal"],
+    )
+    doc_details = next(iter(docs.docs.values()))
+    assert doc_details.dockey == "5300ef1d5fb960d7"
+    # note year is unknown because citation string is only parsed for authors/title/doi
+    # AND we do not request it back from the metadata sources
+    assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
+    assert set(doc_details.authors) == {  # type: ignore[attr-defined]
+        "Geemi P. Wellawatte",
+        "Heta A. Gandhi",
+        "Aditi Seshadri",
+        "Andrew D. White",
+    }
+    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"  # type: ignore[attr-defined]
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_fileio_reader_txt():
+    # can't use curie, because it has trouble with parsed HTML
+    docs = Docs()
+    r = requests.get(  # noqa: S113
+        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+    )
+    if r.status_code != 200:
+        raise ValueError("Could not download wikipedia page")
+    docs.add_file(BytesIO(r.text.encode()), "WikiMedia Foundation, 2023, Accessed now")
+    answer = docs.query("What country was Frederick Bates born in?")
+    assert "United States" in answer.answer
+
+
+def test_pdf_pypdf_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    splits1 = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+    )
+    splits2 = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+    )
+    assert (
+        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
+        > 0.85
+    )
+
+
+def test_parser_only_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    parsed_text = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=True,
+    )
+    assert parsed_text.metadata.parse_type == "pdf"
+    assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)
+    assert parsed_text.metadata.chunk_metadata is None
+    assert parsed_text.metadata.total_parsed_text_length == sum(
+        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
+    )
+
+
+def test_chunk_metadata_reader():
+    tests_dir = os.path.dirname(os.path.abspath(__file__))
+    doc_path = os.path.join(tests_dir, "paper.pdf")
+    chunk_text, metadata = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=True,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    assert metadata.parse_type == "pdf"
+    assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    assert all(
+        chunk_text[i].text[-100:] == chunk_text[i + 1].text[:100]
+        for i in range(len(chunk_text) - 1)
+    )
+
+    doc_path = "example.html"
+    with open(doc_path, "w", encoding="utf-8") as f:
+        # get wiki page about politician
+        r = requests.get(  # noqa: S113
+            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+        )
+        f.write(r.text)
+
+    chunk_text, metadata = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    # NOTE the use of tiktoken changes the actual char and overlap counts
+    assert metadata.parse_type == "html"
+    assert metadata.chunk_metadata.chunk_type == "overlap"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+
+    doc_path = os.path.abspath(__file__)
+
+    chunk_text, metadata = read_doc(
+        Path(doc_path),
+        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+        force_pypdf=False,
+        overlap=100,
+        chunk_chars=3000,
+        parsed_text_only=False,
+        include_metadata=True,
+    )
+    assert metadata.parse_type == "txt"
+    assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
+    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+
+
+def test_code():
+    # load this script
+    doc_path = os.path.abspath(__file__)
+    settings = Settings.from_name("fast")
+    docs = Docs()
+    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)  # type: ignore[arg-type]
+    assert len(docs.docs) == 1
+    assert (
+        "test_paperqa.py"
+        in docs.query("What file is read in by test_code?", settings=settings).answer
+    )
+
+
+def test_zotero() -> None:
+    from paperqa.contrib import ZoteroDB
+
+    Docs()
+    with contextlib.suppress(ValueError):  # Close enough
+        ZoteroDB(library_type="user")  # "group" if group library
+
+
+def test_too_much_evidence(bates_fixture, flag_day_fixture):
+    docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
+    docs.add_url("https://en.wikipedia.org/wiki/Barack_Obama", "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    settings = Settings.from_name("fast")
+    settings.answer.evidence_k = 10
+    settings.answer.answer_max_sources = 10
+    docs.query("What is Barrack's greatest accomplishment?", settings=settings)
+
+
+def test_custom_prompts(bates_fixture):
+    my_qaprompt = (
+        "Answer the question '{question}' "
+        "using the country name alone. For example: "
+        "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: "
+    )
+    settings = Settings.from_name("fast")
+    settings.prompts.qa = my_qaprompt
+    docs = Docs()
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    answer = docs.query("What country is Frederick Bates from?", settings=settings)
+    assert "United States" in answer.answer
+
+
+def test_pre_prompt(bates_fixture):
+    pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
+
+    settings = Settings.from_name("fast")
+    settings.prompts.pre = pre
+    docs = Docs()
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    assert "212" not in docs.query("What is the boiling point of water?").answer
+    assert (
+        "212"
+        in docs.query("What is the boiling point of water?", settings=settings).answer
+    )
+
+
+def test_post_prompt(bates_fixture):
+    post = "The opposite of down is"
+    settings = Settings.from_name("fast")
+    settings.prompts.post = post
+    docs = Docs()
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    response = docs.query("What country is Bates from?", settings=settings)
+    assert "up" in response.answer.lower()
+
+
+def test_embedding_name_consistency():
+    docs = Docs()
+    assert docs.embedding == "text-embedding-3-small"
+    assert docs.texts_index.embedding_model.name == "text-embedding-3-small"
+    docs = Docs(embedding="langchain")
+    assert docs.embedding == "langchain"
+    assert docs.texts_index.embedding_model.name == "langchain"
+    assert isinstance(docs.texts_index.embedding_model, LangchainEmbeddingModel)
+    docs = Docs(embedding="foo")
+    assert docs.embedding == "foo"
+    assert isinstance(docs.texts_index.embedding_model, OpenAIEmbeddingModel)
+    docs = Docs(
+        texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="test"))
+    )
+    assert docs.embedding == "test"
+
+    docs = Docs(embedding="hybrid-text-embedding-3-small")
+    assert isinstance(docs.texts_index.embedding_model, HybridEmbeddingModel)
+    assert docs.texts_index.embedding_model.models[0].name == "text-embedding-3-small"
+    assert docs.texts_index.embedding_model.models[1].name == "sparse"
+
+
+def test_external_doc_index(flag_day_fixture):
+    docs = Docs()
+    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    # force embedding
+    _ = docs.get_evidence(query="What is the date of flag day?")
+    docs2 = Docs(texts_index=docs.texts_index)
+    assert len(docs2.docs) == 0
+    contexts = docs2.get_evidence("What is the date of flag day?")
+    assert contexts

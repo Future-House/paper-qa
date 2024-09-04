@@ -103,7 +103,6 @@ class Docs(BaseModel):
         default=PAPERQA_DIR, description="Path to save index", validate_default=True
     )
     deleted_dockeys: set[DocKey] = set()
-    jit_texts_index: bool = False
 
     def __init__(self, **data):
         # We do it here because we need to move things to private attributes
@@ -555,9 +554,7 @@ class Docs(BaseModel):
             for t in texts:
                 t.name = t.name.replace(doc.docname, new_docname)
             doc.docname = new_docname
-        # 5. Index remaining updates
-        if not self.jit_texts_index:
-            self.texts_index.add_texts_and_embeddings(texts)
+        # 5. We do not embed here, because we do it lazily
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
@@ -583,26 +580,12 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
-    def _build_texts_index(self, keys: set[DocKey] | None = None):
-        texts = self.texts
-        if keys is not None and self.jit_texts_index:
-            # TODO: what is JIT even for??
-            if keys is not None:
-                texts = [t for t in texts if t.doc.dockey in keys]
-            if len(texts) == 0:
-                return
-            self.texts_index.clear()
-            self.texts_index.add_texts_and_embeddings(texts)
-        if self.jit_texts_index and keys is None:
-            # Not sure what else to do here???????
-            print(
-                "Warning: JIT text index without keys "
-                "requires rebuilding index each time!"
-            )
-            self.texts_index.clear()
-            self.texts_index.add_texts_and_embeddings(texts)
+    def _build_texts_index(self):
+        texts = [t for t in self.texts if t not in self.texts_index]
+        self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(self, query: str, k: int) -> list[Text]:
+        self._build_texts_index()
         _k = k + len(self.deleted_dockeys)
         matches = cast(
             Text,
@@ -639,9 +622,7 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
     ) -> list[Context]:
 
-        # Stuff we're missing:
-        # JIT
-        if len(self.docs) == 0:
+        if len(self.docs) == 0 and len(self.texts_index) == 0:
             return []
 
         answer = Answer(question=query) if isinstance(query, str) else query
@@ -725,15 +706,14 @@ class Docs(BaseModel):
             )
         )
 
-    async def aquery(  # noqa: C901, PLR0915
+    async def aquery(
         self,
         query: Answer | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
     ) -> Answer:
 
-        if isinstance(answer, str):
-            answer = Answer(question=answer)
+        answer = Answer(question=query) if isinstance(query, str) else query
 
         _settings = get_settings(settings)
         answer_config = _settings.answer
@@ -744,9 +724,8 @@ class Docs(BaseModel):
         if not contexts:
             contexts = await self.aget_evidence(
                 answer,
-                answer_config=answer_config,
-                prompt_config=prompt_config,
                 callbacks=callbacks,
+                settings=settings,
             )
         pre_str = None
         if prompt_config.pre is not None:
@@ -777,9 +756,7 @@ class Docs(BaseModel):
                 )
                 for c in filtered_contexts
             ]
-            + [f"Extra background information: {pre_str}"]
-            if pre_str
-            else []
+            + ([f"Extra background information: {pre_str}"] if pre_str else [])
         )
 
         valid_names = [c.text.name for c in filtered_contexts]

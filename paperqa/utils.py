@@ -8,12 +8,12 @@ import math
 import os
 import re
 import string
-from collections.abc import Iterable
+from collections.abc import Collection, Coroutine, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
+from typing import Any, BinaryIO, Union
 from uuid import UUID
 
 import aiohttp
@@ -215,7 +215,7 @@ def flatten(iteratble: list) -> list:
 
 def get_loop() -> asyncio.AbstractEventLoop:
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()  # new in python 3.10
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

@@ -650,10 +650,17 @@ class VectorStore(BaseModel, ABC):
     # can be tuned for different tasks
     mmr_lambda: float = Field(default=0.9)
     model_config = ConfigDict(extra="forbid")
+    texts_hashes: set[int] = Field(default_factory=set)
+
+    def __contains__(self, item):
+        return hash(item) in self.texts_hashes
+
+    def __len__(self):
+        return len(self.texts_hashes)
 
     @abstractmethod
     def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
-        pass
+        [self.texts_hashes.add(hash(t)) for t in texts]
 
     @abstractmethod
     async def similarity_search(
@@ -724,6 +731,7 @@ class NumpyVectorStore(VectorStore):
         self,
         texts: Sequence[Embeddable],
     ) -> None:
+        super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
 
@@ -830,24 +838,27 @@ class LangchainVectorStore(VectorStore):
     model_config = ConfigDict(extra="forbid")
 
     def __init__(self, **data):
-        # we have to separate out store from the rest of the data
-        # because langchain objects are not serializable
-        store_builder = None
-        if "store_builder" in data:
-            store_builder = LangchainVectorStore.check_store_builder(
-                data.pop("store_builder")
-            )
-        if "cls" in data and "embedding_model" in data:
-            # make a little closure
-            cls = data.pop("cls")
-            embedding_model = data.pop("embedding_model")
+        raise NotImplementedError(
+            "Langchain has updated vectorstore internals and this is not yet supported"
+        )
+        # # we have to separate out store from the rest of the data
+        # # because langchain objects are not serializable
+        # store_builder = None
+        # if "store_builder" in data:
+        #     store_builder = LangchainVectorStore.check_store_builder(
+        #         data.pop("store_builder")
+        #     )
+        # if "cls" in data and "embedding_model" in data:
+        #     # make a little closure
+        #     cls = data.pop("cls")
+        #     embedding_model = data.pop("embedding_model")
 
-            def candidate(x, y):
-                return cls.from_embeddings(x, embedding_model, y)
+        #     def candidate(x, y):
+        #         return cls.from_embeddings(x, embedding_model, y)
 
-            store_builder = LangchainVectorStore.check_store_builder(candidate)
-        super().__init__(**data)
-        self._store_builder = store_builder
+        #     store_builder = LangchainVectorStore.check_store_builder(candidate)
+        # super().__init__(**data)
+        # self._store_builder = store_builder
 
     @classmethod
     def check_store_builder(cls, builder: Any) -> Any:
@@ -878,6 +889,7 @@ class LangchainVectorStore(VectorStore):
     def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
         if self._store_builder is None:
             raise ValueError("You must set store_builder before adding texts")
+        super().add_texts_and_embeddings(texts)
         self.class_type = type(texts[0])
         if self.class_type == Text:
             vec_store_text_and_embeddings = [
