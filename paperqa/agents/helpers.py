@@ -224,7 +224,6 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
     doc.texts_index.mmr_lambda = request.texts_index_mmr_lambda
     doc.embedding = request.embedding
     doc.max_concurrent = request.max_concurrent
-    doc.prompts = request.prompts
     Docs.make_llm_names_consistent(doc)
 
     logger.debug(

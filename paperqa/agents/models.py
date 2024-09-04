@@ -31,12 +31,10 @@ from typing_extensions import Protocol
 from .. import (
     Answer,
     OpenAILLMModel,
-    PromptSettings,
     llm_model_factory,
 )
 from ..utils import hexdigest
 from ..version import __version__
-from .prompts import STATIC_PROMPTS
 
 logger = logging.getLogger(__name__)
 
@@ -238,11 +236,6 @@ class QueryRequest(BaseModel):
     max_sources: int = 10
     consider_sources: int = 16
     named_prompt: str | None = None
-    # if you change this to something other than default
-    # modify code below in update_prompts
-    prompts: PromptSettings = Field(
-        default=STATIC_PROMPTS["default"], validate_default=True
-    )
     agent_tools: AgentPromptCollection = Field(default_factory=AgentPromptCollection)
     texts_index_mmr_lambda: float = 1.0
     texts_index_embedding_config: dict[str, Any] | None = None
@@ -278,26 +271,6 @@ class QueryRequest(BaseModel):
                 f"Answer LLM and summary LLM types must match: {type(llm)} != {type(summary_llm)}"
             )
         return self
-
-    @field_validator("prompts")
-    def update_prompts(
-        cls,  # noqa: N805
-        v: PromptSettings,
-        info: ValidationInfo,
-    ) -> PromptSettings:
-        values = info.data
-        if values["named_prompt"] is not None:
-            if values["named_prompt"] not in STATIC_PROMPTS:
-                raise ValueError(
-                    f"Named prompt {values['named_prompt']} not in {list(STATIC_PROMPTS.keys())}"
-                )
-            v = STATIC_PROMPTS[values["named_prompt"]]
-        if values["summary_llm"] == "none":
-            v.skip_summary = True
-            # for simplicity (it is not used anywhere)
-            # so that Docs doesn't break when we don't have a summary_llm
-            values["summary_llm"] = "gpt-4o-mini"
-        return v
 
     def set_docs_name(self, docs_name: str) -> None:
         """Set the internal docs name for tracking."""
@@ -350,7 +323,7 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model="gpt-4-turbo") -> str:
+    async def get_summary(self, llm_model="gpt-4o") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."

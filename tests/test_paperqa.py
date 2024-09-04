@@ -3,9 +3,7 @@ from __future__ import annotations
 import contextlib
 import os
 import pickle
-import tempfile
 import textwrap
-import urllib.request
 from io import BytesIO
 from pathlib import Path
 
@@ -57,30 +55,6 @@ def docs_fixture():
     with open(doc_path, "rb") as f:
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
     return docs
-
-
-@pytest.fixture
-def bates_fixture():
-    """A cached version of Frrederick_Bates Wikipedia page."""
-    url = "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-    with urllib.request.urlopen(url) as response:
-        html = response.read()
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(html)
-        f.flush()
-    return f.name
-
-
-@pytest.fixture
-def flag_day_fixture():
-    """A cached version of Frrederick_Bates Wikipedia page."""
-    url = "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
-    with urllib.request.urlopen(url) as response:
-        html = response.read()
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(html)
-        f.flush()
-    return f.name
 
 
 def test_get_citations():
@@ -494,6 +468,7 @@ async def test_chain_chat():
     completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
 
 
+@pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
 async def test_anthropic_chain(flag_day_fixture) -> None:
 
@@ -544,7 +519,7 @@ def test_evidence(docs_fixture):
     evidence = docs_fixture.get_evidence(
         Answer(question="What does XAI stand for?"),
         settings=fast_settings,
-    )
+    ).contexts
     assert len(evidence) >= fast_settings.answer.evidence_k
 
 
@@ -564,7 +539,7 @@ def test_json_evidence(docs_fixture):
     evidence = docs_fixture.get_evidence(
         Answer(question="Who wrote this article?"),
         settings=settings,
-    )
+    ).contexts
     assert evidence[0].author_name
 
 
@@ -576,7 +551,7 @@ def test_ablations(docs_fixture):
         "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
         " chemistry because it can accurately model non-linear structure-function relationships.' on?",
         settings=settings,
-    )
+    ).contexts
     assert contexts[0].text.text == contexts[0].context, "summarization not ablated"
 
     assert len(contexts) == len(docs_fixture.texts), "evidence retrieval not ablated"
@@ -594,7 +569,7 @@ def test_location_awareness(docs_fixture):
         "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
         " chemistry because it can accurately model non-linear structure-function relationships.' on?",
         settings=settings,
-    )
+    ).contexts
     assert "1" in "\n".join(
         [c.context for c in contexts]
     ), "location not found in evidence"
@@ -751,10 +726,10 @@ def test_custom_llm(bates_fixture):
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
-    evidence = docs.get_evidence("Echo")
+    evidence = docs.get_evidence("Echo").contexts
     assert "Echo" in evidence[0].context
 
-    evidence = docs.get_evidence("Echo", callbacks=[print_callback])
+    evidence = docs.get_evidence("Echo", callbacks=[print_callback]).contexts
     assert "Echo" in evidence[0].context
 
 
@@ -1186,5 +1161,5 @@ def test_external_doc_index(flag_day_fixture):
     _ = docs.get_evidence(query="What is the date of flag day?")
     docs2 = Docs(texts_index=docs.texts_index)
     assert len(docs2.docs) == 0
-    contexts = docs2.get_evidence("What is the date of flag day?")
+    contexts = docs2.get_evidence("What is the date of flag day?").contexts
     assert contexts

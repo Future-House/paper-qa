@@ -10,41 +10,40 @@ from unittest.mock import patch
 
 import anyio
 import pytest
+
+# try:
+from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
+from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
 from pytest_subtests import SubTests
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
+from paperqa.agents import agent_query
+from paperqa.agents.helpers import (
+    compute_total_model_token_cost,
+    update_doc_models,
+)
+from paperqa.agents.models import (
+    AgentPromptCollection,
+    AgentStatus,
+    AnswerResponse,
+    MismatchedModelsError,
+    QueryRequest,
+)
+from paperqa.agents.search import get_directory_index
+from paperqa.agents.tools import (
+    GatherEvidenceTool,
+    GenerateAnswerTool,
+    PaperSearchTool,
+    SharedToolState,
+)
 from paperqa.docs import Docs
 from paperqa.llms import LangchainLLMModel
-from paperqa.types import Answer, Context, Doc, PromptSettings, Text
+from paperqa.types import Answer, Context, Doc, Text
 from paperqa.utils import get_year
 
-try:
-    from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
-    from langchain_openai import ChatOpenAI
-    from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
-
-    from paperqa.agents import agent_query
-    from paperqa.agents.helpers import (
-        compute_total_model_token_cost,
-        update_doc_models,
-    )
-    from paperqa.agents.models import (
-        AgentPromptCollection,
-        AgentStatus,
-        AnswerResponse,
-        MismatchedModelsError,
-        QueryRequest,
-    )
-    from paperqa.agents.prompts import STATIC_PROMPTS
-    from paperqa.agents.search import get_directory_index
-    from paperqa.agents.tools import (
-        GatherEvidenceTool,
-        GenerateAnswerTool,
-        PaperSearchTool,
-        SharedToolState,
-    )
-except ImportError:
-    pytest.skip("agents module is not installed", allow_module_level=True)
+# except ImportError:
+#    pytest.skip("agents module is not installed", allow_module_level=True)
 
 
 PAPER_DIRECTORY = Path(__file__).parent
@@ -57,16 +56,18 @@ async def test_get_directory_index(agent_index_dir):
         index_name="pqa_index_0",
         index_directory=agent_index_dir,
     )
-    assert index.fields == [
+    print(index.fields)
+    assert index.fields == {
         "title",
         "file_location",
         "body",
         "year",
-    ], "Incorrect fields in index"
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    }, "Incorrect fields in index"
+    # paper.pdf + bates.html + flag_day.html
+    assert len(await index.index_files) == 3, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
-    # added docs.keys come from md5 hash of the file location
-    assert results[0].docs.keys() == {"dab5b86dea3bd4c7ffe05a9f33ae95f7"}
+    # can't really check the dockey, since timestamps/articles change
+    assert results[0].docs.keys()
 
 
 @pytest.mark.asyncio
@@ -77,19 +78,20 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
         index_directory=agent_index_dir,
         manifest_file=anyio.Path(PAPER_DIRECTORY) / "stub_manifest.csv",
     )
-    assert index.fields == [
+    assert index.fields == {
         "title",
         "file_location",
         "body",
         "year",
-    ], "Incorrect fields in index"
-    # 4 = example.txt + example2.txt + paper.pdf + example.html
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
-    results = await index.query(query="who is Barack Obama?")
+    }, "Incorrect fields in index"
+    # paper.pdf + bates.html + flag_day.html
+    assert len(await index.index_files) == 3, "Incorrect number of index files"
+    results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
-    assert top_result.dockey == "af2c9acf6018e62398fc6efc4f0a04b4"
+    # can't really check the dockey, since timestamps/articles change
+    assert top_result.dockey
     # note: this title comes from the manifest, so we know it worked
-    assert top_result.title == "Barack Obama (Wikipedia article)"
+    assert top_result.title == "Frederick Bates (Wikipedia article)"
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
@@ -534,13 +536,6 @@ def test_answers_are_striped():
     assert response.answer.contexts[0].text.doc.embedding is None
     # make sure it serializes
     response.model_dump_json()
-
-
-def test_prompts_are_set():
-    assert (
-        STATIC_PROMPTS["json"].summary_json_system
-        != PromptSettings().summary_json_system
-    )
 
 
 @pytest.mark.parametrize(

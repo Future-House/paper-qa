@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import shutil
+import tempfile
+import urllib.request
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import patch
@@ -27,6 +29,28 @@ def vcr_config():
 
 
 @pytest.fixture
+def bates_fixture():
+    url = "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+    with urllib.request.urlopen(url) as response:
+        html = response.read()
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(html)
+        f.flush()
+    return f.name
+
+
+@pytest.fixture
+def flag_day_fixture():
+    url = "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
+    with urllib.request.urlopen(url) as response:
+        html = response.read()
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(html)
+        f.flush()
+    return f.name
+
+
+@pytest.fixture
 def tmp_path_cleanup(
     tmp_path: Path,
 ) -> Generator[Path, None, None]:
@@ -39,14 +63,26 @@ def tmp_path_cleanup(
 @pytest.fixture
 def agent_home_dir(
     tmp_path_cleanup: str | os.PathLike,
+    bates_fixture: os.PathLike,
+    flag_day_fixture: os.PathLike,
 ) -> Generator[str | os.PathLike, None, None]:
     """Set up a unique temporary folder for the agent module."""
+    # download necessary files if not present
+    # tests are written to assume files are present in tests
+    tests_dir = Path(__file__).parent
+    with open(tests_dir / "bates.html", "w") as f, open(bates_fixture) as bates_f:
+        f.write(bates_f.read())
+    with (
+        open(tests_dir / "flag_day.html", "w") as f,
+        open(flag_day_fixture) as flag_day_f,
+    ):
+        f.write(flag_day_f.read())
     with patch.dict("os.environ", {"PQA_HOME": str(tmp_path_cleanup)}):
         yield tmp_path_cleanup
 
 
 @pytest.fixture
-def agent_index_dir(agent_home_dir: Path) -> Path:
+def agent_index_dir(agent_home_dir: Path, bates_fixture, flag_day_fixture) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
 
 

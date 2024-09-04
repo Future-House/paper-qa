@@ -301,7 +301,7 @@ class SearchIndex:
         keep_filenames: bool = False,
         field_subset: list[str] | None = None,
     ) -> list[Any]:
-        query_fields = field_subset or self.fields
+        query_fields = list(field_subset or self.fields)
         searcher = await self.searcher
         index = await self.index
         results = [
@@ -444,7 +444,8 @@ async def get_directory_index(
     )
 
     metadata = await maybe_get_manifest(manifest_file)
-
+    print(metadata)
+    print(directory)
     valid_files = [
         file
         async for file in directory.iterdir()

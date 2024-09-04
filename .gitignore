@@ -100,6 +100,7 @@ fabric.properties
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+.vscode
 
 # Local History for Visual Studio Code
 .history/
@@ -301,5 +302,6 @@ env
 
 # Matching pyproject.toml
 paperqa/version.py
-tests/example*
+tests/*txt
+tests/*html
 tests/test_index/*

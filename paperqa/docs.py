@@ -395,6 +395,7 @@ class Docs(BaseModel):
         """Add a document to the collection."""
         parse_config = get_settings(settings).parsing
         if dockey is None:
+            # md5 sum of file contents (not path!)
             dockey = md5sum(path)
         if citation is None:
             # skip system because it's too hesitant to answer
@@ -604,7 +605,7 @@ class Docs(BaseModel):
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
-    ) -> list[Context]:
+    ) -> Answer:
         return get_loop().run_until_complete(
             self.aget_evidence(
                 query=query,
@@ -620,16 +621,19 @@ class Docs(BaseModel):
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
-    ) -> list[Context]:
-
-        if len(self.docs) == 0 and len(self.texts_index) == 0:
-            return []
+    ) -> Answer:
 
         answer = Answer(question=query) if isinstance(query, str) else query
+
+        if len(self.docs) == 0 and len(self.texts_index) == 0:
+            return answer
 
         _settings = get_settings(settings)
         answer_config = _settings.answer
         prompt_config = _settings.prompts
+
+        exclude_text_filter = exclude_text_filter or set()
+        exclude_text_filter |= {c.text.name for c in answer.contexts}
 
         _k = answer_config.evidence_k
         if exclude_text_filter:
@@ -689,8 +693,8 @@ class Docs(BaseModel):
         for _, llm_result in results:
             answer.add_tokens(llm_result)
 
-        # add non-zero
-        return [r for r, _ in results if r is not None and r.score > 0]
+        answer.contexts += [r for r, _ in results if r is not None]
+        return answer
 
     def query(
         self,
@@ -722,20 +726,21 @@ class Docs(BaseModel):
         contexts = answer.contexts
 
         if not contexts:
-            contexts = await self.aget_evidence(
+            answer = await self.aget_evidence(
                 answer,
                 callbacks=callbacks,
                 settings=settings,
             )
+            contexts = answer.contexts
         pre_str = None
         if prompt_config.pre is not None:
-            chain = self.llm_model.make_chain(
+            pre_chain = self.llm_model.make_chain(
                 client=self._client,
                 prompt=prompt_config.pre,
                 system_prompt=prompt_config.system,
             )
             with set_llm_answer_ids(answer.id):
-                pre = await chain({"question": answer.question}, callbacks, "pre")
+                pre = await pre_chain({"question": answer.question}, callbacks, "pre")
             answer.add_tokens(pre)
             pre_str = pre.text
 
@@ -744,6 +749,8 @@ class Docs(BaseModel):
             key=lambda x: x.score,
             reverse=True,
         )[: answer_config.answer_max_sources]
+        # remove any contexts with a score of 0
+        filtered_contexts = [c for c in filtered_contexts if c.score > 0]
 
         context_str = "\n\n".join(
             [
