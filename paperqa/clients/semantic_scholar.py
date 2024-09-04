@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Collection
 from datetime import datetime
 from enum import IntEnum, auto
 from http import HTTPStatus
 from itertools import starmap
-from typing import Any, Collection
+from typing import Any
 
 import aiohttp
 

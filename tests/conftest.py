@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import os
 import shutil
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 from unittest.mock import patch
 
 import pytest

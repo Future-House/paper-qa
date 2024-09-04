@@ -15,8 +15,6 @@ from enum import Enum
 from inspect import signature
 from typing import (
     Any,
-    Generic,
-    TypeVar,
     cast,
 )
 
@@ -660,7 +658,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
-        [self.texts_hashes.add(hash(t)) for t in texts]
+        [self.texts_hashes.add(hash(t)) for t in texts]  # type: ignore[func-returns-value]
 
     @abstractmethod
     async def similarity_search(

@@ -2,7 +2,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional, Union, cast
+from typing import cast
 
 from pydantic import BaseModel
 
@@ -65,9 +65,9 @@ class ZoteroDB(zotero.Zotero):
         self,
         *,
         library_type: str = "user",
-        library_id: Optional[str] = None,  # noqa: FA100
-        api_key: Optional[str] = None,  # noqa: FA100
-        storage: Optional[StrPath] = None,  # noqa: FA100
+        library_id: str | None = None,
+        api_key: str | None = None,
+        storage: StrPath | None = None,
         **kwargs,
     ):
         self.logger = logging.getLogger("ZoteroDB")
@@ -108,7 +108,7 @@ class ZoteroDB(zotero.Zotero):
             library_type=library_type, library_id=library_id, api_key=api_key, **kwargs
         )
 
-    def get_pdf(self, item: dict) -> Union[Path, None]:  # noqa: FA100
+    def get_pdf(self, item: dict) -> Path | None:
         """Gets a filename for a given Zotero key for a PDF.
 
         If the PDF is not found locally, the PDF will be downloaded to a local file at the correct key.
@@ -141,13 +141,13 @@ class ZoteroDB(zotero.Zotero):
         self,
         limit: int = 25,
         start: int = 0,
-        q: Optional[str] = None,  # noqa: FA100
-        qmode: Optional[str] = None,  # noqa: FA100
-        since: Optional[str] = None,  # noqa: FA100
-        tag: Optional[str] = None,  # noqa: FA100
-        sort: Optional[str] = None,  # noqa: FA100
-        direction: Optional[str] = None,  # noqa: FA100
-        collection_name: Optional[str] = None,  # noqa: FA100
+        q: str | None = None,
+        qmode: str | None = None,
+        since: str | None = None,
+        tag: str | None = None,
+        sort: str | None = None,
+        direction: str | None = None,
+        collection_name: str | None = None,
     ):
         """Given a search query, this will lazily iterate over papers in a Zotero library, downloading PDFs as needed.
 
@@ -210,8 +210,8 @@ class ZoteroDB(zotero.Zotero):
 
         max_limit = 100
 
-        items: List = []  # noqa: FA100
-        pdfs: List[Path] = []  # noqa: FA100
+        items: list = []
+        pdfs: list[Path] = []
         i = 0
         actual_i = 0
         num_remaining = limit
@@ -240,7 +240,7 @@ class ZoteroDB(zotero.Zotero):
             _pdfs = [self.get_pdf(item) for item in _items]
 
             # Filter:
-            for item, pdf in zip(_items, _pdfs):
+            for item, pdf in zip(_items, _pdfs, strict=False):
                 no_pdf = item is None or pdf is None
                 is_duplicate = pdf in pdfs
 
@@ -326,7 +326,7 @@ def _get_citation_key(item: dict) -> str:
     return f"{last_name}_{short_title}_{date}_{item['key']}".replace(" ", "")
 
 
-def _extract_pdf_key(item: dict) -> Union[str, None]:  # noqa: FA100
+def _extract_pdf_key(item: dict) -> str | None:
     """Extract the PDF key from a Zotero item."""
     if "links" not in item:
         return None

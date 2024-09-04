@@ -250,6 +250,8 @@ mypy-init-return = true
 "tests/*.py" = [
     "PLR2004",  # Tests can have magic values
     "S101",  # Tests can have assertions
+    "S301",  # can test pickle
+    "S310",
 ]
 
 [tool.ruff.lint.pycodestyle]

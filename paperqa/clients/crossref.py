@@ -4,8 +4,9 @@ import copy
 import json
 import logging
 import os
+from collections.abc import Collection
 from datetime import datetime
-from typing import Any, Collection
+from typing import Any
 from urllib.parse import quote
 
 import aiohttp

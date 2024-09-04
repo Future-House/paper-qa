@@ -7,9 +7,10 @@ import os
 import pathlib
 import pickle
 import zlib
+from collections.abc import Collection
 from enum import Enum, auto
 from io import StringIO
-from typing import Any, ClassVar, Collection
+from typing import Any, ClassVar
 from uuid import UUID
 
 import anyio

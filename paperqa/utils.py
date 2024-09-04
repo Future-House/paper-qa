@@ -13,7 +13,7 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, Union
+from typing import Any, BinaryIO
 from uuid import UUID
 
 import aiohttp
@@ -34,7 +34,7 @@ from tenacity import (
 logger = logging.getLogger(__name__)
 
 
-StrPath = Union[str, Path]
+StrPath = str | Path
 
 
 def name_in_text(name: str, text: str) -> bool:

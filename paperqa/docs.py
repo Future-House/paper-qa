@@ -30,7 +30,7 @@ except ImportError:
     USE_VOYAGE = False
 
 from .clients import DEFAULT_CLIENTS, DocMetadataClient
-from .config import MaybeSettings, Settings, get_settings
+from .config import MaybeSettings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     HybridEmbeddingModel,
@@ -587,14 +587,14 @@ class Docs(BaseModel):
     async def retrieve_texts(self, query: str, k: int) -> list[Text]:
         self._build_texts_index()
         _k = k + len(self.deleted_dockeys)
-        matches = cast(
+        matches: list[Text] = cast(
             Text,
             (
                 await self.texts_index.max_marginal_relevance_search(
                     self._embedding_client, query, k=_k, fetch_k=2 * _k
                 )
-            ),
-        )[0]
+            )[0],
+        )
         matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
         return matches[:k]
 

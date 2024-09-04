@@ -7,10 +7,9 @@ import os
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
 import yaml
-from typing_extensions import Annotated
 
 from .. import __version__
 from ..utils import get_loop, pqa_directory
@@ -111,7 +110,7 @@ def parse_dot_to_dict(str_w_dots: str, value: str) -> dict[str, Any]:
         if not parsed:
             try:
                 eval_value = ast.literal_eval(value)
-                if isinstance(eval_value, (set, list)):
+                if isinstance(eval_value, set | list):
                     parsed[key] = eval_value
                 else:
                     parsed[key] = value

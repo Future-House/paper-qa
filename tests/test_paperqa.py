@@ -8,7 +8,6 @@ import textwrap
 import urllib.request
 from io import BytesIO
 from pathlib import Path
-from typing import cast, no_type_check
 
 import numpy as np
 import pytest
@@ -22,7 +21,6 @@ from paperqa import (
     NumpyVectorStore,
     Settings,
     Text,
-    get_settings,
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
@@ -38,9 +36,6 @@ from paperqa.llms import (
     OpenAIEmbeddingModel,
     OpenAILLMModel,
     SparseEmbeddingModel,
-    VoyageAIEmbeddingModel,
-    guess_model_type,
-    is_openai_model,
 )
 from paperqa.readers import read_doc
 from paperqa.utils import (
@@ -532,11 +527,8 @@ async def test_anthropic_chain(flag_day_fixture) -> None:
     assert isinstance(completion.text, str)
 
     docs = Docs(llm="claude-3-sonnet-20240229", client=client)
-    await docs.aadd_file(flag_day_fixture, "National Flag of Canada Day")
-    answer = await docs.aget_evidence(
-        Answer(question="What is the national flag of Canada?")
-    )
-    await docs.aquery("What is the national flag of Canada?", answer=answer)
+    await docs.aadd(flag_day_fixture, "National Flag of Canada Day")
+    await docs.aget_evidence("What is the national flag of Canada?")
 
 
 def test_make_docs(flag_day_fixture):
@@ -577,8 +569,6 @@ def test_json_evidence(docs_fixture):
 
 
 def test_ablations(docs_fixture):
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
     settings = Settings()
     settings.prompts.skip_summary = True
     settings.answer.evidence_retrieval = False
@@ -602,7 +592,7 @@ def test_location_awareness(docs_fixture):
 
     contexts = docs_fixture.get_evidence(
         "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
-        + " chemistry because it can accurately model non-linear structure-function relationships.' on?",
+        " chemistry because it can accurately model non-linear structure-function relationships.' on?",
         settings=settings,
     )
     assert "1" in "\n".join(
@@ -769,7 +759,7 @@ def test_custom_llm(bates_fixture):
 
 
 def test_langchain_llm(bates_fixture):
-    from langchain_openai import ChatOpenAI, OpenAI
+    from langchain_openai import ChatOpenAI
 
     docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-4o-mini"))
     assert isinstance(docs.llm_model, LangchainLLMModel)
@@ -903,7 +893,7 @@ def test_docs_pickle(flag_day_fixture) -> None:
 
 def test_bad_context(bates_fixture):
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query(
         "What do scientist estimate as the planetary composition of Jupyter?"
     )
@@ -912,13 +902,13 @@ def test_bad_context(bates_fixture):
 
 def test_repeat_keys(bates_fixture, flag_day_fixture):
     docs = Docs()
-    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     assert result
-    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     assert not result
     assert len(docs.docs) == 1
 
-    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
     assert len(docs.docs) == 2
 
     # check keys
@@ -934,7 +924,7 @@ def test_can_read_normal_pdf_reader(docs_fixture):
 
 def test_pdf_reader_w_no_match_doc_details():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+    doc_path = Path(os.path.join(tests_dir, "paper.pdf"))
     docs = Docs()
     docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
     # doc will be a DocDetails object, but nothing can be found
@@ -946,11 +936,11 @@ def test_pdf_reader_w_no_match_doc_details():
 
 def test_pdf_reader_match_doc_details():
     tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+    doc_path = Path(os.path.join(tests_dir, "paper.pdf"))
     docs = Docs()
     # we limit to only crossref since s2 is too flaky
     docs.add(
-        doc_path,  # type: ignore[arg-type]
+        doc_path,
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
         use_doc_details=True,
         clients={CrossrefProvider},
@@ -1096,10 +1086,10 @@ def test_chunk_metadata_reader():
 
 def test_code():
     # load this script
-    doc_path = os.path.abspath(__file__)
+    doc_path = Path(os.path.abspath(__file__))
     settings = Settings.from_name("fast")
     docs = Docs()
-    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)  # type: ignore[arg-type]
+    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)
     assert len(docs.docs) == 1
     assert (
         "test_paperqa.py"
@@ -1117,7 +1107,10 @@ def test_zotero() -> None:
 
 def test_too_much_evidence(bates_fixture, flag_day_fixture):
     docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
-    docs.add_url("https://en.wikipedia.org/wiki/Barack_Obama", "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add_url(
+        "https://en.wikipedia.org/wiki/Barack_Obama",
+        "WikiMedia Foundation, 2023, Accessed now",
+    )
     docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
     docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     settings = Settings.from_name("fast")
@@ -1135,7 +1128,7 @@ def test_custom_prompts(bates_fixture):
     settings = Settings.from_name("fast")
     settings.prompts.qa = my_qaprompt
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country is Frederick Bates from?", settings=settings)
     assert "United States" in answer.answer
 
@@ -1146,7 +1139,7 @@ def test_pre_prompt(bates_fixture):
     settings = Settings.from_name("fast")
     settings.prompts.pre = pre
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     assert "212" not in docs.query("What is the boiling point of water?").answer
     assert (
         "212"
@@ -1159,7 +1152,7 @@ def test_post_prompt(bates_fixture):
     settings = Settings.from_name("fast")
     settings.prompts.post = post
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")  # type: ignore[arg-type]
+    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     response = docs.query("What country is Bates from?", settings=settings)
     assert "up" in response.answer.lower()
 

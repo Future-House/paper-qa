@@ -4,11 +4,12 @@ import asyncio
 import logging
 import os
 import time
+from collections.abc import Collection
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, ClassVar, Collection, assert_never
+from typing import Any, ClassVar, assert_never
 from uuid import UUID, uuid4
 
 from langchain_core.callbacks import AsyncCallbackHandler
