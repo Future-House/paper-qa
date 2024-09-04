@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
     response:
       body:
         string:
@@ -11,7 +11,11 @@ interactions:
           {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 179.79169}]}
+          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
+          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
+          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
+          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
+          "P. Schwaller"}], "matchScore": 179.49144}]}
 
           '
       headers:
@@ -20,31 +24,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "348"
+          - "684"
         Content-Type:
           - application/json
         Date:
-          - Fri, 30 Aug 2024 23:23:23 GMT
+          - Wed, 04 Sep 2024 21:03:31 GMT
         Via:
-          - 1.1 5ee8fb3fa2d9e2b4c274a8647312261e.cloudfront.net (CloudFront)
+          - 1.1 801c4cdd177872a11b03f54a2b3b464e.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - SMJVunmtmaFwjneqnxJI_A7AYozijTT8u19VGiec93ZzEKvJ4mibFQ==
+          - KiXt__gqFunFGwnRfHqec4VvqYjOYJ-dMcR9yjD3pLMvOWIWQmTynA==
         X-Amz-Cf-Pop:
-          - BOS50-P4
+          - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dWIgwHFaPHcEIxg=
+          - dmStjErdPHcEiKg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "348"
+          - "684"
         x-amzn-Remapped-Date:
-          - Fri, 30 Aug 2024 23:23:23 GMT
+          - Wed, 04 Sep 2024 21:03:31 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - d20eb853-9c6a-4d86-ada6-b98b9e31a6e5
+          - 3e5cb564-8489-4409-8507-c33df8b42600
       status:
         code: 200
         message: OK
@@ -69,7 +73,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Fri, 30 Aug 2024 23:23:23 GMT
+          - Wed, 04 Sep 2024 21:03:32 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -89,47 +93,4 @@ interactions:
       status:
         code: 404
         message: Not Found
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2293252,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
-          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 30 Aug 2024 23:23:25 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
 version: 1

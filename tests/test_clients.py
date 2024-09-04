@@ -83,7 +83,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and "
                 "Philippe Schwaller. Augmenting large language models with chemistry tools. Nature "
                 "Machine Intelligence, 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8, "
-                "doi:10.1038/s42256-024-00832-8. This article has 190 citations and is from a "
+                "doi:10.1038/s42256-024-00832-8. This article has 191 citations and is from a "
                 "domain leading peer-reviewed journal."
             ),
             "is_oa": True,
@@ -430,7 +430,7 @@ async def test_bad_init():
         client = DocMetadataClient(clients=[])  # noqa: F841
 
 
-@pytest.mark.vcr(match_on=["host", "path"])
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog):
     caplog.set_level(logging.DEBUG)
@@ -465,7 +465,7 @@ async def test_ensure_sequential_run(caplog):
         ), "Crossref should run first"
 
 
-@pytest.mark.vcr(match_on=["host", "path"])
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(caplog):
     caplog.set_level(logging.DEBUG)

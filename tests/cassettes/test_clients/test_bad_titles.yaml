@@ -20,7 +20,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:05 GMT
+          - Wed, 04 Sep 2024 21:03:27 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -60,30 +60,89 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:07 GMT
+          - Wed, 04 Sep 2024 21:03:27 GMT
         Via:
-          - 1.1 b3169f8fae0104e39a0a9728b6537e08.cloudfront.net (CloudFront)
+          - 1.1 b014854bd0108b7ed0058504b69ccb5a.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - njac2dCY2mYDBr9kpqMw07vocYKj5bqWdB3gjSS35BKQnXDemHVPdw==
+          - ReI_WPUiGFs2Q9BjcPXCHcFOOU_0Qfzz-tx1nf9zwDsFVHq64DZi1Q==
         X-Amz-Cf-Pop:
-          - IAD55-P4
+          - SFO53-C1
         X-Cache:
           - Error from cloudfront
         x-amz-apigw-id:
-          - cdcMuFLwPHcEjHQ=
+          - dmSs8EAkPHcEILQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "34"
         x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:34:07 GMT
+          - Wed, 04 Sep 2024 21:03:27 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - c9ee1896-0b67-4677-b6ed-dd3c7c274fd1
+          - 24518791-1e32-4729-8b0d-ad79ab41ca7e
       status:
         code: 404
         message: Not Found
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
+          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
+          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
+          "title": "Effect of native oxide layers on copper thin-film tensile properties:
+          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
+          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
+          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
+          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
+          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
+          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
+          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
+          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
+          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
+          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
+          208.02252}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1109"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:03:28 GMT
+        Via:
+          - 1.1 b014854bd0108b7ed0058504b69ccb5a.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 1CwyUOBzpuKdRyvgUQ3ySPBw1f4MEBqhqTUzrO9R--v2LIbngIWwMQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmStAEL6PHcEaYw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1109"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 21:03:28 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 22e79a5f-a939-4135-9c9f-1cc4af25af6f
+      status:
+        code: 200
+        message: OK
   - request:
       body: null
       headers: {}
@@ -92,9 +151,9 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10275318,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10323850,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
           Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
-          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
+          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
           layers are likely to be present on metallic nano-structures due to either
           environmental exposure during use, or high temperature processing techniques
           such as annealing. It is well known that nano-structured metals have vastly
@@ -186,7 +245,7 @@ interactions:
           Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
           Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
           Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.39564,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.36099,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -200,11 +259,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3928"
+          - "3945"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:08 GMT
+          - Wed, 04 Sep 2024 21:03:28 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -251,7 +310,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 18:34:09 GMT
+          - Wed, 04 Sep 2024 21:03:29 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -268,65 +327,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
-          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
-          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
-          "title": "Effect of native oxide layers on copper thin-film tensile properties:
-          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
-          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
-          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
-          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
-          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
-          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
-          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
-          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
-          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
-          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          208.29527}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1109"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 18:34:23 GMT
-        Via:
-          - 1.1 b3169f8fae0104e39a0a9728b6537e08.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - DsETikbOnDFtYsX-08CvPI_WjGnGoJnPTVHA97MsDkpnNNTns7nDmA==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdcNCFJZvHcEnsA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1109"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:34:23 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - c85f8443-7411-47f0-ba6f-2a023b2b2b7c
       status:
         code: 200
         message: OK
