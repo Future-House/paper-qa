@@ -23,9 +23,10 @@ def _load_env():
 def vcr_config():
     return {
         "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
-        "record_mode": "once",
+        "record_mode": "none",
         "match_on": ["method", "host", "path", "query"],
         "allow_playback_repeats": True,
+        "cassette_library_dir": "tests/cassettes",
     }
 
 

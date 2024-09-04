@@ -1,0 +1,2068 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2296021,"items":[{"indexed":{"date-parts":[[2024,9,4]],"date-time":"2024-09-04T17:39:08Z","timestamp":1725471548702},"reference-count":103,"publisher":"Springer
+          Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
+          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
+          Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
+          Mach Intell"],"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Large
+          language models (LLMs) have shown strong performance in tasks across domains
+          but struggle with chemistry-related problems. These models also lack access
+          to external knowledge sources, limiting their usefulness in scientific applications.
+          We introduce ChemCrow, an LLM chemistry agent designed to accomplish tasks
+          across organic synthesis, drug discovery and materials design. By integrating
+          18 expert-designed tools and using GPT-4 as the LLM, ChemCrow augments the
+          LLM performance in chemistry, and new capabilities emerge. Our agent autonomously
+          planned and executed the syntheses of an insect repellent and three organocatalysts
+          and guided the discovery of a novel chromophore. Our evaluation, including
+          both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
+          in automating a diverse set of chemical tasks. Our work not only aids expert
+          chemists and lowers barriers for non-experts but also fosters scientific advancement
+          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17,"title":["Augmenting
+          large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
+          Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
+          D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
+          J., Chang, M.-W., Lee, K. & Toutanova, K. Bert: pre-training of deep bidirectional
+          transformers for language understanding. In Proc. Conference of the North
+          American Chapter of the Association for Computational Linguistics: Human Language
+          Technologies (eds Burstein, J. et al.) 4171\u20134186 (Association for Computational
+          Linguistics, 2019)."},{"key":"832_CR2","first-page":"1877","volume":"33","author":"T
+          Brown","year":"2020","unstructured":"Brown, T. et al. Language models are
+          few-shot learners. Adv. Neural Inf. Process. Syst. 33, 1877\u20131901 (2020).","journal-title":"Adv.
+          Neural Inf. Process. Syst."},{"key":"832_CR3","unstructured":"Bommasani, R.
+          et al. On the opportunities and risks of foundation models. Preprint at https:\/\/arxiv.org\/abs\/2108.07258
+          (2021)."},{"key":"832_CR4","first-page":"1","volume":"24","author":"A Chowdhery","year":"2023","unstructured":"Chowdhery,
+          A. et al. Palm: scaling language modeling with pathways. J. Mach. Learn. Res.
+          24, 1\u2013113 (2023).","journal-title":"J. Mach. Learn. Res."},{"key":"832_CR5","unstructured":"Bubeck,
+          S. et al. Sparks of artificial general intelligence: early experiments with
+          gpt-4. Preprint at https:\/\/arxiv.org\/abs\/2303.12712 (2023)."},{"key":"832_CR6","unstructured":"Github
+          Copilot. GitHub https:\/\/copilot.github.com (2023)."},{"key":"832_CR7","unstructured":"Li,
+          R. et al. Starcoder: may the source be with you! Trans. Mach. Learn. Res.
+          https:\/\/openreview.net\/pdf?id=KoFOg41haE (2023)."},{"key":"832_CR8","doi-asserted-by":"crossref","unstructured":"Ziegler,
+          A. et al. Productivity assessment of neural code completion. In Proc. 6th
+          ACM SIGPLAN International Symposium on Machine Programming (eds Chaudhuri,
+          S. and Sutton, C.) 21\u201329 (ACM, 2022).","DOI":"10.1145\/3520312.3534864"},{"key":"832_CR9","unstructured":"Vaswani,
+          A. et al. Attention is all you need. In Proc. Advances in Neural Information
+          Processing Systems 30 (eds. Guyon, I. et al.) 5999\u20136009 (Curran Associates,
+          2017)."},{"key":"832_CR10","unstructured":"Schick, T. et al. Toolformer: language
+          models can teach themselves to use tools. In Proc. Advances in Neural Information
+          Processing Systems 36 (eds. Oh, A. et al.) 68539\u201368551 (Curran Associates,
+          2023)."},{"key":"832_CR11","doi-asserted-by":"publisher","first-page":"1649","DOI":"10.1021\/acs.jcim.3c00285","volume":"63","author":"CM
+          Castro Nascimento","year":"2023","unstructured":"Castro Nascimento, C. M.
+          & Pimentel, A. S. Do large language models understand chemistry? A conversation
+          with ChatGPT. J. Chem. Inf. Model. 63, 1649\u20131655 (2023).","journal-title":"J.
+          Chem. Inf. Model."},{"key":"832_CR12","unstructured":"OpenAI. GPT-4 technical
+          report. Preprint at https:\/\/arxiv.org\/abs\/2303.08774 (2023)."},{"key":"832_CR13","first-page":"27730","volume":"35","author":"L
+          Ouyang","year":"2022","unstructured":"Ouyang, L. et al. Training language
+          models to follow instructions with human feedback. Adv. Neural Inf. Process.
+          Syst. 35, 27730\u201327744 (2022).","journal-title":"Adv. Neural Inf. Process.
+          Syst."},{"key":"832_CR14","doi-asserted-by":"publisher","first-page":"368","DOI":"10.1039\/D2DD00087C","volume":"2","author":"AD
+          White","year":"2023","unstructured":"White, A. D. et al. Assessment of chemistry
+          knowledge in large language models that generate code. Digit. Discov. 2, 368\u2013376
+          (2023).","journal-title":"Digit. Discov."},{"key":"832_CR15","doi-asserted-by":"publisher","first-page":"739","DOI":"10.1021\/ci100384d","volume":"51","author":"DM
+          Lowe","year":"2011","unstructured":"Lowe, D. M., Corbett, P. T., Murray-Rust,
+          P. & Glen, R. C. Chemical name to structure: Opsin, an open source solution.
+          J. Chem. Inf. Model. 51, 739\u2013753 (2011).","journal-title":"J. Chem. Inf.
+          Model."},{"key":"832_CR16","doi-asserted-by":"publisher","first-page":"434","DOI":"10.1021\/acscentsci.7b00064","volume":"3","author":"CW
+          Coley","year":"2017","unstructured":"Coley, C. W., Barzilay, R., Jaakkola,
+          T. S., Green, W. H. & Jensen, K. F. Prediction of organic reaction outcomes
+          using machine learning. ACS Cent. Sci. 3, 434\u2013443 (2017).","journal-title":"ACS
+          Cent. Sci."},{"key":"832_CR17","doi-asserted-by":"publisher","first-page":"370","DOI":"10.1039\/C8SC04228D","volume":"10","author":"CW
+          Coley","year":"2019","unstructured":"Coley, C. W. et al. A graph-convolutional
+          neural network model for the prediction of chemical reactivity. Chem. Sci.
+          10, 370\u2013377 (2019).","journal-title":"Chem. Sci."},{"key":"832_CR18","doi-asserted-by":"publisher","first-page":"1572","DOI":"10.1021\/acscentsci.9b00576","volume":"5","author":"P
+          Schwaller","year":"2019","unstructured":"Schwaller, P. et al. Molecular transformer:
+          a model for uncertainty-calibrated chemical reaction prediction. ACS Cent.
+          Sci. 5, 1572\u20131583 (2019).","journal-title":"ACS Cent. Sci."},{"key":"832_CR19","doi-asserted-by":"publisher","first-page":"4874","DOI":"10.1038\/s41467-020-18671-7","volume":"11","author":"G
+          Pesciullesi","year":"2020","unstructured":"Pesciullesi, G., Schwaller, P.,
+          Laino, T. & Reymond, J.-L. Transfer learning enables the molecular transformer
+          to predict regio-and stereoselective reactions on carbohydrates. Nat. Commun.
+          11, 4874 (2020).","journal-title":"Nat. Commun."},{"key":"832_CR20","doi-asserted-by":"publisher","first-page":"015022","DOI":"10.1088\/2632-2153\/ac3ffb","volume":"3","author":"R
+          Irwin","year":"2022","unstructured":"Irwin, R., Dimitriadis, S., He, J. &
+          Bjerrum, E. J. Chemformer: a pre-trained transformer for computational chemistry.
+          Mach. Learn. Sci.Technol. 3, 015022 (2022).","journal-title":"Mach. Learn.
+          Sci.Technol."},{"key":"832_CR21","doi-asserted-by":"publisher","first-page":"5904","DOI":"10.1002\/anie.201506101","volume":"55","author":"S
+          Szymkuc","year":"2016","unstructured":"Szymkuc, S. et al. Computer-assisted
+          synthetic planning: the end of the beginning. Angew. Chem. Int. Ed. Engl.
+          55, 5904\u20135937 (2016).","journal-title":"Angew. Chem. Int. Ed. Engl."},{"key":"832_CR22","doi-asserted-by":"publisher","first-page":"604","DOI":"10.1038\/nature25978","volume":"555","author":"MH
+          Segler","year":"2018","unstructured":"Segler, M. H., Preuss, M. & Waller,
+          M. P. Planning chemical syntheses with deep neural networks and symbolic AI.
+          Nature 555, 604\u2013610 (2018).","journal-title":"Nature"},{"key":"832_CR23","doi-asserted-by":"crossref","unstructured":"Coley,
+          C. W. et al. A robotic platform for flow synthesis of organic compounds informed
+          by AI planning. Science 365 (2019).","DOI":"10.1126\/science.aax1566"},{"key":"832_CR24","doi-asserted-by":"publisher","first-page":"3316","DOI":"10.1039\/C9SC05704H","volume":"11","author":"P
+          Schwaller","year":"2020","unstructured":"Schwaller, P. et al. Predicting retrosynthetic
+          pathways using transformer-based models and a hyper-graph exploration strategy.
+          Chem. Sci. 11, 3316\u20133325 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR25","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1186\/s13321-020-00472-1","volume":"12","author":"S
+          Genheden","year":"2020","unstructured":"Genheden, S. et al. AiZynthFinder:
+          a fast, robust and flexible open-source software for retrosynthetic planning.
+          J. Cheminf. 12, 1\u20139 (2020).","journal-title":"J. Cheminf."},{"key":"832_CR26","doi-asserted-by":"publisher","first-page":"1094","DOI":"10.1021\/acs.accounts.0c00714","volume":"54","author":"K
+          Molga","year":"2021","unstructured":"Molga, K., Szymkuc, S. & Grzybowski,
+          B. A. Chemist ex machina: advanced synthesis planning by computers. Acc. Chem.
+          Res. 54, 1094\u20131106 (2021).","journal-title":"Acc. Chem. Res."},{"key":"832_CR27","doi-asserted-by":"publisher","first-page":"e1604","DOI":"10.1002\/wcms.1604","volume":"12","author":"P
+          Schwaller","year":"2022","unstructured":"Schwaller, P. et al. Machine intelligence
+          for chemical reaction space. Wiley Interdiscip. Rev. Comput. Mol. Sci. 12,
+          e1604 (2022).","journal-title":"Wiley Interdiscip. Rev. Comput. Mol. Sci."},{"key":"832_CR28","doi-asserted-by":"publisher","first-page":"80","DOI":"10.3389\/fenvs.2015.00080","volume":"3","author":"A
+          Mayr","year":"2016","unstructured":"Mayr, A., Klambauer, G., Unterthiner,
+          T. & Hochreiter, S. Deeptox: toxicity prediction using deep learning. Front.
+          Environ. Sci. 3, 80 (2016).","journal-title":"Front. Environ. Sci."},{"key":"832_CR29","doi-asserted-by":"publisher","first-page":"3370","DOI":"10.1021\/acs.jcim.9b00237","volume":"59","author":"K
+          Yang","year":"2019","unstructured":"Yang, K. et al. Analyzing learned molecular
+          representations for property prediction. J. Chem. Inf. Model. 59, 3370\u20133388
+          (2019).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR30","unstructured":"Chithrananda,
+          S., Grand, G. & Ramsundar, B. Chemberta: large-scale self-supervised pretraining
+          for molecular property prediction. Preprint at https:\/\/arxiv.org\/abs\/2010.09885
+          (2020)."},{"key":"832_CR31","doi-asserted-by":"publisher","first-page":"5938","DOI":"10.1021\/acs.jcim.2c01073","volume":"62","author":"D
+          van Tilborg","year":"2022","unstructured":"van Tilborg, D., Alenicheva, A.
+          & Grisoni, F. Exposing the limitations of molecular machine learning with
+          activity cliffs. J. Chem. Inf. Model. 62, 5938\u20135951 (2022).","journal-title":"J.
+          Chem. Inf. Model."},{"key":"832_CR32","doi-asserted-by":"publisher","first-page":"161","DOI":"10.1038\/s42256-023-00788-1","volume":"6","author":"KM
+          Jablonka","year":"2024","unstructured":"Jablonka, K. M., Schwaller, P., Ortega-Guerrero,
+          A. & Smit, B. Leveraging large language models for predictive chemistry. Nat.
+          Mach. Intell. 6, 161\u2013169 (2024).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR33","doi-asserted-by":"publisher","first-page":"268","DOI":"10.1021\/acscentsci.7b00572","volume":"4","author":"R
+          G\u00f3mez-Bombarelli","year":"2018","unstructured":"G\u00f3mez-Bombarelli,
+          R. et al. Automatic chemical design using a data-driven continuous representation
+          of molecules. ACS Cent. Sci. 4, 268\u2013276 (2018).","journal-title":"ACS
+          Cent. Sci."},{"key":"832_CR34","doi-asserted-by":"publisher","first-page":"5918","DOI":"10.1021\/acs.jcim.0c00915","volume":"60","author":"T
+          Blaschke","year":"2020","unstructured":"Blaschke, T. et al. Reinvent 2.0:
+          an AI tool for de novo drug design. J. Chem. Inf. Model. 60, 5918\u20135922
+          (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR35","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1038\/s41524-021-00495-8","volume":"7","author":"Q
+          Tao","year":"2021","unstructured":"Tao, Q., Xu, P., Li, M. & Lu, W. Machine
+          learning for perovskite materials design and discovery. NPJ Comput. Mater.
+          7, 1\u201318 (2021).","journal-title":"NPJ Comput. Mater."},{"key":"832_CR36","doi-asserted-by":"publisher","first-page":"1120","DOI":"10.1038\/nmat4717","volume":"15","author":"R
+          G\u00f3mez-Bombarelli","year":"2016","unstructured":"G\u00f3mez-Bombarelli,
+          R. et al. Design of efficient molecular organic light-emitting diodes by a
+          high-throughput virtual screening and experimental approach. Nat. Mater. 15,
+          1120\u20131127 (2016).","journal-title":"Nat. Mater."},{"key":"832_CR37","doi-asserted-by":"publisher","first-page":"89","DOI":"10.1038\/s41586-021-03213-y","volume":"590","author":"BJ
+          Shields","year":"2021","unstructured":"Shields, B. J. et al. Bayesian reaction
+          optimization as a tool for chemical synthesis. Nature 590, 89\u201396 (2021).","journal-title":"Nature"},{"key":"832_CR38","doi-asserted-by":"publisher","first-page":"19999","DOI":"10.1021\/jacs.2c08592","volume":"144","author":"JAG
+          Torres","year":"2022","unstructured":"Torres, J. A. G. et al. A multi-objective
+          active learning platform and web app for reaction optimization. J. Am. Chem.
+          Soc. 144, 19999\u201320007 (2022).","journal-title":"J. Am. Chem. Soc."},{"key":"832_CR39","unstructured":"Ramos,
+          M. C., Michtavy, S. S., Porosoff, M. D. & White, A. D. Bayesian optimization
+          of catalysts with in-context learning. Preprint at https:\/\/arxiv.org\/abs\/2304.05341
+          (2023)."},{"key":"832_CR40","doi-asserted-by":"crossref","unstructured":"Marra,
+          G., Giannini, F., Diligenti, M. & Gori, M. Integrating learning and reasoning
+          with deep logic models. In Proc. Machine Learning and Knowledge Discovery
+          in Databases, Part II (eds. Hutter, F. et al.) 517\u2013532 (Springer, 2020).","DOI":"10.1007\/978-3-030-46147-8_31"},{"key":"832_CR41","first-page":"24824","volume":"35","author":"J
+          Wei","year":"2022","unstructured":"Wei, J. et al. Chain-of-thought prompting
+          elicits reasoning in large language models. Adv. Neural Inf. Process. Syst.
+          35, 24824\u201324837 (2022).","journal-title":"Adv. Neural Inf. Process. Syst."},{"key":"832_CR42","doi-asserted-by":"crossref","unstructured":"Ho,
+          N., Schmid, L. & Yun, S.-Y. Large language models are reasoning teachers.
+          In Proc. 61st Annual Meeting of the Association for Computational Linguistics
+          (Volume 1: Long Papers) (eds. Rogers, A. et al.) 14852\u201314882 (ACL, 2023).","DOI":"10.18653\/v1\/2023.acl-long.830"},{"key":"832_CR43","unstructured":"Yao,
+          S. et al. ReAct: synergizing reasoning and acting in language models. In Proc.
+          11th International Conference on Learning Representations (OpenReview, 2023)."},{"key":"832_CR44","first-page":"15476","volume":"35","author":"E
+          Zelikman","year":"2022","unstructured":"Zelikman, E., Wu, Y., Mu, J. & Goodman,
+          N. Star: bootstrapping reasoning with reasoning. Adv. Neural Inf. Process.
+          Syst. 35, 15476\u201315488 (2022).","journal-title":"Adv. Neural Inf. Process.
+          Syst."},{"key":"832_CR45","doi-asserted-by":"publisher","first-page":"266","DOI":"10.1039\/D2DD00004K","volume":"1","author":"Z-W
+          Zhao","year":"2022","unstructured":"Zhao, Z.-W., del Cueto, M. & Troisi, A.
+          Limitations of machine learning models when predicting compounds with completely
+          new chemistries: possible improvements applied to the discovery of new non-fullerene
+          acceptors. Digit. Discov. 1, 266\u2013276 (2022).","journal-title":"Digit.
+          Discov."},{"key":"832_CR46","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-22951-1","volume":"12","author":"AC
+          Vaucher","year":"2021","unstructured":"Vaucher, A. C. et al. Inferring experimental
+          procedures from text-based representations of chemical reactions. Nat. Commun.
+          12, 2573 (2021).","journal-title":"Nat. Commun."},{"key":"832_CR47","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/s42256-020-00284-w","volume":"3","author":"P
+          Schwaller","year":"2021","unstructured":"Schwaller, P. et al. Mapping the
+          space of chemical reactions using attention-based neural networks. Nat. Mach.
+          Intell. 3, 144\u2013152 (2021).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR48","unstructured":"RXN
+          for Chemistry. rxn4Chemistry. GitHub https:\/\/github.com\/rxn4chemistry\/rxn4chemistry
+          (2020)."},{"key":"832_CR49","doi-asserted-by":"publisher","first-page":"154","DOI":"10.1039\/C9SC04944D","volume":"11","author":"A
+          Thakkar","year":"2020","unstructured":"Thakkar, A., Kogej, T., Reymond, J.-L.,
+          Engkvist, O. & Bjerrum, E. J. Datasets and their influence on the development
+          of computer assisted synthesis planning tools in the pharmaceutical domain.
+          Chem. Sci. 11, 154\u2013168 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR50","doi-asserted-by":"publisher","first-page":"8791","DOI":"10.1021\/acs.jmedchem.9b01919","volume":"63","author":"A
+          Thakkar","year":"2020","unstructured":"Thakkar, A., Selmi, N., Reymond, J.-L.,
+          Engkvist, O. & Bjerrum, E. J. \u2018Ring breaker\u2019: neural network driven
+          synthesis prediction of the ring system chemical space. J. Med. Chem. 63,
+          8791\u20138808 (2020).","journal-title":"J. Med. Chem."},{"key":"832_CR51","unstructured":"Yang,
+          Z. et al. Mm-react: prompting ChatGPT for multimodal reasoning and action.
+          Preprint at https:\/\/arxiv.org\/abs\/2303.11381 (2023)."},{"key":"832_CR52","unstructured":"Shen,
+          Y. et al. Hugginggpt: solving AI tasks with chatgpt and its friends in huggingface.
+          Poster at Advances in Neural Information Processing Systems 36 (2023)."},{"key":"832_CR53","unstructured":"Karpas,
+          E. et al. Mrkl systems: a modular, neuro-symbolic architecture that combines
+          large language models, external knowledge sources and discrete reasoning.
+          Preprint at https:\/\/arxiv.org\/abs\/2205.00445 (2022)."},{"key":"832_CR54","doi-asserted-by":"publisher","first-page":"570","DOI":"10.1038\/s41586-023-06792-0","volume":"624","author":"DA
+          Boiko","year":"2023","unstructured":"Boiko, D. A., MacKnight, R., Kline, B.
+          & Gomes, G. Autonomous chemical research with large language models. Nature
+          624, 570\u2013578 (2023).","journal-title":"Nature"},{"key":"832_CR55","unstructured":"RoboRXN.
+          IBM https:\/\/research.ibm.com\/science\/ibm-roborxn\/ (2021)."},{"key":"832_CR56","doi-asserted-by":"publisher","first-page":"407","DOI":"10.1002\/chem.200390042","volume":"9","author":"A
+          Wittkopp","year":"2003","unstructured":"Wittkopp, A. & Schreiner, P. R. Metal-free,
+          noncovalent catalysis of Diels-Alder reactions by neutral hydrogen bond donors
+          in organic solvents and in water. Chem. Eur. J. 9, 407\u2013414 (2003).","journal-title":"Chem.
+          Eur. J."},{"key":"832_CR57","doi-asserted-by":"publisher","first-page":"217","DOI":"10.1021\/ol017117s","volume":"4","author":"PR
+          Schreiner","year":"2002","unstructured":"Schreiner, P. R. & Wittkopp, A. H-bonding
+          additives act like Lewis acid catalysts. Org. Lett. 4, 217\u2013220 (2002).","journal-title":"Org.
+          Lett."},{"key":"832_CR58","doi-asserted-by":"publisher","first-page":"6576","DOI":"10.1002\/anie.200500227","volume":"44","author":"RP
+          Herrera","year":"2005","unstructured":"Herrera, R. P., Sgarzani, V., Bernardi,
+          L. & Ricci, A. Catalytic enantioselective friedel-crafts alkylation of indoles
+          with nitroalkenes by using a simple thiourea organocatalyst. Angew. Chem.
+          Int. Ed. Engl. 44, 6576\u20136579 (2005).","journal-title":"Angew. Chem. Int.
+          Ed. Engl."},{"key":"832_CR59","doi-asserted-by":"publisher","first-page":"12672","DOI":"10.1021\/ja036972z","volume":"125","author":"T
+          Okino","year":"2003","unstructured":"Okino, T., Hoashi, Y. & Takemoto, Y.
+          Enantioselective Michael reaction of malonates to nitroolefins catalyzed by
+          bifunctional organocatalysts. J. Am. Chem. Soc. 125, 12672\u201312673 (2003).","journal-title":"J.
+          Am. Chem. Soc."},{"key":"832_CR60","unstructured":"Joung, J. F., Han, M.,
+          Jeong, M. & Park, S. DB for chromophore. figshare https:\/\/figshare.com\/articles\/dataset\/DB_for_chromophore\/12045567
+          (2020)."},{"key":"832_CR61","unstructured":"Lowe, D. M. Extraction of Chemical
+          Structures and Reactions from the Literature. PhD thesis, Univ. of Cambridge
+          (2012)."},{"key":"832_CR62","doi-asserted-by":"publisher","first-page":"513","DOI":"10.1039\/C7SC02664A","volume":"9","author":"Z
+          Wu","year":"2018","unstructured":"Wu, Z. et al. Moleculenet: a benchmark for
+          molecular machine learning. Chem. Sci. 9, 513\u2013530 (2018).","journal-title":"Chem.
+          Sci."},{"key":"832_CR63","doi-asserted-by":"crossref","unstructured":"Liu,
+          Y. et al. G-Eval: NLG evaluation using GPT-4 with better human alignment.
+          In Proc. Conference on Empirical Methods in Natural Language Processing (eds.
+          Bouamor, H. et al.) 2511\u20132522 (ACL, 2023).","DOI":"10.18653\/v1\/2023.emnlp-main.153"},{"key":"832_CR64","unstructured":"Eloundou,
+          T., Manning, S., Mishkin, P. & Rock, D. GPTs are GPTs: an early look at the
+          labor market impact potential of large language models. Preprint at https:\/\/arxiv.org\/abs\/2303.10130
+          (2023)."},{"key":"832_CR65","doi-asserted-by":"publisher","first-page":"e1630","DOI":"10.1002\/wcms.1630","volume":"13","author":"BA
+          Grzybowski","year":"2023","unstructured":"Grzybowski, B. A., Badowski, T.,
+          Molga, K. & Szymkuc, S. Network search algorithms and scoring functions for
+          advanced-level computerized synthesis planning. Wiley Interdiscip. Rev. Comput.
+          Mol. Sci. 13, e1630 (2023).","journal-title":"Wiley Interdiscip. Rev. Comput.
+          Mol. Sci."},{"key":"832_CR66","doi-asserted-by":"publisher","first-page":"27","DOI":"10.1039\/D0RE00340A","volume":"6","author":"A
+          Thakkar","year":"2021","unstructured":"Thakkar, A. et al. Artificial intelligence
+          and automation in computer aided synthesis planning. React. Chem. Eng. 6,
+          27\u201351 (2021).","journal-title":"React. Chem. Eng."},{"key":"832_CR67","doi-asserted-by":"publisher","first-page":"189","DOI":"10.1038\/s42256-022-00465-9","volume":"4","author":"F
+          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
+          C. & Ekins, S. Dual use of artificial-intelligence-powered drug discovery.
+          Nat. Mach. Intell. 4, 189\u2013191 (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR68","doi-asserted-by":"publisher","first-page":"607","DOI":"10.1038\/s42256-022-00511-6","volume":"4","author":"F
+          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
+          C. & Ekins, S. A teachable moment for dual-use. Nat. Mach. Intell. 4, 607\u2013607
+          (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR69","unstructured":"Campbell,
+          Q. L., Herington, J. & White, A. D. Censoring chemical data to mitigate dual
+          use risk. Preprint at https:\/\/arxiv.org\/abs\/2304.10510 (2023)."},{"key":"832_CR70","unstructured":"Gao,
+          L., Schulman, J. & Hilton, J. Scaling laws for reward model overoptimization.
+          In Proc. International Conference on Machine Learning (eds Krause, A. et al.)
+          10835\u201310866 (PMLR, 2023)."},{"key":"832_CR71","unstructured":"Radford,
+          A. et al. Improving language understanding by generative pre-training. OpenAI
+          blog https:\/\/cdn.openai.com\/research-covers\/language-unsupervised\/language_understanding_paper.pdf
+          (2018)."},{"key":"832_CR72","first-page":"1\u201346","volume":"55","author":"B
+          Li","year":"2021","unstructured":"Li, B. et al. Trustworthy AI: from principles
+          to practices. ACM Comput. Surv. 55, 1\u201346 (2021).","journal-title":"ACM
+          Comput. Surv."},{"key":"832_CR73","doi-asserted-by":"publisher","first-page":"79","DOI":"10.1039\/D1DD00009H","volume":"1","author":"GM
+          Hocky","year":"2022","unstructured":"Hocky, G. M. & White, A. D. Natural language
+          processing models that automate programming will transform chemistry research
+          and teaching. Dig. Discov. 1, 79\u201383 (2022).","journal-title":"Dig. Discov."},{"key":"832_CR74","doi-asserted-by":"crossref","unstructured":"Henderson,
+          P. et al. Foundation models and fair use. Preprint at https:\/\/arxiv.org\/abs\/2303.15715
+          (2023).","DOI":"10.2139\/ssrn.4404340"},{"key":"832_CR75","unstructured":"Askell,
+          A., Brundage, M. & Hadfield, G. The role of cooperation in responsible AI
+          development. Preprint at https:\/\/arxiv.org\/abs\/1907.04534 (2019)."},{"key":"832_CR76","doi-asserted-by":"publisher","first-page":"101649","DOI":"10.1016\/j.techsoc.2021.101649","volume":"66","author":"RD
+          Neufville","year":"2021","unstructured":"Neufville, R. D. & Baum, S. D. Collective
+          action on artificial intelligence: a primer and review. Technol. Soc. 66,
+          101649 (2021).","journal-title":"Technol. Soc."},{"key":"832_CR77","unstructured":"Touvron,
+          H. et al. Llama: open and efficient foundation language models. Preprint at
+          https:\/\/arxiv.org\/abs\/2302.13971 (2023)."},{"key":"832_CR78","unstructured":"Chiang,
+          W.-L. et al. Vicuna: an open-source chatbot impressing GPT-4 with 90%* ChatGPT
+          quality. LMSYS Org. https:\/\/lmsys.org\/blog\/2023-03-30-vicuna\/ (2023)."},{"key":"832_CR79","unstructured":"Mukherjee,
+          S. et al. Orca: progressive learning from complex explanation traces of GPT-4.
+          Preprint at https:\/\/arxiv.org\/abs\/2306.02707 (2023)."},{"key":"832_CR80","unstructured":"Chase,
+          H. LangChain. GitHub https:\/\/github.com\/hwchase17\/langchain (2022)."},{"key":"832_CR81","doi-asserted-by":"crossref","unstructured":"Press,
+          O. et al. Measuring and narrowing the compositionality gap in language models.
+          In Proc. Association for Computational Linguistics: EMNLP (eds. Bouamor, H.
+          et al.) 5687\u20135711 (ACL, 2023).","DOI":"10.18653\/v1\/2023.findings-emnlp.378"},{"key":"832_CR82","unstructured":"Google
+          search API. SerpApi https:\/\/serpapi.com\/ (2023)."},{"key":"832_CR83","unstructured":"Neelakantan,
+          A. et al. Text and code embeddings by contrastive pre-training. Preprint at
+          https:\/\/arxiv.org\/abs\/2201.10005 (2022)."},{"key":"832_CR84","doi-asserted-by":"publisher","first-page":"535","DOI":"10.1109\/TBDATA.2019.2921572","volume":"7","author":"J
+          Johnson","year":"2019","unstructured":"Johnson, J., Douze, M. & J\u00e9gou,
+          H. Billion-scale similarity search with GPUs. IEEE Trans. Big Data 7, 535\u2013547
+          (2019).","journal-title":"IEEE Trans. Big Data"},{"key":"832_CR85","unstructured":"ChemSpace
+          https:\/\/chem-space.com\/ (2023)."},{"key":"832_CR86","unstructured":"National
+          Center for Biotechnology Information. PubChem. NIH https:\/\/pubchem.ncbi.nlm.nih.gov\/
+          (2023)."},{"key":"832_CR87","doi-asserted-by":"publisher","first-page":"95","DOI":"10.1186\/s13321-023-00765-1","volume":"15","author":"J
+          Medina","year":"2023","unstructured":"Medina, J. & White, A. D. Bloom filters
+          for molecules. J. Cheminf. 15, 95 (2023).","journal-title":"J. Cheminf."},{"key":"832_CR88","doi-asserted-by":"publisher","first-page":"6065","DOI":"10.1021\/acs.jcim.0c00675","volume":"60","author":"JJ
+          Irwin","year":"2020","unstructured":"Irwin, J. J. et al. Zinc20\u2014a free
+          ultralarge-scale chemical database for ligand discovery. J. Chem. Inf. Model.
+          60, 6065\u20136073 (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR89","unstructured":"Chemical
+          Abstracts Service. CAS registry number. CAS www.cas.org\/content\/cas-registry
+          (2023)."},{"key":"832_CR90","unstructured":"Tanimoto, T. T. An Elementary
+          Mathematical Theory of Classification and Prediction (IBM, 1958)."},{"key":"832_CR91","doi-asserted-by":"publisher","first-page":"742","DOI":"10.1021\/ci100050t","volume":"50","author":"D
+          Rogers","year":"2010","unstructured":"Rogers, D. & Hahn, M. Extended-connectivity
+          fingerprints. J. Chem. Inf. Model. 50, 742\u2013754 (2010).","journal-title":"J.
+          Chem. Inf. Model."},{"key":"832_CR92","unstructured":"White, A. D. Synspace.
+          GitHub https:\/\/github.com\/whitead\/synspace (2023)."},{"key":"832_CR93","doi-asserted-by":"publisher","first-page":"3697","DOI":"10.1039\/D1SC05259D","volume":"13","author":"GP
+          Wellawatte","year":"2022","unstructured":"Wellawatte, G. P., Seshadri, A.
+          & White, A. D. Model agnostic generation of counterfactual explanations for
+          molecules. Chem. Sci. 13, 3697\u20133705 (2022).","journal-title":"Chem. Sci."},{"key":"832_CR94","doi-asserted-by":"publisher","first-page":"3093","DOI":"10.1021\/ci200379p","volume":"51","author":"M
+          Hartenfeller","year":"2011","unstructured":"Hartenfeller, M. et al. A collection
+          of robust organic synthesis reactions for in silico molecule design. J. Chem.
+          Inf. Model. 51, 3093\u20133098 (2011).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR95","doi-asserted-by":"publisher","first-page":"12152","DOI":"10.1039\/C9CC05122H","volume":"55","author":"Q
+          Yang","year":"2019","unstructured":"Yang, Q. et al. Molecular transformer
+          unifies reaction prediction and retrosynthesis across pharma chemical space.
+          Chem. Commun. 55, 12152\u201312155 (2019).","journal-title":"Chem. Commun."},{"key":"832_CR96","unstructured":"Purchasable
+          Mcule. Mcule https:\/\/purchasable.mcule.com\/ (2023)."},{"key":"832_CR97","unstructured":"RDKit:
+          open-source cheminformatics (RDKit, 2023); www.rdkit.org"},{"key":"832_CR98","unstructured":"Chemical
+          weapons convention, annex on chemicals, b. schedules of chemicals. OPCW www.opcw.org\/chemical-weapons-convention\/annexes\/annex-chemicals\/annex-chemicals
+          (2024)."},{"key":"832_CR99","unstructured":"The Australia Group. Australia
+          Group common control lists: chemical weapons precursors. Department of Foreign
+          Affairs and Trade www.dfat.gov.au\/publications\/minisite\/theaustraliagroupnet\/site\/en\/controllists.html
+          (2023)."},{"key":"832_CR100","unstructured":"Namerxn (NextMove Software, 2023);
+          www.nextmovesoftware.com\/namerxn.html"},{"key":"832_CR101","doi-asserted-by":"publisher","first-page":"2337","DOI":"10.1039\/b602413k","volume":"4","author":"JS
+          Carey","year":"2006","unstructured":"Carey, J. S., Laffan, D., Thomson, C.
+          & Williams, M. T. Analysis of the reactions used for the preparation of drug
+          candidate molecules. Org. Biomol. Chem. 4, 2337\u20132347 (2006).","journal-title":"Org.
+          Biomol. Chem."},{"key":"832_CR102","doi-asserted-by":"publisher","unstructured":"Bran,
+          A. & Cox, S. ur-whitelab\/chemcrow-runs: Zendo release. Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884645
+          (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
+          A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
+          Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.731644,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
+          History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
+          History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
+          Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"A.D.W.
+          has served as a paid consultant for evaluating AI model safety at OpenAI.
+          The other authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
+          interests"}}]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "10574"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/search?query=Augmenting%20large%20language%20models%20with%20chemistry%20tools&email=test@example.com
+    response:
+      body:
+        string:
+          '{"elapsed_seconds":0.298,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
+          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"data_standard":2,"doi":"10.1038/s42256-024-00832-8","doi_url":"https://doi.org/10.1038/s42256-024-00832-8","first_oa_location":{"endpoint_id":null,"evidence":"open
+          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"genre":"journal-article","has_repository_copy":true,"is_oa":true,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"2522-5839","journal_issns":"2522-5839","journal_name":"Nature
+          Machine Intelligence","oa_locations":[{"endpoint_id":null,"evidence":"open
+          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},{"endpoint_id":null,"evidence":"oa
+          repository (via pmcid lookup)","host_type":"repository","is_best":false,"license":null,"oa_date":null,"pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235373","url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","url_for_landing_page":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","url_for_pdf":null,"version":"publishedVersion"}],"oa_locations_embargoed":[],"oa_status":"hybrid","published_date":"2024-05-08","publisher":"Springer
+          Science and Business Media LLC","title":"Augmenting large language models
+          with chemistry tools","updated":"2024-05-09T06:24:40.646053","year":2024,"z_authors":[{"family":"M.
+          Bran","given":"Andres","sequence":"first"},{"family":"Cox","given":"Sam","sequence":"additional"},{"ORCID":"http://orcid.org/0000-0003-0310-0851","authenticated-orcid":false,"family":"Schilter","given":"Oliver","sequence":"additional"},{"family":"Baldassari","given":"Carlo","sequence":"additional"},{"ORCID":"http://orcid.org/0000-0002-6647-3965","authenticated-orcid":false,"family":"White","given":"Andrew
+          D.","sequence":"additional"},{"ORCID":"http://orcid.org/0000-0003-3046-6576","authenticated-orcid":false,"family":"Schwaller","given":"Philippe","sequence":"additional"}]},"score":0.025694918,"snippet":"<b>Augmenting</b>
+          <b>large</b> <b>language</b> <b>models</b> with <b>chemistry</b> <b>tools</b>"},{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
+          (via page says license)","host_type":"publisher","is_best":true,"license":"cc-by-nc","oa_date":"2021-12-31","pmh_id":null,"repository_institution":null,"updated":"2023-02-22T13:05:09.634202","url":"https://jdss.org.pk/issues/v2/4/water-sharing-issues-in-pakistan-impacts-on-inter-provincial-relations.pdf","url_for_landing_page":"https://doi.org/10.47205/jdss.2021(2-iv)74","url_for_pdf":"https://jdss.org.pk/issues/v2/4/water-sharing-issues-in-pakistan-impacts-on-inter-provincial-relations.pdf","version":"publishedVersion"},"data_standard":2,"doi":"10.47205/jdss.2021(2-iv)74","doi_url":"https://doi.org/10.47205/jdss.2021(2-iv)74","first_oa_location":{"endpoint_id":null,"evidence":"open
+          (via page says license)","host_type":"publisher","is_best":true,"license":"cc-by-nc","oa_date":"2021-12-31","pmh_id":null,"repository_institution":null,"updated":"2023-02-22T13:05:09.634202","url":"https://jdss.org.pk/issues/v2/4/water-sharing-issues-in-pakistan-impacts-on-inter-provincial-relations.pdf","url_for_landing_page":"https://doi.org/10.47205/jdss.2021(2-iv)74","url_for_pdf":"https://jdss.org.pk/issues/v2/4/water-sharing-issues-in-pakistan-impacts-on-inter-provincial-relations.pdf","version":"publishedVersion"},"genre":"journal-article","has_repository_copy":false,"is_oa":true,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":true,"journal_issn_l":"2709-6254","journal_issns":"2709-6254,2709-6262","journal_name":"Journal
+          of Development and Social Sciences","oa_locations":[{"endpoint_id":null,"evidence":"open
+          (via page says license)","host_type":"publisher","is_best":true,"license":"cc-by-nc","oa_date":"2021-12-31","pmh_id":null,"repository_institution":null,"updated":"2023-02-22T13:05:09.634202","url":"https://jdss.org.pk/issues/v2/4/water-sharing-issues-in-pakistan-impacts-on-inter-provincial-relations.pdf","url_for_landing_page":"https://doi.org/10.47205/jdss.2021(2-iv)74","url_for_pdf":"https://jdss.org.pk/issues/v2/4/water-sharing-issues-in-pakistan-impacts-on-inter-provincial-relations.pdf","version":"publishedVersion"}],"oa_locations_embargoed":[],"oa_status":"gold","published_date":"2021-12-31","publisher":"Pakistan
+          Social Sciences Research Institute (PSSRI)","title":"(2021) Volume 2, Issue
+          4 Cultural Implications of China Pakistan Economic Corridor (CPEC Authors:
+          Dr. Unsa Jamshed Amar Jahangir Anbrin Khawaja Abstract: This study is an attempt
+          to highlight the cultural implication of CPEC on Pak-China relations, how
+          it will align two nations culturally, and what steps were taken by the governments
+          of two states to bring the people closer. After the establishment of diplomatic
+          relations between Pakistan and China, the cultural aspect of relations between
+          the two states also moved forward. The flow of cultural delegations intensified
+          after the 2010, because this year was celebrated as the \u2018Pak-China Friendship
+          Year\u2019. This dimension of relations further cemented between the two states
+          with the signing of CPEC in April 2015. CPEC will not only bring economic
+          prosperity in Pakistan but it will also bring two states culturally closer.
+          The roads and other communication link under this project will become source
+          of cultural flow between the two states. Keyswords: China, CPEC, Culture,
+          Exhibitions Pages: 01-11 Article: 1 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)01
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)01 Download Pdf: download
+          pdf view article Creative Commons License Political Persona on Twittersphere:
+          Comparing the Stardom of Prime Minister(s) of Pakistan, UK and India Authors:
+          Maryam Waqas Mudassar Hussain Shah Saima Kausar Abstract: Political setup
+          demands to use Twittersphere for preserving its reputation because of significant
+          twitter audience, which follows celebrities and political figures. In this
+          perspective, political figures frequently use twitter to highlight their political
+          as well as personal lives worldwide. However, political figures take the stardom
+          status among the twitter audience that follow, retweet and comment by their
+          fans. The purpose of this study is, to analyze what kind of language, level
+          of interest is made by political figures while communicating via twitter,
+          text, phrases and languages used by political figures, and do their tweets
+          contribute in their reputation. The qualitative content analysis is used for
+          evaluation of the interests shared by PM Imran Khan, PM Boris John Son and
+          PM Narendra Modi with the key words of tweets. A well-established coding sheet
+          is developed for the analysis of text, phrases and words in the frames of
+          negative, positive and neutral from March 2020 to May 2020. The results are
+          demonstrating on the basis of content shared by Prime Ministers of three countries
+          i.e., From Pakistan, Imran Khan, United Kingdom, Johnson Boris and India,
+          Narendra Modi on twitter. The findings also reveal that varied issues discussed
+          in tweets, significantly positive and neutral words are selected by these
+          political figures. PM Imran tweeted more negative tweets than PM Boris Johnson
+          and PM Narendra Modi. However, PM Boris Johnson and PM Narendra Modi make
+          significant positive and neutral tweets. It is observed that political figures
+          are conscious about their personal reputation while tweeting. It also revealed
+          that the issues and tweets shared by these leaders contribute to their personal
+          reputation. Keyswords: Imran Khan, Johnson Boris, Narendra Modi, Political
+          Persona, Stardom, Twittersphere Pages: 12-23 Article: 2 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)02 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)02
+          Download Pdf: download pdf view article Creative Commons License An Empirical
+          Relationship between Government Size and Economic Growth of Pakistan in the
+          Presence of Different Budget Uncertainty Measures Authors: Sunila Jabeen Dr.
+          Wasim Shahid Malik Abstract: Relationship between government size and economic
+          growth has always been a debated issue all over the world since the formative
+          work of Barro (1990). However, this relationship becomes more questionable
+          when policy uncertainty is added in it. Hence, this paper presents evidence
+          on the effect of government size on economic growth in the presence of budget
+          uncertainty measured through three different approaches. Rather than relying
+          on the traditional and complicated measures of uncertainty, a new method of
+          measuring uncertainty based on government budget revisions of total spending
+          is introduced and compared with the other competing approaches. Using time
+          series annual data from 1973-2018, the short run and long run coefficients
+          from Autoregressive Distributed Lag (ARDL) framework validate the negative
+          effect of budget uncertainty and government size on economic growth of Pakistan
+          regardless of the uncertainty measure used. Therefore, to attain the long
+          run economic growth, along with the control on the share of government spending
+          in total GDP, government should keep the revisions in the budget as close
+          to the initial announcements as it can so that uncertainty can be reduced.
+          Further, the uncertainty in fiscal spending calculated through the deviation
+          method raises a big question on the credibility of fiscal policy in Pakistan.
+          Higher will be the deviation higher will be the uncertainty and lower the
+          fiscal policy credibility hence making fiscal policy less effective in the
+          long run. Keyswords: Budget Uncertainty, Economic Growth, Government Size,
+          Policy Credibility Pages: 24-38 Article: 3 , Volume 2 , Issue 4 DOI Number:
+          10.47205/jdss.2021(2-IV)03 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)03
+          Download Pdf: download pdf view article Creative Commons License Despair in
+          The Alchemist by Ben Jonson Authors: Dr. Fatima Syeda Dr. Faiza Zaheer Numrah
+          Mehmood Abstract: This research aims to challenge the assumption that The
+          Alchemist by Ben Jonson is one of the greatest examples of the \u201cexplicit
+          mirth and laughter\u201d (Veneables 86). The paper argues that The Alchemist
+          is a cynical and despairing play created in an atmosphere not suitable for
+          a comedy. This is a qualitative study of the text and aims at an analysis
+          of the theme, situations, characters, language, and the mood of the play to
+          determine that Jonson is unable to retain the comic spirit in The Alchemist
+          and in an attempt to \u201cbetter men\u201d (Prologue. 12) he becomes more
+          satirical and less humorous or comic. This research is important for it contends
+          that the play, termed as a comedy, may be read as a bitter satire on the cynical,
+          stinky, and despairing world of the Elizabethan times. Keyswords: Comedy,
+          Despair, Reformation Pages: 39-47 Article: 4 , Volume 2 , Issue 4 DOI Number:
+          10.47205/jdss.2021(2-IV)04 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)04
+          Download Pdf: download pdf view article Creative Commons License Analysis
+          of Principles of Coordinated Border Management (CBM) in articulation of War-Control
+          Strategies: An Account of Implementation Range on Pakistan and Afghanistan
+          Authors: Dr. Sehrish Qayyum Dr. Umbreen Javaid Abstract: Currently, Border
+          Management is crucial issue not only for Pakistan but for the entire world
+          due to increased technological developments and security circumstances. Pakistan
+          and Afghanistan being immediate states have inter-connected future with socio-economic
+          and security prospects. Principles of Coordinated Border Management (CBM)
+          approach have been extracted on the basis of in-depth interviews with security
+          agencies and policymakers to understand the real time needs. The current research
+          employs mixed method approach. Process Tracing is employed in this research
+          to comprehend the causal mechanism behind the contemporary issue of border
+          management system. A detailed statistical analysis of prospect outcomes has
+          been given to validate the implication of CBM. Implication range of CBM has
+          been discussed with positive and probably negative impacts due to its wide
+          range of significance. This research gives an analysis of feasibility support
+          to exercise CBM in best interest of the state and secure future of the region.
+          Keyswords: Afghanistan, Coordinated Border Management, Fencing, Pakistan,
+          Security Pages: 48-62 Article: 5 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)05
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)05 Download Pdf: download
+          pdf view article Creative Commons License The Belt and Road Initiative (BRI)
+          vs. Quadrilateral Security Dialogue (the Quad): A Perspective of a Game Theory
+          Authors: Muhammad Atif Prof. Dr. Muqarrab Akbar Abstract: Containment is the
+          central part of the U.S.''s foreign policy during the cold war. With the application
+          of containment Policy, the U.S. achieved much success in international politics.
+          Over time China has become more powerful and sees great power in international
+          politics. China wants to expand and launched the Belt and Road Initiative
+          (BRI). The primary purpose of The Belt and Road Initiative (BRI) is to achieve
+          support from regional countries and save their interests from the U.S. In
+          2017, the American administration launched its Containment policy through
+          Quadrilateral Security Dialogue (the Quad) to keep their interest from China.
+          The Quadrilateral Security Dialogue (Quad) is comprising of Australia, the
+          United States, Japan, and India. This Study is based on Qualitative research
+          with theoretical application of Game theory. This research investigates both
+          plans of China (BRI) and the U.S. (the Quad) through a Game Theory. In this
+          study, China and the U.S. both like to act as gamers in international politics.
+          This study recommends that Game theory can predict all developments in the
+          long term. Keyswords: Containment, Expansionism, Quadrilateral Security Dialogue,
+          The Belt and Road Initiative (BRI) Pages: 63-75 Article: 6 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)06 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)06
+          Download Pdf: download pdf view article Creative Commons License Narendra
+          Modi a Machiavellian Prince: An Appraisal Authors: Dr. Imran Khan Dr. Karim
+          Haider Syed Muhammad Yousaf Abstract: The comparison of Narendra Modi and
+          Machiavellian Prince is very important as policies of Modi are creating problems
+          within India and beyond the borders. The Prince is the book of Niccolo Machiavelli
+          a great philosopher of his time. If Indian Prime Minister Narendra Modi qualifies
+          as a Prince of Machiavelli is a very important question. This is answered
+          in the light of his policies and strategies to become the undisputed political
+          leader of India. Much of the Machiavellian Prince deals with the problem of
+          how a layman can raise himself from abject and obscure origins to such a position
+          that Narendra Modi has been holding in India since 2014. The basic theme of
+          this article is revolving around the question that is following: Can Modi\u2019s
+          success be attributed to techniques of The Prince in important respects? This
+          article analyzed Narendra Modi''s policies and strategies to develop an analogy
+          between Machiavellian Prince and Modi in terms of characteristics and political
+          strategies. This research work examines, how Narendra Modi became the strongest
+          person in India. Keyswords: Comparison, India, Machiavelli, Modus Operandi,
+          Narendra Modi Pages: 76-84 Article: 7 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)07
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)07 Download Pdf: download
+          pdf view article Creative Commons License Analyzing Beckett''s Waiting for
+          Godot as a Political Comedy Authors: Muhammad Umer Azim Dr. Muhammad Saleem
+          Nargis Saleem Abstract: This study was devised to analyze Samuel Beckett\u2019s
+          play Waiting for Godot in the light of Jean-Francois Lyotard\u2019s theory
+          of postmodernism given in his book The Postmodern Condition (1984). This Lyotardian
+          paradigm extends a subversive challenge to all the grand narratives that have
+          been enjoying the status of an enviable complete code of life in the world
+          for a long time. Even a cursory scan over the play under analysis creates
+          a strong feel that Beckett very smartly, comprehensively and successfully
+          questioned the relevance of the totalizing metanarratives to the present times.
+          Being an imaginative writer, he was well aware of the fact that ridicule is
+          a much more useful weapon than satire in the context of political literature.
+          There are so many foundationalist ideologies that he ridicules in his dramatic
+          writing. Christianity as a religion is well exposed; the gravity of philosophy
+          is devalued; the traditional luxury that the humans get from the art of poetry
+          is ruptured and the great ideals of struggle are punctured. He achieves his
+          artistic and ideologically evolved authorial intentions with a ringing success.
+          It is interesting to note that he maintains a healthy balance between art
+          and message. Keyswords: Beckett, Lyotard, The Postmodern Condition, Waiting
+          for Godot Pages: 85-94 Article: 8 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)08
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)08 Download Pdf: download
+          pdf view article Creative Commons License Effect of Parenting Styles on Students\u2019
+          Academic Achievement at Elementary Level Authors: Hafsa Noreen Mushtaq Ahmad
+          Uzma Shahzadi Abstract: The study intended to find out the effect of parenting
+          styles on students\u2019 academic achievement. Current study was quantitative
+          in nature. All elementary level enrolled students at government schools in
+          the province of the Punjab made the population of the study. Multistage sampling
+          was used to select the sample from four districts of one division (Sargodha)
+          of the Punjab province i.e., Sargodha. A sample size i.e., n=960; students
+          and their parents were participated in this study. Research scales i.e. Parenting
+          Styles Dimension Questionnaire (PSDQ) was adapted to analyze and measure parents\u2019
+          parenting styles and an achievement test was developed to measure the academic
+          achievement of the elementary students. After pilot testing, reliability coefficient
+          Cronbach Alpha values for PSDQ and achievement test were 0.67 and 0.71 Data
+          was collected and analyzed using frequencies count, percentages, mean scores
+          and one way ANOVA. Major findings of the study were; Majority of the parents
+          had authoritative parental style, a handsome number of parents keep connection
+          of warmth and support with their children, show intimacy, focus on discipline,
+          do not grant autonomy to their children, do not indulge with their children
+          and as well as a handsome number of students were confident during their studies
+          and study, further, found that parental style had positive relationship with
+          academic achievement. Recommendations were made on the basis of findings and
+          conclusion such as arrangement of Parents Teachers Meetings (PTM\u2018s),
+          parents\u2019 training, provision of incentives and facilities to motivate
+          families might be an inclusive component of elementary education program.
+          Keyswords: Academic Achievement, Elementary Education, Parenting Styles Pages:
+          95-110 Article: 9 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)09
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)09 Download Pdf: download
+          pdf view article Creative Commons License Kashmir Conflict and the Question
+          of Self-Determination Authors: Izzat Raazia Saqib Ur Rehman Abstract: The
+          objective of this paper is to explore relations between Pakistan and India
+          since their inception in the perspective of Kashmir conundrum and its impact
+          on the regional security. Kashmir is the unfinished agenda of partition and
+          a stumbling block in the bilateral relations between Pakistan and India. After
+          the partition of sub-continent in 1947, Pakistan and India got their sovereign
+          status. Kashmir conflict, a disputed status state, is the byproduct of partition.
+          Pakistan and India are traditional arch-foes. Any clash between Pakistan and
+          India can bring the two nuclear states toe-to-toe and accelerate into nuclear
+          warfare. Due to the revulsion, hostility and lack of trust between the two,
+          the peaceful resolution of the Kashmir issue has been long overdue. Ever-increasing
+          border spats, arms race and threat of terrorism between the two have augmented
+          anxiety in the subcontinent along with the halt of talks between India and
+          Pakistan at several times. Additionally, it hampers the economic and trade
+          ties between the two. India, time and again, backtracked on Kashmir issue
+          despite UN efforts to resolve the issue. Recently, Indian government has responded
+          heavy-handedly to the Kashmiri agitators\u2019 demand for sovereignty and
+          revocation of \u2018Special Status\u2019 of Kashmir impacting the stability
+          of the region in future. Keyswords: India, Kashmir Conundrum, Pakistan, Regional
+          Security, Sovereignty Pages: 111-119 Article: 10 , Volume 2 , Issue 4 DOI
+          Number: 10.47205/jdss.2021(2-IV)10 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)10
+          Download Pdf: download pdf view article Creative Commons License Exploring
+          Image of China in the Diplomatic Discourse: A Critical Discourse Analysis
+          Authors: Muhammad Afzaal Muhammad Ilyas Chishti Abstract: The present study
+          hinges on the major objective of analyzing Pakistani and Indian diplomatic
+          discourses employed in portrayal of image of China. Data comprises the official
+          discourse which is used in diplomatic affairs of both the states. The extensive
+          investigation seeks insights from the fundamentals of Critical Discourse Analysis
+          propounded by van Dijk, Fairclough and Wodak with a special focus on Bhatia\u2019s
+          (2006) work. The study reveals that the image of China has always been accorded
+          priority within Indian and Pakistani diplomatic discourse even though nature
+          of bilateral relations among China, India and Pakistan is based on entirely
+          different dynamics; Indian and Pakistani diplomatic discourses are reflective
+          of sensitivities involved within the bilateral relations. Through employment
+          of linguistic techniques of \u2018positivity\u2019, \u2018evasion\u2019 and
+          \u2018influence and power\u2019, Indian diplomats have managed not to compromise
+          over the fundamentals in bilateral relations with China despite Pakistan\u2019s
+          already strengthened and deep-rooted relations with China. While Pakistani
+          diplomatic fronts have been equally successful in further deepening their
+          already strengthened relations in the midst of surging controversies on CPEC,
+          BRI and OBOR. Hence, diplomatic fronts of both the counties, through employment
+          of ideologically loaded linguistic choices, leave no stone unturned in consolidation
+          of the diplomatic relations with China. Keyswords: CDA, China Image, Corpus,
+          Language of Diplomacy, Political Discourse Analysis Pages: 120-133 Article:
+          11 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)11 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)11
+          Download Pdf: download pdf view article Creative Commons License Students\u2019
+          Perception about Academic Advising Satisfaction at Higher Education Level
+          Authors: Rukhsana Sardar Zarina Akhtar Shamsa Aziz Abstract: The purpose of
+          the study was to examine the students\u2019 perception about academic advising
+          satisfaction at higher education level. All the students from two years master
+          (M.A) degree programme and four years (BS) degree programme of eight departments
+          from International Islamic University Islamabad (IIUI), Faculty of Social
+          Sciences were taken as a population of the study. 475 students were randomly
+          selected as a sample of the study. The Academic Advising Inventory (AAI) was
+          used to assess Academic Advising Style. For measuring level of the satisfaction,
+          descriptive statistics was used. To compare the mean difference department-wise
+          and gender-wise about academic advising satisfaction t.test was applied. It
+          was concluded that from the major findings of the study those students who
+          received departmental academic advising style are more satisfied as compared
+          to those students who provided prescriptive academic advising style. Female
+          students seemed more satisfied as compared to male students regarding the
+          academic advising style provided to them. Students who satisfied from developmental
+          academic advising style and they were also highly satisfied from the advising
+          provided to them at Personalizing Education (PE) and this is the subscale
+          of developmental academic advising whereas students who received prescriptive
+          academic advising they were also satisfied from the advising provided to them
+          regarding personalizing education and academic decision making but their percentage
+          is less. It is recommended to Universities Administration to focus on Developmental
+          Academic Advising Style and establish centers at universities/department level
+          and nominate staff who may be responsible to provide developmental academic
+          advising. Keyswords: Academic Advising, Higher Level, Students\u2019 Perception
+          Pages: 134-144 Article: 12 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)12
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)12 Download Pdf: download
+          pdf view article Creative Commons License Perceptions of Sexual Harassment
+          in Higher Education Institutions: A Gender Analysis Authors: Ruhina Ghassan
+          Dr. Subha Malik Nayab Javed Abstract: Sexual harassment is a social issue
+          which is present in every society, globally, which interferes in an individual\u2019s
+          social and professional life. It happens almost everywhere i.e. at workplaces,
+          public places or institutes as well. The focus of the present study was to
+          explore the differences of male and female students\u2019 perception of sexual
+          harassment. This study was a quantitative research. Sample of the study included
+          of 400 students (200 males and 200 females) from two government and two private
+          universities. In the present study, Sexual Harassment Perception Questionnaire
+          (SHPQ) was used to find out these differences in perceptions as every person
+          has his own view for different situations. The study revealed the significant
+          differences in perception of students. Study showed that both genders perceived
+          that female students get more harassed than male students. The factors that
+          affect the perception frequently were gender and age. The findings recommended
+          that regulations for sexual harassment should be implemented in universities;
+          laws should be made for sexual harassment in higher education institutes.
+          Students should be aware of sexual harassment through seminars, self-defense
+          classes and awareness campaigns. And every institute should have a counseling
+          center for the better mental health of students. Keyswords: Gender Differences,
+          Higher Educational Institutions, Sexual Harassment Pages: 145-158 Article:
+          13 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)13 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)13
+          Download Pdf: download pdf view article Creative Commons License Role of IMF
+          Over the Governance Structure and Economic Development of Pakistan Authors:
+          Ali Qamar Sheikh Dr. Muhammad Imran Pasha Muhammad Shakeel Ahmad Siddiqui
+          Abstract: Developing countries like Pakistan seeks for financial assistance
+          in order to fulfil their deficits. IMF is one of the largest financial institution
+          who give loans to countries who need it. This research has studied the IMF
+          role and the effects of IMF conditions on the economy of Pakistan. To carry
+          out this research, both quantitative data from primary sources has been gathered
+          and qualitative analysis has been made to signify whither this borrowing creating
+          and maintaining dependency of Pakistan on West and financial and governance
+          structure constructed to curtail Countries like Pakistan. The results concluded
+          that there is negative and insignificant relationship between GDP and IMF
+          loans in the long run. The short-term dynamic shows that weak economic and
+          Political Institutions in Pakistan. The Development dilemma constitutes dependency
+          even today. The Current Budget Deficit Pakistan''s fiscal deficit climbs to
+          Rs 3.403 trillion in 2020-21 needs to be readdressed in such a manner that
+          Pakistan can counter Balance of Payments and import/export imbalance. Keyswords:
+          Dependency, Development, IMF, Loans, Debt, Pakistan, Governance structure
+          Pages: 159-172 Article: 14 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)14
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)14 Download Pdf: download
+          pdf view article Creative Commons License Climate Change and the Indus Basin:
+          Prospects of Cooperation between India and Pakistan Authors: Sarah Saeed Prof.
+          Dr. Rana Eijaz Ahmad Abstract: Climate change is transforming the global societies.
+          The shift in average temperature is putting negative impacts on human health,
+          food production and the natural resources. In the wake of the altered climate,
+          water flow in the river systems is experiencing variability and uncertainty.
+          This paper aims at studying the negative impacts of climate change on the
+          water resources of the Indus Basin and investigate the prospects of cooperation
+          between India and Pakistan; two major riparian nations sharing the basin.
+          Adopting the case study approach, a theoretical framework has been built on
+          the \u2018Theory of the International Regimes\u2019. It has been argued that
+          institutional capacity and the dispute resolution mechanism provided in any
+          water sharing agreement determine the extent of cooperation among the member
+          states. Since India and Pakistan are bound by the provisions of the Indus
+          Waters Treaty, this study tries to assess the effectiveness of this agreement
+          in managing the negative consequences of the climate change. Keyswords: Climate
+          Change, Cooperation, Dispute Resolution Mechanism, Institutional Capacity
+          Pages: 173-185 Article: 15 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)15
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)15 Download Pdf: download
+          pdf view article Creative Commons License Translation, Cultural Adaptation
+          and Validation of Behavioral-Emotional Reactivity Index for Adolescents Authors:
+          Saima Saeed Farah Malik Suzanne Bartle Haring Abstract: Measuring differentiation
+          of self in terms of behavioral/emotional reactivity towards parents is important
+          because of the complex parent-child connection. This needs a valid and reliable
+          measure to assess the differentiation of self particularly in a relationship
+          with parents. Behavior\\Emotional Reactivity Index is such a tool that fulfills
+          this purpose. The present study was carried out to culturaly adapt and translate
+          BERI into the Urdu language and establish the psychometric properties of Urdu
+          version. A sample of 303 adolescents of age (M = 16.07, SD = 1.77) was taken
+          from different schools and colleges. Scale was split into Mother and father
+          forms for the convenience of respondents. Findings supported the original
+          factor structure of the BERI-original version. Higher-order factor analysis
+          showed good fit indices with excellent alpha ranges (\u03b1= .91 to \u03b1=.80).
+          BERI scores were compared for the adolescents who were securely attached with
+          parents and insecurely attached with parents which showed a significant difference
+          between the groups. BERI-Urdu version was found to be a valid and reliable
+          measure in the Pakistani cultural context which gives researchers new directions
+          to work with adolescents. Keyswords: Adolescence, Differentiation of Self,
+          Behavioral, Emotional Reactivit, Index, Parental Attachment Pages: 186-200
+          Article: 16 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)16 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)16 Download Pdf: download pdf
+          view article Creative Commons License Notion of Repression in Modern Society:
+          A Comparative Analysis of Sigmund Freud and Herbert Marcuse Authors: Khadija
+          Naz Abstract: One of the fundamental issues for modern civilized man is how
+          to adapt a modern society without losing his individual status. Is it possible
+          for an individual to adjust in a society where he/she loses his/her individuality
+          and becomes part of collectivity? One point of view is that for society to
+          flourish, man needs to be repressed. But to what extent is repression necessary
+          for societies to rise and survive? This paper shall examine the above given
+          questions from the standpoint of two thinkers who greatly influenced twentieth-century
+          thought: Sigmund Freud and Herbert Marcuse. To undertake this task, first
+          the term Repression shall be examined and then the notions of Freud and Marcuse
+          will be discussed to determine the degree of repression required for the development
+          of modern society. Keyswords: Modern Society, Performance Principle, Repression,
+          Surplus-Repression, The Pleasure Principle, The Reality Principle Pages: 201-214
+          Article: 17 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)17 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)17 Download Pdf: download pdf
+          view article Creative Commons License Perceptions of Teacher Educators about
+          Integration of (ESD) in Elementary Teachers Education Program Authors: Dr.
+          Rukhsana Durrani Dr. Fazal ur Rahman Dr. Shaista Anjum Abstract: Education
+          and sustainable development have a close relationship as education provides
+          sustainability to society. This study explored the perceptions of teacher
+          educators for integration of Education for Sustainable Development (ESD) in
+          B.Ed. 4 years\u2019 elementary program. Four major components of ESD i.e.,
+          Education, Social &amp; Culture, Economic and Environment were included in
+          study. 127 teacher educators from departments of education were randomly selected
+          from public universities of Pakistan who were offering B.Ed. 4 years\u2019
+          elementary program. Data was collected through questionnaires from teacher
+          educators. The findings recommended the inclusion of the components of Education
+          for Sustainable Development (ESD) in curriculum of B.Ed. 4 years\u2019 elementary
+          program. Keyswords: B.Ed. 4 Years Elementary Curriculum, Sustainable Development,
+          Integration, Teacher Education Pages: 215-225 Article: 18 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)18 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)18
+          Download Pdf: download pdf view article Creative Commons License Exploring
+          TPACK skills of prospective teachers and challenges faced in digital technology
+          integration in Pakistan Authors: Tariq Saleem Ghayyur Dr. Nargis Abbas Mirza
+          Abstract: The current study was aimed to explore TPACK skills of prospective
+          teachers and challenges faced in digital technology integration in Pakistan.
+          The study was qualitative in nature and semi structured interview schedule
+          was developed to collect data from prospective teachers. Purposive sampling
+          technique was employed to collect data from 20 prospective teachers of 7 public
+          sector universities. It was concluded that majority of the prospective teachers
+          used general technological and pedagogical practices (GTPP), technological
+          knowledge practices (TKP), Technological Pedagogical Knowledge practices (TPKP),
+          Technological Content Knowledge practices (TCKP). Majority of prospective
+          teachers reported multiple challenges in integration of digital technology
+          in teacher education programs including lack of teacher training as one of
+          the largest hurdle in digital technology integration, lack of digital technology
+          resources or outdated digital technology resources, inadequate computer lab,
+          lack of learning apps (courseware), financial constraints, lack of teachers\u2019
+          motivation to use digital technology, slow computers available at computer
+          labs, and unavailability of technical support. It was recommended that digital
+          technology infrastructure should be improved across all teacher education
+          institution and it was further recommended that TPACK model of digital technology
+          integration should serve digital technology integration in teacher education
+          programs in Pakistan. Keyswords: Challenges, Digital Technology Integration,
+          Digital Technology Resources, Digital Technology, TPACK Pages: 226-241 Article:
+          19 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)19 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)19
+          Download Pdf: download pdf view article Creative Commons License Revisiting
+          the Linkage between Money Supply and Income: A Simultaneous Equation Model
+          for Pakistan Authors: Zenab Faizullah Dr. Shahid Ali Muhammad Imad Khan Abstract:
+          A reliable estimate of the money supply is an important sign of the Gross
+          Domestic Product (GDP) and many other macroeconomic indicators. It is widely
+          discussed that over a long period of time, there is a strong link between
+          GDP and money supply. This link is significantly important for formation of
+          monetary policy. The main aim of this study is to estimate the income-money
+          supply model for Pakistan. This study estimates the income-money supply model
+          for Pakistan over the period of 2009 to 2019. The study uses Two Stage Least
+          Square (2SLS) econometric technique due to the presence of endogeneity problem
+          in the model under consideration. The existence of simultaneity between money
+          supply (M2) and income (GDP) is also clear from the results of Hausman Specification
+          test for simultaneity between M2 and GDP. The results further show that there
+          exists a strong money-income relationship in case of Pakistan. Keyswords:
+          Money Supply, Income, Simultaneous Equations Pages: 242-247 Article: 20 ,
+          Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)20 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)20
+          Download Pdf: download pdf view article Creative Commons License Analyzing
+          the Mechanism of Language Learning Process by the Use of Language Learning
+          Strategies Authors: Shafiq Ahmad Farooqi Dr. Muhammad Shakir Sher Muhammad
+          Awan Abstract: This analytical research study involves the use of learning
+          strategies to know the mechanism of learning a second language. People acquire
+          their native language (L1) without any conscious effort and they have a complete
+          knowledge of L1 and are competent in their native language even without going
+          to school. It is believed that language learning is a process as well as an
+          outcome and the focus of current study is to understand the process of learning
+          a second language. The population in this study comprised of 182 boys and
+          Girls Govt. Higher Secondary Schools studying at intermediate level in the
+          11 Districts of the Southern Punjab. The sample was selected through random
+          probability sampling and consisted of 40 subject specialists teaching the
+          subject of English in Govt. higher secondary schools with 400 students studying
+          English at Intermediate level. A questionnaire comprising some common and
+          easily accessible learning strategies was designed to determine the frequency
+          of these strategies used in the classrooms by the language learners through
+          the specialists of the subject. The data was collected from the selected sample
+          through the subject specialists teaching in these schools. The data was collected
+          quantitatively and was analyzed in the statistical package for social sciences
+          (SPSS) version 20. The most common 27 language learning strategies (LLS) were
+          applied to analyze the process of language learning. In the light of the results
+          of the study, it was concluded that application of the learning strategies
+          according to the nature of the text is helpful in understanding the language
+          functions and its application. Keyswords: Language Acquisition, Learning Strategies,
+          Mechanism of Language Learning Pages: 249-258 Article: 21 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)21 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)21
+          Download Pdf: download pdf view article Creative Commons License Secondary
+          School Science Teachers\u2019 Practices for the Development of Critical Thinking
+          Skills: An Observational Study Authors: Dr. Muhammad Jamil Dr. Yaar Muhammad
+          Dr. Naima Qureshi Abstract: In the National curriculum policy documents, to
+          produce rationale and independent critical thinkers, different pedagogical
+          practices have been recommended like cooperative learning, questioning, discussion,
+          etc. This qualitative case study aimed at analyzing secondary school science
+          teachers\u2019 practices for the development of critical thinking skills in
+          secondary school students. There were twelve classrooms (four from each subject
+          of Physics, Chemistry and Biology) selected as cases. Video recording was
+          used for the observations for six lessons in each classroom. In this way,
+          a total of 72 observations were conducted lasting for approximately 35 minutes.
+          Qualitative content analysis was used for data analysis through Nvivo 12.
+          The findings of the observations revealed that all the teachers used the lecture
+          method. They used this to cover the content at a given specific time. There
+          was not much focus on the development of critical thinking. In a few of the
+          classrooms, the students were engaged and active during learning different
+          specific topics. Whiteboard was used as a visual aid by most of the teachers.
+          Furthermore, to some extent, discussion, questioning, and daily life examples
+          were used in different classrooms. It is recommended that teachers\u2019 professional
+          development should be conducted to focus on the development of critical thinking
+          skills through pedagogical practices which have been recommended by the national
+          education policy documents. Keyswords: Analysis, Critical Thinking, Curriculum
+          Policy, Pedagogy, Secondary Level Pages: 259-265 Article: 22 , Volume 2 ,
+          Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)22 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)22
+          Download Pdf: download pdf view article Creative Commons License Historical
+          Development of Clinical Psychology in Pakistan: A Critical Review-based Study
+          Authors: Muhammad Nawaz Shahzad Dr. Mushtaq Ahmad Dr. Muhammad Waseem Tufail
+          Abstract: Clinical Psychology is clinical and curing psychological practices
+          in Pakistan. The present research study endeavors to examine the contemporary
+          status of Clinical Psychology in the country and descriptively analyzes the
+          significant contribution of various psychologists in its development. The
+          study also elaborates the emergence of Clinical Psychology and its treatment
+          aspects in the country. The experimental approach of the treatment psychology
+          has also been defined. The role of different scholars to set and promote the
+          Clinical Psychology as discipline and dealing about treatment of Human mind
+          has also been discussed here. The study also presented the scenario of the
+          issues of legislative acknowledgment, qualifications mandatory for practice,
+          communal awareness of cerebral treatment, the tradition of ethnic and native
+          practices about the clinical psychological treatments has also been discussed.
+          Keyswords: Approaches, Clinical Psychology, Psychologist, Therapist Pages:
+          266-272 Article: 23 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)23
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)23 Download Pdf: download
+          pdf view article Creative Commons License Impact of Devolution of Power on
+          School Education Performance in Sindh after 18th Constitutional Amendment
+          Authors: Abdul Hafeez Dr. Saima Iqbal Muhammad Imran Abstract: Devolution
+          of the authority from central units of empowering authorities to the local
+          level to develop and exercise policies at local or organizational level is
+          under debate in various countries of the world. The legation in with the name
+          of 18th constitutional amendment in constitution of 1973 of Pakistan ensures
+          more autonomy to federal units. The difference between province and federation
+          mostly creates misunderstanding in the belief of cooperation and universalism
+          of education standards, expenditures and service delivery. Very currently
+          the ministry of education and local government encoring principles and headmasters
+          to adopt self-management skills to be updated to accept the spin of power
+          from higher authorities to lower authorities\u2019 pedagogical and local schools.
+          In this qualitative research semi structured questioner were incorporated
+          as data collection tool equally, the data was analyzed by usage of NVivo software.
+          In this regard Government of Sindh has introduced various reforms and new
+          trends like objectives and policy pillars, better government schools, improved
+          learning outcomes and increased and improved funding in the education sector
+          Sindh government has so far been unable to effectively use its resources to
+          implement effective governance system which provides quality and sustained
+          education in the province. To achieve this basic universal education, equally
+          fourth objective of Sustainable Development Goal (SDG) the educational leaders
+          must develop a comparative education setup that help to educate planers to
+          plan and design standards for school leaders, instruction, appropriate professional
+          development of teachers, ways to support school leaders to change in mission.
+          Parallel, develop new program for early childhood, school and class size and
+          ensure school enrollment. Keyswords: 18th Constitutional Amendment, Devolution
+          of Power, Sindh Education Performance Pages: 273-285 Article: 24 , Volume
+          2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)24 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)24
+          Download Pdf: download pdf view article Creative Commons License Legal Aspects
+          of Evidence Collected by Modern Devices: A Case Study Authors: Muhammad Hassan
+          Zia Alvina Ali Abstract: This paper is a qualitative research of different
+          case laws dealing with modern technological evidence. Courts were required
+          to adopt new methods, techniques and devices obtained through advancement
+          of science without affecting the original intention of law. Because of modern
+          technology, a benefit could be taken from said technology to preserve evidences
+          and to assist proceedings of the Court in the dispensation of justice in modern
+          times. Owing to the scientific and technological advancements the admissibility
+          of audio and visual proofs has grown doubtful. No doubt modern evidence assist
+          the court in reaching out to the just decision but at the same time certain
+          criteria need to be laid down which must be satisfied to consider such evidence
+          admissible. Different Case laws are discussed here to show how the cases were
+          resolved on the basis of technological evidence and when and why such evidence
+          have been rejected by the court, if it did. Moreover, legal practices developed
+          in various countries allow our Courts to record evidence through video conferencing.
+          The Honorable Supreme Court of Pakistan directed that in appropriate cases
+          statement of juvenile rape victims and other cases of sensitive nature must
+          be recorded through video conferencing to avoid inconvenience for them to
+          come to the Court. Nevertheless, it has some problems. The most important
+          among them is the identification of the witness and an assurance that he is
+          not being prompted when his statement is recorded. In this paper protocols
+          that are necessary to follow while examining witness through video link are
+          discussed Keyswords: DNA Profiling, Finger Prints, , Telephone Calls, Video
+          Tape Pages: 286-297 Article: 25 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)25
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)25 Download Pdf: download
+          pdf view article Creative Commons License The Political Economy of Terrorisms:
+          Economic Cost of War on Terror for Pakistan Authors: Muhammad Shakeel Ahmad
+          Siddiqui Dr. Muhammad Imran Pasha Saira Akram Abstract: Terrorism and its
+          effect on contemporary society is one of the core and vital subjects of International
+          Political Economy (IPE) during the last years. Despite the fact that this
+          is not a new phenomenon, special attention has been given to this issue, specifically
+          after the terrorist attacks of 9/11, 2001. The objective of this paper analyzes
+          to what dimensions terrorism affects the global economy mainly the two predominant
+          actors of the conflict i.e. Pakistan and the United States. For this purpose,
+          this article will take a look at the financial cost of War for Pakistan and
+          how Pakistan\u2019s decision to become frontline State has affected its Economy,
+          its effect on agriculture, manufacturing, tourism, FDI, increased defense
+          costs The normative and qualitative methodology shows a significant disadvantage
+          between terrorist activities and economic growth, social progress, and political
+          development. The results shows that Pakistan has bear slow economic growth
+          while facing terrorist activities more than US. In this last section, the
+          paper suggests ways and means to satisfy people around the world not to go
+          in the hands of fundamentals and terrorists. Keyswords: Cost of War, Economic
+          Growth, Frontline States, Pak Us Relations, Terrorism Pages: 297-309 Article:
+          26 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)26 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)26
+          Download Pdf: download pdf view article Creative Commons License A Comparative
+          Study of Grade 10 English Textbooks of Sindh Textbook Board and Cambridge
+          \u201cO Level\u201d in the perspective of Revised Bloom\u2019s Taxonomy Authors:
+          Mahnoor Shaikh Dr. Shumaila Memon Abstract: The present study evaluated the
+          cognitive levels of reading comprehension questions present in grade 10 English
+          Textbooks namely English Textbook for grade 10 by Sindh Textbook Board and
+          compared it to Oxford Progressive English book 10 used in Cambridge \u201cO
+          Level\u201d in the perspective of Revised Bloom\u2019s Taxonomy. Qualitative
+          content analysis was used as a methodology to carry out the study. To collect
+          the data, a checklist based on Revised Bloom\u2019s taxonomy was used as an
+          instrument. A total of 260 reading comprehension questions from both the textbooks
+          were evaluated. The findings of the study revealed that reading comprehension
+          questions in English textbook for grade 10 were solely based on remembering
+          level (100%) whereas the questions in Oxford Progressive English 10 were mainly
+          based on understanding level (75.5%) with a small percentage of remembering
+          (12.5%), analyzing (11.1%) and evaluating level (0.74%). This suggests that
+          the reading comprehension questions in both the textbooks are dominantly based
+          on lower-order thinking skills. Keyswords: Bloom\u2019s Taxonomy, Content
+          Analysis, Reading Comprehension, Textbook Evaluation Pages: 310-320 Article:
+          27 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)27 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)27
+          Download Pdf: download pdf view article Creative Commons License Assessing
+          the Preparedness of Government Hospitals: A Case of Quetta City, Balochiatan
+          Authors: Sahar Arshad Syed Ainuddin Jamal ud din Abstract: Earthquake with
+          high magnitude is often resulting in massive destruction with more causalities
+          and high mortality rate. Timely providence of critical healthcare facilities
+          to affected people during an emergency response is the core principle of disaster
+          resilient communities. The main objective of this paper is assessing the hospital
+          preparedness of government hospitals in Quetta. Primary data was collected
+          through questionnaire survey. Total of 165 sample size chosen via simple random
+          sampling. Relative important index (RII) is used to analyze the overall situation
+          of hospitals preparedness in term of earthquake disaster. Findings of the
+          study showed that the preparedness level of government hospitals in Quetta
+          is weak to moderate level. Based on the findings this study recommends the
+          necessary measures to minimize the risk of earthquake disaster including training
+          and exercise programs for the staff of hospital, proper resource management
+          to efficiently use the existing machinery and equipment in the meeting of
+          disaster to enhance employee\u2019s performance and preparedness of government
+          hospitals in Quetta to deal with earthquake disaster. Keyswords: Earthquake,
+          Preparedness, Relative Important Index Pages: 321-329 Article: 28 , Volume
+          2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)28 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)28
+          Download Pdf: download pdf view article Creative Commons License Development
+          of Reasoning Skills among Prospective Teachers through Cognitive Acceleration
+          Approach Authors: Memoona Bibi Dr. Shamsa Aziz Abstract: The main objectives
+          of this study were to; investigate the effects of the Cognitive Acceleration
+          approach on the reasoning skills of the prospective teachers at the university
+          level and compare the effects of the Cognitive Acceleration approach and traditional
+          approach concerning reasoning skills of prospective teachers\u2019 at the
+          university level. The study was experimental and followed a pre-test post-test
+          control group experimental design. The sample of the study included the experimental
+          group and control group from the BS Education program in the Department of
+          Education at International Islamic University Islamabad. A simple random sampling
+          technique was used to select the sample after pre-test and pairing of prospective
+          teachers. CTSR (classroom test for scientific reasoning) developed by A.E.
+          Lawson (2000) was used to collect the data through pre-tests and post-tests.
+          The experimental group\u2019s perception about different activities of the
+          experiment was taken through a self-made rating scale. Collected data were
+          analyzed by calculating mean scores and t-test for hypothesis testing by using
+          SPSS. The main findings of the study revealed that the Cognitive Acceleration
+          teaching approach has a significant positive effect on the reasoning skills
+          development of prospective teachers at the university level. Findings also
+          showed that participants found this teaching approach effective and learned
+          many new concepts and skills with the help of thinking activities. Based on
+          findings it has been concluded that the Cognitive Acceleration teaching approach
+          might be encouraged for training prospective teachers at the university level
+          and training sessions about the use of the Cognitive Acceleration approach
+          must be arranged by teacher education programs and institutions. Keyswords:
+          Cognitive Acceleration Approach, Prospective Teachers, Reasoning Skills, Traditional
+          Approach Pages: 330-342 Article: 29 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)29
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)29 Download Pdf: download
+          pdf view article Creative Commons License Spatial Injustice in Shamsie\u2019s
+          Kartography Authors: Syeda Hibba Zainab Zaidi Dr. Ali Usman Saleem Sadia Waheed
+          Abstract: Social space under postmodernism and wave of globalization have
+          suffered in and its idealistic representations are lost and deteriorated which
+          ultimately led to discursiveness in the lives of postmodern man, especially
+          Karachiites. The boundaries of geographies play a significant role in shaping
+          fates, biographies, social superstructures and shared collective histories
+          of its residents. Considering this, Henri Lefebvre and Edward William Soja,
+          argue that space is something which determines the living circumstances within
+          the particular social framework and instigates and controls various societal
+          happenings. City space of Karachi suffers from appalling distortions as a
+          part of postmodern, globalized and capitalist world. By employing Lefebvre\u2019s
+          idea of spatial triad and Soja\u2019s views of the trialectrics of spaciality,
+          this paper foregrounds how social space enforces spatial injustice and serves
+          for the inculcation of spatial cleansing in the lives of inhabitants of urban
+          space. Using Shamsie\u2019s Kartography as an interpretive tool for contemporary
+          urban environment, this paper inquires the engrafting of spatial cleansing
+          in the lives of Karachiites resulting in multiple standardization and segregation
+          on the basis of living standards among different social strata. This research
+          substantiates how in Kartography, Materialism nibbles the roots of social
+          values and norms while sequentially administering Spatial Injustice in the
+          lives of Karachiites. This paper proclaims the scarcity of execution of Spatial
+          Justice in the lives of common people in this postmodern globalized capitalist
+          era. This paper urges the possibility of a utopian urban space with enforced
+          spatial justice where people can be saved from dilemmas of injustice and segregation,
+          especially Karachiites. Keyswords: Capitalistic Hegemony, City Space, Globalization,
+          Spatial Cleansing, Spatial Injustice Pages: 343-352 Article: 30 , Volume 2
+          , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)30 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)30
+          Download Pdf: download pdf view article Creative Commons License A Quasi-Experimental
+          Study on the Performance and Attitudes of Pakistani Undergraduate Students
+          towards Hello English Language Learning Application Authors: Wafa Pirzada
+          Dr. Shumaila Memon Dr. Habibullah Pathan Abstract: With the advancement of
+          technology, more and more avenues of bringing creativity and innovation in
+          language learning have opened up. These exciting advances have given rise
+          to a new field of study within linguistics, termed Mobile Assisted Language
+          Learning (MALL). This paper aims to fill the gap of MALL research in the area
+          of grammar teaching in the Pakistan. Two BS Part 1 classes from University
+          of Sindh, Jamshoro, were chosen for this quasi-experimental study. In total,
+          62 out of 101 students volunteered to use the Hello English application for
+          2 months, making up the experiment group, and the remaining 39 students were
+          put in a control group. Paired Samples T-Test was run on pretest and posttest
+          results which revealed no significant difference in both groups\u2019 performances,
+          proving that Hello English application could not significantly improve students\u2019
+          grammar performance. However, in spite of the lack of a significant difference
+          between the test results, the data gathered through the attitudinal survey
+          showed that students still found mobile application very easy to use and effective
+          in language learning. Keyswords: Attitudes, Grammar Learning, Hello English,
+          Mobile Language Learning, Technology In Language Learning Pages: 353-367 Article:
+          31 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)31 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)31
+          Download Pdf: download pdf view article Creative Commons License Impact of
+          Determinants on the Profile Elevation of Secondary School Teachers in Pakistan
+          Authors: Zahida Aziz Sial Dr. Farah Latif Naz Humaira Saadia Abstract: The
+          foremost purpose of this research paper was to interrogate the effects of
+          determinants on the educational and social profile of secondary school teachers
+          in Pakistan. The key question taken was related to determinants that affect
+          teachers\u2019 profile. The Population of the study was secondary school teachers
+          of Punjab province. A questionnaire was used as research instrument. The researcher
+          personally visited the schools to administer the questionnaire. E-Views software
+          was used for data analysis. Moreover, OLS regression model and LOGIT regression
+          model were carried out. It was found that the variable years of teaching experience
+          (EXPYR) (*** 0.03) can have a vital concrete effect upon the societal figuration
+          of teachers as the experience of teachers grows, so does their social interactions
+          with officials, colleagues, students and friends increases. The said variable
+          is significant at 10 percent level. The variable, Residence (RESIDE) (** 0.53)
+          have a significant impact upon civic links. This obviously associated with
+          less community connection of country side teachers than the teachers residing
+          in urban areas. Keyswords: Determinants, Elevation, Educational Profile, Social
+          Profile, Secondary School Teacher Pages: 368-372 Article: 32 , Volume 2 ,
+          Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)32 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)32
+          Download Pdf: download pdf view article Creative Commons License Impact of
+          War on Terror on the Tourism Industry in Swat, Pakistan Authors: Sabir Ihsan
+          Prof. Dr. Anwar Alam Aman Ullah Abstract: The present study was designed to
+          ascertain the status of tourism before insurgency, during insurgency and after
+          insurgency in District Swat-KP Pakistan. The study is quantitative and descriptive
+          in nature. A diverse sample size of 370 out of 9014 was selected through convenient
+          sampling strategy. Notwithstanding, the objectives of the study was achieved
+          through structured questionnaire. Data was analysed through chi-square at
+          Bi Variate level. Findings of the study revealed that earning livelihood in
+          swat was significantly associated (P=0.016), (P=0.003) with tourism industry
+          prior 2009 and present time respective, but the same statement was observed
+          non-significant (P=0.075) at the time of insurgency. Arranging different festivals
+          in the study area and establishment of different showrooms for local handcrafts,
+          artificial jewellery and woollen shawl are some of the recommendations of
+          the study. Keyswords: Business, Insurgency, Swat, Tourism Pages: 373-385 Article:
+          33 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)33 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)33
+          Download Pdf: download pdf view article Creative Commons License Challenges
+          and Prospects of Pak-China Economic Corridor Authors: Muhammad Mudabbir Malik
+          Prof. Dr. Muqarrab Akbar Abstract: Pak-China has historic relationships from
+          the emergence of both states, and were proved long-lasting in every thick
+          and thin times. In initial times they supported each other in foreign policies
+          and regional issues. Pakistan and China have border disputes with India, which
+          forced them to come close to counter India, letter on the economic interests
+          strengthened these relations. In order to maximize the economic benefits,
+          China announced economic corridor with the name China Pakistan Economic Corridor
+          (CEPC). It was thought it will boost the economic growth of China, and as
+          a prime partner Pakistan will also get economic benefits. In order to completely
+          understand how Pakistan and China came on the same page and decided to put
+          CPEC into reality we have to understand the Geo-political Importance of Pakistan,
+          Strategic and economic importance of CPEC for China and Pakistan, Influence
+          and concerns of West and neighboring countries including India. Domestic limitations
+          and all the possible benefits and risks involved in this project for both
+          Pakistan and China, this research acknowledges all these questions. Keyswords:
+          Challenges, China, CPEC, Domestic Limitations Economic Growth, Pakistan, Western
+          and Regional Concerns Pages: 386-404 Article: 34 , Volume 2 , Issue 4 DOI
+          Number: 10.47205/jdss.2021(2-IV)34 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)34
+          Download Pdf: download pdf view article Creative Commons License An Analysis
+          of Learning Practices and Habits of Children at Early Childhood Education:
+          Students\u2019 Perspective Authors: Masood Ahmad Sabiha Iqbal Shaista Noreen
+          Abstract: The study was designed to analysis learning practices and habits
+          of children at early childhood education. The major objective of the study
+          was to find out the learning practices and habits of children. Problem was
+          related to current situation, so survey method was exercised, 220 students
+          were selected with the help of convenient sampling technique. Self-constructed
+          questionnaire were exercised. The collected data was analyzed and calculate
+          frequency, percentage, mean score, standard deviation and t-test of independent
+          variable. The major findings of the study were; students learn from the pictures,
+          cartoons and funny face; student\u2019s eyes get tired of reading. When student
+          read context continuously then they feel that their eyes get tired. There
+          was a significance difference between male and female student about learning
+          practices and habits of children. Keyswords: Early Childhood Education, Learning
+          Practices and Habits, Pre-School Students Pages: 405-416 Article: 35 , Volume
+          2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)35 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)35
+          Download Pdf: download pdf view article Creative Commons License Gender Identity
+          Construction in Akhtar\u2019s Melody of a Tear Authors: Dr. Amna Saeed Hina
+          Quddus Abstract: This study aims to discuss the notion of gender in terms
+          of performativity and social construction. It also draws upon the idea of
+          gender identity construction and how it relates to the society, performativity
+          and biology. As its theoretical framework, the study relies upon the Performative
+          Theory of Gender and Sex (1990) presented by Judith Butler and studies the
+          gender identity construction in the female protagonist of Akhtar\u2019s Melody
+          of a Tear. Zara is a girl who is raised as a boy from his father and there
+          is a kind of dilemma in Zara\u2019s personality related to being masculine
+          and feminine. The cultural norms of a particular gender are also a cause of
+          this dilemma. Throughout the novel, she is in a conflicting state whether
+          she should behave feminine or masculine. She is being depicted as an incomplete
+          person until she finds and resolves this issue of gender identity. The paper
+          discusses the gender performativity, social construction, cultural norms and
+          identity as these are all contributing to the confusion and construction of
+          the protagonist\u2019s identity. Character analysis is used as the methodology
+          of analysis. Keyswords: Cultural Norms, Femininity And Identity Confusion,
+          Gender, Performativity, Masculinity, Social Construction Pages: 417-427 Article:
+          36 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)36 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)36
+          Download Pdf: download pdf view article Creative Commons License The Level
+          of Impulsivity and Aggression among Crystal Meth and Cannabis Users Authors:
+          Dr. Umbreen Khizar Muhammad Shafique Sana Nawab Abstract: Cannabis and crystal
+          meth use is pervading in our society. Present study was conducted to explore
+          the relationship between level of impulsivity and aggression among crystal
+          meth and cannabis users. The sample of the present study was comprised of
+          100 participants. There were 50 cannabis and 50 crystal meth users who were
+          diagnosed on the basis of DSM-V without any comorbidity. The sample were taken
+          from all age range of population. The minimum education level was primary
+          and maximum education level was graduation and above. The sample was selected
+          from different drug rehabilitation centers of Rawalpindi and Islamabad, Pakistan.
+          Demographic Performa was used to collect the initial important information,
+          The \u201cBarratt Impulsiveness Scale was used to measure the impulsivity
+          and \u201cAggression Questionnaire\u201d were used to measure the level of
+          aggression. Finding of the study showed that there are significant differences
+          among crystal meth and cannabis users on level of aggression. The calculated
+          mean value for crystal meth user and for cannabis users indicates that crystal
+          meth users have higher level of aggression as compared to the cannabis user.
+          Over all analysis indicates a significant positive correlation of impulsivity
+          with the variable aggression. The alpha coefficient value for all scale is
+          acceptable. Keyswords: Aggression, Cannabis Users, Crystal Meth, Impulsivity
+          Pages: 428-439 Article: 37 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)37
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)37 Download Pdf: download
+          pdf view article Creative Commons License Impact of Social Factors on the
+          Status of Tribal Women: A Case Study of the (Erstwhile) Mohmand Agency Authors:
+          Sadia Jabeen Prof. Dr. Anwar Alam Muhammad Jawad Abstract: This study investigates
+          the impact of socio-economic and cultural factors on the status of tribal
+          women in the erstwhile Mohmand agency of the Ex-Federally Administered Tribal
+          Area (FATA), Pakistan. Cultural practices and illiteracy impede the role of
+          women in socio-economic development. The respondents were randomly selected
+          from tehsil Ekka Ghund and Pindialai with a sample size of 370, through stratified
+          random sampling. Data collected through structured interview schedule, FGD
+          and observation technique. The study reveals that tribal practices early marriages,
+          joint family system, tradition of forced marriages, compensation/Swara, exchange,
+          purchase marriages, hampers women\u2019s socioeconomic status. The illiteracy
+          rate is high among the tribal women and it further undermines their role and
+          negatively affects their socio-economic status. However, improvement in women
+          status needs peace and stability, reforms in the constitution for women empowerment
+          and active participation, improvement in the quality and quantity of education,
+          women employability, skills development and women entrepreneurship Keyswords:
+          Empowerment and Education, Marriage Types, Tribal Women Role, Tribal Women
+          Status, Violence against Women Pages: 440-455 Article: 38 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)38 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)38
+          Download Pdf: download pdf view article Creative Commons License Effects of
+          Heavy School Bags on Students\u2019 Health at Primary Level in District Haveli
+          (Kahutta) Azad Jammu and Kashmir Authors: Dr. Muhammad Mushtaq Shamsa Rathore
+          Mishbah Saba Abstract: Heavy school bags is a very serious issue for the health
+          of the primary level students throughout the world particularly in Azad Jammu
+          and Kashmir. This study intends to explore the effect of heavy school bags
+          on students\u2019 health at primary level in district Kahuta. Naturally the
+          study was descriptive and survey method was used, the population consists
+          of one hundred ninety teachers and a sample of one hundred twenty seven teachers
+          was selected using non probability sampling technique. A likert scale questionnaire
+          was developed validated and distributed among the sampled respondents. The
+          researcher personally visited the schools and collected the filled questionnaire.
+          The data was coded and fed to the SPSS to analyze and interpret. The Chi Square
+          test was applied to see the effect of heavy school bags on student\u2019s
+          health and academic achievement. The study found that heavy bags have negative
+          effect on their health as well as their academic achievement. Students were
+          found complaining their sickness, body and back pain. They were also found
+          improper in their gait and their body postures. The researcher recommended
+          the policy makers to take and develop strategies to decrease the heavy school
+          bags. The school administration needs to make alternate days\u2019 time tables
+          of the subjects. Keyswords: Health, Primary Level, School, Bags, Students
+          Heavy Pages: 456-466 Article: 39 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)39
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)39 Download Pdf: download
+          pdf view article Creative Commons License Exploring the \u2018Civil Repair\u2019
+          Function of Media: A Case Study of The Christchurch Mosques Shootings Authors:
+          Ayaz Khan Dr. Muhammad Junaid Ghauri Riffat Alam Abstract: This research endeavor
+          is an attempt to explore and analyze the discourse produced by The New Zealand
+          Herald; a newspaper from New Zealand and by The News International; a Pakistani
+          newspaper. The researchers intend to determine whether and to what extent
+          both the newspapers have the role of \u2018civil repair\u2019 played after
+          the Christchurch mosques shootings. The researchers have incorporated the
+          \u2018lexicalization\u2019 and the \u2018ideological square\u2019 techniques
+          proposed by Tuen A. van Dijk within the scope of Critical Discourse Analysis.
+          The findings of this study show that both the selected newspapers assuming
+          the social status of \u2018vital center\u2019 performed the role of \u2018civil
+          repair\u2019 in the aftermath of the shootings by producing the \u2018solidarity
+          discourse\u2019. The \u2018solidarity discourse\u2019 has been produced in
+          terms of the \u2018we-ness\u2019, harmony, understanding, and by mitigating
+          the conflicting opinions. Keyswords: Christchurch Mosque Shootings, Civil
+          Repair, Civil Sphere Theory, Lexicalization, Solidarity Discourse Pages: 467-484
+          Article: 40 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)40 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)40 Download Pdf: download pdf
+          view article Creative Commons License China Pakistan Economic Corridor: Regional
+          Dominance into Peace and Economic Development Authors: Tayba Anwar Asia Saif
+          Alvi Abstract: The purpose of this qualitative study was to investigate the
+          true motivations behind CPEC idea and the advantages it delivers to Pakistan
+          and China. It also recognizes the Corridor''s potential for mixing regional
+          economies while dissolving geographical borders. The study is deductive in
+          character, since it examines financial, political, and military elements of
+          Pakistan and China''s positions and situations. Enhancing geographical linkages
+          through improved road, train, and air transport systems with regular and free
+          exchanges of development and individual\u2019s interaction, boosting through
+          educational, social, and regional civilization and wisdom, activity of larger
+          quantity of investment and commerce flow, generating and moving energy to
+          provide more optimal businesses for the region. Keyswords: Geographical Linkages,
+          Globalized World, Landlocked, Regional Connectivity, Regionalization Pages:
+          485-497 Article: 41 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)41
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)41 Download Pdf: download
+          pdf view article Creative Commons License China\u2019s New Great Game in Central
+          Asia: Its Interest and Development Authors: Bushra Fatima Rana Eijaz Ahmad
+          Abstract: Central Asia is rich in hydrocarbon resources. It\u2019s geostrategic,
+          geopolitical, and geo-economic significance has grasped the attention of multiple
+          actors such as China, the USA, Russia, Turkey, the European Union, Pakistan,
+          Afghanistan, and India. Due to its location, the Central Asian region appeared
+          as a strategic hub. In the present scenario, China\u2019s strategy is massive
+          economic development, energy interest, peace, and stability. This article
+          highlights China\u2019s interest, political and economic development, and
+          its role as a major player in the New Great Game in Central Asia. Shanghai
+          Cooperation Organization (SCO) which presents as a platform where China is
+          playing an active role in political, economic, and security concerns for achieving
+          its objectives in Central Asia. The new step of the Belt and Road Initiative
+          (BRI) sheds light on China\u2019s progressive move in this region via land
+          and sea routes, which creates opportunities for globalization. Keyswords:
+          Belt and Road Initiative, Central Asia, China, New Great Game Pages: 498-509
+          Article: 42 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)42 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)42 Download Pdf: download pdf
+          view article Creative Commons License Personality Traits as Predictors of
+          Self-Esteem and Death Anxiety among Drug Addicts Authors: Umbreen Khizar Saira
+          Irfan Iram Ramzan Abstract: This study seeks to investigate whether personality
+          traits predict self-esteem and death anxiety among drug addicts. The sample
+          consisted of 100 drug addicts taken from the two hospitals in Multan city.
+          Only men between the ages of 20 and 65 were included in the study. Data was
+          collected through reliable and valid questionnaires. Results revealed positive
+          relationship between conscientiousness, openness to experience and self-esteem.
+          Moreover, findings showed positive relationship between extraversion and death
+          anxiety, and negative correlation between neuroticism and death anxiety. Findings
+          also showed that self-esteem and death anxiety are significantly and negatively
+          correlated. Additionally, findings revealed that conscientiousness positively
+          predicted self-esteem and neuroticism negatively predicted death anxiety.
+          Furthermore, significant differences were observed in self-esteem, and death
+          anxiety based on age. Significant differences were also found in extraversion,
+          agreeableness, openness to experience, and death anxiety based on location.
+          Understanding how personality traits affect behavior can help drug addicts
+          get the support they need to live a better life and reduce their risk of death
+          anxiety and premature death. Keyswords: Death Anxiety, Drug Users, Personality
+          Traits, Self- Esteem Pages: 510-524 Article: 43 , Volume 2 , Issue 4 DOI Number:
+          10.47205/jdss.2021(2-IV)43 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)43
+          Download Pdf: download pdf view article Creative Commons License Middle East:
+          A Regional Instability Prototype Provoking Third Party Interventions Authors:
+          Waseem Din Prof. Dr. Iram Khalid Abstract: Third party interventions always
+          prolong the interstate or civil wars with unending sufferings and devastations.
+          The entire Middle East region is fraught with tensions, conflicts, civil wars
+          and rivalries. From strategic interests to power grabbing, sectarian divisions,
+          flaws in the civil and social structure of the state and society, ethnic insurrections,
+          and many other shapes of instability syndromes can be diagnosed in this region.
+          In the post-Arab Spring, 2011, the emerging new regional hierarchical order
+          for power/dominance, in addition to the weakening/declining dominant US power
+          in the region, changed the entire shape of already conflict-ridden region.
+          New weak or collapsing states and bifurcation of the \u2018status quo\u2019
+          and \u2018counter-hegemonic\u2019 states along with their respective allies,
+          made this region a prototype of instability in the regional security complex
+          of the Middle East, as a direct result of these developments. The perpetuation
+          of these abnormalities would not recede this instability conundrum from the
+          region, provoking third party intervention, if not contained. Keyswords: Conflicts/Civil
+          Wars, Dominant Power, Instability, Intervention, Middle East, Middle Powers,
+          Regional Hierarchy, Regional Powers, Security Complex, Weak State Pages: 525-542
+          Article: 44 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)44 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)44 Download Pdf: download pdf
+          view article Creative Commons License Impact of Classroom Environment on Second
+          Language Learning Anxiety Authors: Zohaib Zahid Abstract: Second language
+          learning anxiety has attained the attention of the researchers in almost every
+          part of the world. Pakistan is a country where English is taught as a second
+          language from the very beginning of school education. Second Language learning
+          anxiety is a phenomenon which has been prominently found among the learners
+          because of their less proficiency in learning English language. This study
+          has been conducted to investigate the effect of anxiety in learning and using
+          English language in classroom, university and outside the classroom. There
+          are variables that affect language learning performance of the learners but
+          this paper has solely investigated the effect of anxiety. The paper has concluded
+          that anxiety is a variable which has a striking affect in second language
+          learning and its use inside classrooms. Keyswords: Effect of Anxiety, Proficiency,
+          Second Language Learning Anxiety, Striking Affect Pages: 485-497 Article:
+          45 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)45 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)45
+          Download Pdf: download pdf view article Creative Commons License Struggling
+          for Democracy: A Case of Democratization in Pakistan Authors: Ammara Tariq
+          Cheema Dr. Rehana Saeed Hashmi Abstract: The objective of this research paper
+          is to review the challenges for democratization in Pakistan. The problem of
+          democratization and consolidation refers to the structure of democracy following
+          the collapse of non-democratic regime. Ten factors as given by Michael J.
+          Sodaro are considered effective in helping a democratically unstable state
+          to stabilize its system in other words helps in the democratic consolidation.
+          It is argued in this research that the ten factors of democratization as given
+          by Michael J. Sodaro have been absent in the political system of Pakistan
+          and working on these factors can lead Pakistan to the road of democratization.
+          This study uses qualitative method of research and proposes a novel framework
+          for the deed of parliament, because the effectiveness of parliament can contribute
+          positively to democratization/consolidated democracy. Keyswords: Electoral
+          Politics, General Elections, Political Participation, Women Empowerment Pages:
+          554-562 Article: 46 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)46
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)46 Download Pdf: download
+          pdf view article Creative Commons License Impact of Dependency Ratio on Economic
+          Growth among Most Populated Asian Countries Authors: Dilshad Ahmad Salyha
+          Zulfiqar Ali Shah Abstract: Demographic transition through different channels
+          significantly influences economic growth. Malthusian view postulated as dependency
+          ratio adversely affects economic growth while Julian Simon''s view is quite
+          different, highlighted the long-run benefits of the population in the range
+          of 5 to15 years on economic growth. This study can be a valuable addition
+          in research to analyzing the association of dependency ratio and economic
+          growth of the five most populated Asian countries (Bangladesh, China, Indonesia,
+          India, and Pakistan). Empirical findings of the study indicated that a total
+          dependency and younger dependency ratio has a positive and significant influence
+          on economic growth in both short-run and long-run scenarios while the old
+          dependency ratio shows a negative influence on economic growth in the long
+          run while short-run results are unpredictable. There is a need for state-based
+          proper policy measures in focusing the higher financing in human capital development
+          specifically in education and health. Keyswords: Economic Growth, Gross Saving,
+          Old Dependency Ratio, Young Dependency Ratio Pages: 563-579 Article: 47 ,
+          Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)47 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)47
+          Download Pdf: download pdf view article Creative Commons License Chinese Geo-Strategic
+          Objectives and Economic Interests in Afghanistan under President Xi Jinping
+          Authors: Farooq Ahmed Prof. Dr. Iram Khalid Abstract: China has its own distinctive
+          interests, concerns and strategies with respect to the changing security dynamics
+          in Afghanistan. China has taken an active interest, though retaining a low
+          profile and avoiding direct military interaction. China has exclusively relished
+          on economic engagement actively and provided numerous financial aid and financial
+          support in the rebuilding of Afghanistan''s economy. The aim of this research
+          study is to analyze the geo-strategic objectives and economic interests of
+          China under the leadership of President Xi Jinping. This study looks at the
+          actual diplomatic, economic and protection commitments of both countries as
+          well as the basis of the geopolitical complexities \u2013 core variables that
+          form China''s current foreign policy to Afghanistan. Keyswords: Afghanistan,
+          BRI, China, NATO Withdrawal Pages: 580-592 Article: 48 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)48 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)48
+          Download Pdf: download pdf view article Creative Commons License The Argument
+          Structure of Intransitive Verbs in Pashto Authors: Abdul Hamid Nadeem Haider
+          Bukhari Ghani Rehman Abstract: This study focuses on the description and categorization
+          of intransitive verbs in terms of its argument structure. The study concludes
+          that the unaccusative verbs only project an internal argument. It does not
+          require the event argument. However, the said verb can be causativised by
+          adding external argument and at the same time the event argument gets included
+          in the valency of the derived causative of the unaccusative root. The unergative,
+          on the other hand, requires an external argument as an obligatory argument
+          while the internal argument is not the obligatory argument of the verb. The
+          event argument is also a part of the valency of the verb. The APFs require
+          one argument which is the internal argument of the verb. However, since the
+          external argument is not available, the internal argument of the verb gets
+          realized as the subject of the verb. The verb does not project event argument.
+          The ergative predicates are derived by the suppression of the external argument
+          and by the externalization of the internal argument. Keyswords: Argument Structure,
+          Ergative Case, Event Argument, External Argument, Internal Argument, Valency
+          Pages: 593-610 Article: 49 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)49
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)49 Download Pdf: download
+          pdf view article Creative Commons License Positive, Negative and Criminal
+          Orientation of Beggars in Okara: Perspective of Students Authors: Shahzad
+          Farid Saif-Ur-Rehman Saif Abbasi Hassan Raza Abstract: This study aimed to
+          measure the perspective of students about the criminal orientation of beggars.
+          The sample size of the study (i.e., 100 students) was explored using Taro
+          Yamane\u2019 equation from the university of Okara, Punjab, Pakistan. The
+          respondents were approached using simple random sampling and interviewed using
+          face to face interview schedule. The data was collected using a structured
+          questionnaire. The analysis was administered through SPSS-20.The study explored
+          that parental illiteracy is associated with the high criminal and negative
+          orientation of students towards beggars. It was also explored that females
+          and respondents from rural background have low negative orientation towards
+          beggars. However, males and respondents from urban background have medium
+          criminal orientation and low positive orientation towards beggars, respectively.
+          The study is useful for the government of Punjab, Pakistan campaign and policy
+          for anti-begging. The study introduced the geometrical model of youth\u2019s
+          orientation toward begging. The study also contributed to the literature on
+          begging by extending its domain from Law and Criminology to sociology as it
+          incorporated social variables e.g., parents\u2019 education, gender, etc.,
+          to explore their association with the youth\u2019s socialization about begging.
+          Keyswords: Begging, Crime, Education, Gender, Students Pages: 611-621 Article:
+          50 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)50 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)50
+          Download Pdf: download pdf view article Creative Commons License Relationship
+          between Entrepreneurial Export Orientation and Export Entrepreneurship through
+          Mediation of Entrepreneurial Capabilities Authors: Muhammad Saqib Nawaz Masood
+          ul Hassan Abstract: Export led growth is prominent paradigm in developing
+          world since decades. Exports play vital role in the economy by improving the
+          level of balance of payments, economic growth and employment. Due to strategic
+          importance of exports, organizational researchers focused on finding antecedents
+          of export performance of the organizations. To line with this, current study
+          aims to find the impact of entrepreneurial export orientation on export entrepreneurship
+          through mediation of entrepreneurial capabilities in the Pakistani context.
+          For this purpose, data was collected from 221 exporting firms of Pakistan
+          by using questionnaire. Collected data was analyzed with the help of Smart
+          PLS. In findings, measurement model confirmed the validity and reliability
+          of measures of variables. Additionally, structural model provides the positive
+          impact of entrepreneurial export orientation on export entrepreneurship. Similarly,
+          entrepreneurial capabilities mediate the relationship between entrepreneurial
+          export orientation on export entrepreneurship. The findings provide important
+          implications for the managers of exporting firms to improve export performance.
+          Keyswords: Entrepreneurial Capabilities, Entrepreneurial Export Orientation,
+          Export Entrepreneurship Pages: 622-636 Article: 51 , Volume 2 , Issue 4 DOI
+          Number: 10.47205/jdss.2021(2-IV)51 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)51
+          Download Pdf: download pdf view article Creative Commons License China Pakistan
+          Economic Corridor: Explaining U.S-India Strategic Concerns Authors: Nasreen
+          Akhtar Dilshad Bano Abstract: Regional and International political and economic
+          landscape is being changed owing to China Pakistan Economic Corridor (CEPEC)-the
+          new security paradigm has taken place-that has increased the strategic concerns
+          of the U.S. and India. This research paper attempts to re-examine China-Pakistan
+          relations in the new emerging geo-political compass. This paper has investigated
+          the question that how regional, and global developments have impacted the
+          China-Pakistan relationship? And why China \u2013 Pakistan have become partners
+          of CPEC? In the global context, this paper assesses the emerging International
+          Order, Indo-U. S strategic narrative vis-\u00e0-vis CPEC, and the containment
+          of China through the new alliances and their impacts on China -Pakistan vis-\u00e0-vis
+          the Belt Road Initiative (BRI). Quadrilateral (Quad) alliances is shaping
+          the new strategic political and security paradigms in the world politics.
+          Keyswords: BRI, China, CPEC, India, Pakistan, Silk Road, Strategic Concerns
+          Pages: 637-649 Article: 52 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)52
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)52 Download Pdf: download
+          pdf view article Creative Commons License The Structure of Domestic Politics
+          and 1973 Constitution of Pakistan Authors: Dr. Fida Bazai Dr. Ruqia Rehman
+          Amjad Rashid Abstract: Pakistan is located in a pivotal region. Its geo-strategic
+          location affects its national identity as a nation state. Unlike Europe in
+          South Asia security dilemma, proxy warfare and nuclear arms race are consistent
+          features of the regional politics. The identity of Pakistan as security-centric
+          state gives its army disproportional power, which created institutional imbalance
+          that directly affected constitutionalism in the country. The constitution
+          of Pakistan is based on principles of civilian supremacy and separation of
+          power but in reality Pakistan\u2019s army is the most powerful institution
+          in country. This paper argues that the structure of Pakistani politics; created
+          institutional imbalances by the disproportionate distribution of resources
+          is the key variable in creating dichotomy. The structure of domestic politics
+          is based upon the principles of hostility to India, use of Islam for national
+          unity and strategic alliances with major powers to finance defense against
+          the neighboring countries. Keyswords: Constitutionalism, Identity, Islam,
+          South Asia Pages: 650-661 Article: 53 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)53
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)53 Download Pdf: download
+          pdf view article Creative Commons License National Integration and Regionalism
+          in Pakistan: Government\u2019s Strategy and Response toward Regionalist Demands
+          1947-77 Authors: Najeeb ur Rehman Mohammad Dilshad Mohabbat Muhammad Wahid
+          Abstract: The countries of South Asian region have pluralistic societies with
+          different language, religious, and ethnic identities. Pakistan is no exception
+          who is facing the challenge of regionalism since its inception. Different
+          ethnic groups have been consistently raising their voices for separatism or
+          autonomy within the frame work of an existing territorial state. The issues
+          of provincialism, ethnicity, and regionalism is posing a serious challenge
+          to the integrity of the country. This paper aims to explore the causes of
+          the regionalism in Pakistan and intends to analyze the policies and strategies
+          of different political governments which they launched to tackle this all
+          important issue. The paper follows the historical method of research and analyzes
+          different types of qualitative data to conclude the finding of the research.
+          The paper develops the theory of \u201cRegionalists Demand and Government
+          Response\u201d which shows how different regionalist forces put their demands
+          and how the governments react on these demands. It recommends the grant of
+          greater regional autonomy to the regionalists to enhance internal security
+          and to protect the country from disintegration. Keyswords: Demands, Ethnicity,
+          Government Strategy, National Integrity, Nationalism, Regionalism Pages: 662-678
+          Article: 54 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)54 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)54 Download Pdf: download pdf
+          view article Creative Commons License Fostering Entrepreneurial Mindset through
+          Entrepreneurial Education: A Qualitative Study Authors: Saira Maqbool Dr.
+          Qaisara Parveen Dr. Muhammad Hanif Abstract: Research on entrepreneurial mindset
+          has flourished in these recent years. Its significance lies in a critical
+          suspicion and its matters for inventive behavior. Entrepreneurship joined
+          with innovative abilities, seen as one of the most wanted in this day and
+          age. This study aims to determine the perceptions about entrepreneurial mindset,
+          its importance, and the role of entrepreneurship education and Training in
+          developing the entrepreneurial mindset. This is a qualitative study based
+          on interviews conducted by professors of Pakistan and Germany. The analysis
+          was determined through content analysis. The results determine that ''Making
+          Entrepreneurial Mindset'' assists with seeing better all parts of business
+          venture, which will undoubtedly influence their view of business venture,
+          pioneering abilities, and mentalities. Keyswords: Entrepreneurship Education,
+          Entrepreneurial Mindset Pages: 679-691 Article: 55 , Volume 2 , Issue 4 DOI
+          Number: 10.47205/jdss.2021(2-IV)55 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)55
+          Download Pdf: download pdf view article Creative Commons License Benefits
+          of Implementing Single National Curriculum in Special Schools of Lahore city
+          for Children with Intellectual Disability: Teachers\u2019 Perception Authors:
+          Dr. Hina Fazil Khurram Rameez Sidra Ansar Abstract: Single national curriculum
+          (SNC) is an important issue across the Punjab Province of Pakistan. Making
+          and implementing SNC is not only focusing the education of normal pupils,
+          but also focusing students with disabilities (SWD). The field of special education
+          experienced an increased discussion of curriculum for students with intellectual
+          disabilities (SID). The present research aimed to know the benefits to implement
+          first stage of single national curriculum for students with Intellectual disability
+          and to know the differences about the benefits between public and private
+          schools regarding SNC for students with ID based on demographic characteristics.
+          Likert type researchers-made questionnaire with reliability) Cronbach alpha
+          .922) was used. 90 special educationists from public and private schools were
+          chosen through random sampling technique. The findings raised some benefits
+          such as: SNC will bridge the social and economic disparities which will increase
+          the acceptance of ID students. It was recommended that SNC should include
+          areas of adaptive skills, motor, and vocational skills to get involved in
+          work activities. Keyswords: Benefits, Children with Intellectual Disability,
+          Single National Curriculum Pages: 692-703 Article: 56 , Volume 2 , Issue 4
+          DOI Number: 10.47205/jdss.2021(2-IV)56 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)56
+          Download Pdf: download pdf view article Creative Commons License Last Rituals
+          and Problems Faced by the Hindu Community in Punjab: A Case Study of Lahore
+          Authors: Sabir Naz Abstract: Lahore is the provincial capital of Punjab, where
+          a sizeable population of the Hindus has been residing there since the inception
+          of Pakistan. There had been many crematoriums in the city but with the passage
+          of time, one after another, disappeared from the land after partition of the
+          Sub-continent. Those places were replaced by commercial or residential sites.
+          There is also a graveyard in the city which is in the use of Hindu Valmik
+          Sect. However, it was encroached by some Muslims due to very small size of
+          population and indolence of the Hindus. Later on, the encroachments were removed
+          by the District Government Lahore in compliance of order of the Supreme Court
+          of Pakistan. Presently, there is a graveyard as well as a crematorium in the
+          city. The community remained deprived of a place to dispose of a dead body
+          according to their faith for a long period which is contravention with the
+          guidelines of the Quaid-e-Azam, founder of the nation Keyswords: Crematorium,
+          Graveyard, Hindu community, Last Rituals Pages: 704-713 Article: 57 , Volume
+          2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)57 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)57
+          Download Pdf: download pdf view article Creative Commons License Estimating
+          Growth Model by Non-Nested Encompassing: A Cross Country Analysis Authors:
+          Benish Rashid Dr. Shahid Razzaque Dr. Atiq ur Rehman Abstract: Whether models
+          are nested or non-nested it is important to be able to compare them and evaluate
+          their comparative results. In this study six growth models have been used
+          for analyzing the main determinants of economic growth in case of cross countries,
+          therefore by using these six models we have tested them for non-nested and
+          nested encompassing through Cox test and F-test respectively. Data from 1980
+          to 2020 were used to analyze the cross country growth factors so therefore,
+          the current study looked at about forty four countries with modelling these
+          different comparative studies based on growth modelling. So, we can make these
+          six individual models and we can estimate the General Unrestricted Model with
+          the use of econometric technique of Non-Nested Encompassing. By evaluating
+          the data using the Non-Nested Encompassing econometric technique, different
+          sets of economic variables has been used to evaluate which sets of the economic
+          variables are important to boost up the growth level of the country. And found
+          that in case of nested model or full model it is concluded that model with
+          lag value of GDP, trade openness, population, real export, and gross fix capital
+          formation are the main and potential determinants to boost up the Economic
+          Growth in most of the countries. Keyswords: Cross Country, Economic Growth,
+          Encompassing, Nested, Non-nested Pages: 714-727 Article: 58 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)58 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)58
+          Download Pdf: download pdf view article Creative Commons License Assessment
+          of Youth Buying Behaviour for Organic Food Products in Southern Punjab: Perceptions
+          and Hindrances Authors: Ayousha Rahman Asif Yaseen Muhammad Arif Nawaz Abstract:
+          This research examined the cognitive antecedental effects on organic food
+          purchase behaviour for understanding the perceptions and hindrances associated
+          with purchasing organic food products. Theory of Planned Behaviour (TPB) was
+          adopted as a theoretical framework. A total of 250 young consumers in the
+          two cities of Southern Punjab, Pakistan was randomly sampled and data were
+          collected via a face-to-face survey method. Partial least square technique
+          was employed to test the model. The results showed that attitude towards organic
+          food purchasing motivated when moral norms were activated to consume organic
+          food products. Further, environmental knowledge moderated the relationship
+          of organic food purchase intentions and behaviour significantly. The findings
+          highlighted the importance of moral norms as a meaningful antecedent that
+          could increase the TP-based psychosocial processes if consumers have sufficient
+          environmental knowledge. Therefore, farmers, organic products marketers, government
+          administrators, and food retailers should take initiatives not only to highlight
+          the norms and values but also when promoting organic food production and consumption.
+          Keyswords: Environmental Knowledge, Organic Food Purchase Behaviour, Personal
+          Attitude, PLS-SEM, Subjective &amp; Moral Norms Pages: 728-748 Article: 59
+          , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)59 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)59
+          Download Pdf: download pdf view article Creative Commons License An Analysis
+          on Students Ideas about English and Urdu as Medium of Instructions in the
+          Subjects of Social Sciences studying in the Colleges of the Punjab, Pakistan
+          Authors: Ashiq Hussain Asma Amanat Abstract: The worth and usefulness of English
+          education as a foreign language is of great concern to language rule and planning
+          (LRP) researchers compared to teaching their native language globally in higher
+          education. The study under research examines the perspectives of two similar
+          groups of the final year students of at Higher Education Institutions of Pakistan.
+          The first group consists of art students who received the Urdu medium of instruction
+          (UMI), and the second group received the English medium of instruction (EMI).
+          An empirical methodology was carried out in the present year, students answered
+          questionnaires to find out the benefits and challenges of learning subject-based
+          knowledge, what subject-based knowledge means to them, and their understanding
+          of language as a teaching language. Interviews were conducted with the selected
+          group of students who wished to participate in research. Additional information
+          is available from the tests and results obtained in the two equivalent courses.
+          Although many similarities have been identified between the two groups, the
+          overall knowledge of disciplinary knowledge of English medium instruction
+          students was not very effective, while that of UMI students was very effective.
+          It explains the implications of the findings to continue the language rule
+          as policy experience for teaching in higher education institutions. Keyswords:
+          English as Medium of Instruction (EMI), Higher Education Institutions (HEIs),
+          Urdu as Medium of Instruction (UMI) Pages: 749-760 Article: 60 , Volume 2
+          , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)60 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)60
+          Download Pdf: download pdf view article Creative Commons License Environment
+          and Women in Kurt Vonnegut\u2019s \u2018Happy Birthday Wanda Juny\u2019: An
+          Eco- Critical and Feminist Analysis Authors: Dr. Muhammad Asif Safana Hashmat
+          Khan Muhammad Afzal Khan Janjua Abstract: This is an Eco-feminist study of
+          Vonnegut\u2019s \u2018Happy Birthday Wanda Juny\u2019 and focuses on how both
+          women and environment are exploited by patriarchy. Ecofeminism critiques masculine
+          dominance highlighting its role in creating and perpetuating gender discrimination,
+          social inequity and environmental degradation. Women suffer more because of
+          power disparity in society. Environmental crises affect women more than men
+          because of their already precarious existence and subaltern position. There
+          is affinity between women and nature are victims of climate change and other
+          environmental hazards. Cheryl Glotfelty introduced interdisciplinary approach
+          to the study of literature and environment. Literary ecology as an emerging
+          discipline explores the intriguing relationship between environment and literature.
+          Ecofeminism draws on feminist critique of gender inequality showing how gender
+          categories inscribed in power structure exploit both women and nature. Francoise
+          d\u2018Eaubonne coined the term ecofeminism to critique the prevalent exploitation
+          of both women and environment. Ecofeminism asserts that exploitation of women
+          and degradation of the environment are the direct result of male dominance
+          and capitalism. Ecofeminism argues for redressing the plight of women and
+          protection of environment. Vonnegut\u2019s play \u2018Happy Birthday Wanda
+          June\u2019 was written at a time when the movement for the right of women
+          and protection of environment were gaining momentum. The play shows how toxic
+          masculinity rooted in power and capitalism exploit both women and environment.
+          Keyswords: Eco-Feminism, Eco-Criticism, Ecology, Environment, Exploitation
+          Pages: 761-773 Article: 61 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)61
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)61 Download Pdf: download
+          pdf view article Creative Commons License Critical Analysis of Social Equity
+          and Economic Opportunities in the Light of Quranic Message Authors: Prof.
+          Dr. Muhammad Yousuf Sharjeel Mahnaz Aslam Zahida Shah Abstract: This study
+          critically evaluated the key verses of Surah Al-Baqarah -the second chapter
+          of Quran, a sacred scripture of Islam- which specifically relates to social
+          equity opportunities and a code of conduct in the context of economics. The
+          Quran claims that it is a book which explains every situation; therefore,
+          the aim of this study remained to extract those verses of Surah Al-Baqarah
+          which can guide us in Economics. The authentic and approved Islamic clerics
+          and their translations were consulted for the interpretations of the Holy
+          verses. The researchers chiefly focused and studied Surah Baqarah with regards
+          to social equity and economic opportunities. The translations were primarily
+          in the regional language Urdu so the interpretations must not be related exactly
+          equitable in English. The study engaged the document analysis research strategy.
+          This study is only an endeavour to decipher Holy Quran\u2019s message from
+          Allah for the mankind so it must not be considered as the full and complete
+          solution to the all the economic issues, challenges and opportunities. Ahadees
+          and the saying of the Holy prophet were referred to where ever required and
+          available. The researcher also considered the Tafasir (detail intellectual
+          interpretations) of the Quran done by the well-known scholars of Islam for
+          the verses studied therein and any statements and/or material - such as ideas,
+          studies, articles, documentation, data, reports, facts, statistics etc. For
+          the study, data was collected and analyzed qualitatively. On the basis of
+          the study, recommendations were also primed. Keyswords: Economic Issues and
+          Challenges, Social Equity, Surah Al-Baqarah, Al Quran Pages: 774-790 Article:
+          62 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)62 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)62
+          Download Pdf: download pdf view article Creative Commons License A Critical
+          Discourse Analysis of Dastak by Mirza Adeeb Authors: Muhammad Afzal Dr. Syed
+          Kazim Shah Umar Hayat Abstract: The present research aims to explore ideology
+          in Pakistani drama. The drama, \u201cDastak\u201d, written by Mirza Adeeb,
+          has been taken for exploration ideologically. Fairclough\u2019s (1992) three-dimensional
+          model has been used for analyzing the text of the above-mentioned drama which
+          includes textual, discursive practice and social practice analyses. The linguistic
+          and social analyses of the drama reveal the writer\u2019s ideology about socio-cultural,
+          conventional and professional aspects of life. The study has also explored
+          the past and present states of mind of Dr. Zaidi, the central and principal
+          character of the drama, Dastak. The text implies that the writer has conveyed
+          personal as well as social aspects of his times through the drama of Dastak.
+          Keyswords: Dastak, Drama, Ideology, Semiotics Pages: 791-807 Article: 63 ,
+          Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)63 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)63
+          Download Pdf: download pdf view article Creative Commons License Linking Job
+          Satisfaction to Employee Performance: The Moderating Role of Islamic Work
+          Ethics Authors: Dr. Shakira Huma Siddiqui Dr. Hira Salah ud din Khan Dr. Nabeel
+          Younus Ansari Abstract: The most pervasive concern in public sector organizations
+          is declining employee performance and workforce of these organizations are
+          less satisfied with their jobs. The aim of this study is to investigate the
+          impact of Job Satisfaction on employee\u2019s performance and how Islamic
+          work ethics moderates the above mentioned direct relationship in the public
+          sector organizations of Pakistan. The data were collected from the sample
+          of 193 permanent employees working in public sector organizations through
+          stratified sampling technique. The results revealed that employees Job satisfaction
+          is significantly related to higher performance. Further, the findings indicated
+          that Islamic work ethics moderates the relationship between job satisfaction
+          and employee performance. The present research has some theoretical and empirical
+          implications for academicians, policymakers, especially of public sector organizations,
+          for the improvement of performance of their workforce. Keyswords: Employee
+          Performance, Islamic Work Ethics, Job Satisfaction, Person-Environment Fit
+          Theory Pages: 808-821 Article: 64 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)64
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)64 Download Pdf: download
+          pdf view article Creative Commons License Semantics of Qawwali: Poetry, Perception,
+          and Cultural Consumption Authors: Rao Nadeem Alam Tayyaba Khalid Abstract:
+          Semantics is about meanings and meanings are arbitrary and shared. Understanding
+          qawwali context requires comprehension of semantics or process of meaning
+          creation and meaning sharing among the qawwal party and the audience. This
+          interactive activity might frequently be hindered when interrupted by subjective
+          meanings creation during cultural consumption. Qawwali is a cultural tradition,
+          its semantics are conditioned by axiological premises of poetry and perceptions
+          which are transforming. The previous researches revealed that qawwali is associated
+          with religion which provides the religious message by singing hamd and naat.
+          It was a means to experience Divine; therefore, semantics are multi-layered
+          and often crossroad with values and subjective experiences. It is novel due
+          to its ritual of Sama. It has the therapeutic power that helps mentally disturbed
+          people and they find refuge. This study is exploratory having a small sample
+          size of twenty purposively selected audiences. This phenomenological inquiry
+          used ethnographic method of conversational interviews at selected shrines
+          and cultural spaces in Islamabad. The results indicate that qawwali is a strong
+          refuge for people facing miseries of life and they attend Sama with a belief
+          that attending and listening will consequently resolve their issues, either
+          psychological or physiological. They participate in Sama which teaches them
+          how to be optimistic in a negative situation; this paper brings forth this
+          nodal phenomenon using the verbatim explanations by the interlocutors. Semantics
+          of Qawwali are conditioned and some of these elements are highlighted including
+          poetry and axiology based perceptions and cultural consumption of a cultural
+          realm. Keyswords: Cognition, Culture, Poetry, Qawwal, Qawwali, Semantics Pages:
+          822-834 Article: 65 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)65
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)65 Download Pdf: download
+          pdf view article Creative Commons License Political Economy of Smuggling:
+          The Living Source for the Natives (A Case Study of Jiwani-Iran Border, Baluchistan)
+          Authors: Abdul Raheem Dr. Ikram Badshah Wasia Arshed Abstract: This study
+          explores the political economy of smuggling on Jiwani-Iran border. The natives
+          are majorly involved in illegal transportation of goods and objects, therefore;
+          the study sets to explain how significant smuggling for the local people is.
+          It describes the kinship role in reciprocity of their trade and transportation.
+          The qualitative methods such as purposive sampling and interview guide were
+          employed for data collection. The research findings revealed that local people
+          were satisfied with their illegal trading which is depended largely on their
+          expertise and know-how of smuggling at borders. They disclosed that their
+          total economy was predominantly based on smuggling of stuff like drugs, diesel,
+          oil, gas, petrol, ration food from Iran, and human trafficking. They also
+          enjoyed the privilege of possessing Sajjil (Iranian identity card), thus;
+          the dual nationality helped them in their daily business and rahdari (border
+          crossing agreement), enabling them to travel to Iran for multiple purposes.
+          Keyswords: Drugs, Human, Navigation, Political Economy, Reciprocity, Smuggling,
+          Trafficking Pages: 835-848 Article: 66 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)66
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)66 Download Pdf: download
+          pdf view article Creative Commons License The Vicious Circles of System: A
+          Kafkaesque Study of Kobo Abe\u2019s The Woman in the Dunes Authors: Imran
+          Aslam Kainat Azhar Abstract: This paper analyses the Kafkaesque/Kafkan features
+          of Kobo Abe\u2019s novel The Woman in the as formulated by Kundera in \u201cKafka\u2019s
+          World.\u201d For Kundera, in a Kafkaesque work human existence is bleakly
+          represented through intermingling of tragedy and comedy in an indifferent
+          world dominated by hegemonic systems. The Kafkaesque is characterised by the
+          following: World is a huge forking labyrinthine institution where the man
+          has been thrown to suffer its complexities, confrontation with the labyrinth
+          makes his existence meaningless because freedom is a taboo in no man\u2019s
+          land, he is punished for an unknown sin for which he seeks justification from
+          the superior authorities, but his efforts are viewed as ludicrous or comic
+          despite the underlying sense of tragedy. (5) The Kafkaesque tendency to present
+          tragic situation comically is also explored in Abe\u2019s novel. The paper
+          studies the effect of higher authorities exercising their power over man and
+          the inscrutability of cosmic structures continuously undermining human freedom
+          in nightmarish conditions. The paper establishes Kobo Abe in the literary
+          world as a writer who portrays the hollowness and futility of human lives
+          with a Kafkaesque touch. Keyswords: Authority, Institutions, Kafka, Kafkaesque,
+          Kafkan, Kobo Abe, Kundera, The Trial, The Woman in the Dune Pages: 849-861
+          Article: 67 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)67 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)67 Download Pdf: download pdf
+          view article Creative Commons License Subjectivity and Ideological Interpellation:
+          An Investigation of Omar Shahid Hamid\u2019s The Spinner\u2019s Tale Authors:
+          Hina Iqbal Dr. Muhammad Asif Asia Saeed Abstract: Louis Althusser\u2019s concept
+          of interpellation is a process in which individuals internalize cultural values
+          and ideology and becomes subject. Althusser believes that ideology is a belief
+          system of a society in which ideological agencies establish hierarchies in
+          society through reinforcement and discrimination for cultural conditioning.
+          These agencies function through ideological state apparatuses. These ideological
+          agencies help to construct individual identity in society. The undesirable
+          ideologies promote repressive political agendas. The non-repressive ideologies
+          are inhaled by the individuals as a natural way of looking at the culture
+          and society. This research seeks to investigate Omar Shahid Hamid\u2019s novel
+          The Spinners Tales through the lens of Althusser\u2019s ideology and interpellation.
+          This study examines how the characters of Shahid\u2019s novel inhaled ideology
+          and became its subjects. This research also depicts the alarming effects of
+          cultural hegemony that creates cultural infidelity and hierarchies between
+          the bourgeoisie and proletariat classes. Keyswords: Cultural Hegemony, Ideological
+          State Apparatus, Ideology, Interpellation, Repressive Factors Pages: 862-872
+          Article: 68 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)68 DOI
+          Link: http://doi.org/10.47205/jdss.2021(2-IV)68 Download Pdf: download pdf
+          view article Creative Commons License Blessing in Disguise: Recommendations
+          of Indian Education Commission (1882) and Christian Missionaries\u2019 Educational
+          Policy in the Colonial Punjab Authors: Mohammad Dilshad Mohabbat Muhammad
+          Hassan Muhammad Ayaz Rafi Abstract: Woods Education Despatch is considered
+          to be the Magna Carta of Indian Education. It controlled the Indian education
+          field till the establishment of Indian Education Commission, 1882. The Despatch
+          provided space to Christian missionaries by promising government\u2019s gradual
+          withdrawal from the education in favour of missionaries. It also facilitated
+          the missionaries by offering system of \u2018grants on aid\u2019 to the private
+          bodies. Consequently, the missionaries fancied to replace the government institutions
+          in the Punjab and initiated their efforts to increase the number of their
+          educational institutions. They tried to occupy the educational field by establishing
+          more and more educational institutions. But after the Recommendations of the
+          Indian Education Commission 1882, a change in their policy of numeric increase
+          of educational institutions is quite visible. With the turn of the century,
+          they are found to be eager to establish a few institutions with good quality
+          of education. This paper intends to analyse different factors behind the change
+          of their policy of quantitative dominance to qualitative improvement. It also
+          attempts to evaluate how their change of policy worked and what steps were
+          taken to improve the quality of their educational institutions. Following
+          the historical method qualitative data comprising educational reports, missionaries\u2019
+          autobiographies, Reports of missionaries\u2019 conferences, and the other
+          relevant primary and secondary sources has been collected from different repositories.
+          The analysis of the data suggests that the attitude of the administration
+          of the education department and the recommendations of Indian Education Commission
+          were the major driving forces behind the change of missionaries\u2019 educational
+          policy in the 20th century. The missionaries, after adopting the new policy,
+          worked on the quality of education in their institutions and became successful.
+          Keyswords: Christian Missionaries, Indian Education Commission, Missionary
+          Schools, Numeric Increase, Quality of Education. The Punjab, Woods Education
+          Despatch Pages: 873-887 Article: 69 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)69
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)69 Download Pdf: download
+          pdf view article Creative Commons License Basic Life Values of Prospective
+          Special Education Teachers Authors: Dr. Maria Sohaib Qureshi Dr. Syeda Samina
+          Tahira Dr. Muhammad Irfan Arif Abstract: Future teachers'' preconceived values
+          about how to live their lives and how that affects the lives of their students
+          were the focus of this study. Descriptive research was used by the researchers.
+          The study was carried out by using Morris''s Ways to Live Scale. Researchers
+          used this scale to study prospective special education teachers'' gender,
+          social status, personal relationships, aesthetics and mental approach using
+          purposive sampling method. Descriptive and inferential stats were used to
+          analyse the data collected from those who participated in the study on basic
+          life values of prospective teachers. Results indicated that being social and
+          sympathetic are the most important values among prospective special education
+          teachers. It was also found that male and female prospective special education
+          teachers living in urban and rural areas had no significant differences in
+          their basic life values. Keyswords: Special Education, Teacher, Values Pages:
+          888-896 Article: 70 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)70
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)70 Download Pdf: download
+          pdf view article Creative Commons License Perception of Dowry: Effects on
+          Women Rights in Punjab Authors: Dr. Bushra Yasmeen Dr. Muhammad Ramzan Dr.
+          Asma Seemi Malik Abstract: Dowry is a common tradition in south Asian countries,
+          especially in Pakistan and India. Daughters became curses and liability for
+          parents causing serious consequences. For control, there are legal ban/restrictions
+          (Dowry and Wedding Gifts (Restriction) Act, 1976; Amendment in Act, 1993)
+          on its practice in Pakistan. Despite the legal cover, the custom has been
+          extended. Dowry amount seems to be increasing due to changing lifestyle and
+          trends of society. To understand males\u2019 and females\u2019 perceptions
+          about dowry; impacts of dowry; why dowry is essential; and how it is affecting
+          women\u2019s rights and eventually affecting women\u2019s autonomy. A qualitative
+          study was conducted. Data was collected by using unstructured interviews from
+          males and females including social activists, economists, and married couples
+          about wedding expenses, demands, society pressure, men\u2019s support, and
+          perception against dowry especially with regards to women\u2019s rights and
+          autonomy. The study concluded heavy dowry especially in terms of furniture,
+          electronics, kitchenware, car, furnished houses, and cash highly associated
+          with women\u2019s development and their rights. General people\u2019s perception
+          showed that dowry is no longer remained a custom or tradition in Asian countries.
+          It is just a trend and people follow it as a symbol of respect for parents
+          and women as well. Keyswords: Dowry, Effects, Impacts Of Dowry, Perceptions,
+          Women Autonomy, Women Rights Pages: 897-909 Article: 71 , Volume 2 , Issue
+          4 DOI Number: 10.47205/jdss.2021(2-IV)71 DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)71
+          Download Pdf: download pdf view article Creative Commons License NCOC-An Emblem
+          of Effective Governance: An analysis of Pakistan\u2019s Counter Strategy for
+          Covid-19 as a Non-Traditional Security Challenge Authors: Dr. Iram Khalid
+          Abstract: COVID -19 affected the world unprecedentedly. Lack of capacity and
+          poor standards of governance caused nontraditional security challenges to
+          Pakistan too. The NCOC is the central nerve center to guide the national response
+          to COVID-19 by Pakistan and can be best analyzed in the light of the decision-making
+          theory of Naturalist Decision Making (NDM). The study points out the effective
+          role performed by NCOC at policy formation through a more prosaic combination
+          of science, data, decision making and execution of decisions at the level
+          of federalism. The study highlights the changing patterns of government\u2019s
+          approach during the pandemic at various levels. Pakistan faced economic, political
+          and social crisis during this phase. This study uses a survey and key informant
+          interviews as the source of analysis for qualitative data collection. By applying
+          the decision- making theory, the paper extends that there is a need to use
+          a model to balance the existing gap within the system, to meet challenges.
+          The study suggests a coordinating approach among various units and center;
+          that might raise the level of performance to meet the nontraditional security
+          challenges with innovation, creativity and boldness. Keyswords: COVID-19,
+          Decision Making Theory, Governance, Nontraditional Threats, Strategy Pages:
+          910-930 Article: 72 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)72
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)72 Download Pdf: download
+          pdf view article Creative Commons License Comparative Implications of Wednesbury
+          Principle in England and Pakistan Authors: Safarat Ahmad Ali Shah Dr. Sara
+          Qayum Arzoo Farhad Abstract: Wednesbury principle is one of the most important
+          and useful grounds of the Judicial Review. Judicial review is a remedy provided
+          by the public law and is exercised by the superior and higher courts to supervise
+          administrative authorities'' powers and functions. The main objective of the
+          judicial review is to ensure the fair and transparent treatment of individuals
+          by public authorities. The ground of the judicial review, i.e., Unreasonableness
+          or irrationality or popularly known as Wednesbury Unreasonableness was introduced
+          by lord Greene in the Wednesbury Corporation case in 1948. Initially, the
+          scope of this ground of judicial review was very narrow and was allowed only
+          in rare cases. However, with the development of administrative law and Human
+          rights, it also developed. Its development resulted in different controversies
+          and issues about the application of this ground. The main issue is about its
+          encroachment in the jurisdiction of other branches of the government i.e.,
+          the parliament and executive. The free and loose application of this principle
+          results in confusion and conflict between different organs of the government.
+          The present paper is based on the implications of the limitations on the ground
+          of Wednesbury Unreasonableness both on the judicial and administrative bodies
+          in Pakistan to avoid the chaos and confusion that results in the criticisms
+          on this ground of judicial review. Keyswords: Administrative Authorities,
+          Critical Analysis, Illegality, Judicial Review, Pakistan, Wednesbury Unreasonableness
+          Pages: 931-946 Article: 73 , Volume 2 , Issue 4 DOI Number: 10.47205/jdss.2021(2-IV)73
+          DOI Link: http://doi.org/10.47205/jdss.2021(2-IV)73 Download Pdf: download
+          pdf view article Creative Commons License Water Sharing Issues in Pakistan:
+          Impacts on Inter-Provincial Relations","updated":"2022-09-19T20:05:00.111001","year":2021,"z_authors":null},"score":8.0090365e-07,"snippet":"(2021)
+          Volume 2, Issue 4 Cultural Implications of China Pakistan Economic Corridor
+          (CPEC Authors: Dr"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "39585"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490461&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=j0vwwBQJBKSjl7xJkMYB4ksAyr6H3jKPUYltKx2FaWA%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1725490461&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=j0vwwBQJBKSjl7xJkMYB4ksAyr6H3jKPUYltKx2FaWA%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
+          "title": "Augmenting large language models with chemistry tools", "venue":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 191, "influentialCitationCount":
+          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
+          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
+          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
+          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
+          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
+          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
+          {Augmenting large language models with chemistry tools},\n volume = {6},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
+          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
+          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
+          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
+          "name": "P. Schwaller"}], "matchScore": 179.3787}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1550"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Via:
+          - 1.1 62c71b579b931f194fbc7abcc843d132.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - VwbnXhY_A5M45lRneO76qNYDmL4RnBGAb0pjfkEcjJruMewyZUvaQQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmi8sEt4vHcEvHw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1550"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 797ca22d-1ce8-48ae-b214-3271d15e4a9e
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{M_Bran_2024, title={Augmenting large language models with
+          chemistry tools}, volume={6}, ISSN={2522-5839}, url={http://dx.doi.org/10.1038/s42256-024-00832-8},
+          DOI={10.1038/s42256-024-00832-8}, number={5}, journal={Nature Machine Intelligence},
+          publisher={Springer Science and Business Media LLC}, author={M. Bran, Andres
+          and Cox, Sam and Schilter, Oliver and Baldassari, Carlo and White, Andrew
+          D. and Schwaller, Philippe}, year={2024}, month=may, pages={525\u2013535}
+          }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

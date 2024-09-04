@@ -1,0 +1,96 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
+          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
+          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
+          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
+          "P. Schwaller"}], "matchScore": 179.37169}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "684"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:22 GMT
+        Via:
+          - 1.1 83a6f42adff040301dd9cde8ff611a9c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 1HN8mFjZPofmpyQ4fF_EGLWbgMXI7pT_W-VdVy9L7YyN9jsJFSRazA==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmip8FZFPHcEKGw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "684"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:22 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - ed4aabca-2c6a-4740-9643-85222d4e3d55
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Wed, 04 Sep 2024 22:52:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+version: 1

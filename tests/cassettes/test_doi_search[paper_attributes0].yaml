@@ -1,0 +1,272 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.04.01.587366?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "7e5d4466c8b85f93775fe183e1a318a3e65ac8e4", "externalIds":
+          {"DOI": "10.1101/2024.04.01.587366", "CorpusId": 268890006}, "url": "https://www.semanticscholar.org/paper/7e5d4466c8b85f93775fe183e1a318a3e65ac8e4",
+          "title": "High-throughput screening of human genetic variants by pooled prime
+          editing", "venue": "bioRxiv", "year": 2024, "citationCount": 1, "influentialCitationCount":
+          0, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "status": "GREEN"}, "publicationTypes": null, "publicationDate": "2024-04-01",
+          "journal": {"name": "bioRxiv"}, "citationStyles": {"bibtex": "@Article{Herger2024HighthroughputSO,\n
+          author = {Michael Herger and Christina M. Kajba and Megan Buckley and Ana
+          Cunha and Molly Strom and Gregory M. Findlay},\n booktitle = {bioRxiv},\n
+          journal = {bioRxiv},\n title = {High-throughput screening of human genetic
+          variants by pooled prime editing},\n year = {2024}\n}\n"}, "authors": [{"authorId":
+          "2294884120", "name": "Michael Herger"}, {"authorId": "2163800172", "name":
+          "Christina M. Kajba"}, {"authorId": "2120283350", "name": "Megan Buckley"},
+          {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId": "2294881320",
+          "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory M. Findlay"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1325"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Via:
+          - 1.1 c3d007e42510cc2bd48d2a205774e488.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - I6tmEWVtUOXx8vgyBUlVQsGXL5_gZzTTOWmdPYOnc4TgsGLCVr1Ndg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmi82FjxPHcEaaA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1325"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - edeab9f8-504e-4ac9-b8fd-13af5e37ff5d
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366?mailto=test@example.com
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"institution":[{"name":"bioRxiv"}],"indexed":{"date-parts":[[2024,4,5]],"date-time":"2024-04-05T00:42:23Z","timestamp":1712277743507},"posted":{"date-parts":[[2024,4,1]]},"group-title":"Genomics","reference-count":50,"publisher":"Cold
+          Spring Harbor Laboratory","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"accepted":{"date-parts":[[2024,4,1]]},"abstract":"<jats:title>ABSTRACT<\/jats:title><jats:p>Understanding
+          the effects of rare genetic variants remains challenging, both in coding and
+          non-coding regions. While multiplexed assays of variant effect (MAVEs) have
+          enabled scalable functional assessment of variants, established MAVEs are
+          limited by either exogenous expression of variants or constraints of genome
+          editing. Here, we introduce a pooled prime editing (PE) platform in haploid
+          human cells to scalably assay variants in their endogenous context. We first
+          optimized delivery of variants to HAP1 cells, defining optimal pegRNA designs
+          and establishing a co-selection strategy for improved efficiency. We characterize
+          our platform in the context of negative selection by testing over 7,500 pegRNAs
+          targeting<jats:italic>SMARCB1<\/jats:italic>for editing activity and observing
+          depletion of highly active pegRNAs installing loss-of-function variants. We
+          next assess variants in<jats:italic>MLH1<\/jats:italic>via 6-thioguanine selection,
+          assaying 65.3% of all possible SNVs in a 200-bp region spanning exon 10 and
+          distinguishing LoF variants with high accuracy. Lastly, we assay 362 non-coding<jats:italic>MLH1<\/jats:italic>variants
+          across a 60 kb region in a single experiment, identifying pathogenic variants
+          acting via multiple mechanisms with high specificity. Our analyses detail
+          how filtering for highly active pegRNAs can facilitate both positive and negative
+          selection screens. Accordingly, our platform promises to enable highly scalable
+          functional assessment of human variants.<\/jats:p>","DOI":"10.1101\/2024.04.01.587366","type":"posted-content","created":{"date-parts":[[2024,4,2]],"date-time":"2024-04-02T02:05:17Z","timestamp":1712023517000},"source":"Crossref","is-referenced-by-count":0,"title":["High-throughput
+          screening of human genetic variants by pooled prime editing"],"prefix":"10.1101","author":[{"given":"Michael","family":"Herger","sequence":"first","affiliation":[]},{"given":"Christina
+          M.","family":"Kajba","sequence":"additional","affiliation":[]},{"given":"Megan","family":"Buckley","sequence":"additional","affiliation":[]},{"given":"Ana","family":"Cunha","sequence":"additional","affiliation":[]},{"given":"Molly","family":"Strom","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-7767-8608","authenticated-orcid":false,"given":"Gregory
+          M.","family":"Findlay","sequence":"additional","affiliation":[]}],"member":"246","reference":[{"key":"2024040415500652000_2024.04.01.587366v1.1","doi-asserted-by":"publisher","DOI":"10.1038\/gim.2015.30"},{"key":"2024040415500652000_2024.04.01.587366v1.2","doi-asserted-by":"crossref","first-page":"116","DOI":"10.1016\/j.cels.2017.11.003","article-title":"Quantitative
+          Missense Variant Effect Prediction Using Large-Scale Mutagenesis Data","volume":"6","year":"2018","journal-title":"Cell
+          Syst"},{"key":"2024040415500652000_2024.04.01.587366v1.3","doi-asserted-by":"publisher","DOI":"10.1126\/science.abi8207"},{"key":"2024040415500652000_2024.04.01.587366v1.4","doi-asserted-by":"publisher","DOI":"10.1016\/J.CELL.2018.12.015"},{"key":"2024040415500652000_2024.04.01.587366v1.5","doi-asserted-by":"crossref","first-page":"eabn8153","DOI":"10.1126\/science.abn8197","article-title":"The
+          landscape of tolerated genetic variation in humans and primates","volume":"380","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.6","doi-asserted-by":"crossref","first-page":"eadg7492","DOI":"10.1126\/science.adg7492","article-title":"Accurate
+          proteome-wide missense variant effect prediction with AlphaMissense","volume":"381","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.7","doi-asserted-by":"publisher","DOI":"10.1093\/nar\/gkv1222"},{"key":"2024040415500652000_2024.04.01.587366v1.8","doi-asserted-by":"crossref","first-page":"1381","DOI":"10.1038\/s41436-021-01172-3","article-title":"ACMG
+          SF v3.0 list for reporting of secondary findings in clinical exome and genome
+          sequencing: a policy statement of the American College of Medical Genetics
+          and Genomics (ACMG)","volume":"23","year":"2021","journal-title":"Genet. Med"},{"key":"2024040415500652000_2024.04.01.587366v1.9","doi-asserted-by":"publisher","DOI":"10.1038\/nprot.2016.135"},{"key":"2024040415500652000_2024.04.01.587366v1.10","doi-asserted-by":"publisher","DOI":"10.1093\/hmg\/ddab219"},{"key":"2024040415500652000_2024.04.01.587366v1.11","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-11526-w"},{"key":"2024040415500652000_2024.04.01.587366v1.12","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-022-02839-z"},{"key":"2024040415500652000_2024.04.01.587366v1.13","doi-asserted-by":"crossref","first-page":"2248","DOI":"10.1016\/j.ajhg.2021.11.001","article-title":"Closing
+          the gap: Systematic integration of multiplexed functional data resolves variants
+          of uncertain significance in BRCA1, TP53, and PTEN","volume":"108","year":"2021","journal-title":"Am.
+          J. Hum. Genet."},{"key":"2024040415500652000_2024.04.01.587366v1.14","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-018-0461-z"},{"key":"2024040415500652000_2024.04.01.587366v1.15","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.10.015"},{"key":"2024040415500652000_2024.04.01.587366v1.16","doi-asserted-by":"crossref","first-page":"7702","DOI":"10.1038\/s41467-023-43041-4","article-title":"Saturation
+          genome editing of DDX3X clarifies pathogenicity of germline and somatic variation","volume":"14","year":"2023","journal-title":"Nat.
+          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.17","doi-asserted-by":"publisher","DOI":"10.1038\/nature13695"},{"key":"2024040415500652000_2024.04.01.587366v1.18","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.012"},{"key":"2024040415500652000_2024.04.01.587366v1.19","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.041"},{"key":"2024040415500652000_2024.04.01.587366v1.20","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-019-1711-4"},{"key":"2024040415500652000_2024.04.01.587366v1.21","doi-asserted-by":"crossref","first-page":"288","DOI":"10.1016\/j.ccell.2022.12.009","article-title":"Base
+          editing screens map mutations affecting interferon-\u03b3 signaling in cancer","volume":"41","year":"2023","journal-title":"Cancer
+          Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.22","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.09.018"},{"key":"2024040415500652000_2024.04.01.587366v1.23","doi-asserted-by":"crossref","first-page":"402","DOI":"10.1038\/s41587-021-01039-7","article-title":"Engineered
+          pegRNAs improve prime editing efficiency","volume":"40","year":"2022","journal-title":"Nat.
+          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.24","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01201-1"},{"key":"2024040415500652000_2024.04.01.587366v1.25","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2023.11.021"},{"key":"2024040415500652000_2024.04.01.587366v1.26","doi-asserted-by":"publisher","DOI":"10.1038\/nature10348"},{"key":"2024040415500652000_2024.04.01.587366v1.27","doi-asserted-by":"publisher","DOI":"10.1126\/science.1247005"},{"key":"2024040415500652000_2024.04.01.587366v1.28","doi-asserted-by":"crossref","first-page":"1151","DOI":"10.1038\/s41587-022-01613-7","article-title":"Predicting
+          prime editing efficiency and product purity by deep learning","volume":"41","year":"2023","journal-title":"Nat.
+          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.29","doi-asserted-by":"crossref","first-page":"2256","DOI":"10.1016\/j.cell.2023.03.034","article-title":"Prediction
+          of efficiencies for diverse prime editing systems in multiple cell types","volume":"186","year":"2023","journal-title":"Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.30","doi-asserted-by":"publisher","DOI":"10.1101\/2022.10.26.513842"},{"key":"2024040415500652000_2024.04.01.587366v1.31","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01172-3"},{"key":"2024040415500652000_2024.04.01.587366v1.32","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-020-0677-y"},{"key":"2024040415500652000_2024.04.01.587366v1.33","doi-asserted-by":"publisher","DOI":"10.1016\/j.tibtech.2018.07.017"},{"key":"2024040415500652000_2024.04.01.587366v1.34","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-020-20810-z"},{"key":"2024040415500652000_2024.04.01.587366v1.35","doi-asserted-by":"crossref","first-page":"5909","DOI":"10.1038\/s41467-022-33669-z","article-title":"Marker-free
+          co-selection for successive rounds of prime editing in human cells","volume":"13","year":"2022","journal-title":"Nat.
+          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.36","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2013.12.001"},{"key":"2024040415500652000_2024.04.01.587366v1.37","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-018-02974-x"},{"key":"2024040415500652000_2024.04.01.587366v1.38","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-27838-9"},{"key":"2024040415500652000_2024.04.01.587366v1.39","doi-asserted-by":"publisher","DOI":"10.1126\/science.1225829"},{"key":"2024040415500652000_2024.04.01.587366v1.40","doi-asserted-by":"publisher","DOI":"10.3390\/cancers14153645"},{"key":"2024040415500652000_2024.04.01.587366v1.41","doi-asserted-by":"publisher","DOI":"10.1126\/science.aac7557"},{"key":"2024040415500652000_2024.04.01.587366v1.42","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-10849-y"},{"key":"2024040415500652000_2024.04.01.587366v1.43","doi-asserted-by":"publisher","DOI":"10.1038\/nbt.3437"},{"key":"2024040415500652000_2024.04.01.587366v1.44","doi-asserted-by":"publisher","DOI":"10.1136\/jmg.2007.056499"},{"key":"2024040415500652000_2024.04.01.587366v1.45","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.12.003"},{"key":"2024040415500652000_2024.04.01.587366v1.46","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-019-0032-3"},{"key":"2024040415500652000_2024.04.01.587366v1.47","doi-asserted-by":"publisher","DOI":"10.1038\/nmeth.3047"},{"key":"2024040415500652000_2024.04.01.587366v1.48","doi-asserted-by":"crossref","first-page":"96","DOI":"10.1089\/hgtb.2017.198","article-title":"Determination
+          of Lentiviral Infectious Titer by a Novel Droplet Digital PCR Method","volume":"29","year":"2018","journal-title":"Hum.
+          Gene Ther. Methods"},{"key":"2024040415500652000_2024.04.01.587366v1.49","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-020-02091-3"},{"key":"2024040415500652000_2024.04.01.587366v1.50","doi-asserted-by":"publisher","DOI":"10.1186\/s13073-021-00835-9"}],"container-title":[],"original-title":[],"link":[{"URL":"https:\/\/syndication.highwire.org\/content\/doi\/10.1101\/2024.04.01.587366","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,4,4]],"date-time":"2024-04-04T22:50:19Z","timestamp":1712271019000},"score":1,"resource":{"primary":{"URL":"http:\/\/biorxiv.org\/lookup\/doi\/10.1101\/2024.04.01.587366"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2024,4,1]]},"references-count":50,"URL":"http:\/\/dx.doi.org\/10.1101\/2024.04.01.587366","relation":{},"subject":[],"published":{"date-parts":[[2024,4,1]]},"subtype":"preprint"}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "3214"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1101/2024.04.01.587366?email=test@example.com
+    response:
+      body:
+        string:
+          '{"doi": "10.1101/2024.04.01.587366", "doi_url": "https://doi.org/10.1101/2024.04.01.587366",
+          "title": "High-throughput screening of human genetic variants by pooled prime
+          editing", "genre": "posted-content", "is_paratext": false, "published_date":
+          "2024-04-01", "year": 2024, "journal_name": null, "journal_issns": null, "journal_issn_l":
+          null, "journal_is_oa": false, "journal_is_in_doaj": false, "publisher": "Cold
+          Spring Harbor Laboratory", "is_oa": true, "oa_status": "green", "has_repository_copy":
+          true, "best_oa_location": {"updated": "2024-04-03T02:38:26.107690", "url":
+          "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_pdf": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_landing_page": "https://doi.org/10.1101/2024.04.01.587366", "evidence":
+          "oa repository (via page says license)", "license": "cc-by", "version": "submittedVersion",
+          "host_type": "repository", "is_best": true, "pmh_id": null, "endpoint_id":
+          null, "repository_institution": null, "oa_date": "2024-04-01"}, "first_oa_location":
+          {"updated": "2024-04-03T02:38:26.107690", "url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_pdf": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_landing_page": "https://doi.org/10.1101/2024.04.01.587366", "evidence":
+          "oa repository (via page says license)", "license": "cc-by", "version": "submittedVersion",
+          "host_type": "repository", "is_best": true, "pmh_id": null, "endpoint_id":
+          null, "repository_institution": null, "oa_date": "2024-04-01"}, "oa_locations":
+          [{"updated": "2024-04-03T02:38:26.107690", "url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_pdf": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "url_for_landing_page": "https://doi.org/10.1101/2024.04.01.587366", "evidence":
+          "oa repository (via page says license)", "license": "cc-by", "version": "submittedVersion",
+          "host_type": "repository", "is_best": true, "pmh_id": null, "endpoint_id":
+          null, "repository_institution": null, "oa_date": "2024-04-01"}], "oa_locations_embargoed":
+          [], "updated": "2024-04-03T02:38:52.695109", "data_standard": 2, "z_authors":
+          [{"given": "Michael", "family": "Herger", "sequence": "first"}, {"given":
+          "Christina M.", "family": "Kajba", "sequence": "additional"}, {"given": "Megan",
+          "family": "Buckley", "sequence": "additional"}, {"given": "Ana", "family":
+          "Cunha", "sequence": "additional"}, {"given": "Molly", "family": "Strom",
+          "sequence": "additional"}, {"ORCID": "http://orcid.org/0000-0002-7767-8608",
+          "given": "Gregory M.", "family": "Findlay", "sequence": "additional", "authenticated-orcid":
+          false}]}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "736"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:22 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490462&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=odE5ZlVPcetyhAsFl%2FsK%2BfqBlOzg14I8aiMcemLe%2FTM%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1725490462&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=odE5ZlVPcetyhAsFl%2FsK%2BfqBlOzg14I8aiMcemLe%2FTM%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Herger_2024, title={High-throughput screening of human genetic
+          variants by pooled prime editing}, url={http://dx.doi.org/10.1101/2024.04.01.587366},
+          DOI={10.1101/2024.04.01.587366}, publisher={Cold Spring Harbor Laboratory},
+          author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and Cunha,
+          Ana and Strom, Molly and Findlay, Gregory M.}, year={2024}, month=apr }
+
+          "
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Wed, 04 Sep 2024 22:54:23 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -1,0 +1,333 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=askldjrq3rjaw938h&rows=1
+    response:
+      body:
+        string: '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":0,"items":[],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:18 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=askldjrq3rjaw938h&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string: '{"error":"Title match not found"}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "34"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:18 GMT
+        Via:
+          - 1.1 d12f243c0eac340525d6f4e735c01b64.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 3DWgEuMADlSeiLMhufObr-vygiJPeAWhCoFVgOUvmVrEwbLPbilLAQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Error from cloudfront
+        x-amz-apigw-id:
+          - dmipYEcqvHcEfEw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "34"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:18 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 41badda1-f747-4d97-bf9a-198de87c5eca
+      status:
+        code: 404
+        message: Not Found
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
+          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
+          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
+          "title": "Effect of native oxide layers on copper thin-film tensile properties:
+          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
+          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
+          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
+          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
+          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
+          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
+          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
+          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
+          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
+          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
+          208.01811}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1109"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:19 GMT
+        Via:
+          - 1.1 d12f243c0eac340525d6f4e735c01b64.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 7POquAziX-3ilWrhAo6vJ7PubfSasYLaHfgIUsEfVoP5qSdVsBj6SQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipeH_lvHcETFA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1109"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:19 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 992527e5-3812-4041-81c2-aeb61d4d6980
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&rows=1
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10323850,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
+          Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
+          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
+          layers are likely to be present on metallic nano-structures due to either
+          environmental exposure during use, or high temperature processing techniques
+          such as annealing. It is well known that nano-structured metals have vastly
+          different mechanical properties from bulk metals; however, difficulties in
+          modeling the transition between metallic and ionic bonding have prevented
+          the computational investigation of the effects of oxide surface layers. Newly
+          developed charge-optimized many body [Liang et al., Mater. Sci. Eng., R 74,
+          255 (2013)] potentials are used to perform fully reactive molecular dynamics
+          simulations which elucidate the effects that metal-oxide layers have on the
+          mechanical properties of a copper thin-film. Simulated tensile tests are performed
+          on thin-films while using different strain-rates, temperatures, and oxide
+          thicknesses to evaluate changes in yield stress, modulus, and failure mechanisms.
+          Findings indicate that copper-thin film mechanical properties are strongly
+          affected by native oxide layers. The formed oxide layers have an amorphous
+          structure with lower Cu-O bond-densities than bulk CuO, and a mixture of Cu2O
+          and CuO charge character. It is found that oxidation will cause modifications
+          to the strain response of the elastic modulii, producing a stiffened modulii
+          at low temperatures (&amp;lt;75\u2009K) and low strain values (&amp;lt;5%),
+          and a softened modulii at higher temperatures. While under strain, structural
+          reorganization within the oxide layers facilitates brittle yielding through
+          nucleation of defects across the oxide\/metal interface. The oxide-free copper
+          thin-film yielding mechanism is found to be a tensile-axis reorientation and
+          grain creation. The oxide layers change the observed yielding mechanism, allowing
+          for the inner copper thin-film to sustain an FCC-to-BCC transition during
+          yielding. The mechanical properties are fit to a thermodynamic model based
+          on classical nucleation theory. The fit implies that the oxidation of the
+          films reduces the activation volume for yielding.<\/jats:p>","DOI":"10.1063\/1.4938384","type":"journal-article","created":{"date-parts":[[2015,12,22]],"date-time":"2015-12-22T00:59:18Z","timestamp":1450745958000},"update-policy":"http:\/\/dx.doi.org\/10.1063\/aip-crossmark-policy-page","source":"Crossref","is-referenced-by-count":8,"title":["Effect
+          of native oxide layers on copper thin-film tensile properties: A reactive
+          molecular dynamics study"],"prefix":"10.1063","volume":"118","author":[{"given":"Michael
+          D.","family":"Skarlinski","sequence":"first","affiliation":[{"name":"University
+          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"}]},{"given":"David
+          J.","family":"Quesnel","sequence":"additional","affiliation":[{"name":"University
+          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"},{"name":"University
+          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
+          14627, USA"}]}],"member":"317","published-online":{"date-parts":[[2015,12,21]]},"reference":[{"key":"2023062402360541600_c1","doi-asserted-by":"publisher","first-page":"10973","DOI":"10.1021\/nn504883m","volume":"8","year":"2014","journal-title":"ACS
+          Nano"},{"key":"2023062402360541600_c2","volume-title":"Ultrathin Metal Transparent
+          Electrodes for the Optoelectronics Industry","year":"2013"},{"key":"2023062402360541600_c3","doi-asserted-by":"publisher","first-page":"2224","DOI":"10.1039\/b718768h","volume":"37","year":"2008","journal-title":"Chem.
+          Soc. Rev."},{"key":"2023062402360541600_c4","doi-asserted-by":"publisher","first-page":"3011","DOI":"10.1002\/adma.200501767","volume":"17","year":"2005","journal-title":"Adv.
+          Mater."},{"key":"2023062402360541600_c5","doi-asserted-by":"publisher","first-page":"4816","DOI":"10.1016\/j.actamat.2008.05.044","volume":"56","year":"2008","journal-title":"Acta
+          Mater."},{"key":"2023062402360541600_c6","doi-asserted-by":"publisher","first-page":"76","DOI":"10.1016\/j.commatsci.2014.02.014","volume":"87","year":"2014","journal-title":"Comput.
+          Mater. Sci."},{"key":"2023062402360541600_c7","doi-asserted-by":"publisher","first-page":"3032","DOI":"10.1016\/j.commatsci.2011.05.023","volume":"50","year":"2011","journal-title":"Comput.
+          Mater. Sci."},{"key":"2023062402360541600_c8","doi-asserted-by":"publisher","first-page":"319","DOI":"10.1016\/j.commatsci.2010.08.021","volume":"50","year":"2010","journal-title":"Comput.
+          Mater. Sci."},{"key":"2023062402360541600_c9","doi-asserted-by":"publisher","first-page":"140","DOI":"10.1016\/j.commatsci.2012.08.044","volume":"67","year":"2013","journal-title":"Comput.
+          Mater. Sci."},{"key":"2023062402360541600_c10","doi-asserted-by":"publisher","first-page":"093515","DOI":"10.1063\/1.3120916","volume":"105","year":"2009","journal-title":"J.
+          Appl. Phys."},{"key":"2023062402360541600_c11","doi-asserted-by":"publisher","first-page":"3151","DOI":"10.1021\/nl201233u","volume":"11","year":"2011","journal-title":"Nano
+          Lett."},{"key":"2023062402360541600_c12","doi-asserted-by":"publisher","first-page":"3048","DOI":"10.1021\/nl9015107","volume":"9","year":"2009","journal-title":"Nano
+          Lett."},{"key":"2023062402360541600_c13","doi-asserted-by":"publisher","first-page":"2318","DOI":"10.1016\/j.actamat.2008.01.027","volume":"56","year":"2008","journal-title":"Acta
+          Mater."},{"key":"2023062402360541600_c14","doi-asserted-by":"publisher","first-page":"241403","DOI":"10.1103\/PhysRevB.71.241403","volume":"71","year":"2005","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c15","doi-asserted-by":"publisher","first-page":"195429","DOI":"10.1103\/PhysRevB.77.195429","volume":"77","year":"2008","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c16","doi-asserted-by":"publisher","first-page":"3277","DOI":"10.1039\/c2jm13682a","volume":"22","year":"2012","journal-title":"J.
+          Mater. Chem."},{"key":"2023062402360541600_c17","doi-asserted-by":"publisher","first-page":"075413","DOI":"10.1103\/PhysRevB.70.075413","volume":"70","year":"2004","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c18","doi-asserted-by":"publisher","first-page":"163112","DOI":"10.1063\/1.2723654","volume":"90","year":"2007","journal-title":"Appl.
+          Phys. Lett."},{"key":"2023062402360541600_c19","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/ncomms1149","volume":"1","year":"2010","journal-title":"Nat.
+          Commun."},{"key":"2023062402360541600_c20","doi-asserted-by":"publisher","first-page":"085408","DOI":"10.1103\/PhysRevB.75.085408","volume":"75","year":"2007","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c21","doi-asserted-by":"publisher","first-page":"025502","DOI":"10.1103\/PhysRevLett.100.025502","volume":"100","year":"2008","journal-title":"Phys.
+          Rev. Lett."},{"key":"2023062402360541600_c22","doi-asserted-by":"publisher","first-page":"33","DOI":"10.1016\/j.ijplas.2013.04.002","volume":"52","year":"2014","journal-title":"Int.
+          J. Plast."},{"key":"2023062402360541600_c23","doi-asserted-by":"publisher","first-page":"035020","DOI":"10.1088\/2053-1591\/1\/3\/035020","volume":"1","year":"2014","journal-title":"Mater.
+          Res. Express"},{"key":"2023062402360541600_c24","doi-asserted-by":"publisher","first-page":"670","DOI":"10.1016\/j.jcrysgro.2005.11.111","volume":"289","year":"2006","journal-title":"J.
+          Cryst. Growth"},{"key":"2023062402360541600_c25","doi-asserted-by":"publisher","first-page":"62","DOI":"10.1016\/j.cplett.2004.10.005","volume":"399","year":"2004","journal-title":"Chem.
+          Phys. Lett."},{"key":"2023062402360541600_c26","doi-asserted-by":"publisher","first-page":"4040","DOI":"10.1016\/j.tsf.2007.12.159","volume":"516","year":"2008","journal-title":"Thin
+          Solid Films"},{"key":"2023062402360541600_c27","doi-asserted-by":"publisher","first-page":"085311","DOI":"10.1103\/PhysRevB.75.085311","volume":"75","year":"2007","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c28","doi-asserted-by":"publisher","first-page":"11996","DOI":"10.1103\/PhysRevB.50.11996","volume":"50","year":"1994","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c29","doi-asserted-by":"publisher","first-page":"4866","DOI":"10.1103\/PhysRevLett.82.4866","volume":"82","year":"1999","journal-title":"Phys.
+          Rev. Lett."},{"key":"2023062402360541600_c30","doi-asserted-by":"publisher","first-page":"9396","DOI":"10.1021\/jp004368u","volume":"105","year":"2001","journal-title":"J.
+          Phys. Chem. A."},{"key":"2023062402360541600_c31","doi-asserted-by":"publisher","first-page":"195408","DOI":"10.1103\/PhysRevB.78.195408","volume":"78","year":"2008","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c32","doi-asserted-by":"publisher","first-page":"123517","DOI":"10.1063\/1.2938022","volume":"103","year":"2008","journal-title":"J.
+          Appl. Phys."},{"key":"2023062402360541600_c33","doi-asserted-by":"publisher","first-page":"4073","DOI":"10.1080\/14786435.2011.598881","volume":"91","year":"2011","journal-title":"Philos.
+          Mag."},{"key":"2023062402360541600_c34","doi-asserted-by":"publisher","first-page":"051912","DOI":"10.1063\/1.4790181","volume":"102","year":"2013","journal-title":"Appl.
+          Phys. Lett."},{"key":"2023062402360541600_c35","doi-asserted-by":"publisher","first-page":"3959","DOI":"10.1038\/ncomms4959","volume":"5","year":"2014","journal-title":"Nat.
+          Commun."},{"key":"2023062402360541600_c36","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1006\/jcph.1995.1039","volume":"117","year":"1995","journal-title":"J.
+          Comput. Phys."},{"key":"2023062402360541600_c37","doi-asserted-by":"publisher","first-page":"125308","DOI":"10.1103\/PhysRevB.84.125308","volume":"84","year":"2011","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c38","doi-asserted-by":"publisher","first-page":"255","DOI":"10.1016\/j.mser.2013.07.001","volume":"74","year":"2013","journal-title":"Mater.
+          Sci. Eng., R"},{"key":"2023062402360541600_c39","doi-asserted-by":"publisher","first-page":"6141","DOI":"10.1063\/1.468398","volume":"101","year":"1994","journal-title":"J.
+          Chem. Phys."},{"key":"2023062402360541600_c40","doi-asserted-by":"publisher","first-page":"98","DOI":"10.1103\/PhysRev.159.98","volume":"159","year":"1967","journal-title":"Phys.
+          Rev."},{"key":"2023062402360541600_c41","doi-asserted-by":"publisher","first-page":"109","DOI":"10.1146\/annurev-matsci-071312-121610","volume":"43","year":"2013","journal-title":"Annu.
+          Rev. Mater. Res."},{"key":"2023062402360541600_c42","doi-asserted-by":"publisher","first-page":"4177","DOI":"10.1063\/1.467468","volume":"101","year":"1994","journal-title":"J.
+          Chem. Phys."},{"key":"2023062402360541600_c43","first-page":"35","volume":"3","year":"1969","journal-title":"ESAIM-Math.
+          Model. Num."},{"key":"2023062402360541600_c44","doi-asserted-by":"publisher","first-page":"11085","DOI":"10.1103\/PhysRevB.58.11085","volume":"58","year":"1998","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c45","doi-asserted-by":"publisher","first-page":"045021","DOI":"10.1088\/0965-0393\/20\/4\/045021","volume":"20","year":"2012","journal-title":"Modell.
+          Simul. Mater. Sci. Eng."},{"key":"2023062402360541600_c46","doi-asserted-by":"publisher","first-page":"015012","DOI":"10.1088\/0965-0393\/18\/1\/015012","volume":"18","year":"2010","journal-title":"Modell.
+          Simul. Mater. Sci. Eng."},{"key":"2023062402360541600_c47","doi-asserted-by":"publisher","first-page":"605","DOI":"10.1007\/s11669-005-0005-8","volume":"26","year":"2005","journal-title":"J.
+          Phase Equilib. Diffus."},{"key":"2023062402360541600_c48","doi-asserted-by":"publisher","first-page":"386","DOI":"10.1016\/j.electacta.2015.03.221","volume":"179","year":"2015","journal-title":"Electrochim.
+          Acta"},{"key":"2023062402360541600_c49","doi-asserted-by":"publisher","first-page":"1876","DOI":"10.1016\/j.actamat.2007.12.043","volume":"56","year":"2008","journal-title":"Acta
+          Mater."},{"key":"2023062402360541600_c50","doi-asserted-by":"publisher","first-page":"2237","DOI":"10.1016\/S0020-7403(01)00043-1","volume":"43","year":"2001","journal-title":"Int.
+          J. Mech. Sci."},{"key":"2023062402360541600_c51","doi-asserted-by":"publisher","first-page":"1723","DOI":"10.1080\/14786430802206482","volume":"88","year":"2008","journal-title":"Philos.
+          Mag."},{"key":"2023062402360541600_c52","doi-asserted-by":"publisher","first-page":"224106","DOI":"10.1103\/PhysRevB.63.224106","volume":"63","year":"2001","journal-title":"Phys.
+          Rev. B"},{"key":"2023062402360541600_c53","doi-asserted-by":"publisher","first-page":"136","DOI":"10.1080\/09500830802684114","volume":"89","year":"2009","journal-title":"Philos.
+          Mag. Lett."},{"key":"2023062402360541600_c54","doi-asserted-by":"publisher","first-page":"238","DOI":"10.1016\/S0921-5093(02)00708-6","volume":"350","year":"2003","journal-title":"Mater.
+          Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
+          Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
+          Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.360317,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "3946"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:19 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1063%2F1.4938384/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Skarlinski_2015, title={Effect of native oxide layers on
+          copper thin-film tensile properties: A reactive molecular dynamics study},
+          volume={118}, ISSN={1089-7550}, url={http://dx.doi.org/10.1063/1.4938384},
+          DOI={10.1063/1.4938384}, number={23}, journal={Journal of Applied Physics},
+          publisher={AIP Publishing}, author={Skarlinski, Michael D. and Quesnel, David
+          J.}, year={2015}, month=dec }
+
+          "
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Wed, 04 Sep 2024 22:52:19 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

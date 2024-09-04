@@ -1,0 +1,234 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=test@example.com
+    response:
+      body:
+        string: '{"elapsed_seconds":0.018,"results":[]}
+
+          '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "39"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:20 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490460&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=HLxBN33rMeUOx491OpwKHBqFWhk%2F47Zh%2FMQMQA3ZIc0%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1725490460&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=HLxBN33rMeUOx491OpwKHBqFWhk%2F47Zh%2FMQMQA3ZIc0%3D
+        Server:
+          - gunicorn
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2016375,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
+          University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
+          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
+          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
+          Institutes of Health","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100000002","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
+          automate scientific claim verification using PubMed abstracts.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Materials
+          and Methods<\/jats:title>\n                  <jats:p>We developed CliVER,
+          an end-to-end scientific Claim VERification system that leverages retrieval-augmented
+          techniques to automatically retrieve relevant clinical trial abstracts, extract
+          pertinent sentences, and use the PICO framework to support or refute a scientific
+          claim. We also created an ensemble of three state-of-the-art deep learning
+          models to classify rationale of support, refute, and neutral. We then constructed
+          CoVERt, a new COVID VERification dataset comprising 15 PICO-encoded drug claims
+          accompanied by 96 manually selected and labeled clinical trial abstracts that
+          either support or refute each claim. We used CoVERt and SciFact (a public
+          scientific claim verification dataset) to assess CliVER\u2019s performance
+          in predicting labels. Finally, we compared CliVER to clinicians in the verification
+          of 19 claims from 6 disease domains, using 189\u00a0648 PubMed abstracts extracted
+          from January 2010 to October 2021.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Results<\/jats:title>\n                  <jats:p>In
+          the evaluation of label prediction accuracy on CoVERt, CliVER achieved a notable
+          F1 score of 0.92, highlighting the efficacy of the retrieval-augmented models.
+          The ensemble model outperforms each individual state-of-the-art model by an
+          absolute increase from 3% to 11% in the F1 score. Moreover, when compared
+          with four clinicians, CliVER achieved a precision of 79.0% for abstract retrieval,
+          67.4% for sentence selection, and 63.2% for label prediction, respectively.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Conclusion<\/jats:title>\n                  <jats:p>CliVER
+          demonstrates its early potential to automate scientific claim verification
+          using retrieval-augmented strategies to harness the wealth of clinical trial
+          abstracts in PubMed. Future studies are warranted to further test its clinical
+          utility.<\/jats:p>\n               <\/jats:sec>","DOI":"10.1093\/jamiaopen\/ooae021","type":"journal-article","created":{"date-parts":[[2024,2,22]],"date-time":"2024-02-22T01:48:17Z","timestamp":1708566497000},"source":"Crossref","is-referenced-by-count":0,"title":["Retrieval
+          augmented scientific claim verification"],"prefix":"10.1093","volume":"7","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-1975-1272","authenticated-orcid":false,"given":"Hao","family":"Liu","sequence":"first","affiliation":[{"name":"School
+          of Computing, Montclair State University , Montclair, NJ 07043, United States"}]},{"given":"Ali","family":"Soroush","sequence":"additional","affiliation":[{"name":"Department
+          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0003-1418-3103","authenticated-orcid":false,"given":"Jordan
+          G","family":"Nestor","sequence":"additional","affiliation":[{"name":"Department
+          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"given":"Elizabeth","family":"Park","sequence":"additional","affiliation":[{"name":"Department
+          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-4318-5987","authenticated-orcid":false,"given":"Betina","family":"Idnay","sequence":"additional","affiliation":[{"name":"Department
+          of Biomedical Informatics, Columbia University , New York, NY 10027, United
+          States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-2681-1931","authenticated-orcid":false,"given":"Yilu","family":"Fang","sequence":"additional","affiliation":[{"name":"Department
+          of Biomedical Informatics, Columbia University , New York, NY 10027, United
+          States"}]},{"given":"Jane","family":"Pan","sequence":"additional","affiliation":[{"name":"Department
+          of Applied Physics and Applied Mathematics, Columbia University , New York,
+          NY 10027, United States"}]},{"given":"Stan","family":"Liao","sequence":"additional","affiliation":[{"name":"Department
+          of Applied Physics and Applied Mathematics, Columbia University , New York,
+          NY 10027, United States"}]},{"given":"Marguerite","family":"Bernard","sequence":"additional","affiliation":[{"name":"Institute
+          of Human Nutrition, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0001-9309-8331","authenticated-orcid":false,"given":"Yifan","family":"Peng","sequence":"additional","affiliation":[{"name":"Department
+          of Population Health Sciences, Weill Cornell Medicine , New York, NY 10065,
+          United States"}]},{"given":"Chunhua","family":"Weng","sequence":"additional","affiliation":[{"name":"Department
+          of Biomedical Informatics, Columbia University , New York, NY 10027, United
+          States"}]}],"member":"286","published-online":{"date-parts":[[2024,2,21]]},"reference":[{"issue":"6","key":"2024030720490192400_ooae021-B1","doi-asserted-by":"crossref","first-page":"1192","DOI":"10.1093\/jamia\/ocx050","article-title":"Evidence
+          appraisal: a scoping review, conceptual framework, and research agenda","volume":"24","author":"Goldstein","year":"2017","journal-title":"J
+          Am Med Inform Assoc"},{"issue":"D1","key":"2024030720490192400_ooae021-B2","doi-asserted-by":"crossref","first-page":"D1534","DOI":"10.1093\/nar\/gkaa952","article-title":"LitCovid:
+          an open database of COVID-19 literature","volume":"49","author":"Chen","year":"2021","journal-title":"Nucleic
+          Acids Res"},{"key":"2024030720490192400_ooae021-B3","author":"Medicine NLo"},{"issue":"1","key":"2024030720490192400_ooae021-B4","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1038\/s41591-020-01203-7","article-title":"Automated
+          screening of COVID-19 preprints: can we help authors to improve transparency
+          and reproducibility?","volume":"27","author":"Weissgerber","year":"2021","journal-title":"Nat
+          Med"},{"issue":"2","key":"2024030720490192400_ooae021-B5","doi-asserted-by":"crossref","first-page":"218","DOI":"10.1001\/jama.294.2.218","article-title":"Contradicted
+          and initially stronger effects in highly cited clinical research","volume":"294","author":"Ioannidis","year":"2005","journal-title":"JAMA"},{"issue":"1","key":"2024030720490192400_ooae021-B6","doi-asserted-by":"crossref","first-page":"63","DOI":"10.1162\/coli.2007.33.1.63","article-title":"Answering
+          clinical questions with knowledge-based and statistical techniques","volume":"33","author":"Demner-Fushman","year":"2007","journal-title":"Comput
+          Linguist"},{"issue":"6","key":"2024030720490192400_ooae021-B7","doi-asserted-by":"crossref","first-page":"772","DOI":"10.1197\/jamia.M2407","article-title":"Knowledge-based
+          methods to help clinicians find answers in MEDLINE","volume":"14","author":"Sneiderman","year":"2007","journal-title":"J
+          Am Med Inform Assoc"},{"issue":"5","key":"2024030720490192400_ooae021-B8","doi-asserted-by":"crossref","first-page":"232","DOI":"10.1186\/cc5045","article-title":"Evidence-based
+          medicine: classifying the evidence from clinical trials\u2013the need to consider
+          other dimensions","volume":"10","author":"Bellomo","year":"2006","journal-title":"Crit
+          Care"},{"issue":"1","key":"2024030720490192400_ooae021-B9","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1002\/clc.4960220106","article-title":"The
+          importance of randomized clinical trials and evidence-based medicine: a clinician''s
+          perspective","volume":"22","author":"Kennedy","year":"1999","journal-title":"Clin
+          Cardiol"},{"key":"2024030720490192400_ooae021-B10","first-page":"493","author":"Hanselowski","year":"2019"},{"key":"2024030720490192400_ooae021-B11","first-page":"809","author":"Thorne","year":"2018"},{"key":"2024030720490192400_ooae021-B12","first-page":"7534","author":"Wadden","year":"2020"},{"key":"2024030720490192400_ooae021-B13","first-page":"94","author":"Pradeep","year":"2021"},{"key":"2024030720490192400_ooae021-B14","first-page":"5485","article-title":"Exploring
+          the limits of transfer learning with a unified text-to-text transformer","volume":"140","author":"Raffel","year":"2020","journal-title":"J.
+          Mach. Learn. Res"},{"key":"2024030720490192400_ooae021-B15","author":"Li","year":"2021"},{"key":"2024030720490192400_ooae021-B16","first-page":"61","author":"Wadden","year":"2022"},{"key":"2024030720490192400_ooae021-B17","author":"Beltagy","year":"2020"},{"issue":"7256","key":"2024030720490192400_ooae021-B18","doi-asserted-by":"crossref","first-page":"255","DOI":"10.1136\/bmj.321.7256.255","article-title":"Which
+          clinical studies provide the best evidence?: the best RCT still trumps the
+          best observational study","volume":"321","author":"Barton","year":"2000","journal-title":"BMJ"},{"key":"2024030720490192400_ooae021-B19","doi-asserted-by":"crossref","first-page":"103717","DOI":"10.1016\/j.jbi.2021.103717","article-title":"Toward
+          assessing clinical trial publications for reporting transparency","volume":"116","author":"Kilicoglu","year":"2021","journal-title":"J
+          Biomed Inform"},{"key":"2024030720490192400_ooae021-B20","first-page":"1253","author":"Yang","year":"2017"},{"key":"2024030720490192400_ooae021-B21","first-page":"39","author":"Khattab","year":"2020"},{"key":"2024030720490192400_ooae021-B22","first-page":"19","author":"Yilmaz","year":"2019"},{"key":"2024030720490192400_ooae021-B23","author":"Kuzi","year":"2020"},{"key":"2024030720490192400_ooae021-B24","volume-title":"The
+          Probabilistic Relevance Framework: BM25 and Beyond","author":"Robertson","year":"2009"},{"key":"2024030720490192400_ooae021-B25","first-page":"105","author":"Wang","year":"2011"},{"key":"2024030720490192400_ooae021-B26","first-page":"7740","author":"Kotonya","year":"2020"},{"issue":"1","key":"2024030720490192400_ooae021-B27","doi-asserted-by":"crossref","first-page":"36","DOI":"10.1186\/s13326-016-0083-z","article-title":"A
+          corpus of potentially contradictory research claims from cardiovascular research
+          abstracts","volume":"7","author":"Alamri","year":"2016","journal-title":"J
+          Biomed Semantics"},{"key":"2024030720490192400_ooae021-B28","first-page":"3499","author":"Sarrouti","year":"2021"},{"issue":"9","key":"2024030720490192400_ooae021-B29","doi-asserted-by":"crossref","first-page":"1431","DOI":"10.1093\/jamia\/ocaa091","article-title":"TREC-COVID:
+          rationale and structure of an information retrieval shared task for COVID-19","volume":"27","author":"Roberts","year":"2020","journal-title":"J
+          Am Med Inform Assoc"},{"key":"2024030720490192400_ooae021-B30","author":"Wang","year":"2020"},{"key":"2024030720490192400_ooae021-B31","first-page":"2116","author":"Saakyan","year":"2021"},{"key":"2024030720490192400_ooae021-B32","first-page":"359","author":"Huang","year":"2006"},{"key":"2024030720490192400_ooae021-B33","first-page":"708","author":"Nogueira","year":"2020"},{"key":"2024030720490192400_ooae021-B34","doi-asserted-by":"crossref","first-page":"baw065","DOI":"10.1093\/database\/baw065","article-title":"Mining
+          chemical patents with an ensemble of open systems","volume":"2016","author":"Leaman","year":"2016","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B35","doi-asserted-by":"crossref","first-page":"bay073","DOI":"10.1093\/database\/bay073","article-title":"Extracting
+          chemical\u2013protein relations with ensembles of SVM and deep learning models","volume":"2018","author":"Peng","year":"2018","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B36","author":"Liu","year":"2019"},{"issue":"1","key":"2024030720490192400_ooae021-B37","doi-asserted-by":"crossref","first-page":"1","DOI":"10.1145\/3458754","article-title":"Domain-specific
+          language model pretraining for biomedical natural language processing","volume":"3","author":"Gu","year":"2021","journal-title":"ACM
+          Trans Comput Healthc"},{"issue":"3","key":"2024030720490192400_ooae021-B38","doi-asserted-by":"crossref","first-page":"A12","DOI":"10.7326\/ACPJC-1995-123-3-A12","article-title":"The
+          well-built clinical question: a key to evidence-based decisions","volume":"123","author":"Richardson","year":"1995","journal-title":"ACP
+          J Club"},{"key":"2024030720490192400_ooae021-B39","first-page":"1971","author":"Lee","year":"2021"},{"key":"2024030720490192400_ooae021-B40","author":"Loshchilov","year":"2019"},{"key":"2024030720490192400_ooae021-B41","first-page":"13","author":"Kingma","year":"2015"},{"key":"2024030720490192400_ooae021-B42","first-page":"38","author":"Wolf","year":"2020"},{"key":"2024030720490192400_ooae021-B43","first-page":"2356","author":"Lin","year":"2021"},{"key":"2024030720490192400_ooae021-B44","first-page":"243","author":"J\u00e4rvelin","year":"2017"},{"issue":"4","key":"2024030720490192400_ooae021-B45","doi-asserted-by":"crossref","first-page":"422","DOI":"10.1145\/582415.582418","article-title":"Cumulated
+          gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
+          Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
+          Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
+          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":28.21724,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "4501"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:20 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
+          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
+          "venue": "arXiv.org", "year": 2023, "citationCount": 23, "influentialCitationCount":
+          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
+          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
+          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
+          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
+          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
+          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
+          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
+          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
+          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
+          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
+          "Andrew D. White"}], "matchScore": 245.32262}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1386"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:21 GMT
+        Via:
+          - 1.1 22dc875d744f932282ce89367c98a9de.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - wPdXFyJ6K74yqvcthCmUvijgxfYiphfPhTqPkAOi1NLDO3OTHvZfVQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmi8gHlpvHcEFBg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1386"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:54:21 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 3f4118a6-9ea7-482d-b995-b6732d7193e3
+      status:
+        code: 200
+        message: OK
+version: 1

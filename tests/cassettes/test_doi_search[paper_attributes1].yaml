@@ -1,0 +1,210 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
+          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
+          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
+          "title": "An essential role of active site arginine residue in iodide binding
+          and histidine residue in electron transfer for iodide oxidation by horseradish
+          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
+          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
+          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
+          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
+          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
+          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
+          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
+          of active site arginine residue in iodide binding and histidine residue in
+          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
+          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
+          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
+          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
+          Banerjee"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1446"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:23 GMT
+        Via:
+          - 1.1 9d47bedfe2d83b5ed14a7d02ea9ca902.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - PIxlQLXqDglOwKmu8opGS0LLEvatR2WfeqUMkLIgyZ2PgnWFLJbXOQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmi9BHbsPHcElCw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1446"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:54:23 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - e159dae5-b176-4415-a6a8-689d92cf88d4
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=test@example.com
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,1,21]],"date-time":"2024-01-21T17:53:48Z","timestamp":1705859628791},"reference-count":0,"publisher":"Springer
+          Science and Business Media LLC","issue":"1\/2","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2001]]},"DOI":"10.1023\/a:1007154515475","type":"journal-article","created":{"date-parts":[[2002,12,22]],"date-time":"2002-12-22T09:07:15Z","timestamp":1040548035000},"page":"1-11","source":"Crossref","is-referenced-by-count":6,"title":[],"prefix":"10.1007","volume":"218","author":[{"given":"Subrata","family":"Adak","sequence":"first","affiliation":[]},{"given":"Debashis","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Uday","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Ranajit
+          K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"297","container-title":["Molecular
+          and Cellular Biochemistry"],"original-title":[],"deposited":{"date-parts":[[2012,12,27]],"date-time":"2012-12-27T23:10:34Z","timestamp":1356649834000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1023\/A:1007154515475"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2001]]},"references-count":0,"journal-issue":{"issue":"1\/2"},"alternative-id":["271450"],"URL":"http:\/\/dx.doi.org\/10.1023\/a:1007154515475","relation":{},"ISSN":["0300-8177"],"issn-type":[{"value":"0300-8177","type":"print"}],"subject":[],"published":{"date-parts":[[2001]]}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "762"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:23 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Adak_2001, volume={218}, ISSN={0300-8177}, url={http://dx.doi.org/10.1023/a:1007154515475},
+          DOI={10.1023/a:1007154515475}, number={1/2}, journal={Molecular and Cellular
+          Biochemistry}, publisher={Springer Science and Business Media LLC}, author={Adak,
+          Subrata and Bandyopadhyay, Debashis and Bandyopadhyay, Uday and Banerjee,
+          Ranajit K.}, year={2001}, pages={1\u201311} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Wed, 04 Sep 2024 22:54:24 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=test@example.com
+    response:
+      body:
+        string:
+          '{"doi": "10.1023/a:1007154515475", "doi_url": "https://doi.org/10.1023/a:1007154515475",
+          "title": null, "genre": "journal-article", "is_paratext": false, "published_date":
+          "2001-01-01", "year": 2001, "journal_name": "Molecular and Cellular Biochemistry",
+          "journal_issns": "0300-8177", "journal_issn_l": "0300-8177", "journal_is_oa":
+          false, "journal_is_in_doaj": false, "publisher": "Springer Science and Business
+          Media LLC", "is_oa": false, "oa_status": "closed", "has_repository_copy":
+          false, "best_oa_location": null, "first_oa_location": null, "oa_locations":
+          [], "oa_locations_embargoed": [], "updated": "2021-01-15T22:46:04.723698",
+          "data_standard": 2, "z_authors": [{"given": "Subrata", "family": "Adak", "sequence":
+          "first"}, {"given": "Debashis", "family": "Bandyopadhyay", "sequence": "additional"},
+          {"given": "Uday", "family": "Bandyopadhyay", "sequence": "additional"}, {"given":
+          "Ranajit K.", "family": "Banerjee", "sequence": "additional"}]}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "453"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:28 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490463&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=16xcKFCnanatZSTYbtEmrEHMRUMswP%2FH%2FhmhMexErKo%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1725490463&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=16xcKFCnanatZSTYbtEmrEHMRUMswP%2FH%2FhmhMexErKo%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+version: 1

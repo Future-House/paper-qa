@@ -1,0 +1,203 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "e0d2719e49ad216f98ed640864cdacd1c20f53e6", "externalIds":
+          {"DOI": "10.1007/s40278-023-41815-2", "CorpusId": 259225376}, "url": "https://www.semanticscholar.org/paper/e0d2719e49ad216f98ed640864cdacd1c20f53e6",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
+          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
+          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-06-01", "journal": {"name": "Reactions Weekly", "pages":
+          "145 - 145", "volume": "1962"}, "citationStyles": {"bibtex": "@Article{None,\n
+          booktitle = {Reactions weekly},\n journal = {Reactions Weekly},\n pages =
+          {145 - 145},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
+          volume = {1962},\n year = {2023}\n}\n"}, "authors": []}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "837"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:28 GMT
+        Via:
+          - 1.1 01dbe7e23991a177a7cdfba5803db41c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - uRmNn23CJGWRi9ZYCvXKxbn6Gh9RBXv1V2O6VFwf_fJ8AEyurMVRzw==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmi9xEkCPHcEa4w=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "837"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:54:28 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - be736639-2cc3-46ef-bb7f-ce9d4abc9180
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1007/s40278-023-41815-2?email=test@example.com
+    response:
+      body:
+        string:
+          '{"doi": "10.1007/s40278-023-41815-2", "doi_url": "https://doi.org/10.1007/s40278-023-41815-2",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "genre": "journal-article",
+          "is_paratext": false, "published_date": "2023-06-24", "year": 2023, "journal_name":
+          "Reactions Weekly", "journal_issns": "1179-2051", "journal_issn_l": "0114-9954",
+          "journal_is_oa": false, "journal_is_in_doaj": false, "publisher": "Springer
+          Science and Business Media LLC", "is_oa": false, "oa_status": "closed", "has_repository_copy":
+          false, "best_oa_location": null, "first_oa_location": null, "oa_locations":
+          [], "oa_locations_embargoed": [], "updated": "2023-06-24T05:46:22.445497",
+          "data_standard": 2, "z_authors": null}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "396"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:28 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490468&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=7atICqhTs9Cjq2B7Szr5e8RJKh5vHUfuNCpH8ChJWyw%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1725490468&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=7atICqhTs9Cjq2B7Szr5e8RJKh5vHUfuNCpH8ChJWyw%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=test@example.com
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
+          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
+          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
+          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
+          humoral immunodeficiency - Three consecutive cases and review of the literature.
+          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
+          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
+          Weekly"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":1,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
+          and mild decrease in baseline oxygen saturation following off-label use: 3
+          case reports"],"short-title":[],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","relation":{},"ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"subject":[],"published":{"date-parts":[[2023,6,24]]}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1163"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:54:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
+          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
+          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
+          pages={145\u2013145} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Wed, 04 Sep 2024 22:54:29 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1
