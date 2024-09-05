@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
 from paperqa.config import Settings
-from paperqa.types import Answer
 
 PAPER_DIRECTORY = Path(__file__).parent
 
@@ -85,7 +84,7 @@ def agent_home_dir(
 
 
 @pytest.fixture
-def agent_index_dir(agent_home_dir: Path, bates_fixture, flag_day_fixture) -> Path:
+def agent_index_dir(agent_home_dir: Path) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
 
 
@@ -99,11 +98,6 @@ def agent_test_settings(agent_index_dir: Path) -> Settings:
     settings.answer.answer_max_sources = 2
     settings.answer.evidence_k = 10
     return settings
-
-
-@pytest.fixture(name="agent_test_kit")
-def fixture_stub_answer() -> Answer:
-    return Answer(question="What is is a self-explanatory model?")
 
 
 @pytest.fixture(name="stub_paper_path", scope="session")

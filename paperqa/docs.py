@@ -48,7 +48,6 @@ from .paths import PAPERQA_DIR
 from .readers import read_doc
 from .types import (
     Answer,
-    Context,
     Doc,
     DocDetails,
     DocKey,
@@ -380,7 +379,7 @@ class Docs(BaseModel):
             )
         )
 
-    async def aadd(  # noqa: C901, PLR0912, PLR0915
+    async def aadd(  # noqa: PLR0912
         self,
         path: Path,
         citation: str | None = None,
@@ -409,7 +408,7 @@ class Docs(BaseModel):
             texts = read_doc(
                 path,
                 fake_doc,
-                chunk_chars=parse_config.chunk_chars,
+                chunk_chars=parse_config.chunk_size,
                 overlap=parse_config.overlap,
             )
             if len(texts) == 0:
@@ -495,7 +494,7 @@ class Docs(BaseModel):
         texts = read_doc(
             path,
             doc,
-            chunk_chars=parse_config.chunk_chars,
+            chunk_chars=parse_config.chunk_size,
             overlap=parse_config.overlap,
         )
         # loose check to see if document was loaded
@@ -589,7 +588,7 @@ class Docs(BaseModel):
         self._build_texts_index()
         _k = k + len(self.deleted_dockeys)
         matches: list[Text] = cast(
-            Text,
+            list[Text],
             (
                 await self.texts_index.max_marginal_relevance_search(
                     self._embedding_client, query, k=_k, fetch_k=2 * _k
@@ -657,7 +656,7 @@ class Docs(BaseModel):
 
         summary_chain = None
 
-        if not prompt_config.skip_summary:
+        if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
                 summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
                     client=self._client,
@@ -806,7 +805,7 @@ class Docs(BaseModel):
             [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
 
-        if settings.answer.answer_filter_extra_background:
+        if answer_config.answer_filter_extra_background:
             answer_text = re.sub(
                 r"\([Ee]xtra [Bb]ackground [Ii]nformation\)",
                 "",

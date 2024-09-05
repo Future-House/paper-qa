@@ -15,7 +15,6 @@ from .. import __version__
 from ..utils import get_loop, pqa_directory
 
 try:
-    import anyio
     import typer
     from rich.console import Console
     from rich.logging import RichHandler
@@ -415,7 +414,6 @@ def ask(
             docs=None,
             verbosity=verbosity,
             agent_type=agent_type,
-            index_directory=request.agent_tools.index_directory,
         )
     )
 

@@ -195,6 +195,7 @@ external = [
 ignore = [
     "ANN",  # Don't care to enforce typing
     "BLE001",  # Don't care to enforce blind exception catching
+    "C901",  # we can be complex
     "COM812",  # Trailing comma with black leads to wasting lines
     "D100",  # D100, D101, D102, D103, D104, D105, D106, D107: don't always need docstrings
     "D101",
@@ -222,6 +223,7 @@ ignore = [
     "N803",  # Want to use 'N', or 'L',
     "N806",  # Want to use 'N', or 'L',
     "PLR0913",
+    "PLR0915",  # we can write lots of code
     "PTH",  # Overly pedantic
     "S311",  # Ok to use python random
     "SLF001",  # Overly pedantic

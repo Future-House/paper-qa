@@ -1,11 +1,10 @@
 import importlib.resources
 import os
-from collections.abc import Collection
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar, assert_never, cast
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_settings import (
     BaseSettings,
 )
@@ -40,6 +39,9 @@ class AnswerSettings(BaseModel):
     evidence_summary_length: str = Field(
         default="about 100 words", description="Length of evidence summary"
     )
+    evidence_skip_summary: bool = Field(
+        default=False, description="Whether to summarization"
+    )
     answer_max_sources: int = Field(
         default=5, description="Max number of sources to use for an answer"
     )
@@ -54,15 +56,6 @@ class AnswerSettings(BaseModel):
         description="Whether to cite background information provided by model.",
     )
     model_config = ConfigDict(extra="forbid")
-
-    @field_validator("answer_max_sources")
-    @classmethod
-    def k_should_be_greater_than_max_sources(cls, v: int, info: ValidationInfo) -> int:
-        if v > info.data["evidence_k"]:
-            raise ValueError(
-                "answer_max_sources should be less than or equal to doc_match_k"
-            )
-        return v
 
 
 class ParsingOptions(str, Enum):
@@ -90,7 +83,7 @@ class ChunkingOptions(str, Enum):
 
 
 class ParsingSettings(BaseModel):
-    chunk_chars: int = Field(default=3000, description="Number of characters per chunk")
+    chunk_size: int = Field(default=3000, description="Number of characters per chunk")
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
     )
@@ -119,7 +112,7 @@ class ParsingSettings(BaseModel):
         if chunking_selection == ChunkingOptions.SIMPLE_OVERLAP:
             return (
                 f"{self.parser_version_string}|{chunking_selection.value}"
-                f"|tokens={self.chunksize}|overlap={self.overlap}"
+                f"|tokens={self.chunk_size}|overlap={self.overlap}"
             )
         assert_never()
 
@@ -171,7 +164,6 @@ class PromptSettings(BaseModel):
     )
     post: str | None = None
     system: str = default_system_prompt
-    skip_summary: bool = False
     use_json: bool = False
     # Not thrilled about this model,
     # but need to split out the system/summary
@@ -316,7 +308,7 @@ class AgentSettings(BaseModel):
         if v is None:
             return None
         # imported here to avoid circular imports
-        from agents.main import GenerateAnswerTool
+        from .agents.main import GenerateAnswerTool
 
         answer_tool_name = GenerateAnswerTool.__fields__["name"].default
         if answer_tool_name not in v:
@@ -371,7 +363,7 @@ class Settings(BaseSettings):
             [
                 str(paper_directory),  # cast for typing
                 self.embedding,
-                str(self.parsing.chunk_chars),
+                str(self.parsing.chunk_size),
                 str(self.parsing.overlap),
                 self.parsing.chunking_algorithm,
             ]
