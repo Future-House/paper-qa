@@ -55,7 +55,7 @@ class LLMResult(BaseModel):
 
     To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
 
-    ```python
+    ```
     my_answer_id = uuid4()
     with set_llm_answer_ids(my_answer_id):
         # code that generates LLMResults
@@ -402,7 +402,7 @@ class DocDetails(Doc):
         return data
 
     @classmethod
-    def populate_bibtex_key_citation(  # noqa: C901, PLR0912
+    def populate_bibtex_key_citation(  # noqa: PLR0912
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Add or modify bibtex, key, and citation fields.
@@ -558,7 +558,7 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: C901
+    def __add__(self, other: DocDetails | int) -> DocDetails:
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):

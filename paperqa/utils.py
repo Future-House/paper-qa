@@ -292,7 +292,7 @@ def clean_upbibtex(bibtex: str) -> str:
     return bibtex
 
 
-def format_bibtex(  # noqa: C901
+def format_bibtex(
     bibtex: str,
     key: str | None = None,
     clean: bool = True,

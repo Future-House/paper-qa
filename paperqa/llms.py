@@ -294,7 +294,7 @@ class LLMModel(ABC, BaseModel):
     def count_tokens(self, text: str) -> int:
         return len(text) // 4  # gross approximation
 
-    def make_chain(  # noqa: C901, PLR0915
+    def make_chain(
         self,
         client: Any,
         prompt: str,

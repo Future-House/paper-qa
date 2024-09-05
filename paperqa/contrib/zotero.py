@@ -137,7 +137,7 @@ class ZoteroDB(zotero.Zotero):
 
         return pdf_path
 
-    def iterate(  # noqa: C901, PLR0912
+    def iterate(  # noqa: PLR0912
         self,
         limit: int = 25,
         start: int = 0,

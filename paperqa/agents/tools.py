@@ -1,16 +1,13 @@
 from __future__ import annotations
 import inspect
 import logging
-import os
 import re
 import sys
 from typing import ClassVar
-import anyio
 from langchain_core.callbacks import BaseCallbackHandler
 
 from langchain.tools import BaseTool
 from paperqa import Answer, Docs
-from ..utils import pqa_directory
 from pydantic import BaseModel, ConfigDict, Field
 
 # ruff: noqa: I001

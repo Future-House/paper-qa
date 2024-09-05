@@ -2,14 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 import time
-from collections.abc import Collection
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, ClassVar, assert_never
+from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -24,14 +21,12 @@ from pydantic import (
     ValidationInfo,
     computed_field,
     field_validator,
-    model_validator,
 )
 from typing_extensions import Protocol
 
 from .. import (
     Answer,
     OpenAILLMModel,
-    llm_model_factory,
 )
 from ..config import Settings
 from ..version import __version__
