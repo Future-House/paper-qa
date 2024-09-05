@@ -83,7 +83,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and "
                 "Philippe Schwaller. Augmenting large language models with chemistry tools. Nature "
                 "Machine Intelligence, 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8, "
-                "doi:10.1038/s42256-024-00832-8. This article has 190 citations and is from a "
+                "doi:10.1038/s42256-024-00832-8. This article has 191 citations and is from a "
                 "domain leading peer-reviewed journal."
             ),
             "is_oa": True,
@@ -432,7 +432,7 @@ async def test_bad_init():
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_ensure_sequential_run(caplog):
+async def test_ensure_sequential_run(caplog, reset_log_levels):  # noqa: ARG001
     caplog.set_level(logging.DEBUG)
     # were using a DOI that is NOT in crossref, but running the crossref client first
     # we will ensure that both are run sequentially
@@ -467,7 +467,9 @@ async def test_ensure_sequential_run(caplog):
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_ensure_sequential_run_early_stop(caplog):
+async def test_ensure_sequential_run_early_stop(
+    caplog, reset_log_levels  # noqa: ARG001
+):
     caplog.set_level(logging.DEBUG)
     # now we should stop after hitting s2
     async with aiohttp.ClientSession() as session:

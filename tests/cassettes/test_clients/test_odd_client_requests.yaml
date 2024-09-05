@@ -28,7 +28,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:25 GMT
+          - Wed, 04 Sep 2024 21:03:35 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -64,7 +64,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 181.10751}]}
+          "P. Schwaller"}], "matchScore": 179.49144}]}
 
           '
       headers:
@@ -77,27 +77,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:25 GMT
+          - Wed, 04 Sep 2024 21:03:35 GMT
         Via:
-          - 1.1 6d77342eb60c8ea96903996368766612.cloudfront.net (CloudFront)
+          - 1.1 0f4013a0af68dcba176ca4372e470df4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - S6x8f0DO8iApl_ckPhU9_t1oPg9SxrZeUerK8DIT1DmlW5wMGkFhLQ==
+          - Rtbwgm5xRG2ebZZZ2YD-42e-o0rpoklB8gLcgxhUv3ceOHrwqL5t2g==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmiqgG8FPHcEQag=
+          - dmSuIFrXPHcEYhg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:25 GMT
+          - Wed, 04 Sep 2024 21:03:35 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - db084384-127d-4c64-bde2-9688907e8236
+          - 1fa64d2e-7e2c-47b4-8165-d9c658c8b251
       status:
         code: 200
         message: OK
@@ -122,7 +122,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Wed, 04 Sep 2024 22:52:26 GMT
+          - Wed, 04 Sep 2024 21:03:35 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -146,6 +146,55 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "matchScore": 179.49144}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "348"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:03:36 GMT
+        Via:
+          - 1.1 abc09cc7557c1b633f2222f0c307d884.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - GWmrRA3OZl0mq0r6zbojcQNvgB4m5YAOryAYu2CvSIwSqsmTKaicuQ==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmSuSET9vHcERBA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "348"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 21:03:36 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 852de0fa-5dd8-4ca2-a3b7-fd037b262ef4
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
     response:
       body:
@@ -165,7 +214,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:26 GMT
+          - Wed, 04 Sep 2024 21:03:36 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -182,55 +231,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 179.37169}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "348"
-        Content-Type:
-          - application/json
-        Date:
-          - Wed, 04 Sep 2024 22:52:27 GMT
-        Via:
-          - 1.1 c4f3ed9d980b0f0938aa71b835d9bf96.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - EVPvfs10icErl-1VEGg4mhfSdPk4tKxIm4LWdGr0e18AkJl9l_aNMA==
-        X-Amz-Cf-Pop:
-          - SFO53-C1
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - dmiqrHAjPHcEDvw=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "348"
-        x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:27 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 31d8dee3-bbf4-4742-9a8e-9262ee6cae1c
       status:
         code: 200
         message: OK
@@ -255,7 +255,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Wed, 04 Sep 2024 22:52:27 GMT
+          - Wed, 04 Sep 2024 21:03:36 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -279,6 +279,55 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "matchScore": 181.13739}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "348"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:03:37 GMT
+        Via:
+          - 1.1 b014854bd0108b7ed0058504b69ccb5a.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - cYPzaLfrI5dVJTcCFCq32p45hJLAgp5tSCEDyovmtetkc0UyB2ij6A==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmSudGfVPHcEjww=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "348"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 21:03:37 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - a18ba58c-52d2-4c98-9651-76d5973266ed
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
     response:
       body:
@@ -298,7 +347,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
+          - Wed, 04 Sep 2024 21:03:37 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -315,55 +364,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 179.37169}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "348"
-        Content-Type:
-          - application/json
-        Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
-        Via:
-          - 1.1 c601f966b37ebf3a1ddf28f033b35904.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - aV2mXR534hFnOezRa1OFwmQerAi-1sIArtaSvuLnUGPew4iXGyKiKg==
-        X-Amz-Cf-Pop:
-          - SFO53-C1
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - dmiq5GCIPHcEVVg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "348"
-        x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 01bb6719-ec46-4883-919a-7be57eeacf69
       status:
         code: 200
         message: OK
@@ -388,7 +388,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
+          - Wed, 04 Sep 2024 21:03:37 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -430,27 +430,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
+          - Wed, 04 Sep 2024 21:03:38 GMT
         Via:
-          - 1.1 61770d955dae13eda6e8f1b3baae4d1e.cloudfront.net (CloudFront)
+          - 1.1 930a139903fb043f0be58fe5e0a67072.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 4EO6_Ro68exBcBX-IIzKbAc59Rv2xew-yk0bgPsMyPGLoCDVi6vu0Q==
+          - 560m5ArmFT-Vka41hy8vOwrkFkXR33Q-FOIa3ZCZgG38d5m6ZVey1w==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmirCETbPHcEZ1w=
+          - dmSunFuMPHcEnMg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "197"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
+          - Wed, 04 Sep 2024 21:03:38 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 6eeeafbe-a4fe-4345-8839-162c2990ce23
+          - ea0f2c52-1f99-4e4c-86e7-92dd40681e76
       status:
         code: 200
         message: OK
@@ -489,7 +489,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:28 GMT
+          - Wed, 04 Sep 2024 21:03:38 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -532,7 +532,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 04 Sep 2024 22:52:29 GMT
+          - Wed, 04 Sep 2024 21:03:38 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -575,7 +575,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 04 Sep 2024 22:52:29 GMT
+          - Wed, 04 Sep 2024 21:03:39 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
