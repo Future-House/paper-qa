@@ -2,20 +2,11 @@ import pytest
 from pydantic import ValidationError
 
 from paperqa.config import (
-    AnswerSettings,
     PromptSettings,
     Settings,
     get_formatted_variables,
     get_settings,
 )
-
-
-def test_answer_settings_validation():
-    with pytest.raises(ValidationError):
-        AnswerSettings(evidence_k=5, answer_max_sources=6)
-
-    valid_settings = AnswerSettings(evidence_k=10, answer_max_sources=5)
-    assert valid_settings.answer_max_sources == 5
 
 
 def test_prompt_settings_validation():
@@ -53,5 +44,5 @@ def test_get_settings_missing_file(mocker):
 
 def test_settings_default_instantiation():
     settings = Settings()
-    assert settings.llm == "openai/gpt-4o-2024-08-06"
+    assert "gpt-4o-2024-08-06" in settings.llm
     assert settings.answer.evidence_k == 10

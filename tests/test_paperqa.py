@@ -545,7 +545,7 @@ def test_json_evidence(docs_fixture):
 
 def test_ablations(docs_fixture):
     settings = Settings()
-    settings.prompts.skip_summary = True
+    settings.answer.evidence_skip_summary = True
     settings.answer.evidence_retrieval = False
     contexts = docs_fixture.get_evidence(
         "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
