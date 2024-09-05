@@ -47,7 +47,6 @@ async def agent_query(
     verbosity: int = 0,
     index_directory: str | os.PathLike | None = None,
 ) -> AnswerResponse:
-
     if isinstance(query, str):
         query = QueryRequest(query=query)
 
@@ -64,7 +63,7 @@ async def agent_query(
     )
 
     search_index = SearchIndex(
-        fields=SearchIndex.REQUIRED_FIELDS | {"question"},
+        fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
         index_directory=index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
@@ -115,8 +114,7 @@ async def run_agent(
     profiler.start(outer_profile_name)
 
     logger.info(
-        f"Beginning agent {agent_type!r} run with question {query.query!r} and full"
-        f" query {query.model_dump()}."
+        f"Beginning agent {agent_type!r} run with question {query.query!r} and full query {query.model_dump()}."
     )
 
     if agent_type == "fake":
@@ -130,8 +128,7 @@ async def run_agent(
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
-        f"Finished agent {agent_type!r} run with question {query.query!r} and status"
-        f" {agent_status}."
+        f"Finished agent {agent_type!r} run with question {query.query!r} and status {agent_status}."
     )
     return AnswerResponse(
         answer=answer,
@@ -313,7 +310,6 @@ async def search(
     index_name: str = "answers",
     index_directory: str | os.PathLike | None = None,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
-
     search_index = SearchIndex(
         ["file_location", "body", "question"],
         index_name=index_name,

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Iterator
 from unittest.mock import patch
 
 import pytest
@@ -23,6 +24,10 @@ def _load_env():
 def vcr_config():
     return {
         "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
+        "record_mode": "none",
+        "match_on": ["method", "host", "path", "query"],
+        "allow_playback_repeats": True,
+        "cassette_library_dir": "tests/cassettes",
     }
 
 
@@ -50,12 +55,48 @@ def agent_index_dir(agent_home_dir: Path) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
 
 
-@pytest.fixture(name="agent_test_kit")
-def fixture_stub_answer() -> Answer:
+@pytest.fixture
+def agent_stub_answer() -> Answer:
     return Answer(question="What is is a self-explanatory model?")
 
 
-@pytest.fixture(name="stub_paper_path", scope="session")
-def fixture_stub_paper_path() -> Path:
-    # Corresponds with https://www.semanticscholar.org/paper/A-Perspective-on-Explanations-of-Molecular-Models-Wellawatte-Gandhi/1db1bde653658ec9b30858ae14650b8f9c9d438b
-    return Path(__file__).parent / "paper.pdf"
+@pytest.fixture
+def stub_data_dir() -> Path:
+    return Path(__file__).parent / "stub_data"
+
+
+@pytest.fixture
+def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[Path]:
+
+    # add some near duplicate files then removes them after testing
+    for filename in ("example.txt", "example2.txt"):
+        if not (tmp_path / f"{filename}_modified.txt").exists():
+            with open(stub_data_dir / filename) as f:
+                content = f.read()
+            with open(tmp_path / f"{Path(filename).stem}_modified.txt", "w") as f:
+                f.write(content)
+                f.write("## MODIFIED FOR HASH")
+
+    yield tmp_path
+
+    if tmp_path.exists():
+        shutil.rmtree(tmp_path, ignore_errors=True)
+
+
+@pytest.fixture
+def reset_log_levels(caplog):
+    logging.getLogger().setLevel(logging.DEBUG)
+
+    for name in logging.root.manager.loggerDict:
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = True
+
+    caplog.set_level(logging.DEBUG)
+
+    yield
+
+    for name in logging.root.manager.loggerDict:
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.NOTSET)
+        logger.propagate = True
