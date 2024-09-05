@@ -516,23 +516,7 @@ def build_index(
     loop = get_loop()
 
     return loop.run_until_complete(
-        get_directory_index(
-            directory=anyio.Path(request_settings.agent_tools.paper_directory),
-            index_directory=request_settings.agent_tools.index_directory,
-            index_name=request_settings.get_index_name(
-                request_settings.agent_tools.paper_directory,
-                request_settings.embedding,
-                request_settings.parsing_configuration,
-            ),
-            manifest_file=(
-                anyio.Path(request_settings.agent_tools.manifest_file)
-                if request_settings.agent_tools.manifest_file
-                else None
-            ),
-            embedding=request_settings.embedding,
-            chunk_chars=request_settings.parsing_configuration.chunksize,
-            overlap=request_settings.parsing_configuration.overlap,
-        )
+        get_directory_index(settings=request_settings.settings)
     )
 
 

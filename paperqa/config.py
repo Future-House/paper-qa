@@ -1,8 +1,11 @@
 import importlib.resources
+import os
+from collections.abc import Collection
+from enum import Enum
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar, assert_never, cast
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 from pydantic_settings import (
     BaseSettings,
 )
@@ -19,6 +22,8 @@ from .prompts import (
     summary_prompt,
 )
 from .types import Answer
+from .utils import hexdigest, pqa_directory
+from .version import __version__
 
 
 class AnswerSettings(BaseModel):
@@ -44,6 +49,11 @@ class AnswerSettings(BaseModel):
     max_concurrent_requests: int = Field(
         default=4, description="Max concurrent requests to LLMs"
     )
+    answer_filter_extra_background: bool = Field(
+        default=False,
+        description="Whether to cite background information provided by model.",
+    )
+    model_config = ConfigDict(extra="forbid")
 
     @field_validator("answer_max_sources")
     @classmethod
@@ -53,6 +63,30 @@ class AnswerSettings(BaseModel):
                 "answer_max_sources should be less than or equal to doc_match_k"
             )
         return v
+
+
+class ParsingOptions(str, Enum):
+    PAPERQA_DEFAULT = "paperqa_default"
+
+    def available_for_inference(self) -> list["ParsingOptions"]:
+        return [self.PAPERQA_DEFAULT]  # type: ignore[list-item]
+
+
+def _get_parse_type(opt: ParsingOptions, config: "ParsingSettings") -> str:
+    if opt == ParsingOptions.PAPERQA_DEFAULT:
+        return config.parser_version_string
+    assert_never()
+
+
+class ChunkingOptions(str, Enum):
+    SIMPLE_OVERLAP = "simple_overlap"
+
+    @property
+    def valid_parsings(self) -> list[ParsingOptions]:
+        # Note that SIMPLE_OVERLAP must be valid for all by default
+        # TODO: implement for future parsing options
+        valid_parsing_dict: dict[str, list[ParsingOptions]] = {}
+        return valid_parsing_dict.get(self.value, [])
 
 
 class ParsingSettings(BaseModel):
@@ -75,6 +109,33 @@ class ParsingSettings(BaseModel):
         default=False,
         description="Whether to disable checking if a document looks like text (was parsed correctly)",
     )
+    chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
+    model_config = ConfigDict(extra="forbid")
+
+    def chunk_type(self, chunking_selection: ChunkingOptions | None = None) -> str:
+        """Future chunking implementations (i.e. by section) will get an elif clause here."""
+        if chunking_selection is None:
+            chunking_selection = self.chunking_algorithm
+        if chunking_selection == ChunkingOptions.SIMPLE_OVERLAP:
+            return (
+                f"{self.parser_version_string}|{chunking_selection.value}"
+                f"|tokens={self.chunksize}|overlap={self.overlap}"
+            )
+        assert_never()
+
+    @property
+    def parser_version_string(self) -> str:
+        return f"paperqa-{__version__}"
+
+    def is_chunking_valid_for_parsing(self, parsing: str):
+        # must map the parsings because they won't include versions by default
+        return (
+            self.chunking_algorithm == ChunkingOptions.SIMPLE_OVERLAP
+            or parsing
+            in {  # type: ignore[unreachable]
+                _get_parse_type(p, self) for p in self.chunking_algorithm.valid_parsings
+            }
+        )
 
 
 # Mock a dictionary and store any missing items
@@ -117,6 +178,7 @@ class PromptSettings(BaseModel):
     # to get JSON
     summary_json: str = summary_json_prompt
     summary_json_system: str = summary_json_system_prompt
+    model_config = ConfigDict(extra="forbid")
     EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
 
     @field_validator("summary")
@@ -170,19 +232,152 @@ class PromptSettings(BaseModel):
         return v
 
 
+class AgentSettings(BaseModel):
+    agent_llm: str = Field(
+        default="gpt-4o-2024-08-06",
+        description="Model to use for agent",
+    )
+
+    agent_system_prompt: str | None = Field(
+        # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215
+        default="You are a helpful AI assistant.",
+        description="Optional system prompt message to precede the below agent_prompt.",
+    )
+
+    # TODO: make this prompt more minimalist, instead improving tool descriptions so
+    # how to use them together can be intuited, and exposing them for configuration
+    agent_prompt: str = (
+        "Answer question: {question}"
+        "\n\nSearch for papers, gather evidence, collect papers cited in evidence then re-gather evidence, and answer."
+        " Gathering evidence will do nothing if you have not done a new search or collected new papers."
+        " If you do not have enough evidence to generate a good answer, you can:"
+        "\n- Search for more papers (preferred)"
+        "\n- Collect papers cited by previous evidence (preferred)"
+        "\n- Gather more evidence using a different phrase"
+        "\nIf you search for more papers or collect new papers cited by previous evidence,"
+        " remember to gather evidence again."
+        " Once you have five or more pieces of evidence from multiple sources, or you have tried a few times, "
+        "call {gen_answer_tool_name} tool. The {gen_answer_tool_name} tool output is visible to the user, "
+        "so you do not need to restate the answer and can simply terminate if the answer looks sufficient. "
+        "The current status of evidence/papers/cost is {status}"
+    )
+    paper_directory: str | os.PathLike = Field(
+        default=Path.cwd(),
+        description=(
+            "Local directory which contains the papers to be indexed and searched."
+        ),
+    )
+    index_directory: str | os.PathLike | None = Field(
+        default_factory=lambda: pqa_directory("indexes"),
+        description=(
+            "Directory to store the PQA generated search index, configuration, and answer indexes."
+        ),
+    )
+    manifest_file: str | os.PathLike | None = Field(
+        default=None,
+        description=(
+            "Optional manifest CSV, containing columns which are attributes for a DocDetails object. "
+            "Only 'file_location','doi', and 'title' will be used when indexing."
+        ),
+    )
+    search_count: int = 8
+    wipe_context_on_answer_failure: bool = True
+    timeout: float = Field(
+        default=500.0,
+        description=(
+            "Matches LangChain AgentExecutor.max_execution_time (seconds), the timeout"
+            " on agent execution."
+        ),
+    )
+    should_pre_search: bool = Field(
+        default=False,
+        description="If set to true, run the search tool before invoking agent.",
+    )
+
+    tool_names: set[str] | None = Field(
+        default=None,
+        description=(
+            "Optional override on the tools to provide the agent. Leaving as the"
+            " default of None will use a minimal toolset of the paper search, gather"
+            " evidence, collect cited papers from evidence, and gen answer. If passing tool"
+            " names (non-default route), at least the gen answer tool must be supplied."
+        ),
+    )
+
+    index_concurrency: int = Field(
+        default=30,
+        description="Number of concurrent filesystem reads for indexing",
+    )
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("tool_names")
+    @classmethod
+    def validate_tool_names(cls, v: set[str] | None) -> set[str] | None:
+        if v is None:
+            return None
+        # imported here to avoid circular imports
+        from agents.main import GenerateAnswerTool
+
+        answer_tool_name = GenerateAnswerTool.__fields__["name"].default
+        if answer_tool_name not in v:
+            raise ValueError(
+                f"If using an override, must contain at least the {answer_tool_name}."
+            )
+        return v
+
+
 class Settings(BaseSettings):
     llm: str = Field(
-        default="openai/gpt-4o-2024-08-06",
+        default="gpt-4o-2024-08-06",
         description="Default LLM for most things, including answers. Should be 'best' LLM",
     )
     summary_llm: str = Field(
-        default="openai/gpt-4o-2024-08-06",
+        default="gpt-4o-2024-08-06",
         description="Default LLM for summaries and parsing citations",
     )
+    embedding: str = Field(
+        "text-embedding-3-small",
+        description="Default embedding model for texts",
+    )
+    embedding_config: dict | None = Field(
+        default=None,
+        description="Extra kwargs to pass to embedding model",
+    )
+    temperature: float = Field(default=0.0, description="Temperature for LLMs")
     batch_size: int = Field(default=1, description="Batch size for calling LLMs")
+    texts_index_mmr_lambda: float = Field(
+        default=1.0, description="Lambda for MMR in text index"
+    )
+    index_absolute_directory: bool = Field(
+        default=False,
+        description="Whether to use the absolute directory for the PQA index",
+    )
     answer: AnswerSettings = AnswerSettings()
     parsing: ParsingSettings = ParsingSettings()
     prompts: PromptSettings = PromptSettings()
+    agent: AgentSettings = AgentSettings()
+    model_config = ConfigDict(extra="forbid")
+
+    def get_index_name(self) -> str:
+
+        # index name should use an absolute path
+        # this way two different folders where the
+        # user locally uses '.' will make different indexes
+        paper_directory = self.agent.paper_directory
+        if isinstance(paper_directory, Path):
+            paper_directory = str(paper_directory.absolute())
+
+        index_fields = "|".join(
+            [
+                str(paper_directory),  # cast for typing
+                self.embedding,
+                str(self.parsing.chunk_chars),
+                str(self.parsing.overlap),
+                self.parsing.chunking_algorithm,
+            ]
+        )
+
+        return f"pqa_index_{hexdigest(index_fields)}"
 
     @classmethod
     def from_name(cls, config_name: str) -> "Settings":

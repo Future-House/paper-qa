@@ -24,16 +24,13 @@ from tenacity import (
     wait_random_exponential,
 )
 
+from ..config import MaybeSettings, Settings, get_settings
 from ..docs import Docs
 from ..types import DocDetails
 from ..utils import hexdigest, pqa_directory
 from .models import SupportsPickle
 
 logger = logging.getLogger(__name__)
-
-PQA_INDEX_ABSOLUTE_PATHS = (
-    os.environ.get("PQA_INDEX_ABSOLUTE_PATHS", "true").lower() == "true"
-)
 
 
 class AsyncRetryError(Exception):
@@ -349,7 +346,7 @@ async def process_file(
     search_index: SearchIndex,
     metadata: dict[str, Any],
     semaphore: anyio.Semaphore,
-    docs_kwargs: dict[str, Any],
+    settings: Settings,
 ) -> None:
 
     async with semaphore:
@@ -362,23 +359,21 @@ async def process_file(
             if file_name in metadata:
                 doi, title = metadata[file_name].doi, metadata[file_name].title
 
-            # note extras are forbidden in docs
-            chunk_chars, overlap = 3000, 250
-            if "chunk_chars" in docs_kwargs:
-                chunk_chars = int(docs_kwargs.pop("chunk_chars"))
-            if "overlap" in docs_kwargs:
-                overlap = int(docs_kwargs.pop("overlap"))
-
-            tmp_docs = Docs(**docs_kwargs)
+            # We set the LLM/SummaryLLM because
+            # it could be that all metadata fails and it has to peek to first page
+            # TODO: Eventually we will have an LLM obejct of some kinda passed here
+            # (or coming from settings)
+            tmp_docs = Docs(
+                llm=settings.llm,
+                summary_llm=settings.summary_llm,
+            )
             try:
                 await tmp_docs.aadd(
                     path=pathlib.Path(file_path),
                     title=title,
                     doi=doi,
-                    chunk_chars=chunk_chars,
-                    overlap=overlap,
                     fields=["title", "author", "journal", "year"],
-                    use_doc_details=True,
+                    settings=settings,
                 )
             except ValueError:
                 logger.exception(
@@ -409,43 +404,42 @@ async def process_file(
             logger.info(f"Complete ({title}).")
 
 
+# TODO: Use settings directly for some of this config
 async def get_directory_index(
-    directory: anyio.Path,
-    manifest_file: anyio.Path | None = None,
-    index_name: str = "pqa_index",
-    index_directory: str | os.PathLike | None = None,
     sync_index_w_directory: bool = True,
-    use_absolute_directory_path: bool = PQA_INDEX_ABSOLUTE_PATHS,
-    max_concurrency: int = 30,
-    **docs_kwargs,
+    settings: MaybeSettings = None,
 ) -> SearchIndex:
     """
     Create a Tantivy index from a directory of text files.
 
     Args:
-        directory: Directory to index.
-        manifest_file: File with metadata for each document.
-        index_name: Name of the index.
-        index_directory: Directory to store the index.
         sync_index_w_directory: Sync the index with the directory. (i.e. delete files not in directory)
-        use_absolute_directory_path: Use the absolute path for the directory.
-        docs_kwargs: Keyword arguments for the Docs object.
-        max_concurrency: maximum number of files to be simultaneously indexed.
+        settings: Application settings.
     """
-    semaphore = anyio.Semaphore(max_concurrency)
+    _settings = get_settings(settings)
 
-    if use_absolute_directory_path:
+    semaphore = anyio.Semaphore(_settings.agent.index_concurrency)
+    directory = anyio.Path(_settings.agent.paper_directory)
+
+    if _settings.index_absolute_directory:
         directory = await directory.absolute()
 
     search_index = SearchIndex(
         fields=SearchIndex.REQUIRED_FIELDS | {"title", "year"},
-        index_name=index_name,
-        index_directory=index_directory or pqa_directory("indexes"),
+        index_name=_settings.get_index_name(),
+        index_directory=_settings.agent.index_directory,
     )
 
+    manifest_file = (
+        anyio.Path(_settings.agent.manifest_file)
+        if _settings.agent.manifest_file
+        else None
+    )
+    # check if it doesn't exist - if so, try to make it relative
+    if manifest_file and not await manifest_file.exists():
+        manifest_file = directory / manifest_file
+
     metadata = await maybe_get_manifest(manifest_file)
-    print(metadata)
-    print(directory)
     valid_files = [
         file
         async for file in directory.iterdir()
@@ -476,7 +470,7 @@ async def get_directory_index(
                     search_index,
                     metadata,
                     semaphore,
-                    docs_kwargs,
+                    _settings,
                 )
             else:
                 logger.debug(f"New file {file_path.name} found in directory.")

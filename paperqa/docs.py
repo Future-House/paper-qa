@@ -805,6 +805,14 @@ class Docs(BaseModel):
         bib_str = "\n\n".join(
             [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
+
+        if settings.answer.answer_filter_extra_background:
+            answer_text = re.sub(
+                r"\([Ee]xtra [Bb]ackground [Ii]nformation\)",
+                "",
+                answer_text,
+            )
+
         formatted_answer = f"Question: {answer.question}\n\n{answer_text}\n"
         if len(bib) > 0:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
@@ -828,5 +836,6 @@ class Docs(BaseModel):
         answer.formatted_answer = formatted_answer
         answer.references = bib_str
         answer.contexts = contexts
+        answer.context = context_str
 
         return answer

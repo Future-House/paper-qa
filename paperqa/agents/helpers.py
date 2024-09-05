@@ -169,26 +169,28 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
         request = QueryRequest()
     client: Any = None
 
-    if request.llm.startswith("gemini"):
-        doc.llm_model = LangchainLLMModel(name=request.llm)
-        doc.summary_llm_model = LangchainLLMModel(name=request.summary_llm)
+    if request.settings.llm.startswith("gemini"):
+        doc.llm_model = LangchainLLMModel(name=request.settings.llm)
+        doc.summary_llm_model = LangchainLLMModel(name=request.settings.summary_llm)
     else:
-        doc.llm_model = llm_model_factory(request.llm)
-        doc.summary_llm_model = llm_model_factory(request.summary_llm)
+        doc.llm_model = llm_model_factory(request.settings.llm)
+        doc.summary_llm_model = llm_model_factory(request.settings.summary_llm)
 
     # set temperatures
-    doc.llm_model.config["temperature"] = request.temperature
-    doc.summary_llm_model.config["temperature"] = request.temperature
+    doc.llm_model.config["temperature"] = request.settings.temperature
+    doc.summary_llm_model.config["temperature"] = request.settings.temperature
 
     if isinstance(doc.llm_model, OpenAILLMModel):
-        if request.llm.startswith(
+        if request.settings.llm.startswith(
             ("meta-llama/Meta-Llama-3-", "mistralai/Mistral-", "mistralai/Mixtral-")
         ):
             client = AsyncOpenAI(
                 base_url=os.environ.get("ANYSCALE_BASE_URL"),
                 api_key=os.environ.get("ANYSCALE_API_KEY"),
             )
-            logger.info(f"Using Anyscale (via OpenAI client) for {request.llm}")
+            logger.info(
+                f"Using Anyscale (via OpenAI client) for {request.settings.llm}"
+            )
         else:
             client = AsyncOpenAI()
     elif isinstance(doc.llm_model, AnthropicLLMModel):
@@ -203,7 +205,7 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
         # we have to convert system to human because system is unsupported
         # Also we do get blocked content, so adjust thresholds
         client = ChatVertexAI(
-            model=request.llm,
+            model=request.settings.llm,
             safety_settings={
                 HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
                 HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -219,11 +221,10 @@ def update_doc_models(doc: Docs, request: QueryRequest | None = None):
     doc._embedding_client = AsyncOpenAI()  # hard coded to OpenAI for now
 
     doc.texts_index.embedding_model = embedding_model_factory(
-        request.embedding, **(request.texts_index_embedding_config or {})
+        request.settings.embedding, **(request.settings.embedding_config or {})
     )
-    doc.texts_index.mmr_lambda = request.texts_index_mmr_lambda
-    doc.embedding = request.embedding
-    doc.max_concurrent = request.max_concurrent
+    doc.texts_index.mmr_lambda = request.settings.texts_index_mmr_lambda
+    doc.embedding = request.settings.embedding
     Docs.make_llm_names_consistent(doc)
 
     logger.debug(

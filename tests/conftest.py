@@ -13,7 +13,10 @@ from dotenv import load_dotenv
 
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
+from paperqa.config import Settings
 from paperqa.types import Answer
+
+PAPER_DIRECTORY = Path(__file__).parent
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -84,6 +87,18 @@ def agent_home_dir(
 @pytest.fixture
 def agent_index_dir(agent_home_dir: Path, bates_fixture, flag_day_fixture) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
+
+
+@pytest.fixture
+def agent_test_settings(agent_index_dir: Path) -> Settings:
+    settings = Settings()
+    settings.agent.paper_directory = PAPER_DIRECTORY
+    settings.agent.index_directory = agent_index_dir
+    settings.agent.search_count = 2
+    settings.embedding = "sparse"
+    settings.answer.answer_max_sources = 2
+    settings.answer.evidence_k = 10
+    return settings
 
 
 @pytest.fixture(name="agent_test_kit")

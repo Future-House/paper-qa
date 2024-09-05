@@ -24,7 +24,6 @@ from paperqa.agents.helpers import (
     update_doc_models,
 )
 from paperqa.agents.models import (
-    AgentPromptCollection,
     AgentStatus,
     AnswerResponse,
     MismatchedModelsError,
@@ -37,6 +36,7 @@ from paperqa.agents.tools import (
     PaperSearchTool,
     SharedToolState,
 )
+from paperqa.config import Settings
 from paperqa.docs import Docs
 from paperqa.llms import LangchainLLMModel
 from paperqa.types import Answer, Context, Doc, Text
@@ -46,17 +46,12 @@ from paperqa.utils import get_year
 #    pytest.skip("agents module is not installed", allow_module_level=True)
 
 
-PAPER_DIRECTORY = Path(__file__).parent
-
-
 @pytest.mark.asyncio
-async def test_get_directory_index(agent_index_dir):
+async def test_get_directory_index(agent_test_settings):
+
     index = await get_directory_index(
-        directory=anyio.Path(PAPER_DIRECTORY),
-        index_name="pqa_index_0",
-        index_directory=agent_index_dir,
+        settings=agent_test_settings,
     )
-    print(index.fields)
     assert index.fields == {
         "title",
         "file_location",
@@ -71,13 +66,9 @@ async def test_get_directory_index(agent_index_dir):
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index_w_manifest(agent_index_dir):
-    index = await get_directory_index(
-        directory=anyio.Path(PAPER_DIRECTORY),
-        index_name="pqa_index_0",
-        index_directory=agent_index_dir,
-        manifest_file=anyio.Path(PAPER_DIRECTORY) / "stub_manifest.csv",
-    )
+async def test_get_directory_index_w_manifest(agent_test_settings):
+    agent_test_settings.agent.manifest_file = "stub_manifest.csv"
+    index = await get_directory_index(settings=agent_test_settings)
     assert index.fields == {
         "title",
         "file_location",
@@ -97,45 +88,30 @@ async def test_get_directory_index_w_manifest(agent_index_dir):
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
 @pytest.mark.asyncio
-async def test_agent_types(agent_index_dir, agent_type):
+async def test_agent_types(agent_test_settings, agent_type):
 
     question = "How can you use XAI for chemical property prediction?"
 
     request = QueryRequest(
         query=question,
-        consider_sources=10,
-        max_sources=2,
-        embedding="sparse",
-        agent_tools=AgentPromptCollection(
-            search_count=2,
-            paper_directory=PAPER_DIRECTORY,
-            index_directory=agent_index_dir,
-        ),
+        settings=agent_test_settings,
     )
-    response = await agent_query(
-        request, agent_type=agent_type, index_directory=agent_index_dir
-    )
+    response = await agent_query(request, agent_type=agent_type)
     assert response.answer.answer != "I cannot answer", "Answer not generated"
     assert len(response.answer.context) >= 1, "No contexts were found"
     assert response.answer.question == question
 
 
 @pytest.mark.asyncio
-async def test_timeout(agent_index_dir):
+async def test_timeout(agent_test_settings):
+    agent_test_settings.prompts.pre = None
+    agent_test_settings.agent.timeout = 0.001
+    agent_test_settings.llm = "gpt-4o-mini"
+    agent_test_settings.agent.tool_names = {"gen_answer"}
     response = await agent_query(
         QueryRequest(
-            query="Are COVID-19 vaccines effective?",
-            llm="gpt-4o-mini",
-            prompts=PromptSettings(pre=None),
-            # We just need one tool to test the timeout, gen_answer is not that fast
-            agent_tools=AgentPromptCollection(
-                timeout=0.001,
-                tool_names={"gen_answer"},
-                paper_directory=PAPER_DIRECTORY,
-                index_directory=agent_index_dir,
-            ),
-        ),
-        Docs(),
+            query="Are COVID-19 vaccines effective?", settings=agent_test_settings
+        )
     )
     # ensure that GenerateAnswerTool was called
     assert response.status == AgentStatus.TIMEOUT, "Agent did not timeout"
@@ -279,9 +255,6 @@ async def test_agent_sharing_state(
 
         tool = GatherEvidenceTool(shared_state=tool_state, query=query)
         await tool.arun(fixture_stub_answer.question)
-        assert (
-            len(fixture_stub_answer.dockey_filter) > 0
-        ), "Filter did not preserve reference"
         assert fixture_stub_answer.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswerTool.__name__} working"):

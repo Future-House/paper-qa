@@ -45,7 +45,6 @@ async def agent_query(
     docs: Docs | None = None,
     agent_type: str = "OpenAIFunctionsAgent",
     verbosity: int = 0,
-    index_directory: str | os.PathLike | None = None,
 ) -> AnswerResponse:
 
     if isinstance(query, str):
@@ -53,9 +52,6 @@ async def agent_query(
 
     if docs is None:
         docs = Docs()
-
-    if index_directory is None:
-        index_directory = pqa_directory("indexes")
 
     # in-place modification of the docs object to match query
     update_doc_models(
@@ -66,7 +62,7 @@ async def agent_query(
     search_index = SearchIndex(
         fields=SearchIndex.REQUIRED_FIELDS | {"question"},
         index_name="answers",
-        index_directory=index_directory,
+        index_directory=query.settings.agent.index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 
@@ -111,7 +107,7 @@ async def run_agent(
         Tuple of resultant answer, token counts, and agent status.
     """
     profiler = SimpleProfiler()
-    outer_profile_name = f"agent-{agent_type}-{query.agent_llm}"
+    outer_profile_name = f"agent-{agent_type}-{query.settings.agent.agent_llm}"
     profiler.start(outer_profile_name)
 
     logger.info(
@@ -144,8 +140,10 @@ async def run_fake_agent(
     query: QueryRequest,
     docs: Docs,
 ) -> tuple[Answer, AgentStatus]:
-    answer = Answer(question=query.query, dockey_filter=set(), id=query.id)
-    tools = query_to_tools(query, state=SharedToolState(docs=docs, answer=answer))
+    answer = Answer(question=query.query, id=query.id)
+    tools = query_to_tools(
+        query, state=SharedToolState(docs=docs, answer=answer, settings=query.settings)
+    )
     search_tool = cast(
         PaperSearchTool,
         next(
@@ -197,15 +195,17 @@ async def run_langchain_agent(
     profiler: SimpleProfiler,
     timeout: float | None = None,  # noqa: ASYNC109
 ) -> tuple[Answer, AgentStatus]:
-    answer = Answer(question=query.query, dockey_filter=set(), id=query.id)
+    answer = Answer(question=query.query, id=query.id)
     shared_callbacks: list[BaseCallbackHandler] = [
         AgentCallback(
-            profiler, name=f"step-{agent_type}-{query.agent_llm}", answer_id=answer.id
+            profiler,
+            name=f"step-{agent_type}-{query.settings.agent.agent_llm}",
+            answer_id=answer.id,
         ),
     ]
     tools = query_to_tools(
         query,
-        state=SharedToolState(docs=docs, answer=answer),
+        state=SharedToolState(docs=docs, answer=answer, settings=query.settings),
         callbacks=shared_callbacks,
     )
     try:
@@ -226,16 +226,16 @@ async def run_langchain_agent(
     )
 
     # optionally use the search tool before the agent
-    if search_tool is not None and query.agent_tools.should_pre_search:
+    if search_tool is not None and query.settings.agent.should_pre_search:
         logger.debug("Running search tool before agent choice.")
         await search_tool.arun(answer.question)
     else:
         logger.debug("Skipping search tool before agent choice.")
 
     llm = ChatOpenAI(
-        model=query.agent_llm,
-        request_timeout=timeout or query.agent_tools.timeout / 2.0,
-        temperature=query.temperature,
+        model=query.settings.agent.agent_llm,
+        request_timeout=timeout or query.settings.agent.timeout / 2.0,
+        temperature=query.settings.temperature,
     )
     agent_status = AgentStatus.SUCCESS
     cost_callback = OpenAICallbackHandler()
@@ -243,8 +243,8 @@ async def run_langchain_agent(
         llm,
         tools,
         system_message=(
-            SystemMessage(content=query.agent_tools.agent_system_prompt)
-            if query.agent_tools.agent_system_prompt
+            SystemMessage(content=query.settings.agent.agent_system_prompt)
+            if query.settings.agent.agent_system_prompt
             else None
         ),
     )
@@ -254,9 +254,8 @@ async def run_langchain_agent(
         agent=agent_instance,
         return_intermediate_steps=True,
         handle_parsing_errors=True,
-        max_execution_time=query.agent_tools.timeout,
+        max_execution_time=query.settings.agent.timeout,
         callbacks=[*shared_callbacks, cost_callback],
-        **(query.agent_tools.agent_config or {}),
     )
 
     async def aplan_with_injected_callbacks(
@@ -279,7 +278,7 @@ async def run_langchain_agent(
                 input={
                     # NOTE: str.format still works even if the prompt doesn't have
                     # template fields like 'status' or 'gen_answer_tool_name'
-                    "input": query.agent_tools.agent_prompt.format(
+                    "input": query.settings.agent.agent_prompt.format(
                         question=answer.question,
                         status=await status(docs, answer),
                         gen_answer_tool_name=answer_tool.name,
@@ -300,7 +299,7 @@ async def run_langchain_agent(
         if "Agent stopped" in call_response["output"]:
             # Log that this agent has gone over timeout, and then answer directly
             logger.warning(
-                f"Agent timeout after {query.agent_tools.timeout}-sec, just answering."
+                f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
             )
             await answer_tool.arun(answer.question)
             agent_status = AgentStatus.TIMEOUT
