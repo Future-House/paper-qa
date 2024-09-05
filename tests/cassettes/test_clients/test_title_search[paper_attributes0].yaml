@@ -3,6 +3,60 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.unpaywall.org/v2/search?query=Effect%20of%20native%20oxide%20layers%20on%20copper%20thin-film%20tensile%20properties:%20A%20reactive%20molecular%20dynamics%20study&email=test@example.com
+    response:
+      body:
+        string:
+          '{"elapsed_seconds":0.394,"results":[{"response":{"best_oa_location":null,"data_standard":2,"doi":"10.1063/1.4938384","doi_url":"https://doi.org/10.1063/1.4938384","first_oa_location":null,"genre":"journal-article","has_repository_copy":false,"is_oa":false,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"0021-8979","journal_issns":"0021-8979,1089-7550","journal_name":"Journal
+          of Applied Physics","oa_locations":[],"oa_locations_embargoed":[],"oa_status":"closed","published_date":"2015-12-21","publisher":"AIP
+          Publishing","title":"Effect of native oxide layers on copper thin-film tensile
+          properties: A reactive molecular dynamics study","updated":"2023-07-31T05:28:57.007821","year":2015,"z_authors":[{"affiliation":[{"name":"University
+          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"}],"family":"Skarlinski","given":"Michael
+          D.","sequence":"first"},{"affiliation":[{"name":"University of Rochester 1
+          Materials Science Program, , Rochester, New York 14627, USA"},{"name":"University
+          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
+          14627, USA"}],"family":"Quesnel","given":"David J.","sequence":"additional"}]},"score":0.009231734,"snippet":"<b>Effect</b>
+          of <b>native</b> <b>oxide</b> <b>layers</b> on <b>copper</b> <b>thin</b>-<b>film</b>
+          <b>tensile</b> <b>properties</b>: A <b>reactive</b> <b>molecular</b> <b>dynamics</b>
+          <b>study</b>"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "708"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:04:25 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725483864&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=iNoXSxpIsI31uBqK7f3k2CTCeHimuT0xQ5ij3fFYfEA%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1725483864&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=iNoXSxpIsI31uBqK7f3k2CTCeHimuT0xQ5ij3fFYfEA%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
@@ -21,7 +75,7 @@ interactions:
           tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
           year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
           Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          283.23224}]}
+          283.23682}]}
 
           '
       headers:
@@ -34,27 +88,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:18 GMT
+          - Wed, 04 Sep 2024 21:04:25 GMT
         Via:
-          - 1.1 e8075a4d83e15c8c6543597e1a8de938.cloudfront.net (CloudFront)
+          - 1.1 c3d007e42510cc2bd48d2a205774e488.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - vB0latP66Hte1od43bgj7T8qLdb6UzgZtdqHNa2gxDLLvDKO6z_zQg==
+          - e_f2aMdNel7ONDg-FoAF17oSOG1zBpAyuO78iVd1lm71J60DVEQ-9w==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmi8GFhlvHcErEg=
+          - dmS13FyYvHcEOBw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1109"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:54:18 GMT
+          - Wed, 04 Sep 2024 21:04:25 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 88340ebb-a44f-4660-aa0f-f42e231133a9
+          - 1ba51fd5-dbbb-482d-9629-b63bbd978af7
       status:
         code: 200
         message: OK
@@ -160,7 +214,7 @@ interactions:
           Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
           Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
           Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":64.015274,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":64.020195,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -178,7 +232,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:18 GMT
+          - Wed, 04 Sep 2024 21:04:25 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -225,7 +279,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 04 Sep 2024 22:54:19 GMT
+          - Wed, 04 Sep 2024 21:04:26 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -242,60 +296,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.unpaywall.org/v2/search?query=Effect%20of%20native%20oxide%20layers%20on%20copper%20thin-film%20tensile%20properties:%20A%20reactive%20molecular%20dynamics%20study&email=test@example.com
-    response:
-      body:
-        string:
-          '{"elapsed_seconds":0.357,"results":[{"response":{"best_oa_location":null,"data_standard":2,"doi":"10.1063/1.4938384","doi_url":"https://doi.org/10.1063/1.4938384","first_oa_location":null,"genre":"journal-article","has_repository_copy":false,"is_oa":false,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"0021-8979","journal_issns":"0021-8979,1089-7550","journal_name":"Journal
-          of Applied Physics","oa_locations":[],"oa_locations_embargoed":[],"oa_status":"closed","published_date":"2015-12-21","publisher":"AIP
-          Publishing","title":"Effect of native oxide layers on copper thin-film tensile
-          properties: A reactive molecular dynamics study","updated":"2023-07-31T05:28:57.007821","year":2015,"z_authors":[{"affiliation":[{"name":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"}],"family":"Skarlinski","given":"Michael
-          D.","sequence":"first"},{"affiliation":[{"name":"University of Rochester 1
-          Materials Science Program, , Rochester, New York 14627, USA"},{"name":"University
-          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
-          14627, USA"}],"family":"Quesnel","given":"David J.","sequence":"additional"}]},"score":0.009231734,"snippet":"<b>Effect</b>
-          of <b>native</b> <b>oxide</b> <b>layers</b> on <b>copper</b> <b>thin</b>-<b>film</b>
-          <b>tensile</b> <b>properties</b>: A <b>reactive</b> <b>molecular</b> <b>dynamics</b>
-          <b>study</b>"}]}
-
-          '
-      headers:
-        Access-Control-Allow-Headers:
-          - origin, content-type, accept, x-requested-with
-        Access-Control-Allow-Methods:
-          - POST, GET, OPTIONS, PUT, DELETE, PATCH
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "706"
-        Content-Type:
-          - application/json
-        Date:
-          - Wed, 04 Sep 2024 22:54:20 GMT
-        Nel:
-          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
-        Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490458&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=3iH3mreiGrF6hHOFWXTx5avt8oC7DhAjNvJhBq5sqs8%3D"}]}'
-        Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1725490458&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=3iH3mreiGrF6hHOFWXTx5avt8oC7DhAjNvJhBq5sqs8%3D
-        Server:
-          - gunicorn
-        Vary:
-          - Accept-Encoding
-        Via:
-          - 1.1 vegur
       status:
         code: 200
         message: OK

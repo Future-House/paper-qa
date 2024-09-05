@@ -35,18 +35,19 @@ logger = logging.getLogger(__name__)
 app = typer.Typer()
 
 
-def configure_agent_logging(
-    verbosity: int = 0, default_level: int = logging.INFO
-) -> None:
-    """Default to INFO level, but suppress loquacious loggers."""
+def configure_agent_logging(verbosity: int = 0) -> None:
+    """Suppress loquacious loggers according to verbosity level."""
     verbosity_map = {
         0: {
+            "paperqa.agents": logging.INFO,
             "paperqa.agents.helpers": logging.WARNING,
             "paperqa.agents.main": logging.WARNING,
+            "paperqa.agents.main.agent_callers": logging.INFO,
             "anthropic": logging.WARNING,
             "openai": logging.WARNING,
             "httpx": logging.WARNING,
             "paperqa.agents.models": logging.WARNING,
+            "paperqa.agents.search": logging.INFO,
         }
     }
 
@@ -73,18 +74,11 @@ def configure_agent_logging(
 
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
-    def is_paperqa_related(logger_name: str) -> bool:
-        return logger_name.startswith("paperqa") or logger_name in {
-            "anthropic",
-            "openai",
-            "httpx",
-        }
-
     for logger_name, logger in logging.Logger.manager.loggerDict.items():
-        if isinstance(logger, logging.Logger) and is_paperqa_related(logger_name):
-            logger.setLevel(
-                verbosity_map.get(min(verbosity, 2), {}).get(logger_name, default_level)
-            )
+        if isinstance(logger, logging.Logger) and (
+            log_level := verbosity_map.get(min(verbosity, 2), {}).get(logger_name)
+        ):
+            logger.setLevel(log_level)
             if not any(isinstance(h, RichHandler) for h in logger.handlers):
                 logger.addHandler(rich_handler)
 
@@ -537,10 +531,25 @@ def build_index(
     )
 
 
-@app.command()
-def version():
-    configure_agent_logging(verbosity=0)
-    logger.info(f"PaperQA version: {__version__}")
+def version_callback(value: bool):
+    if value:
+        configure_agent_logging(verbosity=0)
+        logger.info(f"PaperQA version: {__version__}")
+        raise typer.Exit
+
+
+@app.callback()
+def add_version_callback(
+    version: bool | None = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Show the application's version and exit.",
+        callback=version_callback,
+        is_eager=True,
+    )
+):
+    pass
 
 
 if __name__ == "__main__":

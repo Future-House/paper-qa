@@ -9,7 +9,7 @@ import pickle
 import zlib
 from enum import Enum, auto
 from io import StringIO
-from typing import Any, ClassVar, Collection
+from typing import Any, ClassVar, Sequence
 from uuid import UUID
 
 import anyio
@@ -81,12 +81,11 @@ class SearchDocumentStorage(str, Enum):
 
 
 class SearchIndex:
-
-    REQUIRED_FIELDS: ClassVar[set[str]] = {"file_location", "body"}
+    REQUIRED_FIELDS: ClassVar[list[str]] = ["file_location", "body"]
 
     def __init__(
         self,
-        fields: Collection[str] | None = None,
+        fields: Sequence[str] | None = None,
         index_name: str = "pqa_index",
         index_directory: str | os.PathLike | None = None,
         storage: SearchDocumentStorage = SearchDocumentStorage.PICKLE_COMPRESSED,
@@ -350,9 +349,7 @@ async def process_file(
     semaphore: anyio.Semaphore,
     docs_kwargs: dict[str, Any],
 ) -> None:
-
     async with semaphore:
-
         file_name = file_path.name
         if not await search_index.filecheck(str(file_path)):
             logger.info(f"New file to index: {file_name}...")
@@ -437,7 +434,7 @@ async def get_directory_index(
         directory = await directory.absolute()
 
     search_index = SearchIndex(
-        fields=SearchIndex.REQUIRED_FIELDS | {"title", "year"},
+        fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
         index_name=index_name,
         index_directory=index_directory or pqa_directory("indexes"),
     )
