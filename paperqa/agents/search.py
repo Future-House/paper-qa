@@ -7,7 +7,7 @@ import os
 import pathlib
 import pickle
 import zlib
-from collections.abc import Collection
+from collections.abc import Sequence
 from enum import Enum, auto
 from io import StringIO
 from typing import Any, ClassVar
@@ -79,12 +79,11 @@ class SearchDocumentStorage(str, Enum):
 
 
 class SearchIndex:
-
-    REQUIRED_FIELDS: ClassVar[set[str]] = {"file_location", "body"}
+    REQUIRED_FIELDS: ClassVar[list[str]] = ["file_location", "body"]
 
     def __init__(
         self,
-        fields: Collection[str] | None = None,
+        fields: Sequence[str] | None = None,
         index_name: str = "pqa_index",
         index_directory: str | os.PathLike | None = None,
         storage: SearchDocumentStorage = SearchDocumentStorage.PICKLE_COMPRESSED,
@@ -348,9 +347,7 @@ async def process_file(
     semaphore: anyio.Semaphore,
     settings: Settings,
 ) -> None:
-
     async with semaphore:
-
         file_name = file_path.name
         if not await search_index.filecheck(str(file_path)):
             logger.info(f"New file to index: {file_name}...")
@@ -361,7 +358,7 @@ async def process_file(
 
             # We set the LLM/SummaryLLM because
             # it could be that all metadata fails and it has to peek to first page
-            # TODO: Eventually we will have an LLM obejct of some kinda passed here
+            # TODO: Eventually we will have an LLM object of some kinda passed here
             # (or coming from settings)
             tmp_docs = Docs(
                 llm=settings.llm,
@@ -426,7 +423,7 @@ async def get_directory_index(
         directory = await directory.absolute()
 
     search_index = SearchIndex(
-        fields=SearchIndex.REQUIRED_FIELDS | {"title", "year"},
+        fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
         index_name=_settings.get_index_name(),
         index_directory=_settings.agent.index_directory,
     )

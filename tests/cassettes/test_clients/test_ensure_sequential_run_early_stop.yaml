@@ -3,19 +3,14 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.48550/arxiv.2312.07559?fields=externalIds,title
     response:
       body:
         string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
-          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
-          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
-          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 179.37169}]}
+          '{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "title": "PaperQA: Retrieval-Augmented Generative
+          Agent for Scientific Research"}
 
           '
       headers:
@@ -24,31 +19,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "684"
+          - "277"
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:22 GMT
+          - Wed, 04 Sep 2024 21:03:40 GMT
         Via:
-          - 1.1 83a6f42adff040301dd9cde8ff611a9c.cloudfront.net (CloudFront)
+          - 1.1 61770d955dae13eda6e8f1b3baae4d1e.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 1HN8mFjZPofmpyQ4fF_EGLWbgMXI7pT_W-VdVy9L7YyN9jsJFSRazA==
+          - TlIXHVhmD-FMhv1KpKFdxbCIPatnqVtZy-f5g-spchcTG9Ed4hb77g==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmip8FZFPHcEKGw=
+          - dmSu-GTfvHcEqXA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "684"
+          - "277"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:22 GMT
+          - Wed, 04 Sep 2024 21:03:40 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - ed4aabca-2c6a-4740-9643-85222d4e3d55
+          - 4487e5f4-6d25-436d-af83-b4218bc64a04
       status:
         code: 200
         message: OK
@@ -56,7 +51,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2312.07559/transform/application/x-bibtex
     response:
       body:
         string: Resource not found.
@@ -73,7 +68,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Wed, 04 Sep 2024 22:52:22 GMT
+          - Wed, 04 Sep 2024 21:03:40 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

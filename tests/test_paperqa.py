@@ -48,11 +48,9 @@ from paperqa.utils import (
 
 
 @pytest.fixture
-def docs_fixture():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def docs_fixture(stub_data_dir: Path) -> Docs:
     docs = Docs()
-    with open(doc_path, "rb") as f:
+    with open(stub_data_dir / "paper.pdf", "rb") as f:
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
     return docs
 
@@ -470,7 +468,7 @@ async def test_chain_chat():
 
 @pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
-async def test_anthropic_chain(flag_day_fixture) -> None:
+async def test_anthropic_chain(stub_data_dir: Path) -> None:
 
     try:
         from anthropic import AsyncAnthropic
@@ -502,14 +500,16 @@ async def test_anthropic_chain(flag_day_fixture) -> None:
     assert isinstance(completion.text, str)
 
     docs = Docs(llm="claude-3-sonnet-20240229", client=client)
-    await docs.aadd(flag_day_fixture, "National Flag of Canada Day")
+    await docs.aadd(stub_data_dir / "flag_day.html", "National Flag of Canada Day")
     await docs.aget_evidence("What is the national flag of Canada?")
 
 
-def test_make_docs(flag_day_fixture):
+def test_make_docs(stub_data_dir: Path):
     docs = Docs()
     docs.add(
-        flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now", dockey="test"
+        stub_data_dir / "flag_day.html",
+        "WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
     )
     assert docs.docs["test"].docname == "Wiki2023"
 
@@ -592,17 +592,17 @@ def test_llmresult_callback(docs_fixture):
     assert my_results[0].name
 
 
-def test_duplicate(bates_fixture, flag_day_fixture) -> None:
+def test_duplicate(stub_data_dir: Path) -> None:
     """Check Docs doesn't store duplicates, while checking nonduplicate docs are stored."""
     docs = Docs()
     assert docs.add(
-        bates_fixture,
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test1",
     )
     assert (
         docs.add(
-            bates_fixture,
+            stub_data_dir / "bates.txt",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test1",
         )
@@ -610,7 +610,7 @@ def test_duplicate(bates_fixture, flag_day_fixture) -> None:
     )
     assert len(docs.docs) == 1, "Should have added only one document"
     assert docs.add(
-        flag_day_fixture,
+        stub_data_dir / "flag_day.html",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test2",
     )
@@ -619,7 +619,7 @@ def test_duplicate(bates_fixture, flag_day_fixture) -> None:
     ), "Unique documents should be hashed as unique"
 
 
-def test_custom_embedding(bates_fixture):
+def test_custom_embedding(stub_data_dir: Path):
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
@@ -632,18 +632,22 @@ def test_custom_embedding(bates_fixture):
     )
     assert docs._embedding_client is None
     assert docs.embedding == "my_embed"
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert docs.texts[0].embedding == [1, 2, 3]
 
 
-def test_sparse_embedding(bates_fixture) -> None:
+def test_sparse_embedding(stub_data_dir: Path) -> None:
     docs = Docs(
         texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
         embedding_client=None,
     )
     assert docs._embedding_client is None
     assert docs.embedding.startswith("sparse")  # type: ignore[union-attr]
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
@@ -658,11 +662,13 @@ def test_sparse_embedding(bates_fixture) -> None:
     docs = Docs(embedding="sparse")
     assert docs._embedding_client is None
     assert docs.embedding.startswith("sparse")  # type: ignore[union-attr]
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
 
-def test_hybrid_embedding(bates_fixture) -> None:
+def test_hybrid_embedding(stub_data_dir: Path) -> None:
     model = HybridEmbeddingModel(
         models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
     )
@@ -671,7 +677,9 @@ def test_hybrid_embedding(bates_fixture) -> None:
     )
     assert isinstance(docs._embedding_client, AsyncOpenAI)
     assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
     # check the embeddings are the same size
@@ -685,16 +693,20 @@ def test_hybrid_embedding(bates_fixture) -> None:
     )
     assert isinstance(docs._embedding_client, AsyncOpenAI)
     assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
 
-def test_sentence_transformer_embedding(bates_fixture):
+def test_sentence_transformer_embedding(stub_data_dir: Path):
     from paperqa import SentenceTransformerEmbeddingModel
 
     docs = Docs(embedding="sentence-transformers")
     assert docs._embedding_client is None
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
     docs = Docs(
@@ -704,11 +716,13 @@ def test_sentence_transformer_embedding(bates_fixture):
         embedding_client=None,
     )
     assert docs._embedding_client is None
-    docs.add(bates_fixture, citation="WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+    )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
 
-def test_custom_llm(bates_fixture):
+def test_custom_llm(stub_data_dir: Path):
     class MyLLM(LLMModel):
         name: str = "myllm"
 
@@ -722,7 +736,7 @@ def test_custom_llm(bates_fixture):
 
     docs = Docs(llm_model=MyLLM(), client=None)
     docs.add(
-        bates_fixture,
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
@@ -733,7 +747,7 @@ def test_custom_llm(bates_fixture):
     assert "Echo" in evidence[0].context
 
 
-def test_langchain_llm(bates_fixture):
+def test_langchain_llm(stub_data_dir: Path):
     from langchain_openai import ChatOpenAI
 
     docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-4o-mini"))
@@ -742,7 +756,7 @@ def test_langchain_llm(bates_fixture):
     assert docs.llm == "gpt-4o-mini"
     assert docs.summary_llm == "gpt-4o-mini"
     docs.add(
-        bates_fixture,
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
@@ -761,7 +775,7 @@ def test_langchain_llm(bates_fixture):
     docs.get_evidence("What is Frederick Bates's greatest accomplishment?")
 
 
-def test_langchain_embeddings(bates_fixture):
+def test_langchain_embeddings(stub_data_dir: Path):
     from langchain_openai import OpenAIEmbeddings
 
     docs = Docs(
@@ -771,13 +785,13 @@ def test_langchain_embeddings(bates_fixture):
     assert docs._embedding_client is not None
 
     docs.add(
-        bates_fixture,
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     docs = Docs(embedding="langchain", embedding_client=OpenAIEmbeddings())
     docs.add(
-        bates_fixture,
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
@@ -787,7 +801,7 @@ def test_langchain_embeddings(bates_fixture):
     "Langchain updated vector stores and I haven't yet updated the implementation"
 )
 @pytest.mark.asyncio
-async def test_langchain_vector_store(bates_fixture):
+async def test_langchain_vector_store(stub_data_dir: Path):
     from langchain_community.vectorstores.faiss import FAISS
     from langchain_openai import OpenAIEmbeddings
 
@@ -833,7 +847,7 @@ async def test_langchain_vector_store(bates_fixture):
     assert docs._embedding_client is not None  # from default
 
     await docs.aadd(
-        bates_fixture,
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
@@ -851,11 +865,13 @@ async def test_langchain_vector_store(bates_fixture):
     assert dp.texts
 
 
-def test_docs_pickle(flag_day_fixture) -> None:
+def test_docs_pickle(stub_data_dir) -> None:
     """Ensure that Docs object can be pickled and unpickled correctly."""
     docs = Docs()
     docs.add(
-        flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now", dockey="test"
+        stub_data_dir / "flag_day.html",
+        "WikiMedia Foundation, 2023, Accessed now",
+        dockey="test",
     )
 
     # Pickle the Docs object
@@ -866,24 +882,30 @@ def test_docs_pickle(flag_day_fixture) -> None:
     assert len(unpickled_docs.docs) == 1
 
 
-def test_bad_context(bates_fixture):
+def test_bad_context(stub_data_dir):
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query(
         "What do scientist estimate as the planetary composition of Jupyter?"
     )
     assert "cannot answer" in answer.answer
 
 
-def test_repeat_keys(bates_fixture, flag_day_fixture):
+def test_repeat_keys(stub_data_dir):
     docs = Docs()
-    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    result = docs.add(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     assert result
-    result = docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    result = docs.add(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     assert not result
     assert len(docs.docs) == 1
 
-    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
+    )
     assert len(docs.docs) == 2
 
     # check keys
@@ -897,11 +919,9 @@ def test_can_read_normal_pdf_reader(docs_fixture):
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_w_no_match_doc_details():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = Path(os.path.join(tests_dir, "paper.pdf"))
+def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path):
     docs = Docs()
-    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
+    docs.add(stub_data_dir / "paper.pdf", "Wellawatte et al, XAI Review, 2023")
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
     assert (
@@ -909,9 +929,8 @@ def test_pdf_reader_w_no_match_doc_details():
     )
 
 
-def test_pdf_reader_match_doc_details():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = Path(os.path.join(tests_dir, "paper.pdf"))
+def test_pdf_reader_match_doc_details(stub_data_dir: Path):
+    doc_path = stub_data_dir / "paper.pdf"
     docs = Docs()
     # we limit to only crossref since s2 is too flaky
     docs.add(
@@ -937,22 +956,31 @@ def test_pdf_reader_match_doc_details():
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_txt():
+def test_fileio_reader_pdf(stub_data_dir: Path):
+    doc_path = stub_data_dir / "paper.pdf"
+    with open(doc_path, "rb") as f:
+        docs = Docs()
+        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+        answer = docs.query("Are counterfactuals actionable?[yes/no]")
+        assert "yes" in answer.answer or "Yes" in answer.answer
+
+
+def test_fileio_reader_txt(stub_data_dir: Path):
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
-    r = requests.get(  # noqa: S113
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
+    with open(stub_data_dir / "bates.txt", "rb") as file:
+        file_content = file.read()
+
+    docs.add_file(
+        BytesIO(file_content),
+        "WikiMedia Foundation, 2023, Accessed now",
     )
-    if r.status_code != 200:
-        raise ValueError("Could not download wikipedia page")
-    docs.add_file(BytesIO(r.text.encode()), "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country was Frederick Bates born in?")
     assert "United States" in answer.answer
 
 
-def test_pdf_pypdf_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_pdf_pypdf_reader(stub_data_dir: Path):
+    doc_path = stub_data_dir / "paper.pdf"
     splits1 = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
@@ -973,9 +1001,8 @@ def test_pdf_pypdf_reader():
     )
 
 
-def test_parser_only_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_parser_only_reader(stub_data_dir: Path):
+    doc_path = stub_data_dir / "paper.pdf"
     parsed_text = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
@@ -992,9 +1019,8 @@ def test_parser_only_reader():
     )
 
 
-def test_chunk_metadata_reader():
-    tests_dir = os.path.dirname(os.path.abspath(__file__))
-    doc_path = os.path.join(tests_dir, "paper.pdf")
+def test_chunk_metadata_reader(stub_data_dir: Path):
+    doc_path = stub_data_dir / "paper.pdf"
     chunk_text, metadata = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
@@ -1015,13 +1041,7 @@ def test_chunk_metadata_reader():
         for i in range(len(chunk_text) - 1)
     )
 
-    doc_path = "example.html"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        # get wiki page about politician
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-        )
-        f.write(r.text)
+    doc_path = stub_data_dir / "flag_day.html"
 
     chunk_text, metadata = read_doc(
         Path(doc_path),
@@ -1040,10 +1060,10 @@ def test_chunk_metadata_reader():
     assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
-    doc_path = os.path.abspath(__file__)
+    doc_path = Path(os.path.abspath(__file__))
 
     chunk_text, metadata = read_doc(
-        Path(doc_path),
+        doc_path,
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=False,
         overlap=100,
@@ -1080,21 +1100,22 @@ def test_zotero() -> None:
         ZoteroDB(library_type="user")  # "group" if group library
 
 
-def test_too_much_evidence(bates_fixture, flag_day_fixture):
+def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
+    doc_path = stub_data_dir / "obama.txt"
     docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Barack_Obama",
+    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    # add with new dockey
+    docs.add(
+        stub_data_dir_w_near_dupes / "obama_modified.txt",
         "WikiMedia Foundation, 2023, Accessed now",
     )
-    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
     settings = Settings.from_name("fast")
     settings.answer.evidence_k = 10
     settings.answer.answer_max_sources = 10
     docs.query("What is Barrack's greatest accomplishment?", settings=settings)
 
 
-def test_custom_prompts(bates_fixture):
+def test_custom_prompts(stub_data_dir: Path):
     my_qaprompt = (
         "Answer the question '{question}' "
         "using the country name alone. For example: "
@@ -1103,18 +1124,18 @@ def test_custom_prompts(bates_fixture):
     settings = Settings.from_name("fast")
     settings.prompts.qa = my_qaprompt
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query("What country is Frederick Bates from?", settings=settings)
     assert "United States" in answer.answer
 
 
-def test_pre_prompt(bates_fixture):
+def test_pre_prompt(stub_data_dir: Path):
     pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
 
     settings = Settings.from_name("fast")
     settings.prompts.pre = pre
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     assert "212" not in docs.query("What is the boiling point of water?").answer
     assert (
         "212"
@@ -1122,12 +1143,12 @@ def test_pre_prompt(bates_fixture):
     )
 
 
-def test_post_prompt(bates_fixture):
+def test_post_prompt(stub_data_dir: Path):
     post = "The opposite of down is"
     settings = Settings.from_name("fast")
     settings.prompts.post = post
     docs = Docs()
-    docs.add(bates_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     response = docs.query("What country is Bates from?", settings=settings)
     assert "up" in response.answer.lower()
 
@@ -1154,9 +1175,11 @@ def test_embedding_name_consistency():
     assert docs.texts_index.embedding_model.models[1].name == "sparse"
 
 
-def test_external_doc_index(flag_day_fixture):
+def test_external_doc_index(stub_data_dir: Path):
     docs = Docs()
-    docs.add(flag_day_fixture, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
+    )
     # force embedding
     _ = docs.get_evidence(query="What is the date of flag day?")
     docs2 = Docs(texts_index=docs.texts_index)

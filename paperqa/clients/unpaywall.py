@@ -119,7 +119,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
                     await _get_with_retrying(
                         url=(
                             f"{UNPAYWALL_BASE_URL}search?query={quote(query)}"
-                            f'&email={os.environ.get("UNPAYWALL_EMAIL", "test@example.com")}'
+                            f"&email={os.environ.get('UNPAYWALL_EMAIL', 'test@example.com')}"
                         ),
                         params={},
                         session=session,

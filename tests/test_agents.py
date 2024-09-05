@@ -7,8 +7,6 @@ from typing import Any, cast
 from unittest.mock import patch
 
 import pytest
-
-# try:
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
@@ -33,47 +31,47 @@ from paperqa.agents.tools import (
 from paperqa.config import AgentSettings, Settings
 from paperqa.docs import Docs
 from paperqa.types import Answer, Context, Doc, Text
-from paperqa.utils import get_year
-
-# except ImportError:
-#    pytest.skip("agents module is not installed", allow_module_level=True)
+from paperqa.utils import get_year, md5sum
 
 
 @pytest.mark.asyncio
 async def test_get_directory_index(agent_test_settings):
-
     index = await get_directory_index(
         settings=agent_test_settings,
     )
-    assert index.fields == {
-        "title",
+    assert index.fields == [
         "file_location",
         "body",
+        "title",
         "year",
-    }, "Incorrect fields in index"
-    # paper.pdf + bates.html + flag_day.html
-    assert len(await index.index_files) == 3, "Incorrect number of index files"
+    ], "Incorrect fields in index"
+    # paper.pdf + flag_day.html + bates.txt + obama.txt
+    assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
-    # can't really check the dockey, since timestamps/articles change
-    assert results[0].docs.keys()
+    assert results[0].docs.keys() == {
+        md5sum((agent_test_settings.agent.paper_directory / "bates.txt").absolute())
+    }
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index_w_manifest(agent_test_settings):
+async def test_get_directory_index_w_manifest(
+    agent_test_settings, reset_log_levels, caplog  # noqa: ARG001
+):
     agent_test_settings.agent.manifest_file = "stub_manifest.csv"
     index = await get_directory_index(settings=agent_test_settings)
-    assert index.fields == {
-        "title",
+    assert index.fields == [
         "file_location",
         "body",
+        "title",
         "year",
-    }, "Incorrect fields in index"
-    # paper.pdf + bates.html + flag_day.html
-    assert len(await index.index_files) == 3, "Incorrect number of index files"
+    ], "Incorrect fields in index"
+    # paper.pdf + flag_day.html + bates.txt + obama.txt
+    assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
-    # can't really check the dockey, since timestamps/articles change
-    assert top_result.dockey
+    assert top_result.dockey == md5sum(
+        (agent_test_settings.agent.paper_directory / "bates.txt").absolute()
+    )
     # note: this title comes from the manifest, so we know it worked
     assert top_result.title == "Frederick Bates (Wikipedia article)"
 
@@ -142,7 +140,7 @@ async def test_propagate_options(agent_test_settings) -> None:
     assert len(result.answer) > 200, "Answer did not return any results"
     assert "###" in result.answer, "Answer did not propagate system prompt"
     assert (
-        len(result.contexts[0].context) == agent_test_settings.parsing.chunk_chars
+        len(result.contexts[0].context) == agent_test_settings.parsing.chunk_size
     ), "Summary was not skipped"
 
 

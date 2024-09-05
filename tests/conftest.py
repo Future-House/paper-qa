@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
-import tempfile
-import urllib.request
-from collections.abc import Generator
+from collections.abc import Generator, Iterator
 from pathlib import Path
 from unittest.mock import patch
 
@@ -14,6 +13,7 @@ from dotenv import load_dotenv
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
 from paperqa.config import Settings
+from paperqa.types import Answer
 
 PAPER_DIRECTORY = Path(__file__).parent
 
@@ -27,29 +27,11 @@ def _load_env():
 def vcr_config():
     return {
         "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
+        "record_mode": "none",
+        "match_on": ["method", "host", "path", "query"],
+        "allow_playback_repeats": True,
+        "cassette_library_dir": "tests/cassettes",
     }
-
-
-@pytest.fixture
-def bates_fixture():
-    url = "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)"
-    with urllib.request.urlopen(url) as response:
-        html = response.read()
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(html)
-        f.flush()
-    return f.name
-
-
-@pytest.fixture
-def flag_day_fixture():
-    url = "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
-    with urllib.request.urlopen(url) as response:
-        html = response.read()
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(html)
-        f.flush()
-    return f.name
 
 
 @pytest.fixture
@@ -65,20 +47,8 @@ def tmp_path_cleanup(
 @pytest.fixture
 def agent_home_dir(
     tmp_path_cleanup: str | os.PathLike,
-    bates_fixture: os.PathLike,
-    flag_day_fixture: os.PathLike,
 ) -> Generator[str | os.PathLike, None, None]:
     """Set up a unique temporary folder for the agent module."""
-    # download necessary files if not present
-    # tests are written to assume files are present in tests
-    tests_dir = Path(__file__).parent
-    with open(tests_dir / "bates.html", "w") as f, open(bates_fixture) as bates_f:
-        f.write(bates_f.read())
-    with (
-        open(tests_dir / "flag_day.html", "w") as f,
-        open(flag_day_fixture) as flag_day_f,
-    ):
-        f.write(flag_day_f.read())
     with patch.dict("os.environ", {"PQA_HOME": str(tmp_path_cleanup)}):
         yield tmp_path_cleanup
 
@@ -89,9 +59,14 @@ def agent_index_dir(agent_home_dir: Path) -> Path:
 
 
 @pytest.fixture
-def agent_test_settings(agent_index_dir: Path) -> Settings:
+def stub_data_dir() -> Path:
+    return Path(__file__).parent / "stub_data"
+
+
+@pytest.fixture
+def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
     settings = Settings()
-    settings.agent.paper_directory = PAPER_DIRECTORY
+    settings.agent.paper_directory = stub_data_dir
     settings.agent.index_directory = agent_index_dir
     settings.agent.search_count = 2
     settings.embedding = "sparse"
@@ -100,7 +75,43 @@ def agent_test_settings(agent_index_dir: Path) -> Settings:
     return settings
 
 
-@pytest.fixture(name="stub_paper_path", scope="session")
-def fixture_stub_paper_path() -> Path:
-    # Corresponds with https://www.semanticscholar.org/paper/A-Perspective-on-Explanations-of-Molecular-Models-Wellawatte-Gandhi/1db1bde653658ec9b30858ae14650b8f9c9d438b
-    return Path(__file__).parent / "paper.pdf"
+@pytest.fixture
+def agent_stub_answer() -> Answer:
+    return Answer(question="What is is a self-explanatory model?")
+
+
+@pytest.fixture
+def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[Path]:
+
+    # add some near duplicate files then removes them after testing
+    for filename in ("bates.txt", "obama.txt"):
+        if not (tmp_path / f"{filename}_modified.txt").exists():
+            with open(stub_data_dir / filename) as f:
+                content = f.read()
+            with open(tmp_path / f"{Path(filename).stem}_modified.txt", "w") as f:
+                f.write(content)
+                f.write("## MODIFIED FOR HASH")
+
+    yield tmp_path
+
+    if tmp_path.exists():
+        shutil.rmtree(tmp_path, ignore_errors=True)
+
+
+@pytest.fixture
+def reset_log_levels(caplog):
+    logging.getLogger().setLevel(logging.DEBUG)
+
+    for name in logging.root.manager.loggerDict:
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = True
+
+    caplog.set_level(logging.DEBUG)
+
+    yield
+
+    for name in logging.root.manager.loggerDict:
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.NOTSET)
+        logger.propagate = True
