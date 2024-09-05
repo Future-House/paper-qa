@@ -374,9 +374,9 @@ class DocDetails(Doc):
         " We use None as a sentinel for unset values (like for determining hydration) "
         " So, we use -1 means unknown quality and None means it needs to be hydrated.",
     )
-    is_retracted: bool | None =Field(
-        default=None,
-        description="Flag for whether the paper is retracted.",)
+    is_retracted: bool | None = Field(
+        default=None, description="Flag for whether the paper is retracted."
+    )
     doi: str | None = None
     doi_url: str | None = None
     doc_id: str | None = None

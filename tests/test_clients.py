@@ -15,6 +15,7 @@ from paperqa.clients import (
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
+from paperqa.clients.retractions import RetrationDataPostProcessor
 
 
 @pytest.mark.vcr
@@ -326,6 +327,27 @@ async def test_crossref_journalquality_fields_filtering():
             "Nature Machine Intelligence, Unknown year. URL: https://doi.org/10.1038/s42256-024-00832-8, "
             "doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_crossref_retraction_status():
+    async with aiohttp.ClientSession() as session:
+        crossref_client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                [CrossrefProvider, RetrationDataPostProcessor],
+            ),
+        )
+        crossref_details = await crossref_client.query(
+            title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
+            fields=["title", "doi", "authors", "journal"],
+        )
+
+        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]
 
 
 @pytest.mark.vcr

@@ -478,7 +478,7 @@ def test_llm_read_json_newlines():
     }
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_chain_completion():
     client = AsyncOpenAI()
     llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
@@ -503,7 +503,7 @@ async def test_chain_completion():
     assert completion.seconds_to_last_token > 0
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_chain_chat():
     client = AsyncOpenAI()
     llm = OpenAILLMModel(
@@ -530,13 +530,13 @@ async def test_chain_chat():
     assert completion.seconds_to_last_token > 0
 
     # check with mixed callbacks
-    async def ac(x):  # noqa: ARG001
+    async def ac(x):
         pass
 
     completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_anthropic_chain() -> None:
 
     try:
@@ -584,7 +584,7 @@ async def test_anthropic_chain() -> None:
     not (os.environ.get("ANYSCALE_BASE_URL") and os.environ.get("ANYSCALE_API_KEY")),
     reason="Anyscale URL and keys are not set",
 )
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_anyscale_chain():
     client = AsyncOpenAI(
         base_url=os.environ["ANYSCALE_BASE_URL"], api_key=os.environ["ANYSCALE_API_KEY"]
@@ -1090,7 +1090,7 @@ def test_voyage_embeddings():
     assert len(docs.docs["test"].embedding) == 1024, "Wrong voyage-2 embedding shape"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_langchain_vector_store():
     from langchain_community.vectorstores.faiss import FAISS
     from langchain_openai import OpenAIEmbeddings
@@ -1170,7 +1170,7 @@ async def test_langchain_vector_store():
     # will not work at this point - have to reset index
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_aquery():
     docs = Docs()
     await docs.aadd_url(
@@ -1181,7 +1181,7 @@ async def test_aquery():
     await docs.aquery("What is Frederick Bates's greatest accomplishment?")
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_adoc_match() -> None:
     docs = Docs()
     await docs.aadd_url(
