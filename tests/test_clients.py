@@ -430,7 +430,7 @@ async def test_bad_init():
         client = DocMetadataClient(clients=[])  # noqa: F841
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog, reset_log_levels):  # noqa: ARG001
     caplog.set_level(logging.DEBUG)
@@ -465,7 +465,7 @@ async def test_ensure_sequential_run(caplog, reset_log_levels):  # noqa: ARG001
         ), "Crossref should run first"
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(
     caplog, reset_log_levels  # noqa: ARG001
