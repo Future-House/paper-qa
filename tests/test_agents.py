@@ -85,8 +85,8 @@ async def test_get_directory_index_w_manifest(agent_test_settings):
     assert top_result.title == "Frederick Bates (Wikipedia article)"
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
-@pytest.mark.parametrize("agent_type", ["OpenAIFunctionsAgent", "fake"])
+@pytest.mark.flaky(reruns=0, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
+@pytest.mark.parametrize("agent_type", ["fake", "OpenAIFunctionsAgent"])
 @pytest.mark.asyncio
 async def test_agent_types(agent_test_settings, agent_type):
 
@@ -97,6 +97,7 @@ async def test_agent_types(agent_test_settings, agent_type):
         settings=agent_test_settings,
     )
     response = await agent_query(request, agent_type=agent_type)
+    assert response.answer.answer, "Answer not generated"
     assert response.answer.answer != "I cannot answer", "Answer not generated"
     assert len(response.answer.context) >= 1, "No contexts were found"
     assert response.answer.question == question

@@ -366,6 +366,7 @@ async def process_file(
             tmp_docs = Docs(
                 llm=settings.llm,
                 summary_llm=settings.summary_llm,
+                embedding=settings.embedding,
             )
             try:
                 await tmp_docs.aadd(

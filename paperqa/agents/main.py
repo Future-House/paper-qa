@@ -171,7 +171,7 @@ async def run_fake_agent(
     )
     # seed docs with keyword search
     for search in await openai_get_search_query(
-        answer.question, llm=query.llm, count=3
+        answer.question, llm=query.settings.llm, count=3
     ):
         await search_tool.arun(search)
 

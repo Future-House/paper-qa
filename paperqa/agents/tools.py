@@ -258,7 +258,7 @@ class GenerateAnswerTool(BaseTool):
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
         self.shared_state.answer = await self.shared_state.docs.aquery(
-            self.query.query,
+            self.shared_state.answer,
             settings=self.shared_state.settings,
         )
 
