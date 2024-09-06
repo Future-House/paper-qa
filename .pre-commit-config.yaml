@@ -70,6 +70,8 @@ repos:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
         additional_dependencies:
+          - aiohttp
+          - httpx
           - numpy
           - openai>=1 # Match pyproject.toml
           - pydantic~=2.0 # Match pyproject.toml

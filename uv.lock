@@ -199,7 +199,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/25/06/f710a276e4e018b02
 
 [[package]]
 name = "build"
-version = "1.2.1"
+version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "os_name == 'nt'" },
@@ -208,9 +208,9 @@ dependencies = [
     { name = "pyproject-hooks" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/9e/2d725d2f7729c6e79ca62aeb926492abbc06e25910dd30139d60a68bcb19/build-1.2.1.tar.gz", hash = "sha256:526263f4870c26f26c433545579475377b2b7588b6f1eac76a001e873ae3e19d", size = 44781 }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/bb/4a1b7e3a7520e310cf7bfece43788071604e1ccf693a7f0c4638c59068d6/build-1.2.2.tar.gz", hash = "sha256:119b2fb462adef986483438377a13b2f42064a2a3a4161f24a0cca698a07ac8c", size = 46516 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/03/f3c8ba0a6b6e30d7d18c40faab90807c9bb5e9a1e3b2fe2008af624a9c97/build-1.2.1-py3-none-any.whl", hash = "sha256:75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4", size = 21911 },
+    { url = "https://files.pythonhosted.org/packages/91/fd/e4bda6228637ecae5732162b5ac2a5a822e2ba8e546eb4997cde51b231a3/build-1.2.2-py3-none-any.whl", hash = "sha256:277ccc71619d98afdd841a0e96ac9fe1593b823af481d3b0cea748e8894e0613", size = 22823 },
 ]
 
 [[package]]
@@ -1542,10 +1542,12 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev37+g2c1f3f8"
+version = "5.0.0a2.dev34+g0d11594.d20240906"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "html2text" },
+    { name = "httpx" },
     { name = "numpy" },
     { name = "openai" },
     { name = "pybtex" },
@@ -1553,6 +1555,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pypdf" },
+    { name = "setuptools" },
     { name = "tenacity" },
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
@@ -1562,7 +1565,9 @@ dependencies = [
 agents = [
     { name = "anthropic" },
     { name = "anyio" },
+    { name = "langchain" },
     { name = "langchain-community" },
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
     { name = "requests" },
@@ -1578,6 +1583,7 @@ llms = [
     { name = "anthropic" },
     { name = "faiss-cpu" },
     { name = "langchain-community" },
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
     { name = "sentence-transformers" },
@@ -1591,10 +1597,19 @@ typing = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "anthropic" },
+    { name = "anyio" },
     { name = "build" },
+    { name = "faiss-cpu" },
     { name = "ipython" },
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "langchain-core" },
+    { name = "langchain-google-vertexai" },
+    { name = "langchain-openai" },
     { name = "mypy" },
     { name = "pre-commit" },
+    { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-recording" },
@@ -1605,17 +1620,28 @@ dev = [
     { name = "python-dotenv" },
     { name = "pyzotero" },
     { name = "requests" },
+    { name = "sentence-transformers" },
+    { name = "tantivy" },
+    { name = "typer" },
+    { name = "typing-extensions" },
+    { name = "vertexai" },
+    { name = "voyageai" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp" },
     { name = "anthropic", marker = "extra == 'agents'" },
     { name = "anthropic", marker = "extra == 'llms'" },
     { name = "anyio", marker = "extra == 'agents'" },
     { name = "faiss-cpu", marker = "extra == 'llms'" },
     { name = "html2text" },
+    { name = "httpx" },
+    { name = "langchain", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'llms'" },
+    { name = "langchain-core", marker = "extra == 'agents'" },
+    { name = "langchain-core", marker = "extra == 'llms'" },
     { name = "langchain-google-vertexai", marker = "extra == 'google'" },
     { name = "langchain-openai", marker = "extra == 'agents'" },
     { name = "langchain-openai", marker = "extra == 'llms'" },
@@ -1630,6 +1656,7 @@ requires-dist = [
     { name = "pypdf" },
     { name = "requests", marker = "extra == 'agents'" },
     { name = "sentence-transformers", marker = "extra == 'llms'" },
+    { name = "setuptools" },
     { name = "tantivy", marker = "extra == 'agents'" },
     { name = "tenacity" },
     { name = "tiktoken", specifier = ">=0.4.0" },
@@ -1648,6 +1675,7 @@ dev = [
     { name = "build" },
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
+    { name = "paper-qa", extras = ["agents", "google", "llms"] },
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
@@ -2503,6 +2531,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/41/fb/2368f84127920d86330b533792e66b26264e92b729b5c1998aaa33d2e22f/sentence_transformers-3.0.1.tar.gz", hash = "sha256:8a3d2c537cc4d1014ccc20ac92be3d6135420a3bc60ae29a3a8a9b4bb35fbff6", size = 177258 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/4b/922436953394e1bfda05e4bf1fe0e80f609770f256c59a9df7a9254f3e0d/sentence_transformers-3.0.1-py3-none-any.whl", hash = "sha256:01050cc4053c49b9f5b78f6980b5a72db3fd3a0abb9169b1792ac83875505ee6", size = 227071 },
+]
+
+[[package]]
+name = "setuptools"
+version = "74.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/2c/f0a538a2f91ce633a78daaeb34cbfb93a54bd2132a6de1f6cec028eee6ef/setuptools-74.1.2.tar.gz", hash = "sha256:95b40ed940a1c67eb70fc099094bd6e99c6ee7c23aa2306f4d2697ba7916f9c6", size = 1356467 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/9c/9ad11ac06b97e55ada655f8a6bea9d1d3f06e120b178cd578d80e558191d/setuptools-74.1.2-py3-none-any.whl", hash = "sha256:5f4c08aa4d3ebcb57a50c33b1b07e94315d7fc7230f7115e47fc99776c8ce308", size = 1262071 },
 ]
 
 [[package]]

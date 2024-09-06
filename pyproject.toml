@@ -18,13 +18,16 @@ classifiers = [
 ]
 dependencies = [
     "PyCryptodome",
+    "aiohttp",  # TODO: remove in favor of httpx
     "html2text",
+    "httpx",
     "numpy",
     "openai>=1",
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
     "pypdf",
+    "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tenacity",
     "tiktoken>=0.4.0",
     "typing-extensions; python_version <= '3.10'",  # For typing.assert_never
@@ -46,7 +49,9 @@ requires-python = ">=3.10"
 agents = [
     "anthropic",
     "anyio",
+    "langchain",
     "langchain-community",
+    "langchain-core",
     "langchain-openai",
     "pymupdf",
     "requests",
@@ -62,6 +67,7 @@ llms = [
     "anthropic",
     "faiss-cpu",
     "langchain-community",
+    "langchain-core",
     "langchain-openai",
     "pymupdf",
     "sentence_transformers",
@@ -395,6 +401,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
+    "paper-qa[agents,google,llms]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
     "pytest-recording",
