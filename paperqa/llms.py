@@ -676,7 +676,7 @@ class VectorStore(BaseModel, ABC):
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:
-            client: TODOC.
+            client: TODO.
             query: Query vector.
             k: Number of results to return.
             fetch_k: Number of results to fetch from the vector store.

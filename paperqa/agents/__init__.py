@@ -4,7 +4,6 @@ import argparse
 import logging
 import os
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from pydantic_settings import CliSettingsSource
@@ -148,72 +147,36 @@ def main():
     parser = argparse.ArgumentParser(description="PaperQA CLI")
 
     parser.add_argument(
-        "--version", "-v", action="version", version=f"PaperQA version: {__version__}"
-    )
-
-    parser.add_argument(
         "--settings",
         "-s",
-        type=str,
-        help="Name or path of settings file",
         default="default",
+        help="Named settings to use. Will search in local, pqa directory, and package last",
     )
 
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # Set command
-    set_parser = subparsers.add_parser("set", help="Set a persistent PaperQA setting")
-    set_parser.add_argument("variable", help="PaperQA variable to set")
-    set_parser.add_argument("value", help="Value to set to the variable")
+    subparsers = parser.add_subparsers(
+        title="commands", dest="command", description="Available commands"
+    )
 
     # Show command
-    view_parser = subparsers.add_parser("view", help="View the chosen settings")
-    view_parser.add_argument("query", help="Question or task to ask of PaperQA")
+    subparsers.add_parser("view", help="View the chosen settings")
 
-    # Ask command
-    ask_parser = subparsers.add_parser("ask", help="Query PaperQA via an agent")
-    ask_parser.add_argument("query", help="Question or task to ask of PaperQA")
-    ask_parser.add_argument("--agent-type", default="fake", help="Type of agent to use")
-    ask_parser.add_argument(
-        "--verbosity", type=int, default=0, help="Level of verbosity (0-2)"
-    )
-    ask_parser.add_argument(
-        "--directory", type=Path, help="Directory of papers or documents"
-    )
-    ask_parser.add_argument(
-        "--index-directory",
-        type=Path,
-        help="Index directory to store paper index and answers",
-    )
-    ask_parser.add_argument(
-        "--manifest-file", type=Path, help="Optional manifest file (CSV) location"
-    )
-
-    # Search command
-    search_parser = subparsers.add_parser(
-        "search", help="Search using a pre-built PaperQA index"
-    )
-    search_parser.add_argument("query", help="Query for keyword search")
-    search_parser.add_argument("index_name", help="Name of the index to search")
-
-    # Index command
-    index_parser = subparsers.add_parser("index", help="Build a PaperQA search index")
-
+    # Create CliSettingsSource instance
     cli_settings = CliSettingsSource(Settings, root_parser=parser)
 
-    print("ABOUT TO PARSE")
-    args = parser.parse_args()
-
-    settings = Settings.from_name(args.settings, cli_source=cli_settings)
-
-    print(args.command)
+    # Now use argparse to parse the remaining arguments
+    args, remaining_args = parser.parse_known_args()
+    # Parse arguments using CliSettingsSource
+    settings = Settings.from_name(
+        args.settings, cli_source=cli_settings(args=remaining_args)
+    )
 
     match args.command:
         case "ask":
             ask(args.query, settings)
         case "view":
-            logger.info("Viewing settings")
-            logger.info(settings)
+            configure_cli_logging(settings.verbosity)
+            logger.info(f"Viewing: {args.settings}")
+            logger.info(settings.model_dump_json(indent=2))
         case "search":
             search_query(args.query, args.index_name, settings)
         case "index":
