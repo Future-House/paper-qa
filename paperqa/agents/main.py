@@ -17,7 +17,7 @@ from rich.console import Console
 from ..docs import Docs
 from ..types import Answer
 from ..utils import pqa_directory
-from .helpers import litellm_get_search_query, table_formatter, update_doc_models
+from .helpers import litellm_get_search_query, table_formatter
 from .models import (
     AgentCallback,
     AgentStatus,
@@ -51,12 +51,6 @@ async def agent_query(
 
     if docs is None:
         docs = Docs()
-
-    # in-place modification of the docs object to match query
-    update_doc_models(
-        docs,
-        query,
-    )
 
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],

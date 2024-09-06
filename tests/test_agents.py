@@ -13,9 +13,6 @@ from pydantic import ValidationError
 from pytest_subtests import SubTests
 
 from paperqa.agents import agent_query
-from paperqa.agents.helpers import (
-    update_doc_models,
-)
 from paperqa.agents.models import (
     AgentStatus,
     AnswerResponse,
@@ -177,7 +174,6 @@ async def test_agent_sharing_state(agent_test_settings, subtests: SubTests) -> N
         query=answer.question,
         settings=agent_test_settings,
     )
-    update_doc_models(my_docs, query)
     tool_state = SharedToolState(
         docs=my_docs, answer=answer, settings=agent_test_settings
     )

@@ -18,18 +18,17 @@ from pydantic import (
     Field,
     ValidationInfo,
     field_validator,
-    model_validator,
 )
 
 from .clients import DEFAULT_CLIENTS, DocMetadataClient
 from .config import MaybeSettings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
+    EmbeddingModel,
     LiteLLMModel,
     LLMModel,
     NumpyVectorStore,
     VectorStore,
-    vector_store_factory,
 )
 from .paths import PAPERQA_DIR
 from .readers import read_doc
@@ -68,15 +67,6 @@ class Docs(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: UUID = Field(default_factory=uuid4)
-    llm: str = "default"
-    summary_llm: str | None = None
-    llm_model: LLMModel = Field(
-        default=LiteLLMModel(
-            name="gpt-4o-mini",
-        )
-    )
-    summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
-    embedding: str | None = "default"
     docs: dict[DocKey, Doc | DocDetails] = {}
     texts: list[Text] = []
     docnames: set[str] = set()
@@ -87,60 +77,12 @@ class Docs(BaseModel):
     )
     deleted_dockeys: set[DocKey] = set()
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        Docs.make_llm_names_consistent(self)
-
     @field_validator("index_path")
     @classmethod
     def handle_default(cls, value: Path | None, info: ValidationInfo) -> Path | None:
         if value == PAPERQA_DIR:
             return PAPERQA_DIR / info.data["name"]
         return value
-
-    @model_validator(mode="before")
-    @classmethod
-    def setup_alias_models(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            if "llm" in data and data["llm"] != "default":
-                data["llm_model"] = LiteLLMModel(name=data["llm"])
-            if "summary_llm" in data and data["summary_llm"] is not None:
-                data["summary_llm_model"] = LiteLLMModel(name=data["summary_llm"])
-            if (
-                "embedding" in data
-                and data["embedding"] != "default"
-                and "texts_index" not in data
-            ):
-                data["texts_index"] = vector_store_factory(data["embedding"])
-        return data
-
-    @model_validator(mode="after")
-    @classmethod
-    def config_summary_llm_config(cls, data: Any) -> Any:
-        if isinstance(data, Docs):
-            # check our default gpt-4/3.5-turbo config
-            # default check is hard - becauise either llm is set or llm_model is set
-            if (
-                data.summary_llm_model is None
-                and data.llm == "default"
-                and isinstance(data.llm_model, LiteLLMModel)
-            ):
-                data.summary_llm_model = LiteLLMModel(name="gpt-4o-mini")
-            elif data.summary_llm_model is None:
-                data.summary_llm_model = data.llm_model
-        return data
-
-    @classmethod
-    def make_llm_names_consistent(cls, data: Any) -> Any:
-        # TODO: is this needed anymore w. LiteLLM?
-        if isinstance(data, Docs):
-            data.llm = data.llm_model.name
-            if data.summary_llm_model is not None and (
-                data.summary_llm is None and data.summary_llm_model is data.llm_model
-            ):
-                data.summary_llm = data.llm
-            data.embedding = data.texts_index.embedding_model.name
-        return data
 
     def clear_docs(self):
         self.texts = []
@@ -163,6 +105,8 @@ class Docs(BaseModel):
         docname: str | None = None,
         dockey: DocKey | None = None,
         settings: MaybeSettings = None,
+        llm_model: LLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -172,6 +116,8 @@ class Docs(BaseModel):
                 docname=docname,
                 dockey=dockey,
                 settings=settings,
+                llm_model=llm_model,
+                embedding_model=embedding_model,
             )
         )
 
@@ -185,6 +131,8 @@ class Docs(BaseModel):
         doi: str | None = None,
         authors: list[str] | None = None,
         settings: MaybeSettings = None,
+        llm_model: LLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
@@ -207,6 +155,8 @@ class Docs(BaseModel):
                 doi=doi,
                 authors=authors,
                 settings=settings,
+                llm_model=llm_model,
+                embedding_model=embedding_model,
                 **kwargs,
             )
 
@@ -217,6 +167,8 @@ class Docs(BaseModel):
         docname: str | None = None,
         dockey: DocKey | None = None,
         settings: MaybeSettings = None,
+        llm_model: LLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
         loop = get_loop()
         return loop.run_until_complete(
@@ -226,6 +178,8 @@ class Docs(BaseModel):
                 docname=docname,
                 dockey=dockey,
                 settings=settings,
+                llm_model=llm_model,
+                embedding_model=embedding_model,
             )
         )
 
@@ -236,6 +190,8 @@ class Docs(BaseModel):
         docname: str | None = None,
         dockey: DocKey | None = None,
         settings: MaybeSettings = None,
+        llm_model: LLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
         """Add a document to the collection."""
         import urllib.request
@@ -249,6 +205,8 @@ class Docs(BaseModel):
                 docname=docname,
                 dockey=dockey,
                 settings=settings,
+                llm_model=llm_model,
+                embedding_model=embedding_model,
             )
 
     def add(
@@ -261,6 +219,8 @@ class Docs(BaseModel):
         doi: str | None = None,
         authors: list[str] | None = None,
         settings: MaybeSettings = None,
+        llm_model: LLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
         loop = get_loop()
@@ -274,6 +234,8 @@ class Docs(BaseModel):
                 doi=doi,
                 authors=authors,
                 settings=settings,
+                llm_model=llm_model,
+                embedding_model=embedding_model,
                 **kwargs,
             )
         )
@@ -288,16 +250,21 @@ class Docs(BaseModel):
         doi: str | None = None,
         authors: list[str] | None = None,
         settings: MaybeSettings = None,
+        llm_model: LLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
         """Add a document to the collection."""
-        parse_config = get_settings(settings).parsing
+        all_settings = get_settings(settings)
+        parse_config = all_settings.parsing
         if dockey is None:
             # md5 sum of file contents (not path!)
             dockey = md5sum(path)
+        if llm_model is None:
+            llm_model = all_settings.get_llm()
         if citation is None:
             # skip system because it's too hesitant to answer
-            cite_chain = self.llm_model.make_chain(
+            cite_chain = llm_model.make_chain(
                 prompt=parse_config.citation_prompt,
                 skip_system=True,
             )
@@ -343,7 +310,7 @@ class Docs(BaseModel):
 
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
-            structured_cite_chain = self.llm_model.make_chain(
+            structured_cite_chain = llm_model.make_chain(
                 prompt=parse_config.structured_citation_prompt,
                 skip_system=True,
             )
@@ -406,7 +373,7 @@ class Docs(BaseModel):
             raise ValueError(
                 f"This does not look like a text document: {path}. Pass disable_check to ignore this error."
             )
-        if await self.aadd_texts(texts, doc):
+        if await self.aadd_texts(texts, doc, all_settings, embedding_model):
             return docname
         return None
 
@@ -414,11 +381,23 @@ class Docs(BaseModel):
         self,
         texts: list[Text],
         doc: Doc,
+        settings: MaybeSettings = None,
+        embedding_model: EmbeddingModel | None = None,
     ) -> bool:
         loop = get_loop()
-        return loop.run_until_complete(self.aadd_texts(texts, doc))
+        return loop.run_until_complete(
+            self.aadd_texts(
+                texts, doc, settings=settings, embedding_model=embedding_model
+            )
+        )
 
-    async def aadd_texts(self, texts: list[Text], doc: Doc) -> bool:
+    async def aadd_texts(
+        self,
+        texts: list[Text],
+        doc: Doc,
+        settings: MaybeSettings = None,
+        embedding_model: EmbeddingModel | None = None,
+    ) -> bool:
         """
         Add chunked texts to the collection.
 
@@ -427,6 +406,11 @@ class Docs(BaseModel):
         Returns:
             True if the doc was added, otherwise False if already in the collection.
         """
+        all_settings = get_settings(settings)
+
+        if embedding_model is None:
+            embedding_model = all_settings.get_embedding_model()
+
         if doc.dockey in self.docs:
             return False
         if not texts:
@@ -435,9 +419,7 @@ class Docs(BaseModel):
         # the texts until we've set up the Doc's embedding, so callers can retry upon
         # OpenAI rate limit errors
         text_embeddings: list[list[float]] | None = (
-            await self.texts_index.embedding_model.embed_documents(
-                texts=[t.text for t in texts]
-            )
+            await embedding_model.embed_documents(texts=[t.text for t in texts])
             if texts[0].embedding is None
             else None
         )
@@ -481,14 +463,28 @@ class Docs(BaseModel):
         texts = [t for t in self.texts if t not in self.texts_index]
         self.texts_index.add_texts_and_embeddings(texts)
 
-    async def retrieve_texts(self, query: str, k: int) -> list[Text]:
+    async def retrieve_texts(
+        self,
+        query: str,
+        k: int,
+        settings: MaybeSettings = None,
+        embedding_model: EmbeddingModel | None = None,
+    ) -> list[Text]:
+
+        settings = get_settings(settings)
+        if embedding_model is None:
+            embedding_model = settings.get_embedding_model()
+
+        # TODO: should probably happen elsewhere
+        self.texts_index.mmr_lambda = settings.texts_index_mmr_lambda
+
         self._build_texts_index()
         _k = k + len(self.deleted_dockeys)
         matches: list[Text] = cast(
             list[Text],
             (
                 await self.texts_index.max_marginal_relevance_search(
-                    query, k=_k, fetch_k=2 * _k
+                    query, k=_k, fetch_k=2 * _k, embedding_model=embedding_model
                 )
             )[0],
         )
@@ -501,6 +497,8 @@ class Docs(BaseModel):
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
+        embedding_model: EmbeddingModel | None = None,
+        summary_llm_model: LiteLLMModel | None = None,
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aget_evidence(
@@ -508,6 +506,8 @@ class Docs(BaseModel):
                 exclude_text_filter=exclude_text_filter,
                 settings=settings,
                 callbacks=callbacks,
+                embedding_model=embedding_model,
+                summary_llm_model=summary_llm_model,
             )
         )
 
@@ -517,6 +517,8 @@ class Docs(BaseModel):
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
+        embedding_model: EmbeddingModel | None = None,
+        summary_llm_model: LiteLLMModel | None = None,
     ) -> Answer:
 
         answer = Answer(question=query) if isinstance(query, str) else query
@@ -528,6 +530,12 @@ class Docs(BaseModel):
         answer_config = _settings.answer
         prompt_config = _settings.prompts
 
+        if embedding_model is None:
+            embedding_model = _settings.get_embedding_model()
+
+        if summary_llm_model is None:
+            summary_llm_model = _settings.get_summary_llm()
+
         exclude_text_filter = exclude_text_filter or set()
         exclude_text_filter |= {c.text.name for c in answer.contexts}
 
@@ -538,7 +546,9 @@ class Docs(BaseModel):
             )  # heuristic - get enough so we can downselect
 
         if answer_config.evidence_retrieval:
-            matches = await self.retrieve_texts(answer.question, _k)
+            matches = await self.retrieve_texts(
+                answer.question, _k, _settings, embedding_model
+            )
         else:
             matches = self.texts
 
@@ -555,12 +565,12 @@ class Docs(BaseModel):
 
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
-                summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
+                summary_chain = summary_llm_model.make_chain(
                     prompt=prompt_config.summary_json,
                     system_prompt=prompt_config.summary_json_system,
                 )
             else:
-                summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
+                summary_chain = summary_llm_model.make_chain(
                     prompt=prompt_config.summary,
                     system_prompt=prompt_config.system,
                 )
@@ -595,20 +605,29 @@ class Docs(BaseModel):
         query: Answer | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
+        llm_model: LLMModel | None = None,
+        summary_llm_model: LiteLLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aquery(
                 query,
                 settings=settings,
                 callbacks=callbacks,
+                llm_model=llm_model,
+                summary_llm_model=summary_llm_model,
+                embedding_model=embedding_model,
             )
         )
 
-    async def aquery(
+    async def aquery(  # noqa: PLR0912
         self,
         query: Answer | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
+        llm_model: LLMModel | None = None,
+        summary_llm_model: LiteLLMModel | None = None,
+        embedding_model: EmbeddingModel | None = None,
     ) -> Answer:
 
         answer = Answer(question=query) if isinstance(query, str) else query
@@ -617,6 +636,13 @@ class Docs(BaseModel):
         answer_config = _settings.answer
         prompt_config = _settings.prompts
 
+        if llm_model is None:
+            llm_model = _settings.get_llm()
+        if summary_llm_model is None:
+            summary_llm_model = _settings.get_summary_llm()
+        if embedding_model is None:
+            embedding_model = _settings.get_embedding_model()
+
         contexts = answer.contexts
 
         if not contexts:
@@ -624,11 +650,13 @@ class Docs(BaseModel):
                 answer,
                 callbacks=callbacks,
                 settings=settings,
+                embedding_model=embedding_model,
+                summary_llm_model=summary_llm_model,
             )
             contexts = answer.contexts
         pre_str = None
         if prompt_config.pre is not None:
-            pre_chain = self.llm_model.make_chain(
+            pre_chain = llm_model.make_chain(
                 prompt=prompt_config.pre,
                 system_prompt=prompt_config.system,
             )
@@ -668,7 +696,7 @@ class Docs(BaseModel):
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            qa_chain = self.llm_model.make_chain(
+            qa_chain = llm_model.make_chain(
                 prompt=prompt_config.qa,
                 system_prompt=prompt_config.system,
             )
@@ -710,7 +738,7 @@ class Docs(BaseModel):
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         if prompt_config.post is not None:
-            chain = self.llm_model.make_chain(
+            chain = llm_model.make_chain(
                 prompt=prompt_config.post,
                 system_prompt=prompt_config.system,
             )

@@ -9,10 +9,9 @@ from rich.table import Table
 
 from .. import (
     Docs,
-    embedding_model_factory,
 )
 from ..llms import LiteLLMModel
-from .models import AnswerResponse, QueryRequest
+from .models import AnswerResponse
 
 logger = logging.getLogger(__name__)
 
@@ -155,32 +154,3 @@ def compute_total_model_token_cost(token_counts: dict[str, list[int]]) -> float:
                 model, tokens=tokens[0], is_completion=False
             ) + compute_model_token_cost(model, tokens=tokens[1], is_completion=True)
     return cost
-
-
-# the defaults here should be (about) the same as in QueryRequest
-def update_doc_models(doc: Docs, request: QueryRequest | None = None):
-    if request is None:
-        request = QueryRequest()
-
-    doc.llm_model = LiteLLMModel(name=request.settings.llm)
-    doc.summary_llm_model = LiteLLMModel(name=request.settings.summary_llm)
-
-    # set temperatures
-    doc.llm_model.config["model_list"][0]["litellm_params"].update(
-        {"temperature": request.settings.temperature}
-    )
-    doc.summary_llm_model.config["model_list"][0]["litellm_params"].update(
-        {"temperature": request.settings.temperature}
-    )
-
-    doc.texts_index.embedding_model = embedding_model_factory(
-        request.settings.embedding, **(request.settings.embedding_config or {})
-    )
-    doc.texts_index.mmr_lambda = request.settings.texts_index_mmr_lambda
-    doc.embedding = request.settings.embedding
-    Docs.make_llm_names_consistent(doc)
-
-    logger.debug(
-        f"update_doc_models: {doc.name}"
-        f" | {(doc.llm_model.config)} | {(doc.summary_llm_model.config)}"
-    )

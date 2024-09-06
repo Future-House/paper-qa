@@ -421,7 +421,6 @@ def cosine_similarity(a, b):
 class VectorStore(BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
-    embedding_model: EmbeddingModel = Field(default=LiteLLMEmbeddingModel())
     # can be tuned for different tasks
     mmr_lambda: float = Field(default=0.9)
     model_config = ConfigDict(extra="forbid")
@@ -439,7 +438,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     async def similarity_search(
-        self, query: str, k: int
+        self, query: str, k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
         pass
 
@@ -448,7 +447,7 @@ class VectorStore(BaseModel, ABC):
         pass
 
     async def max_marginal_relevance_search(
-        self, query: str, k: int, fetch_k: int
+        self, query: str, k: int, fetch_k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
@@ -456,6 +455,7 @@ class VectorStore(BaseModel, ABC):
             query: Query vector.
             k: Number of results to return.
             fetch_k: Number of results to fetch from the vector store.
+            embedding_model: model used to embed the query
 
         Returns:
             List of tuples (doc, score) of length k.
@@ -463,7 +463,7 @@ class VectorStore(BaseModel, ABC):
         if fetch_k < k:
             raise ValueError("fetch_k must be greater or equal to k")
 
-        texts, scores = await self.similarity_search(query, fetch_k)
+        texts, scores = await self.similarity_search(query, fetch_k, embedding_model)
         if len(texts) <= k or self.mmr_lambda >= 1.0:
             return texts, scores
 
@@ -510,18 +510,18 @@ class NumpyVectorStore(VectorStore):
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
 
     async def similarity_search(
-        self, query: str, k: int
+        self, query: str, k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
         k = min(k, len(self.texts))
         if k == 0:
             return [], []
 
         # this will only affect models that embedding prompts
-        self.embedding_model.set_mode(EmbeddingModes.QUERY)
+        embedding_model.set_mode(EmbeddingModes.QUERY)
 
-        np_query = np.array((await self.embedding_model.embed_documents([query]))[0])
+        np_query = np.array((await embedding_model.embed_documents([query]))[0])
 
-        self.embedding_model.set_mode(EmbeddingModes.DOCUMENT)
+        embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
         similarity_scores = cosine_similarity(
             np_query.reshape(1, -1), self._embeddings_matrix
@@ -537,6 +537,7 @@ class NumpyVectorStore(VectorStore):
         )
 
 
+# TODO: unsure if this is still supported via v5 release
 class LangchainVectorStore(VectorStore):
     """A wrapper around the wrapper langchain.
 
@@ -628,7 +629,7 @@ class LangchainVectorStore(VectorStore):
         )
 
     async def similarity_search(
-        self, query: str, k: int
+        self, query: str, k: int, embedding_model: EmbeddingModel  # noqa: ARG002
     ) -> tuple[Sequence[Embeddable], list[float]]:
         if self._store is None:
             return [], []
@@ -657,7 +658,3 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
         return SparseEmbeddingModel(**kwargs)
 
     return LiteLLMEmbeddingModel(name=embedding, embedding_kwargs=kwargs)
-
-
-def vector_store_factory(embedding: str) -> NumpyVectorStore:
-    return NumpyVectorStore(embedding_model=embedding_model_factory(embedding))

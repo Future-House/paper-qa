@@ -11,7 +11,6 @@ from .llms import (
     NumpyVectorStore,
     SparseEmbeddingModel,
     embedding_model_factory,
-    vector_store_factory,
 )
 from .types import Context, Doc, DocDetails, Text
 from .version import __version__
@@ -37,5 +36,4 @@ __all__ = [
     "embedding_model_factory",
     "get_settings",
     "print_callback",
-    "vector_store_factory",
 ]

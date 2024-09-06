@@ -20,6 +20,7 @@ from .helpers import compute_total_model_token_cost, get_year
 from .search import get_directory_index
 from .models import QueryRequest, SimpleProfiler
 from ..config import Settings
+from ..llms import EmbeddingModel, LiteLLMModel
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,9 @@ class SharedToolState(BaseModel):
     docs: Docs
     settings: Settings
     profiler: SimpleProfiler = Field(default_factory=SimpleProfiler)
+    _llm_model: LiteLLMModel | None = None
+    _summary_llm_model: LiteLLMModel | None = None
+    _embedding_model: EmbeddingModel | None = None
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
@@ -54,6 +58,24 @@ class SharedToolState(BaseModel):
 
     async def get_status(self) -> str:
         return await status(self.docs, self.answer)
+
+    @property
+    def llm_model(self) -> LiteLLMModel:
+        if self._llm_model is None:
+            self._llm_model = self.settings.get_llm()
+        return self._llm_model
+
+    @property
+    def summary_llm_model(self) -> LiteLLMModel:
+        if self._summary_llm_model is None:
+            self._summary_llm_model = self.settings.get_summary_llm()
+        return self._summary_llm_model
+
+    @property
+    def embedding_model(self) -> EmbeddingModel:
+        if self._embedding_model is None:
+            self._embedding_model = self.settings.get_embedding_model()
+        return self._embedding_model
 
 
 def _time_tool(func):
@@ -148,7 +170,12 @@ class PaperSearchTool(BaseTool):
         for r in results:
             this_doc = next(iter(r.docs.values()))
             all_docs.append(this_doc)
-            await self.shared_state.docs.aadd_texts(texts=r.texts, doc=this_doc)
+            await self.shared_state.docs.aadd_texts(
+                texts=r.texts,
+                doc=this_doc,
+                settings=self.shared_state.settings,
+                embedding_model=self.shared_state.embedding_model,
+            )
 
         status = await self.shared_state.get_status()
 
@@ -208,6 +235,8 @@ class GatherEvidenceTool(BaseTool):
         self.shared_state.answer = await self.shared_state.docs.aget_evidence(
             query=self.shared_state.answer,
             settings=self.shared_state.settings,
+            embedding_model=self.shared_state.embedding_model,
+            summary_llm_model=self.shared_state.summary_llm_model,
         )
         l1 = len(self.shared_state.answer.contexts)
         self.shared_state.answer.question = original_question
@@ -257,6 +286,9 @@ class GenerateAnswerTool(BaseTool):
         self.shared_state.answer = await self.shared_state.docs.aquery(
             self.shared_state.answer,
             settings=self.shared_state.settings,
+            llm_model=self.shared_state.llm_model,
+            summary_llm_model=self.shared_state.summary_llm_model,
+            embedding_model=self.shared_state.embedding_model,
         )
 
         if "cannot answer" in self.shared_state.answer.answer.lower():

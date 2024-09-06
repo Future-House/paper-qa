@@ -21,7 +21,6 @@ dependencies = [
     "html2text",
     "litellm",
     "numpy",
-    "openai>=1",
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
@@ -143,6 +142,7 @@ ignore_missing_imports = true
 # Per-module configuration options
 module = [
     "fitz",
+    "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
     "sentence_transformers",  # SEE: https://github.com/UKPLab/sentence-transformers/issues/1723
     "voyageai.*",  # SEE: https://github.com/voyage-ai/voyageai-python/issues/8

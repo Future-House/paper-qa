@@ -9,6 +9,7 @@ from pydantic_settings import (
     BaseSettings,
 )
 
+from .llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from .paths import PAPERQA_DIR
 from .prompts import (
     citation_prompt,
@@ -323,9 +324,25 @@ class Settings(BaseSettings):
         default="gpt-4o-2024-08-06",
         description="Default LLM for most things, including answers. Should be 'best' LLM",
     )
+    llm_config: dict | None = Field(
+        default=None,
+        description=(
+            "LiteLLM Router configuration to pass to LiteLLMModel, must have `model_list` "
+            "key (corresponding to model_list inputs here: https://docs.litellm.ai/docs/routing)"
+            ", and can optionally include a router_kwargs key with router kwargs as values."
+        ),
+    )
     summary_llm: str = Field(
         default="gpt-4o-2024-08-06",
         description="Default LLM for summaries and parsing citations",
+    )
+    summary_llm_config: dict | None = Field(
+        default=None,
+        description=(
+            "LiteLLM Router configuration to pass to LiteLLMModel, must have `model_list` "
+            "key (corresponding to model_list inputs here: https://docs.litellm.ai/docs/routing)"
+            ", and can optionally include a router_kwargs key with router kwargs as values."
+        ),
     )
     embedding: str = Field(
         "text-embedding-3-small",
@@ -398,6 +415,43 @@ class Settings(BaseSettings):
             return Settings.model_validate_json(json_path.read_text())
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")
+
+    def get_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.llm,
+            config=self.llm_config
+            or {
+                "model_list": [
+                    {
+                        "model_name": self.llm,
+                        "litellm_params": {
+                            "model": self.llm,
+                            "temperature": self.temperature,
+                        },
+                    }
+                ]
+            },
+        )
+
+    def get_summary_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.summary_llm,
+            config=self.summary_llm_config
+            or {
+                "model_list": [
+                    {
+                        "model_name": self.summary_llm,
+                        "litellm_params": {
+                            "model": self.summary_llm,
+                            "temperature": self.temperature,
+                        },
+                    }
+                ]
+            },
+        )
+
+    def get_embedding_model(self) -> EmbeddingModel:
+        return embedding_model_factory(self.embedding, **(self.embedding_config or {}))
 
 
 MaybeSettings = Settings | str | None
