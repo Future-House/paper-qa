@@ -627,9 +627,9 @@ class Docs(BaseModel):
         if len(self.docs) == 0 and len(self.texts_index) == 0:
             return answer
 
-        _settings = get_settings(settings)
-        answer_config = _settings.answer
-        prompt_config = _settings.prompts
+        s = get_settings(settings)
+        answer_config = s.answer
+        prompt_config = s.prompts
 
         exclude_text_filter = exclude_text_filter or set()
         exclude_text_filter |= {c.text.name for c in answer.contexts}
@@ -718,9 +718,9 @@ class Docs(BaseModel):
 
         answer = Answer(question=query) if isinstance(query, str) else query
 
-        _settings = get_settings(settings)
-        answer_config = _settings.answer
-        prompt_config = _settings.prompts
+        s = get_settings(settings)
+        answer_config = s.answer
+        prompt_config = s.prompts
 
         contexts = answer.contexts
 

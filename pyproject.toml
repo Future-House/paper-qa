@@ -87,7 +87,7 @@ llms = [
 ]
 
 [project.scripts]
-pqa = "paperqa.agents:app"
+pqa = "paperqa.agents:main"
 
 [tool.codespell]
 check-filenames = true

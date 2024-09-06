@@ -37,8 +37,8 @@ from paperqa.llms import (
 )
 from paperqa.readers import read_doc
 from paperqa.utils import (
+    extract_score,
     get_citenames,
-    get_score,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -224,7 +224,7 @@ def test_extract_score():
     cancer-associated fibroblasts that typically survive at 2 weeks when cultured
     with oxaliplatin. (0/10)
     """
-    assert get_score(sample) == 0
+    assert extract_score(sample) == 0
 
     sample = """
     COVID-19 vaccinations have been shown to be effective against hospitalization
@@ -236,7 +236,7 @@ def test_extract_score():
     showed higher and more sustained vaccine effectiveness. 8
     """
 
-    assert get_score(sample) == 8
+    assert extract_score(sample) == 8
 
     sample = """
     Here is a 100-word summary of the text:
@@ -252,7 +252,7 @@ def test_extract_score():
     provide protection against COVID-19. Relevance score: 8
     """
 
-    assert get_score(sample) == 8
+    assert extract_score(sample) == 8
 
     sample = """
     Here is a 100-word summary of the provided text: The text details
@@ -267,7 +267,7 @@ def test_extract_score():
     effectiveness of COVID-19 vaccinations. Score: 3/10
     """
 
-    assert get_score(sample) == 3
+    assert extract_score(sample) == 3
 
     sample = """
     Here is a 100-word summary of the text: The text discusses a
@@ -285,7 +285,7 @@ def test_extract_score():
     of COVID-19 vaccinations.
     """
 
-    assert get_score(sample) == 8
+    assert extract_score(sample) == 8
 
     sample = """
     Here is a 100-word summary of the text: The text discusses the safety and
@@ -303,7 +303,7 @@ def test_extract_score():
     of Covid-19 vaccinations.
     """
 
-    assert get_score(sample) == 5
+    assert extract_score(sample) == 5
 
     sample = """
     Introduce dynamic elements such as moving nodes or edges to create a sense of activity within
@@ -324,7 +324,7 @@ def test_extract_score():
         organize the network in a visually appealing manner, such as
         force-directed placement or hierarchical layouts. 3/10 """
 
-    assert get_score(sample) == 3
+    assert extract_score(sample) == 3
 
     sample = (
         "The text mentions a work by Shozo Yokoyama titled "
@@ -336,7 +336,7 @@ def test_extract_score():
         "Relevance Score: 7"
     )
 
-    assert get_score(sample) == 7
+    assert extract_score(sample) == 7
 
     sample = (
         "The evolution of human color vision is "
@@ -356,7 +356,7 @@ def test_extract_score():
         "Relevance Score: 9.5"
     )
 
-    assert get_score(sample) == 9
+    assert extract_score(sample) == 9
 
 
 @pytest.mark.parametrize(

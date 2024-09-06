@@ -121,7 +121,7 @@ def strip_citations(text: str) -> str:
     return re.sub(citation_regex, "", text, flags=re.MULTILINE)
 
 
-def get_score(text: str) -> int:
+def extract_score(text: str) -> int:
     # check for N/A
     last_line = text.split("\n")[-1]
     if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
@@ -215,7 +215,7 @@ def flatten(iteratble: list) -> list:
 
 def get_loop() -> asyncio.AbstractEventLoop:
     try:
-        loop = asyncio.get_running_loop()  # new in python 3.10
+        loop = asyncio.get_running_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

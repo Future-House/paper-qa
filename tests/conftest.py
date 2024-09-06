@@ -66,8 +66,8 @@ def stub_data_dir() -> Path:
 @pytest.fixture
 def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
     settings = Settings()
-    settings.agent.paper_directory = stub_data_dir
-    settings.agent.index_directory = agent_index_dir
+    settings.paper_directory = stub_data_dir
+    settings.index_directory = agent_index_dir
     settings.agent.search_count = 2
     settings.embedding = "sparse"
     settings.answer.answer_max_sources = 2

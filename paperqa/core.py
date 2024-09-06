@@ -7,7 +7,7 @@ from typing import Any
 
 from .llms import Chain
 from .types import Context, LLMResult, Text
-from .utils import get_score, strip_citations
+from .utils import extract_score, strip_citations
 
 
 def llm_parse_json(text: str) -> dict:
@@ -83,7 +83,7 @@ async def map_fxn_summary(
                 score = (
                     result_data.pop("relevance_score")
                     if "relevance_score" in result_data
-                    else get_score(context)
+                    else extract_score(context)
                 )
                 # just in case question was present
                 result_data.pop("question", None)
@@ -97,7 +97,7 @@ async def map_fxn_summary(
     # remove citations that collide with our grounded citations (for the answer LLM)
     context = strip_citations(context)
     if not success:
-        score = get_score(context)
+        score = extract_score(context)
 
     c = Context(
         context=context,

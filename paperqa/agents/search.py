@@ -402,7 +402,6 @@ async def process_file(
             logger.info(f"Complete ({title}).")
 
 
-# TODO: Use settings directly for some of this config
 async def get_directory_index(
     sync_index_w_directory: bool = True,
     settings: MaybeSettings = None,
@@ -417,7 +416,7 @@ async def get_directory_index(
     _settings = get_settings(settings)
 
     semaphore = anyio.Semaphore(_settings.agent.index_concurrency)
-    directory = anyio.Path(_settings.agent.paper_directory)
+    directory = anyio.Path(_settings.paper_directory)
 
     if _settings.index_absolute_directory:
         directory = await directory.absolute()
@@ -425,13 +424,11 @@ async def get_directory_index(
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
         index_name=_settings.get_index_name(),
-        index_directory=_settings.agent.index_directory,
+        index_directory=_settings.index_directory,
     )
 
     manifest_file = (
-        anyio.Path(_settings.agent.manifest_file)
-        if _settings.agent.manifest_file
-        else None
+        anyio.Path(_settings.manifest_file) if _settings.manifest_file else None
     )
     # check if it doesn't exist - if so, try to make it relative
     if manifest_file and not await manifest_file.exists():

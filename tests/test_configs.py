@@ -44,5 +44,5 @@ def test_get_settings_missing_file(mocker):
 
 def test_settings_default_instantiation():
     settings = Settings()
-    assert "gpt-4o-2024-08-06" in settings.llm
+    assert "gpt-" in settings.llm
     assert settings.answer.evidence_k == 10

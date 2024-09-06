@@ -5,9 +5,7 @@ from pathlib import Path
 from typing import ClassVar, assert_never, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_settings import (
-    BaseSettings,
-)
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .paths import PAPERQA_DIR
 from .prompts import (
@@ -26,6 +24,8 @@ from .version import __version__
 
 
 class AnswerSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     evidence_k: int = Field(
         default=10, description="Number of evidence pieces to retrieve"
     )
@@ -55,7 +55,6 @@ class AnswerSettings(BaseModel):
         default=False,
         description="Whether to cite background information provided by model.",
     )
-    model_config = ConfigDict(extra="forbid")
 
 
 class ParsingOptions(str, Enum):
@@ -131,8 +130,9 @@ class ParsingSettings(BaseModel):
         )
 
 
-# Mock a dictionary and store any missing items
 class _FormatDict(dict):
+    """Mock a dictionary and store any missing items."""
+
     def __init__(self) -> None:
         self.key_set: set[str] = set()
 
@@ -149,6 +149,8 @@ def get_formatted_variables(s: str) -> set[str]:
 
 
 class PromptSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     summary: str = summary_prompt
     qa: str = qa_prompt
     select: str = select_paper_prompt
@@ -170,7 +172,6 @@ class PromptSettings(BaseModel):
     # to get JSON
     summary_json: str = summary_json_prompt
     summary_json_system: str = summary_json_system_prompt
-    model_config = ConfigDict(extra="forbid")
     EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
 
     @field_validator("summary")
@@ -225,9 +226,15 @@ class PromptSettings(BaseModel):
 
 
 class AgentSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     agent_llm: str = Field(
         default="gpt-4o-2024-08-06",
         description="Model to use for agent",
+    )
+    agent_type: str = Field(
+        default="fake",
+        description="Type of agent to use",
     )
 
     agent_system_prompt: str | None = Field(
@@ -252,25 +259,6 @@ class AgentSettings(BaseModel):
         "call {gen_answer_tool_name} tool. The {gen_answer_tool_name} tool output is visible to the user, "
         "so you do not need to restate the answer and can simply terminate if the answer looks sufficient. "
         "The current status of evidence/papers/cost is {status}"
-    )
-    paper_directory: str | os.PathLike = Field(
-        default=Path.cwd(),
-        description=(
-            "Local directory which contains the papers to be indexed and searched."
-        ),
-    )
-    index_directory: str | os.PathLike | None = Field(
-        default_factory=lambda: pqa_directory("indexes"),
-        description=(
-            "Directory to store the PQA generated search index, configuration, and answer indexes."
-        ),
-    )
-    manifest_file: str | os.PathLike | None = Field(
-        default=None,
-        description=(
-            "Optional manifest CSV, containing columns which are attributes for a DocDetails object. "
-            "Only 'file_location','doi', and 'title' will be used when indexing."
-        ),
     )
     search_count: int = 8
     wipe_context_on_answer_failure: bool = True
@@ -300,7 +288,6 @@ class AgentSettings(BaseModel):
         default=30,
         description="Number of concurrent filesystem reads for indexing",
     )
-    model_config = ConfigDict(extra="forbid")
 
     @field_validator("tool_names")
     @classmethod
@@ -319,6 +306,10 @@ class AgentSettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    model_config = model_config = SettingsConfigDict(
+        cli_parse_args=True, extra="forbid"
+    )
+
     llm: str = Field(
         default="gpt-4o-2024-08-06",
         description="Default LLM for most things, including answers. Should be 'best' LLM",
@@ -344,24 +335,47 @@ class Settings(BaseSettings):
         default=False,
         description="Whether to use the absolute directory for the PQA index",
     )
-    answer: AnswerSettings = AnswerSettings()
-    parsing: ParsingSettings = ParsingSettings()
-    prompts: PromptSettings = PromptSettings()
-    agent: AgentSettings = AgentSettings()
-    model_config = ConfigDict(extra="forbid")
+    index_directory: str | os.PathLike | None = Field(
+        default=pqa_directory("indexes"),
+        description=(
+            "Directory to store the PQA generated search index, configuration, and answer indexes."
+        ),
+    )
+    verbosity: int = Field(default=0, help="Integer verbosity level for logging")
+    manifest_file: str | os.PathLike | None = Field(
+        default=None,
+        description=(
+            "Optional manifest CSV, containing columns which are attributes for a DocDetails object. "
+            "Only 'file_location','doi', and 'title' will be used when indexing."
+        ),
+    )
+    paper_directory: str | os.PathLike = Field(
+        default=Path.cwd(),
+        description=(
+            "Local directory which contains the papers to be indexed and searched."
+        ),
+    )
+
+    answer: AnswerSettings = Field(default_factory=AnswerSettings)
+    parsing: ParsingSettings = Field(default_factory=ParsingSettings)
+    prompts: PromptSettings = Field(default_factory=PromptSettings)
+    agent: AgentSettings = Field(default_factory=AgentSettings)
 
     def get_index_name(self) -> str:
+        """Get programmatically generated index name.
 
+        This index is where parsings are stored based on parsing/embedding strategy.
+        """
         # index name should use an absolute path
         # this way two different folders where the
         # user locally uses '.' will make different indexes
-        paper_directory = self.agent.paper_directory
+        paper_directory = self.paper_directory
         if isinstance(paper_directory, Path):
             paper_directory = str(paper_directory.absolute())
 
         index_fields = "|".join(
             [
-                str(paper_directory),  # cast for typing
+                str(paper_directory),
                 self.embedding,
                 str(self.parsing.chunk_size),
                 str(self.parsing.overlap),
@@ -410,4 +424,4 @@ def get_settings(config_or_name: MaybeSettings = None) -> Settings:
         return Settings()
 
     config_name = config_or_name
-    return Settings.from_name(config_name)
+    return Settings.from_name(config_name=config_name)

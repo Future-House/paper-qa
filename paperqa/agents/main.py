@@ -61,7 +61,7 @@ async def agent_query(
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
-        index_directory=query.settings.agent.index_directory,
+        index_directory=query.settings.index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 

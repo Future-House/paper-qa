@@ -55,7 +55,7 @@ class LLMResult(BaseModel):
 
     To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
 
-    ```
+    ```python
     my_answer_id = uuid4()
     with set_llm_answer_ids(my_answer_id):
         # code that generates LLMResults

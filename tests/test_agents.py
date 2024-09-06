@@ -49,7 +49,7 @@ async def test_get_directory_index(agent_test_settings):
     assert len(await index.index_files) == 4, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     assert results[0].docs.keys() == {
-        md5sum((agent_test_settings.agent.paper_directory / "bates.txt").absolute())
+        md5sum((agent_test_settings.paper_directory / "bates.txt").absolute())
     }
 
 
@@ -57,7 +57,7 @@ async def test_get_directory_index(agent_test_settings):
 async def test_get_directory_index_w_manifest(
     agent_test_settings, reset_log_levels, caplog  # noqa: ARG001
 ):
-    agent_test_settings.agent.manifest_file = "stub_manifest.csv"
+    agent_test_settings.manifest_file = "stub_manifest.csv"
     index = await get_directory_index(settings=agent_test_settings)
     assert index.fields == [
         "file_location",
@@ -70,7 +70,7 @@ async def test_get_directory_index_w_manifest(
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
     assert top_result.dockey == md5sum(
-        (agent_test_settings.agent.paper_directory / "bates.txt").absolute()
+        (agent_test_settings.paper_directory / "bates.txt").absolute()
     )
     # note: this title comes from the manifest, so we know it worked
     assert top_result.title == "Frederick Bates (Wikipedia article)"
