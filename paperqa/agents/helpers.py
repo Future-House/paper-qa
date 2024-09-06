@@ -63,7 +63,7 @@ async def litellm_get_search_query(
         )
     model = LiteLLMModel(name=llm)
     model.config["model_list"][0]["litellm_params"].update({"temperature": temperature})
-    chain = model.make_chain(client=None, prompt=search_prompt, skip_system=True)
+    chain = model.make_chain(prompt=search_prompt, skip_system=True)
     result = await chain({"question": question, "count": count})  # type: ignore[call-arg]
     search_query = result.text
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004

@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
-from openai import AsyncOpenAI
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -22,27 +21,14 @@ from pydantic import (
     model_validator,
 )
 
-try:
-    import voyageai
-
-    USE_VOYAGE = True
-except ImportError:
-    USE_VOYAGE = False
-
 from .clients import DEFAULT_CLIENTS, DocMetadataClient
 from .config import MaybeSettings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
-    HybridEmbeddingModel,
-    LiteLLMEmbeddingModel,
     LiteLLMModel,
     LLMModel,
     NumpyVectorStore,
-    OpenAIEmbeddingModel,
-    OpenAILLMModel,
     VectorStore,
-    VoyageAIEmbeddingModel,
-    is_anyscale_model,
     vector_store_factory,
 )
 from .paths import PAPERQA_DIR
@@ -81,9 +67,6 @@ class Docs(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    # ephemeral vars that should not be pickled (_things)
-    _client: Any | None = None
-    _embedding_client: Any | None = None
     id: UUID = Field(default_factory=uuid4)
     llm: str = "default"
     summary_llm: str | None = None
@@ -105,16 +88,8 @@ class Docs(BaseModel):
     deleted_dockeys: set[DocKey] = set()
 
     def __init__(self, **data):
-        # We do it here because we need to move things to private attributes
-        embedding_client: Any | None = None
-        client: Any | None = None
-        if "embedding_client" in data:
-            embedding_client = data.pop("embedding_client")
-        if "client" in data:
-            client = data.pop("client")
-        # backwards compatibility
         super().__init__(**data)
-        self.set_client(client, embedding_client)
+        Docs.make_llm_names_consistent(self)
 
     @field_validator("index_path")
     @classmethod
@@ -160,22 +135,10 @@ class Docs(BaseModel):
         # TODO: is this needed anymore w. LiteLLM?
         if isinstance(data, Docs):
             data.llm = data.llm_model.name
-            if data.llm == "langchain":
-                # from langchain models - kind of hacky
-                # langchain models cannot know type until
-                # it sees client
-                data.llm_model.infer_llm_type(data._client)
-                data.llm = data.llm_model.name
-            if data.summary_llm_model is not None:
-                if (
-                    data.summary_llm is None
-                    and data.summary_llm_model is data.llm_model
-                ):
-                    data.summary_llm = data.llm
-                if data.summary_llm == "langchain":
-                    # from langchain models - kind of hacky
-                    data.summary_llm_model.infer_llm_type(data._client)
-                    data.summary_llm = data.summary_llm_model.name
+            if data.summary_llm_model is not None and (
+                data.summary_llm is None and data.summary_llm_model is data.llm_model
+            ):
+                data.summary_llm = data.llm
             data.embedding = data.texts_index.embedding_model.name
         return data
 
@@ -183,81 +146,6 @@ class Docs(BaseModel):
         self.texts = []
         self.docs = {}
         self.docnames = set()
-
-    def __getstate__(self):
-        # You may wonder why make these private if we're just going
-        # to be overriding the behavior on setstaet/getstate anyway.
-        # The reason is that the other serialization methods from Pydantic -
-        # model_dump - will not drop private attributes.
-        # So - this getstate/setstate removes private attributes for pickling
-        # and Pydantic will handle removing private attributes for other
-        # serialization methods (like model_dump_json)
-        state = super().__getstate__()
-        # remove client from private attributes
-        del state["__pydantic_private__"]["_client"]
-        del state["__pydantic_private__"]["_embedding_client"]
-        return state
-
-    def __setstate__(self, state):
-        # add client back to private attributes
-        state["__pydantic_private__"]["_client"] = None
-        state["__pydantic_private__"]["_embedding_client"] = None
-        super().__setstate__(state)
-
-    def set_client(
-        self,
-        client: Any | None = None,
-        embedding_client: Any | None = None,
-    ):
-        """Sets an API client for non LiteLLM compatibility.
-
-        If using the LiteLLMModel or LiteLLMEmbeddingModel, no client is needed.
-
-        """
-        if isinstance(self.llm_model, LiteLLMModel):
-            client = None
-        # below logic only for backwards compatibility
-        elif client is None and isinstance(self.llm_model, OpenAILLMModel):
-            if is_anyscale_model(self.llm_model.name):
-                client = AsyncOpenAI(
-                    api_key=os.environ["ANYSCALE_API_KEY"],
-                    base_url=os.environ["ANYSCALE_BASE_URL"],
-                )
-            else:
-                client = AsyncOpenAI()
-        self._client = client
-        if isinstance(self.texts_index.embedding_model, LiteLLMEmbeddingModel):
-            embedding_client = None
-        # below logic only for backwards compatibility
-        elif embedding_client is None:
-            # check if we have an openai embedding model in use
-            if isinstance(self.texts_index.embedding_model, OpenAIEmbeddingModel) or (
-                isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
-                and any(
-                    isinstance(m, OpenAIEmbeddingModel)
-                    for m in self.texts_index.embedding_model.models
-                )
-            ):
-                embedding_client = (
-                    client if isinstance(client, AsyncOpenAI) else AsyncOpenAI()
-                )
-            elif USE_VOYAGE and (
-                isinstance(self.texts_index.embedding_model, VoyageAIEmbeddingModel)
-                or (
-                    isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)
-                    and any(
-                        isinstance(m, VoyageAIEmbeddingModel)
-                        for m in self.texts_index.embedding_model.models
-                    )
-                )
-            ):
-                embedding_client = (
-                    client
-                    if isinstance(client, voyageai.AsyncClient)
-                    else voyageai.AsyncClient()
-                )
-        self._embedding_client = embedding_client
-        Docs.make_llm_names_consistent(self)
 
     def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name."""
@@ -410,7 +298,6 @@ class Docs(BaseModel):
         if citation is None:
             # skip system because it's too hesitant to answer
             cite_chain = self.llm_model.make_chain(
-                client=self._client,
                 prompt=parse_config.citation_prompt,
                 skip_system=True,
             )
@@ -457,7 +344,6 @@ class Docs(BaseModel):
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
             structured_cite_chain = self.llm_model.make_chain(
-                client=self._client,
                 prompt=parse_config.structured_citation_prompt,
                 skip_system=True,
             )
@@ -550,7 +436,7 @@ class Docs(BaseModel):
         # OpenAI rate limit errors
         text_embeddings: list[list[float]] | None = (
             await self.texts_index.embedding_model.embed_documents(
-                self._embedding_client, texts=[t.text for t in texts]
+                texts=[t.text for t in texts]
             )
             if texts[0].embedding is None
             else None
@@ -602,7 +488,7 @@ class Docs(BaseModel):
             list[Text],
             (
                 await self.texts_index.max_marginal_relevance_search(
-                    self._embedding_client, query, k=_k, fetch_k=2 * _k
+                    query, k=_k, fetch_k=2 * _k
                 )
             )[0],
         )
@@ -670,13 +556,11 @@ class Docs(BaseModel):
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
                 summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
-                    client=self._client,
                     prompt=prompt_config.summary_json,
                     system_prompt=prompt_config.summary_json_system,
                 )
             else:
                 summary_chain = self.summary_llm_model.make_chain(  # type: ignore[union-attr]
-                    client=self._client,
                     prompt=prompt_config.summary,
                     system_prompt=prompt_config.system,
                 )
@@ -745,7 +629,6 @@ class Docs(BaseModel):
         pre_str = None
         if prompt_config.pre is not None:
             pre_chain = self.llm_model.make_chain(
-                client=self._client,
                 prompt=prompt_config.pre,
                 system_prompt=prompt_config.system,
             )
@@ -786,7 +669,6 @@ class Docs(BaseModel):
             )
         else:
             qa_chain = self.llm_model.make_chain(
-                client=self._client,
                 prompt=prompt_config.qa,
                 system_prompt=prompt_config.system,
             )
@@ -829,7 +711,6 @@ class Docs(BaseModel):
 
         if prompt_config.post is not None:
             chain = self.llm_model.make_chain(
-                client=self._client,
                 prompt=prompt_config.post,
                 system_prompt=prompt_config.system,
             )

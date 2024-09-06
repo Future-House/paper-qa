@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from abc import ABC, abstractmethod
 from collections.abc import (
-    AsyncGenerator,
     Awaitable,
     Callable,
     Coroutine,
@@ -18,109 +16,19 @@ from typing import (
     cast,
 )
 
-import litellm
 import numpy as np
 import tiktoken
 from litellm import Router, aembedding, token_counter
-from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .prompts import default_system_prompt
 from .types import Doc, Embeddable, LLMResult, Text
-from .utils import batch_iter, flatten, gather_with_concurrency, is_coroutine_callable
-
-try:
-    from anthropic import AsyncAnthropic
-    from anthropic.types import ContentBlockDeltaEvent
-except ImportError:
-    AsyncAnthropic = Any
-    ContentBlockDeltaEvent = Any
-
-litellm.vertex_ai_safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-]
-
-ANYSCALE_MODEL_PREFIXES: tuple[str, ...] = (
-    "meta-llama/Meta-Llama-3-",
-    "mistralai/Mistral-",
-    "mistralai/Mixtral-",
-)
+from .utils import is_coroutine_callable
 
 Chain = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
     Awaitable[LLMResult],
 ]
-
-
-def guess_model_type(model_name: str) -> str:  # noqa: PLR0911
-    if model_name.startswith("babbage"):
-        return "completion"
-    if model_name.startswith("davinci"):
-        return "completion"
-    if (
-        os.environ.get("ANYSCALE_API_KEY")
-        and os.environ.get("ANYSCALE_BASE_URL")
-        and (model_name.startswith(ANYSCALE_MODEL_PREFIXES))
-    ):
-        return "chat"
-    if "instruct" in model_name:
-        return "completion"
-    if model_name.startswith("gpt-4"):
-        if "base" in model_name:
-            return "completion"
-        return "chat"
-    if model_name.startswith("gpt-3.5"):
-        return "chat"
-    return "completion"
-
-
-def is_anyscale_model(model_name: str) -> bool:
-    # compares prefixes with anyscale models
-    # https://docs.anyscale.com/endpoints/text-generation/query-a-model/
-    return bool(
-        os.environ.get("ANYSCALE_API_KEY")
-        and os.environ.get("ANYSCALE_BASE_URL")
-        and model_name.startswith(ANYSCALE_MODEL_PREFIXES)
-    )
-
-
-def is_openai_model(model_name: str) -> bool:
-    return is_anyscale_model(model_name) or model_name.startswith(
-        ("gpt-", "babbage", "davinci", "ft:gpt-")
-    )
-
-
-def process_llm_config(
-    llm_config: dict, max_token_name: str = "max_tokens"  # noqa: S107
-) -> dict:
-    """Remove model_type and try to set max_tokens."""
-    result = {k: v for k, v in llm_config.items() if k != "model_type"}
-    if max_token_name not in result or result[max_token_name] == -1:
-        model = llm_config["model"]
-        # now we guess - we could use tiktoken to count,
-        # but do have the initiative right now
-        if model.startswith("gpt-4") or (
-            model.startswith("gpt-3.5") and "1106" in model
-        ):
-            result[max_token_name] = 3000
-        else:
-            result[max_token_name] = 1500
-    return result
 
 
 def expects_name_kwarg(func: Callable) -> bool:
@@ -147,24 +55,6 @@ async def do_callbacks(
         f(*args, **kwargs)
 
 
-async def embed_documents(
-    client: AsyncOpenAI, texts: list[str], embedding_model: str, batch_size: int = 16
-) -> list[list[float]]:
-    """Embed a list of documents with batching."""
-    if client is None:
-        raise ValueError("Client is None")
-    N = len(texts)
-    embeddings = []
-    for i in range(0, N, batch_size):
-        response = await client.embeddings.create(
-            model=embedding_model,
-            input=texts[i : i + batch_size],
-            encoding_format="float",
-        )
-        embeddings.extend([e.embedding for e in response.data])
-    return embeddings
-
-
 class EmbeddingModes(str, Enum):
     DOCUMENT = "document"
     QUERY = "query"
@@ -177,15 +67,8 @@ class EmbeddingModel(ABC, BaseModel):
         """Several embedding models have a 'mode' or prompt which affects output."""
 
     @abstractmethod
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
+    async def embed_documents(self, texts: list[str]) -> list[list[float]]:
         pass
-
-
-class OpenAIEmbeddingModel(EmbeddingModel):
-    name: str = Field(default="text-embedding-3-small")
-
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
 
 
 class LiteLLMEmbeddingModel(EmbeddingModel):
@@ -193,7 +76,7 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
     embedding_kwargs: dict = Field(default={})
 
     async def embed_documents(
-        self, client: Any | None, texts: list[str], batch_size: int = 16  # noqa: ARG002
+        self, texts: list[str], batch_size: int = 16
     ) -> list[list[float]]:
         N = len(texts)
         embeddings = []
@@ -212,7 +95,7 @@ class SparseEmbeddingModel(EmbeddingModel):
     ndim: int = 256
     enc: Any = Field(default_factory=lambda: tiktoken.get_encoding("cl100k_base"))
 
-    async def embed_documents(self, client, texts) -> list[list[float]]:  # noqa: ARG002
+    async def embed_documents(self, texts) -> list[list[float]]:
         enc_batch = self.enc.encode_ordinary_batch(texts)
         # now get frequency of each token rel to length
         return [
@@ -226,38 +109,11 @@ class HybridEmbeddingModel(EmbeddingModel):
     name: str = "hybrid-embed"
     models: list[EmbeddingModel]
 
-    async def embed_documents(self, client, texts):
+    async def embed_documents(self, texts):
         all_embeds = await asyncio.gather(
-            *[m.embed_documents(client, texts) for m in self.models]
+            *[m.embed_documents(texts) for m in self.models]
         )
         return np.concatenate(all_embeds, axis=1)
-
-
-class VoyageAIEmbeddingModel(EmbeddingModel):
-    """A wrapper around Voyage AI's client lib."""
-
-    name: str = Field(default="voyage-large-2")
-    embedding_type: EmbeddingModes = Field(default=EmbeddingModes.DOCUMENT)
-    batch_size: int = 10
-
-    def set_mode(self, mode: EmbeddingModes):
-        self.embedding_type = mode
-
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        N = len(texts)
-        embeddings = []
-        for i in range(0, N, self.batch_size):
-            response = await client.embed(
-                texts[i : i + self.batch_size],
-                model=self.name,
-                input_type=self.embedding_type.value,
-            )
-            embeddings.extend(response.embeddings)
-        return embeddings
 
 
 class LLMModel(ABC, BaseModel):
@@ -275,27 +131,27 @@ class LLMModel(ABC, BaseModel):
     )
     config: dict = Field(default={})
 
-    async def acomplete(self, client: Any, prompt: str) -> str:
+    async def acomplete(self, prompt: str) -> str:
         raise NotImplementedError
 
-    async def acomplete_iter(self, client: Any, prompt: str) -> Any:
+    async def acomplete_iter(self, prompt: str) -> Any:
         """Return an async generator that yields chunks of the completion.
 
         I cannot get mypy to understand the override, so marked as Any
         """
         raise NotImplementedError
 
-    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
+    async def achat(self, messages: Iterable[dict[str, str]]) -> str:
         raise NotImplementedError
 
-    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
+    async def achat_iter(self, messages: Iterable[dict[str, str]]) -> Any:
         """Return an async generator that yields chunks of the completion.
 
         I cannot get mypy to understand the override, so marked as Any
         """
         raise NotImplementedError
 
-    def infer_llm_type(self, client: Any) -> str:  # noqa: ARG002
+    def infer_llm_type(self) -> str:
         return "completion"
 
     def count_tokens(self, text: str) -> int:
@@ -303,7 +159,6 @@ class LLMModel(ABC, BaseModel):
 
     def make_chain(
         self,
-        client: Any,
         prompt: str,
         skip_system: bool = False,
         system_prompt: str = default_system_prompt,
@@ -313,7 +168,6 @@ class LLMModel(ABC, BaseModel):
         This replaces the previous use of langchain for combining prompts and LLMs.
 
         Args:
-            client: a ephemeral client to use
             prompt: The prompt to use
             skip_system: Whether to skip the system prompt
             system_prompt: The system prompt to use
@@ -325,7 +179,7 @@ class LLMModel(ABC, BaseModel):
         """
         # check if it needs to be set
         if self.llm_type is None:
-            self.llm_type = self.infer_llm_type(client)
+            self.llm_type = self.infer_llm_type()
         if self.llm_type == "chat":
             system_message_prompt = {"role": "system", "content": system_prompt}
             human_message_prompt = {"role": "user", "content": prompt}
@@ -352,13 +206,13 @@ class LLMModel(ABC, BaseModel):
                     self.count_tokens(m["content"]) for m in messages
                 ) + sum(self.count_tokens(m["role"]) for m in messages)
                 if callbacks is None:
-                    output = await self.achat(client, messages)
+                    output = await self.achat(messages)
                 else:
                     sync_callbacks = [
                         f for f in callbacks if not is_coroutine_callable(f)
                     ]
                     async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
-                    completion = self.achat_iter(client, messages)
+                    completion = self.achat_iter(messages)
                     text_result = []
                     async for chunk in completion:  # type: ignore[attr-defined]
                         if chunk:
@@ -401,7 +255,7 @@ class LLMModel(ABC, BaseModel):
                 result.prompt_count = self.count_tokens(formatted_prompt)
                 result.prompt = formatted_prompt
                 if callbacks is None:
-                    output = await self.acomplete(client, formatted_prompt)
+                    output = await self.acomplete(formatted_prompt)
                 else:
                     sync_callbacks = [
                         f for f in callbacks if not is_coroutine_callable(f)
@@ -409,7 +263,6 @@ class LLMModel(ABC, BaseModel):
                     async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
 
                     completion = self.acomplete_iter(
-                        client,
                         formatted_prompt,
                     )
                     text_result = []
@@ -441,6 +294,26 @@ class LLMModel(ABC, BaseModel):
         raise ValueError(f"Unknown llm_type: {self.llm_type}")
 
 
+DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+]
+
+
 class LiteLLMModel(LLMModel):
     """A wrapper around the litellm library.
 
@@ -466,7 +339,12 @@ class LiteLLMModel(LLMModel):
                 "model_list": [
                     {
                         "model_name": data["name"],
-                        "litellm_params": {"model": data["name"]},
+                        "litellm_params": {"model": data["name"]}
+                        | (
+                            {}
+                            if "gemini" not in data["name"]
+                            else {"safety_settings": DEFAULT_VERTEX_SAFETY_SETTINGS}
+                        ),
                     }
                 ],
                 "router_kwargs": {"num_retries": 3, "retry_after": 5},
@@ -497,39 +375,33 @@ class LiteLLMModel(LLMModel):
             )
         return self._router
 
-    async def acomplete(self, client: Any | None, prompt: str) -> str:  # noqa: ARG002
+    async def acomplete(self, prompt: str) -> str:
         return (
             (await self.router.atext_completion(model=self.name, prompt=prompt))
             .choices[0]
             .message.content
         )
 
-    async def acomplete_iter(
-        self, client: Any | None, prompt: str  # noqa: ARG002
-    ) -> Any:
+    async def acomplete_iter(self, prompt: str) -> Any:
         completion = await self.router.atext_completion(
             model=self.name, prompt=prompt, stream=True
         )
         async for chunk in completion:
-            yield chunk.choices[0].delta.content
+            yield chunk.choices[0].text
 
-    async def achat(
-        self, client: Any | None, messages: Iterable[dict[str, str]]  # noqa: ARG002
-    ) -> str:
+    async def achat(self, messages: Iterable[dict[str, str]]) -> str:
         return (
             (await self.router.acompletion(self.name, messages))
             .choices[0]
             .message.content
         )
 
-    async def achat_iter(
-        self, client: Any | None, messages: Iterable[dict[str, str]]  # noqa: ARG002
-    ) -> Any:
+    async def achat_iter(self, messages: Iterable[dict[str, str]]) -> Any:
         completion = await self.router.acompletion(self.name, messages, stream=True)
         async for chunk in completion:
             yield chunk.choices[0].delta.content
 
-    def infer_llm_type(self, client: Any) -> str:  # noqa: ARG002
+    def infer_llm_type(self) -> str:
         if all(
             "text-completion" in m.get("litellm_params", {}).get("model", "")
             for m in self.config["model_list"]
@@ -541,208 +413,6 @@ class LiteLLMModel(LLMModel):
         return token_counter(model=self.name, text=text)
 
 
-class OpenAILLMModel(LLMModel):
-    config: dict = Field(default={"model": "gpt-4o-mini", "temperature": 0.1})
-    name: str = "gpt-4o-mini"
-
-    def _check_client(self, client: Any) -> AsyncOpenAI:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        if not isinstance(client, AsyncOpenAI):
-            raise ValueError(  # noqa: TRY004
-                f"Your client is not a required AsyncOpenAI client. It is a {type(client)}"
-            )
-        return client
-
-    @model_validator(mode="after")
-    @classmethod
-    def guess_llm_type(cls, data: Any) -> Any:
-        m = cast(OpenAILLMModel, data)
-        m.llm_type = guess_model_type(m.config["model"])
-        return m
-
-    @model_validator(mode="after")
-    @classmethod
-    def set_model_name(cls, data: Any) -> Any:
-        m = cast(OpenAILLMModel, data)
-        m.name = m.config["model"]
-        return m
-
-    async def acomplete(self, client: Any, prompt: str) -> str:
-        aclient = self._check_client(client)
-        completion = await aclient.completions.create(
-            prompt=prompt, **process_llm_config(self.config)
-        )
-        return completion.choices[0].text
-
-    async def acomplete_iter(self, client: Any, prompt: str) -> Any:
-        aclient = self._check_client(client)
-        completion = await aclient.completions.create(
-            prompt=prompt, **process_llm_config(self.config), stream=True
-        )
-        async for chunk in completion:
-            yield chunk.choices[0].text
-
-    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
-        aclient = self._check_client(client)
-        completion = await aclient.chat.completions.create(
-            messages=messages, **process_llm_config(self.config)  # type: ignore[arg-type]
-        )
-        return completion.choices[0].message.content or ""
-
-    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
-        aclient = self._check_client(client)
-        completion = await aclient.chat.completions.create(
-            messages=messages, **process_llm_config(self.config), stream=True  # type: ignore[arg-type]
-        )
-        async for chunk in cast(AsyncGenerator, completion):
-            yield chunk.choices[0].delta.content
-
-
-class AnthropicLLMModel(LLMModel):
-    config: dict = Field(
-        default={"model": "claude-3-sonnet-20240229", "temperature": 0.1}
-    )
-    name: str = "claude-3-sonnet-20240229"
-
-    def __init__(self, *args, **kwargs):
-        if AsyncAnthropic is Any:
-            raise ImportError("Please install anthropic to use this model")
-        super().__init__(*args, **kwargs)
-
-    def _check_client(self, client: Any) -> AsyncAnthropic:
-        if client is None:
-            raise ValueError(
-                "Your client is None - did you forget to set it after pickling?"
-            )
-        if not isinstance(client, AsyncAnthropic):
-            raise TypeError(
-                f"Your client is not a required {AsyncAnthropic.__name__} client. It is"
-                f" a {type(client)}."
-            )
-        return client
-
-    @model_validator(mode="after")
-    @classmethod
-    def set_llm_type(cls, data: Any) -> Any:
-        m = cast(AnthropicLLMModel, data)
-        m.llm_type = "chat"
-        return m
-
-    @model_validator(mode="after")
-    @classmethod
-    def set_model_name(cls, data: Any) -> Any:
-        m = cast(AnthropicLLMModel, data)
-        m.name = m.config["model"]
-        return m
-
-    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
-        aclient = self._check_client(client)
-        # filter out system
-        sys_message = next(
-            (m["content"] for m in messages if m["role"] == "system"), None
-        )
-        # BECAUSE THEY DO NOT USE NONE TO INDICATE SENTINEL
-        # LIKE ANY SANE PERSON
-        if sys_message:
-            completion = await aclient.messages.create(
-                system=sys_message,
-                messages=[m for m in messages if m["role"] != "system"],
-                **process_llm_config(self.config, "max_tokens"),
-            )
-        else:
-            completion = await aclient.messages.create(
-                messages=[m for m in messages if m["role"] != "system"],
-                **process_llm_config(self.config, "max_tokens"),
-            )
-        return str(completion.content) or ""
-
-    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
-        aclient = self._check_client(client)
-        sys_message = next(
-            (m["content"] for m in messages if m["role"] == "system"), None
-        )
-        if sys_message:
-            completion = await aclient.messages.create(
-                stream=True,
-                system=sys_message,
-                messages=[m for m in messages if m["role"] != "system"],
-                **process_llm_config(self.config, "max_tokens"),
-            )
-        else:
-            completion = await aclient.messages.create(
-                stream=True,
-                messages=[m for m in messages if m["role"] != "system"],
-                **process_llm_config(self.config, "max_tokens"),
-            )
-        async for event in completion:
-            if isinstance(event, ContentBlockDeltaEvent):
-                yield event.delta.text
-            # yield event.message.content
-
-
-class LlamaEmbeddingModel(EmbeddingModel):
-    embedding_model: str = Field(default="llama")
-
-    batch_size: int = Field(default=4)
-    concurrency: int = Field(default=1)
-
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        cast(AsyncOpenAI, client)
-
-        async def process(texts: list[str]) -> list[float]:
-            for i in range(3):  # noqa: B007
-                # access httpx client directly to avoid type casting
-                response = await client._client.post(
-                    client.base_url.join("../embedding"), json={"content": texts}
-                )
-                body = response.json()
-                if len(texts) == 1:
-                    if (
-                        type(body) != dict  # noqa: E721
-                        or body.get("embedding") is None
-                    ):
-                        continue
-                    return [body["embedding"]]
-                else:  # noqa: RET505
-                    if type(body) != list or body[0] != "results":  # noqa: E721
-                        continue
-                    return [e["embedding"] for e in body[1]]
-            raise ValueError("Failed to embed documents - response was ", body)
-
-        return flatten(
-            await gather_with_concurrency(
-                self.concurrency,
-                [process(b) for b in batch_iter(texts, self.batch_size)],
-            )
-        )
-
-
-class SentenceTransformerEmbeddingModel(EmbeddingModel):
-    name: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
-    _model: Any = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        try:
-            from sentence_transformers import SentenceTransformer
-        except ImportError as exc:
-            raise ImportError(
-                "Please install sentence-transformers to use this model"
-            ) from exc
-
-        self._model = SentenceTransformer(self.name)
-
-    async def embed_documents(
-        self, client: Any, texts: list[str]  # noqa: ARG002
-    ) -> list[list[float]]:
-        from sentence_transformers import SentenceTransformer
-
-        return cast(SentenceTransformer, self._model).encode(texts)
-
-
 def cosine_similarity(a, b):
     norm_product = np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1)
     return a @ b.T / norm_product
@@ -751,7 +421,7 @@ def cosine_similarity(a, b):
 class VectorStore(BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
-    embedding_model: EmbeddingModel = Field(default=OpenAIEmbeddingModel())
+    embedding_model: EmbeddingModel = Field(default=LiteLLMEmbeddingModel())
     # can be tuned for different tasks
     mmr_lambda: float = Field(default=0.9)
     model_config = ConfigDict(extra="forbid")
@@ -769,7 +439,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     async def similarity_search(
-        self, client: Any, query: str, k: int
+        self, query: str, k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         pass
 
@@ -778,12 +448,11 @@ class VectorStore(BaseModel, ABC):
         pass
 
     async def max_marginal_relevance_search(
-        self, client: Any, query: str, k: int, fetch_k: int
+        self, query: str, k: int, fetch_k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
         Args:
-            client: TODOC.
             query: Query vector.
             k: Number of results to return.
             fetch_k: Number of results to fetch from the vector store.
@@ -794,7 +463,7 @@ class VectorStore(BaseModel, ABC):
         if fetch_k < k:
             raise ValueError("fetch_k must be greater or equal to k")
 
-        texts, scores = await self.similarity_search(client, query, fetch_k)
+        texts, scores = await self.similarity_search(query, fetch_k)
         if len(texts) <= k or self.mmr_lambda >= 1.0:
             return texts, scores
 
@@ -841,7 +510,7 @@ class NumpyVectorStore(VectorStore):
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
 
     async def similarity_search(
-        self, client: Any, query: str, k: int
+        self, query: str, k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         k = min(k, len(self.texts))
         if k == 0:
@@ -850,9 +519,7 @@ class NumpyVectorStore(VectorStore):
         # this will only affect models that embedding prompts
         self.embedding_model.set_mode(EmbeddingModes.QUERY)
 
-        np_query = np.array(
-            (await self.embedding_model.embed_documents(client, [query]))[0]
-        )
+        np_query = np.array((await self.embedding_model.embed_documents([query]))[0])
 
         self.embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
@@ -868,64 +535,6 @@ class NumpyVectorStore(VectorStore):
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
         )
-
-
-class LangchainLLMModel(LLMModel):
-    """A wrapper around the wrapper langchain."""
-
-    config: dict = Field(default={"temperature": 0.1})
-    name: str = "langchain"
-
-    def infer_llm_type(self, client: Any) -> str:
-        from langchain_core.language_models.chat_models import BaseChatModel
-
-        self.name = client.model_name
-        if isinstance(client, BaseChatModel):
-            return "chat"
-        return "completion"
-
-    async def acomplete(self, client: Any, prompt: str) -> str:
-        return await client.ainvoke(prompt, **self.config)
-
-    async def acomplete_iter(self, client: Any, prompt: str) -> Any:
-        async for chunk in cast(AsyncGenerator, client.astream(prompt, **self.config)):
-            yield chunk
-
-    async def achat(self, client: Any, messages: Iterable[dict[str, str]]) -> str:
-        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-
-        lc_messages: list[BaseMessage] = []
-        for m in messages:
-            if m["role"] == "user":
-                lc_messages.append(HumanMessage(content=m["content"]))
-            elif m["role"] == "system":
-                lc_messages.append(SystemMessage(content=m["content"]))
-            else:
-                raise ValueError(f"Unknown role: {m['role']}")
-        return (await client.ainvoke(lc_messages, **self.config)).content
-
-    async def achat_iter(self, client: Any, messages: Iterable[dict[str, str]]) -> Any:
-        from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-
-        lc_messages: list[BaseMessage] = []
-        for m in messages:
-            if m["role"] == "user":
-                lc_messages.append(HumanMessage(content=m["content"]))
-            elif m["role"] == "system":
-                lc_messages.append(SystemMessage(content=m["content"]))
-            else:
-                raise ValueError(f"Unknown role: {m['role']}")
-        async for chunk in client.astream(lc_messages, **self.config):
-            yield chunk.content
-
-
-class LangchainEmbeddingModel(EmbeddingModel):
-    """A wrapper around the wrapper langchain."""
-
-    name: str = "langchain"
-
-    async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
-        return await client.aembed_documents(texts)
 
 
 class LangchainVectorStore(VectorStore):
@@ -1019,7 +628,7 @@ class LangchainVectorStore(VectorStore):
         )
 
     async def similarity_search(
-        self, client: Any, query: str, k: int  # noqa: ARG002
+        self, query: str, k: int
     ) -> tuple[Sequence[Embeddable], list[float]]:
         if self._store is None:
             return [], []
