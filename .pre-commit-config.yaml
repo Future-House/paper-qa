@@ -56,6 +56,10 @@ repos:
       - id: validate-pyproject
         additional_dependencies:
           - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.4.6
+    hooks:
+      - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.18.0
     hooks:
