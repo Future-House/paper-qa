@@ -18,7 +18,9 @@ classifiers = [
 ]
 dependencies = [
     "PyCryptodome",
+    "aiohttp",  # TODO: remove in favor of httpx
     "html2text",
+    "httpx",
     "numpy",
     "openai>=1",
     "pybtex",
