@@ -1,26 +1,24 @@
 from __future__ import annotations
 
-import ast
+import argparse
 import logging
-import operator
 import os
-import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Any
 
-import yaml
+from pydantic_settings import CliSettingsSource
 
 from .. import __version__
-from ..utils import get_loop, pqa_directory
+from ..config import Settings
+from ..utils import get_loop
 
 try:
-    import typer
     from rich.console import Console
     from rich.logging import RichHandler
 
     from .main import agent_query, search
-    from .models import AnswerResponse, MismatchedModelsError, QueryRequest
+    from .models import AnswerResponse, QueryRequest
     from .search import SearchIndex, get_directory_index
 
 except ImportError as e:
@@ -30,10 +28,8 @@ except ImportError as e:
 
 logger = logging.getLogger(__name__)
 
-app = typer.Typer()
 
-
-def configure_agent_logging(verbosity: int = 0) -> None:
+def configure_cli_logging(verbosity: int = 0) -> None:
     """Suppress loquacious loggers according to verbosity level."""
     verbosity_map = {
         0: {
@@ -83,6 +79,9 @@ def configure_agent_logging(verbosity: int = 0) -> None:
         ):
             logger.setLevel(log_level)
 
+    if verbosity > 0:
+        print(f"PaperQA version: {__version__}")
+
 
 def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
     # Get the stats for the file/directory
@@ -100,441 +99,137 @@ def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
     }
 
 
-def parse_dot_to_dict(str_w_dots: str, value: str) -> dict[str, Any]:
-    parsed: dict[str, Any] = {}
-    for key in str_w_dots.split(".")[::-1]:
-        if not parsed:
-            try:
-                eval_value = ast.literal_eval(value)
-                if isinstance(eval_value, set | list):
-                    parsed[key] = eval_value
-                else:
-                    parsed[key] = value
-            except (ValueError, SyntaxError):
-                parsed[key] = value
-        else:
-            parsed = {key: parsed}
-    return parsed
-
-
-def pop_nested_dict_recursive(d: dict[str, Any], path: str) -> tuple[Any, bool]:
-    """
-    Pop a value from a nested dictionary (in-place) using a period-separated path.
-
-    Recursively remove empty dictionaries after popping.
-    """
-    keys = path.split(".")
-
-    if len(keys) == 1:
-        if keys[0] not in d:
-            raise KeyError(f"Key not found: {keys[0]}")
-        value = d.pop(keys[0])
-        return value, len(d) == 0
-
-    if keys[0] not in d or not isinstance(d[keys[0]], dict):
-        raise KeyError(f"Invalid path: {path}")
-
-    value, should_remove = pop_nested_dict_recursive(d[keys[0]], ".".join(keys[1:]))
-
-    if should_remove:
-        d.pop(keys[0])
-
-    return value, len(d) == 0
-
-
-def get_settings(
-    settings_path: str | os.PathLike | None = None,
-) -> dict[str, Any]:
-
-    if settings_path is None:
-        settings_path = pqa_directory("settings") / "settings.yaml"
-
-    if os.path.exists(settings_path):
-        with open(settings_path) as f:
-            return yaml.safe_load(f)
-
-    return {}
-
-
-def merge_dicts(dict_a: dict, dict_b: dict) -> dict:
-    """
-    Merge two dictionaries where if dict_a has a key with a subdictionary.
-
-    dict_b only overwrites the keys in dict_a's subdictionary if they are
-    also specified in dict_b, but otherwise keeps all the subkeys.
-    """
-    result = dict_a.copy()  # Start with a shallow copy of dict_a
-
-    for key, value in dict_b.items():
-        if isinstance(value, dict) and key in result and isinstance(result[key], dict):
-            # If both dict_a and dict_b have a dict for this key, recurse
-            result[key] = merge_dicts(result[key], value)
-        else:
-            # Otherwise, just update the value
-            result[key] = value
-
-    return result
-
-
-def get_merged_settings(
-    settings: dict[str, Any], settings_path: Path | None = None
-) -> dict[str, Any]:
-    """Merges a new settings with the current settings saved to file."""
-    current_settings = get_settings(settings_path)
-
-    # deal with the nested key case
-    return merge_dicts(current_settings, settings)
-
-
-@app.command("set")
-def set_setting(
-    variable: Annotated[
-        str,
-        typer.Argument(
-            help=(
-                "PaperQA variable to set, see agents.models.QueryRequest object for all settings, "
-                "nested options can be set using periods, ex. agent_tools.paper_directory"
-            )
-        ),
-    ],
-    value: Annotated[
-        str,
-        typer.Argument(
-            help=(
-                "Value to set to the variable, will be cast to the correct type automatically."
-            )
-        ),
-    ],
-) -> None:
-    """Set a persistent PaperQA setting."""
-    configure_agent_logging(verbosity=0)
-
-    settings_path = pqa_directory("settings") / "settings.yaml"
-
-    current_settings = get_merged_settings(
-        parse_dot_to_dict(variable, value), settings_path=settings_path
-    )
-
-    try:
-        QueryRequest(**current_settings)
-    except MismatchedModelsError:
-        pass
-    except ValueError as e:
-        raise ValueError(
-            f"{variable} (with value {value}) is not a valid setting."
-        ) from e
-
-    logger.info(f"{variable} set to {str(value)[:100]}!")
-
-    with open(settings_path, "w") as f:
-        yaml.dump(current_settings, f)
-
-
-@app.command()
-def show(
-    variable: Annotated[
-        str,
-        typer.Argument(
-            help=(
-                "PaperQA variable to show, see agents.models.QueryRequest object for all settings, "
-                "nested options can be set using periods, ex. agent_tools.paper_directory. "
-                "Can show all indexes with `indexes` input, answers with `answers` input, "
-                "and `all` for all settings."
-            )
-        ),
-    ],
-    limit: Annotated[
-        int, typer.Option(help="limit results, only used for 'answers'.")
-    ] = 5,
-) -> Any:
-    """Show a persistent PaperQA setting, special inputs include `indexes`, `answers` and `all`."""
-    configure_agent_logging(verbosity=0)
-
-    # handle special case when user wants to see indexes
-    if variable == "indexes":
-        for index in os.listdir(pqa_directory("indexes")):
-            index_times = get_file_timestamps(pqa_directory("indexes") / index)
-            logger.info(f"{index}, {index_times}")
-        return os.listdir(pqa_directory("indexes"))
-
-    if variable == "answers":
-        all_answers = []
-        answer_file_location = pqa_directory("indexes") / "answers" / "docs"
-        if os.path.exists(answer_file_location):
-            for answer_file in os.listdir(answer_file_location):
-                all_answers.append(
-                    get_file_timestamps(os.path.join(answer_file_location, answer_file))
-                )
-                with open(os.path.join(answer_file_location, answer_file)) as f:
-                    answer = yaml.safe_load(f)
-                all_answers[-1].update({"answer": answer})
-            all_answers = sorted(
-                all_answers, key=operator.itemgetter("modified_at"), reverse=True
-            )[:limit]
-            for answer in all_answers:
-                logger.info(
-                    f"Q: {answer['answer']['answer']['question']}\n---\nA: {answer['answer']['answer']['answer']}\n\n\n"
-                )
-        return all_answers
-
-    current_settings = get_settings(pqa_directory("settings") / "settings.yaml")
-
-    if variable == "all":
-        logger.info(current_settings)
-        return current_settings
-
-    try:
-        value, _ = pop_nested_dict_recursive(current_settings, variable)
-    except KeyError:
-        logger.info(f"{variable} is not set.")
-        return None
-    else:
-        logger.info(f"{variable}: {value}")
-        return value
-
-
-@app.command()
-def clear(
-    variable: Annotated[
-        str,
-        typer.Argument(
-            help=(
-                "PaperQA variable to clear, see agents.models.QueryRequest object for all settings, "
-                "nested options can be set using periods, ex. agent_tools.paper_directory. "
-                "Index names can also be used if the --index flag is set."
-            )
-        ),
-    ],
-    index: Annotated[
-        bool,
-        typer.Option(
-            "--index",
-            is_flag=True,
-            help="index flag to indicate that this index name should be cleared.",
-        ),
-    ] = False,
-) -> None:
-    """Clear a persistent PaperQA setting, include the --index flag to remove an index."""
-    configure_agent_logging(verbosity=0)
-
-    settings_path = pqa_directory("settings") / "settings.yaml"
-
-    current_settings = get_settings(settings_path)
-
-    if not index:
-        _ = pop_nested_dict_recursive(current_settings, variable)
-        with open(settings_path, "w") as f:
-            yaml.dump(current_settings, f)
-        logger.info(f"{variable} cleared!")
-
-    elif variable in os.listdir(pqa_directory("indexes")):
-        shutil.rmtree(pqa_directory("indexes") / variable)
-        logger.info(f"Index {variable} cleared!")
-    else:
-        logger.info(f"Index {variable} not found!")
-
-
-@app.command()
-def ask(
-    query: Annotated[str, typer.Argument(help=("Question or task ask of PaperQA"))],
-    agent_type: Annotated[
-        str,
-        typer.Option(
-            help=(
-                "Type of agent to use, for now either "
-                "`OpenAIFunctionsAgent` or `fake`. `fake` uses "
-                "a hard coded tool path (search->gather evidence->answer)."
-            )
-        ),
-    ] = "fake",
-    verbosity: Annotated[
-        int, typer.Option(help=("Level of verbosity from 0->2 (inclusive)"))
-    ] = 0,
-    directory: Annotated[
-        Path | None,
-        typer.Option(help=("Directory of papers or documents to run PaperQA over.")),
-    ] = None,
-    index_directory: Annotated[
-        Path | None,
-        typer.Option(
-            help=(
-                "Index directory to store paper index and answers. Default will be `~/.pqa`"
-            )
-        ),
-    ] = None,
-    manifest_file: Annotated[
-        Path | None,
-        typer.Option(
-            help=(
-                "Optional manifest file (CSV) location to map relative a "
-                "`file_location` column to `doi` or `title` columns. "
-                "If not used, then the file will be read by an LLM "
-                "which attempts to extract the title, authors and DOI."
-            )
-        ),
-    ] = None,
-) -> AnswerResponse:
+def ask(query: str, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
-    configure_agent_logging(verbosity=verbosity)
+    configure_cli_logging(verbosity=settings.verbosity)
 
     loop = get_loop()
 
-    # override settings file if requested directly
-    to_merge = {}
-
-    if directory is not None:
-        to_merge = {"agent_tools": {"paper_directory": directory}}
-
-    if index_directory is not None:
-        if "agent_tools" not in to_merge:
-            to_merge = {"agent_tools": {"index_directory": index_directory}}
-        else:
-            to_merge["agent_tools"].update({"index_directory": index_directory})
-
-    if manifest_file is not None:
-        if "agent_tools" not in to_merge:
-            to_merge = {"agent_tools": {"manifest_file": manifest_file}}
-        else:
-            to_merge["agent_tools"].update({"manifest_file": manifest_file})
-
     request = QueryRequest(
         query=query,
-        **get_merged_settings(
-            to_merge,
-            settings_path=pqa_directory("settings") / "settings.yaml",
-        ),
+        settings=settings,
     )
 
     return loop.run_until_complete(
         agent_query(
             request,
             docs=None,
-            verbosity=verbosity,
-            agent_type=agent_type,
+            verbosity=settings.verbosity,
+            agent_type=settings.agent.agent_type,
         )
     )
 
 
-@app.command("search")
 def search_query(
-    query: Annotated[str, typer.Argument(help=("Query for keyword search"))],
-    index_name: Annotated[
-        str,
-        typer.Argument(
-            help=(
-                "Name of the index to search, or use `answers`"
-                " to search all indexed answers"
-            )
-        ),
-    ] = "answers",
-    index_directory: Annotated[
-        Path | None,
-        typer.Option(
-            help=(
-                "Index directory to store paper index and answers. Default will be `~/.pqa`"
-            )
-        ),
-    ] = None,
+    query: str,
+    index_name: str,
+    settings: Settings,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
     """Search using a pre-built PaperQA index."""
-    configure_agent_logging(verbosity=0)
-
+    configure_cli_logging(verbosity=0)
     loop = get_loop()
     return loop.run_until_complete(
         search(
             query,
             index_name=index_name,
-            index_directory=index_directory or pqa_directory("indexes"),
+            index_directory=settings.index_directory,
         )
     )
 
 
-@app.command("index")
 def build_index(
-    directory: Annotated[
-        Path | None,
-        typer.Argument(help=("Directory of papers or documents to run PaperQA over.")),
-    ] = None,
-    index_directory: Annotated[
-        Path | None,
-        typer.Option(
-            help=(
-                "Index directory to store paper index and answers. Default will be `~/.pqa`"
-            )
-        ),
-    ] = None,
-    manifest_file: Annotated[
-        Path | None,
-        typer.Option(
-            help=(
-                "Optional manifest file (CSV) location to map relative a "
-                "`file_location` column to `doi` or `title` columns. "
-                "If not used, then the file will be read by an LLM "
-                "which attempts to extract the title, authors and DOI."
-            )
-        ),
-    ] = None,
-    verbosity: Annotated[
-        int, typer.Option(help=("Level of verbosity from 0->2 (inclusive)"))
-    ] = 0,
+    settings: Settings,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
-    configure_agent_logging(verbosity=verbosity)
-
-    to_merge = {}
-
-    if directory is not None:
-        to_merge = {"agent_tools": {"paper_directory": directory}}
-
-    if index_directory is not None:
-        if "agent_tools" not in to_merge:
-            to_merge = {"agent_tools": {"index_directory": index_directory}}
-        else:
-            to_merge["agent_tools"].update({"index_directory": index_directory})
-
-    if manifest_file is not None:
-        if "agent_tools" not in to_merge:
-            to_merge = {"agent_tools": {"manifest_file": manifest_file}}
-        else:
-            to_merge["agent_tools"].update({"manifest_file": manifest_file})
-
-    configure_agent_logging(verbosity)
-
-    request_settings = QueryRequest(
-        query="",
-        **get_merged_settings(
-            to_merge,
-            settings_path=pqa_directory("settings") / "settings.yaml",
-        ),
-    )
-
+    configure_cli_logging(verbosity=settings.verbosity)
     loop = get_loop()
 
-    return loop.run_until_complete(
-        get_directory_index(settings=request_settings.settings)
+    return loop.run_until_complete(get_directory_index(settings=settings))
+
+
+def main():
+    parser = argparse.ArgumentParser(description="PaperQA CLI")
+
+    parser.add_argument(
+        "--version", "-v", action="version", version=f"PaperQA version: {__version__}"
     )
 
-
-def version_callback(value: bool):
-    if value:
-        configure_agent_logging(verbosity=0)
-        logger.info(f"PaperQA version: {__version__}")
-        raise typer.Exit
-
-
-@app.callback()
-def add_version_callback(
-    version: bool | None = typer.Option(
-        None,
-        "--version",
-        "-v",
-        help="Show the application's version and exit.",
-        callback=version_callback,
-        is_eager=True,
+    parser.add_argument(
+        "--settings",
+        "-s",
+        type=str,
+        help="Name or path of settings file",
+        default="default",
     )
-):
-    pass
+
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Set command
+    set_parser = subparsers.add_parser("set", help="Set a persistent PaperQA setting")
+    set_parser.add_argument("variable", help="PaperQA variable to set")
+    set_parser.add_argument("value", help="Value to set to the variable")
+
+    # Show command
+    view_parser = subparsers.add_parser("view", help="View the chosen settings")
+    view_parser.add_argument("query", help="Question or task to ask of PaperQA")
+
+    # Ask command
+    ask_parser = subparsers.add_parser("ask", help="Query PaperQA via an agent")
+    ask_parser.add_argument("query", help="Question or task to ask of PaperQA")
+    ask_parser.add_argument("--agent-type", default="fake", help="Type of agent to use")
+    ask_parser.add_argument(
+        "--verbosity", type=int, default=0, help="Level of verbosity (0-2)"
+    )
+    ask_parser.add_argument(
+        "--directory", type=Path, help="Directory of papers or documents"
+    )
+    ask_parser.add_argument(
+        "--index-directory",
+        type=Path,
+        help="Index directory to store paper index and answers",
+    )
+    ask_parser.add_argument(
+        "--manifest-file", type=Path, help="Optional manifest file (CSV) location"
+    )
+
+    # Search command
+    search_parser = subparsers.add_parser(
+        "search", help="Search using a pre-built PaperQA index"
+    )
+    search_parser.add_argument("query", help="Query for keyword search")
+    search_parser.add_argument("index_name", help="Name of the index to search")
+
+    # Index command
+    index_parser = subparsers.add_parser(  # noqa: F841
+        "index", help="Build a PaperQA search index"
+    )
+
+    cli_settings = CliSettingsSource(Settings, root_parser=parser)
+
+    print("ABOUT TO PARSE")
+    args = parser.parse_args()
+
+    settings = Settings.from_name(args.settings, cli_source=cli_settings)
+
+    print(args.command)
+
+    match args.command:
+        case "ask":
+            ask(args.query, settings)
+        case "view":
+            logger.info("Viewing settings")
+            logger.info(settings)
+        case "search":
+            search_query(args.query, args.index_name, settings)
+        case "index":
+            build_index(args.verbosity)
+        case _:
+            configure_cli_logging(verbosity=1)
+            commands = ", ".join({"view", "ask", "search", "index"})
+            brief_help = f"\nRun with commands: {{{commands}}}\n\n"
+            brief_help += "For more information, run with --help"
+            print(brief_help)
 
 
 if __name__ == "__main__":
-    app()
+    main()

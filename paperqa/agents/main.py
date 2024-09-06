@@ -55,7 +55,7 @@ async def agent_query(
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
-        index_directory=query.settings.agent.index_directory,
+        index_directory=query.settings.index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 
@@ -184,7 +184,7 @@ async def run_langchain_agent(
     docs: Docs,
     agent_type: str,
     profiler: SimpleProfiler,
-    timeout: float | None = None,  # noqa: ASYNC109
+    timeout: float | None = None,
 ) -> tuple[Answer, AgentStatus]:
     answer = Answer(question=query.query, id=query.id)
     shared_callbacks: list[BaseCallbackHandler] = [

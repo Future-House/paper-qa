@@ -4,34 +4,40 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches:
-      - main
-      - "**release**"
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' # pre-commit-ci/lite-action only runs here
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"] # Our min and max supported Python versions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: pre-commit/action@v3.0.1
+      - uses: pre-commit-ci/lite-action@v1.0.2
+        if: always()
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
-
+        python-version: ["3.10", "3.12"] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
-      - run: pip install .[agents,google,dev,llms]
-      - name: Check pre-commit
-        run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
+      - name: Set up uv
+        run: |-
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv python pin ${{ matrix.python-version }}
+      - run: uv sync --python-preference=only-managed
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
-      - name: Run Test
+      - run: uv run pytest
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
           CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
-        run: pytest

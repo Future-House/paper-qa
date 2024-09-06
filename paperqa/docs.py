@@ -525,15 +525,15 @@ class Docs(BaseModel):
         if len(self.docs) == 0 and len(self.texts_index) == 0:
             return answer
 
-        _settings = get_settings(settings)
-        answer_config = _settings.answer
-        prompt_config = _settings.prompts
+        evidence_settings = get_settings(settings)
+        answer_config = evidence_settings.answer
+        prompt_config = evidence_settings.prompts
 
         if embedding_model is None:
-            embedding_model = _settings.get_embedding_model()
+            embedding_model = evidence_settings.get_embedding_model()
 
         if summary_llm_model is None:
-            summary_llm_model = _settings.get_summary_llm()
+            summary_llm_model = evidence_settings.get_summary_llm()
 
         exclude_text_filter = exclude_text_filter or set()
         exclude_text_filter |= {c.text.name for c in answer.contexts}
@@ -546,7 +546,7 @@ class Docs(BaseModel):
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
-                answer.question, _k, _settings, embedding_model
+                answer.question, _k, evidence_settings, embedding_model
             )
         else:
             matches = self.texts
@@ -631,16 +631,16 @@ class Docs(BaseModel):
 
         answer = Answer(question=query) if isinstance(query, str) else query
 
-        _settings = get_settings(settings)
-        answer_config = _settings.answer
-        prompt_config = _settings.prompts
+        query_settings = get_settings(settings)
+        answer_config = query_settings.answer
+        prompt_config = query_settings.prompts
 
         if llm_model is None:
-            llm_model = _settings.get_llm()
+            llm_model = query_settings.get_llm()
         if summary_llm_model is None:
-            summary_llm_model = _settings.get_summary_llm()
+            summary_llm_model = query_settings.get_summary_llm()
         if embedding_model is None:
-            embedding_model = _settings.get_embedding_model()
+            embedding_model = query_settings.get_embedding_model()
 
         contexts = answer.contexts
 

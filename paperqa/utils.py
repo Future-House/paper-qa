@@ -121,7 +121,7 @@ def strip_citations(text: str) -> str:
     return re.sub(citation_regex, "", text, flags=re.MULTILINE)
 
 
-def get_score(text: str) -> int:
+def extract_score(text: str) -> int:
     # check for N/A
     last_line = text.split("\n")[-1]
     if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
@@ -162,12 +162,12 @@ def get_citenames(text: str) -> set[str]:
     results.extend(none_results)
     values = []
     for citation in results:
-        citation = citation.strip("() ")  # noqa: PLW2901
+        citation = citation.strip("() ")
         for c in re.split(",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces
-            c = c.strip()  # noqa: PLW2901
+            c = c.strip()
             values.append(c)
     return set(values)
 
@@ -215,7 +215,7 @@ def flatten(iteratble: list) -> list:
 
 def get_loop() -> asyncio.AbstractEventLoop:
     try:
-        loop = asyncio.get_running_loop()  # new in python 3.10
+        loop = asyncio.get_running_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -413,7 +413,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,  # noqa: ASYNC109
+    timeout: float = 10.0,
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
