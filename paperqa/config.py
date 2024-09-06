@@ -449,38 +449,31 @@ class Settings(BaseSettings):
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")
 
+    def _default_litellm_router_settings(self, llm: str) -> dict:
+        """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
+        return {
+            "model_list": [
+                {
+                    "model_name": llm,
+                    "litellm_params": {
+                        "model": llm,
+                        "temperature": self.temperature,
+                    },
+                }
+            ]
+        }
+
     def get_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.llm,
-            config=self.llm_config
-            or {
-                "model_list": [
-                    {
-                        "model_name": self.llm,
-                        "litellm_params": {
-                            "model": self.llm,
-                            "temperature": self.temperature,
-                        },
-                    }
-                ]
-            },
+            config=self.llm_config or self._default_litellm_router_settings(self.llm),
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.summary_llm,
             config=self.summary_llm_config
-            or {
-                "model_list": [
-                    {
-                        "model_name": self.summary_llm,
-                        "litellm_params": {
-                            "model": self.summary_llm,
-                            "temperature": self.temperature,
-                        },
-                    }
-                ]
-            },
+            or self._default_litellm_router_settings(self.summary_llm),
         )
 
     def get_embedding_model(self) -> EmbeddingModel:

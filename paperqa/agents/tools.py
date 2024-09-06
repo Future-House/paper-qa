@@ -43,13 +43,15 @@ class SharedToolState(BaseModel):
 
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
+    POPULATE_FROM_SETTINGS: ClassVar[None] = None
+
     answer: Answer
     docs: Docs
     settings: Settings
     profiler: SimpleProfiler = Field(default_factory=SimpleProfiler)
-    _llm_model: LiteLLMModel | None = None
-    _summary_llm_model: LiteLLMModel | None = None
-    _embedding_model: EmbeddingModel | None = None
+    _llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS
+    _summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS
+    _embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (

@@ -67,7 +67,7 @@ def configure_cli_logging(verbosity: int = 0) -> None:
 
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
-    module_logger = logging.getLogger("paperqa")
+    module_logger = logging.getLogger(__name__.split(".")[0])
 
     if not any(isinstance(h, RichHandler) for h in module_logger.handlers):
         module_logger.addHandler(rich_handler)
