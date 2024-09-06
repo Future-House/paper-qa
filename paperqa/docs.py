@@ -25,7 +25,6 @@ from .config import MaybeSettings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     EmbeddingModel,
-    LiteLLMModel,
     LLMModel,
     NumpyVectorStore,
     VectorStore,
@@ -498,7 +497,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
-        summary_llm_model: LiteLLMModel | None = None,
+        summary_llm_model: LLMModel | None = None,
     ) -> Answer:
         return get_loop().run_until_complete(
             self.aget_evidence(
@@ -518,7 +517,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
-        summary_llm_model: LiteLLMModel | None = None,
+        summary_llm_model: LLMModel | None = None,
     ) -> Answer:
 
         answer = Answer(question=query) if isinstance(query, str) else query
@@ -606,7 +605,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
-        summary_llm_model: LiteLLMModel | None = None,
+        summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> Answer:
         return get_loop().run_until_complete(
@@ -626,7 +625,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
-        summary_llm_model: LiteLLMModel | None = None,
+        summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> Answer:
 

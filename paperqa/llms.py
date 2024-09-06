@@ -379,7 +379,7 @@ class LiteLLMModel(LLMModel):
         return (
             (await self.router.atext_completion(model=self.name, prompt=prompt))
             .choices[0]
-            .message.content
+            .text
         )
 
     async def acomplete_iter(self, prompt: str) -> Any:

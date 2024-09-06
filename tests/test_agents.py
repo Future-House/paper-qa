@@ -111,8 +111,8 @@ async def test_timeout(agent_test_settings):
 async def test_propagate_options(agent_test_settings) -> None:
     llm_name = "gpt-4o-mini"
     default_llm_names = {
-        cls.model_fields[name].default  # type: ignore[attr-defined]
-        for name, cls in itertools.product(("llm", "summary_llm"), (Settings, Docs))
+        cls.model_fields[name].default
+        for name, cls in itertools.product(("llm", "summary_llm"), (Settings,))
     }
     assert (
         llm_name not in default_llm_names
