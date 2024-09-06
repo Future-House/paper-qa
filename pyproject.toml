@@ -27,6 +27,7 @@ dependencies = [
     "pypdf",
     "tenacity",
     "tiktoken>=0.4.0",
+    "typing-extensions; python_version <= '3.10'",  # For typing.assert_never
 ]
 description = "LLM Chain for answering questions from docs"
 dynamic = ["version"]
