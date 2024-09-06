@@ -1542,7 +1542,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev32+gb68fd91.d20240906"
+version = "5.0.0a2.dev34+g0d11594.d20240906"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1565,7 +1565,9 @@ dependencies = [
 agents = [
     { name = "anthropic" },
     { name = "anyio" },
+    { name = "langchain" },
     { name = "langchain-community" },
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
     { name = "requests" },
@@ -1581,6 +1583,7 @@ llms = [
     { name = "anthropic" },
     { name = "faiss-cpu" },
     { name = "langchain-community" },
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
     { name = "sentence-transformers" },
@@ -1594,10 +1597,19 @@ typing = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "anthropic" },
+    { name = "anyio" },
     { name = "build" },
+    { name = "faiss-cpu" },
     { name = "ipython" },
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "langchain-core" },
+    { name = "langchain-google-vertexai" },
+    { name = "langchain-openai" },
     { name = "mypy" },
     { name = "pre-commit" },
+    { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-recording" },
@@ -1608,6 +1620,12 @@ dev = [
     { name = "python-dotenv" },
     { name = "pyzotero" },
     { name = "requests" },
+    { name = "sentence-transformers" },
+    { name = "tantivy" },
+    { name = "typer" },
+    { name = "typing-extensions" },
+    { name = "vertexai" },
+    { name = "voyageai" },
 ]
 
 [package.metadata]
@@ -1619,8 +1637,11 @@ requires-dist = [
     { name = "faiss-cpu", marker = "extra == 'llms'" },
     { name = "html2text" },
     { name = "httpx" },
+    { name = "langchain", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'llms'" },
+    { name = "langchain-core", marker = "extra == 'agents'" },
+    { name = "langchain-core", marker = "extra == 'llms'" },
     { name = "langchain-google-vertexai", marker = "extra == 'google'" },
     { name = "langchain-openai", marker = "extra == 'agents'" },
     { name = "langchain-openai", marker = "extra == 'llms'" },
@@ -1654,6 +1675,7 @@ dev = [
     { name = "build" },
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
+    { name = "paper-qa", extras = ["agents", "google", "llms"] },
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
