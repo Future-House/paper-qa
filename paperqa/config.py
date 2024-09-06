@@ -339,7 +339,9 @@ class Settings(BaseSettings):
             "Directory to store the PQA generated search index, configuration, and answer indexes."
         ),
     )
-    verbosity: int = Field(default=0, help="Integer verbosity level for logging")
+    verbosity: int = Field(
+        default=0, description="Integer verbosity level for logging."
+    )
     manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(

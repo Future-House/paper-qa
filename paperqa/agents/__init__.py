@@ -1,28 +1,24 @@
 from __future__ import annotations
 
 import argparse
-import ast
 import logging
-import operator
 import os
-import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Any
 
-import yaml
 from pydantic_settings import CliSettingsSource
 
 from .. import __version__
 from ..config import Settings
-from ..utils import get_loop, pqa_directory
+from ..utils import get_loop
 
 try:
     from rich.console import Console
     from rich.logging import RichHandler
 
     from .main import agent_query, search
-    from .models import AnswerResponse, MismatchedModelsError, QueryRequest
+    from .models import AnswerResponse, QueryRequest
     from .search import SearchIndex, get_directory_index
 
 except ImportError as e:

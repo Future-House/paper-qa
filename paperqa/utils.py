@@ -162,12 +162,12 @@ def get_citenames(text: str) -> set[str]:
     results.extend(none_results)
     values = []
     for citation in results:
-        citation = citation.strip("() ")  # noqa: PLW2901
+        citation = citation.strip("() ")
         for c in re.split(",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces
-            c = c.strip()  # noqa: PLW2901
+            c = c.strip()
             values.append(c)
     return set(values)
 
@@ -413,7 +413,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,  # noqa: ASYNC109
+    timeout: float = 10.0,
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""

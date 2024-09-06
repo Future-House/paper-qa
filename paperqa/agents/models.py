@@ -87,7 +87,7 @@ class QueryRequest(BaseModel):
             return Settings(**{**base_settings.model_dump(), **v.model_dump()})
         return v
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def docs_name(self) -> str | None:
         return self._docs_name

@@ -190,7 +190,7 @@ async def run_langchain_agent(
     docs: Docs,
     agent_type: str,
     profiler: SimpleProfiler,
-    timeout: float | None = None,  # noqa: ASYNC109
+    timeout: float | None = None,
 ) -> tuple[Answer, AgentStatus]:
     answer = Answer(question=query.query, id=query.id)
     shared_callbacks: list[BaseCallbackHandler] = [
