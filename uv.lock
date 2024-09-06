@@ -199,7 +199,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/25/06/f710a276e4e018b02
 
 [[package]]
 name = "build"
-version = "1.2.1"
+version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "os_name == 'nt'" },
@@ -208,9 +208,9 @@ dependencies = [
     { name = "pyproject-hooks" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/9e/2d725d2f7729c6e79ca62aeb926492abbc06e25910dd30139d60a68bcb19/build-1.2.1.tar.gz", hash = "sha256:526263f4870c26f26c433545579475377b2b7588b6f1eac76a001e873ae3e19d", size = 44781 }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/bb/4a1b7e3a7520e310cf7bfece43788071604e1ccf693a7f0c4638c59068d6/build-1.2.2.tar.gz", hash = "sha256:119b2fb462adef986483438377a13b2f42064a2a3a4161f24a0cca698a07ac8c", size = 46516 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/03/f3c8ba0a6b6e30d7d18c40faab90807c9bb5e9a1e3b2fe2008af624a9c97/build-1.2.1-py3-none-any.whl", hash = "sha256:75e10f767a433d9a86e50d83f418e83efc18ede923ee5ff7df93b6cb0306c5d4", size = 21911 },
+    { url = "https://files.pythonhosted.org/packages/91/fd/e4bda6228637ecae5732162b5ac2a5a822e2ba8e546eb4997cde51b231a3/build-1.2.2-py3-none-any.whl", hash = "sha256:277ccc71619d98afdd841a0e96ac9fe1593b823af481d3b0cea748e8894e0613", size = 22823 },
 ]
 
 [[package]]
@@ -1542,10 +1542,12 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev32+gf73584b.d20240906"
+version = "5.0.0a2.dev34+g0d11594.d20240906"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "html2text" },
+    { name = "httpx" },
     { name = "numpy" },
     { name = "openai" },
     { name = "pybtex" },
@@ -1563,7 +1565,9 @@ dependencies = [
 agents = [
     { name = "anthropic" },
     { name = "anyio" },
+    { name = "langchain" },
     { name = "langchain-community" },
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
     { name = "requests" },
@@ -1579,6 +1583,7 @@ llms = [
     { name = "anthropic" },
     { name = "faiss-cpu" },
     { name = "langchain-community" },
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
     { name = "sentence-transformers" },
@@ -1592,10 +1597,19 @@ typing = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "anthropic" },
+    { name = "anyio" },
     { name = "build" },
+    { name = "faiss-cpu" },
     { name = "ipython" },
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "langchain-core" },
+    { name = "langchain-google-vertexai" },
+    { name = "langchain-openai" },
     { name = "mypy" },
     { name = "pre-commit" },
+    { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-recording" },
@@ -1606,17 +1620,28 @@ dev = [
     { name = "python-dotenv" },
     { name = "pyzotero" },
     { name = "requests" },
+    { name = "sentence-transformers" },
+    { name = "tantivy" },
+    { name = "typer" },
+    { name = "typing-extensions" },
+    { name = "vertexai" },
+    { name = "voyageai" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp" },
     { name = "anthropic", marker = "extra == 'agents'" },
     { name = "anthropic", marker = "extra == 'llms'" },
     { name = "anyio", marker = "extra == 'agents'" },
     { name = "faiss-cpu", marker = "extra == 'llms'" },
     { name = "html2text" },
+    { name = "httpx" },
+    { name = "langchain", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'llms'" },
+    { name = "langchain-core", marker = "extra == 'agents'" },
+    { name = "langchain-core", marker = "extra == 'llms'" },
     { name = "langchain-google-vertexai", marker = "extra == 'google'" },
     { name = "langchain-openai", marker = "extra == 'agents'" },
     { name = "langchain-openai", marker = "extra == 'llms'" },
@@ -1650,6 +1675,7 @@ dev = [
     { name = "build" },
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
+    { name = "paper-qa", extras = ["agents", "google", "llms"] },
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
