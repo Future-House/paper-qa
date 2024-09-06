@@ -1542,7 +1542,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev37+g2c1f3f8"
+version = "5.0.0a2.dev32+gf73584b.d20240906"
 source = { editable = "." }
 dependencies = [
     { name = "html2text" },
@@ -1553,6 +1553,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pypdf" },
+    { name = "setuptools" },
     { name = "tenacity" },
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
@@ -1630,6 +1631,7 @@ requires-dist = [
     { name = "pypdf" },
     { name = "requests", marker = "extra == 'agents'" },
     { name = "sentence-transformers", marker = "extra == 'llms'" },
+    { name = "setuptools" },
     { name = "tantivy", marker = "extra == 'agents'" },
     { name = "tenacity" },
     { name = "tiktoken", specifier = ">=0.4.0" },
@@ -2503,6 +2505,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/41/fb/2368f84127920d86330b533792e66b26264e92b729b5c1998aaa33d2e22f/sentence_transformers-3.0.1.tar.gz", hash = "sha256:8a3d2c537cc4d1014ccc20ac92be3d6135420a3bc60ae29a3a8a9b4bb35fbff6", size = 177258 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/4b/922436953394e1bfda05e4bf1fe0e80f609770f256c59a9df7a9254f3e0d/sentence_transformers-3.0.1-py3-none-any.whl", hash = "sha256:01050cc4053c49b9f5b78f6980b5a72db3fd3a0abb9169b1792ac83875505ee6", size = 227071 },
+]
+
+[[package]]
+name = "setuptools"
+version = "74.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/2c/f0a538a2f91ce633a78daaeb34cbfb93a54bd2132a6de1f6cec028eee6ef/setuptools-74.1.2.tar.gz", hash = "sha256:95b40ed940a1c67eb70fc099094bd6e99c6ee7c23aa2306f4d2697ba7916f9c6", size = 1356467 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/9c/9ad11ac06b97e55ada655f8a6bea9d1d3f06e120b178cd578d80e558191d/setuptools-74.1.2-py3-none-any.whl", hash = "sha256:5f4c08aa4d3ebcb57a50c33b1b07e94315d7fc7230f7115e47fc99776c8ce308", size = 1262071 },
 ]
 
 [[package]]
