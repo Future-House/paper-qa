@@ -25,6 +25,7 @@ dependencies = [
     "pydantic-settings",
     "pydantic~=2.0",
     "pypdf",
+    "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tenacity",
     "tiktoken>=0.4.0",
     "typing-extensions; python_version <= '3.10'",  # For typing.assert_never
