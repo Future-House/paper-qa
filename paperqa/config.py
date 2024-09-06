@@ -313,7 +313,7 @@ class AgentSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(cli_parse_args=True, extra="forbid")
+    model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
         default="gpt-4o-2024-08-06",
@@ -416,7 +416,7 @@ class Settings(BaseSettings):
 
         # quick exit for default settings
         if config_name == "default":
-            return Settings()
+            return Settings(_cli_settings_source=cli_source(args=True))
 
         # First, try to find the config file in the user's .config directory
         user_config_path = PAPERQA_DIR / f"{config_name}.json"
