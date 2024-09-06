@@ -31,18 +31,6 @@ repos:
     rev: 24.8.0
     hooks:
       - id: black
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
-    hooks:
-      - id: mypy
-        args: [--pretty, --ignore-missing-imports]
-        additional_dependencies:
-          - numpy
-          - openai>=1 # Match pyproject.toml
-          - pydantic~=2.0 # Match pyproject.toml
-          - types-requests
-          - types-setuptools
-          - types-PyYAML
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.3.3
     hooks:
@@ -72,3 +60,17 @@ repos:
     rev: 1.18.0
     hooks:
       - id: blacken-docs
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args: [--pretty, --ignore-missing-imports]
+        additional_dependencies:
+          - numpy
+          - openai>=1 # Match pyproject.toml
+          - pydantic~=2.0 # Match pyproject.toml
+          - tenacity
+          - tiktoken>=0.4.0 # Match pyproject.toml
+          - types-requests
+          - types-setuptools
+          - types-PyYAML
