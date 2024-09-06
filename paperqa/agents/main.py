@@ -17,7 +17,7 @@ from rich.console import Console
 from ..docs import Docs
 from ..types import Answer
 from ..utils import pqa_directory
-from .helpers import openai_get_search_query, table_formatter, update_doc_models
+from .helpers import litellm_get_search_query, table_formatter, update_doc_models
 from .models import (
     AgentCallback,
     AgentStatus,
@@ -167,7 +167,7 @@ async def run_fake_agent(
         ),
     )
     # seed docs with keyword search
-    for search in await openai_get_search_query(
+    for search in await litellm_get_search_query(
         answer.question, llm=query.settings.llm, count=3
     ):
         await search_tool.arun(search)

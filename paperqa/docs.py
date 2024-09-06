@@ -34,6 +34,8 @@ from .config import MaybeSettings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     HybridEmbeddingModel,
+    LiteLLMEmbeddingModel,
+    LiteLLMModel,
     LLMModel,
     NumpyVectorStore,
     OpenAIEmbeddingModel,
@@ -41,7 +43,6 @@ from .llms import (
     VectorStore,
     VoyageAIEmbeddingModel,
     is_anyscale_model,
-    llm_model_factory,
     vector_store_factory,
 )
 from .paths import PAPERQA_DIR
@@ -87,8 +88,8 @@ class Docs(BaseModel):
     llm: str = "default"
     summary_llm: str | None = None
     llm_model: LLMModel = Field(
-        default=OpenAILLMModel(
-            config={"model": "gpt-4-0125-preview", "temperature": 0.1}
+        default=LiteLLMModel(
+            name="gpt-4o-mini",
         )
     )
     summary_llm_model: LLMModel | None = Field(default=None, validate_default=True)
@@ -127,9 +128,9 @@ class Docs(BaseModel):
     def setup_alias_models(cls, data: Any) -> Any:
         if isinstance(data, dict):
             if "llm" in data and data["llm"] != "default":
-                data["llm_model"] = llm_model_factory(data["llm"])
+                data["llm_model"] = LiteLLMModel(name=data["llm"])
             if "summary_llm" in data and data["summary_llm"] is not None:
-                data["summary_llm_model"] = llm_model_factory(data["summary_llm"])
+                data["summary_llm_model"] = LiteLLMModel(name=data["summary_llm"])
             if (
                 "embedding" in data
                 and data["embedding"] != "default"
@@ -147,17 +148,16 @@ class Docs(BaseModel):
             if (
                 data.summary_llm_model is None
                 and data.llm == "default"
-                and isinstance(data.llm_model, OpenAILLMModel)
+                and isinstance(data.llm_model, LiteLLMModel)
             ):
-                data.summary_llm_model = OpenAILLMModel(
-                    config={"model": "gpt-4o-mini", "temperature": 0.1}
-                )
+                data.summary_llm_model = LiteLLMModel(name="gpt-4o-mini")
             elif data.summary_llm_model is None:
                 data.summary_llm_model = data.llm_model
         return data
 
     @classmethod
     def make_llm_names_consistent(cls, data: Any) -> Any:
+        # TODO: is this needed anymore w. LiteLLM?
         if isinstance(data, Docs):
             data.llm = data.llm_model.name
             if data.llm == "langchain":
@@ -209,7 +209,15 @@ class Docs(BaseModel):
         client: Any | None = None,
         embedding_client: Any | None = None,
     ):
-        if client is None and isinstance(self.llm_model, OpenAILLMModel):
+        """Sets an API client for non LiteLLM compatibility.
+
+        If using the LiteLLMModel or LiteLLMEmbeddingModel, no client is needed.
+
+        """
+        if isinstance(self.llm_model, LiteLLMModel):
+            client = None
+        # below logic only for backwards compatibility
+        elif client is None and isinstance(self.llm_model, OpenAILLMModel):
             if is_anyscale_model(self.llm_model.name):
                 client = AsyncOpenAI(
                     api_key=os.environ["ANYSCALE_API_KEY"],
@@ -218,7 +226,10 @@ class Docs(BaseModel):
             else:
                 client = AsyncOpenAI()
         self._client = client
-        if embedding_client is None:
+        if isinstance(self.texts_index.embedding_model, LiteLLMEmbeddingModel):
+            embedding_client = None
+        # below logic only for backwards compatibility
+        elif embedding_client is None:
             # check if we have an openai embedding model in use
             if isinstance(self.texts_index.embedding_model, OpenAIEmbeddingModel) or (
                 isinstance(self.texts_index.embedding_model, HybridEmbeddingModel)

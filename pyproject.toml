@@ -19,6 +19,7 @@ classifiers = [
 dependencies = [
     "PyCryptodome",
     "html2text",
+    "litellm",
     "numpy",
     "openai>=1",
     "pybtex",

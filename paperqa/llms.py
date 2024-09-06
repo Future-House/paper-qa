@@ -18,8 +18,10 @@ from typing import (
     cast,
 )
 
+import litellm
 import numpy as np
 import tiktoken
+from litellm import Router, aembedding, token_counter
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -34,36 +36,24 @@ except ImportError:
     AsyncAnthropic = Any
     ContentBlockDeltaEvent = Any
 
-# only works for python 3.11
-# def guess_model_type(model_name: str) -> str:
-#     """Guess the model type from the model name for OpenAI models"""
-#     import openai
-
-#     model_type = get_type_hints(
-#         openai.types.chat.completion_create_params.CompletionCreateParamsBase
-#     )["model"]
-#     model_union = get_args(get_args(model_type)[1])
-#     model_arr = list(model_union)
-#     if model_name in model_arr:
-#         return "chat"
-#     return "completion"
-
-# def is_openai_model(model_name):
-#     import openai
-
-#     model_type = get_type_hints(
-#         openai.types.chat.completion_create_params.CompletionCreateParamsBase
-#     )["model"]
-#     model_union = get_args(get_args(model_type)[1])
-#     model_arr = list(model_union)
-
-#     complete_model_types = get_type_hints(
-#         openai.types.completion_create_params.CompletionCreateParamsBase
-#     )["model"]
-#     complete_model_union = get_args(get_args(complete_model_types)[1])
-#     complete_model_arr = list(complete_model_union)
-
-#     return model_name in model_arr or model_name in complete_model_arr
+litellm.vertex_ai_safety_settings = [
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+]
 
 ANYSCALE_MODEL_PREFIXES: tuple[str, ...] = (
     "meta-llama/Meta-Llama-3-",
@@ -196,6 +186,23 @@ class OpenAIEmbeddingModel(EmbeddingModel):
 
     async def embed_documents(self, client: Any, texts: list[str]) -> list[list[float]]:
         return await embed_documents(cast(AsyncOpenAI, client), texts, self.name)
+
+
+class LiteLLMEmbeddingModel(EmbeddingModel):
+    name: str = Field(default="text-embedding-3-small")
+    embedding_kwargs: dict = Field(default={})
+
+    async def embed_documents(
+        self, client: Any | None, texts: list[str], batch_size: int = 16  # noqa: ARG002
+    ) -> list[list[float]]:
+        N = len(texts)
+        embeddings = []
+        for i in range(0, N, batch_size):
+            response = await aembedding(
+                self.name, input=texts[i : i + batch_size], **self.embedding_kwargs
+            )
+            embeddings.extend([e["embedding"] for e in response.data])
+        return embeddings
 
 
 class SparseEmbeddingModel(EmbeddingModel):
@@ -432,6 +439,106 @@ class LLMModel(ABC, BaseModel):
 
             return execute
         raise ValueError(f"Unknown llm_type: {self.llm_type}")
+
+
+class LiteLLMModel(LLMModel):
+    """A wrapper around the litellm library.
+
+    `config` should have two high level keys:
+        `model_list`: stores a list of all model configurations
+          (see https://docs.litellm.ai/docs/routing)
+        `router_kwargs`: kwargs for the Router class
+
+    This way users can specify routing strategies, retries, etc.
+
+    """
+
+    config: dict = Field(default={})
+    name: str = "gpt-4o-mini"
+    _router: Router | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def maybe_set_config_attribute(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """If a user only gives a name, make a sensible config dict for them."""
+        if "name" in data and "config" not in data:
+            data["config"] = {
+                "model_list": [
+                    {
+                        "model_name": data["name"],
+                        "litellm_params": {"model": data["name"]},
+                    }
+                ],
+                "router_kwargs": {"num_retries": 3, "retry_after": 5},
+            }
+        # we only support one "model name" for now, here we validate
+        if (
+            "config" in data
+            and len({m["model_name"] for m in data["config"]["model_list"]}) > 1
+        ):
+            raise ValueError("Only one model name per router is supported for now")
+        return data
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Remove the _router attribute as it's not picklable
+        state["_router"] = None
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+    @property
+    def router(self):
+        if self._router is None:
+            self._router = Router(
+                model_list=self.config["model_list"],
+                **self.config.get("router_kwargs", {}),
+            )
+        return self._router
+
+    async def acomplete(self, client: Any | None, prompt: str) -> str:  # noqa: ARG002
+        return (
+            (await self.router.atext_completion(model=self.name, prompt=prompt))
+            .choices[0]
+            .message.content
+        )
+
+    async def acomplete_iter(
+        self, client: Any | None, prompt: str  # noqa: ARG002
+    ) -> Any:
+        completion = await self.router.atext_completion(
+            model=self.name, prompt=prompt, stream=True
+        )
+        async for chunk in completion:
+            yield chunk.choices[0].delta.content
+
+    async def achat(
+        self, client: Any | None, messages: Iterable[dict[str, str]]  # noqa: ARG002
+    ) -> str:
+        return (
+            (await self.router.acompletion(self.name, messages))
+            .choices[0]
+            .message.content
+        )
+
+    async def achat_iter(
+        self, client: Any | None, messages: Iterable[dict[str, str]]  # noqa: ARG002
+    ) -> Any:
+        completion = await self.router.acompletion(self.name, messages, stream=True)
+        async for chunk in completion:
+            yield chunk.choices[0].delta.content
+
+    def infer_llm_type(self, client: Any) -> str:  # noqa: ARG002
+        if all(
+            "text-completion" in m.get("litellm_params", {}).get("model", "")
+            for m in self.config["model_list"]
+        ):
+            return "completion"
+        return "chat"
+
+    def count_tokens(self, text: str) -> int:
+        return token_counter(model=self.name, text=text)
 
 
 class OpenAILLMModel(LLMModel):
@@ -927,41 +1034,20 @@ class LangchainVectorStore(VectorStore):
         self._store = None
 
 
-def llm_model_factory(llm: str) -> LLMModel:
-    if llm != "default":
-        if is_openai_model(llm):
-            return OpenAILLMModel(config={"model": llm})
-        if llm.startswith("langchain") or "gemini" in llm:
-            return LangchainLLMModel()
-        if "claude" in llm:
-            return AnthropicLLMModel(config={"model": llm})
-        raise ValueError(f"Could not guess model type for {llm}. ")
-    return OpenAILLMModel()
-
-
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
-    if embedding == "langchain":
-        return LangchainEmbeddingModel(**kwargs)
-    if embedding == "sentence-transformers":
-        return SentenceTransformerEmbeddingModel(**kwargs)
-    if embedding.startswith("voyage"):
-        return VoyageAIEmbeddingModel(name=embedding, **kwargs)
+
     if embedding.startswith("hybrid"):
         embedding_model_name = "-".join(embedding.split("-")[1:])
-        dense_model = (
-            OpenAIEmbeddingModel(name=embedding_model_name)
-            if not embedding_model_name.startswith("voyage")
-            else VoyageAIEmbeddingModel(name=embedding_model_name, **kwargs)
-        )
         return HybridEmbeddingModel(
             models=[
-                dense_model,
+                LiteLLMEmbeddingModel(name=embedding_model_name),
                 SparseEmbeddingModel(**kwargs),
             ]
         )
     if embedding == "sparse":
         return SparseEmbeddingModel(**kwargs)
-    return OpenAIEmbeddingModel(name=embedding, **kwargs)
+
+    return LiteLLMEmbeddingModel(name=embedding, embedding_kwargs=kwargs)
 
 
 def vector_store_factory(embedding: str) -> NumpyVectorStore:

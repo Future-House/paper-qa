@@ -7,6 +7,8 @@ from .llms import (
     LangchainEmbeddingModel,
     LangchainLLMModel,
     LangchainVectorStore,
+    LiteLLMEmbeddingModel,
+    LiteLLMModel,
     LlamaEmbeddingModel,
     LLMModel,
     LLMResult,
@@ -16,7 +18,6 @@ from .llms import (
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
     embedding_model_factory,
-    llm_model_factory,
     vector_store_factory,
 )
 from .types import Context, Doc, DocDetails, Text
@@ -36,6 +37,8 @@ __all__ = [
     "LangchainEmbeddingModel",
     "LangchainLLMModel",
     "LangchainVectorStore",
+    "LiteLLMEmbeddingModel",
+    "LiteLLMModel",
     "LlamaEmbeddingModel",
     "NumpyVectorStore",
     "OpenAIEmbeddingModel",
@@ -47,7 +50,6 @@ __all__ = [
     "__version__",
     "embedding_model_factory",
     "get_settings",
-    "llm_model_factory",
     "print_callback",
     "vector_store_factory",
 ]

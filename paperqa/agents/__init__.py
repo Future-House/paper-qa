@@ -72,13 +72,16 @@ def configure_agent_logging(verbosity: int = 0) -> None:
 
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
+    module_logger = logging.getLogger("paperqa")
+
+    if not any(isinstance(h, RichHandler) for h in module_logger.handlers):
+        module_logger.addHandler(rich_handler)
+
     for logger_name, logger in logging.Logger.manager.loggerDict.items():
         if isinstance(logger, logging.Logger) and (
             log_level := verbosity_map.get(min(verbosity, 2), {}).get(logger_name)
         ):
             logger.setLevel(log_level)
-            if not any(isinstance(h, RichHandler) for h in logger.handlers):
-                logger.addHandler(rich_handler)
 
 
 def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
