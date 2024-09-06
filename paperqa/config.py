@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import ClassVar, assert_never, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 from .paths import PAPERQA_DIR
 from .prompts import (
@@ -306,9 +306,7 @@ class AgentSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    model_config = model_config = SettingsConfigDict(
-        cli_parse_args=True, extra="forbid"
-    )
+    model_config = SettingsConfigDict(cli_parse_args=True, extra="forbid")
 
     llm: str = Field(
         default="gpt-4o-2024-08-06",
@@ -386,8 +384,14 @@ class Settings(BaseSettings):
         return f"pqa_index_{hexdigest(index_fields)}"
 
     @classmethod
-    def from_name(cls, config_name: str) -> "Settings":
+    def from_name(
+        cls, config_name: str, cli_source: CliSettingsSource = None
+    ) -> "Settings":
         json_path: Path | None = None
+
+        # quick exit for default settings
+        if config_name == "default":
+            return Settings()
 
         # First, try to find the config file in the user's .config directory
         user_config_path = PAPERQA_DIR / f"{config_name}.json"
@@ -409,7 +413,14 @@ class Settings(BaseSettings):
             ) from e
 
         if json_path:
-            return Settings.model_validate_json(json_path.read_text())
+            # we do the ole switcheroo
+            # json - validate to deserialize knowing the types
+            # then dump it
+            # going json.loads directly will not get types correct
+            tmp = Settings.model_validate_json(json_path.read_text())
+            return Settings(
+                **(tmp.model_dump()), _cli_settings_source=cli_source(args=True)
+            )
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")
 

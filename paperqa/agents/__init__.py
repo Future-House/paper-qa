@@ -155,6 +155,14 @@ def main():
         "--version", "-v", action="version", version=f"PaperQA version: {__version__}"
     )
 
+    parser.add_argument(
+        "--settings",
+        "-s",
+        type=str,
+        help="Name or path of settings file",
+        default="default",
+    )
+
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Set command
@@ -163,24 +171,8 @@ def main():
     set_parser.add_argument("value", help="Value to set to the variable")
 
     # Show command
-    show_parser = subparsers.add_parser(
-        "show", help="Show a persistent PaperQA setting"
-    )
-    show_parser.add_argument("variable", help="PaperQA variable to show")
-    show_parser.add_argument(
-        "--limit", type=int, default=5, help='Limit results (only used for "answers")'
-    )
-
-    # Clear command
-    clear_parser = subparsers.add_parser(
-        "clear", help="Clear a persistent PaperQA setting"
-    )
-    clear_parser.add_argument("variable", help="PaperQA variable to clear")
-    clear_parser.add_argument(
-        "--index",
-        action="store_true",
-        help="Indicate that this index name should be cleared",
-    )
+    view_parser = subparsers.add_parser("view", help="View the chosen settings")
+    view_parser.add_argument("query", help="Question or task to ask of PaperQA")
 
     # Ask command
     ask_parser = subparsers.add_parser("ask", help="Query PaperQA via an agent")
@@ -212,20 +204,27 @@ def main():
     index_parser = subparsers.add_parser("index", help="Build a PaperQA search index")
 
     cli_settings = CliSettingsSource(Settings, root_parser=parser)
-    settings = Settings(_cli_settings_source=cli_settings(args=True))
 
+    print("ABOUT TO PARSE")
     args = parser.parse_args()
+
+    settings = Settings.from_name(args.settings, cli_source=cli_settings)
+
+    print(args.command)
 
     match args.command:
         case "ask":
             ask(args.query, settings)
+        case "view":
+            logger.info("Viewing settings")
+            logger.info(settings)
         case "search":
             search_query(args.query, args.index_name, settings)
         case "index":
             build_index(args.verbosity)
         case _:
             configure_cli_logging(verbosity=1)
-            commands = ", ".join({"set", "show", "clear", "ask", "search", "index"})
+            commands = ", ".join({"view", "ask", "search", "index"})
             brief_help = f"\nRun with commands: {{{commands}}}\n\n"
             brief_help += "For more information, run with --help"
             print(brief_help)
