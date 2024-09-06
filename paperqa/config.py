@@ -1,8 +1,14 @@
 import importlib.resources
 import os
+import sys
 from enum import Enum
 from pathlib import Path
-from typing import ClassVar, assert_never, cast
+from typing import ClassVar, cast
+
+if sys.version_info >= (3, 11):
+    from typing import assert_never
+else:
+    from typing_extensions import assert_never
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
@@ -339,7 +345,9 @@ class Settings(BaseSettings):
             "Directory to store the PQA generated search index, configuration, and answer indexes."
         ),
     )
-    verbosity: int = Field(default=0, help="Integer verbosity level for logging")
+    verbosity: int = Field(
+        default=0, description="Integer verbosity level for logging."
+    )
     manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(

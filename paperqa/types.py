@@ -159,7 +159,7 @@ class Answer(BaseModel):
             data.pop("used_contexts", None)
         return data
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def used_contexts(self) -> set[str]:
         """Return the used contexts."""
@@ -391,7 +391,7 @@ class DocDetails(Doc):
 
     @staticmethod
     def overwrite_docname_dockey_for_compatibility_w_doc(
-        data: dict[str, Any]
+        data: dict[str, Any],
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}

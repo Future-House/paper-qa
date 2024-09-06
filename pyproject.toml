@@ -4,7 +4,7 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 
 [project]
 authors = [
-    {email = "white.d.andrew@gmail.com", name = "Andrew White"},
+    {email = "hello@futurehouse.org", name = "FutureHouse technical staff"},
 ]
 # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = [
@@ -27,6 +27,7 @@ dependencies = [
     "pypdf",
     "tenacity",
     "tiktoken>=0.4.0",
+    "typing-extensions; python_version <= '3.10'",  # For typing.assert_never
 ]
 description = "LLM Chain for answering questions from docs"
 dynamic = ["version"]
@@ -40,7 +41,6 @@ maintainers = [
 name = "paper-qa"
 readme = "README.md"
 requires-python = ">=3.10"
-urls = {repository = "https://github.com/whitead/paper-qa"}
 
 [project.optional-dependencies]
 agents = [
@@ -53,24 +53,6 @@ agents = [
     "tantivy",
     "typer",
     "typing_extensions",
-]
-dev = [
-    "build",
-    "mypy",
-    "pre-commit",
-    "pytest",
-    "pytest-asyncio",
-    "pytest-recording",
-    "pytest-rerunfailures",
-    "pytest-subtests",
-    "pytest-sugar",
-    "pytest-timer",
-    "python-dotenv",
-    "pyzotero",
-    "requests",
-    "types-PyYAML",
-    "types-requests",
-    "types-setuptools",
 ]
 google = [
     "langchain-google-vertexai",
@@ -85,9 +67,21 @@ llms = [
     "sentence_transformers",
     "voyageai",
 ]
+typing = [
+    "types-PyYAML",
+    "types-requests",
+    "types-setuptools",
+]
 
 [project.scripts]
 pqa = "paperqa.agents:main"
+
+[project.urls]
+issues = "https://github.com/Future-House/paper-qa/issues"
+repository = "https://github.com/Future-House/paper-qa"
+
+[tool.black]
+preview = true
 
 [tool.codespell]
 check-filenames = true
@@ -107,12 +101,23 @@ enable_error_code = [
     "redundant-self",
     "truthy-bool",
     "truthy-iterable",
+    "unimported-reveal",
     "unreachable",
     "unused-awaitable",
     "unused-ignore",
 ]
 # Shows a short summary line after error messages.
 error_summary = false
+# A regular expression that matches file names, directory names and paths which mypy
+# should ignore while recursively discovering files to check. Use forward slashes (/) as
+# directory separators on all platforms.
+exclude = [
+    "^\\.?venv",  # SEE: https://regex101.com/r/0rp5Br/1
+]
+# Specifies the OS platform for the target program, for example darwin or win32
+# (meaning OS X or Windows, respectively). The default is the current platform
+# as revealed by Python’s sys.platform variable.
+platform = "linux"
 # Comma-separated list of mypy plugins.
 plugins = ["pydantic.mypy"]
 # Use visually nicer output in error messages: use soft word wrap, show source
@@ -147,6 +152,85 @@ module = [
     "voyageai.*",  # SEE: https://github.com/voyage-ai/voyageai-python/issues/8
 ]
 
+[tool.pylint]
+
+[tool.pylint.design]
+# Maximum number of attributes for a class (see R0902).
+max-attributes = 12
+
+[tool.pylint.format]
+# Maximum number of characters on a single line.
+max-line-length = 88  # Match ruff line-length
+
+[tool.pylint.main]
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use, and will cap the count on Windows to
+# avoid hangs.
+jobs = 0
+# List of plugins (as comma separated values of python module names) to load,
+# usually to register additional checkers.
+load-plugins = [
+    "pylint_pydantic",
+]
+
+[tool.pylint.messages_control]
+# Disable the message, report, category or checker with the given id(s).
+disable = [
+    "arguments-differ",  # Ops intentionally differ arguments
+    "attribute-defined-outside-init",  # Disagrees with reset pattern
+    "bare-except",  # Rely on ruff E722 for this
+    "broad-exception-caught",  # Don't care to enforce this
+    "broad-exception-raised",  # Rely on ruff TRY002 for this
+    "cyclic-import",  # Let Python blow up
+    "expression-not-assigned",  # Rely on mypy func-returns-value for this
+    "fixme",  # codetags are useful
+    "function-redefined",  # Rely on mypy no-redef for this
+    "import-outside-toplevel",  # Rely on ruff PLC0415 for this
+    "invalid-name",  # Don't care to enforce this
+    "line-too-long",  # Rely on ruff E501 for this
+    "logging-fstring-interpolation",  # f-strings are convenient
+    "logging-too-many-args",  # Rely on ruff PLE1205 for this
+    "missing-docstring",  # Let docformatter and ruff take care of docstrings
+    "missing-final-newline",  # Rely on ruff W292 for this
+    "no-else-return",  # Rely on ruff RET506 for this
+    "no-member",  # Buggy, SEE: https://github.com/pylint-dev/pylint/issues/8138
+    "not-callable",  # Don't care to enforce this
+    "protected-access",  # Don't care to enforce this
+    "raise-missing-from",  # Rely on ruff B904 for this
+    "redefined-builtin",  # Rely on ruff A002 for this
+    "super-init-not-called",  # Don't care to enforce this
+    "too-few-public-methods",  # Don't care to enforce this
+    "too-many-ancestors",  # Don't care to enforce this
+    "too-many-arguments",  # Don't care to enforce this
+    "too-many-branches",  # Rely on ruff PLR0912 for this
+    "too-many-instance-attributes",  # Don't care to enforce this
+    "too-many-lines",  # Don't care to enforce this
+    "too-many-locals",  # Rely on ruff PLR0914 for this
+    "too-many-return-statements",  # Rely on ruff PLR0911 for this
+    "too-many-statements",  # Rely on ruff PLR0915 for this
+    "ungrouped-imports",  # Rely on ruff I001 for this
+    "unspecified-encoding",  # Don't care to enforce this
+    "unsubscriptable-object",  # Buggy, SEE: https://github.com/PyCQA/pylint/issues/3637
+    "unsupported-membership-test",  # Buggy, SEE: https://github.com/pylint-dev/pylint/issues/3045
+    "unused-argument",  # Rely on ruff ARG002 for this
+    "unused-import",  # Rely on ruff F401 for this
+    "unused-variable",  # Rely on ruff F841 for this
+    "wrong-import-order",  # Rely on ruff I001 for this
+    "wrong-import-position",  # Rely on ruff E402 for this
+]
+# Enable the message, report, category or checker with the given id(s).
+enable = [
+    "useless-suppression",  # Print unused `pylint: disable` comments
+]
+
+[tool.pylint.reports]
+# Set true to activate the evaluation score.
+score = false
+
+[tool.pylint.similarities]
+# Minimum lines number of a similarity.
+min-similarity-lines = 12
+
 [tool.pytest.ini_options]
 # List of directories that should be searched for tests when no specific directories,
 # files or test ids are given in the command line when executing pytest from the rootdir
@@ -154,11 +238,30 @@ module = [
 # pattern.
 testpaths = ["tests"]
 
+[tool.refurb]
+enable_all = true
+ignore = [
+    "FURB101",  # FURB101, FURB103, FURB141, FURB144, FURB146, FURB147, FURB150, FURB155: no need for pathlib
+    "FURB103",
+    "FURB141",
+    "FURB144",
+    "FURB146",
+    "FURB147",
+    "FURB150",
+    "FURB155",
+]
+
 [tool.ruff]
 # Line length to use when enforcing long-lines violations (like `E501`).
 line-length = 120
 # Enable application of unsafe fixes.
 unsafe-fixes = true
+
+[tool.ruff.format]
+# Enable reformatting of code snippets in docstrings.
+docstring-code-format = true
+# Enable preview style formatting.
+preview = true
 
 [tool.ruff.lint]
 explicit-preview-rules = true
@@ -221,10 +324,12 @@ ignore = [
     "FLY002",  # Can be less readable
     "G004",  # f-strings are convenient
     "INP001",  # Can use namespace packages
+    "ISC001",  # For ruff format compatibility
     "N803",  # Want to use 'N', or 'L',
     "N806",  # Want to use 'N', or 'L',
     "PLR0913",
     "PLR0915",  # we can write lots of code
+    "PLW2901",  # Allow modifying loop variables
     "PTH",  # Overly pedantic
     "S311",  # Ok to use python random
     "SLF001",  # Overly pedantic
@@ -241,6 +346,7 @@ preview = true
 select = ["ALL"]
 unfixable = [
     "B007",  # While debugging, unused loop variables can be useful
+    "B905",  # Default fix is zip(strict=False), but that can hide bugs
     "ERA001",  # While debugging, temporarily commenting code can be useful
     "F401",  # While debugging, unused imports can be useful
     "F841",  # While debugging, unused locals can be useful
@@ -250,7 +356,8 @@ unfixable = [
 mypy-init-return = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*.py" = [
+"**/tests/*.py" = [
+    "N802",  # Tests function names can match class names
     "PLR2004",  # Tests can have magic values
     "S101",  # Tests can have assertions
     "S301",  # can test pickle
@@ -282,3 +389,21 @@ in_place = true
 spaces_before_inline_comment = 2  # Match Python PEP 8
 spaces_indent_inline_array = 4  # Match Python PEP 8
 trailing_comma_inline_array = true
+
+[tool.uv]
+dev-dependencies = [
+    "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
+    "ipython>=8",  # Pin to keep recent
+    "mypy>=1.8",  # Pin for mutable-override
+    "pre-commit~=3.4",  # Pin to keep recent
+    "pytest-asyncio",
+    "pytest-recording",
+    "pytest-rerunfailures",
+    "pytest-subtests",
+    "pytest-sugar",
+    "pytest-timer[colorama]",
+    "pytest>=8",  # Pin to keep recent
+    "python-dotenv",
+    "pyzotero",
+    "requests",
+]
