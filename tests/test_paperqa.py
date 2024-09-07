@@ -10,7 +10,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 import requests
-from openai import AsyncOpenAI
 
 from paperqa import (
     Answer,
@@ -24,15 +23,12 @@ from paperqa import (
 from paperqa.clients import CrossrefProvider
 from paperqa.core import llm_parse_json
 from paperqa.llms import (
-    AnthropicLLMModel,
     EmbeddingModel,
     HybridEmbeddingModel,
-    LangchainEmbeddingModel,
-    LangchainLLMModel,
     LangchainVectorStore,
+    LiteLLMEmbeddingModel,
+    LiteLLMModel,
     LLMModel,
-    OpenAIEmbeddingModel,
-    OpenAILLMModel,
     SparseEmbeddingModel,
 )
 from paperqa.readers import read_doc
@@ -410,10 +406,8 @@ def test_llm_parse_json_newlines():
 
 @pytest.mark.asyncio
 async def test_chain_completion():
-    client = AsyncOpenAI()
-    llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
-    call = llm.make_chain(
-        client,
+    s = Settings(llm="babbage-002", temperature=0.2)
+    call = s.get_llm().make_chain(
         "The {animal} says",
         skip_system=True,
     )
@@ -435,12 +429,20 @@ async def test_chain_completion():
 
 @pytest.mark.asyncio
 async def test_chain_chat():
-    client = AsyncOpenAI()
-    llm = OpenAILLMModel(
-        config={"temperature": 0, "model": "gpt-4o-mini", "max_tokens": 56}
-    )
+    model_config = {
+        "model_list": [
+            {
+                "model_name": "gpt-4o-mini",
+                "litellm_params": {
+                    "model": "gpt-4o-mini",
+                    "temperature": 0,
+                    "max_tokens": 56,
+                },
+            }
+        ]
+    }
+    llm = LiteLLMModel(name="gpt-4o-mini", config=model_config)
     call = llm.make_chain(
-        client,
         "The {animal} says",
         skip_system=True,
     )
@@ -470,15 +472,9 @@ async def test_chain_chat():
 @pytest.mark.asyncio
 async def test_anthropic_chain(stub_data_dir: Path) -> None:
 
-    try:
-        from anthropic import AsyncAnthropic
-    except ImportError:
-        pytest.skip("Test requires anthropic to be installed.")
+    anthropic_settings = Settings(llm="claude-3-haiku-20240307")
 
-    client = AsyncAnthropic()
-    llm = AnthropicLLMModel()
-    call = llm.make_chain(
-        client,
+    call = anthropic_settings.get_llm().make_chain(
         "The {animal} says",
         skip_system=True,
     )
@@ -499,9 +495,15 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert completion.seconds_to_last_token > 0
     assert isinstance(completion.text, str)
 
-    docs = Docs(llm="claude-3-sonnet-20240229", client=client)
-    await docs.aadd(stub_data_dir / "flag_day.html", "National Flag of Canada Day")
-    await docs.aget_evidence("What is the national flag of Canada?")
+    docs = Docs()
+    await docs.aadd(
+        stub_data_dir / "flag_day.html",
+        "National Flag of Canada Day",
+        settings=anthropic_settings,
+    )
+    await docs.aget_evidence(
+        "What is the national flag of Canada?", settings=anthropic_settings
+    )
 
 
 def test_make_docs(stub_data_dir: Path):
@@ -585,9 +587,12 @@ def test_llmresult_callback(docs_fixture):
     async def my_callback(result):
         my_results.append(result)
 
-    docs_fixture.summary_llm_model.llm_result_callback = my_callback
     settings = Settings.from_name("fast")
-    docs_fixture.get_evidence("What is XAI?", settings=settings)
+    summary_llm = settings.get_summary_llm()
+    summary_llm.llm_result_callback = my_callback
+    docs_fixture.get_evidence(
+        "What is XAI?", settings=settings, summary_llm_model=summary_llm
+    )
     assert my_results
     assert my_results[0].name
 
@@ -623,30 +628,28 @@ def test_custom_embedding(stub_data_dir: Path):
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
-        async def embed_documents(self, client, texts):  # noqa: ARG002
+        async def embed_documents(self, texts):
             return [[1, 2, 3] for _ in texts]
 
     docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=MyEmbeds()),
-        embedding_client=None,
+        texts_index=NumpyVectorStore(),
     )
-    assert docs._embedding_client is None
-    assert docs.embedding == "my_embed"
     docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+        stub_data_dir / "bates.txt",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        embedding_model=MyEmbeds(),
     )
     assert docs.texts[0].embedding == [1, 2, 3]
 
 
 def test_sparse_embedding(stub_data_dir: Path) -> None:
     docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        embedding_client=None,
+        texts_index=NumpyVectorStore(),
     )
-    assert docs._embedding_client is None
-    assert docs.embedding.startswith("sparse")  # type: ignore[union-attr]
     docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+        stub_data_dir / "bates.txt",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        embedding_model=SparseEmbeddingModel(),
     )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
     assert all(
@@ -658,27 +661,18 @@ def test_sparse_embedding(stub_data_dir: Path) -> None:
     assert docs.texts[1].embedding is not None
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
-    # test alias
-    docs = Docs(embedding="sparse")
-    assert docs._embedding_client is None
-    assert docs.embedding.startswith("sparse")  # type: ignore[union-attr]
-    docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
-    )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
-
 
 def test_hybrid_embedding(stub_data_dir: Path) -> None:
-    model = HybridEmbeddingModel(
-        models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
+    emb_model = HybridEmbeddingModel(
+        models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()]
     )
     docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=model),
+        texts_index=NumpyVectorStore(),
     )
-    assert isinstance(docs._embedding_client, AsyncOpenAI)
-    assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
     docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+        stub_data_dir / "bates.txt",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        embedding_model=emb_model,
     )
     assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
@@ -688,113 +682,41 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # now try via alias
-    docs = Docs(
+    emb_settings = Settings(
         embedding="hybrid-text-embedding-3-small",
     )
-    assert isinstance(docs._embedding_client, AsyncOpenAI)
-    assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
     docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
+        stub_data_dir / "bates.txt",
+        citation="WikiMedia Foundation, 2023, Accessed now",
+        embedding_model=emb_settings.get_embedding_model(),
     )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
-
-
-def test_sentence_transformer_embedding(stub_data_dir: Path):
-    from paperqa import SentenceTransformerEmbeddingModel
-
-    docs = Docs(embedding="sentence-transformers")
-    assert docs._embedding_client is None
-    docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
-    )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
-
-    docs = Docs(
-        texts_index=NumpyVectorStore(
-            embedding_model=SentenceTransformerEmbeddingModel()
-        ),
-        embedding_client=None,
-    )
-    assert docs._embedding_client is None
-    docs.add(
-        stub_data_dir / "bates.txt", citation="WikiMedia Foundation, 2023, Accessed now"
-    )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)
 
 
 def test_custom_llm(stub_data_dir: Path):
     class MyLLM(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, client, prompt):  # noqa: ARG002
-            assert client is None
+        async def acomplete(self, prompt):  # noqa: ARG002
             return "Echo"
 
-        async def acomplete_iter(self, client, prompt):  # noqa: ARG002
-            assert client is None
+        async def acomplete_iter(self, prompt):  # noqa: ARG002
             yield "Echo"
 
-    docs = Docs(llm_model=MyLLM(), client=None)
+    docs = Docs()
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
+        llm_model=MyLLM(),
     )
-    evidence = docs.get_evidence("Echo").contexts
+    evidence = docs.get_evidence("Echo", summary_llm_model=MyLLM()).contexts
     assert "Echo" in evidence[0].context
 
-    evidence = docs.get_evidence("Echo", callbacks=[print_callback]).contexts
+    evidence = docs.get_evidence(
+        "Echo", callbacks=[print_callback], summary_llm_model=MyLLM()
+    ).contexts
     assert "Echo" in evidence[0].context
-
-
-def test_langchain_llm(stub_data_dir: Path):
-    from langchain_openai import ChatOpenAI
-
-    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-4o-mini"))
-    assert isinstance(docs.llm_model, LangchainLLMModel)
-    assert isinstance(docs.summary_llm_model, LangchainLLMModel)
-    assert docs.llm == "gpt-4o-mini"
-    assert docs.summary_llm == "gpt-4o-mini"
-    docs.add(
-        stub_data_dir / "bates.txt",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    assert docs._client is not None
-    assert isinstance(docs.llm_model, LangchainLLMModel)
-    assert docs.summary_llm_model == docs.llm_model
-
-    docs.get_evidence(
-        "What is Frederick Bates's greatest accomplishment?",
-        callbacks=[print_callback],
-    )
-
-    assert docs.llm_model.llm_type == "chat"
-
-    # trying without callbacks (different codepath)
-    docs.get_evidence("What is Frederick Bates's greatest accomplishment?")
-
-
-def test_langchain_embeddings(stub_data_dir: Path):
-    from langchain_openai import OpenAIEmbeddings
-
-    docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
-        embedding_client=OpenAIEmbeddings(),
-    )
-    assert docs._embedding_client is not None
-
-    docs.add(
-        stub_data_dir / "bates.txt",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    docs = Docs(embedding="langchain", embedding_client=OpenAIEmbeddings())
-    docs.add(
-        stub_data_dir / "bates.txt",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
 
 
 @pytest.mark.skip(
@@ -1102,12 +1024,16 @@ def test_zotero() -> None:
 
 def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
     doc_path = stub_data_dir / "obama.txt"
-    docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    mini_settings = Settings(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
+    docs = Docs()
+    docs.add(
+        doc_path, "WikiMedia Foundation, 2023, Accessed now", settings=mini_settings
+    )
     # add with new dockey
     docs.add(
         stub_data_dir_w_near_dupes / "obama_modified.txt",
         "WikiMedia Foundation, 2023, Accessed now",
+        settings=mini_settings,
     )
     settings = Settings.from_name("fast")
     settings.answer.evidence_k = 10
@@ -1151,28 +1077,6 @@ def test_post_prompt(stub_data_dir: Path):
     docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     response = docs.query("What country is Bates from?", settings=settings)
     assert "up" in response.answer.lower()
-
-
-def test_embedding_name_consistency():
-    docs = Docs()
-    assert docs.embedding == "text-embedding-3-small"
-    assert docs.texts_index.embedding_model.name == "text-embedding-3-small"
-    docs = Docs(embedding="langchain")
-    assert docs.embedding == "langchain"
-    assert docs.texts_index.embedding_model.name == "langchain"
-    assert isinstance(docs.texts_index.embedding_model, LangchainEmbeddingModel)
-    docs = Docs(embedding="foo")
-    assert docs.embedding == "foo"
-    assert isinstance(docs.texts_index.embedding_model, OpenAIEmbeddingModel)
-    docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="test"))
-    )
-    assert docs.embedding == "test"
-
-    docs = Docs(embedding="hybrid-text-embedding-3-small")
-    assert isinstance(docs.texts_index.embedding_model, HybridEmbeddingModel)
-    assert docs.texts_index.embedding_model.models[0].name == "text-embedding-3-small"
-    assert docs.texts_index.embedding_model.models[1].name == "sparse"
 
 
 def test_external_doc_index(stub_data_dir: Path):

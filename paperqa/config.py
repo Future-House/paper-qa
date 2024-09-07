@@ -13,6 +13,7 @@ else:
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
+from .llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from .prompts import (
     citation_prompt,
     default_system_prompt,
@@ -318,9 +319,25 @@ class Settings(BaseSettings):
         default="gpt-4o-2024-08-06",
         description="Default LLM for most things, including answers. Should be 'best' LLM",
     )
+    llm_config: dict | None = Field(
+        default=None,
+        description=(
+            "LiteLLM Router configuration to pass to LiteLLMModel, must have `model_list` "
+            "key (corresponding to model_list inputs here: https://docs.litellm.ai/docs/routing)"
+            ", and can optionally include a router_kwargs key with router kwargs as values."
+        ),
+    )
     summary_llm: str = Field(
         default="gpt-4o-2024-08-06",
         description="Default LLM for summaries and parsing citations",
+    )
+    summary_llm_config: dict | None = Field(
+        default=None,
+        description=(
+            "LiteLLM Router configuration to pass to LiteLLMModel, must have `model_list` "
+            "key (corresponding to model_list inputs here: https://docs.litellm.ai/docs/routing)"
+            ", and can optionally include a router_kwargs key with router kwargs as values."
+        ),
     )
     embedding: str = Field(
         "text-embedding-3-small",
@@ -436,6 +453,36 @@ class Settings(BaseSettings):
             )
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")
+
+    def _default_litellm_router_settings(self, llm: str) -> dict:
+        """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
+        return {
+            "model_list": [
+                {
+                    "model_name": llm,
+                    "litellm_params": {
+                        "model": llm,
+                        "temperature": self.temperature,
+                    },
+                }
+            ]
+        }
+
+    def get_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.llm,
+            config=self.llm_config or self._default_litellm_router_settings(self.llm),
+        )
+
+    def get_summary_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.summary_llm,
+            config=self.summary_llm_config
+            or self._default_litellm_router_settings(self.summary_llm),
+        )
+
+    def get_embedding_model(self) -> EmbeddingModel:
+        return embedding_model_factory(self.embedding, **(self.embedding_config or {}))
 
 
 MaybeSettings = Settings | str | None
