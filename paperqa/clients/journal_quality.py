@@ -46,8 +46,8 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
         return doc_details + DocDetails(  # type: ignore[call-arg]
             source_quality=max(
                 [
-                    self.data.get(query.journal.casefold(), -1),  # type: ignore[union-attr]
-                    self.data.get("the " + query.journal.casefold(), -1),  # type: ignore[union-attr]
+                    self.data.get(query.journal.casefold(), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
+                    self.data.get("the " + query.journal.casefold(), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
                 ]
             )
         )
