@@ -13,9 +13,6 @@ from pydantic import ValidationError
 from pytest_subtests import SubTests
 
 from paperqa.agents import agent_query
-from paperqa.agents.helpers import (
-    update_doc_models,
-)
 from paperqa.agents.models import (
     AgentStatus,
     AnswerResponse,
@@ -114,8 +111,8 @@ async def test_timeout(agent_test_settings):
 async def test_propagate_options(agent_test_settings) -> None:
     llm_name = "gpt-4o-mini"
     default_llm_names = {
-        cls.model_fields[name].default  # type: ignore[attr-defined]
-        for name, cls in itertools.product(("llm", "summary_llm"), (Settings, Docs))
+        cls.model_fields[name].default
+        for name, cls in itertools.product(("llm", "summary_llm"), (Settings,))
     }
     assert (
         llm_name not in default_llm_names
@@ -177,7 +174,6 @@ async def test_agent_sharing_state(agent_test_settings, subtests: SubTests) -> N
         query=answer.question,
         settings=agent_test_settings,
     )
-    update_doc_models(my_docs, query)
     tool_state = SharedToolState(
         docs=my_docs, answer=answer, settings=agent_test_settings
     )

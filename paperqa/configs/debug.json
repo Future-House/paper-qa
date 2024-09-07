@@ -1,6 +1,6 @@
 {
-  "llm": "openai/babbage-002",
-  "summary_llm": "openai/babbage-002",
+  "llm": "text-completion-openai/babbage-002",
+  "summary_llm": "text-completion-openai/babbage-002",
   "answer": {
     "evidence_k": 2,
     "evidence_detailed_citations": false,

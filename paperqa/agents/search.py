@@ -360,11 +360,7 @@ async def process_file(
             # it could be that all metadata fails and it has to peek to first page
             # TODO: Eventually we will have an LLM object of some kinda passed here
             # (or coming from settings)
-            tmp_docs = Docs(
-                llm=settings.llm,
-                summary_llm=settings.summary_llm,
-                embedding=settings.embedding,
-            )
+            tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
                     path=pathlib.Path(file_path),

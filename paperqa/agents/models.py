@@ -12,7 +12,6 @@ from uuid import UUID, uuid4
 from langchain_core.callbacks import AsyncCallbackHandler
 from langchain_core.messages import BaseMessage, messages_to_dict
 from langchain_core.outputs import ChatGeneration, LLMResult
-from openai import AsyncOpenAI
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -24,10 +23,9 @@ from pydantic import (
 )
 from typing_extensions import Protocol
 
-from .. import (
-    Answer,
-    OpenAILLMModel,
-)
+from paperqa.llms import LiteLLMModel
+
+from .. import Answer
 from ..config import Settings
 from ..version import __version__
 
@@ -123,11 +121,13 @@ class AnswerResponse(BaseModel):
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
-        model = OpenAILLMModel(config={"model": llm_model, "temperature": 0.1})
+        model = LiteLLMModel(name=llm_model)
         chain = model.make_chain(
-            AsyncOpenAI(), prompt="{question}\n\n{answer}", system_prompt=sys_prompt
+            prompt="{question}\n\n{answer}", system_prompt=sys_prompt
         )
-        result = await chain({"question": self.answer.question, "answer": self.answer.answer})  # type: ignore[call-arg]
+        result = await chain(  # type: ignore[call-arg]
+            {"question": self.answer.question, "answer": self.answer.answer},
+        )
         return result.text.strip()
 
 
