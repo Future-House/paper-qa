@@ -125,7 +125,9 @@ def search_query(
     settings: Settings,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
     """Search using a pre-built PaperQA index."""
-    configure_cli_logging(verbosity=0)
+    configure_cli_logging(verbosity=settings.verbosity)
+    if index_name == "default":
+        index_name = settings.get_index_name()
     loop = get_loop()
     return loop.run_until_complete(
         search(
@@ -190,6 +192,21 @@ def main():
         "location", help="Location for new settings (name or an absolute path)"
     )
 
+    ask_parser = subparsers.add_parser(
+        "ask", help="Ask a question of current index (based on settings)"
+    )
+    ask_parser.add_argument("query", help="Question to ask")
+
+    search_parser = subparsers.add_parser(
+        "search",
+        help="Search the index specified by --index."
+        " Pass --index answers to search previous answers.",
+    )
+    search_parser.add_argument("query", help="Keyword search")
+    search_parser.add_argument(
+        "-i", dest="index", default="default", help="Index to search"
+    )
+
     # Create CliSettingsSource instance
     cli_settings = CliSettingsSource(Settings, root_parser=parser)
 
@@ -199,23 +216,21 @@ def main():
     settings = Settings.from_name(
         args.settings, cli_source=cli_settings(args=remaining_args)
     )
+    configure_cli_logging(settings.verbosity)
 
     match args.command:
         case "ask":
             ask(args.query, settings)
         case "view":
-            configure_cli_logging(settings.verbosity)
             logger.info(f"Viewing: {args.settings}")
             logger.info(settings.model_dump_json(indent=2))
         case "save":
-            configure_cli_logging(settings.verbosity)
             save_settings(settings, args.location)
         case "search":
-            search_query(args.query, args.index_name, settings)
+            search_query(args.query, args.index, settings)
         case "index":
             build_index(args.verbosity)
         case _:
-            configure_cli_logging(verbosity=1)
             commands = ", ".join({"view", "ask", "search", "index"})
             brief_help = f"\nRun with commands: {{{commands}}}\n\n"
             brief_help += "For more information, run with --help"

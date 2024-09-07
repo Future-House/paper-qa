@@ -379,7 +379,7 @@ class Settings(BaseSettings):
         ),
     )
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def md5(self) -> str:
         return hexdigest(self.model_dump_json(exclude={"md5"}))
