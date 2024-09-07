@@ -137,7 +137,7 @@ async def run_fake_agent(
     query: QueryRequest,
     docs: Docs,
 ) -> tuple[Answer, AgentStatus]:
-    answer = Answer(question=query.query, id=query.id)
+    answer = Answer(question=query.query, id=query.id, config_md5=query.settings.md5)
     tools = query_to_tools(
         query, state=SharedToolState(docs=docs, answer=answer, settings=query.settings)
     )
@@ -192,7 +192,7 @@ async def run_langchain_agent(
     profiler: SimpleProfiler,
     timeout: float | None = None,
 ) -> tuple[Answer, AgentStatus]:
-    answer = Answer(question=query.query, id=query.id)
+    answer = Answer(question=query.query, id=query.id, config_md5=query.settings.md5)
     shared_callbacks: list[BaseCallbackHandler] = [
         AgentCallback(
             profiler,

@@ -10,10 +10,9 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import assert_never
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
-from .paths import PAPERQA_DIR
 from .prompts import (
     citation_prompt,
     default_system_prompt,
@@ -24,7 +23,6 @@ from .prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
-from .types import Answer
 from .utils import hexdigest, pqa_directory
 from .version import __version__
 
@@ -225,6 +223,8 @@ class PromptSettings(BaseModel):
     def check_post(cls, v: str | None) -> str | None:
         if v is not None:
             # kind of a hack to get list of attributes in answer
+            from .types import Answer
+
             attrs = set(Answer.model_fields.keys())
             if not set(get_formatted_variables(v)).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
@@ -362,6 +362,11 @@ class Settings(BaseSettings):
         ),
     )
 
+    @computed_field
+    @property
+    def md5(self) -> str:
+        return hexdigest(self.model_dump_json(exclude={"md5"}))
+
     answer: AnswerSettings = Field(default_factory=AnswerSettings)
     parsing: ParsingSettings = Field(default_factory=ParsingSettings)
     prompts: PromptSettings = Field(default_factory=PromptSettings)
@@ -402,7 +407,7 @@ class Settings(BaseSettings):
             return Settings(_cli_settings_source=cli_source(args=True))
 
         # First, try to find the config file in the user's .config directory
-        user_config_path = PAPERQA_DIR / f"{config_name}.json"
+        user_config_path = pqa_directory("settings") / f"{config_name}.json"
 
         if user_config_path.exists():
             json_path = user_config_path

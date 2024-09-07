@@ -622,14 +622,16 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
     ) -> Answer:
 
-        answer = Answer(question=query) if isinstance(query, str) else query
-
-        if len(self.docs) == 0 and len(self.texts_index) == 0:
-            return answer
-
         s = get_settings(settings)
         answer_config = s.answer
         prompt_config = s.prompts
+
+        answer = (
+            Answer(question=query, config_md5=s.m5) if isinstance(query, str) else query
+        )
+
+        if len(self.docs) == 0 and len(self.texts_index) == 0:
+            return answer
 
         exclude_text_filter = exclude_text_filter or set()
         exclude_text_filter |= {c.text.name for c in answer.contexts}
@@ -716,11 +718,13 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
     ) -> Answer:
 
-        answer = Answer(question=query) if isinstance(query, str) else query
-
         s = get_settings(settings)
         answer_config = s.answer
         prompt_config = s.prompts
+
+        answer = (
+            Answer(question=query, config_md5=s.m5) if isinstance(query, str) else query
+        )
 
         contexts = answer.contexts
 

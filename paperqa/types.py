@@ -23,6 +23,7 @@ from pydantic import (
     model_validator,
 )
 
+from .config import Settings
 from .utils import (
     create_bibtex_key,
     encode_id,
@@ -146,6 +147,11 @@ class Answer(BaseModel):
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
+    config_md5: str = Field(
+        default_factory=lambda: Settings().md5,
+        frozen=True,
+        description="MD5 hash of the settings used to generate the answer. Cannot change",
+    )
     model_config = ConfigDict(extra="ignore")
 
     def __str__(self) -> str:

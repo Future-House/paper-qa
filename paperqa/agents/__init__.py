@@ -10,7 +10,7 @@ from pydantic_settings import CliSettingsSource
 
 from .. import __version__
 from ..config import Settings
-from ..utils import get_loop
+from ..utils import get_loop, pqa_directory
 
 try:
     from rich.console import Console
@@ -143,6 +143,30 @@ def build_index(
     return loop.run_until_complete(get_directory_index(settings=settings))
 
 
+def save_settings(
+    settings: Settings,
+    settings_path: str | os.PathLike,
+) -> None:
+    """Save the settings to a file."""
+    # check if this could be interpreted at an absolute path
+    if os.path.isabs(settings_path):
+        full_settings_path = os.path.expanduser(settings_path)
+    else:
+        full_settings_path = os.path.join(pqa_directory("settings"), settings_path)
+        if not full_settings_path.endswith(".json"):
+            full_settings_path += ".json"
+
+    is_overwrite = os.path.exists(full_settings_path)
+
+    with open(full_settings_path, "w") as f:
+        f.write(settings.model_dump_json(indent=2))
+
+    if is_overwrite:
+        logger.info(f"Settings overwritten to: {full_settings_path}")
+    else:
+        logger.info(f"Settings saved to: {full_settings_path}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="PaperQA CLI")
 
@@ -157,8 +181,11 @@ def main():
         title="commands", dest="command", description="Available commands"
     )
 
-    # Show command
     subparsers.add_parser("view", help="View the chosen settings")
+    save_parser = subparsers.add_parser("save", help="View the chosen settings")
+    save_parser.add_argument(
+        "location", help="Location for new settings (name or an absolute path)"
+    )
 
     # Create CliSettingsSource instance
     cli_settings = CliSettingsSource(Settings, root_parser=parser)
@@ -177,6 +204,9 @@ def main():
             configure_cli_logging(settings.verbosity)
             logger.info(f"Viewing: {args.settings}")
             logger.info(settings.model_dump_json(indent=2))
+        case "save":
+            configure_cli_logging(settings.verbosity)
+            save_settings(settings, args.location)
         case "search":
             search_query(args.query, args.index_name, settings)
         case "index":
