@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import asyncio
+import csv
 import datetime
 import logging
 import os
-from io import StringIO
 
 import aiohttp
-import pandas as pd
+from anyio import open_file
 from pydantic import ValidationError
+from tqdm.asyncio import tqdm
 
 from ..types import DocDetails
 from .client_models import DOIQuery, MetadataPostProcessor
@@ -29,15 +30,12 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         else:
             self.retraction_data_path = str(retraction_data_path)
 
-        self.retraction_filter = ["Retraction"]
+        self.retraction_filter: str = "Retraction"
         self.doi_set: set[str] = set()
         self.columns: list[str] = [
-            "Title",
-            "RetractionDate",
             "RetractionDOI",
             "OriginalPaperDOI",
             "RetractionNature",
-            "Reason",
         ]
 
     def _has_cache_expired(self) -> bool:
@@ -51,29 +49,33 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
 
         return time_difference > datetime.timedelta(days=30)
 
-    async def _download_raw_retracted(self) -> pd.DataFrame:
+    def _is_csv_cached(self) -> bool:
+        return os.path.exists(self.retraction_data_path)
+
+    async def _download_raw_retracted(self) -> None:
         retries = 3
         delay = 5
         url = "https://api.labs.crossref.org/data/retractionwatch"
+
         for i in range(retries):
             try:
-                async with aiohttp.ClientSession() as session:
-                    response = await session.get(
-                        url, timeout=aiohttp.ClientTimeout(total=15)
-                    )
-                    async with response:
-                        response.raise_for_status()
-                        content = await response.text(encoding="mac_roman")
-                        downloaded_df: pd.DataFrame = pd.read_csv(
-                            StringIO(content), usecols=self.columns
+                async with aiohttp.ClientSession() as session, session.get(
+                    url, timeout=aiohttp.ClientTimeout(total=300)
+                ) as response:
+                    response.raise_for_status()
+                    async with await open_file(self.retraction_data_path, "wb") as f:
+                        progress_bar = tqdm(
+                            unit="iB", unit_scale=True, desc=self.retraction_data_path
                         )
-                        return downloaded_df.apply(
-                            lambda col: col.apply(
-                                lambda x: x.strip() if isinstance(x, str) else x
-                            )
-                        )
+                        while True:
+                            chunk = await response.content.read(1024)
+                            if not chunk:
+                                break
+                            await f.write(chunk)
+                            progress_bar.update(len(chunk))
+                        progress_bar.close()
 
-            except (TimeoutError, aiohttp.ClientError) as e:  # noqa: PERF203
+            except (TimeoutError, aiohttp.ClientError) as e:
                 if i < retries - 1:
                     await asyncio.sleep(delay)
                     delay *= 2
@@ -81,32 +83,23 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
                     raise RuntimeError(
                         f"Failed to download retracted data after {retries} attempts: {e}"
                     ) from e
-        return pd.DataFrame(columns=self.columns)  # NOTE: this is empty
 
-    def _write_csv_to_gcs(self, retraction_dataframe: pd.DataFrame) -> None:
-        retraction_dataframe.to_csv(self.retraction_data_path, index=False)
-
-    def _populate_retracted_dois(self, filtered_data: pd.DataFrame) -> set[str]:
-        return set(filtered_data[self.columns[2]].dropna()) | set(
-            filtered_data[self.columns[3]].dropna()
-        )
-
-    def _filter_dois(
-        self, filter_cols: list, retraction_data: pd.DataFrame
-    ) -> pd.DataFrame:
-        return retraction_data[retraction_data["RetractionNature"].isin(filter_cols)]
+    def _filter_dois(self) -> None:
+        with open(self.retraction_data_path, newline="", encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row[self.columns[2]] == self.retraction_filter:
+                    self.doi_set.add(row[self.columns[0]])
+                    self.doi_set.add(row[self.columns[1]])
 
     async def load_data(self) -> None:
-        if os.path.exists(self.retraction_data_path) and not self._has_cache_expired():
-            retraction_data = pd.read_csv(self.retraction_data_path)
-        else:
-            retraction_data = await self._download_raw_retracted()
-            if not retraction_data.empty:
-                raise RuntimeError("Retraction data was not found.")
-            self._write_csv_to_gcs(retraction_data)
+        if not self._is_csv_cached() or self._has_cache_expired():
+            await self._download_raw_retracted()
 
-        filtered_data = self._filter_dois(self.retraction_filter, retraction_data)
-        self.doi_set = self._populate_retracted_dois(filtered_data)
+        self._filter_dois()
+
+        if not self.doi_set:
+            raise RuntimeError("Retraction data was not found.")
 
     async def _process(self, query: DOIQuery, doc_details: DocDetails) -> DocDetails:
         if not self.doi_set:
