@@ -240,7 +240,7 @@ class ZoteroDB(zotero.Zotero):
             _pdfs = [self.get_pdf(item) for item in _items]
 
             # Filter:
-            for item, pdf in zip(_items, _pdfs, strict=False):
+            for item, pdf in zip(_items, _pdfs, strict=True):
                 no_pdf = item is None or pdf is None
                 is_duplicate = pdf in pdfs
 

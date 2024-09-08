@@ -356,10 +356,6 @@ async def process_file(
             if file_name in metadata:
                 doi, title = metadata[file_name].doi, metadata[file_name].title
 
-            # We set the LLM/SummaryLLM because
-            # it could be that all metadata fails and it has to peek to first page
-            # TODO: Eventually we will have an LLM object of some kinda passed here
-            # (or coming from settings)
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
