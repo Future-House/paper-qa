@@ -56,10 +56,6 @@ async def litellm_get_search_query(
             f"The current year is {get_year()}."
         )
 
-    if "gpt" not in llm:
-        raise ValueError(
-            f"Invalid llm: {llm}, note a GPT model must be used for the fake agent search."
-        )
     model = LiteLLMModel(name=llm)
     model.config["model_list"][0]["litellm_params"].update({"temperature": temperature})
     chain = model.make_chain(prompt=search_prompt, skip_system=True)

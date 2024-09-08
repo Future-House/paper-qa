@@ -410,6 +410,7 @@ dev-dependencies = [
     "pytest-subtests",
     "pytest-sugar",
     "pytest-timer[colorama]",
+    "pytest-vcr",
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "pyzotero",
