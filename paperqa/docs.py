@@ -257,23 +257,21 @@ class Docs(BaseModel):
         if llm_model is None:
             llm_model = all_settings.get_llm()
         if citation is None:
-            # skip system because it's too hesitant to answer
-            cite_chain = llm_model.make_chain(
-                prompt=parse_config.citation_prompt,
-                skip_system=True,
-            )
-            # peak first chunk
-            fake_doc = Doc(docname="", citation="", dockey=dockey)
+            # Peek first chunk
             texts = read_doc(
                 path,
-                fake_doc,
+                Doc(docname="", citation="", dockey=dockey),  # Fake doc
                 chunk_chars=parse_config.chunk_size,
                 overlap=parse_config.overlap,
             )
             if len(texts) == 0:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain({"text": texts[0].text}, None, None)
-            citation = chain_result.text
+            result = await llm_model.run_prompt(
+                prompt=parse_config.citation_prompt,
+                data={"text": texts[0].text},
+                skip_system=True,  # skip system because it's too hesitant to answer
+            )
+            citation = result.text
             if (
                 len(citation) < 3  # noqa: PLR2004
                 or "Unknown" in citation
@@ -304,15 +302,13 @@ class Docs(BaseModel):
 
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
-            structured_cite_chain = llm_model.make_chain(
+            result = await llm_model.run_prompt(
                 prompt=parse_config.structured_citation_prompt,
+                data={"citation": citation},
                 skip_system=True,
             )
-            chain_result = await structured_cite_chain(
-                {"citation": citation}, None, None
-            )
             with contextlib.suppress(json.JSONDecodeError):
-                clean_text = chain_result.text.strip("`")
+                clean_text = result.text.strip("`")
                 if clean_text.startswith("json"):
                     clean_text = clean_text.replace("json", "", 1)
                 citation_json = json.loads(clean_text)
@@ -657,12 +653,14 @@ class Docs(BaseModel):
             contexts = answer.contexts
         pre_str = None
         if prompt_config.pre is not None:
-            pre_chain = llm_model.make_chain(
-                prompt=prompt_config.pre,
-                system_prompt=prompt_config.system,
-            )
             with set_llm_answer_ids(answer.id):
-                pre = await pre_chain({"question": answer.question}, callbacks, "pre")
+                pre = await llm_model.run_prompt(
+                    prompt=prompt_config.pre,
+                    data={"question": answer.question},
+                    system_prompt=prompt_config.system,
+                    callbacks=callbacks,
+                    name="pre",
+                )
             answer.add_tokens(pre)
             pre_str = pre.text
 
@@ -697,20 +695,18 @@ class Docs(BaseModel):
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            qa_chain = llm_model.make_chain(
-                prompt=prompt_config.qa,
-                system_prompt=prompt_config.system,
-            )
             with set_llm_answer_ids(answer.id):
-                answer_result = await qa_chain(
-                    {
+                answer_result = await llm_model.run_prompt(
+                    prompt=prompt_config.qa,
+                    data={
                         "context": context_str,
                         "answer_length": answer_config.answer_length,
                         "question": answer.question,
                         "example_citation": prompt_config.EXAMPLE_CITATION,
                     },
-                    callbacks,
-                    "answer",
+                    system_prompt=prompt_config.system,
+                    callbacks=callbacks,
+                    name="answer",
                 )
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
@@ -739,12 +735,14 @@ class Docs(BaseModel):
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         if prompt_config.post is not None:
-            chain = llm_model.make_chain(
-                prompt=prompt_config.post,
-                system_prompt=prompt_config.system,
-            )
             with set_llm_answer_ids(answer.id):
-                post = await chain(answer.model_dump(), callbacks, "post")
+                post = await llm_model.run_prompt(
+                    prompt=prompt_config.post,
+                    data=answer.model_dump(),
+                    system_prompt=prompt_config.system,
+                    callbacks=callbacks,
+                    name="post",
+                )
             answer_text = post.text
             answer.add_tokens(post)
             formatted_answer = f"Question: {answer.question}\n\n{post}\n"

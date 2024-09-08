@@ -115,17 +115,16 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model="gpt-4o") -> str:
+    async def get_summary(self, llm_model: str = "gpt-4o") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
         model = LiteLLMModel(name=llm_model)
-        chain = model.make_chain(
-            prompt="{question}\n\n{answer}", system_prompt=sys_prompt
-        )
-        result = await chain(  # type: ignore[call-arg]
-            {"question": self.answer.question, "answer": self.answer.answer},
+        result = await model.run_prompt(
+            prompt="{question}\n\n{answer}",
+            data={"question": self.answer.question, "answer": self.answer.answer},
+            system_prompt=sys_prompt,
         )
         return result.text.strip()
 
