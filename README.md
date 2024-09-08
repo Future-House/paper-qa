@@ -4,7 +4,7 @@
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. It includes:
+PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) and our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection. It includes:
 
 - A simple interface to get good answers, with no hallucinations, grounding responses with in-text citations.
 - State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
@@ -14,8 +14,6 @@ PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG
 - A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
 
 By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
-
-See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) or our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
 
 ## Install
 
@@ -27,11 +25,65 @@ pip install paper-qa[agents]
 
 PaperQA uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [ollama](https://github.com/ollama/ollama)). Any LiteLLM compatible model can be configured to use with PaperQA.
 
+If you need to index a large set of papers (100+), you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key), which will allow you to avoid hitting public rate limits using these metadata services. Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
+
 ## Usage
 
 ### CLI
 
+First navigate to a directory with some papers and use the `pqa` cli:
+
+```bash
+$ pqa ask 'why does skin injury yield scars?'
+[15:55:58] Starting paper search for 'wound healing scar formation, 2010-2024'.
+           New file to index: Multi-omic analysis reveals divergent molecular _8e8314f6688e8c7d.pdf...
+           ...
+```
+
+You will see PaperQA index your local PDF files, gathering the necessary metadata for each of them (using [Crossref](https://www.crossref.org/) and [Semantic Scholar](https://www.semanticscholar.org/)),
+search over that index, then break the files into chunked evidence contexts, rank them, and ultimately generate an answer. The next time this directory is queried, your index will already be built (save for any differences detected, like new added papers), so it will skip the indexing step.
+
+All prior answers will be indexed and stored, you can view them by querying via the `search` subcommand, or access them yourself in your `PQA_HOME` directory, which defaults to `~/.pqa/`.
+
+```bash
+$ pqa search -i 'answers' 'skin'
+```
+
+PaperQA is highly configurable, when running from the command line, `pqa help` shows all options, descriptions for each field can be found in `paperqa/settings.py`. For example to run with a higher temperature:
+
+```bash
+$ pqa --temperature 0.5 ask 'why does skin injury yield scars?'
+```
+
 ### APIs
+
+The same entrypoint can be accessed via Python directly:
+
+```Python
+from paperqa import ask, Settings
+
+answer = ask('why does skin injury yield scars?', settings=Settings(temperature=0.5))
+```
+
+Or, if you prefer fine grained control, and you wish to add objects to the docs object yourself, the existing `Docs` object interface still exists:
+
+```Python
+from paperqa import Docs, Settings, AnswerSettings
+doc_paths = ('myfile.pdf', 'myotherfile.pdf')
+
+docs = Docs()
+
+for doc in doc_paths:
+    doc.add(doc_paths)
+
+answer = docs.query(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(llm='claude-3-5-sonnet-20240620', answer=AnswerSettings(answer_max_sources=3))
+)
+
+print(answer.formatted_answer)
+
+```
 
 ## How does it work?
 
@@ -63,7 +115,7 @@ Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics usin
 
 ## What's New?
 
-Version 4 removed langchain from the package because it no longer supports pickling. This also simplifies the package a bit - especially prompts. Langchain can still be used, but it's not required. You can use any LLMs from langchain, but you will need to use the `LangchainLLMModel` class to wrap the model.
+Version 5 added a CLI, agentic workflows, and removed much of the state from the `Docs` object. `Docs` objects pickled from prior versions of `PaperQA` are not compatible with version 5 and will need to be rebuilt.
 
 ## Usage
 
