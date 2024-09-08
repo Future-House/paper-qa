@@ -12,8 +12,9 @@ from dotenv import load_dotenv
 
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
-from paperqa.config import Settings
+from paperqa.settings import Settings
 from paperqa.types import Answer
+from paperqa.utils import setup_default_logs
 
 PAPER_DIRECTORY = Path(__file__).parent
 
@@ -21,6 +22,11 @@ PAPER_DIRECTORY = Path(__file__).parent
 @pytest.fixture(autouse=True, scope="session")
 def _load_env():
     load_dotenv()
+
+
+@pytest.fixture(autouse=True)
+def _setup_default_logs():
+    setup_default_logs()
 
 
 @pytest.fixture(scope="session")

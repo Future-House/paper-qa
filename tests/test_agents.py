@@ -25,8 +25,8 @@ from paperqa.agents.tools import (
     PaperSearchTool,
     SharedToolState,
 )
-from paperqa.config import AgentSettings, Settings
 from paperqa.docs import Docs
+from paperqa.settings import AgentSettings, Settings
 from paperqa.types import Answer, Context, Doc, Text
 from paperqa.utils import get_year, md5sum
 

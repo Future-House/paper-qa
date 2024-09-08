@@ -21,7 +21,6 @@ from pydantic import (
 )
 
 from .clients import DEFAULT_CLIENTS, DocMetadataClient
-from .config import MaybeSettings, get_settings
 from .core import llm_parse_json, map_fxn_summary
 from .llms import (
     EmbeddingModel,
@@ -31,6 +30,7 @@ from .llms import (
 )
 from .paths import PAPERQA_DIR
 from .readers import read_doc
+from .settings import MaybeSettings, get_settings
 from .types import (
     Answer,
     Doc,
@@ -525,7 +525,7 @@ class Docs(BaseModel):
         prompt_config = evidence_settings.prompts
 
         answer = (
-            Answer(question=query, config_md5=evidence_settings.m5)
+            Answer(question=query, config_md5=evidence_settings.md5)
             if isinstance(query, str)
             else query
         )
@@ -645,7 +645,7 @@ class Docs(BaseModel):
             embedding_model = query_settings.get_embedding_model()
 
         answer = (
-            Answer(question=query, config_md5=query_settings.m5)
+            Answer(question=query, config_md5=query_settings.md5)
             if isinstance(query, str)
             else query
         )

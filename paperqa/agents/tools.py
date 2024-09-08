@@ -19,7 +19,7 @@ from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to 
 from .helpers import compute_total_model_token_cost, get_year
 from .search import get_directory_index
 from .models import QueryRequest, SimpleProfiler
-from ..config import Settings
+from ..settings import Settings
 from ..llms import EmbeddingModel, LiteLLMModel
 
 logger = logging.getLogger(__name__)

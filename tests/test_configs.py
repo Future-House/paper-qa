@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from paperqa.config import (
+from paperqa.settings import (
     PromptSettings,
     Settings,
     get_formatted_variables,

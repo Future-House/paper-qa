@@ -26,7 +26,7 @@ from typing_extensions import Protocol
 from paperqa.llms import LiteLLMModel
 
 from .. import Answer
-from ..config import Settings
+from ..settings import Settings
 from ..version import __version__
 
 logger = logging.getLogger(__name__)

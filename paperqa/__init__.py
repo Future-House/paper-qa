@@ -1,4 +1,3 @@
-from .config import Settings, get_settings
 from .docs import Answer, Docs, print_callback
 from .llms import (
     EmbeddingModel,
@@ -12,6 +11,7 @@ from .llms import (
     SparseEmbeddingModel,
     embedding_model_factory,
 )
+from .settings import Settings, get_settings
 from .types import Context, Doc, DocDetails, Text
 from .version import __version__
 

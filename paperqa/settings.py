@@ -363,7 +363,8 @@ class Settings(BaseSettings):
         ),
     )
     verbosity: int = Field(
-        default=0, description="Integer verbosity level for logging."
+        default=0,
+        description="Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged",
     )
     manifest_file: str | os.PathLike | None = Field(
         default=None,
@@ -449,7 +450,8 @@ class Settings(BaseSettings):
             # going json.loads directly will not get types correct
             tmp = Settings.model_validate_json(json_path.read_text())
             return Settings(
-                **(tmp.model_dump()), _cli_settings_source=cli_source(args=True)
+                **(tmp.model_dump()),
+                _cli_settings_source=cli_source(args=True) if cli_source else None,
             )
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")

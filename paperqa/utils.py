@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import inspect
 import logging
+import logging.config
 import math
 import os
 import re
@@ -18,6 +19,7 @@ from uuid import UUID
 
 import aiohttp
 import httpx
+import litellm
 import pypdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
@@ -444,3 +446,39 @@ def pqa_directory(name: str) -> Path:
 
     directory.mkdir(parents=True, exist_ok=True)
     return directory
+
+
+def setup_default_logs() -> None:
+    """Configure logs to reasonable defaults."""
+    fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    # Set sane default LiteLLM logging configuration
+    # SEE: https://docs.litellm.ai/docs/observability/telemetry
+    litellm.telemetry = False
+
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            # Configure a default format and level for all loggers
+            "formatters": {
+                "standard": {
+                    "format": fmt,
+                },
+            },
+            "handlers": {
+                "default": {
+                    "level": "INFO",
+                    "formatter": "standard",
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stdout",
+                },
+            },
+            # Lower level for httpx and LiteLLM
+            "loggers": {
+                "httpx": {"level": "WARNING"},
+                # SEE: https://github.com/BerriAI/litellm/issues/2256
+                "LiteLLM": {"level": "WARNING"},
+            },
+        }
+    )

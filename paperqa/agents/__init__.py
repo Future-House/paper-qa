@@ -9,8 +9,8 @@ from typing import Any
 from pydantic_settings import CliSettingsSource
 
 from .. import __version__
-from ..config import Settings
-from ..utils import get_loop, pqa_directory
+from ..settings import Settings
+from ..utils import get_loop, pqa_directory, setup_default_logs
 
 try:
     from rich.console import Console
@@ -30,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 def configure_cli_logging(verbosity: int = 0) -> None:
     """Suppress loquacious loggers according to verbosity level."""
+    setup_default_logs()
+
     verbosity_map = {
         0: {
             "paperqa.agents": logging.INFO,
@@ -41,6 +43,7 @@ def configure_cli_logging(verbosity: int = 0) -> None:
             "httpx": logging.WARNING,
             "paperqa.agents.models": logging.WARNING,
             "paperqa.agents.search": logging.INFO,
+            "litellm": logging.WARNING,
         }
     }
 
@@ -55,6 +58,11 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         "paperqa.agents.main.agent_callers": logging.DEBUG,
         "paperqa.models": logging.DEBUG,
         "paperqa.agents.search": logging.DEBUG,
+        "litellm": logging.INFO,
+    }
+
+    verbosity_map[3] = verbosity_map[2] | {
+        "litellm": logging.DEBUG,  # <-- every single LLM call
     }
 
     rich_handler = RichHandler(

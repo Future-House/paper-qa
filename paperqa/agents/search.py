@@ -24,8 +24,8 @@ from tenacity import (
     wait_random_exponential,
 )
 
-from ..config import MaybeSettings, Settings, get_settings
 from ..docs import Docs
+from ..settings import MaybeSettings, Settings, get_settings
 from ..types import DocDetails
 from ..utils import hexdigest, pqa_directory
 from .models import SupportsPickle
