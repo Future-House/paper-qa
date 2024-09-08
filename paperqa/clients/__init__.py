@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import copy
 import logging
-from typing import Any, Collection, Coroutine, Sequence
+from collections.abc import Collection, Coroutine, Sequence
+from typing import Any
 
 import aiohttp
 from pydantic import BaseModel, ConfigDict

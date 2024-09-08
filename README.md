@@ -173,7 +173,6 @@ local_client = AsyncOpenAI(
 
 docs = Docs(
     client=local_client,
-    docs_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
     texts_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
     llm_model=OpenAILLMModel(
         config=dict(
@@ -201,15 +200,12 @@ docs = Docs(embedding="text-embedding-3-large")
 - `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, any OpenAI or VoyageAI model can be used in the dense model name
 - `"sparse"` to use a sparse keyword embedding only
 
-For deeper embedding customization, embedding models and vector stores can be built separately and passed into the `Docs` object. Embedding models are used to create both paper-qa's index of document citation embedding vectors (`docs_index` argument) as well as the full-text embedding vectors (`texts_index` argument). They can both be specified as arguments when you create a new `Docs` object. You can use use any embedding model which implements paper-qa's `EmbeddingModel` class. For example, to use `text-embedding-3-large`:
+For deeper embedding customization, embedding models and vector stores can be built separately and passed into the `Docs` object. Embedding models are used to create paper-qa's index of the full-text embedding vectors (`texts_index` argument). They can both be specified as arguments when you create a new `Docs` object. You can use use any embedding model which implements paper-qa's `EmbeddingModel` class. For example, to use `text-embedding-3-large`:
 
 ```python
 from paperqa import Docs, NumpyVectorStore, OpenAIEmbeddingModel
 
 docs = Docs(
-    docs_index=NumpyVectorStore(
-        embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")
-    ),
     texts_index=NumpyVectorStore(
         embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")
     ),
@@ -224,7 +220,6 @@ from langchain_openai import OpenAIEmbeddings
 from paperqa import Docs, LangchainVectorStore
 
 docs = Docs(
-    docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
     texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
 )
 ```
@@ -243,7 +238,6 @@ local_client = AsyncOpenAI(
 
 docs = Docs(
     client=local_client,
-    docs_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
     texts_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
     llm_model=OpenAILLMModel(
         config=dict(
@@ -260,7 +254,6 @@ from paperqa import Docs, HybridEmbeddingModel, SparseEmbeddingModel, NumpyVecto
 
 model = HybridEmbeddingModel(models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()])
 docs = Docs(
-    docs_index=NumpyVectorStore(embedding_model=model),
     texts_index=NumpyVectorStore(embedding_model=model),
 )
 ```
@@ -318,7 +311,6 @@ from langchain_openai import OpenAIEmbeddings
 
 docs = Docs(
     texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
-    docs_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
 )
 ```
 

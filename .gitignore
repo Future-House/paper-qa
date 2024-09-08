@@ -100,6 +100,7 @@ fabric.properties
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+.vscode
 
 # Local History for Visual Studio Code
 .history/
@@ -113,7 +114,6 @@ fabric.properties
 
 # Icon must end with two \r
 Icon[\r]
-
 
 # Thumbnails
 ._*
@@ -294,12 +294,12 @@ cython_debug/
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+.idea/
 
-*.ipynb
-env
+# Version files made by setuptools_scm
+**/version.py
 
-# Matching pyproject.toml
-paperqa/version.py
-tests/example*
+# Tests
+tests/*txt
+tests/*html
 tests/test_index/*

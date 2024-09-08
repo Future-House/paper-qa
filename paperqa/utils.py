@@ -3,22 +3,23 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import inspect
-import json
 import logging
+import logging.config
 import math
 import os
 import re
 import string
-from collections.abc import Iterable
+from collections.abc import Collection, Coroutine, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
+from typing import Any, BinaryIO
 from uuid import UUID
 
 import aiohttp
 import httpx
+import litellm
 import pypdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
@@ -35,7 +36,7 @@ from tenacity import (
 logger = logging.getLogger(__name__)
 
 
-StrPath = Union[str, Path]
+StrPath = str | Path
 
 
 def name_in_text(name: str, text: str) -> bool:
@@ -122,6 +123,37 @@ def strip_citations(text: str) -> str:
     return re.sub(citation_regex, "", text, flags=re.MULTILINE)
 
 
+def extract_score(text: str) -> int:
+    # check for N/A
+    last_line = text.split("\n")[-1]
+    if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
+        return 0
+    # check for not applicable, not relevant in summary
+    if "not applicable" in text.lower() or "not relevant" in text.lower():
+        return 0
+
+    score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
+    if not score:
+        score = re.search(r"\(([0-9])\w*\/", text)
+    if not score:
+        score = re.search(r"([0-9]+)\w*\/", text)
+    if score:
+        s = int(score.group(1))
+        if s > 10:  # noqa: PLR2004
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    last_few = text[-15:]
+    scores = re.findall(r"([0-9]+)", last_few)
+    if scores:
+        s = int(scores[-1])
+        if s > 10:  # noqa: PLR2004
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    if len(text) < 100:  # noqa: PLR2004
+        return 1
+    return 5
+
+
 def get_citenames(text: str) -> set[str]:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
@@ -132,12 +164,12 @@ def get_citenames(text: str) -> set[str]:
     results.extend(none_results)
     values = []
     for citation in results:
-        citation = citation.strip("() ")  # noqa: PLW2901
+        citation = citation.strip("() ")
         for c in re.split(",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces
-            c = c.strip()  # noqa: PLW2901
+            c = c.strip()
             values.append(c)
     return set(values)
 
@@ -185,7 +217,7 @@ def flatten(iteratble: list) -> list:
 
 def get_loop() -> asyncio.AbstractEventLoop:
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -198,28 +230,6 @@ def is_coroutine_callable(obj):
     elif callable(obj):  # noqa: RET505
         return inspect.iscoroutinefunction(obj.__call__)
     return False
-
-
-def llm_read_json(text: str) -> dict:
-    """Read LLM output and extract JSON data from it."""
-    # fetch from markdown ```json if present
-    text = text.strip().split("```json")[-1].split("```")[0]
-    # split anything before the first {
-    text = "{" + text.split("{", 1)[-1]
-    # split anything after the last }
-    text = text.rsplit("}", 1)[0] + "}"
-
-    # escape new lines within strings
-    def replace_newlines(match: re.Match) -> str:
-        return match.group(0).replace("\n", "\\n")
-
-    # Match anything between double quotes
-    # including escaped quotes and other escaped characters.
-    # https://regex101.com/r/VFcDmB/1
-    pattern = r'"(?:[^"\\]|\\.)*"'
-    text = re.sub(pattern, replace_newlines, text)
-
-    return json.loads(text)
 
 
 def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
@@ -284,7 +294,7 @@ def clean_upbibtex(bibtex: str) -> str:
     return bibtex
 
 
-def format_bibtex(  # noqa: C901
+def format_bibtex(
     bibtex: str,
     key: str | None = None,
     clean: bool = True,
@@ -405,7 +415,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,  # noqa: ASYNC109
+    timeout: float = 10.0,
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
@@ -436,3 +446,39 @@ def pqa_directory(name: str) -> Path:
 
     directory.mkdir(parents=True, exist_ok=True)
     return directory
+
+
+def setup_default_logs() -> None:
+    """Configure logs to reasonable defaults."""
+    fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    # Set sane default LiteLLM logging configuration
+    # SEE: https://docs.litellm.ai/docs/observability/telemetry
+    litellm.telemetry = False
+
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            # Configure a default format and level for all loggers
+            "formatters": {
+                "standard": {
+                    "format": fmt,
+                },
+            },
+            "handlers": {
+                "default": {
+                    "level": "INFO",
+                    "formatter": "standard",
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stdout",
+                },
+            },
+            # Lower level for httpx and LiteLLM
+            "loggers": {
+                "httpx": {"level": "WARNING"},
+                # SEE: https://github.com/BerriAI/litellm/issues/2256
+                "LiteLLM": {"level": "WARNING"},
+            },
+        }
+    )

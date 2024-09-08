@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Collection
 from datetime import datetime
 from enum import IntEnum, auto
 from http import HTTPStatus
 from itertools import starmap
-from typing import Any, Collection
+from typing import Any
 
 import aiohttp
 
@@ -121,7 +122,7 @@ def s2_authors_match(authors: list[str], data: dict):
     return any(
         starmap(
             lambda x, y: x in y or y in x,
-            zip(s2_authors_noinit, authors_noinit, strict=False),
+            zip(s2_authors_noinit, authors_noinit, strict=True),
         )
     )
 
@@ -158,6 +159,8 @@ async def parse_s2_to_doc_details(
     if paper_data.get("publicationDate"):
         publication_date = datetime.strptime(paper_data["publicationDate"], "%Y-%m-%d")
 
+    journal_data = paper_data.get("journal") or {}
+
     doc_details = DocDetails(  # type: ignore[call-arg]
         key=None if not bibtex else bibtex.split("{")[1].split(",")[0],
         bibtex_type="article",  # s2 should be basically all articles
@@ -165,13 +168,13 @@ async def parse_s2_to_doc_details(
         authors=[author["name"] for author in paper_data.get("authors", [])],
         publication_date=publication_date,
         year=paper_data.get("year"),
-        volume=paper_data.get("journal", {}).get("volume"),
-        pages=paper_data.get("journal", {}).get("pages"),
-        journal=paper_data.get("journal", {}).get("name"),
+        volume=journal_data.get("volume"),
+        pages=journal_data.get("pages"),
+        journal=journal_data.get("name"),
         url=(paper_data.get("openAccessPdf") or {}).get("url"),
         title=paper_data.get("title"),
         citation_count=paper_data.get("citationCount"),
-        doi=paper_data.get("externalIds", {}).get("DOI"),
+        doi=(paper_data.get("externalIds") or {}).get("DOI"),
         other={},  # Initialize empty dict for other fields
     )
 
