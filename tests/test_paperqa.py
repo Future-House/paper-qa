@@ -4,6 +4,7 @@ import contextlib
 import os
 import pickle
 import textwrap
+from collections.abc import AsyncIterable
 from io import BytesIO
 from pathlib import Path
 
@@ -701,16 +702,18 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
     assert any(docs.texts[0].embedding)
 
 
-def test_custom_llm(stub_data_dir: Path):
+def test_custom_llm(stub_data_dir: Path) -> None:
     from paperqa.llms import Chunk
 
     class MyLLM(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, prompt):  # noqa: ARG002
+        async def acomplete(self, prompt: str) -> Chunk:  # noqa: ARG002
             return Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
-        async def acomplete_iter(self, prompt):  # noqa: ARG002
+        async def acomplete_iter(
+            self, prompt: str  # noqa: ARG002
+        ) -> AsyncIterable[Chunk]:
             yield Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
     docs = Docs()

@@ -2,19 +2,10 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from collections.abc import (
-    Awaitable,
-    Callable,
-    Coroutine,
-    Iterable,
-    Sequence,
-)
+from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
 from enum import Enum
 from inspect import signature
-from typing import (
-    Any,
-    cast,
-)
+from typing import Any, cast
 
 import numpy as np
 import tiktoken
@@ -132,7 +123,7 @@ class LLMModel(ABC, BaseModel):
     llm_type: str | None = None
     name: str
     llm_result_callback: (
-        Callable[[LLMResult], None] | Coroutine[Any, Any, LLMResult] | None
+        Callable[[LLMResult], None] | Callable[[LLMResult], Awaitable[None]] | None
     ) = Field(
         default=None,
         description="An async callback that will be executed on each"
@@ -145,23 +136,29 @@ class LLMModel(ABC, BaseModel):
         """Return the completion as string and the number of tokens in the prompt and completion."""
         raise NotImplementedError
 
-    async def acomplete_iter(self, prompt: str) -> Any:
+    async def acomplete_iter(self, prompt: str) -> AsyncIterable[Chunk]:  # noqa: ARG002
         """Return an async generator that yields chunks of the completion.
 
-        Only the last tuple will be non-zero. I cannot get mypy to understand the override, so marked as Any
+        Only the last tuple will be non-zero.
         """
         raise NotImplementedError
+        if False:  # type: ignore[unreachable]
+            yield  # Trick mypy: https://github.com/python/mypy/issues/5070#issuecomment-1050834495
 
     async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
         """Return the completion as string and the number of tokens in the prompt and completion."""
         raise NotImplementedError
 
-    async def achat_iter(self, messages: Iterable[dict[str, str]]) -> Any:
+    async def achat_iter(
+        self, messages: Iterable[dict[str, str]]  # noqa: ARG002
+    ) -> AsyncIterable[Chunk]:
         """Return an async generator that yields chunks of the completion.
 
-        Only the last tuple will be non-zero. I cannot get mypy to understand the override, so marked as Any
+        Only the last tuple will be non-zero.
         """
         raise NotImplementedError
+        if False:  # type: ignore[unreachable]
+            yield  # Trick mypy: https://github.com/python/mypy/issues/5070#issuecomment-1050834495
 
     def infer_llm_type(self) -> str:
         return "completion"
@@ -231,7 +228,7 @@ class LLMModel(ABC, BaseModel):
                     async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
                     completion = self.achat_iter(messages)
                     text_result = []
-                    async for chunk in completion:  # type: ignore[attr-defined]
+                    async for chunk in completion:
                         if chunk.text:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
@@ -255,9 +252,9 @@ class LLMModel(ABC, BaseModel):
                 )
                 if self.llm_result_callback:
                     if is_coroutine_callable(self.llm_result_callback):
-                        await self.llm_result_callback(result)  # type: ignore[misc, operator]
+                        await self.llm_result_callback(result)  # type: ignore[misc]
                     else:
-                        self.llm_result_callback(result)  # type: ignore[operator]
+                        self.llm_result_callback(result)
                 return result
 
             return execute
@@ -293,7 +290,7 @@ class LLMModel(ABC, BaseModel):
                         formatted_prompt,
                     )
                     text_result = []
-                    async for chunk in completion:  # type: ignore[attr-defined]
+                    async for chunk in completion:
                         if chunk.text:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
@@ -316,9 +313,9 @@ class LLMModel(ABC, BaseModel):
                 )
                 if self.llm_result_callback:
                     if is_coroutine_callable(self.llm_result_callback):
-                        await self.llm_result_callback(result)  # type: ignore[misc, operator]
+                        await self.llm_result_callback(result)  # type: ignore[misc]
                     else:
-                        self.llm_result_callback(result)  # type: ignore[operator]
+                        self.llm_result_callback(result)
                 return result
 
             return execute
@@ -414,7 +411,7 @@ class LiteLLMModel(LLMModel):
             completion_tokens=response.usage.completion_tokens,
         )
 
-    async def acomplete_iter(self, prompt: str) -> Any:
+    async def acomplete_iter(self, prompt: str) -> AsyncIterable[Chunk]:
         completion = await self.router.atext_completion(
             model=self.name,
             prompt=prompt,
@@ -438,7 +435,9 @@ class LiteLLMModel(LLMModel):
             completion_tokens=response.usage.completion_tokens,
         )
 
-    async def achat_iter(self, messages: Iterable[dict[str, str]]) -> Any:
+    async def achat_iter(
+        self, messages: Iterable[dict[str, str]]
+    ) -> AsyncIterable[Chunk]:
         completion = await self.router.acompletion(
             self.name, messages, stream=True, stream_options={"include_usage": True}
         )
