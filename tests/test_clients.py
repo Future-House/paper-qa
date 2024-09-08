@@ -284,7 +284,7 @@ async def test_s2_only_fields_filtering():
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr(record_mode="new_episodes")
 @pytest.mark.asyncio()
 async def test_crossref_journalquality_fields_filtering():
     async with aiohttp.ClientSession() as session:
