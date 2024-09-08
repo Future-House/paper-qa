@@ -92,6 +92,9 @@ async def map_fxn_summary(
                 success = False
     else:
         context = text.text
+        # If we don't assign scores, just default to 5.
+        # why 5? Because we filter out 0s in another place
+        # and 5/10 is the other default I could come up with
         score = 5
         success = True
     # remove citations that collide with our grounded citations (for the answer LLM)
