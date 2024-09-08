@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
+import litellm  # for cost
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
@@ -91,6 +92,19 @@ class LLMResult(BaseModel):
     def __str__(self):
         return self.text
 
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cost(self) -> float:
+        """Return the cost of the result in dollars."""
+        if self.prompt_count and self.completion_count:
+            try:
+                pc = litellm.model_cost[self.model]["input_cost_per_token"]
+                oc = litellm.model_cost[self.model]["output_cost_per_token"]
+                return pc * self.prompt_count + oc * self.completion_count
+            except KeyError:
+                logger.warning(f"Could not find cost for model {self.model}.")
+        return 0.0
+
 
 class Embeddable(BaseModel):
     embedding: list[float] | None = Field(default=None, repr=False)
@@ -142,8 +156,7 @@ class Answer(BaseModel):
     contexts: list[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    # just for convenience you can override this
-    cost: float | None = None
+    cost: float = 0.0
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
@@ -191,6 +204,8 @@ class Answer(BaseModel):
         else:
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
+
+        self.cost += result.cost
 
     def get_unique_docs_from_contexts(self, score_threshold: int = 0) -> set[Doc]:
         """Parse contexts for docs with scores above the input threshold."""
