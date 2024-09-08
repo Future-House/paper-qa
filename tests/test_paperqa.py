@@ -407,7 +407,8 @@ def test_llm_parse_json_newlines():
 @pytest.mark.asyncio
 async def test_chain_completion():
     s = Settings(llm="babbage-002", temperature=0.2)
-    call = s.get_llm().make_chain(
+    model = s.get_llm()
+    call = model.make_chain(
         "The {animal} says",
         skip_system=True,
     )
@@ -425,6 +426,8 @@ async def test_chain_completion():
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+
+    assert completion.cost > 0
 
 
 @pytest.mark.asyncio
@@ -456,16 +459,19 @@ async def test_chain_chat():
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
+    assert completion.cost > 0
 
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+    assert completion.cost > 0
 
     # check with mixed callbacks
     async def ac(x):
         pass
 
     completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+    assert completion.cost > 0
 
 
 @pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
@@ -489,11 +495,13 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
     assert isinstance(completion.text, str)
+    assert completion.cost > 0
 
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
     assert isinstance(completion.text, str)
+    assert completion.cost > 0
 
     docs = Docs()
     await docs.aadd(
@@ -501,9 +509,10 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
         "National Flag of Canada Day",
         settings=anthropic_settings,
     )
-    await docs.aget_evidence(
+    result = await docs.aget_evidence(
         "What is the national flag of Canada?", settings=anthropic_settings
     )
+    assert result.cost > 0
 
 
 def test_make_docs(stub_data_dir: Path):
@@ -698,10 +707,10 @@ def test_custom_llm(stub_data_dir: Path):
         name: str = "myllm"
 
         async def acomplete(self, prompt):  # noqa: ARG002
-            return "Echo"
+            return "Echo", (1, 1)
 
         async def acomplete_iter(self, prompt):  # noqa: ARG002
-            yield "Echo"
+            yield "Echo", (1, 1)
 
     docs = Docs()
     docs.add(
