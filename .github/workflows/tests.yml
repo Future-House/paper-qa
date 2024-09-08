@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - "**release**"
 
 jobs:
   test:
@@ -20,11 +22,16 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: pip install .[dev]
+      - run: pip install .[agents,google,dev,llms]
       - name: Check pre-commit
         run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
       - name: Run Test
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
+          CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
         run: pytest

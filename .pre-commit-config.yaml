@@ -7,7 +7,8 @@ repos:
       - id: check-added-large-files
         exclude: |
           (?x)^(
-            paperqa/clients/client_data.*
+            paperqa/clients/client_data.*|
+            tests/stub_data.*
           )$
       - id: check-byte-order-marker
       - id: check-case-conflict
@@ -22,7 +23,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.0
+    rev: v0.6.2
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -41,6 +42,7 @@ repos:
           - pydantic~=2.0 # Match pyproject.toml
           - types-requests
           - types-setuptools
+          - types-PyYAML
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.3.2
     hooks:
@@ -57,7 +59,8 @@ repos:
         exclude: |
           (?x)^(
             tests/cassettes.*|
-            paperqa/clients/client_data.*
+            paperqa/clients/client_data.*|
+            tests/stub_data.*
           )$
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.18
