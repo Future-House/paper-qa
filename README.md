@@ -4,10 +4,38 @@
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-This is a minimal package for doing question and answering from
-PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
+PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. It includes:
 
-By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a simple numpy vector DB to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
+- A simple interface to get good answers, with no hallucinations, grounding responses with in-text citations.
+- State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
+- The ability to do agentic RAG which iteratively refines queries and answers.
+- Automatically obtained paper metadata, including citation and journal quality data.
+- A full-text search engine for a local repository of PDF/text files.
+- A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
+
+By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
+
+See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) or our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
+
+## Install
+
+To use the full suite of features in PaperQA, you need to install it with the optional `agents` extra:
+
+```bash
+pip install paper-qa[agents]
+```
+
+PaperQA uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [ollama](https://github.com/ollama/ollama)). Any LiteLLM compatible model can be configured to use with PaperQA.
+
+## Usage
+
+### CLI
+
+### APIs
+
+## How does it work?
+
+(NOTE: likely move this to FAQ)
 
 paper-qa uses the process shown below:
 
@@ -18,17 +46,6 @@ paper-qa uses the process shown below:
 5. use an LLM to re-score and select only relevant summaries
 6. put summaries into prompt
 7. generate answer with prompt
-
-See our paper for more details:
-
-```bibtex
-@article{lala2023paperqa,
-  title={PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
-  author={L{\'a}la, Jakub and O'Donoghue, Odhran and Shtedritski, Aleksandar and Cox, Sam and Rodriques, Samuel G and White, Andrew D},
-  journal={arXiv preprint arXiv:2312.07559},
-  year={2023}
-}
-```
 
 ## Output Example
 
@@ -47,16 +64,6 @@ Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics usin
 ## What's New?
 
 Version 4 removed langchain from the package because it no longer supports pickling. This also simplifies the package a bit - especially prompts. Langchain can still be used, but it's not required. You can use any LLMs from langchain, but you will need to use the `LangchainLLMModel` class to wrap the model.
-
-## Install
-
-Install with pip:
-
-```bash
-pip install paper-qa
-```
-
-You need to have an LLM to use paper-qa. You can use OpenAI, llama.cpp (via Server), or any LLMs from langchain. OpenAI just works, as long as you have set your OpenAI API key (`export OPENAI_API_KEY=sk-...`). See instructions below for other LLMs.
 
 ## Usage
 
