@@ -323,7 +323,7 @@ async def test_crossref_journalquality_fields_filtering():
             ),
         )
         nejm_crossref_details = await crossref_client.query(
-            title="Beta-Blocker Interruption or Continuation after Myocardial Infarction",
+            title="Beta-Blocker Interruption or Continuation after Myocardial Infarction",  # codespell:ignore
             fields=["title", "doi", "authors", "journal"],
         )
 
