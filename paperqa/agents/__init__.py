@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-from datetime import datetime
 from typing import Any
 
 from pydantic_settings import CliSettingsSource
@@ -90,22 +89,6 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         print(f"PaperQA version: {__version__}")
 
 
-def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
-    # Get the stats for the file/directory
-    stats = os.stat(path)
-
-    # Get created time (ctime)
-    created_time = datetime.fromtimestamp(stats.st_ctime)
-
-    # Get modified time (mtime)
-    modified_time = datetime.fromtimestamp(stats.st_mtime)
-
-    return {
-        "created_at": created_time.strftime("%Y-%m-%d %H:%M:%S"),
-        "modified_at": modified_time.strftime("%Y-%m-%d %H:%M:%S"),
-    }
-
-
 def ask(query: str, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
     configure_cli_logging(verbosity=settings.verbosity)
@@ -147,13 +130,20 @@ def search_query(
 
 
 def build_index(
+    index_name: str,
+    directory: str | os.PathLike,
     settings: Settings,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
+    if index_name == "default":
+        index_name = settings.get_index_name()
     configure_cli_logging(verbosity=settings.verbosity)
+    settings.paper_directory = directory
     loop = get_loop()
 
-    return loop.run_until_complete(get_directory_index(settings=settings))
+    return loop.run_until_complete(
+        get_directory_index(index_name=index_name, settings=settings)
+    )
 
 
 def save_settings(
@@ -190,6 +180,10 @@ def main():
         help="Named settings to use. Will search in local, pqa directory, and package last",
     )
 
+    parser.add_argument(
+        "--index", "-i", default="default", help="Index name to search or create"
+    )
+
     subparsers = parser.add_subparsers(
         title="commands", dest="command", description="Available commands"
     )
@@ -208,12 +202,14 @@ def main():
     search_parser = subparsers.add_parser(
         "search",
         help="Search the index specified by --index."
-        " Pass --index answers to search previous answers.",
+        " Pass `--index answers` to search previous answers.",
     )
     search_parser.add_argument("query", help="Keyword search")
-    search_parser.add_argument(
-        "-i", dest="index", default="default", help="Index to search"
+
+    build_parser = subparsers.add_parser(
+        "index", help="Build a search index from given directory"
     )
+    build_parser.add_argument("directory", help="Directory to build index from")
 
     # Create CliSettingsSource instance
     cli_settings = CliSettingsSource(Settings, root_parser=parser)
@@ -237,7 +233,7 @@ def main():
         case "search":
             search_query(args.query, args.index, settings)
         case "index":
-            build_index(args.verbosity)
+            build_index(args.index, args.directory, settings)
         case _:
             commands = ", ".join({"view", "ask", "search", "index"})
             brief_help = f"\nRun with commands: {{{commands}}}\n\n"

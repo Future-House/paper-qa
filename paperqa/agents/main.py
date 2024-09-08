@@ -320,6 +320,7 @@ async def search(
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        agent_logger.info("No results found.")
+        count = await search_index.count
+        agent_logger.info(f"No results found. Searched {count} docs")
 
     return results

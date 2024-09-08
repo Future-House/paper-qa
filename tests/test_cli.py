@@ -9,7 +9,8 @@ from paperqa.settings import Settings
 from paperqa.utils import pqa_directory
 
 try:
-    from paperqa.agents import ask, main
+    from paperqa.agents import ask, build_index, main, search_query
+    from paperqa.agents.models import AnswerResponse
 except ImportError:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
@@ -44,3 +45,21 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path):
         "How can you use XAI for chemical property prediction?", settings=settings
     )
     assert response.answer.formatted_answer
+
+    search_result = search_query(
+        " ".join(response.answer.formatted_answer.split()[:5]),
+        settings.get_index_name(),
+        settings,
+    )
+    found_answer = search_result[0][0]
+    assert isinstance(found_answer, AnswerResponse)
+    assert found_answer.model_dump_json() == response.model_dump_json()
+
+
+def test_cli_can_build_and_search_index(agent_index_dir: Path, stub_data_dir: Path):
+    settings = Settings.from_name("debug")
+    settings.index_directory = agent_index_dir
+    index_name = "test"
+    build_index(index_name, stub_data_dir, settings)
+    search_result = search_query("XAI", index_name, settings)
+    assert search_result
