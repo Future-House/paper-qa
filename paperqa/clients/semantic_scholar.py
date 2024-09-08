@@ -264,6 +264,9 @@ async def get_s2_doc_details_from_doi(
         session=session,
         headers=semantic_scholar_headers(),
         timeout=SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT,
+        http_exception_mappings={
+            HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {doi}.")
+        },
     )
 
     return await parse_s2_to_doc_details(details, session)

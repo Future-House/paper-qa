@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 from datetime import datetime
 from typing import Any, Callable, ClassVar, Collection
@@ -9,6 +10,7 @@ from uuid import UUID, uuid4
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
+from pybtex.scanner import PybtexSyntaxError
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -266,6 +268,21 @@ class Answer(BaseModel):
             for c in filter(lambda x: x.score >= score_threshold, self.contexts)
         }
 
+    def filter_content_for_user(self) -> None:
+        """Filter out extra items (inplace) that do not need to be returned to the user."""
+        self.contexts = [
+            Context(
+                context=c.context,
+                score=c.score,
+                text=Text(
+                    text="",
+                    **c.text.model_dump(exclude={"text", "embedding", "doc"}),
+                    doc=Doc(**c.text.doc.model_dump(exclude={"embedding"})),
+                ),
+            )
+            for c in self.contexts
+        ]
+
 
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""
@@ -360,11 +377,17 @@ class DocDetails(Doc):
     doi: str | None = None
     doi_url: str | None = None
     doc_id: str | None = None
+    file_location: str | os.PathLike | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
     )
     UNDEFINED_JOURNAL_QUALITY: ClassVar[int] = -1
+    DOI_URL_FORMATS: ClassVar[Collection[str]] = {
+        "https://doi.org/",
+        "http://dx.doi.org/",
+    }
+    AUTHOR_NAMES_TO_REMOVE: ClassVar[Collection[str]] = {"et al", "et al."}
 
     @field_validator("key")
     @classmethod
@@ -372,9 +395,13 @@ class DocDetails(Doc):
         # Replace HTML tags with empty string
         return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
 
-    @staticmethod
-    def lowercase_doi_and_populate_doc_id(data: dict[str, Any]) -> dict[str, Any]:
+    @classmethod
+    def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
         if doi := data.get("doi"):
+            remove_urls = cls.DOI_URL_FORMATS
+            for url in remove_urls:
+                if doi.startswith(url):
+                    doi = doi.replace(url, "")
             data["doi"] = doi.lower()
             data["doc_id"] = encode_id(doi.lower())
         else:
@@ -419,10 +446,21 @@ class DocDetails(Doc):
         if doi and not doi_url:
             doi_url = "https://doi.org/" + doi
 
+        # ensure the modern doi url is used
         if doi_url:
             data["doi_url"] = doi_url.replace(
                 "http://dx.doi.org/", "https://doi.org/"
             ).lower()
+
+        return data
+
+    @classmethod
+    def remove_invalid_authors(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Capture and cull strange author names."""
+        if authors := data.get("authors"):
+            data["authors"] = [
+                a for a in authors if a.lower() not in cls.AUTHOR_NAMES_TO_REMOVE
+            ]
 
         return data
 
@@ -477,10 +515,13 @@ class DocDetails(Doc):
                         data["other"]["bibtex_source"] = ["self_generated"]
                 else:
                     data["other"] = {"bibtex_source": ["self_generated"]}
-
-                existing_entry = next(
-                    iter(Parser().parse_string(data["bibtex"]).entries.values())
-                )
+                try:
+                    existing_entry = next(
+                        iter(Parser().parse_string(data["bibtex"]).entries.values())
+                    )
+                except PybtexSyntaxError:
+                    logger.warning(f"Failed to parse bibtex for {data['bibtex']}.")
+                    existing_entry = None
 
             entry_data = {
                 "title": data.get("title") or CITATION_FALLBACK_DATA["title"],
@@ -505,7 +546,9 @@ class DocDetails(Doc):
             }
             entry_data = {k: v for k, v in entry_data.items() if v}
             try:
-                new_entry = Entry(data.get("bibtex_type", "article"), fields=entry_data)
+                new_entry = Entry(
+                    data.get("bibtex_type", "article") or "article", fields=entry_data
+                )
                 if existing_entry:
                     new_entry = cls.merge_bibtex_entries(existing_entry, new_entry)
                 # add in authors manually into the entry
@@ -519,17 +562,22 @@ class DocDetails(Doc):
                 if data.get("overwrite_fields_from_metadata", True):
                     data["citation"] = None
             except Exception:
-                logger.exception(f"Failed to generate bibtex for {data}")
-        if not data.get("citation"):
+                logger.warning(
+                    f"Failed to generate bibtex for {data.get('docname') or data.get('citation')}"
+                )
+        if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
                 data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
+        elif not data.get("citation"):
+            data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
         data = cls.lowercase_doi_and_populate_doc_id(data)
+        data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
         data = cls.inject_clean_doi_url_into_data(data)
         data = cls.populate_bibtex_key_citation(data)
@@ -646,7 +694,9 @@ class DocDetails(Doc):
                 # pre-prints / arXiv versions of papers that are not as up-to-date
                 merged_data[field] = (
                     other_value
-                    if (other_value is not None and PREFER_OTHER)
+                    if (
+                        (other_value is not None and other_value != []) and PREFER_OTHER
+                    )
                     else self_value
                 )
 

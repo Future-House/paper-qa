@@ -3,15 +3,75 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e5d4466c8b85f93775fe183e1a318a3e65ac8e4", "externalIds":
+          {"DOI": "10.1101/2024.04.01.587366", "CorpusId": 268890006}, "url": "https://www.semanticscholar.org/paper/7e5d4466c8b85f93775fe183e1a318a3e65ac8e4",
+          "title": "High-throughput screening of human genetic variants by pooled prime
+          editing", "venue": "bioRxiv", "year": 2024, "citationCount": 1, "influentialCitationCount":
+          0, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "status": "GREEN"}, "publicationTypes": null, "publicationDate": "2024-04-01",
+          "journal": {"name": "bioRxiv"}, "citationStyles": {"bibtex": "@Article{Herger2024HighthroughputSO,\n
+          author = {Michael Herger and Christina M. Kajba and Megan Buckley and Ana
+          Cunha and Molly Strom and Gregory M. Findlay},\n booktitle = {bioRxiv},\n
+          journal = {bioRxiv},\n title = {High-throughput screening of human genetic
+          variants by pooled prime editing},\n year = {2024}\n}\n"}, "authors": [{"authorId":
+          "2294884120", "name": "Michael Herger"}, {"authorId": "2163800172", "name":
+          "Christina M. Kajba"}, {"authorId": "2120283350", "name": "Megan Buckley"},
+          {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId": "2294881320",
+          "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory M. Findlay"}],
+          "matchScore": 252.53987}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1362"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Via:
+          - 1.1 dee6f6319b26c06091b49860450185bc.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 5b_YmO3yxkrgxxYMTHYZnrL0XfwwngTTfGwp3K1-6fwv73ExNPziOg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipDHnkvHcEJow=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1362"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - b2b30b39-0717-4939-a177-8a2fc1e1ad5a
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=test@example.com&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2004346,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2016375,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
           University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
-          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"]},{"DOI":"10.13039\/100006108","name":"National
-          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"]},{"DOI":"10.13039\/100000002","name":"National
-          Institutes of Health","doi-asserted-by":"publisher"}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
+          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
+          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
+          Institutes of Health","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100000002","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
           automate scientific claim verification using PubMed abstracts.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Materials
           and Methods<\/jats:title>\n                  <jats:p>We developed CliVER,
           an end-to-end scientific Claim VERification system that leverages retrieval-augmented
@@ -94,7 +154,7 @@ interactions:
           gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
           Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
           Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
-          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":28.254375,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":28.217403,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -108,11 +168,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "4472"
+          - "4502"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 19:48:10 GMT
+          - Wed, 04 Sep 2024 22:52:16 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -136,54 +196,62 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":1477701,"items":[{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
-          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
-          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
-          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
-          humoral immunodeficiency - Three consecutive cases and review of the literature.
-          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
-          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
-          Weekly"],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":57.402653,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
-          and mild decrease in baseline oxygen saturation following off-label use: 3
-          case reports"],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"published":{"date-parts":[[2023,6,24]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
+          "title": "Augmenting large language models with chemistry tools", "venue":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 191, "influentialCitationCount":
+          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
+          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
+          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
+          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
+          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
+          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
+          {Augmenting large language models with chemistry tools},\n volume = {6},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
+          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
+          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
+          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
+          "name": "P. Schwaller"}], "matchScore": 179.37169}]}
+
+          '
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
         Access-Control-Allow-Origin:
           - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "1207"
+          - "1551"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 19:48:10 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Via:
+          - 1.1 ac433885d6f49db81bf694a6c6b6bea0.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 8RWYfQ3K0fHIsdnKFbs2dMEqFXbc9GJGrH0PUd0eYkZeZWGuz9Q-oA==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipCF7OPHcEv5Q=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1551"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 3b7ac010-c3d6-40f5-bd40-810ac0a276bd
       status:
         code: 200
         message: OK
@@ -195,10 +263,10 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2283975,"items":[{"indexed":{"date-parts":[[2024,8,13]],"date-time":"2024-08-13T19:31:35Z","timestamp":1723577495194},"reference-count":103,"publisher":"Springer
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2296021,"items":[{"indexed":{"date-parts":[[2024,9,4]],"date-time":"2024-09-04T17:39:08Z","timestamp":1725471548702},"reference-count":103,"publisher":"Springer
           Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
-          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"]},{"DOI":"10.13039\/100000001","name":"National
-          Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
+          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
+          Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
           Mach Intell"],"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Large
           language models (LLMs) have shown strong performance in tasks across domains
           but struggle with chemistry-related problems. These models also lack access
@@ -212,7 +280,7 @@ interactions:
           both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
           in automating a diverse set of chemical tasks. Our work not only aids expert
           chemists and lowers barriers for non-experts but also fosters scientific advancement
-          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":13,"title":["Augmenting
+          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17,"title":["Augmenting
           large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
           Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
           D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
@@ -501,7 +569,7 @@ interactions:
           (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
           A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
           Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.768044,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.73176,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
           September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
@@ -522,11 +590,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "10547"
+          - "10573"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 19:48:10 GMT
+          - Wed, 04 Sep 2024 22:52:16 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -550,11 +618,302 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Convalescent-anti-sars-cov-2-plasma/immune-globulin&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "762ceacc20db232d3f6bcda6e867eb8148848ced", "externalIds":
+          {"DOI": "10.1007/s40278-023-33114-1", "CorpusId": 256742540}, "url": "https://www.semanticscholar.org/paper/762ceacc20db232d3f6bcda6e867eb8148848ced",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
+          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
+          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": null, "publicationDate":
+          "2023-02-01", "journal": {"name": "Reactions Weekly", "pages": "229", "volume":
+          "1943"}, "citationStyles": {"bibtex": "@Article{None,\n booktitle = {Reactions
+          weekly},\n journal = {Reactions Weekly},\n pages = {229},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
+          volume = {1943},\n year = {2023}\n}\n"}, "authors": [], "matchScore": 240.49017}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "848"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Via:
+          - 1.1 ca38026a6de2ccb3904aed4709dff3d0.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - BekSoSV5_hDVcPr3pEfFqDuohiZ_bvOkJ-60h1CNHOAE2nlzXNuLXg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipDGiDPHcEkXQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "848"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - a4c541fa-4233-404c-861f-a8cec6e7dd5b
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":1484561,"items":[{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
+          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
+          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
+          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
+          humoral immunodeficiency - Three consecutive cases and review of the literature.
+          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
+          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
+          Weekly"],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":57.623535,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
+          and mild decrease in baseline oxygen saturation following off-label use: 3
+          case reports"],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"published":{"date-parts":[[2023,6,24]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1208"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
+          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
+          "venue": "arXiv.org", "year": 2023, "citationCount": 23, "influentialCitationCount":
+          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
+          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
+          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
+          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
+          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
+          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
+          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
+          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
+          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
+          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
+          "Andrew D. White"}], "matchScore": 252.56201}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1386"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Via:
+          - 1.1 ac3f0425be668a2439884bb8cbd3ccd8.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - akQIiUpSMnHVbA6Rd7fM9bx3okuFjd51sJHSN13ytMKyN2yu82OiTw==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipDF4hvHcEb2A=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1386"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 2c7f8551-c2f5-44e5-b443-1e2e55cc4535
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
+          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
+          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
+          "title": "An essential role of active site arginine residue in iodide binding
+          and histidine residue in electron transfer for iodide oxidation by horseradish
+          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
+          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
+          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
+          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
+          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
+          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
+          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
+          of active site arginine residue in iodide binding and histidine residue in
+          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
+          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
+          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
+          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
+          Banerjee"}], "matchScore": 386.07397}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1483"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Via:
+          - 1.1 0f4013a0af68dcba176ca4372e470df4.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - ZryTJm7V0OUJNMOw-4WtBaG6Xa9q7tIRGaC-VwmN7nbaHLD_oe4VWg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipDFyRPHcESSg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1483"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 436a1dd8-fcea-4b29-902b-b6c4deda66db
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
+          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
+          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
+          "title": "Effect of native oxide layers on copper thin-film tensile properties:
+          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
+          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
+          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
+          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
+          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
+          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
+          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
+          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
+          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
+          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
+          283.23236}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1109"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        Via:
+          - 1.1 cc58556a6e846289f4d3105969536e4c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - fr8wFJr8qUMSHVSM8k2HN7PVFQLvdl5NGBYIylx4PXKMWimUr_1btw==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmipDE-TvHcEKkQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1109"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 22:52:16 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - db83976b-3b0e-46db-ab2d-0f79796d0935
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=test@example.com&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5138747,"items":[{"institution":[{"name":"bioRxiv"}],"indexed":{"date-parts":[[2024,4,5]],"date-time":"2024-04-05T00:42:23Z","timestamp":1712277743507},"posted":{"date-parts":[[2024,4,1]]},"group-title":"Genomics","reference-count":50,"publisher":"Cold
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5160892,"items":[{"institution":[{"name":"bioRxiv"}],"indexed":{"date-parts":[[2024,4,5]],"date-time":"2024-04-05T00:42:23Z","timestamp":1712277743507},"posted":{"date-parts":[[2024,4,1]]},"group-title":"Genomics","reference-count":50,"publisher":"Cold
           Spring Harbor Laboratory","content-domain":{"domain":[],"crossmark-restriction":false},"accepted":{"date-parts":[[2024,4,1]]},"abstract":"<jats:title>ABSTRACT<\/jats:title><jats:p>Understanding
           the effects of rare genetic variants remains challenging, both in coding and
           non-coding regions. While multiplexed assays of variant effect (MAVEs) have
@@ -600,7 +959,7 @@ interactions:
           co-selection for successive rounds of prime editing in human cells","volume":"13","year":"2022","journal-title":"Nat.
           Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.36","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2013.12.001"},{"key":"2024040415500652000_2024.04.01.587366v1.37","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-018-02974-x"},{"key":"2024040415500652000_2024.04.01.587366v1.38","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-27838-9"},{"key":"2024040415500652000_2024.04.01.587366v1.39","doi-asserted-by":"publisher","DOI":"10.1126\/science.1225829"},{"key":"2024040415500652000_2024.04.01.587366v1.40","doi-asserted-by":"publisher","DOI":"10.3390\/cancers14153645"},{"key":"2024040415500652000_2024.04.01.587366v1.41","doi-asserted-by":"publisher","DOI":"10.1126\/science.aac7557"},{"key":"2024040415500652000_2024.04.01.587366v1.42","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-10849-y"},{"key":"2024040415500652000_2024.04.01.587366v1.43","doi-asserted-by":"publisher","DOI":"10.1038\/nbt.3437"},{"key":"2024040415500652000_2024.04.01.587366v1.44","doi-asserted-by":"publisher","DOI":"10.1136\/jmg.2007.056499"},{"key":"2024040415500652000_2024.04.01.587366v1.45","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.12.003"},{"key":"2024040415500652000_2024.04.01.587366v1.46","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-019-0032-3"},{"key":"2024040415500652000_2024.04.01.587366v1.47","doi-asserted-by":"publisher","DOI":"10.1038\/nmeth.3047"},{"key":"2024040415500652000_2024.04.01.587366v1.48","doi-asserted-by":"crossref","first-page":"96","DOI":"10.1089\/hgtb.2017.198","article-title":"Determination
           of Lentiviral Infectious Titer by a Novel Droplet Digital PCR Method","volume":"29","year":"2018","journal-title":"Hum.
-          Gene Ther. Methods"},{"key":"2024040415500652000_2024.04.01.587366v1.49","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-020-02091-3"},{"key":"2024040415500652000_2024.04.01.587366v1.50","doi-asserted-by":"publisher","DOI":"10.1186\/s13073-021-00835-9"}],"link":[{"URL":"https:\/\/syndication.highwire.org\/content\/doi\/10.1101\/2024.04.01.587366","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,4,4]],"date-time":"2024-04-04T22:50:19Z","timestamp":1712271019000},"score":61.49816,"resource":{"primary":{"URL":"http:\/\/biorxiv.org\/lookup\/doi\/10.1101\/2024.04.01.587366"}},"issued":{"date-parts":[[2024,4,1]]},"references-count":50,"URL":"http:\/\/dx.doi.org\/10.1101\/2024.04.01.587366","published":{"date-parts":[[2024,4,1]]},"subtype":"preprint"}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Gene Ther. Methods"},{"key":"2024040415500652000_2024.04.01.587366v1.49","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-020-02091-3"},{"key":"2024040415500652000_2024.04.01.587366v1.50","doi-asserted-by":"publisher","DOI":"10.1186\/s13073-021-00835-9"}],"link":[{"URL":"https:\/\/syndication.highwire.org\/content\/doi\/10.1101\/2024.04.01.587366","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,4,4]],"date-time":"2024-04-04T22:50:19Z","timestamp":1712271019000},"score":61.46666,"resource":{"primary":{"URL":"http:\/\/biorxiv.org\/lookup\/doi\/10.1101\/2024.04.01.587366"}},"issued":{"date-parts":[[2024,4,1]]},"references-count":50,"URL":"http:\/\/dx.doi.org\/10.1101\/2024.04.01.587366","published":{"date-parts":[[2024,4,1]]},"subtype":"preprint"}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -614,11 +973,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3247"
+          - "3246"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 19:48:10 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -661,7 +1020,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 19:48:11 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -689,7 +1048,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4058432,"items":[{"indexed":{"date-parts":[[2024,6,24]],"date-time":"2024-06-24T23:08:06Z","timestamp":1719270486276},"reference-count":40,"publisher":"Elsevier
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4075855,"items":[{"indexed":{"date-parts":[[2024,6,24]],"date-time":"2024-06-24T23:08:06Z","timestamp":1719270486276},"reference-count":40,"publisher":"Elsevier
           BV","issue":"14","license":[{"start":{"date-parts":[[1992,5,1]],"date-time":"1992-05-01T00:00:00Z","timestamp":704678400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2020,10,3]],"date-time":"2020-10-03T00:00:00Z","timestamp":1601683200000},"content-version":"vor","delay-in-days":10382,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Journal
           of Biological Chemistry"],"published-print":{"date-parts":[[1992,5]]},"DOI":"10.1016\/s0021-9258(19)50164-8","type":"journal-article","created":{"date-parts":[[2021,1,6]],"date-time":"2021-01-06T15:57:43Z","timestamp":1609948663000},"page":"9800-9804","source":"Crossref","is-referenced-by-count":23,"title":["Chemical
           and kinetic evidence for an essential histidine in horseradish peroxidase
@@ -725,7 +1084,7 @@ interactions:
           Biochem. (Tokyo)"},{"key":"10.1016\/S0021-9258(19)50164-8_bib37","doi-asserted-by":"crossref","first-page":"520","DOI":"10.1038\/326520a0","volume":"326","author":"Tien","year":"1987","journal-title":"Nature"},{"key":"10.1016\/S0021-9258(19)50164-8_bib38","doi-asserted-by":"crossref","first-page":"87","DOI":"10.1111\/j.1432-1033.1986.tb09461.x","volume":"155","author":"Topham","year":"1986","journal-title":"Eur.
           J. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib39","doi-asserted-by":"crossref","first-page":"210","DOI":"10.1016\/0005-2744(81)90032-2","volume":"662","author":"Ugarova","year":"1981","journal-title":"Biochim.
           Biophys. Acta"},{"key":"10.1016\/S0021-9258(19)50164-8_bib40","doi-asserted-by":"crossref","first-page":"483","DOI":"10.1111\/j.1432-1033.1979.tb13061.x","volume":"96","author":"Welinder","year":"1979","journal-title":"Eur.
-          J. Biochem."}],"container-title":["Journal of Biological Chemistry"],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2022,1,2]],"date-time":"2022-01-02T19:58:22Z","timestamp":1641153502000},"score":52.82067,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0021925819501648"}},"issued":{"date-parts":[[1992,5]]},"references-count":40,"journal-issue":{"issue":"14","published-print":{"date-parts":[[1992,5]]}},"alternative-id":["S0021925819501648"],"URL":"http:\/\/dx.doi.org\/10.1016\/s0021-9258(19)50164-8","ISSN":["0021-9258"],"issn-type":[{"value":"0021-9258","type":"print"}],"published":{"date-parts":[[1992,5]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          J. Biochem."}],"container-title":["Journal of Biological Chemistry"],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2022,1,2]],"date-time":"2022-01-02T19:58:22Z","timestamp":1641153502000},"score":52.803257,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0021925819501648"}},"issued":{"date-parts":[[1992,5]]},"references-count":40,"journal-issue":{"issue":"14","published-print":{"date-parts":[[1992,5]]}},"alternative-id":["S0021925819501648"],"URL":"http:\/\/dx.doi.org\/10.1016\/s0021-9258(19)50164-8","ISSN":["0021-9258"],"issn-type":[{"value":"0021-9258","type":"print"}],"published":{"date-parts":[[1992,5]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -739,11 +1098,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "2523"
+          - "2524"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 19:48:11 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -789,7 +1148,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 19:48:11 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -817,9 +1176,9 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":11734920,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":11790075,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
           Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
-          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
+          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
           layers are likely to be present on metallic nano-structures due to either
           environmental exposure during use, or high temperature processing techniques
           such as annealing. It is well known that nano-structured metals have vastly
@@ -911,7 +1270,7 @@ interactions:
           Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
           Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
           Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":64.01897,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":64.01529,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -925,11 +1284,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3928"
+          - "3945"
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 19:48:11 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -975,7 +1334,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 19:48:11 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -1022,7 +1381,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Tue, 13 Aug 2024 19:48:12 GMT
+          - Wed, 04 Sep 2024 22:52:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -1039,365 +1398,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Convalescent-anti-sars-cov-2-plasma/immune-globulin&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "762ceacc20db232d3f6bcda6e867eb8148848ced", "externalIds":
-          {"DOI": "10.1007/s40278-023-33114-1", "CorpusId": 256742540}, "url": "https://www.semanticscholar.org/paper/762ceacc20db232d3f6bcda6e867eb8148848ced",
-          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
-          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
-          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": null, "publicationDate":
-          "2023-02-01", "journal": {"name": "Reactions Weekly", "pages": "229", "volume":
-          "1943"}, "citationStyles": {"bibtex": "@Article{None,\n booktitle = {Reactions
-          weekly},\n journal = {Reactions Weekly},\n pages = {229},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
-          volume = {1943},\n year = {2023}\n}\n"}, "authors": [], "matchScore": 240.53656}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "848"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 19:48:15 GMT
-        Via:
-          - 1.1 0af050b863ec46156a524df4e5d86692.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - g4O7sGb3PiXZV-fPpPVE2G2GffyPMijX4lQfgf2rRH3d7Ok9Q0xmYQ==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdnDJHo3vHcEhTA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "848"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 19:48:15 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 40059075-3a1a-43b0-9c73-d57c5a549333
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
-          "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 187, "influentialCitationCount":
-          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
-          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
-          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
-          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
-          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
-          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
-          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
-          {Augmenting large language models with chemistry tools},\n volume = {6},\n
-          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
-          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
-          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
-          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 181.36966}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1551"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 19:48:15 GMT
-        Via:
-          - 1.1 8e6324c5a68bac8fd8e6eead6a5b73f2.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - zuVPj6yMN5rCD2R7HcLxHy8x-kLnwMahQ7G8pfSyNiFDT0cWbvfmNw==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdnDJEUTPHcEmug=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1551"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 19:48:15 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - e745ac14-504e-4348-aa4a-06e390fcc9bf
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
-          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
-          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
-          "title": "An essential role of active site arginine residue in iodide binding
-          and histidine residue in electron transfer for iodide oxidation by horseradish
-          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
-          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
-          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
-          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
-          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
-          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
-          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
-          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
-          of active site arginine residue in iodide binding and histidine residue in
-          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
-          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
-          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
-          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
-          Banerjee"}], "matchScore": 386.0899}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1482"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 19:48:16 GMT
-        Via:
-          - 1.1 e7803a00a023f1e04faef1ed4f572ace.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - MMShBSHvjIEqV7dMMopd69PyMoIyLOGwR7EaBoeO2wSrkk2CLTEgXw==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdnDJGY-PHcECwg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1482"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 19:48:16 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 40970c02-4f72-4951-8233-7b2bc06ca357
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
-          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
-          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
-          "title": "Effect of native oxide layers on copper thin-film tensile properties:
-          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
-          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
-          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
-          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
-          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
-          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
-          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
-          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
-          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
-          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          283.86478}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1109"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 19:48:16 GMT
-        Via:
-          - 1.1 6d5b0fa46ef77b2ff227bdbcee6603ee.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - eg4X8O8nSOfFymtbAfahuzJx5flTjiyknQB-4WuqRhsMZ_qwftt2Cw==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdnDKElMPHcEsng=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1109"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 19:48:16 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - de32ffb2-6693-4732-b687-c858492bf043
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "7e5d4466c8b85f93775fe183e1a318a3e65ac8e4", "externalIds":
-          {"DOI": "10.1101/2024.04.01.587366", "CorpusId": 268890006}, "url": "https://www.semanticscholar.org/paper/7e5d4466c8b85f93775fe183e1a318a3e65ac8e4",
-          "title": "High-throughput screening of human genetic variants by pooled prime
-          editing", "venue": "bioRxiv", "year": 2024, "citationCount": 1, "influentialCitationCount":
-          0, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
-          "status": "GREEN"}, "publicationTypes": null, "publicationDate": "2024-04-01",
-          "journal": {"name": "bioRxiv"}, "citationStyles": {"bibtex": "@Article{Herger2024HighthroughputSO,\n
-          author = {Michael Herger and Christina M. Kajba and Megan Buckley and Ana
-          Cunha and Molly Strom and Gregory M. Findlay},\n booktitle = {bioRxiv},\n
-          journal = {bioRxiv},\n title = {High-throughput screening of human genetic
-          variants by pooled prime editing},\n year = {2024}\n}\n"}, "authors": [{"authorId":
-          "2294884120", "name": "Michael Herger"}, {"authorId": "2163800172", "name":
-          "Christina M. Kajba"}, {"authorId": "2120283350", "name": "Megan Buckley"},
-          {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId": "2294881320",
-          "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory M. Findlay"}],
-          "matchScore": 252.66568}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1362"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 19:48:18 GMT
-        Via:
-          - 1.1 ce05e2e2ef149c875905ee7ff636fb28.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - k9mONTTlp728qjoElst9l23YQPE_wNuyrPFQFHTpquZDsDqGWZbRuA==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdnDLHnCvHcEWDg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1362"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 19:48:18 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 9a08224c-83b7-4b80-b178-8112100b71c0
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
-          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
-          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
-          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 21, "influentialCitationCount":
-          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
-          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
-          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
-          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
-          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
-          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
-          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
-          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
-          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
-          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}], "matchScore": 245.13055}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1386"
-        Content-Type:
-          - application/json
-        Date:
-          - Tue, 13 Aug 2024 19:48:20 GMT
-        Via:
-          - 1.1 ddd3d8441374ce62d11d031216138152.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - PNlpdqVj19cLnEc8Et0E_OPukDYcChYs_uxr6On1Jg9ze-bDq8iwfA==
-        X-Amz-Cf-Pop:
-          - IAD55-P4
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - cdnDJHF0vHcEftw=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1386"
-        x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 19:48:20 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 85aa5394-fef3-4c7c-b0a4-7d862f56bd92
       status:
         code: 200
         message: OK

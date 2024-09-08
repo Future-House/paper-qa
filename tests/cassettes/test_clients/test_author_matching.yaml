@@ -1,0 +1,195 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Jack+NoScience&select=DOI,author,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":3975,"items":[{"DOI":"10.4337\/cilj.2023.02.08","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2467-681X","authenticated-orcid":true,"given":"Jack
+          Wright","family":"Nelson","sequence":"first","affiliation":[{"name":"Doctoral
+          Candidate, McGill University Faculty of Law, Montreal, QC, Canada"},{"name":"Adjunct
+          Research Fellow, National University of Singapore Faculty of Law, Singapore"}]}],"title":["Large
+          language models and the treaty interpretation game"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:03:33 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
+          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
+          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
+          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
+          "P. Schwaller"}], "matchScore": 181.13739}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "684"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:03:33 GMT
+        Via:
+          - 1.1 acc85cd7bb80090b1fc6f29cede93766.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - F3U7fSYJrgwAzNuNwJbXjB72W4hFJA85vDS7jDn7HSaY_6vgBMvvcg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmSt4H_0vHcEaaA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "684"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 21:03:33 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 6233b7fa-9fce-480c-80c2-ba31e96234e3
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
+          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
+          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
+          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
+          "P. Schwaller"}], "matchScore": 179.49144}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "684"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 04 Sep 2024 21:03:34 GMT
+        Via:
+          - 1.1 acc85cd7bb80090b1fc6f29cede93766.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 1jBkgX134EgvSi_uMo3j__q02oXYMbmDFPwdCeTw-J-uslRm5dnFpw==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - dmSt-HRhvHcEHlQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "684"
+        x-amzn-Remapped-Date:
+          - Wed, 04 Sep 2024 21:03:34 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - fcbd63d4-2be5-4247-9af7-6a0a18c54e6b
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Wed, 04 Sep 2024 21:03:34 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+version: 1
