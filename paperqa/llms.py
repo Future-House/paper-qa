@@ -168,6 +168,170 @@ class LLMModel(ABC, BaseModel):
     def count_tokens(self, text: str) -> int:
         return len(text) // 4  # gross approximation
 
+    async def run_prompt(
+        self,
+        prompt: str,
+        data: dict,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+    ) -> LLMResult:
+        if self.llm_type is None:
+            self.llm_type = self.infer_llm_type()
+        if self.llm_type == "chat":
+            return await self._run_chat(
+                prompt, data, skip_system, system_prompt, callbacks, name
+            )
+        if self.llm_type == "completion":
+            return await self._run_completion(
+                prompt, data, skip_system, system_prompt, callbacks, name
+            )
+        raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
+
+    async def _run_chat(
+        self,
+        prompt: str,
+        data: dict,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+    ) -> LLMResult:
+        """Run a chat prompt.
+
+        Args:
+            prompt: Prompt to use.
+            data: Keys for the input variables that will be formatted into prompt.
+            skip_system: Set True to skip the system prompt.
+            system_prompt: System prompt to use.
+            callbacks: Optional functions to call with each chunk of the completion.
+            name: Optional name for the result.
+
+        Returns:
+            Result of the chat.
+        """
+        system_message_prompt = {"role": "system", "content": system_prompt}
+        human_message_prompt = {"role": "user", "content": prompt}
+        messages = [
+            {"role": m["role"], "content": m["content"].format(**data)}
+            for m in (
+                [human_message_prompt]
+                if skip_system
+                else [system_message_prompt, human_message_prompt]
+            )
+        ]
+        result = LLMResult(
+            model=self.name,
+            name=name,
+            prompt=messages,
+            prompt_count=(
+                sum(self.count_tokens(m["content"]) for m in messages)
+                + sum(self.count_tokens(m["role"]) for m in messages)
+            ),
+        )
+
+        start_clock = asyncio.get_running_loop().time()
+        if callbacks is None:
+            chunk = await self.achat(messages)
+            output = chunk.text
+        else:
+            sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
+            async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+            completion = self.achat_iter(messages)
+            text_result = []
+            async for chunk in completion:
+                if chunk.text:
+                    if result.seconds_to_first_token == 0:
+                        result.seconds_to_first_token = (
+                            asyncio.get_running_loop().time() - start_clock
+                        )
+                    text_result.append(chunk.text)
+                    await do_callbacks(
+                        async_callbacks, sync_callbacks, chunk.text, name
+                    )
+            output = "".join(text_result)
+        usage = chunk.prompt_tokens, chunk.completion_tokens
+        if sum(usage) > 0:
+            result.prompt_count, result.completion_count = usage
+        elif output:
+            result.completion_count = self.count_tokens(output)
+        result.text = output or ""
+        result.seconds_to_last_token = asyncio.get_running_loop().time() - start_clock
+        if self.llm_result_callback:
+            if is_coroutine_callable(self.llm_result_callback):
+                await self.llm_result_callback(result)  # type: ignore[misc]
+            else:
+                self.llm_result_callback(result)
+        return result
+
+    async def _run_completion(
+        self,
+        prompt: str,
+        data: dict,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
+        callbacks: Iterable[Callable] | None = None,
+        name: str | None = None,
+    ) -> LLMResult:
+        """Run a completion prompt.
+
+        Args:
+            prompt: Prompt to use.
+            data: Keys for the input variables that will be formatted into prompt.
+            skip_system: Set True to skip the system prompt.
+            system_prompt: System prompt to use.
+            callbacks: Optional functions to call with each chunk of the completion.
+            name: Optional name for the result.
+
+        Returns:
+            Result of the completion.
+        """
+        formatted_prompt: str = (
+            prompt if skip_system else system_prompt + "\n\n" + prompt
+        ).format(**data)
+        result = LLMResult(
+            model=self.name,
+            name=name,
+            prompt=formatted_prompt,
+            prompt_count=self.count_tokens(formatted_prompt),
+        )
+
+        start_clock = asyncio.get_running_loop().time()
+        if callbacks is None:
+            chunk = await self.acomplete(formatted_prompt)
+            output = chunk.text
+        else:
+            sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
+            async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+
+            completion = self.acomplete_iter(formatted_prompt)
+            text_result = []
+            async for chunk in completion:
+                if chunk.text:
+                    if result.seconds_to_first_token == 0:
+                        result.seconds_to_first_token = (
+                            asyncio.get_running_loop().time() - start_clock
+                        )
+                    text_result.append(chunk.text)
+                    await do_callbacks(
+                        async_callbacks, sync_callbacks, chunk.text, name
+                    )
+            output = "".join(text_result)
+        usage = chunk.prompt_tokens, chunk.completion_tokens
+        if sum(usage) > 0:
+            result.prompt_count, result.completion_count = usage
+        elif output:
+            result.completion_count = self.count_tokens(output)
+        result.text = output or ""
+        result.seconds_to_last_token = asyncio.get_running_loop().time() - start_clock
+        if self.llm_result_callback:
+            if is_coroutine_callable(self.llm_result_callback):
+                await self.llm_result_callback(result)  # type: ignore[misc]
+            else:
+                self.llm_result_callback(result)
+        return result
+
     def make_chain(
         self,
         prompt: str,
