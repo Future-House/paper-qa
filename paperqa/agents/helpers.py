@@ -1,24 +1,17 @@
 from __future__ import annotations
 
 import logging
-import os
 import re
 from datetime import datetime
-from typing import Any, cast
+from typing import cast
 
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
 from rich.table import Table
 
 from .. import (
-    AnthropicLLMModel,
     Docs,
-    OpenAILLMModel,
-    embedding_model_factory,
-    llm_model_factory,
 )
-from ..llms import LangchainLLMModel
-from .models import AnswerResponse, QueryRequest
+from ..llms import LiteLLMModel
+from .models import AnswerResponse
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +23,7 @@ def get_year(ts: datetime | None = None) -> str:
     return ts.strftime("%Y")
 
 
-async def openai_get_search_query(
+async def litellm_get_search_query(
     question: str,
     count: int,
     template: str | None = None,
@@ -67,16 +60,16 @@ async def openai_get_search_query(
         raise ValueError(
             f"Invalid llm: {llm}, note a GPT model must be used for the fake agent search."
         )
-    client = AsyncOpenAI()
-    model = OpenAILLMModel(config={"model": llm, "temperature": temperature})
-    chain = model.make_chain(client, prompt=search_prompt, skip_system=True)
+    model = LiteLLMModel(name=llm)
+    model.config["model_list"][0]["litellm_params"].update({"temperature": temperature})
+    chain = model.make_chain(prompt=search_prompt, skip_system=True)
     result = await chain({"question": question, "count": count})  # type: ignore[call-arg]
     search_query = result.text
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004
     # remove "2.", "3.", etc. -- https://regex101.com/r/W2f7F1/1
     queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
     # remove quotes
-    return [re.sub(r"\"", "", q) for q in queries]
+    return [re.sub(r'["\[\]]', "", q) for q in queries]
 
 
 def table_formatter(
@@ -161,78 +154,3 @@ def compute_total_model_token_cost(token_counts: dict[str, list[int]]) -> float:
                 model, tokens=tokens[0], is_completion=False
             ) + compute_model_token_cost(model, tokens=tokens[1], is_completion=True)
     return cost
-
-
-# the defaults here should be (about) the same as in QueryRequest
-def update_doc_models(doc: Docs, request: QueryRequest | None = None):
-    if request is None:
-        request = QueryRequest()
-    client: Any = None
-
-    if request.llm.startswith("gemini"):
-        doc.llm_model = LangchainLLMModel(name=request.llm)
-        doc.summary_llm_model = LangchainLLMModel(name=request.summary_llm)
-    else:
-        doc.llm_model = llm_model_factory(request.llm)
-        doc.summary_llm_model = llm_model_factory(request.summary_llm)
-
-    # set temperatures
-    doc.llm_model.config["temperature"] = request.temperature
-    doc.summary_llm_model.config["temperature"] = request.temperature
-
-    if isinstance(doc.llm_model, OpenAILLMModel):
-        if request.llm.startswith(
-            ("meta-llama/Meta-Llama-3-", "mistralai/Mistral-", "mistralai/Mixtral-")
-        ):
-            client = AsyncOpenAI(
-                base_url=os.environ.get("ANYSCALE_BASE_URL"),
-                api_key=os.environ.get("ANYSCALE_API_KEY"),
-            )
-            logger.info(f"Using Anyscale (via OpenAI client) for {request.llm}")
-        else:
-            client = AsyncOpenAI()
-    elif isinstance(doc.llm_model, AnthropicLLMModel):
-        client = AsyncAnthropic()
-    elif isinstance(doc.llm_model, LangchainLLMModel):
-        from langchain_google_vertexai import (
-            ChatVertexAI,
-            HarmBlockThreshold,
-            HarmCategory,
-        )
-
-        # we have to convert system to human because system is unsupported
-        # Also we do get blocked content, so adjust thresholds
-        client = ChatVertexAI(
-            model=request.llm,
-            safety_settings={
-                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-            },
-            convert_system_message_to_human=True,
-        )
-    else:
-        raise TypeError(f"Unsupported LLM model: {doc.llm_model}")
-
-    doc._client = client  # set client, since could be just unpickled.
-    doc._embedding_client = AsyncOpenAI()  # hard coded to OpenAI for now
-
-    doc.texts_index.embedding_model = embedding_model_factory(
-        request.embedding, **(request.texts_index_embedding_config or {})
-    )
-    doc.docs_index.embedding_model = embedding_model_factory(
-        request.embedding, **(request.docs_index_embedding_config or {})
-    )
-    doc.texts_index.mmr_lambda = request.texts_index_mmr_lambda
-    doc.docs_index.mmr_lambda = request.docs_index_mmr_lambda
-    doc.embedding = request.embedding
-    doc.max_concurrent = request.max_concurrent
-    doc.prompts = request.prompts
-    Docs.make_llm_names_consistent(doc)
-
-    logger.debug(
-        f"update_doc_models: {doc.name}"
-        f" | {(doc.llm_model.config)} | {(doc.summary_llm_model.config)}"
-        f" | {doc.docs_index.__class__}"
-    )

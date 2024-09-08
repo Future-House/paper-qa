@@ -4,8 +4,9 @@ import copy
 import json
 import logging
 import os
+from collections.abc import Collection
 from datetime import datetime
-from typing import Any, Collection
+from typing import Any
 from urllib.parse import quote
 
 import aiohttp
@@ -144,7 +145,7 @@ async def doi_to_bibtex(
     return data.replace(key, new_key, 1)
 
 
-async def parse_crossref_to_doc_details(  # noqa: C901
+async def parse_crossref_to_doc_details(
     message: dict[str, Any],
     session: aiohttp.ClientSession,
     query_bibtex: bool = True,
@@ -228,7 +229,7 @@ async def parse_crossref_to_doc_details(  # noqa: C901
     return doc_details
 
 
-async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
+async def get_doc_details_from_crossref(  # noqa: PLR0912
     session: aiohttp.ClientSession,
     doi: str | None = None,
     authors: list[str] | None = None,
