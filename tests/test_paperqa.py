@@ -407,8 +407,7 @@ def test_llm_parse_json_newlines():
 @pytest.mark.asyncio
 async def test_chain_completion():
     s = Settings(llm="babbage-002", temperature=0.2)
-    model = s.get_llm()
-    call = model.make_chain(
+    call = s.get_llm().make_chain(
         "The {animal} says",
         skip_system=True,
     )

@@ -182,7 +182,6 @@ class LLMModel(ABC, BaseModel):
         # check if it needs to be set
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type()
-        print(self.llm_type, self.name)
         if self.llm_type == "chat":
             system_message_prompt = {"role": "system", "content": system_prompt}
             human_message_prompt = {"role": "user", "content": prompt}
