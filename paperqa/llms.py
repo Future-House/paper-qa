@@ -73,7 +73,7 @@ class EmbeddingModel(ABC, BaseModel):
 
 class LiteLLMEmbeddingModel(EmbeddingModel):
     name: str = Field(default="text-embedding-3-small")
-    embedding_kwargs: dict = Field(default={})
+    embedding_kwargs: dict = Field(default_factory=dict)
 
     async def embed_documents(
         self, texts: list[str], batch_size: int = 16
@@ -116,6 +116,16 @@ class HybridEmbeddingModel(EmbeddingModel):
         return np.concatenate(all_embeds, axis=1)
 
 
+class Chunk(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    text: str | None
+    prompt_tokens: int
+    completion_tokens: int
+
+    def __str__(self):
+        return self.text
+
+
 class LLMModel(ABC, BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
@@ -129,25 +139,27 @@ class LLMModel(ABC, BaseModel):
         " LLMResult (different than callbacks that execute on each chunk)",
         exclude=True,
     )
-    config: dict = Field(default={})
+    config: dict = Field(default_factory=dict)
 
-    async def acomplete(self, prompt: str) -> str:
+    async def acomplete(self, prompt: str) -> Chunk:
+        """Return the completion as string and the number of tokens in the prompt and completion."""
         raise NotImplementedError
 
     async def acomplete_iter(self, prompt: str) -> Any:
         """Return an async generator that yields chunks of the completion.
 
-        I cannot get mypy to understand the override, so marked as Any
+        Only the last tuple will be non-zero. I cannot get mypy to understand the override, so marked as Any
         """
         raise NotImplementedError
 
-    async def achat(self, messages: Iterable[dict[str, str]]) -> str:
+    async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
+        """Return the completion as string and the number of tokens in the prompt and completion."""
         raise NotImplementedError
 
     async def achat_iter(self, messages: Iterable[dict[str, str]]) -> Any:
         """Return an async generator that yields chunks of the completion.
 
-        I cannot get mypy to understand the override, so marked as Any
+        Only the last tuple will be non-zero. I cannot get mypy to understand the override, so marked as Any
         """
         raise NotImplementedError
 
@@ -205,8 +217,13 @@ class LLMModel(ABC, BaseModel):
                 result.prompt_count = sum(
                     self.count_tokens(m["content"]) for m in messages
                 ) + sum(self.count_tokens(m["role"]) for m in messages)
+                usage = (0, 0)
                 if callbacks is None:
-                    output = await self.achat(messages)
+                    chunk = await self.achat(messages)
+                    output, usage = chunk.text, (
+                        chunk.prompt_tokens,
+                        chunk.completion_tokens,
+                    )
                 else:
                     sync_callbacks = [
                         f for f in callbacks if not is_coroutine_callable(f)
@@ -215,18 +232,23 @@ class LLMModel(ABC, BaseModel):
                     completion = self.achat_iter(messages)
                     text_result = []
                     async for chunk in completion:  # type: ignore[attr-defined]
-                        if chunk:
+                        if chunk.text:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
                                     asyncio.get_running_loop().time() - start_clock
                                 )
-                            text_result.append(chunk)
+                            text_result.append(chunk.text)
                             await do_callbacks(
-                                async_callbacks, sync_callbacks, chunk, name
+                                async_callbacks, sync_callbacks, chunk.text, name
                             )
+                    usage = (chunk.prompt_tokens, chunk.completion_tokens)
                     output = "".join(text_result)
-                result.completion_count = self.count_tokens(output)
-                result.text = output
+                # not always reliable
+                if sum(usage) > 0:
+                    result.prompt_count, result.completion_count = usage
+                elif output:
+                    result.completion_count = self.count_tokens(output)
+                result.text = output or ""
                 result.name = name
                 result.seconds_to_last_token = (
                     asyncio.get_running_loop().time() - start_clock
@@ -254,8 +276,13 @@ class LLMModel(ABC, BaseModel):
                 formatted_prompt = completion_prompt.format(**data)
                 result.prompt_count = self.count_tokens(formatted_prompt)
                 result.prompt = formatted_prompt
+                usage = (0, 0)
                 if callbacks is None:
-                    output = await self.acomplete(formatted_prompt)
+                    chunk = await self.acomplete(formatted_prompt)
+                    output, usage = chunk.text, (
+                        chunk.prompt_tokens,
+                        chunk.completion_tokens,
+                    )
                 else:
                     sync_callbacks = [
                         f for f in callbacks if not is_coroutine_callable(f)
@@ -267,18 +294,22 @@ class LLMModel(ABC, BaseModel):
                     )
                     text_result = []
                     async for chunk in completion:  # type: ignore[attr-defined]
-                        if chunk:
+                        if chunk.text:
                             if result.seconds_to_first_token == 0:
                                 result.seconds_to_first_token = (
                                     asyncio.get_running_loop().time() - start_clock
                                 )
-                            text_result.append(chunk)
+                            text_result.append(chunk.text)
                             await do_callbacks(
-                                async_callbacks, sync_callbacks, chunk, name
+                                async_callbacks, sync_callbacks, chunk.text, name
                             )
+                    usage = (chunk.prompt_tokens, chunk.completion_tokens)
                     output = "".join(text_result)
-                result.completion_count = self.count_tokens(output)
-                result.text = output
+                if sum(usage) > 0:
+                    result.prompt_count, result.completion_count = usage
+                elif output:
+                    result.completion_count = self.count_tokens(output)
+                result.text = output or ""
                 result.name = name
                 result.seconds_to_last_token = (
                     asyncio.get_running_loop().time() - start_clock
@@ -326,7 +357,7 @@ class LiteLLMModel(LLMModel):
 
     """
 
-    config: dict = Field(default={})
+    config: dict = Field(default_factory=dict)
     name: str = "gpt-4o-mini"
     _router: Router | None = None
 
@@ -375,31 +406,54 @@ class LiteLLMModel(LLMModel):
             )
         return self._router
 
-    async def acomplete(self, prompt: str) -> str:
-        return (
-            (await self.router.atext_completion(model=self.name, prompt=prompt))
-            .choices[0]
-            .text
+    async def acomplete(self, prompt: str) -> Chunk:
+        response = await self.router.atext_completion(model=self.name, prompt=prompt)
+        return Chunk(
+            text=response.choices[0].text,
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
         )
 
     async def acomplete_iter(self, prompt: str) -> Any:
         completion = await self.router.atext_completion(
-            model=self.name, prompt=prompt, stream=True
+            model=self.name,
+            prompt=prompt,
+            stream=True,
+            stream_options={"include_usage": True},
         )
         async for chunk in completion:
-            yield chunk.choices[0].text
+            yield Chunk(
+                text=chunk.choices[0].text, prompt_tokens=0, completion_tokens=0
+            )
+        if hasattr(chunk, "usage") and hasattr(chunk.usage, "prompt_tokens"):
+            yield Chunk(
+                text=chunk.choices[0].text, prompt_tokens=0, completion_tokens=0
+            )
 
-    async def achat(self, messages: Iterable[dict[str, str]]) -> str:
-        return (
-            (await self.router.acompletion(self.name, messages))
-            .choices[0]
-            .message.content
+    async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
+        response = await self.router.acompletion(self.name, messages)
+        return Chunk(
+            text=response.choices[0].message.content,
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
         )
 
     async def achat_iter(self, messages: Iterable[dict[str, str]]) -> Any:
-        completion = await self.router.acompletion(self.name, messages, stream=True)
+        completion = await self.router.acompletion(
+            self.name, messages, stream=True, stream_options={"include_usage": True}
+        )
         async for chunk in completion:
-            yield chunk.choices[0].delta.content
+            yield Chunk(
+                text=chunk.choices[0].delta.content,
+                prompt_tokens=0,
+                completion_tokens=0,
+            )
+        if hasattr(chunk, "usage") and hasattr(chunk.usage, "prompt_tokens"):
+            yield Chunk(
+                text=None,
+                prompt_tokens=chunk.usage.prompt_tokens,
+                completion_tokens=chunk.usage.completion_tokens,
+            )
 
     def infer_llm_type(self) -> str:
         if all(
