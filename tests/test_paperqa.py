@@ -702,14 +702,16 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
 
 
 def test_custom_llm(stub_data_dir: Path):
+    from paperqa.llms import Chunk
+
     class MyLLM(LLMModel):
         name: str = "myllm"
 
         async def acomplete(self, prompt):  # noqa: ARG002
-            return "Echo", (1, 1)
+            return Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
         async def acomplete_iter(self, prompt):  # noqa: ARG002
-            yield "Echo", (1, 1)
+            yield Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
     docs = Docs()
     docs.add(
