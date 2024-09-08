@@ -300,7 +300,7 @@ async def test_s2_only_fields_filtering():
 
 
 @pytest.mark.vcr(record_mode="new_episodes")
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_crossref_journalquality_fields_filtering():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
