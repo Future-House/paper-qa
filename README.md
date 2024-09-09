@@ -89,43 +89,56 @@ pqa --parsing.chunk_size 5000 ask 'What manufacturing challenges are unique to b
 
 PaperQA's full workflow can be accessed via Python directly:
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents import ask
 
-answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(temperature=0.5))
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(temperature=0.5),
+)
 ```
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer). `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents import ask
 
-answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(temperature=0.5, paper_directory='my_papers/'))
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(temperature=0.5, paper_directory="my_papers/"),
+)
 ```
 
 `ask` is just a convenience wrapper around the real entrypoint, which can be accessed if you'd like to run concurrent asynchronous workloads:
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents.main import agent_query
 from paperqa.agents.models import QueryRequest
 
-answer = await agent_query(QueryRequest(query='What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(temperature=0.5, paper_directory='my_papers/')))
+answer = await agent_query(
+    QueryRequest(
+        query="What manufacturing challenges are unique to bispecific antibodies?",
+        settings=Settings(temperature=0.5, paper_directory="my_papers/"),
+    )
+)
 ```
 
-The default agent will use an `OpenAIFunctionsAgent` from langchain, but you can also specify a `"fake"` agent to use a hard coded call path of search->gather evidence->answer.
+The default agent will use an `OpenAIFunctionsAgent` from langchain,
+but you can also specify a `"fake"` agent to use a hard coded call path of search -> gather evidence -> answer.
 
 ### Adding Documents Manually
 
 If you prefer fine grained control, and you wish to add objects to the docs object yourself (rather than using the search tool), then the previously existing `Docs` object interface can be used:
 
-```Python
-from paperqa import Docs, Settings, AnswerSettings
+```python
+from paperqa import Docs, Settings
+from paperqa.settings import AnswerSettings
 
 # valid extensions include .pdf, .txt, and .html
-doc_paths = ('myfile.pdf', 'myotherfile.pdf')
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 docs = Docs()
 
@@ -134,11 +147,12 @@ for doc in doc_paths:
 
 answer = docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    settings=Settings(llm='claude-3-5-sonnet-20240620', answer=AnswerSettings(answer_max_sources=3))
+    settings=Settings(
+        llm="claude-3-5-sonnet-20240620", answer=AnswerSettings(answer_max_sources=3)
+    ),
 )
 
 print(answer.formatted_answer)
-
 ```
 
 ### Async
@@ -156,7 +170,8 @@ paper-qa is written to be used asynchronously. The synchronous API is just a wra
 The synchronous version just call the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
 
 ```python
-from paperqa import Docs, Settings, AnswerSettings
+from paperqa import Docs, Settings
+from paperqa.settings import AnswerSettings
 
 # valid extensions include .pdf, .txt, and .html
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
@@ -180,20 +195,30 @@ print(answer.formatted_answer)
 
 By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents import ask
 
-answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(llm='gpt-4o-mini', summary_llm='gpt-4o-mini', paper_directory='my_papers/'))
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers/"
+    ),
+)
 ```
 
 You can use Anthropic or any other model supported by `litellm`:
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents import ask
 
-answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(llm='claude-3-5-sonnet-20240620', summary_llm='claude-3-5-sonnet-20240620'))
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
+    ),
+)
 ```
 
 #### Locally Hosted
@@ -202,31 +227,47 @@ You can use llama.cpp to be the LLM. Note that you should be using relatively la
 
 The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents import ask
 
-local_llm_config = dict(model_list=dict(model_name='my_llm_model', litellm_params=dict(model='my-llm-model', api_base='http://localhost:8080/v1', api_key='sk-no-key-required', temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
+local_llm_config = dict(
+    model_list=dict(
+        model_name="my_llm_model",
+        litellm_params=dict(
+            model="my-llm-model",
+            api_base="http://localhost:8080/v1",
+            api_key="sk-no-key-required",
+            temperature=0.1,
+            frequency_penalty=1.5,
+            max_tokens=512,
+        ),
+    )
+)
 
-answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(
-                llm='my-llm-model',
-                llm_config=local_llm_config,
-                summary_llm='my-llm-model',
-                summary_llm_config=local_llm_config,
-                ))
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="my-llm-model",
+        llm_config=local_llm_config,
+        summary_llm="my-llm-model",
+        summary_llm_config=local_llm_config,
+    ),
+)
 ```
 
 ### Changing Embedding Model
 
 PaperQA defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
 
-```Python
-from paperqa Settings
+```python
+from paperqa import Settings
 from paperqa.agents import ask
 
-answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(
-                embedding='text-embedding-3-large'
-                ))
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(embedding="text-embedding-3-large"),
+)
 ```
 
 `embedding` accepts any embedding model name supported by litellm. PaperQA also supports an embedding input of `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, where any litellm model can be used in the dense model name. `"sparse"` can be used to use a sparse keyword embedding only.
@@ -246,18 +287,10 @@ for doc in doc_paths:
     doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
 ```
 
-Note that PaperQA uses Numpy as a dense vector store. Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
-Therefore, `NumpyVectorStore` is the best place to start, it's a simple in-memory store, without an index. However, if a larger-than-memory vector store is needed, you can use the `LangchainVectorStore` like this:
-
-```python
-from langchain_community.vectorstores.faiss import FAISS
-from langchain_openai import OpenAIEmbeddings
-from paperqa import Docs, LangchainVectorStore
-
-docs = Docs(
-    texts_index=LangchainVectorStore(cls=FAISS),
-)
-```
+Note that PaperQA uses Numpy as a dense vector store.
+Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
+Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
+However, if a larger-than-memory vector store is needed, we are currently lacking here.
 
 We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
 
@@ -267,14 +300,14 @@ from paperqa import (
     HybridEmbeddingModel,
     SparseEmbeddingModel,
     LiteLLMEmbeddingModel,
+    NumpyVectorStore,
 )
+
 
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 model = HybridEmbeddingModel(models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()])
-docs = Docs(
-    texts_index=NumpyVectorStore(),
-)
+docs = Docs(texts_index=NumpyVectorStore())
 for doc in doc_paths:
     doc.add(doc_paths, embedding_model=model)
 ```
@@ -301,6 +334,8 @@ You do not need to use papers -- you can use code or raw HTML. Note that this to
 
 ```python
 import glob
+import os
+from paperqa import Docs
 
 source_files = glob.glob("**/*.js")
 
@@ -317,24 +352,14 @@ print(answer)
 You may want to cache parsed texts and embeddings in an external database or file. You can then build a Docs object from those directly:
 
 ```python
+from paperqa import Docs, Doc, Text
+
 docs = Docs()
 
 for ... in my_docs:
     doc = Doc(docname=..., citation=..., dockey=..., citation=...)
     texts = [Text(text=..., name=..., doc=doc) for ... in my_texts]
     docs.add_texts(texts, doc)
-```
-
-If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) vector store from langchain:
-
-```python
-from paperqa import LangchainVectorStore, Docs
-from langchain_community.vector_store import FAISS
-from langchain_openai import OpenAIEmbeddings
-
-docs = Docs(
-    texts_index=LangchainVectorStore(cls=FAISS),
-)
 ```
 
 ## Where do I get papers?
@@ -347,10 +372,10 @@ If you use [Zotero](https://www.zotero.org/) to organize your personal bibliogra
 you can use the `paperqa.contrib.ZoteroDB` to query papers from your library,
 which relies on [pyzotero](https://github.com/urschrei/pyzotero).
 
-Install `pyzotero` to use this feature:
+Install `pyzotero` via the `zotero` extra for this feature:
 
 ```bash
-pip install pyzotero
+pip install paperqa[zotero]
 ```
 
 First, note that `paperqa` parses the PDFs of papers to store in the database,
@@ -370,9 +395,10 @@ To download papers, you need to get an API key for your account.
 With this, we can download papers from our library and add them to `paperqa`:
 
 ```python
+from paperqa import Docs
 from paperqa.contrib import ZoteroDB
 
-docs = paperqa.Docs()
+docs = Docs()
 zotero = ZoteroDB(library_type="user")  # "group" if group library
 
 for item in zotero.iterate(limit=20):
@@ -406,9 +432,11 @@ If you want to search for papers outside of your own collection, I've found an u
 like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
 
 ```python
+from paperqa import Docs
+
 keyword_search = "bispecific antibody manufacture"
 papers = paperscraper.search_papers(keyword_search)
-docs = paperqa.Docs()
+docs = Docs()
 for path, data in papers.items():
     try:
         docs.add(path)
@@ -435,7 +463,7 @@ To execute a function on each chunk of LLM completions, you need to provide a fu
 
 ```python
 def make_typewriter(step_name):
-    def typewriter(chunk):
+    def typewriter(chunk: str) -> None:
         print(chunk, end="")
 
     return [typewriter]  # <- note that this is a list of functions
@@ -471,10 +499,9 @@ my_qa_prompt = (
 )
 
 docs = Docs()
-
 docs.query(
     "Are covid-19 vaccines effective?",
-    settings=Setting(prompts=PromptSettings(qa=my_qaprompt)),
+    settings=Settings(prompts=PromptSettings(qa=my_qa_prompt)),
 )
 ```
 
@@ -491,7 +518,8 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 ### How is this different from LangChain?
 
-There has been some great work on retrievers in langchain and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
+There has been some great work on retrievers in LangChain,
+and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
 
 ### Can I save or load?
 

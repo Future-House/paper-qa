@@ -12,21 +12,12 @@ import numpy as np
 import pytest
 import requests
 
-from paperqa import (
-    Answer,
-    Doc,
-    Docs,
-    NumpyVectorStore,
-    Settings,
-    Text,
-    print_callback,
-)
+from paperqa import Answer, Doc, Docs, NumpyVectorStore, Settings, print_callback
 from paperqa.clients import CrossrefProvider
 from paperqa.core import llm_parse_json
 from paperqa.llms import (
     EmbeddingModel,
     HybridEmbeddingModel,
-    LangchainVectorStore,
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     LLMModel,
@@ -752,74 +743,6 @@ def test_custom_llm(stub_data_dir: Path) -> None:
         "Echo", callbacks=[print_callback], summary_llm_model=MyLLM()
     ).contexts
     assert "Echo" in evidence[0].context
-
-
-@pytest.mark.skip(
-    "Langchain updated vector stores and I haven't yet updated the implementation"
-)
-@pytest.mark.asyncio
-async def test_langchain_vector_store(stub_data_dir: Path) -> None:
-    from langchain_community.vectorstores.faiss import FAISS
-    from langchain_openai import OpenAIEmbeddings
-
-    some_texts = [
-        Text(
-            embedding=OpenAIEmbeddings().embed_query("test"),
-            text="this is a test",
-            name="test",
-            doc=Doc(docname="test", citation="test", dockey="test"),
-        )
-    ]
-
-    index = LangchainVectorStore()
-    with pytest.raises(ValueError, match="You must set store_builder"):
-        index.add_texts_and_embeddings(some_texts)
-
-    with pytest.raises(ValueError, match="store_builder must take two arguments"):
-        index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
-
-    with pytest.raises(ValueError, match="store_builder must be callable"):
-        index = LangchainVectorStore(store_builder="foo")
-
-    # now with real builder
-    index = LangchainVectorStore(
-        store_builder=lambda x, y: FAISS.from_embeddings(x, OpenAIEmbeddings(), y)
-    )
-    assert index._store is None
-    index.add_texts_and_embeddings(some_texts)
-    assert index._store is not None
-    # check search returns Text obj
-    data, _ = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
-    assert isinstance(data[0], Text)
-
-    # now try with convenience
-    index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-    assert index._store is None
-    index.add_texts_and_embeddings(some_texts)
-    assert index._store is not None
-
-    docs = Docs(
-        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-    )
-    assert docs._embedding_client is not None  # from default
-
-    await docs.aadd(
-        stub_data_dir / "bates.txt",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-
-    # will not be embedded until we ask something
-    fast_settings = Settings.from_name("fast")
-    _ = await docs.aget_evidence(
-        "What is Frederick Bates's greatest accomplishment?", settings=fast_settings
-    )
-    assert docs.texts[0].embedding is not None
-    # make sure we can pickle it
-    docs_pickle = pickle.dumps(docs)
-    dp = pickle.loads(docs_pickle)
-
-    assert dp.texts
 
 
 def test_docs_pickle(stub_data_dir) -> None:
