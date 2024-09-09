@@ -332,27 +332,6 @@ async def test_crossref_journalquality_fields_filtering():
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_crossref_retraction_status():
-    async with aiohttp.ClientSession() as session:
-        crossref_client = DocMetadataClient(
-            session,
-            clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
-                [CrossrefProvider, RetrationDataPostProcessor],
-            ),
-        )
-        crossref_details = await crossref_client.query(
-            title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
-            fields=["title", "doi", "authors", "journal"],
-        )
-
-        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]
-
-
-@pytest.mark.vcr
-@pytest.mark.asyncio
 async def test_author_matching():
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(session, clients=[CrossrefProvider])
@@ -527,3 +506,23 @@ async def test_ensure_sequential_run_early_stop(
             record_indices["semantic_scholar"] != -1
         ), "Semantic Scholar should be found"
         assert record_indices["early_stop"] != -1, "We should stop early."
+
+
+@pytest.mark.asyncio
+async def test_crossref_retraction_status():
+    async with aiohttp.ClientSession() as session:
+        crossref_client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                [CrossrefProvider, RetrationDataPostProcessor],
+            ),
+        )
+        crossref_details = await crossref_client.query(
+            title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
+            fields=["title", "doi", "authors", "journal"],
+        )
+
+        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]

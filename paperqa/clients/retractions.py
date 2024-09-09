@@ -52,28 +52,38 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
     def _is_csv_cached(self) -> bool:
         return os.path.exists(self.retraction_data_path)
 
-    async def _download_raw_retracted(self) -> None:
-        retries = 3
+    async def _download_retracted_dataset(self) -> None:
+        retries = 2
         delay = 5
-        url = "https://api.labs.crossref.org/data/retractionwatch"
+        if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
+            CROSSREF_MAILTO = "test@example.com"
+        url = f"https://api.labs.crossref.org/data/retractionwatch?{CROSSREF_MAILTO}"
 
         for i in range(retries):
             try:
-                async with aiohttp.ClientSession() as session, session.get(
-                    url, timeout=aiohttp.ClientTimeout(total=300)
-                ) as response:
+                async with (
+                    aiohttp.ClientSession() as session,
+                    session.get(
+                        url,
+                        timeout=aiohttp.ClientTimeout(total=300),
+                    ) as response,
+                ):
                     response.raise_for_status()
+
                     async with await open_file(self.retraction_data_path, "wb") as f:
-                        progress_bar = tqdm(
+                        with tqdm(
                             unit="iB", unit_scale=True, desc=self.retraction_data_path
-                        )
-                        while True:
-                            chunk = await response.content.read(1024)
-                            if not chunk:
-                                break
-                            await f.write(chunk)
-                            progress_bar.update(len(chunk))
-                        progress_bar.close()
+                        ) as progress_bar:
+                            while True:
+                                chunk = await response.content.read(1024)
+                                if not chunk:
+                                    break
+                                await f.write(chunk)
+                                progress_bar.update(len(chunk))
+
+                        # assert csv file is not empty
+                        if os.path.getsize(self.retraction_data_path) == 0:
+                            raise RuntimeError("Retraction data is empty")
 
             except (TimeoutError, aiohttp.ClientError) as e:
                 if i < retries - 1:
@@ -94,7 +104,7 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
 
     async def load_data(self) -> None:
         if not self._is_csv_cached() or self._has_cache_expired():
-            await self._download_raw_retracted()
+            await self._download_retracted_dataset()
 
         self._filter_dois()
 
@@ -113,5 +123,7 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         try:
             return DOIQuery(doi=doc_details.doi, **kwargs)
         except ValidationError:
-            logger.debug("Must have a valid doi to query retraction data.")
+            logger.debug(
+                f"Must have a valid DOI to query retraction data:{doc_details.doi} "
+            )
             return None
