@@ -899,7 +899,10 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path):
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
-    assert doc_details.dockey == "5300ef1d5fb960d7"
+    assert doc_details.dockey in {
+        "41f786fcc56d27ff0c1507153fae3774",  # From file contents
+        "5300ef1d5fb960d7",  # Or from crossref data
+    }
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
     assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
