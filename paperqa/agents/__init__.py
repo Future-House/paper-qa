@@ -97,17 +97,9 @@ def configure_cli_logging(verbosity: int = 0) -> None:
 def ask(query: str, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
     configure_cli_logging(verbosity=settings.verbosity)
-
-    loop = get_loop()
-
-    request = QueryRequest(
-        query=query,
-        settings=settings,
-    )
-
-    return loop.run_until_complete(
+    return get_loop().run_until_complete(
         agent_query(
-            request,
+            QueryRequest(query=query, settings=settings),
             docs=None,
             verbosity=settings.verbosity,
             agent_type=settings.agent.agent_type,
@@ -124,8 +116,7 @@ def search_query(
     configure_cli_logging(verbosity=settings.verbosity)
     if index_name == "default":
         index_name = settings.get_index_name()
-    loop = get_loop()
-    return loop.run_until_complete(
+    return get_loop().run_until_complete(
         index_search(
             query,
             index_name=index_name,
@@ -144,9 +135,7 @@ def build_index(
         index_name = settings.get_index_name()
     configure_cli_logging(verbosity=settings.verbosity)
     settings.paper_directory = directory
-    loop = get_loop()
-
-    return loop.run_until_complete(
+    return get_loop().run_until_complete(
         get_directory_index(index_name=index_name, settings=settings)
     )
 
@@ -222,7 +211,9 @@ def main():
     build_parser.add_argument("directory", help="Directory to build index from")
 
     # Create CliSettingsSource instance
-    cli_settings = CliSettingsSource(Settings, root_parser=parser)
+    cli_settings = CliSettingsSource[argparse.ArgumentParser](
+        Settings, root_parser=parser
+    )
 
     # Now use argparse to parse the remaining arguments
     args, remaining_args = parser.parse_known_args()

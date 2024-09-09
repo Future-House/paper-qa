@@ -434,12 +434,16 @@ class Settings(BaseSettings):
 
     @classmethod
     def from_name(
-        cls, config_name: str, cli_source: CliSettingsSource = None
+        cls, config_name: str = "default", cli_source: CliSettingsSource | None = None
     ) -> "Settings":
         json_path: Path | None = None
 
         # quick exit for default settings
         if config_name == "default":
+            if not cli_source:
+                raise NotImplementedError(
+                    f"For config_name {config_name!r}, we require cli_source."
+                )
             return Settings(_cli_settings_source=cli_source(args=True))
 
         # First, try to find the config file in the user's .config directory
@@ -513,6 +517,4 @@ def get_settings(config_or_name: MaybeSettings = None) -> Settings:
         return config_or_name
     if config_or_name is None:
         return Settings()
-
-    config_name = config_or_name
-    return Settings.from_name(config_name=config_name)
+    return Settings.from_name(config_name=config_or_name)
