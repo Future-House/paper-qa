@@ -562,13 +562,13 @@ class Docs(BaseModel):
             if prompt_config.use_json:
                 prompt_runner = partial(
                     summary_llm_model.run_prompt,
-                    prompt=prompt_config.summary_json,
+                    prompt_config.summary_json,
                     system_prompt=prompt_config.summary_json_system,
                 )
             else:
                 prompt_runner = partial(
                     summary_llm_model.run_prompt,
-                    prompt=prompt_config.summary,
+                    prompt_config.summary,
                     system_prompt=prompt_config.system,
                 )
 
@@ -661,9 +661,9 @@ class Docs(BaseModel):
                 pre = await llm_model.run_prompt(
                     prompt=prompt_config.pre,
                     data={"question": answer.question},
-                    system_prompt=prompt_config.system,
                     callbacks=callbacks,
                     name="pre",
+                    system_prompt=prompt_config.system,
                 )
             answer.add_tokens(pre)
             pre_str = pre.text
@@ -708,9 +708,9 @@ class Docs(BaseModel):
                         "question": answer.question,
                         "example_citation": prompt_config.EXAMPLE_CITATION,
                     },
-                    system_prompt=prompt_config.system,
                     callbacks=callbacks,
                     name="answer",
+                    system_prompt=prompt_config.system,
                 )
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
@@ -743,9 +743,9 @@ class Docs(BaseModel):
                 post = await llm_model.run_prompt(
                     prompt=prompt_config.post,
                     data=answer.model_dump(),
-                    system_prompt=prompt_config.system,
                     callbacks=callbacks,
                     name="post",
+                    system_prompt=prompt_config.system,
                 )
             answer_text = post.text
             answer.add_tokens(post)
