@@ -228,7 +228,8 @@ class SearchIndex:
             await _add_document_with_retry()
         except RetryError:
             logger.exception(
-                f"Failed to add document after {max_retries} attempts: {index_doc['file_location']}"
+                f"Failed to add document after {max_retries} attempts:"
+                f" {index_doc['file_location']}"
             )
             raise
 
@@ -450,7 +451,8 @@ async def get_directory_index(
             logger.warning("[bold red]Files removed![/bold red]")
         else:
             logger.warning(
-                f"[bold red]Indexed files are missing from index folder ({directory}).[/bold red]"
+                "[bold red]Indexed files are missing from index folder"
+                f" ({directory}).[/bold red]"
             )
             logger.warning(f"[bold red]files: {missing}[/bold red]")
 

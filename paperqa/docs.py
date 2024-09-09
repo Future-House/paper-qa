@@ -368,7 +368,8 @@ class Docs(BaseModel):
             )
         ):
             raise ValueError(
-                f"This does not look like a text document: {path}. Pass disable_check to ignore this error."
+                f"This does not look like a text document: {path}. Pass disable_check"
+                " to ignore this error."
             )
         if await self.aadd_texts(texts, doc, all_settings, embedding_model):
             return docname

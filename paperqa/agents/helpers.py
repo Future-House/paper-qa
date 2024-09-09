@@ -35,7 +35,8 @@ async def litellm_get_search_query(
             "{count}" in template and "{question}" in template and "{date}" in template
         ):
             logger.warning(
-                "Template does not contain {count}, {question} and {date} variables. Ignoring template."
+                "Template does not contain {count}, {question} and {date} variables."
+                " Ignoring template."
             )
             template = None
 
@@ -45,15 +46,13 @@ async def litellm_get_search_query(
 
     if template is None:
         search_prompt = (
-            "We want to answer the following question: {question} \n"
-            "Provide {count} unique keyword searches (one search per line) and year ranges "
-            "that will find papers to help answer the question. "
-            "Do not use boolean operators. "
-            "Make sure not to repeat searches without changing the keywords or year ranges. "
-            "Make some searches broad and some narrow. "
-            "Use this format: [keyword search], [start year]-[end year]. "
-            "where end year is optional. "
-            f"The current year is {get_year()}."
+            "We want to answer the following question: {question} \nProvide"
+            " {count} unique keyword searches (one search per line) and year ranges"
+            " that will find papers to help answer the question. Do not use boolean"
+            " operators. Make sure not to repeat searches without changing the"
+            " keywords or year ranges. Make some searches broad and some narrow. Use"
+            " this format: [keyword search], [start year]-[end year]. where end year"
+            f" is optional. The current year is {get_year()}."
         )
 
     model = LiteLLMModel(name=llm)

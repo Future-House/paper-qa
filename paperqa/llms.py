@@ -126,8 +126,10 @@ class LLMModel(ABC, BaseModel):
         Callable[[LLMResult], None] | Callable[[LLMResult], Awaitable[None]] | None
     ) = Field(
         default=None,
-        description="An async callback that will be executed on each"
-        " LLMResult (different than callbacks that execute on each chunk)",
+        description=(
+            "An async callback that will be executed on each"
+            " LLMResult (different than callbacks that execute on each chunk)"
+        ),
         exclude=True,
     )
     config: dict = Field(default_factory=dict)

@@ -230,20 +230,21 @@ def test_functions() -> None:
         {
             "name": "paper_search",
             "description": (
-                "Search for papers to increase the paper count. You can call this a second "
-                "time with an different search to gather more papers."
+                "Search for papers to increase the paper count. You can call this a"
+                " second time with an different search to gather more papers."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "description": (
-                            "A search query in this format: [query], [start year]-[end year]. "
-                            "You may include years as the last word in the query, "
-                            "e.g. 'machine learning 2020' or 'machine learning 2010-2020'. "
-                            f"The current year is {get_year()}. "
-                            "The query portion can be a specific phrase, complete sentence, "
-                            "or general keywords, e.g. 'machine learning for immunology'."
+                            "A search query in this format: [query], [start year]-[end"
+                            " year]. You may include years as the last word in the"
+                            " query, e.g. 'machine learning 2020' or 'machine learning"
+                            f" 2010-2020'. The current year is {get_year()}. The query"
+                            " portion can be a specific phrase, complete sentence, or"
+                            " general keywords, e.g. 'machine learning for"
+                            " immunology'."
                         ),
                         "type": "string",
                     }

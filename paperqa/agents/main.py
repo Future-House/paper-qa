@@ -65,7 +65,8 @@ async def agent_query(
     truncation_chars = 1_000_000 if verbosity > 1 else 1500 * (verbosity + 1)
     agent_logger.info(
         f"[bold blue]Answer: {response.answer.answer[:truncation_chars]}"
-        f'{"...(truncated)" if len(response.answer.answer) > truncation_chars else ""}[/bold blue]'
+        f"{'...(truncated)' if len(response.answer.answer) > truncation_chars else ''}"
+        "[/bold blue]"
     )
 
     await search_index.add_document(
@@ -104,7 +105,8 @@ async def run_agent(
     profiler.start(outer_profile_name)
 
     logger.info(
-        f"Beginning agent {agent_type!r} run with question {query.query!r} and full query {query.model_dump()}."
+        f"Beginning agent {agent_type!r} run with question {query.query!r} and full"
+        f" query {query.model_dump()}."
     )
 
     if agent_type == "fake":
@@ -118,7 +120,8 @@ async def run_agent(
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
-        f"Finished agent {agent_type!r} run with question {query.query!r} and status {agent_status}."
+        f"Finished agent {agent_type!r} run with question {query.query!r} and status"
+        f" {agent_status}."
     )
     return AnswerResponse(
         answer=answer,
@@ -290,7 +293,8 @@ async def run_langchain_agent(
         if "Agent stopped" in call_response["output"]:
             # Log that this agent has gone over timeout, and then answer directly
             logger.warning(
-                f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
+                f"Agent timeout after {query.settings.agent.timeout}-sec, just"
+                " answering."
             )
             await answer_tool.arun(answer.question)
             agent_status = AgentStatus.TIMEOUT

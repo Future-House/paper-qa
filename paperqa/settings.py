@@ -100,11 +100,16 @@ class ParsingSettings(BaseModel):
     )
     structured_citation_prompt: str = Field(
         default=structured_citation_prompt,
-        description="Prompt that tries to creates a citation in JSON from peeking one page",
+        description=(
+            "Prompt that tries to creates a citation in JSON from peeking one page"
+        ),
     )
     disable_doc_valid_check: bool = Field(
         default=False,
-        description="Whether to disable checking if a document looks like text (was parsed correctly)",
+        description=(
+            "Whether to disable checking if a document looks like text (was parsed"
+            " correctly)"
+        ),
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
     model_config = ConfigDict(extra="forbid")
@@ -186,7 +191,8 @@ class PromptSettings(BaseModel):
             set(get_formatted_variables(summary_prompt))
         ):
             raise ValueError(
-                f"Summary prompt can only have variables: {get_formatted_variables(summary_prompt)}"
+                "Summary prompt can only have variables:"
+                f" {get_formatted_variables(summary_prompt)}"
             )
         return v
 
@@ -197,7 +203,8 @@ class PromptSettings(BaseModel):
             set(get_formatted_variables(qa_prompt))
         ):
             raise ValueError(
-                f"QA prompt can only have variables: {get_formatted_variables(qa_prompt)}"
+                "QA prompt can only have variables:"
+                f" {get_formatted_variables(qa_prompt)}"
             )
         return v
 
@@ -208,7 +215,8 @@ class PromptSettings(BaseModel):
             set(get_formatted_variables(select_paper_prompt))
         ):
             raise ValueError(
-                f"Select prompt can only have variables: {get_formatted_variables(select_paper_prompt)}"
+                "Select prompt can only have variables:"
+                f" {get_formatted_variables(select_paper_prompt)}"
             )
         return v
 
@@ -253,19 +261,19 @@ class AgentSettings(BaseModel):
     # TODO: make this prompt more minimalist, instead improving tool descriptions so
     # how to use them together can be intuited, and exposing them for configuration
     agent_prompt: str = (
-        "Answer question: {question}"
-        "\n\nSearch for papers, gather evidence, collect papers cited in evidence then re-gather evidence, and answer."
-        " Gathering evidence will do nothing if you have not done a new search or collected new papers."
-        " If you do not have enough evidence to generate a good answer, you can:"
-        "\n- Search for more papers (preferred)"
-        "\n- Collect papers cited by previous evidence (preferred)"
-        "\n- Gather more evidence using a different phrase"
-        "\nIf you search for more papers or collect new papers cited by previous evidence,"
-        " remember to gather evidence again."
-        " Once you have five or more pieces of evidence from multiple sources, or you have tried a few times, "
-        "call {gen_answer_tool_name} tool. The {gen_answer_tool_name} tool output is visible to the user, "
-        "so you do not need to restate the answer and can simply terminate if the answer looks sufficient. "
-        "The current status of evidence/papers/cost is {status}"
+        "Answer question: {question}\n\nSearch for papers, gather evidence, collect"
+        " papers cited in evidence then re-gather evidence, and answer. Gathering"
+        " evidence will do nothing if you have not done a new search or collected new"
+        " papers. If you do not have enough evidence to generate a good answer, you"
+        " can:\n- Search for more papers (preferred)\n- Collect papers cited by"
+        " previous evidence (preferred)\n- Gather more evidence using a different"
+        " phrase\nIf you search for more papers or collect new papers cited by previous"
+        " evidence, remember to gather evidence again. Once you have five or more"
+        " pieces of evidence from multiple sources, or you have tried a few times, call"
+        " {gen_answer_tool_name} tool. The {gen_answer_tool_name} tool output is"
+        " visible to the user, so you do not need to restate the answer and can simply"
+        " terminate if the answer looks sufficient. The current status of"
+        " evidence/papers/cost is {status}"
     )
     search_count: int = 8
     wipe_context_on_answer_failure: bool = True
@@ -286,8 +294,9 @@ class AgentSettings(BaseModel):
         description=(
             "Optional override on the tools to provide the agent. Leaving as the"
             " default of None will use a minimal toolset of the paper search, gather"
-            " evidence, collect cited papers from evidence, and gen answer. If passing tool"
-            " names (non-default route), at least the gen answer tool must be supplied."
+            " evidence, collect cited papers from evidence, and gen answer. If passing"
+            " tool names (non-default route), at least the gen answer tool must be"
+            " supplied."
         ),
     )
 
@@ -317,14 +326,17 @@ class Settings(BaseSettings):
 
     llm: str = Field(
         default="gpt-4o-2024-08-06",
-        description="Default LLM for most things, including answers. Should be 'best' LLM",
+        description=(
+            "Default LLM for most things, including answers. Should be 'best' LLM"
+        ),
     )
     llm_config: dict | None = Field(
         default=None,
         description=(
-            "LiteLLM Router configuration to pass to LiteLLMModel, must have `model_list` "
-            "key (corresponding to model_list inputs here: https://docs.litellm.ai/docs/routing)"
-            ", and can optionally include a router_kwargs key with router kwargs as values."
+            "LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " `model_list` key (corresponding to model_list inputs here:"
+            " https://docs.litellm.ai/docs/routing), and can optionally include a"
+            " router_kwargs key with router kwargs as values."
         ),
     )
     summary_llm: str = Field(
@@ -334,9 +346,10 @@ class Settings(BaseSettings):
     summary_llm_config: dict | None = Field(
         default=None,
         description=(
-            "LiteLLM Router configuration to pass to LiteLLMModel, must have `model_list` "
-            "key (corresponding to model_list inputs here: https://docs.litellm.ai/docs/routing)"
-            ", and can optionally include a router_kwargs key with router kwargs as values."
+            "LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " `model_list` key (corresponding to model_list inputs here:"
+            " https://docs.litellm.ai/docs/routing), and can optionally include a"
+            " router_kwargs key with router kwargs as values."
         ),
     )
     embedding: str = Field(
@@ -359,18 +372,23 @@ class Settings(BaseSettings):
     index_directory: str | os.PathLike | None = Field(
         default=pqa_directory("indexes"),
         description=(
-            "Directory to store the PQA generated search index, configuration, and answer indexes."
+            "Directory to store the PQA generated search index, configuration, and"
+            " answer indexes."
         ),
     )
     verbosity: int = Field(
         default=0,
-        description="Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged",
+        description=(
+            "Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls"
+            " logged"
+        ),
     )
     manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(
-            "Optional manifest CSV, containing columns which are attributes for a DocDetails object. "
-            "Only 'file_location','doi', and 'title' will be used when indexing."
+            "Optional manifest CSV, containing columns which are attributes for a"
+            " DocDetails object. Only 'file_location','doi', and 'title' will be used"
+            " when indexing."
         ),
     )
     paper_directory: str | os.PathLike = Field(

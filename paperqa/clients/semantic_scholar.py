@@ -194,7 +194,8 @@ def semantic_scholar_headers() -> dict[str, str]:
     if api_key := os.environ.get("SEMANTIC_SCHOLAR_API_KEY"):
         return {SEMANTIC_SCHOLAR_HEADER_KEY: api_key}
     logger.warning(
-        "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API rate limits may apply."
+        "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API"
+        " rate limits may apply."
     )
     return {}
 
