@@ -161,6 +161,10 @@ class SearchIndex:
         return self._searcher
 
     @property
+    async def count(self) -> int:
+        return (await self.searcher).num_docs
+
+    @property
     async def index_files(self) -> dict[str, str]:
         if not self._index_files:
             file_index_path = await self.file_index_filename
@@ -284,7 +288,7 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        for replace in ("*", "[", "]"):
+        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~"):
             query = query.replace(replace, "")
         return query
 
@@ -395,6 +399,7 @@ async def process_file(
 
 
 async def get_directory_index(
+    index_name: str | None = None,
     sync_index_w_directory: bool = True,
     settings: MaybeSettings = None,
 ) -> SearchIndex:
@@ -403,6 +408,7 @@ async def get_directory_index(
 
     Args:
         sync_index_w_directory: Sync the index with the directory. (i.e. delete files not in directory)
+        index_name: Name of the index. If not given, the name will be taken from the settings
         settings: Application settings.
     """
     _settings = get_settings(settings)
@@ -415,7 +421,7 @@ async def get_directory_index(
 
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
-        index_name=_settings.get_index_name(),
+        index_name=index_name or _settings.get_index_name(),
         index_directory=_settings.index_directory,
     )
 

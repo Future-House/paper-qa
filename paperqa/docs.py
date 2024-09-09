@@ -327,7 +327,6 @@ class Docs(BaseModel):
                     doi = citation_doi
                 if citation_author := citation_json.get("authors"):
                     authors = citation_author
-
         # see if we can upgrade to DocDetails
         # if not, we can progress with a normal Doc
         # if "overwrite_fields_from_metadata" is used:
@@ -349,7 +348,6 @@ class Docs(BaseModel):
                 query_kwargs["authors"] = authors
             if title:
                 query_kwargs["title"] = title
-
             doc = await metadata_client.upgrade_doc_to_doc_details(
                 doc, **(query_kwargs | kwargs)
             )
