@@ -268,7 +268,6 @@ class GenerateAnswerTool(BaseTool):
         "Having more than one piece of evidence or relevant papers is best."
     )
     shared_state: SharedToolState
-    wipe_context_on_answer_failure: bool = True
     query: QueryRequest
 
     FAILED_TO_ANSWER: ClassVar[str] = "Failed to answer question."
@@ -294,7 +293,7 @@ class GenerateAnswerTool(BaseTool):
         )
 
         if "cannot answer" in self.shared_state.answer.answer.lower():
-            if self.wipe_context_on_answer_failure:
+            if self.shared_state.settings.agent.wipe_context_on_answer_failure:
                 self.shared_state.answer.contexts = []
                 self.shared_state.answer.context = ""
             status = await self.shared_state.get_status()
