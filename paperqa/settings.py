@@ -267,6 +267,13 @@ class AgentSettings(BaseModel):
         " terminate if the answer looks sufficient. The current status of"
         " evidence/papers/cost is {status}"
     )
+    return_paper_metadata: bool = Field(
+        default=False,
+        description=(
+            "Set True to have the search tool include paper title/year information as"
+            " part of its return."
+        ),
+    )
     search_count: int = 8
     wipe_context_on_answer_failure: bool = True
     timeout: float = Field(
