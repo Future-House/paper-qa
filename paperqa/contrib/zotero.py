@@ -1,4 +1,5 @@
-# This file gets PDF files from the user's Zotero library
+"""This module gets PDF files from the user's Zotero library."""
+
 import logging
 import os
 from pathlib import Path
@@ -8,8 +9,11 @@ from pydantic import BaseModel
 
 try:
     from pyzotero import zotero
-except ImportError:
-    raise ImportError("Please install pyzotero: `pip install pyzotero`")  # noqa: B904
+except ImportError as e:
+    raise ImportError(
+        "zotero requires the 'zotero' extra for 'pyzotero'. Please:"
+        " `pip install aviary[zotero]`."
+    ) from e
 from ..paths import PAPERQA_DIR
 from ..utils import StrPath, count_pdf_pages
 
