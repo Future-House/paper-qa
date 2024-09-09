@@ -323,7 +323,7 @@ async def test_s2_only_fields_filtering():
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
 
-@pytest.mark.vcr
+@pytest.mark.vcr(record_mode="new_episodes")
 @pytest.mark.asyncio
 async def test_crossref_journalquality_fields_filtering() -> None:
     async with aiohttp.ClientSession() as session:
@@ -352,6 +352,23 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             " https://doi.org/10.1038/s42256-024-00832-8,"
             " doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
+
+    async with aiohttp.ClientSession() as session:
+        crossref_client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                [CrossrefProvider, JournalQualityPostProcessor],
+            ),
+        )
+        nejm_crossref_details = await crossref_client.query(
+            title="Beta-Blocker Interruption or Continuation after Myocardial Infarction",  # codespell:ignore
+            fields=["title", "doi", "authors", "journal"],
+        )
+
+        assert nejm_crossref_details.source_quality == 3, "Should have source quality data"  # type: ignore[union-attr]
 
 
 @pytest.mark.vcr
