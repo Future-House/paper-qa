@@ -89,7 +89,7 @@ class LLMResult(BaseModel):
         default=0.0, description="Delta time (sec) to last response token's arrival."
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text
 
     @computed_field  # type: ignore[prop-decorator]
@@ -198,7 +198,7 @@ class Answer(BaseModel):
             raise ValueError(f"Could not find docname {name} in contexts.") from exc
         return doc.citation
 
-    def add_tokens(self, result: LLMResult):
+    def add_tokens(self, result: LLMResult) -> None:
         """Update the token counts for the given result."""
         if result.model not in self.token_counts:
             self.token_counts[result.model] = [

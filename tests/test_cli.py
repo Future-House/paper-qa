@@ -15,7 +15,7 @@ except ImportError:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
-def test_can_modify_settings():
+def test_can_modify_settings() -> None:
     old_argv = sys.argv
     old_stdout = sys.stdout
     captured_output = io.StringIO()
@@ -37,7 +37,7 @@ def test_can_modify_settings():
         os.unlink(pqa_directory("settings") / "unit_test.json")
 
 
-def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path):
+def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
     settings = Settings.from_name("debug")
     settings.index_directory = agent_index_dir
     settings.paper_directory = stub_data_dir
@@ -56,7 +56,9 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path):
     assert found_answer.model_dump_json() == response.model_dump_json()
 
 
-def test_cli_can_build_and_search_index(agent_index_dir: Path, stub_data_dir: Path):
+def test_cli_can_build_and_search_index(
+    agent_index_dir: Path, stub_data_dir: Path
+) -> None:
     settings = Settings.from_name("debug")
     settings.index_directory = agent_index_dir
     index_name = "test"
