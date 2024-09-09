@@ -24,10 +24,9 @@ from pydantic import (
 from typing_extensions import Protocol
 
 from paperqa.llms import LiteLLMModel
-
-from .. import Answer
-from ..settings import Settings
-from ..version import __version__
+from paperqa.settings import Settings
+from paperqa.types import Answer
+from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
 

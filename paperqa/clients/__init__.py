@@ -8,8 +8,9 @@ from typing import Any
 import aiohttp
 from pydantic import BaseModel, ConfigDict
 
-from ..types import Doc, DocDetails
-from ..utils import gather_with_concurrency
+from paperqa.types import Doc, DocDetails
+from paperqa.utils import gather_with_concurrency
+
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor

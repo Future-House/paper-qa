@@ -7,10 +7,9 @@ from typing import cast
 
 from rich.table import Table
 
-from .. import (
-    Docs,
-)
-from ..llms import LiteLLMModel
+from paperqa.docs import Docs
+from paperqa.llms import LiteLLMModel
+
 from .models import AnswerResponse
 
 logger = logging.getLogger(__name__)

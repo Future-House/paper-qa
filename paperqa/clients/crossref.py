@@ -11,16 +11,17 @@ from urllib.parse import quote
 
 import aiohttp
 
-from ..clients.exceptions import DOINotFoundError
-from ..types import CITATION_FALLBACK_DATA, DocDetails
-from ..utils import (
+from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
+from paperqa.utils import (
     bibtex_field_extract,
     create_bibtex_key,
     remove_substrings,
     strings_similarity,
     union_collections_to_ordered_list,
 )
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
+from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
