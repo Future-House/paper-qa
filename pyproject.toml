@@ -54,14 +54,12 @@ agents = [
     "langchain-openai",
     "pymupdf",
     "pymupdf",
-    "requests",
     "tantivy",
     "typer",
     "typing_extensions",
 ]
 typing = [
     "types-PyYAML",
-    "types-requests",
     "types-setuptools",
 ]
 zotero = [
