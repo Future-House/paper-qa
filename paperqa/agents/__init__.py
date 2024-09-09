@@ -163,7 +163,7 @@ def save_settings(
         logger.info(f"Settings saved to: {full_settings_path}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="PaperQA CLI")
 
     parser.add_argument(

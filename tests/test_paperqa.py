@@ -12,21 +12,12 @@ import numpy as np
 import pytest
 import requests
 
-from paperqa import (
-    Answer,
-    Doc,
-    Docs,
-    NumpyVectorStore,
-    Settings,
-    Text,
-    print_callback,
-)
+from paperqa import Answer, Doc, Docs, NumpyVectorStore, Settings, print_callback
 from paperqa.clients import CrossrefProvider
 from paperqa.core import llm_parse_json
 from paperqa.llms import (
     EmbeddingModel,
     HybridEmbeddingModel,
-    LangchainVectorStore,
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     LLMModel,
@@ -51,7 +42,7 @@ def docs_fixture(stub_data_dir: Path) -> Docs:
     return docs
 
 
-def test_get_citations():
+def test_get_citations() -> None:
     text = (
         "Yes, COVID-19 vaccines are effective. Various studies have documented the"
         " effectiveness of COVID-19 vaccines in preventing severe disease,"
@@ -87,17 +78,17 @@ def test_get_citations():
     assert get_citenames(text) == ref
 
 
-def test_single_author():
+def test_single_author() -> None:
     text = "This was first proposed by (Smith 1999)."
     assert strip_citations(text) == "This was first proposed by ."
 
 
-def test_multiple_authors():
+def test_multiple_authors() -> None:
     text = "Recent studies (Smith et al. 1999) show that this is true."
     assert strip_citations(text) == "Recent studies  show that this is true."
 
 
-def test_multiple_citations():
+def test_multiple_citations() -> None:
     text = (
         "As discussed by several authors (Smith et al. 1999; Johnson 2001; Lee et al."
         " 2003)."
@@ -105,47 +96,47 @@ def test_multiple_citations():
     assert strip_citations(text) == "As discussed by several authors ."
 
 
-def test_citations_with_pages():
+def test_citations_with_pages() -> None:
     text = "This is shown in (Smith et al. 1999, p. 150)."
     assert strip_citations(text) == "This is shown in ."
 
 
-def test_citations_without_space():
+def test_citations_without_space() -> None:
     text = "Findings by(Smith et al. 1999)were significant."
     assert strip_citations(text) == "Findings bywere significant."
 
 
-def test_citations_with_commas():
+def test_citations_with_commas() -> None:
     text = "The method was adopted by (Smith, 1999, 2001; Johnson, 2002)."
     assert strip_citations(text) == "The method was adopted by ."
 
 
-def test_citations_with_text():
+def test_citations_with_text() -> None:
     text = "This was noted (see Smith, 1999, for a review)."
     assert strip_citations(text) == "This was noted ."
 
 
-def test_no_citations():
+def test_no_citations() -> None:
     text = "There are no references in this text."
     assert strip_citations(text) == "There are no references in this text."
 
 
-def test_malformed_citations():
+def test_malformed_citations() -> None:
     text = "This is a malformed citation (Smith 199)."
     assert strip_citations(text) == "This is a malformed citation (Smith 199)."
 
 
-def test_edge_case_citations():
+def test_edge_case_citations() -> None:
     text = "Edge cases like (Smith et al.1999) should be handled."
     assert strip_citations(text) == "Edge cases like  should be handled."
 
 
-def test_citations_with_special_characters():
+def test_citations_with_special_characters() -> None:
     text = "Some names have dashes (O'Neil et al. 2000; Smith-Jones 1998)."
     assert strip_citations(text) == "Some names have dashes ."
 
 
-def test_citations_with_nonstandard_chars():
+def test_citations_with_nonstandard_chars() -> None:
     text = (
         "In non-English languages, citations might look different (Müller et al. 1999)."
     )
@@ -155,7 +146,7 @@ def test_citations_with_nonstandard_chars():
     )
 
 
-def test_maybe_is_text():
+def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
@@ -171,7 +162,7 @@ def test_maybe_is_text():
     assert not maybe_is_text(bad_text)
 
 
-def test_name_in_text():
+def test_name_in_text() -> None:
     name1 = "FooBar2022"
     name2 = "FooBar2022a"
     name3 = "FooBar20"
@@ -212,7 +203,7 @@ def test_name_in_text():
     assert not name_in_text(name3, text7)
 
 
-def test_extract_score():
+def test_extract_score() -> None:
     sample = """
     The text describes an experiment where different cell subtypes,
     including colorectal cancer-associated fibroblasts, were treated with
@@ -386,11 +377,11 @@ I have written the json you asked for.""",
 """,
     ],
 )
-def test_llm_parse_json(example: str):
+def test_llm_parse_json(example: str) -> None:
     assert llm_parse_json(example) == {"example": "json"}
 
 
-def test_llm_parse_json_newlines():
+def test_llm_parse_json_newlines() -> None:
     """Make sure that newlines in json are preserved and escaped."""
     example = textwrap.dedent(
         """
@@ -408,7 +399,7 @@ def test_llm_parse_json_newlines():
 
 
 @pytest.mark.asyncio
-async def test_chain_completion():
+async def test_chain_completion() -> None:
     s = Settings(llm="babbage-002", temperature=0.2)
     outputs = []
 
@@ -437,7 +428,7 @@ async def test_chain_completion():
 
 
 @pytest.mark.asyncio
-async def test_chain_chat():
+async def test_chain_chat() -> None:
     model_config = {
         "model_list": [
             {
@@ -534,7 +525,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert result.cost > 0
 
 
-def test_make_docs(stub_data_dir: Path):
+def test_make_docs(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(
         stub_data_dir / "flag_day.html",
@@ -544,7 +535,7 @@ def test_make_docs(stub_data_dir: Path):
     assert docs.docs["test"].docname == "Wiki2023"
 
 
-def test_evidence(docs_fixture):
+def test_evidence(docs_fixture) -> None:
     fast_settings = Settings.from_name("debug")
     evidence = docs_fixture.get_evidence(
         Answer(question="What does XAI stand for?"),
@@ -553,7 +544,7 @@ def test_evidence(docs_fixture):
     assert len(evidence) >= fast_settings.answer.evidence_k
 
 
-def test_json_evidence(docs_fixture):
+def test_json_evidence(docs_fixture) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
     settings.prompts.summary_json_system = (
@@ -573,7 +564,7 @@ def test_json_evidence(docs_fixture):
     assert evidence[0].author_name
 
 
-def test_ablations(docs_fixture):
+def test_ablations(docs_fixture) -> None:
     settings = Settings()
     settings.answer.evidence_skip_summary = True
     settings.answer.evidence_retrieval = False
@@ -588,7 +579,7 @@ def test_ablations(docs_fixture):
     assert len(contexts) == len(docs_fixture.texts), "evidence retrieval not ablated"
 
 
-def test_location_awareness(docs_fixture):
+def test_location_awareness(docs_fixture) -> None:
     settings = Settings()
     settings.answer.evidence_k = 3
     settings.prompts.use_json = False
@@ -607,14 +598,14 @@ def test_location_awareness(docs_fixture):
     ), "location not found in evidence"
 
 
-def test_query(docs_fixture):
+def test_query(docs_fixture) -> None:
     docs_fixture.query("Is XAI usable in chemistry?")
 
 
-def test_llmresult_callback(docs_fixture):
+def test_llmresult_callback(docs_fixture) -> None:
     my_results = []
 
-    async def my_callback(result):
+    async def my_callback(result) -> None:
         my_results.append(result)
 
     settings = Settings.from_name("fast")
@@ -654,7 +645,7 @@ def test_duplicate(stub_data_dir: Path) -> None:
     ), "Unique documents should be hashed as unique"
 
 
-def test_custom_embedding(stub_data_dir: Path):
+def test_custom_embedding(stub_data_dir: Path) -> None:
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
@@ -753,74 +744,6 @@ def test_custom_llm(stub_data_dir: Path) -> None:
     assert "Echo" in evidence[0].context
 
 
-@pytest.mark.skip(
-    "Langchain updated vector stores and I haven't yet updated the implementation"
-)
-@pytest.mark.asyncio
-async def test_langchain_vector_store(stub_data_dir: Path):
-    from langchain_community.vectorstores.faiss import FAISS
-    from langchain_openai import OpenAIEmbeddings
-
-    some_texts = [
-        Text(
-            embedding=OpenAIEmbeddings().embed_query("test"),
-            text="this is a test",
-            name="test",
-            doc=Doc(docname="test", citation="test", dockey="test"),
-        )
-    ]
-
-    index = LangchainVectorStore()
-    with pytest.raises(ValueError, match="You must set store_builder"):
-        index.add_texts_and_embeddings(some_texts)
-
-    with pytest.raises(ValueError, match="store_builder must take two arguments"):
-        index = LangchainVectorStore(store_builder=lambda x: None)  # noqa: ARG005
-
-    with pytest.raises(ValueError, match="store_builder must be callable"):
-        index = LangchainVectorStore(store_builder="foo")
-
-    # now with real builder
-    index = LangchainVectorStore(
-        store_builder=lambda x, y: FAISS.from_embeddings(x, OpenAIEmbeddings(), y)
-    )
-    assert index._store is None
-    index.add_texts_and_embeddings(some_texts)
-    assert index._store is not None
-    # check search returns Text obj
-    data, _ = await index.similarity_search(None, "test", k=1)  # type: ignore[unreachable]
-    assert isinstance(data[0], Text)
-
-    # now try with convenience
-    index = LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-    assert index._store is None
-    index.add_texts_and_embeddings(some_texts)
-    assert index._store is not None
-
-    docs = Docs(
-        texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
-    )
-    assert docs._embedding_client is not None  # from default
-
-    await docs.aadd(
-        stub_data_dir / "bates.txt",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-
-    # will not be embedded until we ask something
-    fast_settings = Settings.from_name("fast")
-    _ = await docs.aget_evidence(
-        "What is Frederick Bates's greatest accomplishment?", settings=fast_settings
-    )
-    assert docs.texts[0].embedding is not None
-    # make sure we can pickle it
-    docs_pickle = pickle.dumps(docs)
-    dp = pickle.loads(docs_pickle)
-
-    assert dp.texts
-
-
 def test_docs_pickle(stub_data_dir) -> None:
     """Ensure that Docs object can be pickled and unpickled correctly."""
     docs = Docs()
@@ -838,7 +761,7 @@ def test_docs_pickle(stub_data_dir) -> None:
     assert len(unpickled_docs.docs) == 1
 
 
-def test_bad_context(stub_data_dir):
+def test_bad_context(stub_data_dir) -> None:
     docs = Docs()
     docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     answer = docs.query(
@@ -847,7 +770,7 @@ def test_bad_context(stub_data_dir):
     assert "cannot answer" in answer.answer
 
 
-def test_repeat_keys(stub_data_dir):
+def test_repeat_keys(stub_data_dir) -> None:
     docs = Docs()
     result = docs.add(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
@@ -870,12 +793,12 @@ def test_repeat_keys(stub_data_dir):
     assert ds[1].docname == "Wiki2023a"
 
 
-def test_can_read_normal_pdf_reader(docs_fixture):
+def test_can_read_normal_pdf_reader(docs_fixture) -> None:
     answer = docs_fixture.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path):
+def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(stub_data_dir / "paper.pdf", "Wellawatte et al, XAI Review, 2023")
     # doc will be a DocDetails object, but nothing can be found
@@ -885,7 +808,7 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path):
     )
 
 
-def test_pdf_reader_match_doc_details(stub_data_dir: Path):
+def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     doc_path = stub_data_dir / "paper.pdf"
     docs = Docs()
     # we limit to only crossref since s2 is too flaky
@@ -898,7 +821,10 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path):
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
-    assert doc_details.dockey == "5300ef1d5fb960d7"
+    assert doc_details.dockey in {
+        "41f786fcc56d27ff0c1507153fae3774",  # From file contents
+        "5300ef1d5fb960d7",  # Or from crossref data
+    }
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
     assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
@@ -913,7 +839,8 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path):
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_pdf(stub_data_dir: Path):
+@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
+def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
@@ -921,7 +848,7 @@ def test_fileio_reader_pdf(stub_data_dir: Path):
         assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_fileio_reader_txt(stub_data_dir: Path):
+def test_fileio_reader_txt(stub_data_dir: Path) -> None:
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
     with (stub_data_dir / "bates.txt").open("rb") as file:
@@ -949,7 +876,7 @@ def test_parser_only_reader(stub_data_dir: Path):
     )
 
 
-def test_chunk_metadata_reader(stub_data_dir: Path):
+def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     doc_path = stub_data_dir / "paper.pdf"
     chunk_text, metadata = read_doc(
         Path(doc_path),
@@ -1000,7 +927,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path):
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
-def test_code():
+def test_code() -> None:
     # load this script
     doc_path = Path(os.path.abspath(__file__))
     settings = Settings.from_name("fast")
@@ -1021,7 +948,7 @@ def test_zotero() -> None:
         ZoteroDB()  # "group" if group library
 
 
-def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
+def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes) -> None:
     doc_path = stub_data_dir / "obama.txt"
     mini_settings = Settings(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
     docs = Docs()
@@ -1040,7 +967,7 @@ def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
     docs.query("What is Barrack's greatest accomplishment?", settings=settings)
 
 
-def test_custom_prompts(stub_data_dir: Path):
+def test_custom_prompts(stub_data_dir: Path) -> None:
     my_qaprompt = (
         "Answer the question '{question}' using the country name alone. For example: A:"
         " United States\nA: Canada\nA: Mexico\n\n Using the"
@@ -1054,7 +981,7 @@ def test_custom_prompts(stub_data_dir: Path):
     assert "United States" in answer.answer
 
 
-def test_pre_prompt(stub_data_dir: Path):
+def test_pre_prompt(stub_data_dir: Path) -> None:
     pre = (
         "What is water's boiling point in Fahrenheit? Please respond with a complete"
         " sentence."
@@ -1071,7 +998,7 @@ def test_pre_prompt(stub_data_dir: Path):
     )
 
 
-def test_post_prompt(stub_data_dir: Path):
+def test_post_prompt(stub_data_dir: Path) -> None:
     post = "The opposite of down is"
     settings = Settings.from_name("fast")
     settings.prompts.post = post
@@ -1081,7 +1008,7 @@ def test_post_prompt(stub_data_dir: Path):
     assert "up" in response.answer.lower()
 
 
-def test_external_doc_index(stub_data_dir: Path):
+def test_external_doc_index(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(
         stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"

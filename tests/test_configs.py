@@ -11,7 +11,7 @@ from paperqa.settings import (
 )
 
 
-def test_prompt_settings_validation():
+def test_prompt_settings_validation() -> None:
     with pytest.raises(ValidationError):
         PromptSettings(summary="Invalid {variable}")
 
@@ -27,13 +27,13 @@ def test_prompt_settings_validation():
     assert valid_pre_settings.pre == "{question}"
 
 
-def test_get_formatted_variables():
+def test_get_formatted_variables() -> None:
     template = "This is a test {variable} with {another_variable}"
     variables = get_formatted_variables(template)
     assert variables == {"variable", "another_variable"}
 
 
-def test_get_settings_with_valid_config():
+def test_get_settings_with_valid_config() -> None:
     settings = get_settings("fast")
     assert not settings.parsing.use_doc_details
 
@@ -46,7 +46,7 @@ def test_get_settings_missing_file() -> None:
         get_settings("missing_config")
 
 
-def test_settings_default_instantiation():
+def test_settings_default_instantiation() -> None:
     settings = Settings()
     assert "gpt-" in settings.llm
     assert settings.answer.evidence_k == 10

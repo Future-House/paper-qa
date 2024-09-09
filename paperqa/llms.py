@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
 from enum import Enum
 from inspect import signature
-from typing import Any, cast
+from typing import Any
 
 import numpy as np
 import tiktoken
@@ -14,7 +14,7 @@ from litellm import Router, aembedding, token_counter
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from paperqa.prompts import default_system_prompt
-from paperqa.types import Doc, Embeddable, LLMResult, Text
+from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
 
 PromptRunner = Callable[
@@ -488,10 +488,10 @@ class VectorStore(BaseModel, ABC):
     model_config = ConfigDict(extra="forbid")
     texts_hashes: set[int] = Field(default_factory=set)
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         return hash(item) in self.texts_hashes
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.texts_hashes)
 
     @abstractmethod
@@ -597,113 +597,6 @@ class NumpyVectorStore(VectorStore):
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
         )
-
-
-# TODO: unsure if this is still supported via v5 release
-class LangchainVectorStore(VectorStore):
-    """A wrapper around the wrapper langchain.
-
-    Note that if this is cleared (e.g., by `Docs` having `jit_texts_index` set to True),
-    this will calls the `from_texts` class method on the `store`. This means that any non-default
-    constructor arguments will be lost. You can override the clear method on this class.
-    """
-
-    _store_builder: Any | None = None
-    _store: Any | None = None
-    # JIT Generics - store the class type (Doc or Text)
-    class_type: type[Embeddable] = Field(default=Embeddable)
-    model_config = ConfigDict(extra="forbid")
-
-    def __init__(self, **data):
-        raise NotImplementedError(
-            "Langchain has updated vectorstore internals and this is not yet supported"
-        )
-        # # we have to separate out store from the rest of the data
-        # # because langchain objects are not serializable
-        # store_builder = None
-        # if "store_builder" in data:
-        #     store_builder = LangchainVectorStore.check_store_builder(
-        #         data.pop("store_builder")
-        #     )
-        # if "cls" in data and "embedding_model" in data:
-        #     # make a little closure
-        #     cls = data.pop("cls")
-        #     embedding_model = data.pop("embedding_model")
-
-        #     def candidate(x, y):
-        #         return cls.from_embeddings(x, embedding_model, y)
-
-        #     store_builder = LangchainVectorStore.check_store_builder(candidate)
-        # super().__init__(**data)
-        # self._store_builder = store_builder
-
-    @classmethod
-    def check_store_builder(cls, builder: Any) -> Any:
-        # check it is a callable
-        if not callable(builder):
-            raise ValueError("store_builder must be callable")  # noqa: TRY004
-        # check it takes two arguments
-        # we don't use type hints because it could be
-        # a partial
-        sig = signature(builder)
-        if len(sig.parameters) != 2:  # noqa: PLR2004
-            raise ValueError("store_builder must take two arguments")
-        return builder
-
-    def __getstate__(self):
-        state = super().__getstate__()
-        # remove non-serializable private attributes
-        del state["__pydantic_private__"]["_store"]
-        del state["__pydantic_private__"]["_store_builder"]
-        return state
-
-    def __setstate__(self, state):
-        # restore non-serializable private attributes
-        state["__pydantic_private__"]["_store"] = None
-        state["__pydantic_private__"]["_store_builder"] = None
-        super().__setstate__(state)
-
-    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
-        if self._store_builder is None:
-            raise ValueError("You must set store_builder before adding texts")
-        super().add_texts_and_embeddings(texts)
-        self.class_type = type(texts[0])
-        if self.class_type == Text:
-            vec_store_text_and_embeddings = [
-                (x.text, x.embedding) for x in cast(list[Text], texts)
-            ]
-        elif self.class_type == Doc:
-            vec_store_text_and_embeddings = [
-                (x.citation, x.embedding) for x in cast(list[Doc], texts)
-            ]
-        else:
-            raise ValueError("Only embeddings of type Text are supported")
-        if self._store is None:
-            self._store = self._store_builder(
-                vec_store_text_and_embeddings,
-                texts,
-            )
-            if self._store is None or not hasattr(self._store, "add_embeddings"):
-                raise ValueError("store_builder did not return a valid vectorstore")
-        self._store.add_embeddings(
-            vec_store_text_and_embeddings,
-            metadatas=texts,
-        )
-
-    async def similarity_search(
-        self, query: str, k: int, embedding_model: EmbeddingModel  # noqa: ARG002
-    ) -> tuple[Sequence[Embeddable], list[float]]:
-        if self._store is None:
-            return [], []
-        results = await self._store.asimilarity_search_with_relevance_scores(query, k=k)
-        texts, scores = [self.class_type(**r[0].metadata) for r in results], [
-            r[1] for r in results
-        ]
-        return texts, scores
-
-    def clear(self) -> None:
-        del self._store  # be explicit, because it could be large
-        self._store = None
 
 
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
