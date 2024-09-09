@@ -21,7 +21,8 @@ try:
 
 except ImportError as e:
     raise ImportError(
-        '"agents" module is not installed please install it using "pip install paper-qa[agents]"'
+        '"agents" module is not installed please install it using "pip install'
+        ' paper-qa[agents]"'
     ) from e
 
 logger = logging.getLogger(__name__)
@@ -181,7 +182,10 @@ def main():
         "--settings",
         "-s",
         default="default",
-        help="Named settings to use. Will search in local, pqa directory, and package last",
+        help=(
+            "Named settings to use. Will search in local, pqa directory, and package"
+            " last"
+        ),
     )
 
     parser.add_argument(
@@ -205,8 +209,10 @@ def main():
 
     search_parser = subparsers.add_parser(
         "search",
-        help="Search the index specified by --index."
-        " Pass `--index answers` to search previous answers.",
+        help=(
+            "Search the index specified by --index."
+            " Pass `--index answers` to search previous answers."
+        ),
     )
     search_parser.add_argument("query", help="Keyword search")
 

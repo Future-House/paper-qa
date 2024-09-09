@@ -96,7 +96,8 @@ def crossref_headers() -> dict[str, str]:
     if api_key := os.environ.get("CROSSREF_API_KEY"):
         return {CROSSREF_HEADER_KEY: f"Bearer {api_key}"}
     logger.warning(
-        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may apply."
+        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may"
+        " apply."
     )
     return {}
 
@@ -253,7 +254,8 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
         logger.warning(
-            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may apply."
+            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
+            " apply."
         )
         CROSSREF_MAILTO = "test@example.com"
     quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
