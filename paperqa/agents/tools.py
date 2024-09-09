@@ -156,9 +156,7 @@ class PaperSearchTool(BaseTool):
                 year = last_word
                 if "-" not in year:
                     year = year + "-" + year  # Convert to date range (e.g. 2022-2022)
-        index = await get_directory_index(
-            settings=self.shared_state.settings,
-        )
+        index = await get_directory_index(settings=self.shared_state.settings)
 
         results = await index.query(
             keywords,

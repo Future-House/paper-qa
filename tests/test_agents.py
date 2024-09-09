@@ -75,10 +75,7 @@ async def test_agent_types(agent_test_settings, agent_type) -> None:
 
     question = "How can you use XAI for chemical property prediction?"
 
-    request = QueryRequest(
-        query=question,
-        settings=agent_test_settings,
-    )
+    request = QueryRequest(query=question, settings=agent_test_settings)
     response = await agent_query(request, agent_type=agent_type)
     assert response.answer.answer, "Answer not generated"
     assert response.answer.answer != "I cannot answer", "Answer not generated"
@@ -123,8 +120,7 @@ async def test_propagate_options(agent_test_settings) -> None:
     agent_test_settings.answer.evidence_detailed_citations = False
 
     query = QueryRequest(
-        query="What is is a self-explanatory model?",
-        settings=agent_test_settings,
+        query="What is is a self-explanatory model?", settings=agent_test_settings
     )
     response = await agent_query(query, agent_type="fake")
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
@@ -165,18 +161,13 @@ async def test_agent_sharing_state(agent_test_settings, subtests: SubTests) -> N
     agent_test_settings.answer.answer_max_sources = 1
     answer = Answer(question="What is is a self-explanatory model?")
     my_docs = Docs()
-    query = QueryRequest(
-        query=answer.question,
-        settings=agent_test_settings,
-    )
+    query = QueryRequest(query=answer.question, settings=agent_test_settings)
     tool_state = SharedToolState(
         docs=my_docs, answer=answer, settings=agent_test_settings
     )
 
     with subtests.test(msg=PaperSearchTool.__name__):
-        tool: BaseTool = PaperSearchTool(
-            shared_state=tool_state,
-        )
+        tool: BaseTool = PaperSearchTool(shared_state=tool_state)
         await tool.arun("XAI self explanatory model")
         assert tool_state.docs.docs, "Search did not save any papers"
         assert all(
@@ -209,9 +200,7 @@ async def test_agent_sharing_state(agent_test_settings, subtests: SubTests) -> N
 def test_functions() -> None:
     """Check the functions schema passed to OpenAI."""
     shared_tool_state = SharedToolState(
-        answer=Answer(question="stub"),
-        docs=Docs(),
-        settings=Settings(),
+        answer=Answer(question="stub"), docs=Docs(), settings=Settings()
     )
     agent = OpenAIFunctionsAgent.from_llm_and_tools(
         llm=ChatOpenAI(model="gpt-4-turbo-2024-04-09"),
