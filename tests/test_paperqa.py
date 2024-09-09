@@ -4,6 +4,7 @@ import contextlib
 import os
 import pickle
 import textwrap
+from collections.abc import AsyncIterable
 from io import BytesIO
 from pathlib import Path
 
@@ -53,25 +54,25 @@ def docs_fixture(stub_data_dir: Path) -> Docs:
 
 def test_get_citations():
     text = (
-        "Yes, COVID-19 vaccines are effective. Various studies have documented the "
-        "effectiveness of COVID-19 vaccines in preventing severe disease, "
-        "hospitalization, and death. The BNT162b2 vaccine has shown effectiveness "
-        "ranging from 65% to -41% for the 5-11 years age group and 76% to 46% for the "
-        "12-17 years age group, after the emergence of the Omicron variant in New York "
-        "(Dorabawila2022EffectivenessOT). Against the Delta variant, the effectiveness "
-        "of the BNT162b2 vaccine was approximately 88% after two doses "
-        "(Bernal2021EffectivenessOC pg. 1-3).\n\n"
-        "Vaccine effectiveness was also found to be 89% against hospitalization and "
-        "91% against emergency department or urgent care clinic visits "
-        "(Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo pg. 3-4). In the UK "
-        "vaccination program, vaccine effectiveness was approximately 56% in "
-        "individuals aged ≥70 years between 28-34 days post-vaccination, increasing to "
-        "approximately 58% from day 35 onwards (Marfé2021EffectivenessOC).\n\n"
-        "However, it is important to note that vaccine effectiveness can decrease over "
-        "time. For instance, the effectiveness of COVID-19 vaccines against severe "
-        "COVID-19 declined to 64% after 121 days, compared to around 90% initially "
-        "(Chemaitelly2022WaningEO, Foo2019Bar). Despite this, vaccines still provide "
-        "significant protection against severe outcomes (Bar2000Foo pg 1-3; Far2000 pg 2-5)."
+        "Yes, COVID-19 vaccines are effective. Various studies have documented the"
+        " effectiveness of COVID-19 vaccines in preventing severe disease,"
+        " hospitalization, and death. The BNT162b2 vaccine has shown effectiveness"
+        " ranging from 65% to -41% for the 5-11 years age group and 76% to 46% for the"
+        " 12-17 years age group, after the emergence of the Omicron variant in New York"
+        " (Dorabawila2022EffectivenessOT). Against the Delta variant, the effectiveness"
+        " of the BNT162b2 vaccine was approximately 88% after two doses"
+        " (Bernal2021EffectivenessOC pg. 1-3).\n\nVaccine effectiveness was also found"
+        " to be 89% against hospitalization and 91% against emergency department or"
+        " urgent care clinic visits (Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo"
+        " pg. 3-4). In the UK vaccination program, vaccine effectiveness was"
+        " approximately 56% in individuals aged ≥70 years between 28-34 days"
+        " post-vaccination, increasing to approximately 58% from day 35 onwards"
+        " (Marfé2021EffectivenessOC).\n\nHowever, it is important to note that vaccine"
+        " effectiveness can decrease over time. For instance, the effectiveness of"
+        " COVID-19 vaccines against severe COVID-19 declined to 64% after 121 days,"
+        " compared to around 90% initially (Chemaitelly2022WaningEO, Foo2019Bar)."
+        " Despite this, vaccines still provide significant protection against severe"
+        " outcomes (Bar2000Foo pg 1-3; Far2000 pg 2-5)."
     )
     ref = {
         "Dorabawila2022EffectivenessOT",
@@ -98,7 +99,10 @@ def test_multiple_authors():
 
 
 def test_multiple_citations():
-    text = "As discussed by several authors (Smith et al. 1999; Johnson 2001; Lee et al. 2003)."
+    text = (
+        "As discussed by several authors (Smith et al. 1999; Johnson 2001; Lee et al."
+        " 2003)."
+    )
     assert strip_citations(text) == "As discussed by several authors ."
 
 
@@ -407,24 +411,30 @@ def test_llm_parse_json_newlines():
 @pytest.mark.asyncio
 async def test_chain_completion():
     s = Settings(llm="babbage-002", temperature=0.2)
-    call = s.get_llm().make_chain(
-        "The {animal} says",
-        skip_system=True,
-    )
     outputs = []
 
-    def accum(x):
+    def accum(x) -> None:
         outputs.append(x)
 
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    llm = s.get_llm()
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum],
+    )
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
 
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+    )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+
+    assert completion.cost > 0
 
 
 @pytest.mark.asyncio
@@ -442,58 +452,76 @@ async def test_chain_chat():
         ]
     }
     llm = LiteLLMModel(name="gpt-4o-mini", config=model_config)
-    call = llm.make_chain(
-        "The {animal} says",
-        skip_system=True,
-    )
+
     outputs = []
 
-    def accum(x):
+    def accum(x) -> None:
         outputs.append(x)
 
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum],
+    )
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
+    assert completion.cost > 0
 
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+    )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+    assert completion.cost > 0
 
     # check with mixed callbacks
-    async def ac(x):
+    async def ac(x) -> None:
         pass
 
-    completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum, ac],
+    )
+    assert completion.cost > 0
 
 
 @pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
 async def test_anthropic_chain(stub_data_dir: Path) -> None:
-
     anthropic_settings = Settings(llm="claude-3-haiku-20240307")
+    outputs: list[str] = []
 
-    call = anthropic_settings.get_llm().make_chain(
-        "The {animal} says",
-        skip_system=True,
-    )
-
-    def accum(x):
+    def accum(x) -> None:
         outputs.append(x)
 
-    outputs: list[str] = []
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    llm = anthropic_settings.get_llm()
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum],
+    )
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
     assert isinstance(completion.text, str)
+    assert completion.cost > 0
 
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+    )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
     assert isinstance(completion.text, str)
+    assert completion.cost > 0
 
     docs = Docs()
     await docs.aadd(
@@ -501,9 +529,10 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
         "National Flag of Canada Day",
         settings=anthropic_settings,
     )
-    await docs.aget_evidence(
+    result = await docs.aget_evidence(
         "What is the national flag of Canada?", settings=anthropic_settings
     )
+    assert result.cost > 0
 
 
 def test_make_docs(stub_data_dir: Path):
@@ -529,14 +558,14 @@ def test_json_evidence(docs_fixture):
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
     settings.prompts.summary_json_system = (
-        "Provide a summary of the excerpt that could help answer the question based on the excerpt."
-        " The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. "
-        " Respond with the following JSON format:\n\n"
-        ' {{\n"summary": "...",\n"author_name": "...",\n"relevance_score": "..."}}\n\n'
-        " where `summary` is relevant information from text - "
-        " about 100 words words, `author_name` specifies the author"
-        " , and `relevance_score` is "
-        " the relevance of `summary` to answer the question (integer out of 10)."
+        "Provide a summary of the excerpt that could help answer the question based on"
+        " the excerpt. The excerpt may be irrelevant. Do not directly answer the"
+        " question - only summarize relevant information.  Respond with the following"
+        ' JSON format:\n\n {{\n"summary": "...",\n"author_name":'
+        ' "...",\n"relevance_score": "..."}}\n\n where `summary` is relevant'
+        " information from text -  about 100 words words, `author_name` specifies the"
+        " author , and `relevance_score` is  the relevance of `summary` to answer the"
+        " question (integer out of 10)."
     )
     evidence = docs_fixture.get_evidence(
         Answer(question="Who wrote this article?"),
@@ -550,8 +579,9 @@ def test_ablations(docs_fixture):
     settings.answer.evidence_skip_summary = True
     settings.answer.evidence_retrieval = False
     contexts = docs_fixture.get_evidence(
-        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
-        " chemistry because it can accurately model non-linear structure-function relationships.' on?",
+        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
+        " computational chemistry because it can accurately model non-linear"
+        " structure-function relationships.' on?",
         settings=settings,
     ).contexts
     assert contexts[0].text.text == contexts[0].context, "summarization not ablated"
@@ -568,8 +598,9 @@ def test_location_awareness(docs_fixture):
     settings.answer.evidence_summary_length = ""
 
     contexts = docs_fixture.get_evidence(
-        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
-        " chemistry because it can accurately model non-linear structure-function relationships.' on?",
+        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
+        " computational chemistry because it can accurately model non-linear"
+        " structure-function relationships.' on?",
         settings=settings,
     ).contexts
     assert "1" in "\n".join(
@@ -693,15 +724,19 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
     assert any(docs.texts[0].embedding)
 
 
-def test_custom_llm(stub_data_dir: Path):
+def test_custom_llm(stub_data_dir: Path) -> None:
+    from paperqa.llms import Chunk
+
     class MyLLM(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, prompt):  # noqa: ARG002
-            return "Echo"
+        async def acomplete(self, prompt: str) -> Chunk:  # noqa: ARG002
+            return Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
-        async def acomplete_iter(self, prompt):  # noqa: ARG002
-            yield "Echo"
+        async def acomplete_iter(
+            self, prompt: str  # noqa: ARG002
+        ) -> AsyncIterable[Chunk]:
+            yield Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
     docs = Docs()
     docs.add(
@@ -857,7 +892,8 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path):
     # we limit to only crossref since s2 is too flaky
     docs.add(
         doc_path,
-        "Wellawatte et al, A Perspective on Explanations of Molecular Prediction Models, XAI Review, 2023",
+        "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
+        " Models, XAI Review, 2023",
         use_doc_details=True,
         clients={CrossrefProvider},
         fields=["author", "journal"],
@@ -1043,9 +1079,9 @@ def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
 
 def test_custom_prompts(stub_data_dir: Path):
     my_qaprompt = (
-        "Answer the question '{question}' "
-        "using the country name alone. For example: "
-        "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: "
+        "Answer the question '{question}' using the country name alone. For example: A:"
+        " United States\nA: Canada\nA: Mexico\n\n Using the"
+        " context:\n\n{context}\n\nA: "
     )
     settings = Settings.from_name("fast")
     settings.prompts.qa = my_qaprompt
@@ -1056,7 +1092,10 @@ def test_custom_prompts(stub_data_dir: Path):
 
 
 def test_pre_prompt(stub_data_dir: Path):
-    pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
+    pre = (
+        "What is water's boiling point in Fahrenheit? Please respond with a complete"
+        " sentence."
+    )
 
     settings = Settings.from_name("fast")
     settings.prompts.pre = pre

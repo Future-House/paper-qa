@@ -3,26 +3,26 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-from datetime import datetime
 from typing import Any
 
 from pydantic_settings import CliSettingsSource
 
-from .. import __version__
-from ..settings import Settings
-from ..utils import get_loop, pqa_directory, setup_default_logs
+from paperqa.settings import Settings
+from paperqa.utils import get_loop, pqa_directory, setup_default_logs
+from paperqa.version import __version__
 
 try:
     from rich.console import Console
     from rich.logging import RichHandler
 
-    from .main import agent_query, search
+    from .main import agent_query, index_search
     from .models import AnswerResponse, QueryRequest
     from .search import SearchIndex, get_directory_index
 
 except ImportError as e:
     raise ImportError(
-        '"agents" module is not installed please install it using "pip install paper-qa[agents]"'
+        '"agents" module is not installed please install it using "pip install'
+        ' paper-qa[agents]"'
     ) from e
 
 logger = logging.getLogger(__name__)
@@ -44,6 +44,8 @@ def configure_cli_logging(verbosity: int = 0) -> None:
             "paperqa.agents.models": logging.WARNING,
             "paperqa.agents.search": logging.INFO,
             "litellm": logging.WARNING,
+            "LiteLLM Router": logging.WARNING,
+            "LiteLLM Proxy": logging.WARNING,
         }
     }
 
@@ -59,6 +61,8 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         "paperqa.models": logging.DEBUG,
         "paperqa.agents.search": logging.DEBUG,
         "litellm": logging.INFO,
+        "LiteLLM Router": logging.INFO,
+        "LiteLLM Proxy": logging.INFO,
     }
 
     verbosity_map[3] = verbosity_map[2] | {
@@ -90,36 +94,12 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         print(f"PaperQA version: {__version__}")
 
 
-def get_file_timestamps(path: os.PathLike | str) -> dict[str, str]:
-    # Get the stats for the file/directory
-    stats = os.stat(path)
-
-    # Get created time (ctime)
-    created_time = datetime.fromtimestamp(stats.st_ctime)
-
-    # Get modified time (mtime)
-    modified_time = datetime.fromtimestamp(stats.st_mtime)
-
-    return {
-        "created_at": created_time.strftime("%Y-%m-%d %H:%M:%S"),
-        "modified_at": modified_time.strftime("%Y-%m-%d %H:%M:%S"),
-    }
-
-
 def ask(query: str, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
     configure_cli_logging(verbosity=settings.verbosity)
-
-    loop = get_loop()
-
-    request = QueryRequest(
-        query=query,
-        settings=settings,
-    )
-
-    return loop.run_until_complete(
+    return get_loop().run_until_complete(
         agent_query(
-            request,
+            QueryRequest(query=query, settings=settings),
             docs=None,
             verbosity=settings.verbosity,
             agent_type=settings.agent.agent_type,
@@ -136,9 +116,8 @@ def search_query(
     configure_cli_logging(verbosity=settings.verbosity)
     if index_name == "default":
         index_name = settings.get_index_name()
-    loop = get_loop()
-    return loop.run_until_complete(
-        search(
+    return get_loop().run_until_complete(
+        index_search(
             query,
             index_name=index_name,
             index_directory=settings.index_directory,
@@ -147,13 +126,18 @@ def search_query(
 
 
 def build_index(
+    index_name: str,
+    directory: str | os.PathLike,
     settings: Settings,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
+    if index_name == "default":
+        index_name = settings.get_index_name()
     configure_cli_logging(verbosity=settings.verbosity)
-    loop = get_loop()
-
-    return loop.run_until_complete(get_directory_index(settings=settings))
+    settings.paper_directory = directory
+    return get_loop().run_until_complete(
+        get_directory_index(index_name=index_name, settings=settings)
+    )
 
 
 def save_settings(
@@ -187,7 +171,14 @@ def main():
         "--settings",
         "-s",
         default="default",
-        help="Named settings to use. Will search in local, pqa directory, and package last",
+        help=(
+            "Named settings to use. Will search in local, pqa directory, and package"
+            " last"
+        ),
+    )
+
+    parser.add_argument(
+        "--index", "-i", default="default", help="Index name to search or create"
     )
 
     subparsers = parser.add_subparsers(
@@ -207,16 +198,22 @@ def main():
 
     search_parser = subparsers.add_parser(
         "search",
-        help="Search the index specified by --index."
-        " Pass --index answers to search previous answers.",
+        help=(
+            "Search the index specified by --index."
+            " Pass `--index answers` to search previous answers."
+        ),
     )
     search_parser.add_argument("query", help="Keyword search")
-    search_parser.add_argument(
-        "-i", dest="index", default="default", help="Index to search"
+
+    build_parser = subparsers.add_parser(
+        "index", help="Build a search index from given directory"
     )
+    build_parser.add_argument("directory", help="Directory to build index from")
 
     # Create CliSettingsSource instance
-    cli_settings = CliSettingsSource(Settings, root_parser=parser)
+    cli_settings = CliSettingsSource[argparse.ArgumentParser](
+        Settings, root_parser=parser
+    )
 
     # Now use argparse to parse the remaining arguments
     args, remaining_args = parser.parse_known_args()
@@ -237,7 +234,7 @@ def main():
         case "search":
             search_query(args.query, args.index, settings)
         case "index":
-            build_index(args.verbosity)
+            build_index(args.index, args.directory, settings)
         case _:
             commands = ", ".join({"view", "ask", "search", "index"})
             brief_help = f"\nRun with commands: {{{commands}}}\n\n"

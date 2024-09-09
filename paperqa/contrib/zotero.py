@@ -1,4 +1,5 @@
-# This file gets PDF files from the user's Zotero library
+"""This module gets PDF files from the user's Zotero library."""
+
 import logging
 import os
 from pathlib import Path
@@ -8,10 +9,13 @@ from pydantic import BaseModel
 
 try:
     from pyzotero import zotero
-except ImportError:
-    raise ImportError("Please install pyzotero: `pip install pyzotero`")  # noqa: B904
-from ..paths import PAPERQA_DIR
-from ..utils import StrPath, count_pdf_pages
+except ImportError as e:
+    raise ImportError(
+        "zotero requires the 'zotero' extra for 'pyzotero'. Please:"
+        " `pip install aviary[zotero]`."
+    ) from e
+from paperqa.paths import PAPERQA_DIR
+from paperqa.utils import StrPath, count_pdf_pages
 
 
 class ZoteroPaper(BaseModel):
@@ -43,9 +47,9 @@ class ZoteroPaper(BaseModel):
     def __str__(self) -> str:
         """Return the title of the paper."""
         return (
-            f'ZoteroPaper(\n    key = "{self.key}",\n'
-            f'title = "{self.title}",\n    pdf = "{self.pdf}",\n    '
-            f'num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+            f'ZoteroPaper(\n    key = "{self.key}",\ntitle = "{self.title}",\n    pdf ='
+            f' "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key ='
+            f' "{self.zotero_key}",\n    details = ...\n)'
         )
 
 
@@ -205,7 +209,8 @@ class ZoteroDB(zotero.Zotero):
 
         if collection_name is not None and len(query_kwargs) > 0:
             raise ValueError(
-                "You cannot specify a `collection_name` and search query simultaneously!"
+                "You cannot specify a `collection_name` and search query"
+                " simultaneously!"
             )
 
         max_limit = 100
