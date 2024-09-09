@@ -246,18 +246,10 @@ for doc in doc_paths:
     doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
 ```
 
-Note that PaperQA uses Numpy as a dense vector store. Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
-Therefore, `NumpyVectorStore` is the best place to start, it's a simple in-memory store, without an index. However, if a larger-than-memory vector store is needed, you can use the `LangchainVectorStore` like this:
-
-```python
-from langchain_community.vectorstores.faiss import FAISS
-from langchain_openai import OpenAIEmbeddings
-from paperqa import Docs, LangchainVectorStore
-
-docs = Docs(
-    texts_index=LangchainVectorStore(cls=FAISS),
-)
-```
+Note that PaperQA uses Numpy as a dense vector store.
+Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
+Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
+However, if a larger-than-memory vector store is needed, we are currently lacking here.
 
 We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
 
@@ -323,18 +315,6 @@ for ... in my_docs:
     doc = Doc(docname=..., citation=..., dockey=..., citation=...)
     texts = [Text(text=..., name=..., doc=doc) for ... in my_texts]
     docs.add_texts(texts, doc)
-```
-
-If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) vector store from langchain:
-
-```python
-from paperqa import LangchainVectorStore, Docs
-from langchain_community.vector_store import FAISS
-from langchain_openai import OpenAIEmbeddings
-
-docs = Docs(
-    texts_index=LangchainVectorStore(cls=FAISS),
-)
 ```
 
 ## Where do I get papers?
@@ -491,7 +471,8 @@ It's not that different! This is similar to the tree response method in LlamaInd
 
 ### How is this different from LangChain?
 
-There has been some great work on retrievers in langchain and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
+There has been some great work on retrievers in LangChain,
+and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
 
 ### Can I save or load?
 
