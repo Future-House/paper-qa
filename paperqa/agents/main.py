@@ -14,9 +14,10 @@ from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 from rich.console import Console
 
-from ..docs import Docs
-from ..types import Answer
-from ..utils import pqa_directory
+from paperqa.docs import Docs
+from paperqa.types import Answer
+from paperqa.utils import pqa_directory
+
 from .helpers import litellm_get_search_query, table_formatter
 from .models import (
     AgentCallback,
@@ -65,7 +66,8 @@ async def agent_query(
     truncation_chars = 1_000_000 if verbosity > 1 else 1500 * (verbosity + 1)
     agent_logger.info(
         f"[bold blue]Answer: {response.answer.answer[:truncation_chars]}"
-        f'{"...(truncated)" if len(response.answer.answer) > truncation_chars else ""}[/bold blue]'
+        f"{'...(truncated)' if len(response.answer.answer) > truncation_chars else ''}"
+        "[/bold blue]"
     )
 
     await search_index.add_document(
@@ -104,7 +106,8 @@ async def run_agent(
     profiler.start(outer_profile_name)
 
     logger.info(
-        f"Beginning agent {agent_type!r} run with question {query.query!r} and full query {query.model_dump()}."
+        f"Beginning agent {agent_type!r} run with question {query.query!r} and full"
+        f" query {query.model_dump()}."
     )
 
     if agent_type == "fake":
@@ -118,7 +121,8 @@ async def run_agent(
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
-        f"Finished agent {agent_type!r} run with question {query.query!r} and status {agent_status}."
+        f"Finished agent {agent_type!r} run with question {query.query!r} and status"
+        f" {agent_status}."
     )
     return AnswerResponse(
         answer=answer,
@@ -225,7 +229,7 @@ async def run_langchain_agent(
 
     llm = ChatOpenAI(
         model=query.settings.agent.agent_llm,
-        request_timeout=timeout or query.settings.agent.timeout / 2.0,
+        timeout=timeout or query.settings.agent.timeout / 2.0,
         temperature=query.settings.temperature,
     )
     agent_status = AgentStatus.SUCCESS
@@ -290,7 +294,8 @@ async def run_langchain_agent(
         if "Agent stopped" in call_response["output"]:
             # Log that this agent has gone over timeout, and then answer directly
             logger.warning(
-                f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
+                f"Agent timeout after {query.settings.agent.timeout}-sec, just"
+                " answering."
             )
             await answer_tool.arun(answer.question)
             agent_status = AgentStatus.TIMEOUT
@@ -298,16 +303,23 @@ async def run_langchain_agent(
     return answer, agent_status
 
 
-async def search(
+async def index_search(
     query: str,
     index_name: str = "answers",
     index_directory: str | os.PathLike | None = None,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
+    fields = [*SearchIndex.REQUIRED_FIELDS]
+    if index_name == "answers":
+        fields.append("question")
     search_index = SearchIndex(
-        ["file_location", "body", "question"],
+        fields=fields,
         index_name=index_name,
         index_directory=index_directory or pqa_directory("indexes"),
-        storage=SearchDocumentStorage.JSON_MODEL_DUMP,
+        storage=(
+            SearchDocumentStorage.JSON_MODEL_DUMP
+            if index_name == "answers"
+            else SearchDocumentStorage.PICKLE_COMPRESSED
+        ),
     )
 
     results = [
@@ -320,6 +332,7 @@ async def search(
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        agent_logger.info("No results found.")
+        count = await search_index.count
+        agent_logger.info(f"No results found. Searched {count} docs")
 
     return results

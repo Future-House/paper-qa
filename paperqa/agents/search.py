@@ -10,7 +10,7 @@ import zlib
 from collections.abc import Sequence
 from enum import Enum, auto
 from io import StringIO
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 from uuid import UUID
 
 import anyio
@@ -24,10 +24,11 @@ from tenacity import (
     wait_random_exponential,
 )
 
-from ..docs import Docs
-from ..settings import MaybeSettings, Settings, get_settings
-from ..types import DocDetails
-from ..utils import hexdigest, pqa_directory
+from paperqa.docs import Docs
+from paperqa.settings import MaybeSettings, Settings, get_settings
+from paperqa.types import DocDetails
+from paperqa.utils import hexdigest, pqa_directory
+
 from .models import SupportsPickle
 
 logger = logging.getLogger(__name__)
@@ -106,7 +107,7 @@ class SearchIndex:
         self.changed = False
         self.storage = storage
 
-    async def init_directory(self):
+    async def init_directory(self) -> None:
         await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
 
     @staticmethod
@@ -139,26 +140,30 @@ class SearchIndex:
             schema_builder = SchemaBuilder()
             for field in self.fields:
                 schema_builder.add_text_field(field, stored=True)
-            self._schema = schema_builder.build()
-        return self._schema
+            self._schema = schema_builder.build()  # type: ignore[assignment]
+        return cast(Schema, self._schema)
 
     @property
     async def index(self) -> Index:
         if not self._index:
             index_path = await self.index_filename
             if await (index_path / "meta.json").exists():
-                self._index = Index.open(str(index_path))
+                self._index = Index.open(str(index_path))  # type: ignore[assignment]
             else:
-                self._index = Index(self.schema, str(index_path))
-        return self._index
+                self._index = Index(self.schema, str(index_path))  # type: ignore[assignment]
+        return cast(Index, self._index)
 
     @property
     async def searcher(self) -> Searcher:
         if not self._searcher:
             index = await self.index
             index.reload()
-            self._searcher = index.searcher()
-        return self._searcher
+            self._searcher = index.searcher()  # type: ignore[assignment]
+        return cast(Searcher, self._searcher)
+
+    @property
+    async def count(self) -> int:
+        return (await self.searcher).num_docs
 
     @property
     async def index_files(self) -> dict[str, str]:
@@ -195,12 +200,12 @@ class SearchIndex:
             retry=retry_if_exception_type(AsyncRetryError),
             reraise=True,
         )
-        async def _add_document_with_retry():
+        async def _add_document_with_retry() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
                     index = await self.index
                     writer = index.writer()
-                    writer.add_document(Document.from_dict(index_doc))
+                    writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
                     writer.commit()
 
                     filehash = self.filehash(index_doc["body"])
@@ -224,7 +229,8 @@ class SearchIndex:
             await _add_document_with_retry()
         except RetryError:
             logger.exception(
-                f"Failed to add document after {max_retries} attempts: {index_doc['file_location']}"
+                f"Failed to add document after {max_retries} attempts:"
+                f" {index_doc['file_location']}"
             )
             raise
 
@@ -284,7 +290,7 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        for replace in ("*", "[", "]"):
+        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~"):
             query = query.replace(replace, "")
         return query
 
@@ -312,7 +318,7 @@ class SearchIndex:
             result
             for result in [
                 await self.get_saved_object(
-                    doc["file_location"][0], keep_filenames=keep_filenames
+                    doc["file_location"][0], keep_filenames=keep_filenames  # type: ignore[index]
                 )
                 for doc in search_index_docs
             ]
@@ -395,6 +401,7 @@ async def process_file(
 
 
 async def get_directory_index(
+    index_name: str | None = None,
     sync_index_w_directory: bool = True,
     settings: MaybeSettings = None,
 ) -> SearchIndex:
@@ -403,6 +410,7 @@ async def get_directory_index(
 
     Args:
         sync_index_w_directory: Sync the index with the directory. (i.e. delete files not in directory)
+        index_name: Name of the index. If not given, the name will be taken from the settings
         settings: Application settings.
     """
     _settings = get_settings(settings)
@@ -415,7 +423,7 @@ async def get_directory_index(
 
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
-        index_name=_settings.get_index_name(),
+        index_name=index_name or _settings.get_index_name(),
         index_directory=_settings.index_directory,
     )
 
@@ -444,7 +452,8 @@ async def get_directory_index(
             logger.warning("[bold red]Files removed![/bold red]")
         else:
             logger.warning(
-                f"[bold red]Indexed files are missing from index folder ({directory}).[/bold red]"
+                "[bold red]Indexed files are missing from index folder"
+                f" ({directory}).[/bold red]"
             )
             logger.warning(f"[bold red]files: {missing}[/bold red]")
 

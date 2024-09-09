@@ -7,8 +7,8 @@ from typing import Literal, overload
 import html2text
 import tiktoken
 
-from .types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
-from .version import __version__ as pqa_version
+from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from paperqa.version import __version__ as pqa_version
 
 
 def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
@@ -91,7 +91,7 @@ def chunk_pdf(
 
 
 def parse_text(
-    path: Path, html: bool = False, split_lines=False, use_tiktoken=True
+    path: Path, html: bool = False, split_lines: bool = False, use_tiktoken: bool = True
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -100,11 +100,10 @@ def parse_text(
         html: flag to use html2text library for parsing
         split_lines: flag to split lines into a list
         use_tiktoken: flag to use tiktoken library to encode text
-
     """
     try:
         with open(path) as f:
-            text = [str(line) for line in f] if split_lines else f.read()
+            text: str = "".join([str(line) for line in f]) if split_lines else f.read()
     except UnicodeDecodeError:
         with open(path, encoding="utf-8", errors="ignore") as f:
             text = f.read()
@@ -115,9 +114,7 @@ def parse_text(
     metadata = {
         "parsing_libraries": ["tiktoken (cl100k_base)"] if use_tiktoken else [],
         "paperqa_version": str(pqa_version),
-        "total_parsed_text_length": (
-            len(text) if isinstance(text, str) else sum(len(t) for t in text)
-        ),
+        "total_parsed_text_length": len(text),
         "parse_type": "txt" if not html else "html",
     }
     if html:

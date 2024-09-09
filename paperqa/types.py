@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
+import litellm  # for cost
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
@@ -23,13 +24,13 @@ from pydantic import (
     model_validator,
 )
 
-from .utils import (
+from paperqa.utils import (
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citenames,
 )
-from .version import __version__ as pqa_version
+from paperqa.version import __version__ as pqa_version
 
 # Just for clarity
 # also in case one day we want to narrow
@@ -91,6 +92,19 @@ class LLMResult(BaseModel):
     def __str__(self):
         return self.text
 
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cost(self) -> float:
+        """Return the cost of the result in dollars."""
+        if self.prompt_count and self.completion_count:
+            try:
+                pc = litellm.model_cost[self.model]["input_cost_per_token"]
+                oc = litellm.model_cost[self.model]["output_cost_per_token"]
+                return pc * self.prompt_count + oc * self.completion_count
+            except KeyError:
+                logger.warning(f"Could not find cost for model {self.model}.")
+        return 0.0
+
 
 class Embeddable(BaseModel):
     embedding: list[float] | None = Field(default=None, repr=False)
@@ -102,7 +116,9 @@ class Doc(Embeddable):
     dockey: DocKey
     overwrite_fields_from_metadata: bool = Field(
         default=True,
-        description="flag to overwrite fields from metadata when upgrading to a DocDetails",
+        description=(
+            "flag to overwrite fields from metadata when upgrading to a DocDetails"
+        ),
     )
 
     def __hash__(self) -> int:
@@ -142,15 +158,16 @@ class Answer(BaseModel):
     contexts: list[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    # just for convenience you can override this
-    cost: float | None = None
+    cost: float = 0.0
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
     config_md5: str | None = Field(
         default=None,
         frozen=True,
-        description="MD5 hash of the settings used to generate the answer. Cannot change",
+        description=(
+            "MD5 hash of the settings used to generate the answer. Cannot change"
+        ),
     )
     model_config = ConfigDict(extra="ignore")
 
@@ -191,6 +208,8 @@ class Answer(BaseModel):
         else:
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
+
+        self.cost += result.cost
 
     def get_unique_docs_from_contexts(self, score_threshold: int = 0) -> set[Doc]:
         """Parse contexts for docs with scores above the input threshold."""
@@ -301,9 +320,11 @@ class DocDetails(Doc):
 
     source_quality: int | None = Field(
         default=None,
-        description="Quality of journal/venue of paper. "
-        " We use None as a sentinel for unset values (like for determining hydration) "
-        " So, we use -1 means unknown quality and None means it needs to be hydrated.",
+        description=(
+            "Quality of journal/venue of paper.  We use None as a sentinel for unset"
+            " values (like for determining hydration)  So, we use -1 means unknown"
+            " quality and None means it needs to be hydrated."
+        ),
     )
     doi: str | None = None
     doi_url: str | None = None
@@ -494,7 +515,8 @@ class DocDetails(Doc):
                     data["citation"] = None
             except Exception:
                 logger.warning(
-                    f"Failed to generate bibtex for {data.get('docname') or data.get('citation')}"
+                    "Failed to generate bibtex for"
+                    f" {data.get('docname') or data.get('citation')}"
                 )
         if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
@@ -529,7 +551,8 @@ class DocDetails(Doc):
             or self.source_quality is None
         ):
             raise ValueError(
-                "Citation, citationCount, and sourceQuality are not set -- do you need to call `hydrate`?"
+                "Citation, citationCount, and sourceQuality are not set -- do you need"
+                " to call `hydrate`?"
             )
         quality = (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
@@ -539,8 +562,8 @@ class DocDetails(Doc):
         if quality is None:
             return f"{self.citation} This article has {self.citation_count} citations."
         return (
-            f"{self.citation} This article has {self.citation_count} citations and is from a "
-            f"{quality}."
+            f"{self.citation} This article has {self.citation_count} citations and is"
+            f" from a {quality}."
         )
 
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}

@@ -8,16 +8,13 @@ from unittest.mock import patch
 
 import pytest
 from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
+from langchain.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
 from paperqa.agents import agent_query
-from paperqa.agents.models import (
-    AgentStatus,
-    AnswerResponse,
-    QueryRequest,
-)
+from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
 from paperqa.agents.search import get_directory_index
 from paperqa.agents.tools import (
     GatherEvidenceTool,
@@ -32,10 +29,8 @@ from paperqa.utils import get_year, md5sum
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index(agent_test_settings):
-    index = await get_directory_index(
-        settings=agent_test_settings,
-    )
+async def test_get_directory_index(agent_test_settings) -> None:
+    index = await get_directory_index(settings=agent_test_settings)
     assert index.fields == [
         "file_location",
         "body",
@@ -179,7 +174,7 @@ async def test_agent_sharing_state(agent_test_settings, subtests: SubTests) -> N
     )
 
     with subtests.test(msg=PaperSearchTool.__name__):
-        tool = PaperSearchTool(
+        tool: BaseTool = PaperSearchTool(
             shared_state=tool_state,
         )
         await tool.arun("XAI self explanatory model")
@@ -230,20 +225,21 @@ def test_functions() -> None:
         {
             "name": "paper_search",
             "description": (
-                "Search for papers to increase the paper count. You can call this a second "
-                "time with an different search to gather more papers."
+                "Search for papers to increase the paper count. You can call this a"
+                " second time with an different search to gather more papers."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "description": (
-                            "A search query in this format: [query], [start year]-[end year]. "
-                            "You may include years as the last word in the query, "
-                            "e.g. 'machine learning 2020' or 'machine learning 2010-2020'. "
-                            f"The current year is {get_year()}. "
-                            "The query portion can be a specific phrase, complete sentence, "
-                            "or general keywords, e.g. 'machine learning for immunology'."
+                            "A search query in this format: [query], [start year]-[end"
+                            " year]. You may include years as the last word in the"
+                            " query, e.g. 'machine learning 2020' or 'machine learning"
+                            f" 2010-2020'. The current year is {get_year()}. The query"
+                            " portion can be a specific phrase, complete sentence, or"
+                            " general keywords, e.g. 'machine learning for"
+                            " immunology'."
                         ),
                         "type": "string",
                     }

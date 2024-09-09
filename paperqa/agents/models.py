@@ -24,10 +24,9 @@ from pydantic import (
 from typing_extensions import Protocol
 
 from paperqa.llms import LiteLLMModel
-
-from .. import Answer
-from ..settings import Settings
-from ..version import __version__
+from paperqa.settings import Settings
+from paperqa.types import Answer
+from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -116,17 +115,16 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model="gpt-4o") -> str:
+    async def get_summary(self, llm_model: str = "gpt-4o") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
         model = LiteLLMModel(name=llm_model)
-        chain = model.make_chain(
-            prompt="{question}\n\n{answer}", system_prompt=sys_prompt
-        )
-        result = await chain(  # type: ignore[call-arg]
-            {"question": self.answer.question, "answer": self.answer.answer},
+        result = await model.run_prompt(
+            prompt="{question}\n\n{answer}",
+            data={"question": self.answer.question, "answer": self.answer.answer},
+            system_prompt=sys_prompt,
         )
         return result.text.strip()
 
@@ -158,7 +156,8 @@ class SimpleProfiler(BaseModel):
             elapsed = end_time - start_time
             self.timers.setdefault(name, []).append(elapsed)
             logger.info(
-                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s | VERSION: {__version__}"
+                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s"
+                f" | VERSION: {__version__}"
             )
 
     def start(self, name: str) -> None:
@@ -177,7 +176,8 @@ class SimpleProfiler(BaseModel):
             elapsed = t_stop - timer_data.start_time
             self.timers.setdefault(name, []).append(elapsed)
             logger.info(
-                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s | VERSION: {__version__}"
+                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s"
+                f" | VERSION: {__version__}"
             )
         else:
             logger.warning(f"Timer {name} not running")

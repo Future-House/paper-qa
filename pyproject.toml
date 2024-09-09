@@ -47,36 +47,31 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 agents = [
-    "anthropic",
     "anyio",
     "langchain",
     "langchain-community",
     "langchain-core",
     "langchain-openai",
     "pymupdf",
+    "pymupdf",
     "requests",
     "tantivy",
     "typer",
     "typing_extensions",
 ]
-google = [
-    "langchain-google-vertexai",
-    "vertexai",
-]
 llms = [
-    "anthropic",
     "faiss-cpu",
     "langchain-community",
     "langchain-core",
     "langchain-openai",
-    "pymupdf",
-    "sentence_transformers",
-    "voyageai",
 ]
 typing = [
     "types-PyYAML",
     "types-requests",
     "types-setuptools",
+]
+zotero = [
+    "pyzotero",
 ]
 
 [project.scripts]
@@ -154,9 +149,8 @@ ignore_missing_imports = true
 module = [
     "fitz",
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
+    "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
-    "sentence_transformers",  # SEE: https://github.com/UKPLab/sentence-transformers/issues/1723
-    "voyageai.*",  # SEE: https://github.com/voyage-ai/voyageai-python/issues/8
 ]
 
 [tool.pylint]
@@ -346,7 +340,6 @@ ignore = [
     "TCH003",
     "TD002",  # Don't care for TODO author
     "TD003",  # Don't care for TODO links
-    "TID252",  # Allow relative imports for packaging
     "TRY003",  # Overly pedantic
 ]
 preview = true
@@ -402,7 +395,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[agents,google,llms]",
+    "paper-qa[agents,llms,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
     "pytest-recording",
@@ -410,6 +403,7 @@ dev-dependencies = [
     "pytest-subtests",
     "pytest-sugar",
     "pytest-timer[colorama]",
+    "pytest-xdist",
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "pyzotero",

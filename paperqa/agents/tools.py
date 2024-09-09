@@ -1,13 +1,13 @@
 from __future__ import annotations
+
 import inspect
 import logging
 import re
 import sys
 from typing import ClassVar
-from langchain_core.callbacks import BaseCallbackHandler
 
 from langchain.tools import BaseTool
-from paperqa import Answer, Docs
+from langchain_core.callbacks import BaseCallbackHandler
 from pydantic import BaseModel, ConfigDict, Field
 
 # ruff: noqa: I001
@@ -16,21 +16,23 @@ from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to 
     Field as FieldV1,
 )
 
-from .helpers import compute_total_model_token_cost, get_year
-from .search import get_directory_index
+from paperqa.docs import Docs
+from paperqa.llms import EmbeddingModel, LiteLLMModel
+from paperqa.settings import Settings
+from paperqa.types import Answer
+
+from .helpers import get_year
 from .models import QueryRequest, SimpleProfiler
-from ..settings import Settings
-from ..llms import EmbeddingModel, LiteLLMModel
+from .search import get_directory_index
 
 logger = logging.getLogger(__name__)
 
 
 async def status(docs: Docs, answer: Answer, relevant_score_cutoff: int = 5) -> str:
     """Create a string that provides a summary of the input doc/answer."""
-    answer.cost = compute_total_model_token_cost(answer.token_counts)
     return (
-        f"Status: Paper Count={len(docs.docs)}"
-        f" | Relevant Papers={len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
+        f"Status: Paper Count={len(docs.docs)} | Relevant Papers="
+        f"{len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
         f" | Current Evidence={len([c for c in answer.contexts if c.score > relevant_score_cutoff])}"
         f" | Current Cost=${answer.cost:.2f}"
     )

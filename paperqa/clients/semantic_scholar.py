@@ -11,13 +11,14 @@ from typing import Any
 
 import aiohttp
 
-from ..types import DocDetails
-from ..utils import (
+from paperqa.types import DocDetails
+from paperqa.utils import (
     _get_with_retrying,
     clean_upbibtex,
     strings_similarity,
     union_collections_to_ordered_list,
 )
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .crossref import doi_to_bibtex
 from .exceptions import DOINotFoundError
@@ -194,7 +195,8 @@ def semantic_scholar_headers() -> dict[str, str]:
     if api_key := os.environ.get("SEMANTIC_SCHOLAR_API_KEY"):
         return {SEMANTIC_SCHOLAR_HEADER_KEY: api_key}
     logger.warning(
-        "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API rate limits may apply."
+        "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API"
+        " rate limits may apply."
     )
     return {}
 
