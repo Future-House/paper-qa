@@ -1,16 +1,13 @@
 from __future__ import annotations
 import inspect
 import logging
-import os
 import re
 import sys
 from typing import ClassVar
-import anyio
 from langchain_core.callbacks import BaseCallbackHandler
 
 from langchain.tools import BaseTool
 from paperqa import Answer, Docs
-from ..utils import pqa_directory
 from pydantic import BaseModel, ConfigDict, Field
 
 # ruff: noqa: I001
@@ -19,16 +16,17 @@ from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to 
     Field as FieldV1,
 )
 
-from .helpers import compute_total_model_token_cost, get_year
+from .helpers import get_year
 from .search import get_directory_index
-from .models import ParsingConfiguration, QueryRequest, SimpleProfiler
+from .models import QueryRequest, SimpleProfiler
+from ..settings import Settings
+from ..llms import EmbeddingModel, LiteLLMModel
 
 logger = logging.getLogger(__name__)
 
 
 async def status(docs: Docs, answer: Answer, relevant_score_cutoff: int = 5) -> str:
     """Create a string that provides a summary of the input doc/answer."""
-    answer.cost = compute_total_model_token_cost(answer.token_counts)
     return (
         f"Status: Paper Count={len(docs.docs)}"
         f" | Relevant Papers={len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
@@ -44,9 +42,15 @@ class SharedToolState(BaseModel):
 
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
+    POPULATE_FROM_SETTINGS: ClassVar[None] = None
+
     answer: Answer
     docs: Docs
+    settings: Settings
     profiler: SimpleProfiler = Field(default_factory=SimpleProfiler)
+    _llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS
+    _summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS
+    _embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
@@ -55,6 +59,24 @@ class SharedToolState(BaseModel):
 
     async def get_status(self) -> str:
         return await status(self.docs, self.answer)
+
+    @property
+    def llm_model(self) -> LiteLLMModel:
+        if self._llm_model is None:
+            self._llm_model = self.settings.get_llm()
+        return self._llm_model
+
+    @property
+    def summary_llm_model(self) -> LiteLLMModel:
+        if self._summary_llm_model is None:
+            self._summary_llm_model = self.settings.get_summary_llm()
+        return self._summary_llm_model
+
+    @property
+    def embedding_model(self) -> EmbeddingModel:
+        if self._embedding_model is None:
+            self._embedding_model = self.settings.get_embedding_model()
+        return self._embedding_model
 
 
 def _time_tool(func):
@@ -84,9 +106,6 @@ class PaperSearchTool(BaseTool):
             )
         )
 
-    paper_directory: str | os.PathLike = "."
-    index_directory: str | os.PathLike | None = None
-    manifest_file: str | os.PathLike | None = None
     name: str = "paper_search"
     args_schema: type[BaseModelV1] | None = InputSchema
     description: str = (
@@ -98,12 +117,7 @@ class PaperSearchTool(BaseTool):
     return_paper_metadata: bool = False
     # Second item being True means specify a year range in the search
     search_type: tuple[str, bool] = ("google", False)
-    search_count: int = 8
     previous_searches: dict[str, int] = FieldV1(default_factory=dict)
-    embedding: str = "text-embedding-3-small"
-    parsing_configuration: ParsingConfiguration = FieldV1(
-        default_factory=ParsingConfiguration
-    )
 
     def _run(self, query: str) -> str:
         raise NotImplementedError
@@ -140,22 +154,12 @@ class PaperSearchTool(BaseTool):
                 if "-" not in year:
                     year = year + "-" + year  # Convert to date range (e.g. 2022-2022)
         index = await get_directory_index(
-            directory=anyio.Path(self.paper_directory),
-            index_name=QueryRequest.get_index_name(
-                self.paper_directory, self.embedding, self.parsing_configuration
-            ),
-            index_directory=self.index_directory,
-            manifest_file=(
-                anyio.Path(self.manifest_file) if self.manifest_file else None
-            ),
-            embedding=self.embedding,
-            chunk_chars=self.parsing_configuration.chunksize,
-            overlap=self.parsing_configuration.overlap,
+            settings=self.shared_state.settings,
         )
 
         results = await index.query(
             keywords,
-            top_n=self.search_count,
+            top_n=self.shared_state.settings.agent.search_count,
             offset=offset,
             field_subset=[f for f in index.fields if f != "year"],
         )
@@ -167,14 +171,21 @@ class PaperSearchTool(BaseTool):
         for r in results:
             this_doc = next(iter(r.docs.values()))
             all_docs.append(this_doc)
-            await self.shared_state.docs.aadd_texts(texts=r.texts, doc=this_doc)
+            await self.shared_state.docs.aadd_texts(
+                texts=r.texts,
+                doc=this_doc,
+                settings=self.shared_state.settings,
+                embedding_model=self.shared_state.embedding_model,
+            )
 
         status = await self.shared_state.get_status()
 
         logger.info(status)
 
         # mark how far we've searched so that continuation will start at the right place
-        self.previous_searches[search_key] += self.search_count
+        self.previous_searches[
+            search_key
+        ] += self.shared_state.settings.agent.search_count
 
         if self.return_paper_metadata:
             retrieved_papers = "\n".join([f"{x.title} ({x.year})" for x in all_docs])
@@ -213,40 +224,23 @@ class GatherEvidenceTool(BaseTool):
 
         logger.info(f"Gathering and ranking evidence for '{question}'.")
 
-        # first we see if we'd like to filter any docs for relevance
-        # at the citation level
-        if len(self.shared_state.docs.docs) >= self.query.adoc_match_threshold:
-            doc_keys_to_keep = await self.shared_state.docs.adoc_match(
-                question,
-                rerank=True,  # want to set it explicitly
-                answer=self.shared_state.answer,
-            )
-        else:
-            doc_keys_to_keep = set(self.shared_state.docs.docs.keys())
-
-        self.shared_state.answer.dockey_filter = doc_keys_to_keep
-
         # swap out the question
         # TODO: evaluate how often does the agent changes the question
-        old = self.shared_state.answer.question
+        original_question = self.shared_state.answer.question
         self.shared_state.answer.question = question
 
         # generator, so run it
         l0 = len(self.shared_state.answer.contexts)
 
-        # set jit so that the index is rebuilt; helps if the texts have changed
-        self.shared_state.docs.jit_texts_index = True
-        # ensure length is set correctly
-        self.shared_state.answer.summary_length = self.query.summary_length
         # TODO: refactor answer out of this...
         self.shared_state.answer = await self.shared_state.docs.aget_evidence(
-            answer=self.shared_state.answer,
-            max_sources=self.query.max_sources,
-            k=self.query.consider_sources,
-            detailed_citations=True,
+            query=self.shared_state.answer,
+            settings=self.shared_state.settings,
+            embedding_model=self.shared_state.embedding_model,
+            summary_llm_model=self.shared_state.summary_llm_model,
         )
         l1 = len(self.shared_state.answer.contexts)
-        self.shared_state.answer.question = old
+        self.shared_state.answer.question = original_question
         sorted_contexts = sorted(
             self.shared_state.answer.contexts, key=lambda x: x.score, reverse=True
         )
@@ -290,26 +284,17 @@ class GenerateAnswerTool(BaseTool):
         logger.info(f"Generating answer for '{question}'.")
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
-        self.shared_state.answer.answer_length = self.query.length
         self.shared_state.answer = await self.shared_state.docs.aquery(
-            self.query.query,
-            k=self.query.consider_sources,
-            max_sources=self.query.max_sources,
-            answer=self.shared_state.answer,
+            self.shared_state.answer,
+            settings=self.shared_state.settings,
+            llm_model=self.shared_state.llm_model,
+            summary_llm_model=self.shared_state.summary_llm_model,
+            embedding_model=self.shared_state.embedding_model,
         )
-
-        if self.query.filter_extra_background:
-            # filter out "(Extra Background Information)" from the answer
-            self.shared_state.answer.answer = re.sub(
-                r"\([Ee]xtra [Bb]ackground [Ii]nformation\)",
-                "",
-                self.shared_state.answer.answer,
-            )
 
         if "cannot answer" in self.shared_state.answer.answer.lower():
             if self.wipe_context_on_answer_failure:
                 self.shared_state.answer.contexts = []
-                self.shared_state.answer.dockey_filter = None
                 self.shared_state.answer.context = ""
             status = await self.shared_state.get_status()
             logger.info(status)
@@ -350,7 +335,7 @@ def query_to_tools(
     state: SharedToolState,
     callbacks: list[BaseCallbackHandler] | None = None,
 ) -> list[BaseTool]:
-    if query.agent_tools.tool_names is None:
+    if query.settings.agent.tool_names is None:
         tool_types: list[type[BaseTool]] = [
             PaperSearchTool,
             GatherEvidenceTool,
@@ -359,7 +344,7 @@ def query_to_tools(
     else:
         tool_types = [
             AVAILABLE_TOOL_NAME_TO_CLASS[name]
-            for name in set(query.agent_tools.tool_names)
+            for name in set(query.settings.agent.tool_names)
         ]
     tools: list[BaseTool] = []
     for tool_type in tool_types:
@@ -367,13 +352,6 @@ def query_to_tools(
             tools.append(
                 PaperSearchTool(
                     shared_state=state,
-                    search_count=query.agent_tools.search_count,
-                    embedding=query.embedding,
-                    parsing_configuration=query.parsing_configuration,
-                    paper_directory=query.agent_tools.paper_directory,
-                    index_directory=query.agent_tools.index_directory
-                    or pqa_directory("indexes"),
-                    manifest_file=query.agent_tools.manifest_file,
                     callbacks=callbacks,
                 )
             )
@@ -385,7 +363,7 @@ def query_to_tools(
             tools.append(
                 GenerateAnswerTool(
                     shared_state=state,
-                    wipe_context_on_answer_failure=query.agent_tools.wipe_context_on_answer_failure,
+                    wipe_context_on_answer_failure=query.settings.agent.wipe_context_on_answer_failure,
                     query=query,
                     callbacks=callbacks,
                 )

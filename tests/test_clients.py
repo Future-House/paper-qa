@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Collection, Sequence, cast
+from collections.abc import Collection, Sequence
+from typing import Any, cast
 
 import aiohttp
 import pytest

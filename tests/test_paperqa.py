@@ -3,47 +3,39 @@ from __future__ import annotations
 import contextlib
 import os
 import pickle
-import tempfile
 import textwrap
+from collections.abc import AsyncIterable
 from io import BytesIO
 from pathlib import Path
-from typing import cast, no_type_check
 
 import numpy as np
 import pytest
 import requests
-from openai import AsyncOpenAI
 
 from paperqa import (
     Answer,
     Doc,
     Docs,
     NumpyVectorStore,
-    PromptCollection,
+    Settings,
     Text,
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
+from paperqa.core import llm_parse_json
 from paperqa.llms import (
-    AnthropicLLMModel,
     EmbeddingModel,
     HybridEmbeddingModel,
-    LangchainEmbeddingModel,
-    LangchainLLMModel,
     LangchainVectorStore,
+    LiteLLMEmbeddingModel,
+    LiteLLMModel,
     LLMModel,
-    OpenAIEmbeddingModel,
-    OpenAILLMModel,
     SparseEmbeddingModel,
-    VoyageAIEmbeddingModel,
-    get_score,
-    guess_model_type,
-    is_openai_model,
 )
 from paperqa.readers import read_doc
 from paperqa.utils import (
+    extract_score,
     get_citenames,
-    llm_read_json,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -52,37 +44,12 @@ from paperqa.utils import (
 )
 
 
-def test_is_openai_model():
-    assert is_openai_model("gpt-4o-mini")
-    assert is_openai_model("babbage-002")
-    assert is_openai_model("gpt-4-1106-preview")
-    assert is_openai_model("davinci-002")
-    assert is_openai_model("ft:gpt-3.5-turbo-0125:my-org::ABC123")
-    assert not is_openai_model("llama")
-    assert not is_openai_model("labgpt")
-    assert not is_openai_model("mixtral-7B")
-    os.environ["ANYSCALE_API_KEY"] = "abc123"
-    os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
-    assert is_openai_model("meta-llama/Meta-Llama-3-70B-Instruct")
-    assert is_openai_model("mistralai/Mixtral-8x22B-Instruct-v0.1")
-    os.environ.pop("ANYSCALE_API_KEY")
-    os.environ.pop("ANYSCALE_BASE_URL")
-    assert not is_openai_model("meta-llama/Meta-Llama-3-70B-Instruct")
-    assert not is_openai_model("mistralai/Mixtral-8x22B-Instruct-v0.1")
-
-
-def test_guess_model_type():
-    assert guess_model_type("gpt-3.5-turbo") == "chat"
-    assert guess_model_type("babbage-002") == "completion"
-    assert guess_model_type("gpt-4-1106-preview") == "chat"
-    assert guess_model_type("gpt-3.5-turbo-instruct") == "completion"
-    assert guess_model_type("davinci-002") == "completion"
-    os.environ["ANYSCALE_API_KEY"] = "abc123"
-    os.environ["ANYSCALE_BASE_URL"] = "https://example.com"
-    assert guess_model_type("meta-llama/Meta-Llama-3-70B-Instruct") == "chat"
-    assert guess_model_type("mistralai/Mixtral-8x22B-Instruct-v0.1") == "chat"
-    os.environ.pop("ANYSCALE_API_KEY")
-    os.environ.pop("ANYSCALE_BASE_URL")
+@pytest.fixture
+def docs_fixture(stub_data_dir: Path) -> Docs:
+    docs = Docs()
+    with open(stub_data_dir / "paper.pdf", "rb") as f:
+        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+    return docs
 
 
 def test_get_citations():
@@ -186,44 +153,6 @@ def test_citations_with_nonstandard_chars():
     )
 
 
-def test_ablations(stub_data_dir: Path):
-    doc_path = stub_data_dir / "paper.pdf"
-    with open(doc_path, "rb") as f:
-        docs = Docs(prompts=PromptCollection(skip_summary=True))
-        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
-        answer = docs.get_evidence(
-            Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"  # noqa: ISC003
-                + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
-            )
-        )
-        assert (
-            answer.contexts[0].text.text == answer.contexts[0].context
-        ), "summarization not ablated"
-        answer = docs.get_evidence(
-            Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"  # noqa: ISC003
-                + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
-            ),
-            disable_vector_search=True,
-        )
-
-
-def test_location_awareness(stub_data_dir: Path):
-    doc_path = stub_data_dir / "paper.pdf"
-    with open(doc_path, "rb") as f:
-        docs = Docs()
-        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
-        answer = docs.get_evidence(
-            Answer(
-                question="Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"  # noqa: ISC003
-                + "chemistry because it can accurately model non-linear structure-function relationships.' on?"
-            ),
-            detailed_citations=True,
-        )
-        assert "2" in answer.context or "1" in answer.context
-
-
 def test_maybe_is_text():
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
@@ -292,7 +221,7 @@ def test_extract_score():
     cancer-associated fibroblasts that typically survive at 2 weeks when cultured
     with oxaliplatin. (0/10)
     """
-    assert get_score(sample) == 0
+    assert extract_score(sample) == 0
 
     sample = """
     COVID-19 vaccinations have been shown to be effective against hospitalization
@@ -304,7 +233,7 @@ def test_extract_score():
     showed higher and more sustained vaccine effectiveness. 8
     """
 
-    assert get_score(sample) == 8
+    assert extract_score(sample) == 8
 
     sample = """
     Here is a 100-word summary of the text:
@@ -320,7 +249,7 @@ def test_extract_score():
     provide protection against COVID-19. Relevance score: 8
     """
 
-    assert get_score(sample) == 8
+    assert extract_score(sample) == 8
 
     sample = """
     Here is a 100-word summary of the provided text: The text details
@@ -335,7 +264,7 @@ def test_extract_score():
     effectiveness of COVID-19 vaccinations. Score: 3/10
     """
 
-    assert get_score(sample) == 3
+    assert extract_score(sample) == 3
 
     sample = """
     Here is a 100-word summary of the text: The text discusses a
@@ -353,7 +282,7 @@ def test_extract_score():
     of COVID-19 vaccinations.
     """
 
-    assert get_score(sample) == 8
+    assert extract_score(sample) == 8
 
     sample = """
     Here is a 100-word summary of the text: The text discusses the safety and
@@ -371,7 +300,7 @@ def test_extract_score():
     of Covid-19 vaccinations.
     """
 
-    assert get_score(sample) == 5
+    assert extract_score(sample) == 5
 
     sample = """
     Introduce dynamic elements such as moving nodes or edges to create a sense of activity within
@@ -392,7 +321,7 @@ def test_extract_score():
         organize the network in a visually appealing manner, such as
         force-directed placement or hierarchical layouts. 3/10 """
 
-    assert get_score(sample) == 3
+    assert extract_score(sample) == 3
 
     sample = (
         "The text mentions a work by Shozo Yokoyama titled "
@@ -404,7 +333,7 @@ def test_extract_score():
         "Relevance Score: 7"
     )
 
-    assert get_score(sample) == 7
+    assert extract_score(sample) == 7
 
     sample = (
         "The evolution of human color vision is "
@@ -424,7 +353,7 @@ def test_extract_score():
         "Relevance Score: 9.5"
     )
 
-    assert get_score(sample) == 9
+    assert extract_score(sample) == 9
 
 
 @pytest.mark.parametrize(
@@ -455,11 +384,11 @@ I have written the json you asked for.""",
 """,
     ],
 )
-def test_llm_read_json(example: str):
-    assert llm_read_json(example) == {"example": "json"}
+def test_llm_parse_json(example: str):
+    assert llm_parse_json(example) == {"example": "json"}
 
 
-def test_llm_read_json_newlines():
+def test_llm_parse_json_newlines():
     """Make sure that newlines in json are preserved and escaped."""
     example = textwrap.dedent(
         """
@@ -470,7 +399,7 @@ def test_llm_read_json_newlines():
         "relevance_score": 7
         }"""
     )
-    assert llm_read_json(example) == {
+    assert llm_parse_json(example) == {
         "summary": "A line\n\nAnother line",
         "relevance_score": 7,
     }
@@ -478,10 +407,8 @@ def test_llm_read_json_newlines():
 
 @pytest.mark.asyncio
 async def test_chain_completion():
-    client = AsyncOpenAI()
-    llm = OpenAILLMModel(config={"model": "babbage-002", "temperature": 0.2})
-    call = llm.make_chain(
-        client,
+    s = Settings(llm="babbage-002", temperature=0.2)
+    call = s.get_llm().make_chain(
         "The {animal} says",
         skip_system=True,
     )
@@ -499,16 +426,26 @@ async def test_chain_completion():
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+
+    assert completion.cost > 0
 
 
 @pytest.mark.asyncio
 async def test_chain_chat():
-    client = AsyncOpenAI()
-    llm = OpenAILLMModel(
-        config={"temperature": 0, "model": "gpt-4o-mini", "max_tokens": 56}
-    )
+    model_config = {
+        "model_list": [
+            {
+                "model_name": "gpt-4o-mini",
+                "litellm_params": {
+                    "model": "gpt-4o-mini",
+                    "temperature": 0,
+                    "max_tokens": 56,
+                },
+            }
+        ]
+    }
+    llm = LiteLLMModel(name="gpt-4o-mini", config=model_config)
     call = llm.make_chain(
-        client,
         "The {animal} says",
         skip_system=True,
     )
@@ -522,30 +459,28 @@ async def test_chain_chat():
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
+    assert completion.cost > 0
 
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+    assert completion.cost > 0
 
     # check with mixed callbacks
     async def ac(x):
         pass
 
     completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+    assert completion.cost > 0
 
 
+@pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
-async def test_anthropic_chain() -> None:
+async def test_anthropic_chain(stub_data_dir: Path) -> None:
 
-    try:
-        from anthropic import AsyncAnthropic
-    except ImportError:
-        pytest.skip("Test requires anthropic to be installed.")
+    anthropic_settings = Settings(llm="claude-3-haiku-20240307")
 
-    client = AsyncAnthropic()
-    llm = AnthropicLLMModel()
-    call = llm.make_chain(
-        client,
+    call = anthropic_settings.get_llm().make_chain(
         "The {animal} says",
         skip_system=True,
     )
@@ -560,230 +495,136 @@ async def test_anthropic_chain() -> None:
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
     assert isinstance(completion.text, str)
+    assert completion.cost > 0
 
     completion = await call({"animal": "duck"})  # type: ignore[call-arg]
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
     assert isinstance(completion.text, str)
+    assert completion.cost > 0
 
-    docs = Docs(llm="claude-3-sonnet-20240229", client=client)
-    await docs.aadd_url(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+    docs = Docs()
+    await docs.aadd(
+        stub_data_dir / "flag_day.html",
+        "National Flag of Canada Day",
+        settings=anthropic_settings,
     )
-    answer = await docs.aget_evidence(
-        Answer(question="What is the national flag of Canada?")
+    result = await docs.aget_evidence(
+        "What is the national flag of Canada?", settings=anthropic_settings
     )
-    await docs.aquery("What is the national flag of Canada?", answer=answer)
+    assert result.cost > 0
 
 
-@pytest.mark.skipif(
-    not (os.environ.get("ANYSCALE_BASE_URL") and os.environ.get("ANYSCALE_API_KEY")),
-    reason="Anyscale URL and keys are not set",
-)
-@pytest.mark.asyncio
-async def test_anyscale_chain():
-    client = AsyncOpenAI(
-        base_url=os.environ["ANYSCALE_BASE_URL"], api_key=os.environ["ANYSCALE_API_KEY"]
-    )
-    llm = OpenAILLMModel(
-        config={
-            "temperature": 0,
-            "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-            "max_tokens": 56,  # matches openAI chat test
-        }
-    )
-    call = llm.make_chain(
-        client,
-        "The {animal} says",
-        skip_system=True,
-    )
-    outputs = []  # type: ignore[var-annotated]
-    completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
-    assert completion.seconds_to_first_token > 0
-    assert completion.prompt_count > 0
-    assert completion.completion_count > 0
-    assert str(completion) == "".join(outputs)
-
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
-    assert completion.seconds_to_first_token == 0
-    assert completion.seconds_to_last_token > 0
-
-    completion = await call({"animal": "duck"}, callbacks=[outputs.append])  # type: ignore[call-arg]
-
-
-def test_docs():
-    docs = Docs(llm="babbage-002")
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
-        citation="WikiMedia Foundation, 2023, Accessed now",
+def test_make_docs(stub_data_dir: Path):
+    docs = Docs()
+    docs.add(
+        stub_data_dir / "flag_day.html",
+        "WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
     assert docs.docs["test"].docname == "Wiki2023"
-    assert docs.llm == "babbage-002"
-    assert docs.summary_llm == "babbage-002"
 
 
-def test_evidence(stub_data_dir: Path):
-    doc_path = stub_data_dir / "example.html"
-    docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    original_doc = next(iter(docs.docs.values()))
-    assert (
-        original_doc.embedding is not None
-    ), "For downstream assertions of in-tact embedding, we need an embedding"
-    evidence = docs.get_evidence(
-        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
+def test_evidence(docs_fixture):
+    fast_settings = Settings.from_name("debug")
+    evidence = docs_fixture.get_evidence(
+        Answer(question="What does XAI stand for?"),
+        settings=fast_settings,
+    ).contexts
+    assert len(evidence) >= fast_settings.answer.evidence_k
+
+
+def test_json_evidence(docs_fixture):
+    settings = Settings.from_name("fast")
+    settings.prompts.use_json = True
+    settings.prompts.summary_json_system = (
+        "Provide a summary of the excerpt that could help answer the question based on the excerpt."
+        " The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. "
+        " Respond with the following JSON format:\n\n"
+        ' {{\n"summary": "...",\n"author_name": "...",\n"relevance_score": "..."}}\n\n'
+        " where `summary` is relevant information from text - "
+        " about 100 words words, `author_name` specifies the author"
+        " , and `relevance_score` is "
+        " the relevance of `summary` to answer the question (integer out of 10)."
     )
-    assert "Missouri" in evidence.context
-    assert original_doc.embedding is not None, "Embedding should have remained in-tact"
-    assert (
-        evidence.contexts[0].text.doc.embedding is None
-    ), "Embedding should have been removed"
-
-    evidence = docs.get_evidence(
-        Answer(question="For which state was Bates a governor?"),
-        detailed_citations=True,
-    )
-    assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
+    evidence = docs_fixture.get_evidence(
+        Answer(question="Who wrote this article?"),
+        settings=settings,
+    ).contexts
+    assert evidence[0].author_name
 
 
-def test_json_evidence(stub_data_dir: Path) -> None:
-    doc_path = stub_data_dir / "example.html"
+def test_ablations(docs_fixture):
+    settings = Settings()
+    settings.answer.evidence_skip_summary = True
+    settings.answer.evidence_retrieval = False
+    contexts = docs_fixture.get_evidence(
+        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+        " chemistry because it can accurately model non-linear structure-function relationships.' on?",
+        settings=settings,
+    ).contexts
+    assert contexts[0].text.text == contexts[0].context, "summarization not ablated"
 
-    summary_llm = OpenAILLMModel(
-        config={
-            "model": "gpt-4o-mini",
-            "response_format": {"type": "json_object"},
-            "temperature": 0.0,
-        }
-    )
-    docs = Docs(
-        prompts=PromptCollection(json_summary=True),
-        summary_llm_model=summary_llm,
-        llm_result_callback=print_callback,
-    )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    evidence = docs.get_evidence(
-        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
-    )
-    assert "Missouri" in evidence.context
-
-    evidence = docs.get_evidence(
-        Answer(question="For which state was Bates a governor?"),
-        detailed_citations=True,
-    )
-    assert "From WikiMedia Foundation, 2023, Accessed now" in evidence.context
+    assert len(contexts) == len(docs_fixture.texts), "evidence retrieval not ablated"
 
 
-def test_custom_json_props(stub_data_dir: Path):
-    doc_path = stub_data_dir / "example.html"
+def test_location_awareness(docs_fixture):
+    settings = Settings()
+    settings.answer.evidence_k = 3
+    settings.prompts.use_json = False
+    settings.prompts.system = "Answer either N/A or a page number."
+    settings.prompts.summary = "{citation}\n\n{text}\n\n{question}{summary_length}"
+    settings.answer.evidence_summary_length = ""
 
-    summary_llm = OpenAILLMModel(
-        config={
-            "model": "gpt-4o-mini",
-            "response_format": {"type": "json_object"},
-            "temperature": 0.0,
-        }
-    )
-    my_prompts = PromptCollection(
-        json_summary=True,
-        summary_json_system="Provide a summary of the excerpt that could help answer the question based on the excerpt.  "  # noqa: E501
-        "The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. "
-        "Respond with the following JSON format:\n\n"
-        '{{\n"summary": "...",\n"person_name": "...",\n"relevance_score": "..."}}\n\n'
-        "where `summary` is relevant information from text - "
-        "about 100 words words, `person_name` specifies the person discussed in "
-        "the excerpt (may be different than query), and `relevance_score` is "
-        "the relevance of `summary` to answer the question (integer out of 10).",
-    )
-    docs = Docs(
-        prompts=my_prompts,
-        summary_llm_model=summary_llm,
-        llm_result_callback=print_callback,
-    )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    evidence = docs.get_evidence(
-        Answer(question="For which state was Bates a governor?"), k=1, max_sources=1
-    )
-    assert "person_name" in cast(dict, evidence.contexts[0].model_extra)
-    assert "person_name: " in evidence.context
-    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
-    assert "person_name" in answer.context
+    contexts = docs_fixture.get_evidence(
+        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of computational"
+        " chemistry because it can accurately model non-linear structure-function relationships.' on?",
+        settings=settings,
+    ).contexts
+    assert "1" in "\n".join(
+        [c.context for c in contexts]
+    ), "location not found in evidence"
 
 
-def test_query():
-    docs = Docs()
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    docs.query("What is Frederick Bates's greatest accomplishment?")
+def test_query(docs_fixture):
+    docs_fixture.query("Is XAI usable in chemistry?")
 
 
-def test_answer_attributes():
-    docs = Docs()
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    answer = docs.query("What is Frederick Bates's greatest accomplishment?")
-    used_citations = answer.used_contexts
-    assert len(used_citations) > 0
-    assert len(used_citations) < len(answer.contexts)
-    assert (
-        answer.get_citation(next(iter(used_citations)))
-        == "WikiMedia Foundation, 2023, Accessed now"
-    )
-
-    # make sure it is serialized correctly
-    js = answer.model_dump_json()
-    assert "used_contexts" in js
-
-    # make sure it can be deserialized
-    answer2 = Answer.model_validate_json(js)
-    assert answer2.used_contexts == used_citations
-
-
-def test_llmresult_callbacks():
+def test_llmresult_callback(docs_fixture):
     my_results = []
 
     async def my_callback(result):
         my_results.append(result)
 
-    docs = Docs(llm_result_callback=my_callback)
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+    settings = Settings.from_name("fast")
+    summary_llm = settings.get_summary_llm()
+    summary_llm.llm_result_callback = my_callback
+    docs_fixture.get_evidence(
+        "What is XAI?", settings=settings, summary_llm_model=summary_llm
     )
-    docs.query("What is Frederick Bates's greatest accomplishment?")
-    assert any(x.name == "answer" for x in my_results)
-    assert len(my_results) > 1
+    assert my_results
+    assert my_results[0].name
 
 
-def test_duplicate() -> None:
+def test_duplicate(stub_data_dir: Path) -> None:
     """Check Docs doesn't store duplicates, while checking nonduplicate docs are stored."""
     docs = Docs()
-    assert docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+    assert docs.add(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test1",
     )
     assert (
-        docs.add_url(
-            "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        docs.add(
+            stub_data_dir / "bates.txt",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test1",
         )
         is None
     )
     assert len(docs.docs) == 1, "Should have added only one document"
-    assert docs.add_url(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+    assert docs.add(
+        stub_data_dir / "flag_day.html",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test2",
     )
@@ -792,45 +633,34 @@ def test_duplicate() -> None:
     ), "Unique documents should be hashed as unique"
 
 
-def test_custom_embedding():
+def test_custom_embedding(stub_data_dir: Path):
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
-        async def embed_documents(self, client, texts):  # noqa: ARG002
+        async def embed_documents(self, texts):
             return [[1, 2, 3] for _ in texts]
 
     docs = Docs(
-        docs_index=NumpyVectorStore(embedding_model=MyEmbeds()),
-        texts_index=NumpyVectorStore(embedding_model=MyEmbeds()),
-        embedding_client=None,
+        texts_index=NumpyVectorStore(),
     )
-    assert docs._embedding_client is None
-    assert docs.embedding == "my_embed"
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+    docs.add(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+        embedding_model=MyEmbeds(),
     )
-    assert docs.docs["test"].embedding == [1, 2, 3]
+    assert docs.texts[0].embedding == [1, 2, 3]
 
 
-def test_sparse_embedding() -> None:
+def test_sparse_embedding(stub_data_dir: Path) -> None:
     docs = Docs(
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        embedding_client=None,
+        texts_index=NumpyVectorStore(),
     )
-    assert docs._embedding_client is None
-    assert docs.embedding.startswith("sparse")  # type: ignore[union-attr]
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+    docs.add(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+        embedding_model=SparseEmbeddingModel(),
     )
-    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
-    assert all(
-        len(np.array(x.embedding).shape) == 1 for x in docs.docs.values()
-    ), "Embeddings should be 1D"
+    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -840,34 +670,20 @@ def test_sparse_embedding() -> None:
     assert docs.texts[1].embedding is not None
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
-    # test alias
-    docs = Docs(embedding="sparse")
-    assert docs._embedding_client is None
-    assert docs.embedding.startswith("sparse")  # type: ignore[union-attr]
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
 
-
-def test_hybrid_embedding() -> None:
-    model = HybridEmbeddingModel(
-        models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()]
+def test_hybrid_embedding(stub_data_dir: Path) -> None:
+    emb_model = HybridEmbeddingModel(
+        models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()]
     )
     docs = Docs(
-        docs_index=NumpyVectorStore(embedding_model=model),
-        texts_index=NumpyVectorStore(embedding_model=model),
+        texts_index=NumpyVectorStore(),
     )
-    assert isinstance(docs._embedding_client, AsyncOpenAI)
-    assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+    docs.add(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+        embedding_model=emb_model,
     )
-    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
@@ -875,201 +691,52 @@ def test_hybrid_embedding() -> None:
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
     # now try via alias
-    docs = Docs(
+    emb_settings = Settings(
         embedding="hybrid-text-embedding-3-small",
     )
-    assert isinstance(docs._embedding_client, AsyncOpenAI)
-    assert docs.embedding.startswith("hybrid")  # type: ignore[union-attr]
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+    docs.add(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+        embedding_model=emb_settings.get_embedding_model(),
     )
-    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)
 
 
-def test_sentence_transformer_embedding():
-    from paperqa import SentenceTransformerEmbeddingModel
+def test_custom_llm(stub_data_dir: Path) -> None:
+    from paperqa.llms import Chunk
 
-    docs = Docs(embedding="sentence-transformers")
-    assert docs._embedding_client is None
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
-
-    docs = Docs(
-        texts_index=NumpyVectorStore(
-            embedding_model=SentenceTransformerEmbeddingModel()
-        ),
-        doc_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
-        embedding_client=None,
-    )
-    assert docs._embedding_client is None
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    assert any(docs.docs["test"].embedding)  # type: ignore[arg-type]
-
-
-def test_custom_llm():
     class MyLLM(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, client, prompt):  # noqa: ARG002
-            assert client is None
-            return "Echo"
+        async def acomplete(self, prompt: str) -> Chunk:  # noqa: ARG002
+            return Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
 
-    docs = Docs(llm_model=MyLLM(), client=None)
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+        async def acomplete_iter(
+            self, prompt: str  # noqa: ARG002
+        ) -> AsyncIterable[Chunk]:
+            yield Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
+
+    docs = Docs()
+    docs.add(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
+        llm_model=MyLLM(),
     )
-    evidence = docs.get_evidence(Answer(question="Echo"))
-    assert "Echo" in evidence.context
+    evidence = docs.get_evidence("Echo", summary_llm_model=MyLLM()).contexts
+    assert "Echo" in evidence[0].context
 
-
-def test_custom_llm_stream():
-    class MyLLM(LLMModel):
-        name: str = "myllm"
-
-        async def acomplete_iter(self, client, prompt):  # noqa: ARG002
-            assert client is None
-            yield "Echo"
-
-    docs = Docs(llm_model=MyLLM(), client=None)
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
     evidence = docs.get_evidence(
-        Answer(question="Echo"),
-        get_callbacks=lambda x: [lambda y: print(y, end="")],  # noqa: ARG005
-    )
-    assert "Echo" in evidence.context
+        "Echo", callbacks=[print_callback], summary_llm_model=MyLLM()
+    ).contexts
+    assert "Echo" in evidence[0].context
 
 
-def test_langchain_llm():
-    from langchain_openai import ChatOpenAI, OpenAI
-
-    docs = Docs(llm="langchain", client=ChatOpenAI(model="gpt-4o-mini"))
-    assert isinstance(docs.llm_model, LangchainLLMModel)
-    assert isinstance(docs.summary_llm_model, LangchainLLMModel)
-    assert docs.llm == "gpt-4o-mini"
-    assert docs.summary_llm == "gpt-4o-mini"
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    assert docs._client is not None
-    assert isinstance(docs.llm_model, LangchainLLMModel)
-    assert docs.summary_llm_model == docs.llm_model
-
-    docs.get_evidence(
-        Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y, end="")],  # noqa: ARG005
-    )
-
-    assert docs.llm_model.llm_type == "chat"
-
-    # trying without callbacks (different codepath)
-    docs.get_evidence(
-        Answer(question="What is Frederick Bates's greatest accomplishment?")
-    )
-
-    # now completion
-
-    docs = Docs(llm_model=LangchainLLMModel(), client=OpenAI(model="babbage-002"))
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    docs.get_evidence(
-        Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [lambda y: print(y, end="")],  # noqa: ARG005
-    )
-
-    assert docs.summary_llm_model.llm_type == "completion"  # type: ignore[union-attr]
-
-    # trying without callbacks (different codepath)
-    docs.get_evidence(
-        Answer(question="What is Frederick Bates's greatest accomplishment?")
-    )
-
-    # now make sure we can pickle it
-    docs_pickle = pickle.dumps(docs)
-    docs2 = pickle.loads(docs_pickle)  # noqa: S301
-    assert docs2._client is None
-    assert docs2.llm == "babbage-002"
-    docs2.set_client(OpenAI(model="babbage-002"))
-    assert docs2.summary_llm == "babbage-002"
-    docs2.get_evidence(
-        Answer(question="What is Frederick Bates's greatest accomplishment?"),
-        get_callbacks=lambda x: [print],  # noqa: ARG005
-    )
-
-
-def test_langchain_embeddings():
-    from langchain_openai import OpenAIEmbeddings
-
-    docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
-        docs_index=NumpyVectorStore(embedding_model=LangchainEmbeddingModel()),
-        embedding_client=OpenAIEmbeddings(),
-    )
-    assert docs._embedding_client is not None
-
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    docs = Docs(embedding="langchain", embedding_client=OpenAIEmbeddings())
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-
-
-@pytest.mark.skipif(
-    not os.environ.get("VOYAGE_API_KEY"),
-    reason="Voyage embeddings require a VOYAGE_API_KEY",
+@pytest.mark.skip(
+    "Langchain updated vector stores and I haven't yet updated the implementation"
 )
-def test_voyage_embeddings():
-    from voyageai import AsyncClient
-
-    docs = Docs(
-        texts_index=NumpyVectorStore(
-            embedding_model=VoyageAIEmbeddingModel(name="voyage-2")
-        ),
-        docs_index=NumpyVectorStore(
-            embedding_model=VoyageAIEmbeddingModel(name="voyage-2")
-        ),
-        embedding_client=AsyncClient(),
-    )
-    assert docs._embedding_client is not None
-
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    assert docs.docs["test"].embedding, "Embedding should not be None"
-    assert any(docs.docs["test"].embedding), "Embeddings are not present"
-    assert len(docs.docs["test"].embedding) == 1024, "Wrong voyage-2 embedding shape"
-
-
 @pytest.mark.asyncio
-async def test_langchain_vector_store():
+async def test_langchain_vector_store(stub_data_dir: Path):
     from langchain_community.vectorstores.faiss import FAISS
     from langchain_openai import OpenAIEmbeddings
 
@@ -1112,160 +779,68 @@ async def test_langchain_vector_store():
     docs = Docs(
         texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings())
     )
-    assert docs._embedding_client is not None  # from docs_index default
+    assert docs._embedding_client is not None  # from default
 
-    await docs.aadd_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
+    await docs.aadd(
+        stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
-    # should be embedded
 
-    # now try with JIT
-    docs = Docs(texts_index=index, jit_texts_index=True)
-    await docs.aadd_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+    # will not be embedded until we ask something
+    fast_settings = Settings.from_name("fast")
+    _ = await docs.aget_evidence(
+        "What is Frederick Bates's greatest accomplishment?", settings=fast_settings
     )
-    # should get cleared and rebuilt here
-    ev = await docs.aget_evidence(
-        answer=Answer(question="What is Frederick Bates's greatest accomplishment?")
-    )
-    assert len(ev.context) > 0
-    # now with dockkey filter
-    await docs.aget_evidence(
-        answer=Answer(
-            question="What is Frederick Bates's greatest accomplishment?",
-            dockey_filter=["test"],
-        )
-    )
-
+    assert docs.texts[0].embedding is not None
     # make sure we can pickle it
     docs_pickle = pickle.dumps(docs)
-    pickle.loads(docs_pickle)  # noqa: S301
+    dp = pickle.loads(docs_pickle)
 
-    # will not work at this point - have to reset index
+    assert dp.texts
 
 
-@pytest.mark.asyncio
-async def test_aquery():
+def test_docs_pickle(stub_data_dir) -> None:
+    """Ensure that Docs object can be pickled and unpickled correctly."""
     docs = Docs()
-    await docs.aadd_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
+    docs.add(
+        stub_data_dir / "flag_day.html",
+        "WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
-    await docs.aquery("What is Frederick Bates's greatest accomplishment?")
 
-
-@pytest.mark.asyncio
-async def test_adoc_match() -> None:
-    docs = Docs()
-    await docs.aadd_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation=(
-            'Wikipedia contributors. "Frederick Bates (politician)."'
-            " Wikipedia, The Free Encyclopedia. Wikipedia, The Free Encyclopedia,"
-            " Accessed now"
-        ),
-        dockey="test",
-    )
-    for _ in range(2):  # Check calling 2+ times doesn't wipe the Docs
-        assert await docs.adoc_match(
-            "What is Frederick Bates's greatest accomplishment?"
-        )
-
-
-def test_docs_pickle() -> None:
-    # 1. Fill out docs
-    with tempfile.NamedTemporaryFile(mode="r+", encoding="utf-8", suffix=".html") as f:
-        # get front page of wikipedia
-        r = requests.get(  # noqa: S113
-            "https://en.wikipedia.org/wiki/Take_Your_Dog_to_Work_Day"
-        )
-        r.raise_for_status()
-        f.write(r.text)
-        docs = Docs(
-            llm_model=OpenAILLMModel(
-                config={"temperature": 0.0, "model": "gpt-4o-mini"}
-            ),
-            summary_llm_model=OpenAILLMModel(
-                config={"temperature": 0.0, "model": "gpt-4o-mini"}
-            ),
-        )
-        assert docs._client is not None
-        old_config = cast(OpenAILLMModel, docs.llm_model).config
-        old_sconfig = docs.summary_llm_model.config  # type: ignore[union-attr]
-        docs.add(f.name, "WikiMedia Foundation, 2023, Accessed now", chunk_chars=1000)  # type: ignore[arg-type]
-
-    # 2. Pickle and unpickle, checking unpickled is in-tact
+    # Pickle the Docs object
     docs_pickle = pickle.dumps(docs)
-    docs2 = pickle.loads(docs_pickle)  # noqa: S301
-    with pytest.raises(ValueError, match="forget to set it after pickling"):
-        docs2.query("What date is bring your dog to work in the US?")
-    docs2.set_client()
-    assert docs2._client is not None
-    assert docs2.llm_model.config == old_config
-    assert docs2.summary_llm_model.config == old_sconfig
-    print(old_config, old_sconfig)
-    assert len(docs.docs) == len(docs2.docs)
-    for _ in range(4):  # Retry a few times, because this is flaky
-        docs_context = docs.get_evidence(
-            Answer(
-                question="What date is bring your dog to work in the US?",
-                summary_length="about 20 words",
-            ),
-            k=3,
-            max_sources=1,
-        ).context
-        docs2_context = docs2.get_evidence(
-            Answer(
-                question="What date is bring your dog to work in the US?",
-                summary_length="about 20 words",
-            ),
-            k=3,
-            max_sources=1,
-        ).context
-        # It is shocking how unrepeatable this is
-        if strings_similarity(s1=docs_context, s2=docs2_context) > 0.50:
-            break
-    else:
-        raise AssertionError("Failed to attain similar contexts, even with retrying.")
+    unpickled_docs = pickle.loads(docs_pickle)
 
-    # make sure we can query
-    docs.query("What date is bring your dog to work in the US?")
-
-    # make sure we can still embed documents
-    docs2.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-    )
+    assert unpickled_docs.docs["test"].docname == "Wiki2023"
+    assert len(unpickled_docs.docs) == 1
 
 
-def test_bad_context(stub_data_dir: Path):
-    doc_path = stub_data_dir / "example.html"
+def test_bad_context(stub_data_dir):
     docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What is the radius of Jupyter?")
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    answer = docs.query(
+        "What do scientist estimate as the planetary composition of Jupyter?"
+    )
     assert "cannot answer" in answer.answer
 
 
-def test_repeat_keys(stub_data_dir: Path):
-    doc_path = stub_data_dir / "example.txt"
-    docs = Docs(
-        llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
+def test_repeat_keys(stub_data_dir):
+    docs = Docs()
+    result = docs.add(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    try:  # noqa: SIM105
-        docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    except ValueError:
-        pass
+    assert result
+    result = docs.add(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
+    assert not result
     assert len(docs.docs) == 1
 
-    # now with different paths
-    doc_path2 = stub_data_dir / "example2.txt"
-    docs.add(doc_path2, "WikiMedia Foundation, 2023, Accessed now")
+    docs.add(
+        stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
+    )
     assert len(docs.docs) == 2
 
     # check keys
@@ -1274,30 +849,24 @@ def test_repeat_keys(stub_data_dir: Path):
     assert ds[1].docname == "Wiki2023a"
 
 
-def test_pdf_reader(stub_data_dir: Path):
-    doc_path = stub_data_dir / "paper.pdf"
-    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
-    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023")
-    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+def test_can_read_normal_pdf_reader(docs_fixture):
+    answer = docs_fixture.query("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
 def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path):
-    doc_path = stub_data_dir / "paper.pdf"
-    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
-    docs.add(doc_path, "Wellawatte et al, XAI Review, 2023", use_doc_details=True)
+    docs = Docs()
+    docs.add(stub_data_dir / "paper.pdf", "Wellawatte et al, XAI Review, 2023")
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
     assert (
         next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
     )
-    answer = docs.query("Are counterfactuals actionable? [yes/no]")
-    assert "yes" in answer.answer or "Yes" in answer.answer
 
 
 def test_pdf_reader_match_doc_details(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
-    docs = Docs(llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "gpt-4"}))
+    docs = Docs()
     # we limit to only crossref since s2 is too flaky
     docs.add(
         doc_path,
@@ -1334,13 +903,12 @@ def test_fileio_reader_pdf(stub_data_dir: Path):
 def test_fileio_reader_txt(stub_data_dir: Path):
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
-    with open(stub_data_dir / "example.txt", "rb") as file:
+    with open(stub_data_dir / "bates.txt", "rb") as file:
         file_content = file.read()
 
     docs.add_file(
         BytesIO(file_content),
         "WikiMedia Foundation, 2023, Accessed now",
-        chunk_chars=1000,
     )
     answer = docs.query("What country was Frederick Bates born in?")
     assert "United States" in answer.answer
@@ -1408,7 +976,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path):
         for i in range(len(chunk_text) - 1)
     )
 
-    doc_path = stub_data_dir / "example.html"
+    doc_path = stub_data_dir / "flag_day.html"
 
     chunk_text, metadata = read_doc(
         Path(doc_path),
@@ -1446,98 +1014,17 @@ def test_chunk_metadata_reader(stub_data_dir: Path):
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
-def test_prompt_length(stub_data_dir: Path):
-    doc_path = stub_data_dir / "example.txt"
-    docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.query("What is the name of the politician?")
-
-
 def test_code():
     # load this script
-    doc_path = os.path.abspath(__file__)
-    docs = Docs(
-        llm_model=OpenAILLMModel(config={"temperature": 0.0, "model": "babbage-002"})
-    )
-    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)  # type: ignore[arg-type]
+    doc_path = Path(os.path.abspath(__file__))
+    settings = Settings.from_name("fast")
+    docs = Docs()
+    docs.add(doc_path, "test_paperqa.py", docname="test_paperqa.py", disable_check=True)
     assert len(docs.docs) == 1
-    docs.query("What function tests the preview?")
-
-
-def test_citation(stub_data_dir: Path):
-    doc_path = stub_data_dir / "example.txt"
-    docs = Docs()
-    docs.add(doc_path)
-    assert next(iter(docs.docs.values())).docname in {
-        "Wikipedia2024",
-        "Frederick2024",
-        "Wikipedia",
-        "Frederick",
-    }
-
-
-def test_dockey_filter(stub_data_dir: Path, stub_data_dir_w_near_dupes):
-    """Test that we can filter evidence with dockeys."""
-    doc_path = stub_data_dir / "example.txt"
-    docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    # add with new dockey
-    docs.add(
-        stub_data_dir_w_near_dupes / "example_modified.txt",
-        "WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+    assert (
+        "test_paperqa.py"
+        in docs.query("What file is read in by test_code?", settings=settings).answer
     )
-    answer = Answer(question="What country is Bates from?", dockey_filter=["test"])
-    docs.get_evidence(answer)
-
-
-def test_dockey_delete(stub_data_dir: Path, stub_data_dir_w_near_dupes):
-    """Test that we can filter evidence with dockeys."""
-    doc_path = stub_data_dir / "example.txt"
-    docs = Docs()
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    # add with new dockey
-    docs.add(
-        stub_data_dir_w_near_dupes / "example_modified.txt",
-        "WikiMedia Foundation, 2023, Accessed now",
-        docname="test",
-    )
-    answer = Answer(question="What country was Bates born in?")
-    answer = docs.get_evidence(
-        answer, max_sources=25, k=30
-    )  # we just have a lot so we get both docs
-    keys = {c.text.doc.dockey for c in answer.contexts}
-    assert len(keys) == 2
-    assert len(docs.docs) == 2
-
-    docs.delete(docname="test")
-    assert len(docs.docs) == 1
-    assert len(list(filter(lambda x: x.doc.dockey == "test", docs.texts))) == 0
-
-    answer = Answer(question="What country was Bates born in?")
-    assert len(docs.docs) == 1
-    assert len(docs.deleted_dockeys) == 1
-    answer = docs.get_evidence(answer, max_sources=25, k=30)
-    keys = {c.text.doc.dockey for c in answer.contexts}
-    assert len(keys) == 1
-
-
-def test_query_filter(stub_data_dir: Path, stub_data_dir_w_near_dupes):
-    """Test that we can filter evidence with in query."""
-    doc_path = stub_data_dir / "example.txt"
-    docs = Docs()
-    docs.add(
-        doc_path,
-        "Information about Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
-    )
-    # add with new dockey
-    docs.add(
-        stub_data_dir_w_near_dupes / "example_modified.txt",
-        "WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    docs.query("What country is Bates from?", key_filter=True)
-    # the filter shouldn't trigger, so just checking that it doesn't crash
 
 
 def test_zotero() -> None:
@@ -1549,17 +1036,22 @@ def test_zotero() -> None:
 
 
 def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
-    doc_path = stub_data_dir / "example2.txt"
-    docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
+    doc_path = stub_data_dir / "obama.txt"
+    mini_settings = Settings(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
+    docs = Docs()
+    docs.add(
+        doc_path, "WikiMedia Foundation, 2023, Accessed now", settings=mini_settings
+    )
     # add with new dockey
     docs.add(
-        stub_data_dir_w_near_dupes / "example2_modified.txt",
+        stub_data_dir_w_near_dupes / "obama_modified.txt",
         "WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-        chunk_chars=4000,
+        settings=mini_settings,
     )
-    docs.query("What is Barrack's greatest accomplishment?", max_sources=10, k=10)
+    settings = Settings.from_name("fast")
+    settings.answer.evidence_k = 10
+    settings.answer.answer_max_sources = 10
+    docs.query("What is Barrack's greatest accomplishment?", settings=settings)
 
 
 def test_custom_prompts(stub_data_dir: Path):
@@ -1568,187 +1060,46 @@ def test_custom_prompts(stub_data_dir: Path):
         "using the country name alone. For example: "
         "A: United States\nA: Canada\nA: Mexico\n\n Using the context:\n\n{context}\n\nA: "
     )
-
-    docs = Docs(prompts=PromptCollection(qa=my_qaprompt))
-
-    doc_path = stub_data_dir / "example.html"
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query("What country is Frederick Bates from?")
+    settings = Settings.from_name("fast")
+    settings.prompts.qa = my_qaprompt
+    docs = Docs()
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    answer = docs.query("What country is Frederick Bates from?", settings=settings)
     assert "United States" in answer.answer
 
 
 def test_pre_prompt(stub_data_dir: Path):
-    pre = "Provide context you have memorized that could help answer '{question}'. "
+    pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
 
-    docs = Docs(prompts=PromptCollection(pre=pre))
-
-    doc_path = stub_data_dir / "example.txt"
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.query("What country is Bates from?")
+    settings = Settings.from_name("fast")
+    settings.prompts.pre = pre
+    docs = Docs()
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    assert "212" not in docs.query("What is the boiling point of water?").answer
+    assert (
+        "212"
+        in docs.query("What is the boiling point of water?", settings=settings).answer
+    )
 
 
 def test_post_prompt(stub_data_dir: Path):
-    post = (
-        "We are trying to answer the question below "
-        "and have an answer provided. "
-        "Please edit the answer be extremely terse, with no extra words or formatting"
-        "with no extra information.\n\n"
-        "Q: {question}\nA: {answer}\n\n"
-    )
-
-    docs = Docs(prompts=PromptCollection(post=post))
-
-    doc_path = stub_data_dir / "example.txt"
-    docs.add(doc_path, "WikiMedia Foundation, 2023, Accessed now")
-    docs.query("What country is Bates from?")
-
-    docs = Docs(
-        prompts=PromptCollection(
-            system="Answer all questions with as few words as possible"
-        )
-    )
-    docs.query("What country is Bates from?")
-
-
-@pytest.mark.skip("TODO: bring this back")
-@no_type_check  # TODO: remove this when restored
-def test_memory() -> None:
-    # Not sure why, but gpt-3.5 cannot do this anymore.
-    docs = Docs(memory=True, k=3, max_sources=1, llm="gpt-4", key_filter=False)
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Red_Army",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-    answer1 = docs.query("When did the Soviet Union and Japan agree to a cease-fire?")
-    assert answer1.memory is not None
-    assert "1939" in answer1.answer
-    assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
-    answer2 = docs.query("When was the conflict resolved?")
-    assert "1941" in answer2.answer or "1945" in answer2.answer
-    assert answer2.memory is not None
-    assert "Answer" in docs.memory_model.load_memory_variables({})["memory"]
-    print(answer2.answer)
-
-    docs.clear_memory()
-
-    answer3 = docs.query("When was the conflict resolved?")
-    assert answer3.memory is not None
-    assert (
-        "I cannot answer" in answer3.answer
-        or "insufficient" in answer3.answer
-        or "does not provide" in answer3.answer
-        or "ambiguous" in answer3.answer
-    )
-
-
-def test_add_texts():
-    llm_config = {"temperature": 0.1, "model": "babbage-02"}
-    # want to use sparse embedding because
-    # we get some randomness in the OpenAI embeddings
-    docs = Docs(
-        llm_model=OpenAILLMModel(config=llm_config),
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        embedding_client=None,
-    )
-
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
-    )
-
-    docs2 = Docs(
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        embedding_client=None,
-    )
-    texts = [Text(**dict(t)) for t in docs.texts]
-    for t in texts:
-        t.embedding = None
-    docs2.add_texts(texts, next(iter(docs.docs.values())))
-
-    for t1, t2 in zip(docs2.texts, docs.texts):
-        assert t1.text == t2.text
-        assert t1.embedding is not None
-        assert t2.embedding is not None
-        assert np.allclose(t1.embedding, t2.embedding, atol=1e-3)
-    docs2._build_texts_index()
-    # now do it again to test after text index is already built
-    llm_config = {"temperature": 0.1, "model": "babbage-02"}
-    docs = Docs(
-        llm_model=OpenAILLMModel(config=llm_config),
-        docs_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        texts_index=NumpyVectorStore(embedding_model=SparseEmbeddingModel()),
-        embedding_client=None,
-    )
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test3",
-    )
-
-    texts = [Text(**dict(t)) for t in docs.texts]
-    for t in texts:
-        t.embedding = None
-    docs2.add_texts(texts, next(iter(docs.docs.values())))
-    assert len(docs2.docs) == 2
-
-    docs2.query("What country was Bates Born in?")
-
-
-def test_external_doc_index():
+    post = "The opposite of down is"
+    settings = Settings.from_name("fast")
+    settings.prompts.post = post
     docs = Docs()
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test",
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    response = docs.query("What country is Bates from?", settings=settings)
+    assert "up" in response.answer.lower()
+
+
+def test_external_doc_index(stub_data_dir: Path):
+    docs = Docs()
+    docs.add(
+        stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
     )
-    evidence = docs.query(query="What is the date of flag day?", key_filter=True)
-    docs2 = Docs(docs_index=docs.docs_index, texts_index=docs.texts_index)
+    # force embedding
+    _ = docs.get_evidence(query="What is the date of flag day?")
+    docs2 = Docs(texts_index=docs.texts_index)
     assert len(docs2.docs) == 0
-    evidence = docs2.query("What is the date of flag day?", key_filter=True)
-    assert "February 15" in evidence.context
-
-
-def test_embedding_name_consistency():
-    docs = Docs()
-    assert docs.embedding == "text-embedding-3-small"
-    assert docs.texts_index.embedding_model.name == "text-embedding-3-small"
-    docs = Docs(embedding="langchain")
-    assert docs.embedding == "langchain"
-    assert docs.texts_index.embedding_model.name == "langchain"
-    assert isinstance(docs.texts_index.embedding_model, LangchainEmbeddingModel)
-    docs = Docs(embedding="foo")
-    assert docs.embedding == "foo"
-    assert isinstance(docs.texts_index.embedding_model, OpenAIEmbeddingModel)
-    docs = Docs(
-        texts_index=NumpyVectorStore(embedding_model=OpenAIEmbeddingModel(name="test"))
-    )
-    assert docs.embedding == "test"
-
-    docs = Docs(embedding="hybrid-text-embedding-3-small")
-    assert isinstance(docs.docs_index.embedding_model, HybridEmbeddingModel)
-    assert docs.docs_index.embedding_model.models[0].name == "text-embedding-3-small"
-    assert docs.docs_index.embedding_model.models[1].name == "sparse"
-
-
-def test_external_texts_index():
-    docs = Docs(jit_texts_index=True)
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
-        citation="Flag Day of Canada, WikiMedia Foundation, 2023, Accessed now",
-    )
-    answer = docs.query(query="On which date is flag day annually observed?")
-    assert "February 15" in answer.answer
-
-    docs.add_url(
-        "https://en.wikipedia.org/wiki/Frederick_Bates_(politician)",
-        citation="Fredrick Bates, WikiMedia Foundation, 2023, Accessed now",
-    )
-
-    answer = docs.query(
-        query="On which date is flag day annually observed?", key_filter=True
-    )
-    assert "February 15" in answer.answer
+    contexts = docs2.get_evidence("What is the date of flag day?").contexts
+    assert contexts

@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+from collections.abc import Generator, Iterator
 from pathlib import Path
-from typing import Generator, Iterator
 from unittest.mock import patch
 
 import pytest
@@ -12,12 +12,21 @@ from dotenv import load_dotenv
 
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
+from paperqa.settings import Settings
 from paperqa.types import Answer
+from paperqa.utils import setup_default_logs
+
+PAPER_DIRECTORY = Path(__file__).parent
 
 
 @pytest.fixture(autouse=True, scope="session")
 def _load_env():
     load_dotenv()
+
+
+@pytest.fixture(autouse=True)
+def _setup_default_logs():
+    setup_default_logs()
 
 
 @pytest.fixture(scope="session")
@@ -56,20 +65,32 @@ def agent_index_dir(agent_home_dir: Path) -> Path:
 
 
 @pytest.fixture
-def agent_stub_answer() -> Answer:
-    return Answer(question="What is is a self-explanatory model?")
+def stub_data_dir() -> Path:
+    return Path(__file__).parent / "stub_data"
 
 
 @pytest.fixture
-def stub_data_dir() -> Path:
-    return Path(__file__).parent / "stub_data"
+def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
+    settings = Settings()
+    settings.paper_directory = stub_data_dir
+    settings.index_directory = agent_index_dir
+    settings.agent.search_count = 2
+    settings.embedding = "sparse"
+    settings.answer.answer_max_sources = 2
+    settings.answer.evidence_k = 10
+    return settings
+
+
+@pytest.fixture
+def agent_stub_answer() -> Answer:
+    return Answer(question="What is is a self-explanatory model?")
 
 
 @pytest.fixture
 def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[Path]:
 
     # add some near duplicate files then removes them after testing
-    for filename in ("example.txt", "example2.txt"):
+    for filename in ("bates.txt", "obama.txt"):
         if not (tmp_path / f"{filename}_modified.txt").exists():
             with open(stub_data_dir / filename) as f:
                 content = f.read()

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import contextvars
 import logging
 import os
 import re
+from collections.abc import Collection
+from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, Callable, ClassVar, Collection
+from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
+import litellm  # for cost
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
@@ -20,16 +24,6 @@ from pydantic import (
     model_validator,
 )
 
-from .prompts import (
-    citation_prompt,
-    default_system_prompt,
-    qa_prompt,
-    select_paper_prompt,
-    structured_citation_prompt,
-    summary_json_prompt,
-    summary_json_system_prompt,
-    summary_prompt,
-)
 from .utils import (
     create_bibtex_key,
     encode_id,
@@ -39,17 +33,45 @@ from .utils import (
 from .version import __version__ as pqa_version
 
 # Just for clarity
+# also in case one day we want to narrow
+# the type
 DocKey = Any
-CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
-
 logger = logging.getLogger(__name__)
+
+# A context var that will be unique to threads/processes
+cvar_answer_id = contextvars.ContextVar[UUID | None]("answer_id", default=None)
+
+
+@contextmanager
+def set_llm_answer_ids(answer_id: UUID):
+    token = cvar_answer_id.set(answer_id)
+    try:
+        yield
+    finally:
+        cvar_answer_id.reset(token)
 
 
 class LLMResult(BaseModel):
-    """A class to hold the result of a LLM completion."""
+    """A class to hold the result of a LLM completion.
+
+    To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
+
+    ```python
+    my_answer_id = uuid4()
+    with set_llm_answer_ids(my_answer_id):
+        # code that generates LLMResults
+        pass
+    ```
+
+    and all the LLMResults generated within the context will have the same `answer_id`.
+    This can be combined with LLMModels `llm_result_callback` to store all LLMResults.
+    """
 
     id: UUID = Field(default_factory=uuid4)
-    answer_id: UUID | None = None
+    answer_id: UUID | None = Field(
+        default_factory=cvar_answer_id.get,
+        description="A persistent ID to associate a group of LLMResults",
+    )
     name: str | None = None
     prompt: str | list[dict] | None = Field(
         default=None,
@@ -69,6 +91,19 @@ class LLMResult(BaseModel):
 
     def __str__(self):
         return self.text
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cost(self) -> float:
+        """Return the cost of the result in dollars."""
+        if self.prompt_count and self.completion_count:
+            try:
+                pc = litellm.model_cost[self.model]["input_cost_per_token"]
+                oc = litellm.model_cost[self.model]["output_cost_per_token"]
+                return pc * self.prompt_count + oc * self.completion_count
+            except KeyError:
+                logger.warning(f"Could not find cost for model {self.model}.")
+        return 0.0
 
 
 class Embeddable(BaseModel):
@@ -93,99 +128,8 @@ class Text(Embeddable):
     name: str
     doc: Doc
 
-
-# Mock a dictionary and store any missing items
-class _FormatDict(dict):
-    def __init__(self) -> None:
-        self.key_set: set[str] = set()
-
-    def __missing__(self, key: str) -> str:
-        self.key_set.add(key)
-        return key
-
-
-def get_formatted_variables(s: str) -> set[str]:
-    """Returns the set of variables implied by the format string."""
-    format_dict = _FormatDict()
-    s.format_map(format_dict)
-    return format_dict.key_set
-
-
-class PromptCollection(BaseModel):
-    summary: str = summary_prompt
-    qa: str = qa_prompt
-    select: str = select_paper_prompt
-    cite: str = citation_prompt
-    structured_cite: str = structured_citation_prompt
-    pre: str | None = Field(
-        default=None,
-        description=(
-            "Opt-in pre-prompt (templated with just the original question) to append"
-            " information before a qa prompt. For example:"
-            " 'Summarize all scientific terms in the following question:\n{question}'."
-            " This pre-prompt can enable injection of question-specific guidance later"
-            " used by the qa prompt, without changing the qa prompt's template."
-        ),
-    )
-    post: str | None = None
-    system: str = default_system_prompt
-    skip_summary: bool = False
-    json_summary: bool = False
-    # Not thrilled about this model,
-    # but need to split out the system/summary
-    # to get JSON
-    summary_json: str = summary_json_prompt
-    summary_json_system: str = summary_json_system_prompt
-
-    @field_validator("summary")
-    @classmethod
-    def check_summary(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(summary_prompt))
-        ):
-            raise ValueError(
-                f"Summary prompt can only have variables: {get_formatted_variables(summary_prompt)}"
-            )
-        return v
-
-    @field_validator("qa")
-    @classmethod
-    def check_qa(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(qa_prompt))
-        ):
-            raise ValueError(
-                f"QA prompt can only have variables: {get_formatted_variables(qa_prompt)}"
-            )
-        return v
-
-    @field_validator("select")
-    @classmethod
-    def check_select(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(select_paper_prompt))
-        ):
-            raise ValueError(
-                f"Select prompt can only have variables: {get_formatted_variables(select_paper_prompt)}"
-            )
-        return v
-
-    @field_validator("pre")
-    @classmethod
-    def check_pre(cls, v: str | None) -> str | None:
-        if v is not None and set(get_formatted_variables(v)) != {"question"}:
-            raise ValueError("Pre prompt must have input variables: question")
-        return v
-
-    @field_validator("post")
-    @classmethod
-    def check_post(cls, v: str | None) -> str | None:
-        if v is not None:
-            # kind of a hack to get list of attributes in answer
-            attrs = set(Answer.model_fields.keys())
-            if not set(get_formatted_variables(v)).issubset(attrs):
-                raise ValueError(f"Post prompt must have input variables: {attrs}")
-        return v
+    def __hash__(self) -> int:
+        return hash(self.text)
 
 
 class Context(BaseModel):
@@ -197,10 +141,9 @@ class Context(BaseModel):
     text: Text
     score: int = 5
 
-
-def __str__(self) -> str:  # noqa: N807
-    """Return the context as a string."""
-    return self.context
+    def __str__(self) -> str:
+        """Return the context as a string."""
+        return self.context
 
 
 class Answer(BaseModel):
@@ -213,14 +156,15 @@ class Answer(BaseModel):
     contexts: list[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    dockey_filter: set[DocKey] | None = None
-    summary_length: str = "about 100 words"
-    answer_length: str = "about 100 words"
-    # just for convenience you can override this
-    cost: float | None = None
+    cost: float = 0.0
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
+    config_md5: str | None = Field(
+        default=None,
+        frozen=True,
+        description="MD5 hash of the settings used to generate the answer. Cannot change",
+    )
     model_config = ConfigDict(extra="ignore")
 
     def __str__(self) -> str:
@@ -234,7 +178,7 @@ class Answer(BaseModel):
             data.pop("used_contexts", None)
         return data
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def used_contexts(self) -> set[str]:
         """Return the used contexts."""
@@ -260,6 +204,8 @@ class Answer(BaseModel):
         else:
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
+
+        self.cost += result.cost
 
     def get_unique_docs_from_contexts(self, score_threshold: int = 0) -> set[Doc]:
         """Parse contexts for docs with scores above the input threshold."""
@@ -469,7 +415,7 @@ class DocDetails(Doc):
 
     @staticmethod
     def overwrite_docname_dockey_for_compatibility_w_doc(
-        data: dict[str, Any]
+        data: dict[str, Any],
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}
@@ -480,7 +426,7 @@ class DocDetails(Doc):
         return data
 
     @classmethod
-    def populate_bibtex_key_citation(  # noqa: C901, PLR0912
+    def populate_bibtex_key_citation(  # noqa: PLR0912
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Add or modify bibtex, key, and citation fields.
@@ -636,7 +582,7 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: C901
+    def __add__(self, other: DocDetails | int) -> DocDetails:
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
