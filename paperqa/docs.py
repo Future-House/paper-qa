@@ -54,11 +54,11 @@ from paperqa.utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_callback(result: LLMResult):
+async def empty_callback(result: LLMResult) -> None:
     pass
 
 
-async def print_callback(result: LLMResult):
+async def print_callback(result: LLMResult) -> None:
     pass
 
 
@@ -85,7 +85,7 @@ class Docs(BaseModel):
             return PAPERQA_DIR / info.data["name"]
         return value
 
-    def clear_docs(self):
+    def clear_docs(self) -> None:
         self.texts = []
         self.docs = {}
         self.docnames = set()
@@ -451,7 +451,7 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
-    def _build_texts_index(self):
+    def _build_texts_index(self) -> None:
         texts = [t for t in self.texts if t not in self.texts_index]
         self.texts_index.add_texts_and_embeddings(texts)
 

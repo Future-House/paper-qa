@@ -166,7 +166,7 @@ class SimpleProfiler(BaseModel):
         except RuntimeError:  # No running event loop (not in async)
             self.running_timers[name] = TimerData(start_time=time.time())
 
-    def stop(self, name: str):
+    def stop(self, name: str) -> None:
         timer_data = self.running_timers.pop(name, None)
         if timer_data:
             try:

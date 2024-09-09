@@ -193,7 +193,7 @@ class SearchIndex:
 
     async def add_document(
         self, index_doc: dict, document: Any | None = None, max_retries: int = 1000
-    ):
+    ) -> None:
         @retry(
             stop=stop_after_attempt(max_retries),
             wait=wait_random_exponential(multiplier=0.25, max=60),

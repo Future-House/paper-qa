@@ -488,10 +488,10 @@ class VectorStore(BaseModel, ABC):
     model_config = ConfigDict(extra="forbid")
     texts_hashes: set[int] = Field(default_factory=set)
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         return hash(item) in self.texts_hashes
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.texts_hashes)
 
     @abstractmethod
@@ -614,7 +614,7 @@ class LangchainVectorStore(VectorStore):
     class_type: type[Embeddable] = Field(default=Embeddable)
     model_config = ConfigDict(extra="forbid")
 
-    def __init__(self, **data):
+    def __init__(self, **data) -> None:
         raise NotImplementedError(
             "Langchain has updated vectorstore internals and this is not yet supported"
         )

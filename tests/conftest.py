@@ -20,12 +20,12 @@ PAPER_DIRECTORY = Path(__file__).parent
 
 
 @pytest.fixture(autouse=True, scope="session")
-def _load_env():
+def _load_env() -> None:
     load_dotenv()
 
 
 @pytest.fixture(autouse=True)
-def _setup_default_logs():
+def _setup_default_logs() -> None:
     setup_default_logs()
 
 
