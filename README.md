@@ -495,7 +495,7 @@ You can customize any of the prompts, using the `PromptCollection` class. For ex
 ```python
 from paperqa import Docs, Answer, PromptCollection
 
-my_qaprompt = (
+my_qa_prompt = (
     "Answer the question '{question}' "
     "Use the context below if helpful. "
     "You can cite the context using the key "
@@ -504,7 +504,7 @@ my_qaprompt = (
     "about how you cannot answer.\n\n"
     "Context: {context}\n\n"
 )
-prompts = PromptCollection(qa=my_qaprompt)
+prompts = PromptCollection(qa=my_qa_prompt)
 docs = Docs(prompts=prompts)
 ```
 

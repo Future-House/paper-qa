@@ -381,16 +381,19 @@ def bibtex_field_extract(
         return missing_replacements.get(field, "")
 
 
+UNKNOWN_AUTHOR_KEY: str = "unknownauthors"
+
+
 def create_bibtex_key(author: list[str], year: str, title: str) -> str:
     FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
     try:
         author_rep = (
             author[0].split()[-1].casefold()
             if "Unknown" not in author[0]
-            else "unknownauthors"
+            else UNKNOWN_AUTHOR_KEY
         )
     except IndexError:
-        author_rep = "unknownauthors"
+        author_rep = UNKNOWN_AUTHOR_KEY
     # we don't want a bibtex-parsing induced line break in the key
     # so we cap it to 100+50+4 = 154 characters max
     # 50 for the author, 100 for the first three title words, 4 for the year
