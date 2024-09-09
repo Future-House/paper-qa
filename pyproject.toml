@@ -47,31 +47,23 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 agents = [
-    "anthropic",
     "anyio",
     "langchain",
     "langchain-community",
     "langchain-core",
     "langchain-openai",
     "pymupdf",
+    "pymupdf",
     "requests",
     "tantivy",
     "typer",
     "typing_extensions",
 ]
-google = [
-    "langchain-google-vertexai",
-    "vertexai",
-]
 llms = [
-    "anthropic",
     "faiss-cpu",
     "langchain-community",
     "langchain-core",
     "langchain-openai",
-    "pymupdf",
-    "sentence_transformers",
-    "voyageai",
 ]
 typing = [
     "types-PyYAML",
@@ -155,8 +147,6 @@ module = [
     "fitz",
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
-    "sentence_transformers",  # SEE: https://github.com/UKPLab/sentence-transformers/issues/1723
-    "voyageai.*",  # SEE: https://github.com/voyage-ai/voyageai-python/issues/8
 ]
 
 [tool.pylint]
@@ -402,9 +392,10 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[agents,google,llms]",
+    "paper-qa[agents,llms,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
+    "pytest-mock",
     "pytest-recording",
     "pytest-rerunfailures",
     "pytest-subtests",
