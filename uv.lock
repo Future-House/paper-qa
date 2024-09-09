@@ -1143,7 +1143,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev8+g6a0a603.d20240909"
+version = "5.0.0a2.dev9+gb656b6e.d20240909"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1205,7 +1205,6 @@ dev = [
     { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
-    { name = "pytest-mock" },
     { name = "pytest-recording" },
     { name = "pytest-rerunfailures" },
     { name = "pytest-subtests" },
@@ -1267,7 +1266,6 @@ dev = [
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
-    { name = "pytest-mock" },
     { name = "pytest-recording" },
     { name = "pytest-rerunfailures" },
     { name = "pytest-subtests" },
@@ -1608,18 +1606,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/52/6d/c6cf50ce320cf8611df7a1254d86233b3df7cc07f9b5f5cbcb82e08aa534/pytest_asyncio-0.24.0.tar.gz", hash = "sha256:d081d828e576d85f875399194281e92bf8a68d60d72d1a2faf2feddb6c46b276", size = 49855 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/96/31/6607dab48616902f76885dfcf62c08d929796fc3b2d2318faf9fd54dbed9/pytest_asyncio-0.24.0-py3-none-any.whl", hash = "sha256:a811296ed596b69bf0b6f3dc40f83bcaf341b155a269052d82efa2b25ac7037b", size = 18024 },
-]
-
-[[package]]
-name = "pytest-mock"
-version = "3.14.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/90/a955c3ab35ccd41ad4de556596fa86685bf4fc5ffcc62d22d856cfd4e29a/pytest-mock-3.14.0.tar.gz", hash = "sha256:2719255a1efeceadbc056d6bf3df3d1c5015530fb40cf347c0f9afac88410bd0", size = 32814 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/3b/b26f90f74e2986a82df6e7ac7e319b8ea7ccece1caec9f8ab6104dc70603/pytest_mock-3.14.0-py3-none-any.whl", hash = "sha256:0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f", size = 9863 },
 ]
 
 [[package]]

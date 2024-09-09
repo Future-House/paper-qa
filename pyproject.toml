@@ -397,7 +397,6 @@ dev-dependencies = [
     "paper-qa[agents,llms,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
-    "pytest-mock",
     "pytest-recording",
     "pytest-rerunfailures",
     "pytest-subtests",
