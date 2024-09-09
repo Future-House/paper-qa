@@ -24,10 +24,11 @@ from tenacity import (
     wait_random_exponential,
 )
 
-from ..docs import Docs
-from ..settings import MaybeSettings, Settings, get_settings
-from ..types import DocDetails
-from ..utils import hexdigest, pqa_directory
+from paperqa.docs import Docs
+from paperqa.settings import MaybeSettings, Settings, get_settings
+from paperqa.types import DocDetails
+from paperqa.utils import hexdigest, pqa_directory
+
 from .models import SupportsPickle
 
 logger = logging.getLogger(__name__)

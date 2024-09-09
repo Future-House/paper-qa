@@ -11,13 +11,14 @@ from typing import Any
 
 import aiohttp
 
-from ..types import DocDetails
-from ..utils import (
+from paperqa.types import DocDetails
+from paperqa.utils import (
     _get_with_retrying,
     clean_upbibtex,
     strings_similarity,
     union_collections_to_ordered_list,
 )
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .crossref import doi_to_bibtex
 from .exceptions import DOINotFoundError

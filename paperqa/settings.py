@@ -13,8 +13,8 @@ else:
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
-from .llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
-from .prompts import (
+from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
+from paperqa.prompts import (
     citation_prompt,
     default_system_prompt,
     qa_prompt,
@@ -24,8 +24,8 @@ from .prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
-from .utils import hexdigest, pqa_directory
-from .version import __version__
+from paperqa.utils import hexdigest, pqa_directory
+from paperqa.version import __version__
 
 
 class AnswerSettings(BaseModel):
@@ -232,7 +232,7 @@ class PromptSettings(BaseModel):
     def check_post(cls, v: str | None) -> str | None:
         if v is not None:
             # kind of a hack to get list of attributes in answer
-            from .types import Answer
+            from paperqa.types import Answer
 
             attrs = set(Answer.model_fields.keys())
             if not set(get_formatted_variables(v)).issubset(attrs):
@@ -311,7 +311,7 @@ class AgentSettings(BaseModel):
         if v is None:
             return None
         # imported here to avoid circular imports
-        from .agents.main import GenerateAnswerTool
+        from paperqa.agents.main import GenerateAnswerTool
 
         answer_tool_name = GenerateAnswerTool.__fields__["name"].default
         if answer_tool_name not in v:

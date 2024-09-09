@@ -1,5 +1,5 @@
-from .docs import Answer, Docs, print_callback
-from .llms import (
+from paperqa.docs import Answer, Docs, print_callback
+from paperqa.llms import (
     EmbeddingModel,
     HybridEmbeddingModel,
     LangchainVectorStore,
@@ -11,9 +11,9 @@ from .llms import (
     SparseEmbeddingModel,
     embedding_model_factory,
 )
-from .settings import Settings, get_settings
-from .types import Context, Doc, DocDetails, Text
-from .version import __version__
+from paperqa.settings import Settings, get_settings
+from paperqa.types import Context, Doc, DocDetails, Text
+from paperqa.version import __version__
 
 __all__ = [
     "Answer",

@@ -7,9 +7,9 @@ from typing import Any
 
 from pydantic_settings import CliSettingsSource
 
-from .. import __version__
-from ..settings import Settings
-from ..utils import get_loop, pqa_directory, setup_default_logs
+from paperqa.settings import Settings
+from paperqa.utils import get_loop, pqa_directory, setup_default_logs
+from paperqa.version import __version__
 
 try:
     from rich.console import Console

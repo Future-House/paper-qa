@@ -8,11 +8,9 @@ from urllib.parse import quote
 import aiohttp
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from ..types import DocDetails
-from ..utils import (
-    _get_with_retrying,
-    strings_similarity,
-)
+from paperqa.types import DocDetails
+from paperqa.utils import _get_with_retrying, strings_similarity
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
 

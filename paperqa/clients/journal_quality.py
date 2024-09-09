@@ -7,7 +7,8 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from ..types import DocDetails
+from paperqa.types import DocDetails
+
 from .client_models import JournalQuery, MetadataPostProcessor
 
 logger = logging.getLogger(__name__)

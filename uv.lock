@@ -1143,7 +1143,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev9+g4f1aa80.d20240909"
+version = "5.0.0a2.dev8+g6a0a603.d20240909"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1185,6 +1185,9 @@ typing = [
     { name = "types-pyyaml" },
     { name = "types-requests" },
     { name = "types-setuptools" },
+]
+zotero = [
+    { name = "pyzotero" },
 ]
 
 [package.dev-dependencies]
@@ -1241,6 +1244,7 @@ requires-dist = [
     { name = "pydantic-settings" },
     { name = "pymupdf", marker = "extra == 'agents'" },
     { name = "pypdf" },
+    { name = "pyzotero", marker = "extra == 'zotero'" },
     { name = "requests", marker = "extra == 'agents'" },
     { name = "setuptools" },
     { name = "tantivy", marker = "extra == 'agents'" },

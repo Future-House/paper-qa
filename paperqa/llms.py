@@ -12,9 +12,9 @@ import tiktoken
 from litellm import Router, aembedding, token_counter
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .prompts import default_system_prompt
-from .types import Doc, Embeddable, LLMResult, Text
-from .utils import is_coroutine_callable
+from paperqa.prompts import default_system_prompt
+from paperqa.types import Doc, Embeddable, LLMResult, Text
+from paperqa.utils import is_coroutine_callable
 
 Chain = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
