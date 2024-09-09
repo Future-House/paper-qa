@@ -56,10 +56,6 @@ async def litellm_get_search_query(
             f"The current year is {get_year()}."
         )
 
-    if "gpt" not in llm:
-        raise ValueError(
-            f"Invalid llm: {llm}, note a GPT model must be used for the fake agent search."
-        )
     model = LiteLLMModel(name=llm)
     model.config["model_list"][0]["litellm_params"].update({"temperature": temperature})
     chain = model.make_chain(prompt=search_prompt, skip_system=True)
@@ -91,9 +87,11 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
-            table.add_row(
-                cast(Docs, obj).texts[0].doc.title[:max_chars_per_column], filename  # type: ignore[attr-defined]
-            )
+            try:
+                display_name = cast(Docs, obj).texts[0].doc.title  # type: ignore[attr-defined]
+            except AttributeError:
+                display_name = cast(Docs, obj).texts[0].doc.citation
+            table.add_row(display_name[:max_chars_per_column], filename)
         return table
     raise NotImplementedError(
         f"Object type {type(example_object)} can not be converted to table."

@@ -298,16 +298,23 @@ async def run_langchain_agent(
     return answer, agent_status
 
 
-async def search(
+async def index_search(
     query: str,
     index_name: str = "answers",
     index_directory: str | os.PathLike | None = None,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
+    fields = [*SearchIndex.REQUIRED_FIELDS]
+    if index_name == "answers":
+        fields.append("question")
     search_index = SearchIndex(
-        ["file_location", "body", "question"],
+        fields=fields,
         index_name=index_name,
         index_directory=index_directory or pqa_directory("indexes"),
-        storage=SearchDocumentStorage.JSON_MODEL_DUMP,
+        storage=(
+            SearchDocumentStorage.JSON_MODEL_DUMP
+            if index_name == "answers"
+            else SearchDocumentStorage.PICKLE_COMPRESSED
+        ),
     )
 
     results = [
@@ -320,6 +327,7 @@ async def search(
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        agent_logger.info("No results found.")
+        count = await search_index.count
+        agent_logger.info(f"No results found. Searched {count} docs")
 
     return results
