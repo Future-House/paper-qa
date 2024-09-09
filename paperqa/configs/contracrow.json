@@ -1,0 +1,17 @@
+{
+  "llm": "claude-3-5-sonnet-20240620",
+  "summary_llm": "claude-3-5-sonnet-20240620",
+  "agent": { "agent_type": "OpenAIFunctionsAgent", "search_count": 12 },
+  "answer": {
+    "evidence_summary_length": "about 300 words",
+    "answer_max_sources": 15,
+    "evidence_k": 30
+  },
+  "prompts": {
+    "summary_json_system": "Provide a summary of the relevant information that could help determine if a claim is contradicted or supported by this excerpt. The excerpt may be irrelevant. Do not directly answer if it is contradicted - only summarize relevant information. Respond with the following JSON format:\n\n{{\n  \"summary\": \"...\",\n  \"relevance_score\": \"...\"\n}}\n\nwhere `summary` is relevant information from excerpt ({summary_length}) and `relevance_score` is the relevance of `summary` to support or contradict the claim (integer out of 10). If any string entry in the JSON has newlines, be sure to escape them. ",
+    "use_json": true,
+    "qa": "Determine if the claim below is contradicted by the context below\n\n\n{context}\n\n----\n\nClaim: {question}\n\n\nDetermine if the claim is contradicted by the context. For each part of your response, indicate which sources most support it via citation keys at the end of sentences, like (Example2012Example pages 3-4). Only cite from the context below and only use the valid keys.\n\nRespond with the following XML format:\n\n<response>\n  <reasoning>...</reasoning>\n  <label>...</label>\n</response>\n\n\nwhere `reasoning` is your reasoning ({answer_length}) about if the claim is being contradicted. `label` is one of the following (must match exactly): \n\nexplicit contradiction\nstrong contradiction\ncontradiction\nnuanced contradiction\npossibly a contradiction\nlack of evidence\npossibly an agreement\nnuanced agreement\nagreement\nstrong agreement\nexplicit agreement\n\nDon't worry about other contradictions or agreements in the context, only focus on the specific claim. If there is no evidence for the claim, you should choose lack of evidence."
+  },
+  "embedding": "hybrid-text-embedding-3-large",
+  "parsing": { "chunk_size": 7000, "overlap": 250 }
+}
