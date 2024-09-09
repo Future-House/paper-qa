@@ -8,9 +8,9 @@ from collections.abc import AsyncIterable
 from io import BytesIO
 from pathlib import Path
 
+import httpx
 import numpy as np
 import pytest
-import requests
 
 from paperqa import Answer, Doc, Docs, NumpyVectorStore, Settings, print_callback
 from paperqa.clients import CrossrefProvider
@@ -151,9 +151,7 @@ def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
-    r = requests.get(  # noqa: S113
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
-    )
+    r = httpx.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
     assert maybe_is_text(r.text)
 
     assert maybe_is_html(BytesIO(r.text.encode()))

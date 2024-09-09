@@ -1125,7 +1125,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev30+g2443cbc.d20240909"
+version = "5.0.0a2.dev32+g01bb765.d20240909"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1152,14 +1152,12 @@ agents = [
     { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "pymupdf" },
-    { name = "requests" },
     { name = "tantivy" },
     { name = "typer" },
     { name = "typing-extensions" },
 ]
 typing = [
     { name = "types-pyyaml" },
-    { name = "types-requests" },
     { name = "types-setuptools" },
 ]
 zotero = [
@@ -1193,7 +1191,6 @@ dev = [
     { name = "tantivy" },
     { name = "typer" },
     { name = "types-pyyaml" },
-    { name = "types-requests" },
     { name = "types-setuptools" },
     { name = "typing-extensions" },
 ]
@@ -1217,14 +1214,12 @@ requires-dist = [
     { name = "pymupdf", marker = "extra == 'agents'" },
     { name = "pypdf" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
-    { name = "requests", marker = "extra == 'agents'" },
     { name = "setuptools" },
     { name = "tantivy", marker = "extra == 'agents'" },
     { name = "tenacity" },
     { name = "tiktoken", specifier = ">=0.4.0" },
     { name = "typer", marker = "extra == 'agents'" },
     { name = "types-pyyaml", marker = "extra == 'typing'" },
-    { name = "types-requests", marker = "extra == 'typing'" },
     { name = "types-setuptools", marker = "extra == 'typing'" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions", marker = "extra == 'agents'" },
@@ -2196,18 +2191,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/dd/08/6f5737f645571b7a0b1ebd2fe8b5cf1ee4ec3e707866ca96042a86fc1d10/types-PyYAML-6.0.12.20240808.tar.gz", hash = "sha256:b8f76ddbd7f65440a8bda5526a9607e4c7a322dc2f8e1a8c405644f9a6f4b9af", size = 12359 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f3/ad/ffbad24e2bc8f20bf047ec22af0c0a92f6ce2071eb21c9103df600cda6de/types_PyYAML-6.0.12.20240808-py3-none-any.whl", hash = "sha256:deda34c5c655265fc517b546c902aa6eed2ef8d3e921e4765fe606fe2afe8d35", size = 15298 },
-]
-
-[[package]]
-name = "types-requests"
-version = "2.32.0.20240907"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "urllib3" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9f/94/b6f90e5f09e1d621d5cd6d1057d5d28d4019d95f06eab205afa743ba1907/types-requests-2.32.0.20240907.tar.gz", hash = "sha256:ff33935f061b5e81ec87997e91050f7b4af4f82027a7a7a9d9aaea04a963fdf8", size = 18004 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5f/6e/425219be1dfc954c3e129b3ea70407abc78c1bd6414d0c7180df9940ca1f/types_requests-2.32.0.20240907-py3-none-any.whl", hash = "sha256:1d1e79faeaf9d42def77f3c304893dea17a97cae98168ac69f3cb465516ee8da", size = 15828 },
 ]
 
 [[package]]
