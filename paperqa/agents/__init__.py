@@ -15,7 +15,7 @@ try:
     from rich.console import Console
     from rich.logging import RichHandler
 
-    from .main import agent_query, search
+    from .main import agent_query, index_search
     from .models import AnswerResponse, QueryRequest
     from .search import SearchIndex, get_directory_index
 
@@ -125,7 +125,7 @@ def search_query(
         index_name = settings.get_index_name()
     loop = get_loop()
     return loop.run_until_complete(
-        search(
+        index_search(
             query,
             index_name=index_name,
             index_directory=settings.index_directory,

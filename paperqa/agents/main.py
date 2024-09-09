@@ -298,7 +298,7 @@ async def run_langchain_agent(
     return answer, agent_status
 
 
-async def search(
+async def index_search(
     query: str,
     index_name: str = "answers",
     index_directory: str | os.PathLike | None = None,
@@ -310,7 +310,11 @@ async def search(
         fields=fields,
         index_name=index_name,
         index_directory=index_directory or pqa_directory("indexes"),
-        storage=SearchDocumentStorage.JSON_MODEL_DUMP,
+        storage=(
+            SearchDocumentStorage.JSON_MODEL_DUMP
+            if index_name == "answers"
+            else SearchDocumentStorage.PICKLE_COMPRESSED
+        ),
     )
 
     results = [
