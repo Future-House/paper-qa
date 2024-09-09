@@ -40,6 +40,12 @@ jobs:
         python-version: ["3.12"] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
+      - name: Setup DNS caching
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dnsmasq
+          echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+          sudo systemctl start dnsmasq
       - name: Set up uv
         run: |-
           curl -LsSf https://astral.sh/uv/install.sh | sh
