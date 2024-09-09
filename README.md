@@ -457,10 +457,7 @@ In general, embeddings are cached when you pickle a `Docs` regardless of what ve
 You can customize any of the prompts, using the `PromptCollection` class. For example, if you want to change the prompt for the question, you can do:
 
 ```python
-from paperqa import (
-    Docs,
-    Settings,
-)
+from paperqa import Docs, Settings
 from paperqa.settings import PromptSettings
 
 my_qaprompt = (
