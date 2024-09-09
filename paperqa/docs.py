@@ -109,8 +109,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd_file(
                 file,
                 citation=citation,
@@ -171,8 +170,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd_url(
                 url,
                 citation=citation,
@@ -224,8 +222,7 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd(
                 path,
                 citation=citation,
@@ -271,7 +268,7 @@ class Docs(BaseModel):
                 chunk_chars=parse_config.chunk_size,
                 overlap=parse_config.overlap,
             )
-            if len(texts) == 0:
+            if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
             result = await llm_model.run_prompt(
                 prompt=parse_config.citation_prompt,
@@ -358,7 +355,7 @@ class Docs(BaseModel):
         )
         # loose check to see if document was loaded
         if (
-            len(texts) == 0
+            not texts
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
                 not parse_config.disable_doc_valid_check
@@ -380,8 +377,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> bool:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd_texts(
                 texts, doc, settings=settings, embedding_model=embedding_model
             )
@@ -527,7 +523,7 @@ class Docs(BaseModel):
             else query
         )
 
-        if len(self.docs) == 0 and len(self.texts_index) == 0:
+        if not self.docs and len(self.texts_index) == 0:
             return answer
 
         if embedding_model is None:
@@ -739,7 +735,7 @@ class Docs(BaseModel):
             )
 
         formatted_answer = f"Question: {answer.question}\n\n{answer_text}\n"
-        if len(bib) > 0:
+        if bib:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         if prompt_config.post is not None:
@@ -754,7 +750,7 @@ class Docs(BaseModel):
             answer_text = post.text
             answer.add_tokens(post)
             formatted_answer = f"Question: {answer.question}\n\n{post}\n"
-            if len(bib) > 0:
+            if bib:
                 formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         # now at end we modify, so we could have retried earlier

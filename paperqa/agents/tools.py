@@ -248,7 +248,7 @@ class GatherEvidenceTool(BaseTool):
             self.shared_state.answer.contexts, key=lambda x: x.score, reverse=True
         )
         best_evidence = ""
-        if len(sorted_contexts) > 0:
+        if sorted_contexts:
             best_evidence = f" Best evidence:\n\n{sorted_contexts[0].context}"
         status = await self.shared_state.get_status()
         logger.info(status)

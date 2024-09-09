@@ -520,7 +520,7 @@ class DocDetails(Doc):
                 )
         if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
-                data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
+                data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
         elif not data.get("citation"):
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
@@ -607,7 +607,7 @@ class DocDetails(Doc):
                 # Merge 'other' dictionaries
                 merged_data[field] = {**self.other, **other.other}
                 # handle the bibtex / sources as special fields
-                for field_to_combine in ["bibtex_source", "client_source"]:
+                for field_to_combine in ("bibtex_source", "client_source"):
                     if self.other.get(field_to_combine) and other.other.get(
                         field_to_combine
                     ):

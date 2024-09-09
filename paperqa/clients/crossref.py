@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import copy
 import json
 import logging
@@ -156,7 +157,7 @@ async def parse_crossref_to_doc_details(
     bibtex_source = "self_generated"
     bibtex = None
 
-    try:
+    with contextlib.suppress(DOINotFoundError):
         # get the title from the message, if it exists
         # rare circumstance, but bibtex may not have a title
         fallback_data = copy.copy(CITATION_FALLBACK_DATA)
@@ -173,9 +174,6 @@ async def parse_crossref_to_doc_details(
             )
             # track the origin of the bibtex entry for debugging
             bibtex_source = "crossref"
-
-    except DOINotFoundError:
-        pass
 
     authors = [
         f"{author.get('given', '')} {author.get('family', '')}".strip()
