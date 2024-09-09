@@ -20,6 +20,19 @@ jobs:
       - uses: pre-commit/action@v3.0.1
       - uses: pre-commit-ci/lite-action@v1.0.2
         if: always()
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"] # Our min supported Python version
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv
+        run: |-
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv python pin ${{ matrix.python-version }}
+      - run: uv sync --python-preference=only-managed
+      - run: uv run refurb paperqa tests
   test:
     runs-on: ubuntu-latest
     strategy:

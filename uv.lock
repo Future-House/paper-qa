@@ -1152,7 +1152,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev9+gb656b6e.d20240909"
+version = "5.0.0a2.dev13+g8a6e225.d20240909"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1222,6 +1222,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
+    { name = "refurb" },
     { name = "requests" },
     { name = "tantivy" },
     { name = "typer" },
@@ -1284,6 +1285,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
+    { name = "refurb", specifier = ">=2" },
     { name = "requests" },
 ]
 
@@ -1790,6 +1792,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/99/5b/73ca1f8e72fff6fa52119dbd185f73a907b1989428917b24cff660129b6d/referencing-0.35.1.tar.gz", hash = "sha256:25b42124a6c8b632a425174f24087783efb348a6f1e0008e63cd4466fedf703c", size = 62991 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/59/2056f61236782a2c86b33906c025d4f4a0b17be0161b63b70fd9e8775d36/referencing-0.35.1-py3-none-any.whl", hash = "sha256:eda6d3234d62814d1c64e305c1331c9a3a6132da475ab6382eaa997b21ee75de", size = 26684 },
+]
+
+[[package]]
+name = "refurb"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mypy" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/83/56ecbe3af6462e7a87cc4a302c2889e7ce447e9502ea76b7a739d1d46123/refurb-2.0.0.tar.gz", hash = "sha256:8a8f1e7c131ef7dc460cbecbeaf536f5eb0ecb657c099d7823941f0e65b1cfe1", size = 91453 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fb/3e/f0a47001b29205d96c9f2bf7f7383fdeadd7c35488e6dadd9afa3b6283e8/refurb-2.0.0-py3-none-any.whl", hash = "sha256:fa9e950dc6edd7473642569c118f8714eefd1e6f21a15ee4210a1be853aaaf80", size = 138560 },
 ]
 
 [[package]]

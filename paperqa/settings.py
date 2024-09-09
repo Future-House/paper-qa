@@ -83,7 +83,7 @@ class ChunkingOptions(str, Enum):
         # Note that SIMPLE_OVERLAP must be valid for all by default
         # TODO: implement for future parsing options
         valid_parsing_dict: dict[str, list[ParsingOptions]] = {}
-        return valid_parsing_dict.get(self.value, [])
+        return valid_parsing_dict.get(self.value, [])  # noqa: FURB184
 
 
 class ParsingSettings(BaseModel):
@@ -140,7 +140,7 @@ class ParsingSettings(BaseModel):
         )
 
 
-class _FormatDict(dict):
+class _FormatDict(dict):  # noqa: FURB189
     """Mock a dictionary and store any missing items."""
 
     def __init__(self) -> None:
@@ -187,8 +187,8 @@ class PromptSettings(BaseModel):
     @field_validator("summary")
     @classmethod
     def check_summary(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(summary_prompt))
+        if not get_formatted_variables(v).issubset(
+            get_formatted_variables(summary_prompt)
         ):
             raise ValueError(
                 "Summary prompt can only have variables:"
@@ -199,9 +199,7 @@ class PromptSettings(BaseModel):
     @field_validator("qa")
     @classmethod
     def check_qa(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(qa_prompt))
-        ):
+        if not get_formatted_variables(v).issubset(get_formatted_variables(qa_prompt)):
             raise ValueError(
                 "QA prompt can only have variables:"
                 f" {get_formatted_variables(qa_prompt)}"
@@ -211,8 +209,8 @@ class PromptSettings(BaseModel):
     @field_validator("select")
     @classmethod
     def check_select(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(select_paper_prompt))
+        if not get_formatted_variables(v).issubset(
+            get_formatted_variables(select_paper_prompt)
         ):
             raise ValueError(
                 "Select prompt can only have variables:"
@@ -223,7 +221,7 @@ class PromptSettings(BaseModel):
     @field_validator("pre")
     @classmethod
     def check_pre(cls, v: str | None) -> str | None:
-        if v is not None and set(get_formatted_variables(v)) != {"question"}:
+        if v is not None and get_formatted_variables(v) != {"question"}:
             raise ValueError("Pre prompt must have input variables: question")
         return v
 
@@ -235,7 +233,7 @@ class PromptSettings(BaseModel):
             from paperqa.types import Answer
 
             attrs = set(Answer.model_fields.keys())
-            if not set(get_formatted_variables(v)).issubset(attrs):
+            if not get_formatted_variables(v).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
         return v
 

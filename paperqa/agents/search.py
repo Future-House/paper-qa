@@ -276,8 +276,7 @@ class SearchIndex:
     async def get_saved_object(
         self, file_location: str, keep_filenames: bool = False
     ) -> Any | None | tuple[Any, str]:
-        index_files = await self.index_files
-        filehash = index_files.get(file_location)
+        filehash = (await self.index_files).get(file_location)
         if filehash:
             docs_index_dir = await self.docs_index_directory
             async with await anyio.open_file(
