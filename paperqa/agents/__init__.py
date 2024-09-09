@@ -43,6 +43,8 @@ def configure_cli_logging(verbosity: int = 0) -> None:
             "paperqa.agents.models": logging.WARNING,
             "paperqa.agents.search": logging.INFO,
             "litellm": logging.WARNING,
+            "LiteLLM Router": logging.WARNING,
+            "LiteLLM Proxy": logging.WARNING,
         }
     }
 
@@ -58,6 +60,8 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         "paperqa.models": logging.DEBUG,
         "paperqa.agents.search": logging.DEBUG,
         "litellm": logging.INFO,
+        "LiteLLM Router": logging.INFO,
+        "LiteLLM Proxy": logging.INFO,
     }
 
     verbosity_map[3] = verbosity_map[2] | {

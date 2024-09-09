@@ -48,7 +48,7 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path):
 
     search_result = search_query(
         " ".join(response.answer.formatted_answer.split()[:5]),
-        settings.get_index_name(),
+        "answers",
         settings,
     )
     found_answer = search_result[0][0]

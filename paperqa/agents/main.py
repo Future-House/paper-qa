@@ -303,8 +303,11 @@ async def search(
     index_name: str = "answers",
     index_directory: str | os.PathLike | None = None,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
+    fields = [*SearchIndex.REQUIRED_FIELDS]
+    if index_name == "answers":
+        fields.append("question")
     search_index = SearchIndex(
-        ["file_location", "body", "question"],
+        fields=fields,
         index_name=index_name,
         index_directory=index_directory or pqa_directory("indexes"),
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
