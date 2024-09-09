@@ -6,7 +6,7 @@
 
 PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) and our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection. It includes:
 
-- A simple interface to get good answers, with no hallucinations, grounding responses with in-text citations.
+- A simple interface to get good query answers, with no hallucinations, grounding responses with in-text citations.
 - State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
 - The ability to do agentic RAG which iteratively refines queries and answers.
 - Automatically obtained paper metadata, including citation and journal quality data.
