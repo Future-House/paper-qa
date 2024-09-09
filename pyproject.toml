@@ -22,10 +22,6 @@ dependencies = [
     "anyio",
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
-    "langchain",
-    "langchain-community",
-    "langchain-core",
-    "langchain-openai",
     "litellm",
     "numpy",
     "pybtex",

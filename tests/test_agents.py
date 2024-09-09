@@ -7,9 +7,6 @@ from typing import Any, cast
 from unittest.mock import patch
 
 import pytest
-from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
-from langchain.tools import BaseTool
-from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
