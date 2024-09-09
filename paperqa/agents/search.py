@@ -47,6 +47,8 @@ class RobustEncoder(json.JSONEncoder):
             return str(obj)
         if isinstance(obj, set):
             return list(obj)
+        if isinstance(obj, os.PathLike):
+            return str(obj)
         return json.JSONEncoder.default(self, obj)
 
 
