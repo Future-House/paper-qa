@@ -7,6 +7,7 @@ import re
 import tempfile
 from collections.abc import Callable
 from datetime import datetime
+from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import Any, BinaryIO, cast
@@ -22,7 +23,13 @@ from pydantic import (
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
-from paperqa.llms import EmbeddingModel, LLMModel, NumpyVectorStore, VectorStore
+from paperqa.llms import (
+    EmbeddingModel,
+    LLMModel,
+    NumpyVectorStore,
+    PromptRunner,
+    VectorStore,
+)
 from paperqa.paths import PAPERQA_DIR
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
@@ -554,16 +561,17 @@ class Docs(BaseModel):
             else matches
         )
 
-        summary_chain = None
-
+        prompt_runner: PromptRunner | None = None
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
-                summary_chain = summary_llm_model.make_chain(
+                prompt_runner = partial(
+                    summary_llm_model.run_prompt,
                     prompt=prompt_config.summary_json,
                     system_prompt=prompt_config.summary_json_system,
                 )
             else:
-                summary_chain = summary_llm_model.make_chain(
+                prompt_runner = partial(
+                    summary_llm_model.run_prompt,
                     prompt=prompt_config.summary,
                     system_prompt=prompt_config.system,
                 )
@@ -573,15 +581,15 @@ class Docs(BaseModel):
                 answer_config.max_concurrent_requests,
                 [
                     map_fxn_summary(
-                        m,
-                        answer.question,
-                        summary_chain,
-                        {
+                        text=m,
+                        question=answer.question,
+                        prompt_runner=prompt_runner,
+                        extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
                             "citation": f"{m.name}: {m.doc.citation}",
                         },
-                        llm_parse_json if prompt_config.use_json else None,
-                        callbacks,
+                        parser=llm_parse_json if prompt_config.use_json else None,
+                        callbacks=callbacks,
                     )
                     for m in matches
                 ],
