@@ -158,7 +158,8 @@ class SimpleProfiler(BaseModel):
             elapsed = end_time - start_time
             self.timers.setdefault(name, []).append(elapsed)
             logger.info(
-                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s | VERSION: {__version__}"
+                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s"
+                f" | VERSION: {__version__}"
             )
 
     def start(self, name: str) -> None:
@@ -177,7 +178,8 @@ class SimpleProfiler(BaseModel):
             elapsed = t_stop - timer_data.start_time
             self.timers.setdefault(name, []).append(elapsed)
             logger.info(
-                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s | VERSION: {__version__}"
+                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s"
+                f" | VERSION: {__version__}"
             )
         else:
             logger.warning(f"Timer {name} not running")

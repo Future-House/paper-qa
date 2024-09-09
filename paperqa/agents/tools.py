@@ -28,8 +28,8 @@ logger = logging.getLogger(__name__)
 async def status(docs: Docs, answer: Answer, relevant_score_cutoff: int = 5) -> str:
     """Create a string that provides a summary of the input doc/answer."""
     return (
-        f"Status: Paper Count={len(docs.docs)}"
-        f" | Relevant Papers={len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
+        f"Status: Paper Count={len(docs.docs)} | Relevant Papers="
+        f"{len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
         f" | Current Evidence={len([c for c in answer.contexts if c.score > relevant_score_cutoff])}"
         f" | Current Cost=${answer.cost:.2f}"
     )

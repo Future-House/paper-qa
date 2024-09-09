@@ -1,13 +1,12 @@
 summary_prompt = (
-    "Summarize the excerpt below to help answer a question.\n\n"
-    "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\n"
-    "Question: {question}\n\n"
-    "Do not directly answer the question, instead summarize to give evidence to help "
-    "answer the question. Stay detailed; report specific numbers, equations, or "
-    'direct quotes (marked with quotation marks). Reply "Not applicable" if the '
-    "excerpt is irrelevant. At the end of your response, provide an integer score "
-    "from 1-10 on a newline indicating relevance to question. Do not explain your score."
-    "\n\nRelevant Information Summary ({summary_length}):"
+    "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
+    " {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly"
+    " answer the question, instead summarize to give evidence to help answer the"
+    " question. Stay detailed; report specific numbers, equations, or direct quotes"
+    ' (marked with quotation marks). Reply "Not applicable" if the excerpt is'
+    " irrelevant. At the end of your response, provide an integer score from 1-10 on a"
+    " newline indicating relevance to question. Do not explain your score.\n\nRelevant"
+    " Information Summary ({summary_length}):"
 )
 
 summary_json_prompt = (

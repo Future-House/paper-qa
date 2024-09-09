@@ -43,9 +43,9 @@ class ZoteroPaper(BaseModel):
     def __str__(self) -> str:
         """Return the title of the paper."""
         return (
-            f'ZoteroPaper(\n    key = "{self.key}",\n'
-            f'title = "{self.title}",\n    pdf = "{self.pdf}",\n    '
-            f'num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+            f'ZoteroPaper(\n    key = "{self.key}",\ntitle = "{self.title}",\n    pdf ='
+            f' "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key ='
+            f' "{self.zotero_key}",\n    details = ...\n)'
         )
 
 
@@ -205,7 +205,8 @@ class ZoteroDB(zotero.Zotero):
 
         if collection_name is not None and len(query_kwargs) > 0:
             raise ValueError(
-                "You cannot specify a `collection_name` and search query simultaneously!"
+                "You cannot specify a `collection_name` and search query"
+                " simultaneously!"
             )
 
         max_limit = 100
