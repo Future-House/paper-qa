@@ -2,7 +2,6 @@ from paperqa.docs import Answer, Docs, print_callback
 from paperqa.llms import (
     EmbeddingModel,
     HybridEmbeddingModel,
-    LangchainVectorStore,
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     LLMModel,
@@ -25,7 +24,6 @@ __all__ = [
     "HybridEmbeddingModel",
     "LLMModel",
     "LLMResult",
-    "LangchainVectorStore",
     "LiteLLMEmbeddingModel",
     "LiteLLMModel",
     "NumpyVectorStore",
