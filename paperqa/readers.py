@@ -105,18 +105,24 @@ def parse_text(
     """
     try:
         with path.open() as f:
-            text: str = "".join(list(f)) if split_lines else f.read()
+            text = list(f) if split_lines else f.read()
     except UnicodeDecodeError:
         with path.open(encoding="utf-8", errors="ignore") as f:
             text = f.read()
 
     if html:
+        if not isinstance(text, str):
+            raise NotImplementedError(
+                "HTML parsing is not yet set up to work with split_lines."
+            )
         text = html2text.html2text(text)
 
     metadata = {
         "parsing_libraries": ["tiktoken (cl100k_base)"] if use_tiktoken else [],
         "paperqa_version": pqa_version,
-        "total_parsed_text_length": len(text),
+        "total_parsed_text_length": (
+            len(text) if isinstance(text, str) else sum(len(t) for t in text)
+        ),
         "parse_type": "txt" if not html else "html",
     }
     if html:
