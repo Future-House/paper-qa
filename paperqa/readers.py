@@ -25,7 +25,7 @@ def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"fitz ({fitz.__doc__})"],
-        paperqa_version=str(pqa_version),
+        paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
         parse_type="pdf",
     )
@@ -35,7 +35,7 @@ def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
 def parse_pdf_to_pages(path: Path) -> ParsedText:
     import pypdf
 
-    with open(path, "rb") as pdfFileObj:
+    with path.open("rb") as pdfFileObj:
         pdfReader = pypdf.PdfReader(pdfFileObj)
         pages: dict[str, str] = {}
         total_length = 0
@@ -44,13 +44,15 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
             pages[str(i + 1)] = page.extract_text()
             total_length += len(pages[str(i + 1)])
 
-    metadata = ParsedMetadata(
-        parsing_libraries=[f"pypdf ({pypdf.__version__})"],
-        paperqa_version=str(pqa_version),
-        total_parsed_text_length=total_length,
-        parse_type="pdf",
+    return ParsedText(
+        content=pages,
+        metadata=ParsedMetadata(
+            parsing_libraries=[f"pypdf ({pypdf.__version__})"],
+            paperqa_version=pqa_version,
+            total_parsed_text_length=total_length,
+            parse_type="pdf",
+        ),
     )
-    return ParsedText(content=pages, metadata=metadata)
 
 
 def chunk_pdf(
@@ -82,7 +84,7 @@ def chunk_pdf(
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
-    if len(split) > overlap or len(texts) == 0:
+    if len(split) > overlap or not texts:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
             Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
@@ -102,10 +104,10 @@ def parse_text(
         use_tiktoken: flag to use tiktoken library to encode text
     """
     try:
-        with open(path) as f:
-            text: str = "".join([str(line) for line in f]) if split_lines else f.read()
+        with path.open() as f:
+            text: str = "".join(list(f)) if split_lines else f.read()
     except UnicodeDecodeError:
-        with open(path, encoding="utf-8", errors="ignore") as f:
+        with path.open(encoding="utf-8", errors="ignore") as f:
             text = f.read()
 
     if html:
@@ -113,7 +115,7 @@ def parse_text(
 
     metadata = {
         "parsing_libraries": ["tiktoken (cl100k_base)"] if use_tiktoken else [],
-        "paperqa_version": str(pqa_version),
+        "paperqa_version": pqa_version,
         "total_parsed_text_length": len(text),
         "parse_type": "txt" if not html else "html",
     }
@@ -192,7 +194,7 @@ def chunk_code_text(
             )
             split = split[chunk_chars - overlap :]
             last_line = i
-    if len(split) > overlap or len(texts) == 0:
+    if len(split) > overlap or not texts:
         texts.append(
             Text(
                 text=split[:chunk_chars],
@@ -287,11 +289,11 @@ def read_doc(
                 parsed_text = parse_pdf_to_pages(path)
 
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path, html=False, split_lines=False, use_tiktoken=True)
+        parsed_text = parse_text(path)
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True, split_lines=False, use_tiktoken=True)
+        parsed_text = parse_text(path, html=True)
     else:
-        parsed_text = parse_text(path, html=False, split_lines=True, use_tiktoken=False)
+        parsed_text = parse_text(path, split_lines=True, use_tiktoken=False)
 
     if parsed_text_only:
         return parsed_text
@@ -306,11 +308,7 @@ def read_doc(
         )
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
-            parsed_text,
-            doc,
-            chunk_chars=chunk_chars,
-            overlap=overlap,
-            use_tiktoken=True,
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"

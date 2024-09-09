@@ -207,7 +207,7 @@ class ZoteroDB(zotero.Zotero):
         if direction is not None:
             query_kwargs["direction"] = direction
 
-        if collection_name is not None and len(query_kwargs) > 0:
+        if collection_name is not None and query_kwargs:
             raise ValueError(
                 "You cannot specify a `collection_name` and search query"
                 " simultaneously!"

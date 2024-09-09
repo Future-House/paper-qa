@@ -46,7 +46,7 @@ def name_in_text(name: str, text: str) -> bool:
 
 
 def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
-    if len(s) == 0:
+    if not s:
         return False
     # Calculate the entropy of the string
     entropy = 0.0
@@ -72,7 +72,7 @@ def maybe_is_html(file: BinaryIO) -> bool:
 
 
 def strings_similarity(s1: str, s2: str) -> float:
-    if len(s1) == 0 or len(s2) == 0:
+    if not s1 or not s2:
         return 0
     # break the strings into words
     ss1 = set(s1.split())
@@ -188,8 +188,7 @@ def extract_doi(reference: str) -> str:
     # If DOI is found in the reference, return the DOI link
     if doi_match:
         return "https://doi.org/" + doi_match.group()
-    else:  # noqa: RET505
-        return ""
+    return ""
 
 
 def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
@@ -203,16 +202,6 @@ def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
     length = len(iterable)
     for ndx in range(0, length, n):
         yield iterable[ndx : min(ndx + n, length)]
-
-
-def flatten(iteratble: list) -> list:
-    """
-    Flatten a list of lists.
-
-    :param l: The list of lists to flatten
-    :return: A flattened list
-    """
-    return [item for sublist in iteratble for item in sublist]
 
 
 def get_loop() -> asyncio.AbstractEventLoop:

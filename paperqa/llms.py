@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
 from enum import Enum
@@ -22,19 +23,16 @@ PromptRunner = Callable[
 ]
 
 
-def expects_name_kwarg(func: Callable) -> bool:
-    return "name" in signature(func).parameters
-
-
 def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
-    if expects_name_kwarg(func):
-        return (chunk,), {"name": name}
+    with contextlib.suppress(TypeError):
+        if "name" in signature(func).parameters:
+            return (chunk,), {"name": name}
     return (chunk,), {}
 
 
 async def do_callbacks(
-    async_callbacks: list[Callable],
-    sync_callbacks: list[Callable],
+    async_callbacks: Iterable[Callable[..., Awaitable]],
+    sync_callbacks: Iterable[Callable[..., Any]],
     chunk: str,
     name: str | None,
 ) -> None:
@@ -172,20 +170,20 @@ class LLMModel(ABC, BaseModel):
         self,
         prompt: str,
         data: dict,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
         callbacks: list[Callable] | None = None,
         name: str | None = None,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
     ) -> LLMResult:
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type()
         if self.llm_type == "chat":
             return await self._run_chat(
-                prompt, data, skip_system, system_prompt, callbacks, name
+                prompt, data, callbacks, name, skip_system, system_prompt
             )
         if self.llm_type == "completion":
             return await self._run_completion(
-                prompt, data, skip_system, system_prompt, callbacks, name
+                prompt, data, callbacks, name, skip_system, system_prompt
             )
         raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
 
@@ -193,20 +191,20 @@ class LLMModel(ABC, BaseModel):
         self,
         prompt: str,
         data: dict,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
         callbacks: list[Callable] | None = None,
         name: str | None = None,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
     ) -> LLMResult:
         """Run a chat prompt.
 
         Args:
             prompt: Prompt to use.
             data: Keys for the input variables that will be formatted into prompt.
-            skip_system: Set True to skip the system prompt.
-            system_prompt: System prompt to use.
             callbacks: Optional functions to call with each chunk of the completion.
             name: Optional name for the result.
+            skip_system: Set True to skip the system prompt.
+            system_prompt: System prompt to use.
 
         Returns:
             Result of the chat.
@@ -269,20 +267,20 @@ class LLMModel(ABC, BaseModel):
         self,
         prompt: str,
         data: dict,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
         callbacks: Iterable[Callable] | None = None,
         name: str | None = None,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
     ) -> LLMResult:
         """Run a completion prompt.
 
         Args:
             prompt: Prompt to use.
             data: Keys for the input variables that will be formatted into prompt.
-            skip_system: Set True to skip the system prompt.
-            system_prompt: System prompt to use.
             callbacks: Optional functions to call with each chunk of the completion.
             name: Optional name for the result.
+            skip_system: Set True to skip the system prompt.
+            system_prompt: System prompt to use.
 
         Returns:
             Result of the completion.
