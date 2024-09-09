@@ -325,7 +325,7 @@ async def test_s2_only_fields_filtering():
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_crossref_journalquality_fields_filtering():
+async def test_crossref_journalquality_fields_filtering() -> None:
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
             session,
@@ -340,11 +340,12 @@ async def test_crossref_journalquality_fields_filtering():
             title="Augmenting large language models with chemistry tools",
             fields=["title", "doi", "authors", "journal"],
         )
-        assert set(crossref_details.other["client_source"]) == {  # type: ignore[union-attr]
+        assert crossref_details, "Failed to query crossref"
+        assert set(crossref_details.other["client_source"]) == {
             "crossref"
         }, "Should be from only crossref"
-        assert crossref_details.source_quality == 2, "Should have source quality data"  # type: ignore[union-attr]
-        assert crossref_details.citation == (  # type: ignore[union-attr]
+        assert crossref_details.source_quality == 2, "Should have source quality data"
+        assert crossref_details.citation == (
             "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and Philippe Schwaller. Augmenting large language models with"
             " chemistry tools. Nature Machine Intelligence, Unknown year. URL:"
