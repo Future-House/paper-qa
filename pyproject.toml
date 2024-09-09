@@ -26,7 +26,7 @@ dependencies = [
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
-    "pypdf",
+    "pymupdf",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tenacity",
     "tiktoken>=0.4.0",
@@ -52,8 +52,6 @@ agents = [
     "langchain-community",
     "langchain-core",
     "langchain-openai",
-    "pymupdf",
-    "pymupdf",
     "requests",
     "tantivy",
     "typer",

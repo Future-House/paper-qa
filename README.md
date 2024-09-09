@@ -4,30 +4,52 @@
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) and our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection. It includes:
+PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) and our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
 
-- A simple interface to get good query answers, with no hallucinations, grounding responses with in-text citations.
-- State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
-- The ability to do agentic RAG which iteratively refines queries and answers.
-- Automatically obtained paper metadata, including citation and journal quality data.
-- A full-text search engine for a local repository of PDF/text files.
-- A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
+## Quickstart
 
-By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
+Here we take a folder of PDFs, use a variety of APIs/LLMs to build metadata such as authors/citation count/journal quality/retracted status, parse the text, and then answer arbitrary questions.
 
-## Output Example
+```bash
+pip install paper-qa[agents]
+cd my_papers
+pqa ask 'What manufacturing challenges are unique to bispecific antibodies?'
+```
 
+```md
 Question: How can carbon nanotubes be manufactured at a large scale?
 
 Carbon nanotubes can be manufactured at a large scale using the electric-arc technique (Journet6644). This technique involves creating an arc between two electrodes in a reactor under a helium atmosphere and using a mixture of a metallic catalyst and graphite powder in the anode. Yields of 80% of entangled carbon filaments can be achieved, which consist of smaller aligned SWNTs self-organized into bundle-like crystallites (Journet6644). Additionally, carbon nanotubes can be synthesized and self-assembled using various methods such as DNA-mediated self-assembly, nanoparticle-assisted alignment, chemical self-assembly, and electro-addressed functionalization (Tulevski2007). These methods have been used to fabricate large-area nanostructured arrays, high-density integration, and freestanding networks (Tulevski2007). 98% semiconducting CNT network solution can also be used and is separated from metallic nanotubes using a density gradient ultracentrifugation approach (Chen2014). The substrate is incubated in the solution and then rinsed with deionized water and dried with N2 air gun, leaving a uniform carbon network (Chen2014).
-
-### References
 
 Journet6644: Journet, Catherine, et al. "Large-scale production of single-walled carbon nanotubes by the electric-arc technique." nature 388.6644 (1997): 756-758.
 
 Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly of carbon nanotubes for the fabrication of large-scale device arrays." Journal of the American Chemical Society 129.39 (2007): 11964-11968.
 
 Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
+```
+
+## What is PaperQA
+
+PaperQA is engineered to be the best RAG model for working with scientific papers. Specifically, it has the following features:
+
+- A simple interface to get good answers, with no hallucinations, grounding responses with in-text citations.
+- State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
+- The ability to do agentic RAG which iteratively refines queries and answers.
+- Automatically obtained paper metadata, including citation and journal quality data.
+- A usable full-text search engine for a local repository of PDF/text files.
+- A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
+
+By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
+
+PaperQA depends on some heroes that make our repo possible (in the order I remembered them):
+
+1. [Semantic Scholar](https://www.semanticscholar.org/)
+2. [Crossref](https://www.crossref.org/)
+3. [Unpaywall](https://unpaywall.org/)
+4. [Pydantic](https://docs.pydantic.dev/latest/)
+5. [Litellm](https://github.com/BerriAI/litellm)
+6. [pybtex](https://pybtex.org/)
+7. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
 
 ## Install
 
@@ -37,7 +59,7 @@ To use the full suite of features in PaperQA, you need to install it with the op
 pip install paper-qa[agents]
 ```
 
-PaperQA uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [ollama](https://github.com/ollama/ollama)). Any LiteLLM compatible model can be configured to use with PaperQA.
+PaperQA uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile). Any LiteLLM compatible model can be configured to use with PaperQA.
 
 If you need to index a large set of papers (100+), you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key), which will allow you to avoid hitting public rate limits using these metadata services. Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
 
@@ -419,14 +441,6 @@ answer = docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?"
 )
 print(answer)
-```
-
-## PDF Reading Options
-
-By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure python and easy to install. For faster PDF reading, paper-qa will detect and use [PymuPDF (fitz)](https://pymupdf.readthedocs.io/en/latest/):
-
-```sh
-pip install pymupdf
 ```
 
 ## Callbacks Factory

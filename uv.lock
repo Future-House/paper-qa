@@ -1152,7 +1152,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev13+g8a6e225.d20240909"
+version = "5.0.0a2.dev16+ga681fe2.d20240909"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1164,7 +1164,7 @@ dependencies = [
     { name = "pycryptodome" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
-    { name = "pypdf" },
+    { name = "pymupdf" },
     { name = "setuptools" },
     { name = "tenacity" },
     { name = "tiktoken" },
@@ -1178,7 +1178,6 @@ agents = [
     { name = "langchain-community" },
     { name = "langchain-core" },
     { name = "langchain-openai" },
-    { name = "pymupdf" },
     { name = "requests" },
     { name = "tantivy" },
     { name = "typer" },
@@ -1211,7 +1210,6 @@ dev = [
     { name = "langchain-openai" },
     { name = "mypy" },
     { name = "pre-commit" },
-    { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-recording" },
@@ -1252,8 +1250,7 @@ requires-dist = [
     { name = "pycryptodome" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pydantic-settings" },
-    { name = "pymupdf", marker = "extra == 'agents'" },
-    { name = "pypdf" },
+    { name = "pymupdf" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
     { name = "requests", marker = "extra == 'agents'" },
     { name = "setuptools" },
@@ -1569,18 +1566,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/83/08/13f3bce01b2061f2bbd582c9df82723de943784cf719a35ac886c652043a/pyparsing-3.1.4.tar.gz", hash = "sha256:f86ec8d1a83f11977c9a6ea7598e8c27fc5cddfa5b07ea2241edbbde1d7bc032", size = 900231 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/0c/0e3c05b1c87bb6a1c76d281b0f35e78d2d80ac91b5f8f524cebf77f51049/pyparsing-3.1.4-py3-none-any.whl", hash = "sha256:a6a7ee4235a3f944aa1fa2249307708f893fe5717dc603503c6c7969c070fb7c", size = 104100 },
-]
-
-[[package]]
-name = "pypdf"
-version = "4.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/65/2ed7c9e1d31d860f096061b3dd2d665f501e09faaa0409a3f0d719d2a16d/pypdf-4.3.1.tar.gz", hash = "sha256:b2f37fe9a3030aa97ca86067a56ba3f9d3565f9a791b305c7355d8392c30d91b", size = 293266 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/60/eccdd92dd4af3e4bea6d6a342f7588c618a15b9bec4b968af581e498bcc4/pypdf-4.3.1-py3-none-any.whl", hash = "sha256:64b31da97eda0771ef22edb1bfecd5deee4b72c3d1736b7df2689805076d6418", size = 295825 },
 ]
 
 [[package]]
