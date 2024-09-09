@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from pydantic import ValidationError
 
@@ -36,9 +38,11 @@ def test_get_settings_with_valid_config():
     assert not settings.parsing.use_doc_details
 
 
-def test_get_settings_missing_file(mocker):
-    mocker.patch("importlib.resources.files", side_effect=FileNotFoundError)
-    with pytest.raises(FileNotFoundError):
+def test_get_settings_missing_file() -> None:
+    with (
+        patch("importlib.resources.files", side_effect=FileNotFoundError),
+        pytest.raises(FileNotFoundError),
+    ):
         get_settings("missing_config")
 
 
