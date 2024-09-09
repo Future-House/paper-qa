@@ -48,7 +48,7 @@ async def test_get_directory_index(agent_test_settings) -> None:
 @pytest.mark.asyncio
 async def test_get_directory_index_w_manifest(
     agent_test_settings, reset_log_levels, caplog  # noqa: ARG001
-):
+) -> None:
     agent_test_settings.manifest_file = "stub_manifest.csv"
     index = await get_directory_index(settings=agent_test_settings)
     assert index.fields == [
@@ -71,7 +71,7 @@ async def test_get_directory_index_w_manifest(
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", ["fake", "OpenAIFunctionsAgent"])
 @pytest.mark.asyncio
-async def test_agent_types(agent_test_settings, agent_type):
+async def test_agent_types(agent_test_settings, agent_type) -> None:
 
     question = "How can you use XAI for chemical property prediction?"
 
@@ -87,7 +87,7 @@ async def test_agent_types(agent_test_settings, agent_type):
 
 
 @pytest.mark.asyncio
-async def test_timeout(agent_test_settings):
+async def test_timeout(agent_test_settings) -> None:
     agent_test_settings.prompts.pre = None
     agent_test_settings.agent.timeout = 0.001
     agent_test_settings.llm = "gpt-4o-mini"
@@ -287,7 +287,7 @@ def test_functions() -> None:
     ]
 
 
-def test_query_request_docs_name_serialized():
+def test_query_request_docs_name_serialized() -> None:
     """Test that the query request has a docs_name property."""
     request = QueryRequest(query="Are COVID-19 vaccines effective?")
     request_data = json.loads(request.model_dump_json())
@@ -298,7 +298,7 @@ def test_query_request_docs_name_serialized():
     assert request_data["docs_name"] == "my_doc"
 
 
-def test_answers_are_striped():
+def test_answers_are_striped() -> None:
     """Test that answers are striped."""
     answer = Answer(
         question="What is the meaning of life?",
