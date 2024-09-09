@@ -10,7 +10,7 @@ import zlib
 from collections.abc import Sequence
 from enum import Enum, auto
 from io import StringIO
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 from uuid import UUID
 
 import anyio
@@ -107,7 +107,7 @@ class SearchIndex:
         self.changed = False
         self.storage = storage
 
-    async def init_directory(self):
+    async def init_directory(self) -> None:
         await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
 
     @staticmethod
@@ -140,26 +140,26 @@ class SearchIndex:
             schema_builder = SchemaBuilder()
             for field in self.fields:
                 schema_builder.add_text_field(field, stored=True)
-            self._schema = schema_builder.build()
-        return self._schema
+            self._schema = schema_builder.build()  # type: ignore[assignment]
+        return cast(Schema, self._schema)
 
     @property
     async def index(self) -> Index:
         if not self._index:
             index_path = await self.index_filename
             if await (index_path / "meta.json").exists():
-                self._index = Index.open(str(index_path))
+                self._index = Index.open(str(index_path))  # type: ignore[assignment]
             else:
-                self._index = Index(self.schema, str(index_path))
-        return self._index
+                self._index = Index(self.schema, str(index_path))  # type: ignore[assignment]
+        return cast(Index, self._index)
 
     @property
     async def searcher(self) -> Searcher:
         if not self._searcher:
             index = await self.index
             index.reload()
-            self._searcher = index.searcher()
-        return self._searcher
+            self._searcher = index.searcher()  # type: ignore[assignment]
+        return cast(Searcher, self._searcher)
 
     @property
     async def count(self) -> int:
@@ -200,12 +200,12 @@ class SearchIndex:
             retry=retry_if_exception_type(AsyncRetryError),
             reraise=True,
         )
-        async def _add_document_with_retry():
+        async def _add_document_with_retry() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
                     index = await self.index
                     writer = index.writer()
-                    writer.add_document(Document.from_dict(index_doc))
+                    writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
                     writer.commit()
 
                     filehash = self.filehash(index_doc["body"])
@@ -318,7 +318,7 @@ class SearchIndex:
             result
             for result in [
                 await self.get_saved_object(
-                    doc["file_location"][0], keep_filenames=keep_filenames
+                    doc["file_location"][0], keep_filenames=keep_filenames  # type: ignore[index]
                 )
                 for doc in search_index_docs
             ]

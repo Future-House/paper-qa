@@ -229,7 +229,7 @@ async def run_langchain_agent(
 
     llm = ChatOpenAI(
         model=query.settings.agent.agent_llm,
-        request_timeout=timeout or query.settings.agent.timeout / 2.0,
+        timeout=timeout or query.settings.agent.timeout / 2.0,
         temperature=query.settings.temperature,
     )
     agent_status = AgentStatus.SUCCESS
