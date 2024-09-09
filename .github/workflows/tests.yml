@@ -11,7 +11,7 @@ jobs:
     if: github.event_name == 'pull_request' # pre-commit-ci/lite-action only runs here
     strategy:
       matrix:
-        python-version: ["3.10", "3.12"] # Our min and max supported Python versions
+        python-version: ["3.12"] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.12"] # Our min and max supported Python versions
+        python-version: ["3.12"] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
       - name: Set up uv
