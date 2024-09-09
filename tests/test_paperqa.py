@@ -411,22 +411,26 @@ def test_llm_parse_json_newlines():
 @pytest.mark.asyncio
 async def test_chain_completion():
     s = Settings(llm="babbage-002", temperature=0.2)
-    call = s.get_llm().make_chain(
-        "The {animal} says",
-        skip_system=True,
-    )
     outputs = []
 
-    def accum(x):
+    def accum(x) -> None:
         outputs.append(x)
 
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    llm = s.get_llm()
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum],
+    )
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
 
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+    )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
 
@@ -448,51 +452,62 @@ async def test_chain_chat():
         ]
     }
     llm = LiteLLMModel(name="gpt-4o-mini", config=model_config)
-    call = llm.make_chain(
-        "The {animal} says",
-        skip_system=True,
-    )
+
     outputs = []
 
-    def accum(x):
+    def accum(x) -> None:
         outputs.append(x)
 
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum],
+    )
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
     assert completion.cost > 0
 
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+    )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
     assert completion.cost > 0
 
     # check with mixed callbacks
-    async def ac(x):
+    async def ac(x) -> None:
         pass
 
-    completion = await call({"animal": "duck"}, callbacks=[accum, ac])  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum, ac],
+    )
     assert completion.cost > 0
 
 
 @pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
 async def test_anthropic_chain(stub_data_dir: Path) -> None:
-
     anthropic_settings = Settings(llm="claude-3-haiku-20240307")
+    outputs: list[str] = []
 
-    call = anthropic_settings.get_llm().make_chain(
-        "The {animal} says",
-        skip_system=True,
-    )
-
-    def accum(x):
+    def accum(x) -> None:
         outputs.append(x)
 
-    outputs: list[str] = []
-    completion = await call({"animal": "duck"}, callbacks=[accum])  # type: ignore[call-arg]
+    llm = anthropic_settings.get_llm()
+    completion = await llm.run_prompt(
+        prompt="The {animal} says",
+        data={"animal": "duck"},
+        skip_system=True,
+        callbacks=[accum],
+    )
     assert completion.seconds_to_first_token > 0
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
@@ -500,7 +515,9 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await call({"animal": "duck"})  # type: ignore[call-arg]
+    completion = await llm.run_prompt(
+        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+    )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
     assert isinstance(completion.text, str)
