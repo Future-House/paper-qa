@@ -48,11 +48,11 @@ Version 5 added a CLI, agentic workflows, and removed much of the state from the
 ## Usage
 
 The default workflow of PaperQA is as follows:
-| Phase        | PaperQA Actions           |
+| Phase | PaperQA Actions |
 | ------------- |:-------------:|
-| 1. Paper Search      | <ul style="text-align: left"><li>Get candidate papers from LLM-generated keyword query</li><li>Chunk, embed, and add candidate papers to state</li></ul> |
-| 2. Gather Evidence      | <ul style="text-align: left"><li>Embed query into vector</li><li>Rank top k document chunks in current state</li><li>Create scored summary of each chunk in the context of the current query</li><li>Use LLM to re-score and select most relevant summaries</li></ul>      |
-| 3. Generate Answer | <ul style="text-align: left"><li>Put best summaries into prompt with context</li><li>Generate answer with prompt</li></ul>      |
+| 1. Paper Search | <ul style="text-align: left"><li>Get candidate papers from LLM-generated keyword query</li><li>Chunk, embed, and add candidate papers to state</li></ul> |
+| 2. Gather Evidence | <ul style="text-align: left"><li>Embed query into vector</li><li>Rank top k document chunks in current state</li><li>Create scored summary of each chunk in the context of the current query</li><li>Use LLM to re-score and select most relevant summaries</li></ul> |
+| 3. Generate Answer | <ul style="text-align: left"><li>Put best summaries into prompt with context</li><li>Generate answer with prompt</li></ul> |
 
 The agent can choose to iteratively update its search or answer if it doesn't find sufficient evidence.
 
@@ -79,7 +79,8 @@ PaperQA is highly configurable, when running from the command line, `pqa help` s
 $ pqa --temperature 0.5 ask 'What manufacturing challenges are unique to bispecific antibodies?'
 ```
 
-If you run `pqa` with a command which requires a new indexing, say if you change the default chunk_size, a new index will automatically be created for you. 
+If you run `pqa` with a command which requires a new indexing, say if you change the default chunk_size, a new index will automatically be created for you.
+
 ```bash
 pqa --parsing.chunk_size 5000 ask 'What manufacturing challenges are unique to bispecific antibodies?'
 ```
@@ -112,7 +113,7 @@ from paperqa.agents.main import agent_query
 from paperqa.agents.models import QueryRequest
 
 answer = await agent_query(QueryRequest(query='What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(temperature=0.5, paper_directory='my_papers/')))
-````
+```
 
 The default agent will use an `OpenAIFunctionsAgent` from langchain, but you can also specify a `"fake"` agent to use a hard coded call path of search->gather evidence->answer.
 
@@ -158,7 +159,7 @@ The synchronous version just call the async version in a loop. Most modern pytho
 from paperqa import Docs, Settings, AnswerSettings
 
 # valid extensions include .pdf, .txt, and .html
-doc_paths = ('myfile.pdf', 'myotherfile.pdf')
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 docs = Docs()
 
@@ -167,7 +168,9 @@ for doc in doc_paths:
 
 answer = await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    settings=Settings(llm='claude-3-5-sonnet-20240620', answer=AnswerSettings(answer_max_sources=3))
+    settings=Settings(
+        llm="claude-3-5-sonnet-20240620", answer=AnswerSettings(answer_max_sources=3)
+    ),
 )
 
 print(answer.formatted_answer)
@@ -177,7 +180,7 @@ print(answer.formatted_answer)
 
 By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
 
-```python
+```Python
 from paperqa Settings
 from paperqa.agents import ask
 
@@ -186,7 +189,7 @@ answer = ask('What manufacturing challenges are unique to bispecific antibodies?
 
 You can use Anthropic or any other model supported by `litellm`:
 
-```python
+```Python
 from paperqa Settings
 from paperqa.agents import ask
 
@@ -199,11 +202,11 @@ You can use llama.cpp to be the LLM. Note that you should be using relatively la
 
 The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
-```python
+```Python
 from paperqa Settings
 from paperqa.agents import ask
 
-local_llm_config = dict(model_list=dict(model_name='my_llm_model', litellm_params=dict(model='my-llm-model', api_base='http://localhost:8080/v1', api_key='sk-no-key-required', temperature=0.1, frequency_penalty=1.5, max_tokens=512))) 
+local_llm_config = dict(model_list=dict(model_name='my_llm_model', litellm_params=dict(model='my-llm-model', api_base='http://localhost:8080/v1', api_key='sk-no-key-required', temperature=0.1, frequency_penalty=1.5, max_tokens=512)))
 
 answer = ask('What manufacturing challenges are unique to bispecific antibodies?', settings=Settings(
                 llm='my-llm-model',
@@ -213,12 +216,11 @@ answer = ask('What manufacturing challenges are unique to bispecific antibodies?
                 ))
 ```
 
-
 ### Changing Embedding Model
 
 PaperQA defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
 
-```python
+```Python
 from paperqa Settings
 from paperqa.agents import ask
 
@@ -234,15 +236,14 @@ Embedding models are used to create paper-qa's index of the full-text embedding 
 ```python
 from paperqa import Docs, NumpyVectorStore, Settings
 
-doc_paths = ('myfile.pdf', 'myotherfile.pdf')
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 docs = Docs(
     texts_index=NumpyVectorStore(),
 )
 
 for doc in doc_paths:
-    doc.add(doc_paths, Settings(embedding='text-embedding-large-3'))
-
+    doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
 ```
 
 Note that PaperQA uses Numpy as a dense vector store. Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
@@ -261,8 +262,14 @@ docs = Docs(
 We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
 
 ```python
-from paperqa import Docs, HybridEmbeddingModel, SparseEmbeddingModel, LiteLLMEmbeddingModel
-doc_paths = ('myfile.pdf', 'myotherfile.pdf')
+from paperqa import (
+    Docs,
+    HybridEmbeddingModel,
+    SparseEmbeddingModel,
+    LiteLLMEmbeddingModel,
+)
+
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 model = HybridEmbeddingModel(models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()])
 docs = Docs(
@@ -281,9 +288,11 @@ You can adjust the numbers of sources (passages of text) to reduce token usage o
 ```python
 from paperqa import Settings
 from paperqa.settings import AnswerSettings
+
 docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    Settings(answer=AnswerSettings(evidence_k=5, answer_max_sources=2)))
+    Settings(answer=AnswerSettings(evidence_k=5, answer_max_sources=2)),
+)
 ```
 
 ### Using Code or HTML
@@ -448,7 +457,10 @@ In general, embeddings are cached when you pickle a `Docs` regardless of what ve
 You can customize any of the prompts, using the `PromptCollection` class. For example, if you want to change the prompt for the question, you can do:
 
 ```python
-from paperqa import Docs, Settings,
+from paperqa import (
+    Docs,
+    Settings,
+)
 from paperqa.settings import PromptSettings
 
 my_qaprompt = (
@@ -463,7 +475,10 @@ my_qaprompt = (
 
 docs = Docs()
 
-docs.query('Are covid-19 vaccines effective?', settings=Setting(prompts=PromptSettings(qa=my_qaprompt)))
+docs.query(
+    "Are covid-19 vaccines effective?",
+    settings=Setting(prompts=PromptSettings(qa=my_qaprompt)),
+)
 ```
 
 ### Pre and Post Prompts
@@ -495,5 +510,4 @@ with open("my_docs.pkl", "wb") as f:
 # load
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
-
 ```
