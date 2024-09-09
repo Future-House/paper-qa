@@ -73,7 +73,7 @@ async def agent_query(
     await search_index.add_document(
         {
             "file_location": str(response.answer.id),
-            "body": response.answer.answer or "",
+            "body": response.answer.answer,
             "question": response.answer.question,
         },
         document=response,

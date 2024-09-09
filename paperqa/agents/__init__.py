@@ -100,7 +100,6 @@ def ask(query: str, settings: Settings) -> AnswerResponse:
     return get_loop().run_until_complete(
         agent_query(
             QueryRequest(query=query, settings=settings),
-            docs=None,
             verbosity=settings.verbosity,
             agent_type=settings.agent.agent_type,
         )

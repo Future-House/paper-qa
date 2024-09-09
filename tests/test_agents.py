@@ -82,7 +82,7 @@ async def test_agent_types(agent_test_settings, agent_type):
     response = await agent_query(request, agent_type=agent_type)
     assert response.answer.answer, "Answer not generated"
     assert response.answer.answer != "I cannot answer", "Answer not generated"
-    assert len(response.answer.context) >= 1, "No contexts were found"
+    assert response.answer.context, "No contexts were found"
     assert response.answer.question == question
 
 

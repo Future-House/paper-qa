@@ -47,7 +47,7 @@ from paperqa.utils import (
 @pytest.fixture
 def docs_fixture(stub_data_dir: Path) -> Docs:
     docs = Docs()
-    with open(stub_data_dir / "paper.pdf", "rb") as f:
+    with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
     return docs
 
@@ -915,8 +915,7 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path):
 
 
 def test_fileio_reader_pdf(stub_data_dir: Path):
-    doc_path = stub_data_dir / "paper.pdf"
-    with open(doc_path, "rb") as f:
+    with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.query("Are counterfactuals actionable?[yes/no]")
@@ -926,7 +925,7 @@ def test_fileio_reader_pdf(stub_data_dir: Path):
 def test_fileio_reader_txt(stub_data_dir: Path):
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
-    with open(stub_data_dir / "bates.txt", "rb") as file:
+    with (stub_data_dir / "bates.txt").open("rb") as file:
         file_content = file.read()
 
     docs.add_file(
@@ -943,15 +942,10 @@ def test_pdf_pypdf_reader(stub_data_dir: Path):
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
-        overlap=100,
-        chunk_chars=3000,
     )
     splits2 = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        force_pypdf=False,
-        overlap=100,
-        chunk_chars=3000,
     )
     assert (
         strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
@@ -965,8 +959,6 @@ def test_parser_only_reader(stub_data_dir: Path):
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
-        overlap=100,
-        chunk_chars=3000,
         parsed_text_only=True,
     )
     assert parsed_text.metadata.parse_type == "pdf"
@@ -983,9 +975,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path):
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         force_pypdf=True,
-        overlap=100,
-        chunk_chars=3000,
-        parsed_text_only=False,
+        parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
     )
     assert metadata.parse_type == "pdf"
@@ -1004,10 +994,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path):
     chunk_text, metadata = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        force_pypdf=False,
-        overlap=100,
-        chunk_chars=3000,
-        parsed_text_only=False,
+        parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
     )
     # NOTE the use of tiktoken changes the actual char and overlap counts
@@ -1023,10 +1010,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path):
     chunk_text, metadata = read_doc(
         doc_path,
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        force_pypdf=False,
-        overlap=100,
-        chunk_chars=3000,
-        parsed_text_only=False,
+        parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
     )
     assert metadata.parse_type == "txt"
@@ -1055,7 +1039,7 @@ def test_zotero() -> None:
 
     Docs()
     with contextlib.suppress(ValueError):  # Close enough
-        ZoteroDB(library_type="user")  # "group" if group library
+        ZoteroDB()  # "group" if group library
 
 
 def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes):
@@ -1126,6 +1110,5 @@ def test_external_doc_index(stub_data_dir: Path):
     # force embedding
     _ = docs.get_evidence(query="What is the date of flag day?")
     docs2 = Docs(texts_index=docs.texts_index)
-    assert len(docs2.docs) == 0
-    contexts = docs2.get_evidence("What is the date of flag day?").contexts
-    assert contexts
+    assert not docs2.docs
+    assert docs2.get_evidence("What is the date of flag day?").contexts

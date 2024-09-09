@@ -81,7 +81,7 @@ class QueryRequest(BaseModel):
     def apply_settings_template(cls, v: Settings, info: ValidationInfo) -> Settings:
         if info.data["settings_template"] and isinstance(v, Settings):
             base_settings = Settings.from_name(info.data["settings_template"])
-            return Settings(**{**base_settings.model_dump(), **v.model_dump()})
+            return Settings(**(base_settings.model_dump() | v.model_dump()))
         return v
 
     @computed_field  # type: ignore[prop-decorator]
