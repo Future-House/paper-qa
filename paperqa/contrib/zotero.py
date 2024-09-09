@@ -14,8 +14,8 @@ except ImportError as e:
         "zotero requires the 'zotero' extra for 'pyzotero'. Please:"
         " `pip install aviary[zotero]`."
     ) from e
-from ..paths import PAPERQA_DIR
-from ..utils import StrPath, count_pdf_pages
+from paperqa.paths import PAPERQA_DIR
+from paperqa.utils import StrPath, count_pdf_pages
 
 
 class ZoteroPaper(BaseModel):

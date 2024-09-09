@@ -5,9 +5,9 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from .llms import Chain
-from .types import Context, LLMResult, Text
-from .utils import extract_score, strip_citations
+from paperqa.llms import Chain
+from paperqa.types import Context, LLMResult, Text
+from paperqa.utils import extract_score, strip_citations
 
 
 def llm_parse_json(text: str) -> dict:

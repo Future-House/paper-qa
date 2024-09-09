@@ -24,13 +24,13 @@ from pydantic import (
     model_validator,
 )
 
-from .utils import (
+from paperqa.utils import (
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citenames,
 )
-from .version import __version__ as pqa_version
+from paperqa.version import __version__ as pqa_version
 
 # Just for clarity
 # also in case one day we want to narrow

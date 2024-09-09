@@ -14,9 +14,10 @@ from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 from rich.console import Console
 
-from ..docs import Docs
-from ..types import Answer
-from ..utils import pqa_directory
+from paperqa.docs import Docs
+from paperqa.types import Answer
+from paperqa.utils import pqa_directory
+
 from .helpers import litellm_get_search_query, table_formatter
 from .models import (
     AgentCallback,

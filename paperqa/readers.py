@@ -7,8 +7,8 @@ from typing import Literal, overload
 import html2text
 import tiktoken
 
-from .types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
-from .version import __version__ as pqa_version
+from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from paperqa.version import __version__ as pqa_version
 
 
 def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:

@@ -339,7 +339,6 @@ ignore = [
     "TCH003",
     "TD002",  # Don't care for TODO author
     "TD003",  # Don't care for TODO links
-    "TID252",  # Allow relative imports for packaging
     "TRY003",  # Overly pedantic
 ]
 preview = true

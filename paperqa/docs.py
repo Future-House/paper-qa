@@ -20,18 +20,13 @@ from pydantic import (
     field_validator,
 )
 
-from .clients import DEFAULT_CLIENTS, DocMetadataClient
-from .core import llm_parse_json, map_fxn_summary
-from .llms import (
-    EmbeddingModel,
-    LLMModel,
-    NumpyVectorStore,
-    VectorStore,
-)
-from .paths import PAPERQA_DIR
-from .readers import read_doc
-from .settings import MaybeSettings, get_settings
-from .types import (
+from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
+from paperqa.core import llm_parse_json, map_fxn_summary
+from paperqa.llms import EmbeddingModel, LLMModel, NumpyVectorStore, VectorStore
+from paperqa.paths import PAPERQA_DIR
+from paperqa.readers import read_doc
+from paperqa.settings import MaybeSettings, get_settings
+from paperqa.types import (
     Answer,
     Doc,
     DocDetails,
@@ -40,7 +35,7 @@ from .types import (
     Text,
     set_llm_answer_ids,
 )
-from .utils import (
+from paperqa.utils import (
     gather_with_concurrency,
     get_loop,
     maybe_is_html,

@@ -16,9 +16,9 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa.clients.exceptions import DOINotFoundError
+from paperqa.types import DocDetails
 
-from ..types import DocDetails
+from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
