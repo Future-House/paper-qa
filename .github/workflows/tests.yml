@@ -40,12 +40,31 @@ jobs:
         python-version: ["3.12"] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
-      - name: Setup DNS caching
+      - name: Configure systemd-resolved for DNS caching
         run: |
-          sudo apt-get update
-          sudo apt-get install -y dnsmasq
-          echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
-          sudo systemctl start dnsmasq
+          sudo -s <<EOF
+          # Check if systemd-resolved is running
+          systemctl status systemd-resolved
+
+          # If it's not running, start it
+          systemctl start systemd-resolved
+          systemctl enable systemd-resolved
+
+          # Configure systemd-resolved to use caching
+          cat > /etc/systemd/resolved.conf <<EOT
+          [Resolve]
+          DNS=8.8.8.8 8.8.4.4
+          FallbackDNS=1.1.1.1 9.9.9.9
+          Cache=yes
+          DNSStubListener=yes
+          EOT
+
+          # Restart systemd-resolved to apply changes
+          systemctl restart systemd-resolved
+
+          # Update /etc/resolv.conf to use systemd-resolved
+          ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+          EOF
       - name: Set up uv
         run: |-
           curl -LsSf https://astral.sh/uv/install.sh | sh
