@@ -95,7 +95,17 @@ from paperqa.clients.retractions import RetrationDataPostProcessor
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session, clients=ALL_CLIENTS)
+        client_list = list(ALL_CLIENTS)
+        client_list.remove(RetrationDataPostProcessor)
+        client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                client_list,
+            ),
+        )
         details = await client.query(title=paper_attributes["title"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
@@ -181,7 +191,17 @@ async def test_title_search(paper_attributes: dict[str, str]):
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]):
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session, clients=ALL_CLIENTS)
+        client_list = list(ALL_CLIENTS)
+        client_list.remove(RetrationDataPostProcessor)
+        client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                client_list,
+            ),
+        )
         details = await client.query(doi=paper_attributes["doi"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
