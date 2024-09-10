@@ -73,7 +73,7 @@ preview = true
 [tool.codespell]
 check-filenames = true
 check-hidden = true
-ignore-words-list = "aadd,ser"
+ignore-words-list = "aadd,astroid,ser"
 
 [tool.mypy]
 # Type-checks the interior of functions without type annotations.
@@ -386,6 +386,8 @@ dev-dependencies = [
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
+    "pydantic~=2.0",
+    "pylint-pydantic",
     "pytest-asyncio",
     "pytest-recording",
     "pytest-rerunfailures",
