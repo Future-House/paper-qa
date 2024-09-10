@@ -1017,7 +1017,6 @@ def test_pre_prompt(stub_data_dir: Path) -> None:
         "212"
         in docs.query("What is the boiling point of water?", settings=settings).answer
     )
-    raise AssertionError
 
 
 def test_post_prompt(stub_data_dir: Path) -> None:
