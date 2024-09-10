@@ -4,6 +4,7 @@ from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
+import fitz
 import tiktoken
 
 try:
@@ -17,8 +18,7 @@ from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
 from paperqa.version import __version__ as pqa_version
 
 
-def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
-    import fitz
+def parse_pdf_to_pages(path: Path) -> ParsedText:
 
     with fitz.open(path) as file:
         pages: dict[str, str] = {}
@@ -36,29 +36,6 @@ def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
         parse_type="pdf",
     )
     return ParsedText(content=pages, metadata=metadata)
-
-
-def parse_pdf_to_pages(path: Path) -> ParsedText:
-    import pypdf
-
-    with path.open("rb") as pdfFileObj:
-        pdfReader = pypdf.PdfReader(pdfFileObj)
-        pages: dict[str, str] = {}
-        total_length = 0
-
-        for i, page in enumerate(pdfReader.pages):
-            pages[str(i + 1)] = page.extract_text()
-            total_length += len(pages[str(i + 1)])
-
-    return ParsedText(
-        content=pages,
-        metadata=ParsedMetadata(
-            parsing_libraries=[f"pypdf ({pypdf.__version__})"],
-            paperqa_version=pqa_version,
-            total_parsed_text_length=total_length,
-            parse_type="pdf",
-        ),
-    )
 
 
 def chunk_pdf(
@@ -232,7 +209,6 @@ def read_doc(
     include_metadata: Literal[False],
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> list[Text]: ...
 
 
@@ -244,7 +220,6 @@ def read_doc(
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> list[Text]: ...
 
 
@@ -256,7 +231,6 @@ def read_doc(
     include_metadata: bool = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> ParsedText: ...
 
 
@@ -268,7 +242,6 @@ def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
@@ -279,7 +252,6 @@ def read_doc(
     include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
-    force_pypdf: bool = False,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
@@ -290,7 +262,6 @@ def read_doc(
         doc: object with document metadata
         chunk_chars: size of chunks
         overlap: size of overlap between chunks
-        force_pypdf: flag to force use of pypdf in parsing
         parsed_text_only: return parsed text without chunking
         include_metadata: return a tuple
     """
@@ -299,13 +270,7 @@ def read_doc(
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        if force_pypdf:
-            parsed_text = parse_pdf_to_pages(path)
-        else:
-            try:
-                parsed_text = parse_pdf_fitz_to_pages(path)
-            except ImportError:
-                parsed_text = parse_pdf_to_pages(path)
+        parsed_text = parse_pdf_to_pages(path)
 
     elif str_path.endswith(".txt"):
         parsed_text = parse_text(path)
