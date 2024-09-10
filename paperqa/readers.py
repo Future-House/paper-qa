@@ -15,6 +15,7 @@ except ImportError:
     html2text = None  # type: ignore[assignment]
 
 from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
 
@@ -48,6 +49,11 @@ def chunk_pdf(
     if not isinstance(parsed_text.content, dict):
         raise NotImplementedError(
             f"ParsedText.content must be a `dict`, not {type(parsed_text.content)}."
+        )
+
+    if not parsed_text.content:
+        raise ImpossibleParsingError(
+            "No text was parsed from the document: either empty or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():

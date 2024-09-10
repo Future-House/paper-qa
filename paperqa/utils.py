@@ -14,7 +14,7 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, ClassVar
 from uuid import UUID
 
 import aiohttp
@@ -37,6 +37,12 @@ logger = logging.getLogger(__name__)
 
 
 StrPath = str | Path
+
+
+class ImpossibleParsingError(Exception):
+    """Error to throw when a parsing is impossible."""
+
+    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 def name_in_text(name: str, text: str) -> bool:
