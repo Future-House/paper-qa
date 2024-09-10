@@ -53,7 +53,7 @@ def chunk_pdf(
 
     if not parsed_text.content:
         raise ImpossibleParsingError(
-            "No text was parsed from the document: " "either empty or corrupted."
+            "No text was parsed from the document: either empty or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():
