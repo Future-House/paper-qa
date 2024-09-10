@@ -40,12 +40,11 @@ jobs:
         python-version: [3.12] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
-      - run: pip install .
+      - name: Set up uv
+        run: |-
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv python pin ${{ matrix.python-version }}
+      - run: uv export > requirements.txt && uv pip install -r requirements.txt
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}

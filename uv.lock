@@ -1009,28 +1009,46 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev48+g3c7b272.d20240910"
+version = "5.0.0a2.dev49+gca75a31.d20240910"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "build" },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "ipython" },
     { name = "langchain" },
     { name = "langchain-community" },
     { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "litellm" },
-    { name = "mypy" },
     { name = "numpy" },
-    { name = "pre-commit" },
     { name = "pybtex" },
     { name = "pycryptodome" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pymupdf" },
+    { name = "rich" },
+    { name = "setuptools" },
+    { name = "tantivy" },
+    { name = "tenacity" },
+    { name = "tiktoken" },
+]
+
+[package.optional-dependencies]
+typing = [
+    { name = "types-pyyaml" },
+    { name = "types-setuptools" },
+]
+zotero = [
+    { name = "pyzotero" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "build" },
+    { name = "ipython" },
+    { name = "mypy" },
+    { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-recording" },
@@ -1043,46 +1061,44 @@ dependencies = [
     { name = "pyzotero" },
     { name = "refurb" },
     { name = "requests" },
-    { name = "rich" },
-    { name = "setuptools" },
-    { name = "tantivy" },
-    { name = "tenacity" },
-    { name = "tiktoken" },
     { name = "types-pyyaml" },
     { name = "types-setuptools" },
-]
-
-[package.optional-dependencies]
-typing = [
-    { name = "types-pyyaml" },
-    { name = "types-setuptools" },
-]
-zotero = [
-    { name = "pyzotero" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "build" },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "ipython", specifier = ">=8" },
     { name = "langchain" },
     { name = "langchain-community" },
     { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "litellm" },
-    { name = "mypy", specifier = ">=1.8" },
     { name = "numpy" },
-    { name = "paper-qa", extras = ["typing"] },
-    { name = "pre-commit", specifier = "~=3.4" },
     { name = "pybtex" },
     { name = "pycryptodome" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pydantic-settings" },
     { name = "pymupdf" },
+    { name = "pyzotero", marker = "extra == 'zotero'" },
+    { name = "rich" },
+    { name = "setuptools" },
+    { name = "tantivy" },
+    { name = "tenacity" },
+    { name = "tiktoken", specifier = ">=0.4.0" },
+    { name = "types-pyyaml", marker = "extra == 'typing'" },
+    { name = "types-setuptools", marker = "extra == 'typing'" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "build" },
+    { name = "ipython", specifier = ">=8" },
+    { name = "mypy", specifier = ">=1.8" },
+    { name = "paper-qa", extras = ["typing"] },
+    { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
     { name = "pytest-recording" },
@@ -1093,16 +1109,8 @@ requires-dist = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
-    { name = "pyzotero", marker = "extra == 'zotero'" },
     { name = "refurb", specifier = ">=2" },
     { name = "requests" },
-    { name = "rich" },
-    { name = "setuptools" },
-    { name = "tantivy" },
-    { name = "tenacity" },
-    { name = "tiktoken", specifier = ">=0.4.0" },
-    { name = "types-pyyaml", marker = "extra == 'typing'" },
-    { name = "types-setuptools", marker = "extra == 'typing'" },
 ]
 
 [[package]]
