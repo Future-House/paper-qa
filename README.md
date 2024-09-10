@@ -84,7 +84,7 @@ The default workflow of PaperQA is as follows:
 | **3. Generate Answer** | - Put best summaries into prompt with context                             |
 |                        | - Generate answer with prompt                                             |
 
-The agent can choose to iteratively update its search or answer if it doesn't find sufficient evidence.
+However, the underlying agent can go in any order - for example doing a narrow and broad search, or using different phrasing for the gather evidence step.
 
 ### CLI
 
