@@ -8,17 +8,21 @@ PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG
 
 ## Quickstart
 
-In this example we take a folder of research paper PDFs, magically get their metadata - even including citation counts and a note if the paper was retracted, then parse the PDFs into a full-text search index, and then answer the user question:
+In this example we take a folder of research paper PDFs, magically get their metadata - including citation counts and a retraction check, then parse and cache PDFs into a full-text search index, and finally answer the user question with an LLM agent.
 
 ```bash
 pip install paper-qa[agents]
 cd my_papers
-pqa ask 'What manufacturing challenges are unique to bispecific antibodies?'
+pqa ask 'How can carbon nanotubes be manufactured at a large scale?'
 ```
+
+### Example Output
 
 Question: How can carbon nanotubes be manufactured at a large scale?
 
 Carbon nanotubes can be manufactured at a large scale using the electric-arc technique (Journet6644). This technique involves creating an arc between two electrodes in a reactor under a helium atmosphere and using a mixture of a metallic catalyst and graphite powder in the anode. Yields of 80% of entangled carbon filaments can be achieved, which consist of smaller aligned SWNTs self-organized into bundle-like crystallites (Journet6644). Additionally, carbon nanotubes can be synthesized and self-assembled using various methods such as DNA-mediated self-assembly, nanoparticle-assisted alignment, chemical self-assembly, and electro-addressed functionalization (Tulevski2007). These methods have been used to fabricate large-area nanostructured arrays, high-density integration, and freestanding networks (Tulevski2007). 98% semiconducting CNT network solution can also be used and is separated from metallic nanotubes using a density gradient ultracentrifugation approach (Chen2014). The substrate is incubated in the solution and then rinsed with deionized water and dried with N2 air gun, leaving a uniform carbon network (Chen2014).
+
+**References:**
 
 Journet6644: Journet, Catherine, et al. "Large-scale production of single-walled carbon nanotubes by the electric-arc technique." nature 388.6644 (1997): 756-758.
 
@@ -33,13 +37,13 @@ PaperQA is engineered to be the best RAG model for working with scientific paper
 - A simple interface to get good answers with grounded responses that have in-text citations.
 - State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
 - The ability to do agentic RAG which iteratively refines queries and answers.
-- Automatically obtain paper metadata, including citation and journal quality data.
+- Automatic redundant fetching of paper metadata, including citation and journal quality data from multiple providers.
 - A usable full-text search engine for a local repository of PDF/text files.
 - A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
 
 By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a Numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
 
-PaperQA depends on some heroes that make our repo possible. Here are some in a random order:
+PaperQA depends on some awesome libraries/APIs that make our repo possible. Here are some in a random order:
 
 1. [Semantic Scholar](https://www.semanticscholar.org/)
 2. [Crossref](https://www.crossref.org/)
