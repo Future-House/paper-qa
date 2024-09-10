@@ -541,6 +541,10 @@ class DocDetails(Doc):
 
     @property
     def formatted_citation(self) -> str:
+
+        if self.is_retracted:
+            return f"RETRACTED ARTICLE! Original doi: {self.doi}. Retrieved from http://retractiondatabase.org/."
+
         if (
             self.citation is None  # type: ignore[redundant-expr]
             or self.citation_count is None
@@ -554,6 +558,7 @@ class DocDetails(Doc):
             if self.source_quality >= 0
             else None
         )
+
         if quality is None:
             return f"{self.citation} This article has {self.citation_count} citations."
         return (

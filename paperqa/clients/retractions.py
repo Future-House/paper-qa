@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import csv
 import datetime
 import logging
@@ -9,6 +8,7 @@ import os
 import aiohttp
 from anyio import open_file
 from pydantic import ValidationError
+from tenacity import retry, stop_after_attempt, wait_exponential
 from tqdm.asyncio import tqdm
 
 from paperqa.types import DocDetails
@@ -53,47 +53,39 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
     def _is_csv_cached(self) -> bool:
         return os.path.exists(self.retraction_data_path)
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=5, min=5),
+        reraise=True,
+    )
     async def _download_retracted_dataset(self) -> None:
-        retries = 2
-        delay = 5
+
         if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
             CROSSREF_MAILTO = "test@example.com"
         url = f"https://api.labs.crossref.org/data/retractionwatch?{CROSSREF_MAILTO}"
 
-        for i in range(retries):
-            try:
-                async with (
-                    aiohttp.ClientSession() as session,
-                    session.get(
-                        url,
-                        timeout=aiohttp.ClientTimeout(total=300),
-                    ) as response,
-                ):
-                    response.raise_for_status()
+        async with (
+            aiohttp.ClientSession() as session,
+            session.get(
+                url,
+                timeout=aiohttp.ClientTimeout(total=300),
+            ) as response,
+        ):
+            response.raise_for_status()
 
-                    async with await open_file(self.retraction_data_path, "wb") as f:
-                        with tqdm(
-                            unit="iB", unit_scale=True, desc=self.retraction_data_path
-                        ) as progress_bar:
-                            while True:
-                                chunk = await response.content.read(1024)
-                                if not chunk:
-                                    break
-                                await f.write(chunk)
-                                progress_bar.update(len(chunk))
+            async with await open_file(self.retraction_data_path, "wb") as f:
+                with tqdm(
+                    unit="iB", unit_scale=True, desc=self.retraction_data_path
+                ) as progress_bar:
+                    while True:
+                        chunk = await response.content.read(1024)
+                        if not chunk:
+                            break
+                        await f.write(chunk)
+                        progress_bar.update(len(chunk))
 
-                        # assert csv file is not empty
-                        if os.path.getsize(self.retraction_data_path) == 0:
-                            raise RuntimeError("Retraction data is empty")
-
-            except (TimeoutError, aiohttp.ClientError) as e:
-                if i < retries - 1:
-                    await asyncio.sleep(delay)
-                    delay *= 2
-                else:
-                    raise RuntimeError(
-                        f"Failed to download retracted data after {retries} attempts: {e}"
-                    ) from e
+                if os.path.getsize(self.retraction_data_path) == 0:
+                    raise RuntimeError("Retraction data is empty")
 
     def _filter_dois(self) -> None:
         with open(self.retraction_data_path, newline="", encoding="utf-8") as csvfile:
