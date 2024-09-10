@@ -6,7 +6,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -21,7 +21,6 @@ from pydantic import (
     computed_field,
     field_validator,
 )
-from typing_extensions import Protocol
 
 from paperqa.llms import LiteLLMModel
 from paperqa.settings import Settings

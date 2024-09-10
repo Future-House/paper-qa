@@ -6,13 +6,8 @@ from typing import Literal, overload
 
 import pymupdf
 import tiktoken
-
-try:
-    from html2text import __version__ as html2text_version
-    from html2text import html2text
-except ImportError:
-    html2text_version = (0, 0, 0)
-    html2text = None  # type: ignore[assignment]
+from html2text import __version__ as html2text_version
+from html2text import html2text
 
 from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
 from paperqa.utils import ImpossibleParsingError
@@ -105,14 +100,8 @@ def parse_text(
             raise NotImplementedError(
                 "HTML parsing is not yet set up to work with split_lines."
             )
-        try:
-            text = html2text(text)
-            parsing_libraries.append(f"html2text ({html2text_version})")
-        except TypeError as exc:
-            raise ImportError(
-                "HTML parsing requires the 'html' extra for 'html2text'. Please:"
-                " `pip install paper-qa[html]`."
-            ) from exc
+        text = html2text(text)
+        parsing_libraries.append(f"html2text ({html2text_version})")
 
     return ParsedText(
         content=text,
