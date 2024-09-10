@@ -2,7 +2,7 @@ import importlib.resources
 import os
 from enum import StrEnum
 from pathlib import Path
-from typing import ClassVar, assert_never, cast
+from typing import Any, ClassVar, assert_never, cast
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
@@ -243,6 +243,10 @@ class AgentSettings(BaseModel):
         default="fake",
         description="Type of agent to use",
     )
+    agent_config: dict[str, Any] | None = Field(
+        default=None,
+        description="Optional keyword argument configuration for the agent.",
+    )
 
     agent_system_prompt: str | None = Field(
         # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215
@@ -253,19 +257,10 @@ class AgentSettings(BaseModel):
     # TODO: make this prompt more minimalist, instead improving tool descriptions so
     # how to use them together can be intuited, and exposing them for configuration
     agent_prompt: str = (
-        "Answer question: {question}\n\nSearch for papers, gather evidence, collect"
-        " papers cited in evidence then re-gather evidence, and answer. Gathering"
-        " evidence will do nothing if you have not done a new search or collected new"
-        " papers. If you do not have enough evidence to generate a good answer, you"
-        " can:\n- Search for more papers (preferred)\n- Collect papers cited by"
-        " previous evidence (preferred)\n- Gather more evidence using a different"
-        " phrase\nIf you search for more papers or collect new papers cited by previous"
-        " evidence, remember to gather evidence again. Once you have five or more"
-        " pieces of evidence from multiple sources, or you have tried a few times, call"
-        " {gen_answer_tool_name} tool. The {gen_answer_tool_name} tool output is"
-        " visible to the user, so you do not need to restate the answer and can simply"
-        " terminate if the answer looks sufficient. The current status of"
-        " evidence/papers/cost is {status}"
+        "Use the tools to answer the question: {question}\n\nThe {gen_answer_tool_name}"
+        " tool output is visible to the user, so you do not need to restate the answer"
+        " and can simply terminate if the answer looks sufficient. The current status"
+        " of evidence/papers/cost is {status}"
     )
     return_paper_metadata: bool = Field(
         default=False,
@@ -310,9 +305,9 @@ class AgentSettings(BaseModel):
         if v is None:
             return None
         # imported here to avoid circular imports
-        from paperqa.agents.main import GenerateAnswerTool
+        from paperqa.agents.tools import GenerateAnswer
 
-        answer_tool_name = GenerateAnswerTool.__fields__["name"].default
+        answer_tool_name = GenerateAnswer.TOOL_FN_NAME
         if answer_tool_name not in v:
             raise ValueError(
                 f"If using an override, must contain at least the {answer_tool_name}."
@@ -487,10 +482,7 @@ class Settings(BaseSettings):
             "model_list": [
                 {
                     "model_name": llm,
-                    "litellm_params": {
-                        "model": llm,
-                        "temperature": self.temperature,
-                    },
+                    "litellm_params": {"model": llm, "temperature": self.temperature},
                 }
             ]
         }
