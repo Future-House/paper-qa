@@ -5,7 +5,7 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
@@ -39,7 +39,7 @@ class SupportsPickle(Protocol):
     def __setstate__(self, state: object) -> None: ...
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     # FAIL - no answer could be generated
     FAIL = "fail"
     # SUCCESS - answer was generated

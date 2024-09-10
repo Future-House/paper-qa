@@ -84,6 +84,5 @@ repos:
           - tantivy
           - tenacity
           - tiktoken>=0.4.0 # Match pyproject.toml
-          - types-requests
           - types-setuptools
           - types-PyYAML

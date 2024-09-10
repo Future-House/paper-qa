@@ -8,7 +8,7 @@ import pathlib
 import pickle
 import zlib
 from collections.abc import Sequence
-from enum import Enum, auto
+from enum import StrEnum, auto
 from io import StringIO
 from typing import Any, ClassVar, cast
 from uuid import UUID
@@ -52,7 +52,7 @@ class RobustEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class SearchDocumentStorage(str, Enum):
+class SearchDocumentStorage(StrEnum):
     JSON_MODEL_DUMP = auto()
     PICKLE_COMPRESSED = auto()
     PICKLE_UNCOMPRESSED = auto()

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import Collection
@@ -116,7 +115,7 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
                 f" {self.__class__.__name__}."
             )
-        except (TimeoutError, asyncio.exceptions.TimeoutError):
+        except TimeoutError:
             logger.warning(
                 f"Request to {self.__class__.__name__} for"
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} timed"

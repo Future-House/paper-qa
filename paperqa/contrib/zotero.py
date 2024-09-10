@@ -12,7 +12,7 @@ try:
 except ImportError as e:
     raise ImportError(
         "zotero requires the 'zotero' extra for 'pyzotero'. Please:"
-        " `pip install aviary[zotero]`."
+        " `pip install paper-qa[zotero]`."
     ) from e
 from paperqa.paths import PAPERQA_DIR
 from paperqa.utils import StrPath, count_pdf_pages
