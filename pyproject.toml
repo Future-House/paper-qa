@@ -172,6 +172,7 @@ disable = [
     "fixme",  # codetags are useful
     "function-redefined",  # Rely on mypy no-redef for this
     "import-outside-toplevel",  # Rely on ruff PLC0415 for this
+    "inconsistent-return-statements",  # TODO: remove after pylint>=3.3 for https://github.com/pylint-dev/pylint/pull/9591
     "invalid-name",  # Don't care to enforce this
     "line-too-long",  # Rely on ruff E501 for this
     "logging-fstring-interpolation",  # f-strings are convenient
@@ -194,9 +195,12 @@ disable = [
     "too-many-locals",  # Rely on ruff PLR0914 for this
     "too-many-return-statements",  # Rely on ruff PLR0911 for this
     "too-many-statements",  # Rely on ruff PLR0915 for this
+    "undefined-loop-variable",  # Don't care to enforce this
     "ungrouped-imports",  # Rely on ruff I001 for this
+    "unidiomatic-typecheck",  # Rely on ruff E721 for this
+    "unreachable",  # Rely on mypy unreachable for this
     "unspecified-encoding",  # Don't care to enforce this
-    "unsubscriptable-object",  # Buggy, SEE: https://github.com/PyCQA/pylint/issues/3637
+    "unsubscriptable-object",  # Buggy, SEE: https://github.com/pylint-dev/pylint/issues/3637
     "unsupported-membership-test",  # Buggy, SEE: https://github.com/pylint-dev/pylint/issues/3045
     "unused-argument",  # Rely on ruff ARG002 for this
     "unused-import",  # Rely on ruff F401 for this
