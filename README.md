@@ -4,7 +4,7 @@
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our 2023 [PaperQA paper](https://arxiv.org/abs/2312.07559) and our 2024 application paper[TODO] to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
+PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [2024 application paper](https://paper.wikicrow.ai) to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
 
 ## Quickstart
 
@@ -18,17 +18,9 @@ pqa ask 'How can carbon nanotubes be manufactured at a large scale?'
 
 ### Example Output
 
-Question: How can carbon nanotubes be manufactured at a large scale?
+Question: Has anyone designed neural networks that compute with proteins or DNA?
 
-Carbon nanotubes can be manufactured at a large scale using the electric-arc technique (Journet6644). This technique involves creating an arc between two electrodes in a reactor under a helium atmosphere and using a mixture of a metallic catalyst and graphite powder in the anode. Yields of 80% of entangled carbon filaments can be achieved, which consist of smaller aligned SWNTs self-organized into bundle-like crystallites (Journet6644). Additionally, carbon nanotubes can be synthesized and self-assembled using various methods such as DNA-mediated self-assembly, nanoparticle-assisted alignment, chemical self-assembly, and electro-addressed functionalization (Tulevski2007). These methods have been used to fabricate large-area nanostructured arrays, high-density integration, and freestanding networks (Tulevski2007). 98% semiconducting CNT network solution can also be used and is separated from metallic nanotubes using a density gradient ultracentrifugation approach (Chen2014). The substrate is incubated in the solution and then rinsed with deionized water and dried with N2 air gun, leaving a uniform carbon network (Chen2014).
-
-**References:**
-
-Journet6644: Journet, Catherine, et al. "Large-scale production of single-walled carbon nanotubes by the electric-arc technique." nature 388.6644 (1997): 756-758.
-
-Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly of carbon nanotubes for the fabrication of large-scale device arrays." Journal of the American Chemical Society 129.39 (2007): 11964-11968.
-
-Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
+The claim that neural networks have been designed to compute with DNA is supported by multiple sources. The work by Qian, Winfree, and Bruck demonstrates the use of DNA strand displacement cascades to construct neural network components, such as artificial neurons and associative memories, using a DNA-based system (Qian2011Neural pages 1-2, Qian2011Neural pages 15-16, Qian2011Neural pages 54-56). This research includes the implementation of a 3-bit XOR gate and a four-neuron Hopfield associative memory, showcasing the potential of DNA for neural network computation. Additionally, the application of deep learning techniques to genomics, which involves computing with DNA sequences, is well-documented. Studies have applied convolutional neural networks (CNNs) to predict genomic features such as transcription factor binding and DNA accessibility (Eraslan2019Deep pages 4-5, Eraslan2019Deep pages 5-6). These models leverage DNA sequences as input data, effectively using neural networks to compute with DNA. While the provided excerpts do not explicitly mention protein-based neural network computation, they do highlight the use of neural networks in tasks related to protein sequences, such as predicting DNA-protein binding (Zeng2016Convolutional pages 1-2). However, the primary focus remains on DNA-based computation.
 
 ## What is PaperQA
 
@@ -582,4 +574,35 @@ with open("my_docs.pkl", "wb") as f:
 # load
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
+```
+
+## Citation
+
+Please read and cite the following papers if you use this software:
+
+```bibtex
+@article{skarlinski2024language,
+  title={Language agents achieve superhuman synthesis of scientific knowledge},
+  author={
+    Michael D. Skarlinski and
+    Sam Cox and
+    Jon M. Laurent and
+    James D. Braza and
+    Michaela Hinks and
+    Michael J. Hammerling and
+    Manvitha Ponnapati and
+    Samuel G. Rodriques and
+    Andrew D. White},
+  year={2024},
+  journal={preprint},
+  url={https://paper.wikicrow.ai}
+}
+
+
+@article{lala2023paperqa,
+  title={PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
+  author={L{\'a}la, Jakub and O'Donoghue, Odhran and Shtedritski, Aleksandar and Cox, Sam and Rodriques, Samuel G and White, Andrew D},
+  journal={arXiv preprint arXiv:2312.07559},
+  year={2023}
+}
 ```
