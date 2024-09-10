@@ -18,9 +18,9 @@ from typing import Any, BinaryIO
 from uuid import UUID
 
 import aiohttp
+import fitz
 import httpx
 import litellm
-import pypdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -82,16 +82,8 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 
 def count_pdf_pages(file_path: StrPath) -> int:
-    with open(file_path, "rb") as pdf_file:
-        try:  # try fitz by default
-            import fitz
-
-            doc = fitz.open(file_path)
-            num_pages = len(doc)
-        except ModuleNotFoundError:  # pypdf instead
-            pdf_reader = pypdf.PdfReader(pdf_file)
-            num_pages = len(pdf_reader.pages)
-    return num_pages
+    with fitz.open(file_path) as doc:
+        return len(doc)
 
 
 def hexdigest(data: str | bytes) -> str:
