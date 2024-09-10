@@ -27,7 +27,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import MaybeSettings, Settings, get_settings
 from paperqa.types import DocDetails
-from paperqa.utils import hexdigest, pqa_directory
+from paperqa.utils import ImpossibleParsingError, hexdigest, pqa_directory
 
 from .models import SupportsPickle
 
@@ -372,7 +372,7 @@ async def process_file(
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
                 )
-            except ValueError:
+            except (ValueError, ImpossibleParsingError):
                 logger.exception(
                     f"Error parsing {file_name}, skipping index for this file."
                 )
