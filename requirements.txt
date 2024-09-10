@@ -114,7 +114,7 @@ types-pyyaml==6.0.12.20240808
 types-setuptools==74.1.0.20240907
 typing-extensions==4.12.2
 typing-inspect==0.9.0
-urllib3==1.26.20
+urllib3==2.2.2
 vcrpy==6.0.1
 virtualenv==20.26.4
 wcwidth==0.2.13
