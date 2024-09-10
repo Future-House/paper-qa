@@ -11,7 +11,7 @@ PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG
 In this example we take a folder of research paper PDFs, magically get their metadata - including citation counts and a retraction check, then parse and cache PDFs into a full-text search index, and finally answer the user question with an LLM agent.
 
 ```bash
-pip install paper-qa[agents]
+pip install paper-qa
 cd my_papers
 pqa ask 'How can carbon nanotubes be manufactured at a large scale?'
 ```
@@ -55,10 +55,10 @@ PaperQA depends on some awesome libraries/APIs that make our repo possible. Here
 
 ## Install
 
-To use the full suite of features in PaperQA, you need to install it with the optional `agents` extra:
+You can install PaperQA via pip:
 
 ```bash
-pip install paper-qa[agents]
+pip install paper-qa
 ```
 
 PaperQA uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile). Any LiteLLM compatible model can be configured to use with PaperQA.
@@ -152,8 +152,7 @@ pqa -i nanomaterials ask 'Are there nm scale features in thermoelectric material
 PaperQA's full workflow can be accessed via Python directly:
 
 ```python
-from paperqa import Settings
-from paperqa.agents import ask
+from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
@@ -164,8 +163,7 @@ answer = ask(
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer). `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
 
 ```python
-from paperqa import Settings
-from paperqa.agents import ask
+from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
@@ -176,9 +174,7 @@ answer = ask(
 `ask` is just a convenience wrapper around the real entrypoint, which can be accessed if you'd like to run concurrent asynchronous workloads:
 
 ```python
-from paperqa import Settings
-from paperqa.agents.main import agent_query
-from paperqa.agents.models import QueryRequest
+from paperqa import Settings, agent_query, QueryRequest
 
 answer = await agent_query(
     QueryRequest(
@@ -233,8 +229,7 @@ paper-qa is written to be used asynchronously. The synchronous API is just a wra
 The synchronous version just call the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
 
 ```python
-from paperqa import Docs, Settings
-from paperqa.settings import AnswerSettings
+from paperqa import Docs
 
 # valid extensions include .pdf, .txt, and .html
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
@@ -256,8 +251,7 @@ print(answer.formatted_answer)
 By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
 
 ```python
-from paperqa import Settings
-from paperqa.agents import ask
+from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
@@ -270,8 +264,7 @@ answer = ask(
 You can use Anthropic or any other model supported by `litellm`:
 
 ```python
-from paperqa import Settings
-from paperqa.agents import ask
+from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
@@ -288,8 +281,7 @@ You can use llama.cpp to be the LLM. Note that you should be using relatively la
 The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
 ```python
-from paperqa import Settings
-from paperqa.agents import ask
+from paperqa import Settings, ask
 
 local_llm_config = dict(
     model_list=dict(
@@ -321,8 +313,7 @@ answer = ask(
 PaperQA defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
 
 ```python
-from paperqa import Settings
-from paperqa.agents import ask
+from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
