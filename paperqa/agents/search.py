@@ -15,7 +15,13 @@ from uuid import UUID
 
 import anyio
 from pydantic import BaseModel
-from tantivy import Document, Index, Schema, SchemaBuilder, Searcher
+from tantivy import (  # pylint: disable=no-name-in-module
+    Document,
+    Index,
+    Schema,
+    SchemaBuilder,
+    Searcher,
+)
 from tenacity import (
     RetryError,
     retry,
@@ -41,15 +47,15 @@ class AsyncRetryError(Exception):
 class RobustEncoder(json.JSONEncoder):
     """JSON encoder that can handle UUID and set objects."""
 
-    def default(self, obj):
-        if isinstance(obj, UUID):
+    def default(self, o):
+        if isinstance(o, UUID):
             # if the obj is uuid, we simply return the value of uuid
-            return str(obj)
-        if isinstance(obj, set):
-            return list(obj)
-        if isinstance(obj, os.PathLike):
-            return str(obj)
-        return json.JSONEncoder.default(self, obj)
+            return str(o)
+        if isinstance(o, set):
+            return list(o)
+        if isinstance(o, os.PathLike):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 
 class SearchDocumentStorage(StrEnum):

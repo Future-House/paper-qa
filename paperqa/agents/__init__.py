@@ -71,16 +71,16 @@ def configure_cli_logging(verbosity: int = 0) -> None:
 
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
-    module_logger = logging.getLogger(__name__.split(".")[0])
+    module_logger = logging.getLogger(__name__.split(".", maxsplit=1)[0])
 
     if not any(isinstance(h, RichHandler) for h in module_logger.handlers):
         module_logger.addHandler(rich_handler)
 
-    for logger_name, logger in logging.Logger.manager.loggerDict.items():
-        if isinstance(logger, logging.Logger) and (
+    for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
+        if isinstance(logger_, logging.Logger) and (
             log_level := verbosity_map.get(min(verbosity, 2), {}).get(logger_name)
         ):
-            logger.setLevel(log_level)
+            logger_.setLevel(log_level)
 
     if verbosity > 0:
         print(f"PaperQA version: {__version__}")

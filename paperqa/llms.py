@@ -142,7 +142,7 @@ class LLMModel(ABC, BaseModel):
         Only the last tuple will be non-zero.
         """
         raise NotImplementedError
-        if False:  # type: ignore[unreachable]
+        if False:  # type: ignore[unreachable]  # pylint: disable=using-constant-test
             yield  # Trick mypy: https://github.com/python/mypy/issues/5070#issuecomment-1050834495
 
     async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
@@ -157,7 +157,7 @@ class LLMModel(ABC, BaseModel):
         Only the last tuple will be non-zero.
         """
         raise NotImplementedError
-        if False:  # type: ignore[unreachable]
+        if False:  # type: ignore[unreachable]  # pylint: disable=using-constant-test
             yield  # Trick mypy: https://github.com/python/mypy/issues/5070#issuecomment-1050834495
 
     def infer_llm_type(self) -> str:
