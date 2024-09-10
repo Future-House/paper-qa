@@ -72,11 +72,17 @@ Version 5 added a CLI, agentic workflows, and removed much of the state from the
 ## Usage
 
 The default workflow of PaperQA is as follows:
-| Phase | PaperQA Actions |
-| ------------- |:-------------:|
-| 1. Paper Search | <ul style="text-align: left"><li>Get candidate papers from LLM-generated keyword query</li><li>Chunk, embed, and add candidate papers to state</li></ul> |
-| 2. Gather Evidence | <ul style="text-align: left"><li>Embed query into vector</li><li>Rank top k document chunks in current state</li><li>Create scored summary of each chunk in the context of the current query</li><li>Use LLM to re-score and select most relevant summaries</li></ul> |
-| 3. Generate Answer | <ul style="text-align: left"><li>Put best summaries into prompt with context</li><li>Generate answer with prompt</li></ul> |
+
+| Phase                  | PaperQA Actions                                                           |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
+|                        | - Chunk, embed, and add candidate papers to state                         |
+| **2. Gather Evidence** | - Embed query into vector                                                 |
+|                        | - Rank top _k_ document chunks in current state                           |
+|                        | - Create scored summary of each chunk in the context of the current query |
+|                        | - Use LLM to re-score and select most relevant summaries                  |
+| **3. Generate Answer** | - Put best summaries into prompt with context                             |
+|                        | - Generate answer with prompt                                             |
 
 The agent can choose to iteratively update its search or answer if it doesn't find sufficient evidence.
 
