@@ -4,8 +4,14 @@ from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
-import html2text
 import tiktoken
+
+try:
+    from html2text import __version__ as html2text_version
+    from html2text import html2text
+except ImportError:
+    html2text_version = (0, 0, 0)
+    html2text = None  # type: ignore[assignment]
 
 from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
 from paperqa.version import __version__ as pqa_version
@@ -98,10 +104,10 @@ def parse_text(
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
     Args:
-        path: path to file
-        html: flag to use html2text library for parsing
-        split_lines: flag to split lines into a list
-        use_tiktoken: flag to use tiktoken library to encode text
+        path: path to file.
+        html: flag to use html2text library for parsing.
+        split_lines: flag to split lines into a list.
+        use_tiktoken: flag to use tiktoken library to encode text.
     """
     try:
         with path.open() as f:
@@ -110,25 +116,32 @@ def parse_text(
         with path.open(encoding="utf-8", errors="ignore") as f:
             text = f.read()
 
+    parsing_libraries: list[str] = ["tiktoken (cl100k_base)"] if use_tiktoken else []
     if html:
         if not isinstance(text, str):
             raise NotImplementedError(
                 "HTML parsing is not yet set up to work with split_lines."
             )
-        text = html2text.html2text(text)
+        try:
+            text = html2text(text)
+            parsing_libraries.append(f"html2text ({html2text_version})")
+        except TypeError as exc:
+            raise ImportError(
+                "HTML parsing requires the 'html' extra for 'html2text'. Please:"
+                " `pip install paper-qa[html]`."
+            ) from exc
 
-    metadata = {
-        "parsing_libraries": ["tiktoken (cl100k_base)"] if use_tiktoken else [],
-        "paperqa_version": pqa_version,
-        "total_parsed_text_length": (
-            len(text) if isinstance(text, str) else sum(len(t) for t in text)
+    return ParsedText(
+        content=text,
+        metadata=ParsedMetadata(
+            parsing_libraries=parsing_libraries,
+            paperqa_version=pqa_version,
+            total_parsed_text_length=(
+                len(text) if isinstance(text, str) else sum(len(t) for t in text)
+            ),
+            parse_type="txt" if not html else "html",
         ),
-        "parse_type": "txt" if not html else "html",
-    }
-    if html:
-        metadata["parsing_libraries"].append(f"html2text ({html2text.__version__})")  # type: ignore[attr-defined]
-
-    return ParsedText(content=text, metadata=ParsedMetadata(**metadata))
+    )
 
 
 def chunk_text(

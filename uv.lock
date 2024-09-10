@@ -1125,11 +1125,10 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev32+g01bb765.d20240909"
+version = "5.0.0a2.dev35+g8863c3d.d20240910"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
-    { name = "html2text" },
     { name = "httpx" },
     { name = "litellm" },
     { name = "numpy" },
@@ -1156,6 +1155,9 @@ agents = [
     { name = "typer" },
     { name = "typing-extensions" },
 ]
+html = [
+    { name = "html2text" },
+]
 typing = [
     { name = "types-pyyaml" },
     { name = "types-setuptools" },
@@ -1168,6 +1170,7 @@ zotero = [
 dev = [
     { name = "anyio" },
     { name = "build" },
+    { name = "html2text" },
     { name = "ipython" },
     { name = "langchain" },
     { name = "langchain-community" },
@@ -1199,7 +1202,7 @@ dev = [
 requires-dist = [
     { name = "aiohttp" },
     { name = "anyio", marker = "extra == 'agents'" },
-    { name = "html2text" },
+    { name = "html2text", marker = "extra == 'html'" },
     { name = "httpx" },
     { name = "langchain", marker = "extra == 'agents'" },
     { name = "langchain-community", marker = "extra == 'agents'" },
@@ -1230,7 +1233,7 @@ dev = [
     { name = "build" },
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
-    { name = "paper-qa", extras = ["agents", "llms", "typing"] },
+    { name = "paper-qa", extras = ["agents", "html", "typing"] },
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
