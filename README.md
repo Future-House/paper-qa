@@ -69,7 +69,7 @@ If you need to index a large set of papers (100+), you will likely want an API k
 
 Version 5 added a CLI, agentic workflows, and removed much of the state from the `Docs` object. `Docs` objects pickled from prior versions of `PaperQA` are not compatible with version 5 and will need to be rebuilt.
 
-## Usage
+## Algorithm Pieces
 
 The default workflow of PaperQA is as follows:
 
