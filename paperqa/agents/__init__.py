@@ -136,6 +136,7 @@ def save_settings(
     settings_path: str | os.PathLike,
 ) -> None:
     """Save the settings to a file."""
+    configure_cli_logging(verbosity=settings.verbosity)
     # check if this could be interpreted at an absolute path
     if os.path.isabs(settings_path):
         full_settings_path = os.path.expanduser(settings_path)
@@ -212,12 +213,12 @@ def main() -> None:
     settings = Settings.from_name(
         args.settings, cli_source=cli_settings(args=remaining_args)
     )
-    configure_cli_logging(settings.verbosity)
 
     match args.command:
         case "ask":
             ask(args.query, settings)
         case "view":
+            configure_cli_logging(settings.verbosity)
             logger.info(f"Viewing: {args.settings}")
             logger.info(settings.model_dump_json(indent=2))
         case "save":
