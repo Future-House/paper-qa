@@ -393,10 +393,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/e8/30c84a3c639691f6c00b04575abd474d94d404a9ad686e60ba0c17c797d0/greenlet-3.1.0-cp313-cp313-musllinux_1_1_aarch64.whl", hash = "sha256:90b5bbf05fe3d3ef697103850c2ce3374558f6fe40fd57c9fac1bf14903f50a5", size = 1150524 },
     { url = "https://files.pythonhosted.org/packages/f7/ed/f25832e30a54a92fa13ab94a206f2ea296306acdf5f6a48f88bbb41a6e44/greenlet-3.1.0-cp313-cp313-musllinux_1_1_x86_64.whl", hash = "sha256:726377bd60081172685c0ff46afbc600d064f01053190e4450857483c4d44484", size = 1180196 },
     { url = "https://files.pythonhosted.org/packages/87/b0/ac381b73c9b9e2cb55970b9a5842ff5b6bc83a7f23aedd3dded1589f0039/greenlet-3.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:d46d5069e2eeda111d6f71970e341f4bd9aeeee92074e649ae263b834286ecc0", size = 294593 },
-    { url = "https://files.pythonhosted.org/packages/e4/e4/08c0cc18d069ace519543318805b29a3280dc99546d2751ed2eb0aa1b0b8/greenlet-3.1.0-cp313-cp313t-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f82891460ec9c91e712d8e82880d35a838f660d99050690f6e064cbff19b347a", size = 647646 },
-    { url = "https://files.pythonhosted.org/packages/8c/db/2bce7c9496739c64de6b61d1a836c948f55cfdc118dbd5dc1d8fc1774380/greenlet-3.1.0-cp313-cp313t-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:3d355093c822c49acda06467ce1261e490662073771dfa88851a6b6715ce893a", size = 658023 },
-    { url = "https://files.pythonhosted.org/packages/72/41/b4014cf65e64b44a14b177aaa8b262ed35b96a7551a86f5ef44c1f01b68b/greenlet-3.1.0-cp313-cp313t-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:ad5cb5d62b504d371264f08aa879f4cbed095ea25e224b4cdae032d652ee13fa", size = 654952 },
-    { url = "https://files.pythonhosted.org/packages/de/92/0478a7571daa1cf389b32247650ec270378d3399232194f264be02b3dd3d/greenlet-3.1.0-cp313-cp313t-musllinux_1_1_aarch64.whl", hash = "sha256:d985b2de702baf876aa1ad861b0fd848f09755e238a59155168078e8da5ed184", size = 1128001 },
 ]
 
 [[package]]
@@ -1013,11 +1009,12 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev38+g71bf45a.d20240910"
+version = "5.0.0a2.dev40+g040d7a2.d20240910"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
+    { name = "html2text" },
     { name = "httpx" },
     { name = "langchain" },
     { name = "langchain-community" },
@@ -1035,13 +1032,9 @@ dependencies = [
     { name = "tantivy" },
     { name = "tenacity" },
     { name = "tiktoken" },
-    { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
-html = [
-    { name = "html2text" },
-]
 typing = [
     { name = "types-pyyaml" },
     { name = "types-setuptools" },
@@ -1053,7 +1046,6 @@ zotero = [
 [package.dev-dependencies]
 dev = [
     { name = "build" },
-    { name = "html2text" },
     { name = "ipython" },
     { name = "mypy" },
     { name = "pre-commit" },
@@ -1077,7 +1069,7 @@ dev = [
 requires-dist = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "html2text", marker = "extra == 'html'" },
+    { name = "html2text" },
     { name = "httpx" },
     { name = "langchain" },
     { name = "langchain-community" },
@@ -1098,7 +1090,6 @@ requires-dist = [
     { name = "tiktoken", specifier = ">=0.4.0" },
     { name = "types-pyyaml", marker = "extra == 'typing'" },
     { name = "types-setuptools", marker = "extra == 'typing'" },
-    { name = "typing-extensions" },
 ]
 
 [package.metadata.requires-dev]
@@ -1106,7 +1097,7 @@ dev = [
     { name = "build" },
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
-    { name = "paper-qa", extras = ["html", "typing"] },
+    { name = "paper-qa", extras = ["typing"] },
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },

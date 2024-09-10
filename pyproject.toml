@@ -20,6 +20,7 @@ dependencies = [
     "PyCryptodome",
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
+    "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "langchain",
     "langchain-community",
@@ -36,7 +37,6 @@ dependencies = [
     "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",
-    "typing_extensions",
 ]
 description = "LLM Chain for answering questions from docs"
 dynamic = ["version"]
@@ -52,9 +52,6 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-html = [
-    "html2text",
-]
 typing = [
     "types-PyYAML",
     "types-setuptools",
@@ -383,7 +380,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[html,typing]",
+    "paper-qa[typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
     "pytest-recording",
