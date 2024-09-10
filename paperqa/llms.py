@@ -4,7 +4,7 @@ import asyncio
 import contextlib
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
-from enum import Enum
+from enum import StrEnum
 from inspect import signature
 from typing import Any
 
@@ -44,7 +44,7 @@ async def do_callbacks(
         f(*args, **kwargs)
 
 
-class EmbeddingModes(str, Enum):
+class EmbeddingModes(StrEnum):
     DOCUMENT = "document"
     QUERY = "query"
 

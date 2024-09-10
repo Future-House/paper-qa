@@ -410,7 +410,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,
+    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""

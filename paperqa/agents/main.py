@@ -188,7 +188,7 @@ async def run_langchain_agent(
     docs: Docs,
     agent_type: str,
     profiler: SimpleProfiler,
-    timeout: float | None = None,
+    agent_timeout: float | None = None,
 ) -> tuple[Answer, AgentStatus]:
     answer = Answer(question=query.query, id=query.id, config_md5=query.settings.md5)
     shared_callbacks: list[BaseCallbackHandler] = [
@@ -229,7 +229,7 @@ async def run_langchain_agent(
 
     llm = ChatOpenAI(
         model=query.settings.agent.agent_llm,
-        timeout=timeout or query.settings.agent.timeout / 2.0,
+        timeout=agent_timeout or query.settings.agent.timeout / 2.0,
         temperature=query.settings.temperature,
     )
     agent_status = AgentStatus.SUCCESS
