@@ -26,7 +26,6 @@ DEFAULT_CLIENTS: (
     CrossrefProvider,
     SemanticScholarProvider,
     JournalQualityPostProcessor,
-    RetrationDataPostProcessor,
 }
 
 ALL_CLIENTS: (
@@ -34,6 +33,7 @@ ALL_CLIENTS: (
     | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
 ) = DEFAULT_CLIENTS | {  # type: ignore[operator]
     UnpaywallProvider,
+    RetrationDataPostProcessor,
 }
 
 
