@@ -43,8 +43,7 @@ jobs:
       - name: Set up uv and run test
         run: |-
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv venv --python=${{ matrix.python-version }} && source .venv/bin/activate
-          uv export > requirements.txt && uv pip install -r requirements.txt
+          uv export > requirements.txt && uv pip --system install -r requirements.txt
           python -m pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
