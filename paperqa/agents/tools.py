@@ -101,7 +101,7 @@ class PaperSearch(NamedTool):
         except KeyError:
             offset = self.previous_searches[search_key] = 0
 
-        logger.info(f"{self.TOOL_FN_NAME} starting for query {query!r}.")
+        logger.info(f"Starting paper search for {query!r}.")
         index = await get_directory_index(settings=self.settings)
         results = await index.query(
             query,
@@ -127,7 +127,7 @@ class PaperSearch(NamedTool):
             )
 
         status = state.status
-        logger.info(f"{self.TOOL_FN_NAME} new status {status}.")
+        logger.info(status)
         # mark how far we've searched so that continuation will start at the right place
         self.previous_searches[search_key] += self.settings.agent.search_count
         if self.settings.agent.return_paper_metadata:
@@ -184,7 +184,7 @@ class GatherEvidence(NamedTool):
             state.answer.question = original_question
 
         status = state.status
-        logger.info(f"{self.TOOL_FN_NAME} new status {status}.")
+        logger.info(status)
         sorted_contexts = sorted(
             state.answer.contexts, key=lambda x: x.score, reverse=True
         )
@@ -242,7 +242,7 @@ class GenerateAnswer(NamedTool):
         else:
             answer = state.answer.answer
         status = state.status
-        logger.info(f"{self.TOOL_FN_NAME} new status {status}.")
+        logger.info(status)
         return f"{answer} | {status}"
 
     # NOTE: can match failure to answer or an actual answer
