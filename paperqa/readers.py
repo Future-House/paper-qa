@@ -4,7 +4,7 @@ from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
-import fitz
+import pymupdf
 import tiktoken
 
 try:
@@ -20,7 +20,7 @@ from paperqa.version import __version__ as pqa_version
 
 def parse_pdf_to_pages(path: Path) -> ParsedText:
 
-    with fitz.open(path) as file:
+    with pymupdf.open(path) as file:
         pages: dict[str, str] = {}
         total_length = 0
 
@@ -30,7 +30,7 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
             total_length += len(pages[str(i + 1)])
 
     metadata = ParsedMetadata(
-        parsing_libraries=[f"fitz ({fitz.__doc__})"],
+        parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
         paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
         parse_type="pdf",

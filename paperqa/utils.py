@@ -18,9 +18,9 @@ from typing import Any, BinaryIO
 from uuid import UUID
 
 import aiohttp
-import fitz
 import httpx
 import litellm
+import pymupdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -82,7 +82,7 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 
 def count_pdf_pages(file_path: StrPath) -> int:
-    with fitz.open(file_path) as doc:
+    with pymupdf.open(file_path) as doc:
         return len(doc)
 
 
