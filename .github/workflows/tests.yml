@@ -40,15 +40,12 @@ jobs:
         python-version: [3.12] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
-      - name: Set up uv
+      - name: Set up uv and run test
         run: |-
           curl -LsSf https://astral.sh/uv/install.sh | sh
           uv venv --python=${{ matrix.python-version }} && source .venv/bin/activate
           uv export > requirements.txt && uv pip install -r requirements.txt
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
-      - run: python -m pytest -n auto
+          python -m pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
