@@ -20,18 +20,35 @@ dependencies = [
     "PyCryptodome",
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
+    "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
+    "ipython>=8",  # Pin to keep recent
     "langchain",
     "langchain-community",
     "langchain-core",
     "langchain-openai",
     "litellm",
+    "mypy>=1.8",  # Pin for mutable-override
     "numpy",
+    "paper-qa[typing]",
+    "pre-commit~=3.4",  # Pin to keep recent
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
     "pymupdf",
+    "pytest-asyncio",
+    "pytest-recording",
+    "pytest-rerunfailures",
+    "pytest-subtests",
+    "pytest-sugar",
+    "pytest-timer[colorama]",
+    "pytest-xdist",
+    "pytest>=8",  # Pin to keep recent
+    "python-dotenv",
+    "pyzotero",
+    "refurb>=2",  # Pin to keep recent
+    "requests",
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",
@@ -374,24 +391,3 @@ in_place = true
 spaces_before_inline_comment = 2  # Match Python PEP 8
 spaces_indent_inline_array = 4  # Match Python PEP 8
 trailing_comma_inline_array = true
-
-[tool.uv]
-dev-dependencies = [
-    "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
-    "ipython>=8",  # Pin to keep recent
-    "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[typing]",
-    "pre-commit~=3.4",  # Pin to keep recent
-    "pytest-asyncio",
-    "pytest-recording",
-    "pytest-rerunfailures",
-    "pytest-subtests",
-    "pytest-sugar",
-    "pytest-timer[colorama]",
-    "pytest-xdist",
-    "pytest>=8",  # Pin to keep recent
-    "python-dotenv",
-    "pyzotero",
-    "refurb>=2",  # Pin to keep recent
-    "requests",
-]
