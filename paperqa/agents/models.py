@@ -50,12 +50,6 @@ class AgentStatus(StrEnum):
     UNSURE = "unsure"
 
 
-class ImpossibleParsingError(Exception):
-    """Error to throw when a parsing is impossible."""
-
-    LOG_METHOD_NAME: ClassVar[str] = "warning"
-
-
 class MismatchedModelsError(Exception):
     """Error to throw when model clients clash ."""
 
