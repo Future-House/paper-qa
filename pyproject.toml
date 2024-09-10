@@ -19,7 +19,6 @@ classifiers = [
 dependencies = [
     "PyCryptodome",
     "aiohttp",  # TODO: remove in favor of httpx
-    "html2text",
     "httpx",
     "litellm",
     "numpy",
@@ -57,6 +56,9 @@ agents = [
     "tantivy",
     "typer",
     "typing_extensions",
+]
+html = [
+    "html2text",
 ]
 typing = [
     "types-PyYAML",
@@ -387,7 +389,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[agents,llms,typing]",
+    "paper-qa[agents,html,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
     "pytest-recording",
