@@ -1,14 +1,8 @@
 import importlib.resources
 import os
-import sys
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import ClassVar, cast
-
-if sys.version_info >= (3, 11):
-    from typing import assert_never
-else:
-    from typing_extensions import assert_never
+from typing import ClassVar, assert_never, cast
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
@@ -62,7 +56,7 @@ class AnswerSettings(BaseModel):
     )
 
 
-class ParsingOptions(str, Enum):
+class ParsingOptions(StrEnum):
     PAPERQA_DEFAULT = "paperqa_default"
 
     def available_for_inference(self) -> list["ParsingOptions"]:
@@ -75,7 +69,7 @@ def _get_parse_type(opt: ParsingOptions, config: "ParsingSettings") -> str:
     assert_never()
 
 
-class ChunkingOptions(str, Enum):
+class ChunkingOptions(StrEnum):
     SIMPLE_OVERLAP = "simple_overlap"
 
     @property
@@ -373,6 +367,10 @@ class Settings(BaseSettings):
             "Directory to store the PQA generated search index, configuration, and"
             " answer indexes."
         ),
+    )
+    index_recursively: bool = Field(
+        default=True,
+        description="Whether to recurse into subdirectories when indexing sources.",
     )
     verbosity: int = Field(
         default=0,

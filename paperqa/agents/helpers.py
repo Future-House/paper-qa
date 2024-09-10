@@ -29,23 +29,20 @@ async def litellm_get_search_query(
     llm: str = "gpt-4o-mini",
     temperature: float = 1.0,
 ) -> list[str]:
-    if isinstance(template, str):
-        if not (
-            "{count}" in template and "{question}" in template and "{date}" in template
-        ):
-            logger.warning(
-                "Template does not contain {count}, {question} and {date} variables."
-                " Ignoring template."
-            )
-            template = None
-
-        else:
-            # partial formatting
-            search_prompt = template.replace("{date}", get_year())
-
-    if template is None:
+    search_prompt = ""
+    if isinstance(template, str) and all(
+        x in template for x in ("{count}", "{question}", "{date}")
+    ):
+        # partial formatting
+        search_prompt = template.replace("{date}", get_year())
+    elif isinstance(template, str):
+        logger.warning(
+            "Template does not contain {count}, {question} and {date} variables."
+            " Ignoring template and using default search prompt."
+        )
+    if not search_prompt:
         search_prompt = (
-            "We want to answer the following question: {question} \nProvide"
+            "We want to answer the following question: {question}\nProvide"
             " {count} unique keyword searches (one search per line) and year ranges"
             " that will find papers to help answer the question. Do not use boolean"
             " operators. Make sure not to repeat searches without changing the"

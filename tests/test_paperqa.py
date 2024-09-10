@@ -8,9 +8,9 @@ from collections.abc import AsyncIterable
 from io import BytesIO
 from pathlib import Path
 
+import httpx
 import numpy as np
 import pytest
-import requests
 
 from paperqa import Answer, Doc, Docs, NumpyVectorStore, Settings, print_callback
 from paperqa.clients import CrossrefProvider
@@ -30,7 +30,6 @@ from paperqa.utils import (
     maybe_is_html,
     maybe_is_text,
     name_in_text,
-    strings_similarity,
     strip_citations,
 )
 
@@ -151,9 +150,7 @@ def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
-    r = requests.get(  # noqa: S113
-        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day"
-    )
+    r = httpx.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
     assert maybe_is_text(r.text)
 
     assert maybe_is_html(BytesIO(r.text.encode()))
@@ -863,33 +860,14 @@ def test_fileio_reader_txt(stub_data_dir: Path) -> None:
     assert "United States" in answer.answer
 
 
-def test_pdf_pypdf_reader(stub_data_dir: Path) -> None:
-    doc_path = stub_data_dir / "paper.pdf"
-    splits1 = read_doc(
-        Path(doc_path),
-        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        force_pypdf=True,
-    )
-    splits2 = read_doc(
-        Path(doc_path),
-        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-    )
-    assert (
-        strings_similarity(splits1[0].text.casefold(), splits2[0].text.casefold())
-        > 0.85
-    )
-
-
-def test_parser_only_reader(stub_data_dir: Path) -> None:
+def test_parser_only_reader(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
     parsed_text = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        force_pypdf=True,
         parsed_text_only=True,
     )
     assert parsed_text.metadata.parse_type == "pdf"
-    assert any("pypdf" in t for t in parsed_text.metadata.parsing_libraries)
     assert parsed_text.metadata.chunk_metadata is None
     assert parsed_text.metadata.total_parsed_text_length == sum(
         len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
@@ -901,7 +879,6 @@ def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     chunk_text, metadata = read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        force_pypdf=True,
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
     )

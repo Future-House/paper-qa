@@ -8,7 +8,7 @@ import pathlib
 import pickle
 import zlib
 from collections.abc import Sequence
-from enum import Enum, auto
+from enum import StrEnum, auto
 from io import StringIO
 from typing import Any, ClassVar, cast
 from uuid import UUID
@@ -27,7 +27,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import MaybeSettings, Settings, get_settings
 from paperqa.types import DocDetails
-from paperqa.utils import hexdigest, pqa_directory
+from paperqa.utils import ImpossibleParsingError, hexdigest, pqa_directory
 
 from .models import SupportsPickle
 
@@ -52,7 +52,7 @@ class RobustEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class SearchDocumentStorage(str, Enum):
+class SearchDocumentStorage(StrEnum):
     JSON_MODEL_DUMP = auto()
     PICKLE_COMPRESSED = auto()
     PICKLE_UNCOMPRESSED = auto()
@@ -372,7 +372,7 @@ async def process_file(
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
                 )
-            except ValueError:
+            except (ValueError, ImpossibleParsingError):
                 logger.exception(
                     f"Error parsing {file_name}, skipping index for this file."
                 )
@@ -399,6 +399,9 @@ async def process_file(
             )
             await search_index.save_index()
             logger.info(f"Complete ({title}).")
+
+
+WARN_IF_INDEXING_MORE_THAN = 999
 
 
 async def get_directory_index(
@@ -438,9 +441,15 @@ async def get_directory_index(
     metadata = await maybe_get_manifest(manifest_file)
     valid_files = [
         file
-        async for file in directory.iterdir()
+        async for file in (
+            directory.rglob("*") if _settings.index_recursively else directory.iterdir()
+        )
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
+    if len(valid_files) > WARN_IF_INDEXING_MORE_THAN:
+        logger.warning(
+            f"Indexing {len(valid_files)} files. This may take a few minutes."
+        )
     index_files = await search_index.index_files
 
     if missing := (set(index_files.keys()) - {str(f) for f in valid_files}):

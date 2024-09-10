@@ -19,18 +19,24 @@ classifiers = [
 dependencies = [
     "PyCryptodome",
     "aiohttp",  # TODO: remove in favor of httpx
-    "html2text",
+    "anyio",
+    "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
+    "langchain",
+    "langchain-community",
+    "langchain-core",
+    "langchain-openai",
     "litellm",
     "numpy",
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
-    "pypdf",
+    "pymupdf",
+    "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
+    "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",
-    "typing-extensions; python_version <= '3.10'",  # For typing.assert_never
 ]
 description = "LLM Chain for answering questions from docs"
 dynamic = ["version"]
@@ -43,25 +49,11 @@ maintainers = [
 ]
 name = "paper-qa"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [project.optional-dependencies]
-agents = [
-    "anyio",
-    "langchain",
-    "langchain-community",
-    "langchain-core",
-    "langchain-openai",
-    "pymupdf",
-    "pymupdf",
-    "requests",
-    "tantivy",
-    "typer",
-    "typing_extensions",
-]
 typing = [
     "types-PyYAML",
-    "types-requests",
     "types-setuptools",
 ]
 zotero = [
@@ -141,7 +133,6 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
-    "fitz",
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
@@ -389,7 +380,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[agents,llms,typing]",
+    "paper-qa[typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
     "pytest-recording",

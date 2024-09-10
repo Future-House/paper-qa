@@ -14,13 +14,13 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, ClassVar
 from uuid import UUID
 
 import aiohttp
 import httpx
 import litellm
-import pypdf
+import pymupdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -37,6 +37,12 @@ logger = logging.getLogger(__name__)
 
 
 StrPath = str | Path
+
+
+class ImpossibleParsingError(Exception):
+    """Error to throw when a parsing is impossible."""
+
+    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 def name_in_text(name: str, text: str) -> bool:
@@ -82,16 +88,8 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 
 def count_pdf_pages(file_path: StrPath) -> int:
-    with open(file_path, "rb") as pdf_file:
-        try:  # try fitz by default
-            import fitz
-
-            doc = fitz.open(file_path)
-            num_pages = len(doc)
-        except ModuleNotFoundError:  # pypdf instead
-            pdf_reader = pypdf.PdfReader(pdf_file)
-            num_pages = len(pdf_reader.pages)
-    return num_pages
+    with pymupdf.open(file_path) as doc:
+        return len(doc)
 
 
 def hexdigest(data: str | bytes) -> str:
@@ -410,7 +408,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,
+    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""

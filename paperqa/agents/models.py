@@ -5,8 +5,8 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
-from enum import Enum
-from typing import Any, ClassVar
+from enum import StrEnum
+from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -21,7 +21,6 @@ from pydantic import (
     computed_field,
     field_validator,
 )
-from typing_extensions import Protocol
 
 from paperqa.llms import LiteLLMModel
 from paperqa.settings import Settings
@@ -39,7 +38,7 @@ class SupportsPickle(Protocol):
     def __setstate__(self, state: object) -> None: ...
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     # FAIL - no answer could be generated
     FAIL = "fail"
     # SUCCESS - answer was generated
@@ -48,12 +47,6 @@ class AgentStatus(str, Enum):
     TIMEOUT = "timeout"
     # UNSURE - the agent was unsure, but an answer is present
     UNSURE = "unsure"
-
-
-class ImpossibleParsingError(Exception):
-    """Error to throw when a parsing is impossible."""
-
-    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 class MismatchedModelsError(Exception):
