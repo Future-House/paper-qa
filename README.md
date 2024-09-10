@@ -69,9 +69,9 @@ If you need to index a large set of papers (100+), you will likely want an API k
 
 Version 5 added a CLI, agentic workflows, and removed much of the state from the `Docs` object. `Docs` objects pickled from prior versions of `PaperQA` are not compatible with version 5 and will need to be rebuilt.
 
-## Algorithm Pieces
+## Usage
 
-The default workflow of PaperQA is as follows:
+To understand PaperQA, let's start with the pieces of the underlying algorithm. The default workflow of PaperQA is as follows:
 
 | Phase                  | PaperQA Actions                                                           |
 | ---------------------- | ------------------------------------------------------------------------- |
@@ -84,7 +84,7 @@ The default workflow of PaperQA is as follows:
 | **3. Generate Answer** | - Put best summaries into prompt with context                             |
 |                        | - Generate answer with prompt                                             |
 
-However, the underlying agent can go in any order - for example doing a narrow and broad search, or using different phrasing for the gather evidence step.
+The phases can go in any order. For example, an LLM agent might do a narrow and broad search, or using different phrasing for the gather evidence step from the generate answer step.
 
 ### CLI
 
