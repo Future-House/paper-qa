@@ -138,7 +138,6 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
-    "fitz",
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
