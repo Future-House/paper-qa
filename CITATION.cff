@@ -1,0 +1,51 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Skarlinski"
+    given-names: "Michael D."
+  - family-names: "Cox"
+    given-names: "Sam"
+  - family-names: "Laurent"
+    given-names: "Jon M."
+  - family-names: "Braza"
+    given-names: "James D."
+  - family-names: "Hinks"
+    given-names: "Michaela"
+  - family-names: "Hammerling"
+    given-names: "Michael J."
+  - family-names: "Ponnapati"
+    given-names: "Manvitha"
+  - family-names: "Rodriques"
+    given-names: "Samuel G."
+  - family-names: "White"
+    given-names: "Andrew D."
+title: "Language agents achieve superhuman synthesis of scientific knowledge"
+version: 2024
+doi: "10.xxxx/xxxxxx"
+date-released: 2024
+url: "https://paper.wikicrow.ai"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Skarlinski"
+      given-names: "Michael D."
+    - family-names: "Cox"
+      given-names: "Sam"
+    - family-names: "Laurent"
+      given-names: "Jon M."
+    - family-names: "Braza"
+      given-names: "James D."
+    - family-names: "Hinks"
+      given-names: "Michaela"
+    - family-names: "Hammerling"
+      given-names: "Michael J."
+    - family-names: "Ponnapati"
+      given-names: "Manvitha"
+    - family-names: "Rodriques"
+      given-names: "Samuel G."
+    - family-names: "White"
+      given-names: "Andrew D."
+  title: "Language agents achieve superhuman synthesis of scientific knowledge"
+  journal: "preprint"
+  year: 2024
+  month: 9 # Adjust month if known
