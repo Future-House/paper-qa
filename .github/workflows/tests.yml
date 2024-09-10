@@ -45,9 +45,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up uv and run test
         run: |-
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv export > requirements.txt && uv pip install  --system -r requirements.txt
-          python -m pytest
+          pip install .
+          python -m pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
