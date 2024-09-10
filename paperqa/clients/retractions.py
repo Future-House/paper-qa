@@ -11,7 +11,8 @@ from anyio import open_file
 from pydantic import ValidationError
 from tqdm.asyncio import tqdm
 
-from ..types import DocDetails
+from paperqa.types import DocDetails
+
 from .client_models import DOIQuery, MetadataPostProcessor
 
 logger = logging.getLogger(__name__)
