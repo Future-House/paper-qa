@@ -368,6 +368,10 @@ class Settings(BaseSettings):
             " answer indexes."
         ),
     )
+    index_recursively: bool = Field(
+        default=True,
+        description="Whether to recurse into subdirectories when indexing sources.",
+    )
     verbosity: int = Field(
         default=0,
         description=(
