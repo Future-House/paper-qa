@@ -349,7 +349,6 @@ from paperqa import (
     HybridEmbeddingModel,
     SparseEmbeddingModel,
     LiteLLMEmbeddingModel,
-    NumpyVectorStore,
 )
 
 
