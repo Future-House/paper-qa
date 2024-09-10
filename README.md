@@ -504,19 +504,22 @@ answer = docs.query(
 print(answer)
 ```
 
-## Callbacks Factory
+## Callbacks
 
-To execute a function on each chunk of LLM completions, you need to provide a function that when called with the name of the step produces a list of functions to execute on each chunk. For example, to get a typewriter view of the completions, you can do:
+To execute a function on each chunk of LLM completions, you need to provide a function that can be executed on each chunk. For example, to get a typewriter view of the completions, you can do:
 
 ```python
 def typewriter(chunk: str) -> None:
     print(chunk, end="")
 
 
-...
+docs = Docs()
+
+# add some docs...
+
 docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    callbacks=[make_typewriter],
+    callbacks=[typewriter],
 )
 ```
 
