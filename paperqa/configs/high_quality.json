@@ -11,5 +11,8 @@
   },
   "prompts": {
     "use_json": true
+  },
+  "agent": {
+    "agent_type": "ToolSelector"
   }
 }

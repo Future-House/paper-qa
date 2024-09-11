@@ -70,7 +70,7 @@ class PaperSearch(NamedTool):
         """
         Search for papers to increase the paper count.
 
-        Repeat previous calls with the same query and years to continue a search.
+        Repeat previous calls with the same query and years to continue a search. Only repeat a maximum of twice.
         This tool can be called concurrently.
         This tool introduces novel papers, so invoke this tool when just beginning or when unsatisfied with the current evidence.
 
@@ -210,9 +210,7 @@ class GenerateAnswer(NamedTool):
     def did_not_fail_to_answer(cls, message: str) -> bool:
         return not message.startswith(cls.FAILED_TO_ANSWER)
 
-    async def gen_answer(
-        self, question: str, state: EnvironmentState  # noqa: ARG002
-    ) -> str:
+    async def gen_answer(self, question: str, state: EnvironmentState) -> str:
         """
         Ask a model to propose an answer using current evidence.
 
@@ -224,6 +222,7 @@ class GenerateAnswer(NamedTool):
             question: Question to be answered.
             state: Current state.
         """
+        logger.info(f"Generating answer for '{question}'.")
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
         state.answer = await state.docs.aquery(
