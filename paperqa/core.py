@@ -99,14 +99,16 @@ async def map_fxn_summary(
     if not success:
         score = extract_score(context)
 
-    c = Context(
-        context=context,
-        text=Text(
-            text=text.text,
-            name=text.name,
-            doc=text.doc.__class__(**text.doc.model_dump(exclude={"embedding"})),
+    return (
+        Context(
+            context=context,
+            text=Text(
+                text=text.text,
+                name=text.name,
+                doc=text.doc.__class__(**text.doc.model_dump(exclude={"embedding"})),
+            ),
+            score=score,  # pylint: disable=possibly-used-before-assignment
+            **extras,
         ),
-        score=score,
-        **extras,
+        llm_result,
     )
-    return c, llm_result

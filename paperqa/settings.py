@@ -66,7 +66,7 @@ class ParsingOptions(StrEnum):
 def _get_parse_type(opt: ParsingOptions, config: "ParsingSettings") -> str:
     if opt == ParsingOptions.PAPERQA_DEFAULT:
         return config.parser_version_string
-    assert_never()
+    assert_never(opt)
 
 
 class ChunkingOptions(StrEnum):
@@ -117,7 +117,7 @@ class ParsingSettings(BaseModel):
                 f"{self.parser_version_string}|{chunking_selection.value}"
                 f"|tokens={self.chunk_size}|overlap={self.overlap}"
             )
-        assert_never()
+        assert_never(chunking_selection)
 
     @property
     def parser_version_string(self) -> str:
