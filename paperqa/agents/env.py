@@ -9,7 +9,7 @@ from aviary.tools import Tool, ToolRequestMessage, ToolResponseMessage
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import Answer, LLMResult
 from paperqa.utils import get_year
 
 from .models import QueryRequest
@@ -151,6 +151,17 @@ class Environment(_Environment[EnvironmentState]):
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[list[Message], float, bool, bool]:
+
+        # add usage for action if it has usage
+        info = action.info
+        if info and "usage" in info and "model" in info:
+            r = LLMResult(
+                model=info["model"],
+                prompt_count=info["usage"][0],
+                completion_count=info["usage"][1],
+            )
+            self.state.answer.add_tokens(r)
+
         # If the action has empty tool_calls, the agent can later take that into account
         msgs = cast(
             list[Message],

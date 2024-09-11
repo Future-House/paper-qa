@@ -85,7 +85,6 @@ class QueryRequest(BaseModel):
 
 class AnswerResponse(BaseModel):
     answer: Answer
-    usage: dict[str, list[int]]
     bibtex: dict[str, str] | None = None
     status: AgentStatus
     timing_info: dict[str, dict[str, float]] | None = None
