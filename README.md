@@ -1,10 +1,10 @@
-# PaperQA
+# PaperQA2
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-PaperQA is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [2024 application paper](https://paper.wikicrow.ai) to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
+PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [recent paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
 
 ## Quickstart
 
@@ -22,9 +22,9 @@ Question: Has anyone designed neural networks that compute with proteins or DNA?
 
 The claim that neural networks have been designed to compute with DNA is supported by multiple sources. The work by Qian, Winfree, and Bruck demonstrates the use of DNA strand displacement cascades to construct neural network components, such as artificial neurons and associative memories, using a DNA-based system (Qian2011Neural pages 1-2, Qian2011Neural pages 15-16, Qian2011Neural pages 54-56). This research includes the implementation of a 3-bit XOR gate and a four-neuron Hopfield associative memory, showcasing the potential of DNA for neural network computation. Additionally, the application of deep learning techniques to genomics, which involves computing with DNA sequences, is well-documented. Studies have applied convolutional neural networks (CNNs) to predict genomic features such as transcription factor binding and DNA accessibility (Eraslan2019Deep pages 4-5, Eraslan2019Deep pages 5-6). These models leverage DNA sequences as input data, effectively using neural networks to compute with DNA. While the provided excerpts do not explicitly mention protein-based neural network computation, they do highlight the use of neural networks in tasks related to protein sequences, such as predicting DNA-protein binding (Zeng2016Convolutional pages 1-2). However, the primary focus remains on DNA-based computation.
 
-## What is PaperQA
+## What is PaperQA2
 
-PaperQA is engineered to be the best RAG model for working with scientific papers. Here are some features:
+PaperQA2 is engineered to be the best RAG model for working with scientific papers. Here are some features:
 
 - A simple interface to get good answers with grounded responses that have in-text citations.
 - State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
@@ -35,37 +35,42 @@ PaperQA is engineered to be the best RAG model for working with scientific paper
 
 By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a Numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
 
-PaperQA depends on some awesome libraries/APIs that make our repo possible. Here are some in a random order:
+PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Here are some in a random order:
 
 1. [Semantic Scholar](https://www.semanticscholar.org/)
 2. [Crossref](https://www.crossref.org/)
 3. [Unpaywall](https://unpaywall.org/)
 4. [Pydantic](https://docs.pydantic.dev/latest/)
-5. [Litellm](https://github.com/BerriAI/litellm)
-6. [pybtex](https://pybtex.org/)
-7. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
+5. [tantivy](https://github.com/quickwit-oss/tantivy) and [tantivy-py](https://github.com/quickwit-oss/tantivy-py)
+6. [Litellm](https://github.com/BerriAI/litellm)
+7. [pybtex](https://pybtex.org/)
+8. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
 
 ## Install
 
-You can install PaperQA via pip:
+You can install PaperQA2 via pip:
 
 ```bash
 pip install paper-qa
 ```
 
-PaperQA uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile). Any LiteLLM compatible model can be configured to use with PaperQA.
+PaperQA2 uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile). Any LiteLLM compatible model can be configured to use with PaperQA2.
 
 If you need to index a large set of papers (100+), you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key), which will allow you to avoid hitting public rate limits using these metadata services. Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
 
-## What's New?
+## PaperQA2 vs PaperQA
+
+We've been working on hard on engineering it for a while and tried to follow [SemVer](https://semver.org/), meaning we've incremented the major version number on each breaking change. This brings us to our current version number: v5.x.x. So why call it PaperQA2? We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai). So we arbitrarily call versions after v5 PaperQA2 and versions before it as PaperQA1 to denote the significant change in performance. We recognize that we are challenged at naming and counting at FutureHouse, so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+
+## What's New in PaperQA2 v5?
 
 Version 5 added a CLI, agentic workflows, and removed much of the state from the `Docs` object. `Docs` objects pickled from prior versions of `PaperQA` are not compatible with version 5 and will need to be rebuilt.
 
 ## Usage
 
-To understand PaperQA, let's start with the pieces of the underlying algorithm. The default workflow of PaperQA is as follows:
+To understand PaperQA2, let's start with the pieces of the underlying algorithm. The default workflow of PaperQA2 is as follows:
 
-| Phase                  | PaperQA Actions                                                           |
+| Phase                  | PaperQA2 Actions                                                          |
 | ---------------------- | ------------------------------------------------------------------------- |
 | **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
 |                        | - Chunk, embed, and add candidate papers to state                         |
@@ -80,13 +85,13 @@ The phases can go in any order. For example, an LLM agent might do a narrow and 
 
 ### CLI
 
-The fastest way to test PaperQA is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
+The fastest way to test PaperQA2 is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
 
 ```bash
 $ pqa ask 'What manufacturing challenges are unique to bispecific antibodies?'
 ```
 
-You will see PaperQA index your local PDF files, gathering the necessary metadata for each of them (using [Crossref](https://www.crossref.org/) and [Semantic Scholar](https://www.semanticscholar.org/)),
+You will see PaperQA2 index your local PDF files, gathering the necessary metadata for each of them (using [Crossref](https://www.crossref.org/) and [Semantic Scholar](https://www.semanticscholar.org/)),
 search over that index, then break the files into chunked evidence contexts, rank them, and ultimately generate an answer. The next time this directory is queried, your index will already be built (save for any differences detected, like new added papers), so it will skip the indexing and chunking steps.
 
 All prior answers will be indexed and stored, you can view them by querying via the `search` subcommand, or access them yourself in your `PQA_HOME` directory, which defaults to `~/.pqa/`.
@@ -95,7 +100,7 @@ All prior answers will be indexed and stored, you can view them by querying via 
 $ pqa search -i 'answers' 'antibodies'
 ```
 
-PaperQA is highly configurable, when running from the command line, `pqa --help` shows all options and short descriptions. For example to run with a higher temperature:
+PaperQA2 is highly configurable, when running from the command line, `pqa --help` shows all options and short descriptions. For example to run with a higher temperature:
 
 ```bash
 $ pqa --temperature 0.5 ask 'What manufacturing challenges are unique to bispecific antibodies?'
@@ -141,7 +146,7 @@ pqa -i nanomaterials ask 'Are there nm scale features in thermoelectric material
 
 ### Module Usage
 
-PaperQA's full workflow can be accessed via Python directly:
+PaperQA2's full workflow can be accessed via Python directly:
 
 ```python
 from paperqa import Settings, ask
@@ -208,7 +213,7 @@ print(answer.formatted_answer)
 
 ### Async
 
-paper-qa is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
+PaperQA2 is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
 
 | Sync                | Async                |
 | ------------------- | -------------------- |
@@ -268,7 +273,7 @@ answer = ask(
 
 #### Locally Hosted
 
-You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because PaperQA requires following a lot of instructions. You won't get good performance with 7B models.
+You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because PaperQA2 requires following a lot of instructions. You won't get good performance with 7B models.
 
 The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
@@ -302,7 +307,7 @@ answer = ask(
 
 ### Changing Embedding Model
 
-PaperQA defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
+PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
 
 ```python
 from paperqa import Settings, ask
@@ -313,9 +318,9 @@ answer = ask(
 )
 ```
 
-`embedding` accepts any embedding model name supported by litellm. PaperQA also supports an embedding input of `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, where any litellm model can be used in the dense model name. `"sparse"` can be used to use a sparse keyword embedding only.
+`embedding` accepts any embedding model name supported by litellm. PaperQA2 also supports an embedding input of `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, where any litellm model can be used in the dense model name. `"sparse"` can be used to use a sparse keyword embedding only.
 
-Embedding models are used to create PaperQA's index of the full-text embedding vectors (`texts_index` argument). The embedding model can be specified as a setting when you are adding new papers to the `Docs` object:
+Embedding models are used to create PaperQA2's index of the full-text embedding vectors (`texts_index` argument). The embedding model can be specified as a setting when you are adding new papers to the `Docs` object:
 
 ```python
 from paperqa import Docs, Settings
@@ -328,7 +333,7 @@ for doc in doc_paths:
     doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
 ```
 
-Note that PaperQA uses Numpy as a dense vector store.
+Note that PaperQA2 uses Numpy as a dense vector store.
 Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
 Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
 However, if a larger-than-memory vector store is needed, we are currently lacking here.
@@ -425,7 +430,7 @@ Install `pyzotero` via the `zotero` extra for this feature:
 pip install paperqa[zotero]
 ```
 
-First, note that PaperQA parses the PDFs of papers to store in the database,
+First, note that PaperQA2 parses the PDFs of papers to store in the database,
 so all relevant papers should have PDFs stored inside your database.
 You can get Zotero to automatically do this by highlighting the references
 you wish to retrieve, right clicking, and selecting _"Find Available PDFs"_.
@@ -439,7 +444,7 @@ To download papers, you need to get an API key for your account.
 2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
    - The key will need read access to the library.
 
-With this, we can download papers from our library and add them to PaperQA:
+With this, we can download papers from our library and add them to PaperQA2:
 
 ```python
 from paperqa import Docs
