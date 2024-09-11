@@ -1,14 +1,20 @@
 from __future__ import annotations
 
+import contextvars
 import logging
+import os
 import re
+from collections.abc import Collection
+from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, Callable, ClassVar, Collection
+from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
+import litellm  # for cost
 import tiktoken
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
+from pybtex.scanner import PybtexSyntaxError
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -18,36 +24,54 @@ from pydantic import (
     model_validator,
 )
 
-from .prompts import (
-    citation_prompt,
-    default_system_prompt,
-    qa_prompt,
-    select_paper_prompt,
-    structured_citation_prompt,
-    summary_json_prompt,
-    summary_json_system_prompt,
-    summary_prompt,
-)
-from .utils import (
+from paperqa.utils import (
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citenames,
 )
-from .version import __version__ as pqa_version
+from paperqa.version import __version__ as pqa_version
 
 # Just for clarity
+# also in case one day we want to narrow
+# the type
 DocKey = Any
-CallbackFactory = Callable[[str], list[Callable[[str], None]] | None]
-
 logger = logging.getLogger(__name__)
+
+# A context var that will be unique to threads/processes
+cvar_answer_id = contextvars.ContextVar[UUID | None]("answer_id", default=None)
+
+
+@contextmanager
+def set_llm_answer_ids(answer_id: UUID):
+    token = cvar_answer_id.set(answer_id)
+    try:
+        yield
+    finally:
+        cvar_answer_id.reset(token)
 
 
 class LLMResult(BaseModel):
-    """A class to hold the result of a LLM completion."""
+    """A class to hold the result of a LLM completion.
+
+    To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
+
+    ```python
+    my_answer_id = uuid4()
+    with set_llm_answer_ids(my_answer_id):
+        # code that generates LLMResults
+        pass
+    ```
+
+    and all the LLMResults generated within the context will have the same `answer_id`.
+    This can be combined with LLMModels `llm_result_callback` to store all LLMResults.
+    """
 
     id: UUID = Field(default_factory=uuid4)
-    answer_id: UUID | None = None
+    answer_id: UUID | None = Field(
+        default_factory=cvar_answer_id.get,
+        description="A persistent ID to associate a group of LLMResults",
+    )
     name: str | None = None
     prompt: str | list[dict] | None = Field(
         default=None,
@@ -65,8 +89,21 @@ class LLMResult(BaseModel):
         default=0.0, description="Delta time (sec) to last response token's arrival."
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cost(self) -> float:
+        """Return the cost of the result in dollars."""
+        if self.prompt_count and self.completion_count:
+            try:
+                pc = litellm.model_cost[self.model]["input_cost_per_token"]
+                oc = litellm.model_cost[self.model]["output_cost_per_token"]
+                return pc * self.prompt_count + oc * self.completion_count
+            except KeyError:
+                logger.warning(f"Could not find cost for model {self.model}.")
+        return 0.0
 
 
 class Embeddable(BaseModel):
@@ -79,7 +116,9 @@ class Doc(Embeddable):
     dockey: DocKey
     overwrite_fields_from_metadata: bool = Field(
         default=True,
-        description="flag to overwrite fields from metadata when upgrading to a DocDetails",
+        description=(
+            "flag to overwrite fields from metadata when upgrading to a DocDetails"
+        ),
     )
 
     def __hash__(self) -> int:
@@ -91,99 +130,8 @@ class Text(Embeddable):
     name: str
     doc: Doc
 
-
-# Mock a dictionary and store any missing items
-class _FormatDict(dict):
-    def __init__(self) -> None:
-        self.key_set: set[str] = set()
-
-    def __missing__(self, key: str) -> str:
-        self.key_set.add(key)
-        return key
-
-
-def get_formatted_variables(s: str) -> set[str]:
-    """Returns the set of variables implied by the format string."""
-    format_dict = _FormatDict()
-    s.format_map(format_dict)
-    return format_dict.key_set
-
-
-class PromptCollection(BaseModel):
-    summary: str = summary_prompt
-    qa: str = qa_prompt
-    select: str = select_paper_prompt
-    cite: str = citation_prompt
-    structured_cite: str = structured_citation_prompt
-    pre: str | None = Field(
-        default=None,
-        description=(
-            "Opt-in pre-prompt (templated with just the original question) to append"
-            " information before a qa prompt. For example:"
-            " 'Summarize all scientific terms in the following question:\n{question}'."
-            " This pre-prompt can enable injection of question-specific guidance later"
-            " used by the qa prompt, without changing the qa prompt's template."
-        ),
-    )
-    post: str | None = None
-    system: str = default_system_prompt
-    skip_summary: bool = False
-    json_summary: bool = False
-    # Not thrilled about this model,
-    # but need to split out the system/summary
-    # to get JSON
-    summary_json: str = summary_json_prompt
-    summary_json_system: str = summary_json_system_prompt
-
-    @field_validator("summary")
-    @classmethod
-    def check_summary(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(summary_prompt))
-        ):
-            raise ValueError(
-                f"Summary prompt can only have variables: {get_formatted_variables(summary_prompt)}"
-            )
-        return v
-
-    @field_validator("qa")
-    @classmethod
-    def check_qa(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(qa_prompt))
-        ):
-            raise ValueError(
-                f"QA prompt can only have variables: {get_formatted_variables(qa_prompt)}"
-            )
-        return v
-
-    @field_validator("select")
-    @classmethod
-    def check_select(cls, v: str) -> str:
-        if not set(get_formatted_variables(v)).issubset(
-            set(get_formatted_variables(select_paper_prompt))
-        ):
-            raise ValueError(
-                f"Select prompt can only have variables: {get_formatted_variables(select_paper_prompt)}"
-            )
-        return v
-
-    @field_validator("pre")
-    @classmethod
-    def check_pre(cls, v: str | None) -> str | None:
-        if v is not None and set(get_formatted_variables(v)) != {"question"}:
-            raise ValueError("Pre prompt must have input variables: question")
-        return v
-
-    @field_validator("post")
-    @classmethod
-    def check_post(cls, v: str | None) -> str | None:
-        if v is not None:
-            # kind of a hack to get list of attributes in answer
-            attrs = set(Answer.model_fields.keys())
-            if not set(get_formatted_variables(v)).issubset(attrs):
-                raise ValueError(f"Post prompt must have input variables: {attrs}")
-        return v
+    def __hash__(self) -> int:
+        return hash(self.text)
 
 
 class Context(BaseModel):
@@ -195,10 +143,9 @@ class Context(BaseModel):
     text: Text
     score: int = 5
 
-
-def __str__(self) -> str:  # noqa: N807
-    """Return the context as a string."""
-    return self.context
+    def __str__(self) -> str:
+        """Return the context as a string."""
+        return self.context
 
 
 class Answer(BaseModel):
@@ -211,14 +158,17 @@ class Answer(BaseModel):
     contexts: list[Context] = []
     references: str = ""
     formatted_answer: str = ""
-    dockey_filter: set[DocKey] | None = None
-    summary_length: str = "about 100 words"
-    answer_length: str = "about 100 words"
-    # just for convenience you can override this
-    cost: float | None = None
+    cost: float = 0.0
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
     token_counts: dict[str, list[int]] = Field(default_factory=dict)
+    config_md5: str | None = Field(
+        default=None,
+        frozen=True,
+        description=(
+            "MD5 hash of the settings used to generate the answer. Cannot change"
+        ),
+    )
     model_config = ConfigDict(extra="ignore")
 
     def __str__(self) -> str:
@@ -232,7 +182,7 @@ class Answer(BaseModel):
             data.pop("used_contexts", None)
         return data
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def used_contexts(self) -> set[str]:
         """Return the used contexts."""
@@ -248,7 +198,7 @@ class Answer(BaseModel):
             raise ValueError(f"Could not find docname {name} in contexts.") from exc
         return doc.citation
 
-    def add_tokens(self, result: LLMResult):
+    def add_tokens(self, result: LLMResult) -> None:
         """Update the token counts for the given result."""
         if result.model not in self.token_counts:
             self.token_counts[result.model] = [
@@ -259,12 +209,29 @@ class Answer(BaseModel):
             self.token_counts[result.model][0] += result.prompt_count
             self.token_counts[result.model][1] += result.completion_count
 
+        self.cost += result.cost
+
     def get_unique_docs_from_contexts(self, score_threshold: int = 0) -> set[Doc]:
         """Parse contexts for docs with scores above the input threshold."""
         return {
             c.text.doc
             for c in filter(lambda x: x.score >= score_threshold, self.contexts)
         }
+
+    def filter_content_for_user(self) -> None:
+        """Filter out extra items (inplace) that do not need to be returned to the user."""
+        self.contexts = [
+            Context(
+                context=c.context,
+                score=c.score,
+                text=Text(
+                    text="",
+                    **c.text.model_dump(exclude={"text", "embedding", "doc"}),
+                    doc=Doc(**c.text.doc.model_dump(exclude={"embedding"})),
+                ),
+            )
+            for c in self.contexts
+        ]
 
 
 class ChunkMetadata(BaseModel):
@@ -353,18 +320,29 @@ class DocDetails(Doc):
 
     source_quality: int | None = Field(
         default=None,
-        description="Quality of journal/venue of paper. "
-        " We use None as a sentinel for unset values (like for determining hydration) "
-        " So, we use -1 means unknown quality and None means it needs to be hydrated.",
+        description=(
+            "Quality of journal/venue of paper.  We use None as a sentinel for unset"
+            " values (like for determining hydration)  So, we use -1 means unknown"
+            " quality and None means it needs to be hydrated."
+        ),
+    )
+    is_retracted: bool | None = Field(
+        default=None, description="Flag for whether the paper is retracted."
     )
     doi: str | None = None
     doi_url: str | None = None
     doc_id: str | None = None
+    file_location: str | os.PathLike | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
     )
     UNDEFINED_JOURNAL_QUALITY: ClassVar[int] = -1
+    DOI_URL_FORMATS: ClassVar[Collection[str]] = {
+        "https://doi.org/",
+        "http://dx.doi.org/",
+    }
+    AUTHOR_NAMES_TO_REMOVE: ClassVar[Collection[str]] = {"et al", "et al."}
 
     @field_validator("key")
     @classmethod
@@ -372,9 +350,13 @@ class DocDetails(Doc):
         # Replace HTML tags with empty string
         return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
 
-    @staticmethod
-    def lowercase_doi_and_populate_doc_id(data: dict[str, Any]) -> dict[str, Any]:
+    @classmethod
+    def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
         if doi := data.get("doi"):
+            remove_urls = cls.DOI_URL_FORMATS
+            for url in remove_urls:
+                if doi.startswith(url):
+                    doi = doi.replace(url, "")
             data["doi"] = doi.lower()
             data["doc_id"] = encode_id(doi.lower())
         else:
@@ -419,6 +401,7 @@ class DocDetails(Doc):
         if doi and not doi_url:
             doi_url = "https://doi.org/" + doi
 
+        # ensure the modern doi url is used
         if doi_url:
             data["doi_url"] = doi_url.replace(
                 "http://dx.doi.org/", "https://doi.org/"
@@ -426,9 +409,19 @@ class DocDetails(Doc):
 
         return data
 
+    @classmethod
+    def remove_invalid_authors(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Capture and cull strange author names."""
+        if authors := data.get("authors"):
+            data["authors"] = [
+                a for a in authors if a.lower() not in cls.AUTHOR_NAMES_TO_REMOVE
+            ]
+
+        return data
+
     @staticmethod
     def overwrite_docname_dockey_for_compatibility_w_doc(
-        data: dict[str, Any]
+        data: dict[str, Any],
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}
@@ -439,7 +432,7 @@ class DocDetails(Doc):
         return data
 
     @classmethod
-    def populate_bibtex_key_citation(  # noqa: C901, PLR0912
+    def populate_bibtex_key_citation(  # noqa: PLR0912
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
         """Add or modify bibtex, key, and citation fields.
@@ -477,10 +470,13 @@ class DocDetails(Doc):
                         data["other"]["bibtex_source"] = ["self_generated"]
                 else:
                     data["other"] = {"bibtex_source": ["self_generated"]}
-
-                existing_entry = next(
-                    iter(Parser().parse_string(data["bibtex"]).entries.values())
-                )
+                try:
+                    existing_entry = next(
+                        iter(Parser().parse_string(data["bibtex"]).entries.values())
+                    )
+                except PybtexSyntaxError:
+                    logger.warning(f"Failed to parse bibtex for {data['bibtex']}.")
+                    existing_entry = None
 
             entry_data = {
                 "title": data.get("title") or CITATION_FALLBACK_DATA["title"],
@@ -505,7 +501,9 @@ class DocDetails(Doc):
             }
             entry_data = {k: v for k, v in entry_data.items() if v}
             try:
-                new_entry = Entry(data.get("bibtex_type", "article"), fields=entry_data)
+                new_entry = Entry(
+                    data.get("bibtex_type", "article") or "article", fields=entry_data
+                )
                 if existing_entry:
                     new_entry = cls.merge_bibtex_entries(existing_entry, new_entry)
                 # add in authors manually into the entry
@@ -519,17 +517,23 @@ class DocDetails(Doc):
                 if data.get("overwrite_fields_from_metadata", True):
                     data["citation"] = None
             except Exception:
-                logger.exception(f"Failed to generate bibtex for {data}")
-        if not data.get("citation"):
+                logger.warning(
+                    "Failed to generate bibtex for"
+                    f" {data.get('docname') or data.get('citation')}"
+                )
+        if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
-                data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
+                data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
+        elif not data.get("citation"):
+            data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
         data = cls.lowercase_doi_and_populate_doc_id(data)
+        data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
         data = cls.inject_clean_doi_url_into_data(data)
         data = cls.populate_bibtex_key_citation(data)
@@ -544,24 +548,30 @@ class DocDetails(Doc):
 
     @property
     def formatted_citation(self) -> str:
+
+        if self.is_retracted:
+            return f"**RETRACTED ARTICLE** Citation: {self.citation} Retrieved from http://retractiondatabase.org/."
+
         if (
             self.citation is None  # type: ignore[redundant-expr]
             or self.citation_count is None
             or self.source_quality is None
         ):
             raise ValueError(
-                "Citation, citationCount, and sourceQuality are not set -- do you need to call `hydrate`?"
+                "Citation, citationCount, and sourceQuality are not set -- do you need"
+                " to call `hydrate`?"
             )
         quality = (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
             if self.source_quality >= 0
             else None
         )
+
         if quality is None:
             return f"{self.citation} This article has {self.citation_count} citations."
         return (
-            f"{self.citation} This article has {self.citation_count} citations and is from a "
-            f"{quality}."
+            f"{self.citation} This article has {self.citation_count} citations and is"
+            f" from a {quality}."
         )
 
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
@@ -585,7 +595,7 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: C901
+    def __add__(self, other: DocDetails | int) -> DocDetails:
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
@@ -605,7 +615,7 @@ class DocDetails(Doc):
                 # Merge 'other' dictionaries
                 merged_data[field] = {**self.other, **other.other}
                 # handle the bibtex / sources as special fields
-                for field_to_combine in ["bibtex_source", "client_source"]:
+                for field_to_combine in ("bibtex_source", "client_source"):
                     if self.other.get(field_to_combine) and other.other.get(
                         field_to_combine
                     ):
@@ -646,7 +656,9 @@ class DocDetails(Doc):
                 # pre-prints / arXiv versions of papers that are not as up-to-date
                 merged_data[field] = (
                     other_value
-                    if (other_value is not None and PREFER_OTHER)
+                    if (
+                        (other_value is not None and other_value != []) and PREFER_OTHER
+                    )
                     else self_value
                 )
 

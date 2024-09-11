@@ -1,13 +1,12 @@
 summary_prompt = (
-    "Summarize the excerpt below to help answer a question.\n\n"
-    "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\n"
-    "Question: {question}\n\n"
-    "Do not directly answer the question, instead summarize to give evidence to help "
-    "answer the question. Stay detailed; report specific numbers, equations, or "
-    'direct quotes (marked with quotation marks). Reply "Not applicable" if the '
-    "excerpt is irrelevant. At the end of your response, provide an integer score "
-    "from 1-10 on a newline indicating relevance to question. Do not explain your score."
-    "\n\nRelevant Information Summary ({summary_length}):"
+    "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
+    " {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly"
+    " answer the question, instead summarize to give evidence to help answer the"
+    " question. Stay detailed; report specific numbers, equations, or direct quotes"
+    ' (marked with quotation marks). Reply "Not applicable" if the excerpt is'
+    " irrelevant. At the end of your response, provide an integer score from 1-10 on a"
+    " newline indicating relevance to question. Do not explain your score.\n\nRelevant"
+    " Information Summary ({summary_length}):"
 )
 
 summary_json_prompt = (
@@ -19,12 +18,11 @@ qa_prompt = (
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
-    "If the context provides insufficient information and "
-    "the question cannot be directly answered, reply "
+    "If the context provides insufficient information reply "
     '"I cannot answer."'
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
-    "like (Example2012Example pages 3-4). Only cite from the context "
+    "like {example_citation}. Only cite from the context "
     "below and only use the valid keys. Write in the style of a "
     "Wikipedia article, with concise sentences and coherent paragraphs. "
     "The context comes from a variety of sources and is only a summary, "

@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2283974,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2296021,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
           large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
@@ -22,7 +22,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:28 GMT
+          - Wed, 04 Sep 2024 22:52:21 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -54,7 +54,7 @@ interactions:
           {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 181.37788}]}
+          "matchScore": 179.37169}]}
 
           '
       headers:
@@ -67,27 +67,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 13 Aug 2024 18:34:37 GMT
+          - Wed, 04 Sep 2024 22:52:21 GMT
         Via:
-          - 1.1 2db4851b6d360f79d8bbeb4eae3c9eb6.cloudfront.net (CloudFront)
+          - 1.1 bd414f5f75d6893558dff609c5ff1fe6.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - IiLEFl6DqYOTEwoXbVW_IELLcpelLNK0CI5_R5rQEVNdP9f_VYhzFQ==
+          - y9LH1Kkvy7AkEVcJ2xQo8FicwDSkeTvt7ELbNE8NIHVDQBfryZIuYg==
         X-Amz-Cf-Pop:
-          - IAD55-P4
+          - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - cdcQLHZwPHcECzA=
+          - dmipyG2VvHcEfNQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "348"
         x-amzn-Remapped-Date:
-          - Tue, 13 Aug 2024 18:34:37 GMT
+          - Wed, 04 Sep 2024 22:52:21 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 452022b5-32e5-4c67-9b7a-d57d29f74200
+          - b0e7573d-bb72-4f0f-a29b-d556474a476c
       status:
         code: 200
         message: OK
@@ -112,7 +112,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Tue, 13 Aug 2024 18:34:37 GMT
+          - Wed, 04 Sep 2024 22:52:21 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

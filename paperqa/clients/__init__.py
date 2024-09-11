@@ -2,27 +2,34 @@ from __future__ import annotations
 
 import copy
 import logging
-from typing import Any, Collection, Coroutine, Sequence
+from collections.abc import Collection, Coroutine, Sequence
+from typing import Any
 
 import aiohttp
 from pydantic import BaseModel, ConfigDict
 
-from ..types import Doc, DocDetails
-from ..utils import gather_with_concurrency
+from paperqa.types import Doc, DocDetails
+from paperqa.utils import gather_with_concurrency
+
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor
+from .retractions import RetrationDataPostProcessor
 from .semantic_scholar import SemanticScholarProvider
+from .unpaywall import UnpaywallProvider
 
 logger = logging.getLogger(__name__)
 
-ALL_CLIENTS: (
-    Collection[type[MetadataPostProcessor | MetadataProvider]]
-    | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
-) = {
+DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
     CrossrefProvider,
     SemanticScholarProvider,
     JournalQualityPostProcessor,
+}
+
+ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
+    *DEFAULT_CLIENTS,
+    UnpaywallProvider,
+    RetrationDataPostProcessor,
 }
 
 
@@ -53,13 +60,13 @@ class DocMetadataTask(BaseModel):
 
 
 class DocMetadataClient:
-    def __init__(
+    def __init__(  # pylint: disable=dangerous-default-value
         self,
         session: aiohttp.ClientSession | None = None,
         clients: (
             Collection[type[MetadataPostProcessor | MetadataProvider]]
             | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
-        ) = ALL_CLIENTS,
+        ) = DEFAULT_CLIENTS,
     ) -> None:
         """Metadata client for querying multiple metadata providers and processors.
 
@@ -150,6 +157,9 @@ class DocMetadataClient:
                 )
                 break
 
+        if self._session is None:
+            await session.close()
+
         return doc_details
 
     async def bulk_query(
@@ -160,18 +170,31 @@ class DocMetadataClient:
         )
 
     async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
+
+        # note we have some extra fields which may have come from reading the doc text,
+        # but aren't in the doc object, we add them here too.
+        extra_fields = {
+            k: v for k, v in kwargs.items() if k in {"title", "authors", "doi"}
+        }
+        # abuse our doc_details object to be an int if it's empty
+        # our __add__ operation supports int by doing nothing
+        extra_doc: int | DocDetails = (
+            0 if not extra_fields else DocDetails(**extra_fields)
+        )
+
         if doc_details := await self.query(**kwargs):
             if doc.overwrite_fields_from_metadata:
-                return doc_details
+                return extra_doc + doc_details
+
             # hard overwrite the details from the prior object
             doc_details.dockey = doc.dockey
             doc_details.doc_id = doc.dockey
             doc_details.docname = doc.docname
             doc_details.key = doc.docname
             doc_details.citation = doc.citation
-            return doc_details
+            return extra_doc + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
         prior_doc = doc.model_dump()
         prior_doc["overwrite_fields_from_metadata"] = False
-        return DocDetails(**prior_doc)
+        return DocDetails(**(prior_doc | extra_fields))

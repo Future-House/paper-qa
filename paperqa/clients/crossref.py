@@ -1,24 +1,28 @@
 from __future__ import annotations
 
+import contextlib
 import copy
 import json
 import logging
 import os
+from collections.abc import Collection
 from datetime import datetime
-from typing import Any, Collection
+from typing import Any
 from urllib.parse import quote
 
 import aiohttp
 
-from ..clients.exceptions import DOINotFoundError
-from ..types import CITATION_FALLBACK_DATA, DocDetails
-from ..utils import (
+from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
+from paperqa.utils import (
     bibtex_field_extract,
+    create_bibtex_key,
     remove_substrings,
     strings_similarity,
     union_collections_to_ordered_list,
 )
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
+from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +98,8 @@ def crossref_headers() -> dict[str, str]:
     if api_key := os.environ.get("CROSSREF_API_KEY"):
         return {CROSSREF_HEADER_KEY: f"Bearer {api_key}"}
     logger.warning(
-        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may apply."
+        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may"
+        " apply."
     )
     return {}
 
@@ -136,12 +141,14 @@ async def doi_to_bibtex(
     ]
     # replace the key if all the fragments are present
     if all(fragments):
-        new_key = remove_substrings(("".join(fragments)), FORBIDDEN_KEY_CHARACTERS)
+        new_key = create_bibtex_key(
+            author=fragments[0].split(), year=fragments[1], title=fragments[2]
+        )
     # we use the count parameter below to ensure only the 1st entry is replaced
     return data.replace(key, new_key, 1)
 
 
-async def parse_crossref_to_doc_details(  # noqa: C901
+async def parse_crossref_to_doc_details(
     message: dict[str, Any],
     session: aiohttp.ClientSession,
     query_bibtex: bool = True,
@@ -150,7 +157,7 @@ async def parse_crossref_to_doc_details(  # noqa: C901
     bibtex_source = "self_generated"
     bibtex = None
 
-    try:
+    with contextlib.suppress(DOINotFoundError):
         # get the title from the message, if it exists
         # rare circumstance, but bibtex may not have a title
         fallback_data = copy.copy(CITATION_FALLBACK_DATA)
@@ -167,9 +174,6 @@ async def parse_crossref_to_doc_details(  # noqa: C901
             )
             # track the origin of the bibtex entry for debugging
             bibtex_source = "crossref"
-
-    except DOINotFoundError:
-        pass
 
     authors = [
         f"{author.get('given', '')} {author.get('family', '')}".strip()
@@ -225,7 +229,7 @@ async def parse_crossref_to_doc_details(  # noqa: C901
     return doc_details
 
 
-async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
+async def get_doc_details_from_crossref(  # noqa: PLR0912
     session: aiohttp.ClientSession,
     doi: str | None = None,
     authors: list[str] | None = None,
@@ -249,7 +253,8 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
 
     if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
         logger.warning(
-            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may apply."
+            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
+            " apply."
         )
         CROSSREF_MAILTO = "test@example.com"
     quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
@@ -265,7 +270,8 @@ async def get_doc_details_from_crossref(  # noqa: C901, PLR0912
 
     query_bibtex = True
 
-    if fields:
+    # note we only do field selection if querying on title
+    if fields and title:
         # crossref has a special endpoint for bibtex, so we don't need to request it here
         if "bibtex" not in fields:
             query_bibtex = False

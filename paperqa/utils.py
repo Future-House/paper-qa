@@ -3,22 +3,24 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import inspect
-import json
 import logging
+import logging.config
 import math
+import os
 import re
 import string
-from collections.abc import Iterable
+from collections.abc import Collection, Coroutine, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, Collection, Coroutine, Iterator, Union
+from typing import Any, BinaryIO, ClassVar
 from uuid import UUID
 
 import aiohttp
 import httpx
-import pypdf
+import litellm
+import pymupdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -34,7 +36,13 @@ from tenacity import (
 logger = logging.getLogger(__name__)
 
 
-StrPath = Union[str, Path]
+StrPath = str | Path
+
+
+class ImpossibleParsingError(Exception):
+    """Error to throw when a parsing is impossible."""
+
+    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 def name_in_text(name: str, text: str) -> bool:
@@ -44,7 +52,7 @@ def name_in_text(name: str, text: str) -> bool:
 
 
 def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
-    if len(s) == 0:
+    if not s:
         return False
     # Calculate the entropy of the string
     entropy = 0.0
@@ -70,7 +78,7 @@ def maybe_is_html(file: BinaryIO) -> bool:
 
 
 def strings_similarity(s1: str, s2: str) -> float:
-    if len(s1) == 0 or len(s2) == 0:
+    if not s1 or not s2:
         return 0
     # break the strings into words
     ss1 = set(s1.split())
@@ -80,23 +88,19 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 
 def count_pdf_pages(file_path: StrPath) -> int:
-    with open(file_path, "rb") as pdf_file:
-        try:  # try fitz by default
-            import fitz
+    with pymupdf.open(file_path) as doc:
+        return len(doc)
 
-            doc = fitz.open(file_path)
-            num_pages = len(doc)
-        except ModuleNotFoundError:  # pypdf instead
-            pdf_reader = pypdf.PdfReader(pdf_file)
-            num_pages = len(pdf_reader.pages)
-    return num_pages
+
+def hexdigest(data: str | bytes) -> str:
+    if isinstance(data, str):
+        return hashlib.md5(data.encode("utf-8")).hexdigest()  # noqa: S324
+    return hashlib.md5(data).hexdigest()  # noqa: S324
 
 
 def md5sum(file_path: StrPath) -> str:
-    import hashlib
-
     with open(file_path, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()  # noqa: S324
+        return hexdigest(f.read())
 
 
 async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
@@ -117,6 +121,37 @@ def strip_citations(text: str) -> str:
     return re.sub(citation_regex, "", text, flags=re.MULTILINE)
 
 
+def extract_score(text: str) -> int:
+    # check for N/A
+    last_line = text.split("\n")[-1]
+    if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
+        return 0
+    # check for not applicable, not relevant in summary
+    if "not applicable" in text.lower() or "not relevant" in text.lower():
+        return 0
+
+    score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
+    if not score:
+        score = re.search(r"\(([0-9])\w*\/", text)
+    if not score:
+        score = re.search(r"([0-9]+)\w*\/", text)
+    if score:
+        s = int(score.group(1))
+        if s > 10:  # noqa: PLR2004
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    last_few = text[-15:]
+    scores = re.findall(r"([0-9]+)", last_few)
+    if scores:
+        s = int(scores[-1])
+        if s > 10:  # noqa: PLR2004
+            s = int(s / 10)  # sometimes becomes out of 100
+        return s
+    if len(text) < 100:  # noqa: PLR2004
+        return 1
+    return 5
+
+
 def get_citenames(text: str) -> set[str]:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
@@ -127,12 +162,12 @@ def get_citenames(text: str) -> set[str]:
     results.extend(none_results)
     values = []
     for citation in results:
-        citation = citation.strip("() ")  # noqa: PLW2901
+        citation = citation.strip("() ")
         for c in re.split(",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces
-            c = c.strip()  # noqa: PLW2901
+            c = c.strip()
             values.append(c)
     return set(values)
 
@@ -151,8 +186,7 @@ def extract_doi(reference: str) -> str:
     # If DOI is found in the reference, return the DOI link
     if doi_match:
         return "https://doi.org/" + doi_match.group()
-    else:  # noqa: RET505
-        return ""
+    return ""
 
 
 def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
@@ -168,19 +202,9 @@ def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
         yield iterable[ndx : min(ndx + n, length)]
 
 
-def flatten(iteratble: list) -> list:
-    """
-    Flatten a list of lists.
-
-    :param l: The list of lists to flatten
-    :return: A flattened list
-    """
-    return [item for sublist in iteratble for item in sublist]
-
-
 def get_loop() -> asyncio.AbstractEventLoop:
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -193,28 +217,6 @@ def is_coroutine_callable(obj):
     elif callable(obj):  # noqa: RET505
         return inspect.iscoroutinefunction(obj.__call__)
     return False
-
-
-def llm_read_json(text: str) -> dict:
-    """Read LLM output and extract JSON data from it."""
-    # fetch from markdown ```json if present
-    text = text.strip().split("```json")[-1].split("```")[0]
-    # split anything before the first {
-    text = "{" + text.split("{", 1)[-1]
-    # split anything after the last }
-    text = text.rsplit("}", 1)[0] + "}"
-
-    # escape new lines within strings
-    def replace_newlines(match: re.Match) -> str:
-        return match.group(0).replace("\n", "\\n")
-
-    # Match anything between double quotes
-    # including escaped quotes and other escaped characters.
-    # https://regex101.com/r/VFcDmB/1
-    pattern = r'"(?:[^"\\]|\\.)*"'
-    text = re.sub(pattern, replace_newlines, text)
-
-    return json.loads(text)
 
 
 def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
@@ -279,7 +281,7 @@ def clean_upbibtex(bibtex: str) -> str:
     return bibtex
 
 
-def format_bibtex(  # noqa: C901
+def format_bibtex(
     bibtex: str,
     key: str | None = None,
     clean: bool = True,
@@ -366,16 +368,24 @@ def bibtex_field_extract(
         return missing_replacements.get(field, "")
 
 
+UNKNOWN_AUTHOR_KEY: str = "unknownauthors"
+
+
 def create_bibtex_key(author: list[str], year: str, title: str) -> str:
-    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":"}
-    author_rep = (
-        author[0].split()[-1].casefold()
-        if "Unknown" not in author[0]
-        else "unknownauthors"
-    )
-    key = (
-        f"{author_rep}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
-    )
+    FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
+    try:
+        author_rep = (
+            author[0].split()[-1].casefold()
+            if "Unknown" not in author[0]
+            else UNKNOWN_AUTHOR_KEY
+        )
+    except IndexError:
+        author_rep = UNKNOWN_AUTHOR_KEY
+    # we don't want a bibtex-parsing induced line break in the key
+    # so we cap it to 100+50+4 = 154 characters max
+    # 50 for the author, 100 for the first three title words, 4 for the year
+    # the first three title words are just emulating the s2 convention
+    key = f"{author_rep[:50]}{year}{''.join([t.casefold() for t in title.split()[:3]])[:100]}"
     return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
 
 
@@ -398,7 +408,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,
+    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
@@ -419,3 +429,51 @@ async def _get_with_retrying(
 
 def union_collections_to_ordered_list(collections: Iterable) -> list:
     return sorted(reduce(lambda x, y: set(x) | set(y), collections))
+
+
+def pqa_directory(name: str) -> Path:
+    if pqa_home := os.environ.get("PQA_HOME"):
+        directory = Path(pqa_home) / ".pqa" / name
+    else:
+        directory = Path.home() / ".pqa" / name
+
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
+
+
+def setup_default_logs() -> None:
+    """Configure logs to reasonable defaults."""
+    fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+    # Set sane default LiteLLM logging configuration
+    # SEE: https://docs.litellm.ai/docs/observability/telemetry
+    litellm.telemetry = False
+
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            # Configure a default format and level for all loggers
+            "formatters": {
+                "standard": {
+                    "format": fmt,
+                },
+            },
+            "handlers": {
+                "default": {
+                    "level": "INFO",
+                    "formatter": "standard",
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stdout",
+                },
+            },
+            # Lower level for httpx and LiteLLM
+            "loggers": {
+                "httpx": {"level": "WARNING"},
+                # SEE: https://github.com/BerriAI/litellm/issues/2256
+                "LiteLLM": {"level": "WARNING"},
+                "LiteLLM Router": {"level": "WARNING"},
+                "LiteLLM Proxy": {"level": "WARNING"},
+            },
+        }
+    )
