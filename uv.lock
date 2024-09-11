@@ -1161,7 +1161,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.0a2.dev50+gd2ef5e5.d20240911"
+version = "5.0.0a2.dev49+g1bd6946.d20240911"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1228,7 +1228,7 @@ requires-dist = [
     { name = "html2text" },
     { name = "httpx" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.4" },
-    { name = "litellm" },
+    { name = "litellm", specifier = ">=1.44" },
     { name = "numpy" },
     { name = "pybtex" },
     { name = "pycryptodome" },
