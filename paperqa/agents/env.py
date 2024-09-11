@@ -9,7 +9,7 @@ from aviary.tools import Tool, ToolRequestMessage, ToolResponseMessage
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import Answer, LLMResult
 from paperqa.utils import get_year
 
 from .models import QueryRequest
@@ -156,6 +156,16 @@ class Environment(_Environment[EnvironmentState]):
             list[Message],
             await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
         )
+        # add usage for any messages that has it
+        for msg in msgs:
+            info = msg.info
+            if info and "usage" in info and "model" in info:
+                r = LLMResult(
+                    model=info["model"],
+                    prompt_count=info["usage"][0],
+                    response_count=info["usage"][1],
+                )
+                self.state.answer.add_tokens(r)
         return (
             msgs,
             0,  # Reward is computed in post-processing, use 0 as a placeholder
