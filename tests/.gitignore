@@ -1,3 +1,6 @@
 # ignore test-generated files
 example.*
 example2.*
+
+# ignore downloaded files in paper-qa/clients/client_data
+paperqa/clients/client_data/*csv
