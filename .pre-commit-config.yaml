@@ -76,7 +76,7 @@ repos:
         additional_dependencies:
           - aiohttp
           - fhaviary[llm]>=0.6 # Match pyproject.toml
-          - ldp>=0.4 # Match pyproject.toml
+          - ldp>=0.6 # Match pyproject.toml
           - html2text
           - httpx
           - numpy
