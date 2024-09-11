@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.48550%2Farxiv.2312.07559?mailto=test@example.com
+      uri: https://api.crossref.org/works/10.48550%2Farxiv.2312.07559?mailto=example@papercrow.ai
     response:
       body:
         string: Resource not found.
