@@ -4,7 +4,7 @@
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [2024 application paper](https://paper.wikicrow.ai) to see examples of PaperQA's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
+PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [recent paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
 
 ## Quickstart
 
