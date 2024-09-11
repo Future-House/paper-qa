@@ -14,6 +14,7 @@ from paperqa.utils import gather_with_concurrency
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor
+from .retractions import RetrationDataPostProcessor
 from .semantic_scholar import SemanticScholarProvider
 from .unpaywall import UnpaywallProvider
 
@@ -33,6 +34,7 @@ ALL_CLIENTS: (
     | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
 ) = DEFAULT_CLIENTS | {  # type: ignore[operator]
     UnpaywallProvider,
+    RetrationDataPostProcessor,
 }
 
 
