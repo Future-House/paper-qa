@@ -1,0 +1,57 @@
+{
+  "llm": "gpt-4-turbo-2024-04-09",
+  "llm_config": null,
+  "summary_llm": "gpt-4-turbo-2024-04-09",
+  "summary_llm_config": null,
+  "embedding": "hybrid-text-embedding-3-small",
+  "embedding_config": null,
+  "temperature": 0.0,
+  "batch_size": 1,
+  "texts_index_mmr_lambda": 1.0,
+  "index_absolute_directory": false,
+  "verbosity": 0,
+  "manifest_file": null,
+  "answer": {
+    "evidence_k": 25,
+    "evidence_detailed_citations": true,
+    "evidence_retrieval": true,
+    "evidence_summary_length": "about 300 words",
+    "evidence_skip_summary": false,
+    "answer_max_sources": 12,
+    "answer_length": "about 200 words, but can be longer",
+    "max_concurrent_requests": 4,
+    "answer_filter_extra_background": false
+  },
+  "parsing": {
+    "chunk_size": 7000,
+    "use_doc_details": true,
+    "overlap": 1750,
+    "citation_prompt": "Provide the citation for the following text in MLA Format. Do not write an introductory sentence. If reporting date accessed, the current year is 2024\n\n{text}\n\nCitation:",
+    "structured_citation_prompt": "Extract the title, authors, and doi as a JSON from this MLA citation. If any field can not be found, return it as null. Use title, authors, and doi as keys, author's value should be a list of authors. {citation}\n\nCitation JSON:",
+    "disable_doc_valid_check": false,
+    "chunking_algorithm": "simple_overlap"
+  },
+  "prompts": {
+    "summary": "Summarize the excerpt below to help answer a question.\n\nExcerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly answer the question, instead summarize to give evidence to help answer the question. Stay detailed; report specific numbers, equations, or direct quotes (marked with quotation marks). Reply \"Not applicable\" if the excerpt is irrelevant. At the end of your response, provide an integer score from 1-10 on a newline indicating relevance to question. Do not explain your score.\n\nRelevant Information Summary ({summary_length}):",
+    "qa": "Answer the question below with the context.\n\nContext (with relevance scores):\n\n{context}\n\n----\n\nQuestion: {question}\n\nWrite an answer based on the context. If the context provides insufficient information and the question cannot be directly answered, reply \"I cannot answer.\" For each part of your answer, indicate which sources most support it via citation keys at the end of sentences, like (Example2012Example pages 3-4). Only cite from the context below and only use the valid keys. Write in the style of a Wikipedia article, with concise sentences and coherent paragraphs. The context comes from a variety of sources and is only a summary, so there may inaccuracies or ambiguities. Make sure the gene_names exactly match the gene name in the question before using a context. If quotes are present and relevant, use them in the answer. This answer will go directly onto Wikipedia, so do not add any extraneous information. Do not reference this prompt or your context. Do not include general summary information, it will be provided in an \"Overview\" section. Do not include the section title in your output. Avoid using adverb phrases like \"furthermore\", \"additionally\", and \"moreover\".\n\nAnswer ({answer_length}):",
+    "select": "Select papers that may help answer the question below. Papers are listed as $KEY: $PAPER_INFO. Return a list of keys, separated by commas. Return \"None\", if no papers are applicable. Choose papers that are relevant, from reputable sources, and timely (if the question requires timely information).\n\nQuestion: {question}\n\nPapers: {papers}\n\nSelected keys:",
+    "pre": null,
+    "post": null,
+    "system": "Answer in a direct and concise tone.",
+    "use_json": true,
+    "summary_json": "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\n",
+    "summary_json_system": "Provide a summary of the relevant information that could help answer the question based on the excerpt. The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. \n\nRespond with the following JSON format:\n\n{{\n  \"summary\": \"...\",\n  \"relevance_score\": \"...\",\n  \"gene_name: \"...\"\n}}\n\nwhere `summary` is relevant information from text - {summary_length}, \n`gene_name` is the gene discussed in the excerpt (may be different than query), and `relevance_score` is the relevance of `summary` to answer the question (integer out of 10)"
+  },
+  "agent": {
+    "agent_llm": "gpt-4-turbo-2024-04-09",
+    "agent_type": "ToolSelector",
+    "agent_system_prompt": "You are a helpful AI assistant.",
+    "agent_prompt": "Answer question: {question}\n\nSearch for papers, gather evidence, collect papers cited in evidence then re-gather evidence, and answer. Gathering evidence will do nothing if you have not done a new search or collected new papers. If you do not have enough evidence to generate a good answer, you can:\n- Search for more papers (preferred)\n- Collect papers cited by previous evidence (preferred)\n- Gather more evidence using a different phrase\nIf you search for more papers or collect new papers cited by previous evidence, remember to gather evidence again. Once you have five or more pieces of evidence from multiple sources, or you have tried a few times, call {gen_answer_tool_name} tool. The {gen_answer_tool_name} tool output is visible to the user, so you do not need to restate the answer and can simply terminate if the answer looks sufficient. The current status of evidence/papers/cost is {status}",
+    "search_count": 12,
+    "wipe_context_on_answer_failure": true,
+    "timeout": 500.0,
+    "should_pre_search": false,
+    "tool_names": null,
+    "index_concurrency": 30
+  }
+}

@@ -4,17 +4,19 @@ from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
-import html2text
+import pymupdf
 import tiktoken
+from html2text import __version__ as html2text_version
+from html2text import html2text
 
-from .types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
-from .version import __version__ as pqa_version
+from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from paperqa.utils import ImpossibleParsingError
+from paperqa.version import __version__ as pqa_version
 
 
-def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
-    import fitz
+def parse_pdf_to_pages(path: Path) -> ParsedText:
 
-    with fitz.open(path) as file:
+    with pymupdf.open(path) as file:
         pages: dict[str, str] = {}
         total_length = 0
 
@@ -24,29 +26,8 @@ def parse_pdf_fitz_to_pages(path: Path) -> ParsedText:
             total_length += len(pages[str(i + 1)])
 
     metadata = ParsedMetadata(
-        parsing_libraries=[f"fitz ({fitz.__doc__})"],
-        paperqa_version=str(pqa_version),
-        total_parsed_text_length=total_length,
-        parse_type="pdf",
-    )
-    return ParsedText(content=pages, metadata=metadata)
-
-
-def parse_pdf_to_pages(path: Path) -> ParsedText:
-    import pypdf
-
-    with open(path, "rb") as pdfFileObj:
-        pdfReader = pypdf.PdfReader(pdfFileObj)
-        pages: dict[str, str] = {}
-        total_length = 0
-
-        for i, page in enumerate(pdfReader.pages):
-            pages[str(i + 1)] = page.extract_text()
-            total_length += len(pages[str(i + 1)])
-
-    metadata = ParsedMetadata(
-        parsing_libraries=[f"pypdf ({pypdf.__version__})"],
-        paperqa_version=str(pqa_version),
+        parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
+        paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
         parse_type="pdf",
     )
@@ -63,6 +44,11 @@ def chunk_pdf(
     if not isinstance(parsed_text.content, dict):
         raise NotImplementedError(
             f"ParsedText.content must be a `dict`, not {type(parsed_text.content)}."
+        )
+
+    if not parsed_text.content:
+        raise ImpossibleParsingError(
+            "No text was parsed from the document: either empty or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():
@@ -82,7 +68,7 @@ def chunk_pdf(
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
-    if len(split) > overlap or len(texts) == 0:
+    if len(split) > overlap or not texts:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
             Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
@@ -91,39 +77,43 @@ def chunk_pdf(
 
 
 def parse_text(
-    path: Path, html: bool = False, split_lines=False, use_tiktoken=True
+    path: Path, html: bool = False, split_lines: bool = False, use_tiktoken: bool = True
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
     Args:
-        path: path to file
-        html: flag to use html2text library for parsing
-        split_lines: flag to split lines into a list
-        use_tiktoken: flag to use tiktoken library to encode text
-
+        path: path to file.
+        html: flag to use html2text library for parsing.
+        split_lines: flag to split lines into a list.
+        use_tiktoken: flag to use tiktoken library to encode text.
     """
     try:
-        with open(path) as f:
-            text = [str(line) for line in f] if split_lines else f.read()
+        with path.open() as f:
+            text = list(f) if split_lines else f.read()
     except UnicodeDecodeError:
-        with open(path, encoding="utf-8", errors="ignore") as f:
+        with path.open(encoding="utf-8", errors="ignore") as f:
             text = f.read()
 
+    parsing_libraries: list[str] = ["tiktoken (cl100k_base)"] if use_tiktoken else []
     if html:
-        text = html2text.html2text(text)
+        if not isinstance(text, str):
+            raise NotImplementedError(
+                "HTML parsing is not yet set up to work with split_lines."
+            )
+        text = html2text(text)
+        parsing_libraries.append(f"html2text ({html2text_version})")
 
-    metadata = {
-        "parsing_libraries": ["tiktoken (cl100k_base)"] if use_tiktoken else [],
-        "paperqa_version": str(pqa_version),
-        "total_parsed_text_length": (
-            len(text) if isinstance(text, str) else sum(len(t) for t in text)
+    return ParsedText(
+        content=text,
+        metadata=ParsedMetadata(
+            parsing_libraries=parsing_libraries,
+            paperqa_version=pqa_version,
+            total_parsed_text_length=(
+                len(text) if isinstance(text, str) else sum(len(t) for t in text)
+            ),
+            parse_type="txt" if not html else "html",
         ),
-        "parse_type": "txt" if not html else "html",
-    }
-    if html:
-        metadata["parsing_libraries"].append(f"html2text ({html2text.__version__})")  # type: ignore[attr-defined]
-
-    return ParsedText(content=text, metadata=ParsedMetadata(**metadata))
+    )
 
 
 def chunk_text(
@@ -195,7 +185,7 @@ def chunk_code_text(
             )
             split = split[chunk_chars - overlap :]
             last_line = i
-    if len(split) > overlap or len(texts) == 0:
+    if len(split) > overlap or not texts:
         texts.append(
             Text(
                 text=split[:chunk_chars],
@@ -214,7 +204,6 @@ def read_doc(
     include_metadata: Literal[False],
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> list[Text]: ...
 
 
@@ -226,7 +215,6 @@ def read_doc(
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> list[Text]: ...
 
 
@@ -238,7 +226,6 @@ def read_doc(
     include_metadata: bool = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> ParsedText: ...
 
 
@@ -250,7 +237,6 @@ def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
-    force_pypdf: bool = ...,
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
@@ -261,7 +247,6 @@ def read_doc(
     include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
-    force_pypdf: bool = False,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
@@ -272,7 +257,6 @@ def read_doc(
         doc: object with document metadata
         chunk_chars: size of chunks
         overlap: size of overlap between chunks
-        force_pypdf: flag to force use of pypdf in parsing
         parsed_text_only: return parsed text without chunking
         include_metadata: return a tuple
     """
@@ -281,20 +265,14 @@ def read_doc(
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        if force_pypdf:
-            parsed_text = parse_pdf_to_pages(path)
-        else:
-            try:
-                parsed_text = parse_pdf_fitz_to_pages(path)
-            except ImportError:
-                parsed_text = parse_pdf_to_pages(path)
+        parsed_text = parse_pdf_to_pages(path)
 
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path, html=False, split_lines=False, use_tiktoken=True)
+        parsed_text = parse_text(path)
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True, split_lines=False, use_tiktoken=True)
+        parsed_text = parse_text(path, html=True)
     else:
-        parsed_text = parse_text(path, html=False, split_lines=True, use_tiktoken=False)
+        parsed_text = parse_text(path, split_lines=True, use_tiktoken=False)
 
     if parsed_text_only:
         return parsed_text
@@ -309,11 +287,7 @@ def read_doc(
         )
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
-            parsed_text,
-            doc,
-            chunk_chars=chunk_chars,
-            overlap=overlap,
-            use_tiktoken=True,
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"

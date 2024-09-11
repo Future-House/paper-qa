@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Collection, Generic, TypeVar
+from collections.abc import Collection
+from typing import Any, Generic, TypeVar
 
 import aiohttp
 from pydantic import (
@@ -14,9 +15,9 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa.clients.exceptions import DOINotFoundError
+from paperqa.types import DocDetails
 
-from ..types import DocDetails
+from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +64,17 @@ class DOIQuery(ClientQuery):
 
     @model_validator(mode="before")
     @classmethod
-    def ensure_fields_are_present(cls, data: dict[str, Any]) -> dict[str, Any]:
+    def add_doi_to_fields_and_validate(cls, data: dict[str, Any]) -> dict[str, Any]:
+
         if (fields := data.get("fields")) and "doi" not in fields:
             fields.append("doi")
+
+        # sometimes the DOI has a URL prefix, remove it
+        remove_urls = ["https://doi.org/", "http://dx.doi.org/"]
+        for url in remove_urls:
+            if data["doi"].startswith(url):
+                data["doi"] = data["doi"].replace(url, "")
+
         return data
 
 
@@ -101,16 +110,16 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
         # DOINotFoundError means the paper doesn't exist in the source, the timeout is to prevent
         # this service from failing us when it's down or slow.
         except DOINotFoundError:
-            logger.exception(
-                f"Metadata not found for "
-                f"{client_query.doi if isinstance(client_query, DOIQuery) else client_query.title}"
-                " in Crossref."
+            logger.warning(
+                "Metadata not found for"
+                f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
+                f" {self.__class__.__name__}."
             )
         except TimeoutError:
-            logger.exception(
-                f"Request to Crossref for "
-                f"{client_query.doi if isinstance(client_query, DOIQuery) else client_query.title}"
-                " timed out."
+            logger.warning(
+                f"Request to {self.__class__.__name__} for"
+                f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} timed"
+                " out."
             )
         return None
 
