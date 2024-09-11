@@ -42,6 +42,7 @@ except ImportError:
 from rich.console import Console
 
 from paperqa.docs import Docs
+from paperqa.settings import Settings
 from paperqa.types import Answer
 from paperqa.utils import pqa_directory
 
@@ -96,7 +97,7 @@ async def agent_query(
 
 
 def to_aviary_tool_selector(
-    agent_type: str | type, query: QueryRequest
+    agent_type: str | type, settings: Settings
 ) -> ToolSelector | None:
     """Attempt to convert the agent type to an aviary ToolSelector."""
     if agent_type is ToolSelector or (
@@ -110,15 +111,15 @@ def to_aviary_tool_selector(
         )
     ):
         return ToolSelector(
-            model_name=query.settings.agent.agent_llm,
-            acompletion=query.settings.get_agent_llm().router.acompletion,
-            **(query.settings.agent.agent_config or {}),
+            model_name=settings.agent.agent_llm,
+            acompletion=settings.get_agent_llm().router.acompletion,
+            **(settings.agent.agent_config or {}),
         )
     return None
 
 
 async def to_ldp_agent(
-    agent_type: str | type, query: QueryRequest
+    agent_type: str | type, settings: Settings
 ) -> "Agent[SimpleAgentState] | None":
     """Attempt to convert the agent type to an ldp Agent."""
     if not isinstance(agent_type, str):  # Convert to fully qualified name
@@ -133,7 +134,7 @@ async def to_ldp_agent(
 
     # TODO: support general agents
     agent_cls = cast(type[Agent], locate(agent_type))
-    agent_settings = query.settings.agent
+    agent_settings = settings.agent
     agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
     if issubclass(agent_cls, ReActAgent | MemoryAgent):
         if (
@@ -157,12 +158,12 @@ async def to_ldp_agent(
                 )
             )
         return agent_cls(
-            llm_model={"model": agent_llm, "temperature": query.settings.temperature},
+            llm_model={"model": agent_llm, "temperature": settings.temperature},
             **config,
         )
     if issubclass(agent_cls, SimpleAgent):
         return agent_cls(
-            llm_model={"model": agent_llm, "temperature": query.settings.temperature},
+            llm_model={"model": agent_llm, "temperature": settings.temperature},
             sys_prompt=agent_settings.agent_system_prompt,
             **config,
         )
@@ -204,11 +205,11 @@ async def run_agent(
 
     if agent_type == "fake":
         answer, agent_status = await run_fake_agent(query, docs, **env_kwargs)
-    elif tool_selector_or_none := to_aviary_tool_selector(agent_type, query):
+    elif tool_selector_or_none := to_aviary_tool_selector(agent_type, query.settings):
         answer, agent_status = await run_aviary_agent(
             query, docs, tool_selector_or_none, **env_kwargs
         )
-    elif ldp_agent_or_none := await to_ldp_agent(agent_type, query):
+    elif ldp_agent_or_none := await to_ldp_agent(agent_type, query.settings):
         answer, agent_status = await run_ldp_agent(
             query, docs, ldp_agent_or_none, **env_kwargs
         )
