@@ -20,7 +20,7 @@ dependencies = [
     "PyCryptodome",
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
-    "fhaviary[llm]>=0.5",  # For ToolSelector
+    "fhaviary[llm]>=0.6",  # For info on Message
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "litellm",

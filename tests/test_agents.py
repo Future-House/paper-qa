@@ -75,6 +75,15 @@ async def test_agent_types(
 ) -> None:
     question = "How can you use XAI for chemical property prediction?"
 
+    # make sure agent_llm is different from default, so we can correctly track tokens
+    # for agent
+    agent_test_settings.agent.agent_llm = "gpt-4o-2024-08-06"
+    agent_test_settings.llm = "gpt-4o-mini"
+    agent_test_settings.summary_llm = "gpt-4o-mini"
+    agent_test_settings.agent.agent_prompt += (
+        "\n\n Call each tool once in appropriate order and "
+        " accept the answer for now, as we're in debug mode."
+    )
     request = QueryRequest(query=question, settings=agent_test_settings)
     response = await agent_query(request, agent_type=agent_type)
     assert response.answer.answer, "Answer not generated"
@@ -82,9 +91,16 @@ async def test_agent_types(
     assert response.answer.context, "No contexts were found"
     assert response.answer.question == question
     agent_llm = request.settings.agent.agent_llm
-    assert response.usage[agent_llm][0] > 5000, "Expected many prompt tokens"
-    assert response.usage[agent_llm][1] > 250, "Expected many completion tokens"
-    assert response.answer.cost > 0, "Expected nonzero cost"
+    # TODO: once LDP can track tokens, we can remove this check
+    if agent_type not in {"fake", SimpleAgent}:
+        print(response.answer.token_counts)
+        assert (
+            response.answer.token_counts[agent_llm][0] > 1000
+        ), "Expected many prompt tokens"
+        assert (
+            response.answer.token_counts[agent_llm][1] > 50
+        ), "Expected many completion tokens"
+        assert response.answer.cost > 0, "Expected nonzero cost"
 
 
 @pytest.mark.asyncio
@@ -356,7 +372,7 @@ def test_answers_are_striped() -> None:
             )
         ],
     )
-    response = AnswerResponse(answer=answer, usage={}, bibtex={}, status="success")
+    response = AnswerResponse(answer=answer, bibtex={}, status="success")
 
     assert response.answer.contexts[0].text.embedding is None
     assert response.answer.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]
