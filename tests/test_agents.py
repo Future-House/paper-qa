@@ -271,7 +271,8 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                 "description": (
                     "Search for papers to increase the paper count.\n\nRepeat"
                     " previous calls with the same query and years to continue a"
-                    " search.\nThis tool can be called concurrently.\nThis tool"
+                    " search. Only repeat a maximum of twice.\nThis tool can be "
+                    "called concurrently.\nThis tool"
                     " introduces novel papers, so invoke this tool when just"
                     " beginning or when unsatisfied with the current evidence."
                 ),
