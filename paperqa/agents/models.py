@@ -4,14 +4,10 @@ import asyncio
 import logging
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime
 from enum import StrEnum
 from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
-from langchain_core.callbacks import AsyncCallbackHandler
-from langchain_core.messages import BaseMessage, messages_to_dict
-from langchain_core.outputs import ChatGeneration, LLMResult
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -186,90 +182,3 @@ class SimpleProfiler(BaseModel):
                 "total": sum(durations),
             }
         return result
-
-
-class AgentCallback(AsyncCallbackHandler):
-    """
-    Callback handler used to monitor the agent, for debugging.
-
-    Its various capabilities include:
-    - Chain start --> error/stop: profile runtime
-    - Tool start: count tool invocations
-    - LLM start --> error/stop: insert into LLMResultDB
-
-    NOTE: this is not a thread safe implementation since start(s)/end(s) mutate self.
-    """
-
-    def __init__(
-        self, profiler: SimpleProfiler, name: str, answer_id: UUID, **kwargs
-    ) -> None:
-        super().__init__(**kwargs)
-        self.profiler = profiler
-        self.name = name
-        self._tool_starts: list[str] = []
-        self._answer_id = answer_id
-        # This will be None before/after a completion, and a dict during one
-        self._llm_result_db_kwargs: dict[str, Any] | None = None
-
-    @property
-    def tool_invocations(self) -> list[str]:
-        return self._tool_starts
-
-    async def on_chain_start(self, *args, **kwargs) -> None:
-        await super().on_chain_start(*args, **kwargs)
-        self.profiler.start(self.name)
-
-    async def on_chain_end(self, *args, **kwargs) -> None:
-        await super().on_chain_end(*args, **kwargs)
-        self.profiler.stop(self.name)
-
-    async def on_chain_error(self, *args, **kwargs) -> None:
-        await super().on_chain_error(*args, **kwargs)
-        self.profiler.stop(self.name)
-
-    async def on_tool_start(
-        self, serialized: dict[str, Any], input_str: str, **kwargs
-    ) -> None:
-        await super().on_tool_start(serialized, input_str, **kwargs)
-        self._tool_starts.append(serialized["name"])
-
-    async def on_chat_model_start(
-        self,
-        serialized: dict[str, Any],  # noqa: ARG002
-        messages: list[list[BaseMessage]],
-        **kwargs,
-    ) -> None:
-        # NOTE: don't call super(), as it changes semantics
-        if len(messages) != 1:
-            raise NotImplementedError(f"Didn't handle shape of messages {messages}.")
-        self._llm_result_db_kwargs = {
-            "answer_id": self._answer_id,
-            "name": f"tool_selection:{len(messages[0])}",
-            "prompt": {
-                "messages": messages_to_dict(messages[0]),
-                # SEE: https://platform.openai.com/docs/api-reference/chat/create#chat-create-functions
-                "functions": kwargs["invocation_params"]["functions"],
-                "tool_history": self.tool_invocations,
-            },
-            "model": kwargs["invocation_params"]["model"],
-            "date": datetime.now().isoformat(),
-        }
-
-    async def on_llm_end(self, response: LLMResult, **kwargs) -> None:
-        await super().on_llm_end(response, **kwargs)
-        if (
-            len(response.generations) != 1
-            or len(response.generations[0]) != 1
-            or not isinstance(response.generations[0][0], ChatGeneration)
-        ):
-            raise NotImplementedError(
-                f"Didn't handle shape of generations {response.generations}."
-            )
-        if self._llm_result_db_kwargs is None:
-            raise NotImplementedError(
-                "There should have been an LLM result populated here by now."
-            )
-        if not isinstance(response.llm_output, dict):
-            raise NotImplementedError(
-                f"Expected llm_output to be a dict, but got {response.llm_output}."
-            )
