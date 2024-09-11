@@ -15,7 +15,7 @@ except ImportError as e:
         " `pip install paper-qa[zotero]`."
     ) from e
 from paperqa.paths import PAPERQA_DIR
-from paperqa.utils import StrPath, count_pdf_pages
+from paperqa.utils import count_pdf_pages
 
 
 class ZoteroPaper(BaseModel):
@@ -71,7 +71,7 @@ class ZoteroDB(zotero.Zotero):
         library_type: str = "user",
         library_id: str | None = None,
         api_key: str | None = None,
-        storage: StrPath | None = None,
+        storage: str | os.PathLike | None = None,
         **kwargs,
     ):
         self.logger = logging.getLogger("ZoteroDB")
@@ -104,7 +104,7 @@ class ZoteroDB(zotero.Zotero):
             storage = PAPERQA_DIR / "zotero"
 
         self.logger.info(f"Using cache location: {storage}")
-        self.storage = storage
+        self.storage = Path(storage)
 
         super().__init__(
             library_type=library_type, library_id=library_id, api_key=api_key, **kwargs
@@ -130,7 +130,7 @@ class ZoteroDB(zotero.Zotero):
         if pdf_key is None:
             return None
 
-        pdf_path: Path = Path(self.storage / (pdf_key + ".pdf"))  # type: ignore[operator]
+        pdf_path = self.storage / (pdf_key + ".pdf")
 
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)

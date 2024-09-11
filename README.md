@@ -4,7 +4,10 @@
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [recent paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
+PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files,
+with a focus on the scientific literature.
+See our [recent 2024 paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like
+question answering, summarization, and contradiction detection.
 
 ## Quickstart
 
@@ -20,18 +23,23 @@ pqa ask 'How can carbon nanotubes be manufactured at a large scale?'
 
 Question: Has anyone designed neural networks that compute with proteins or DNA?
 
-The claim that neural networks have been designed to compute with DNA is supported by multiple sources. The work by Qian, Winfree, and Bruck demonstrates the use of DNA strand displacement cascades to construct neural network components, such as artificial neurons and associative memories, using a DNA-based system (Qian2011Neural pages 1-2, Qian2011Neural pages 15-16, Qian2011Neural pages 54-56). This research includes the implementation of a 3-bit XOR gate and a four-neuron Hopfield associative memory, showcasing the potential of DNA for neural network computation. Additionally, the application of deep learning techniques to genomics, which involves computing with DNA sequences, is well-documented. Studies have applied convolutional neural networks (CNNs) to predict genomic features such as transcription factor binding and DNA accessibility (Eraslan2019Deep pages 4-5, Eraslan2019Deep pages 5-6). These models leverage DNA sequences as input data, effectively using neural networks to compute with DNA. While the provided excerpts do not explicitly mention protein-based neural network computation, they do highlight the use of neural networks in tasks related to protein sequences, such as predicting DNA-protein binding (Zeng2016Convolutional pages 1-2). However, the primary focus remains on DNA-based computation.
+> The claim that neural networks have been designed to compute with DNA is supported by multiple sources. The work by Qian, Winfree, and Bruck demonstrates the use of DNA strand displacement cascades to construct neural network components, such as artificial neurons and associative memories, using a DNA-based system (Qian2011Neural pages 1-2, Qian2011Neural pages 15-16, Qian2011Neural pages 54-56). This research includes the implementation of a 3-bit XOR gate and a four-neuron Hopfield associative memory, showcasing the potential of DNA for neural network computation. Additionally, the application of deep learning techniques to genomics, which involves computing with DNA sequences, is well-documented. Studies have applied convolutional neural networks (CNNs) to predict genomic features such as transcription factor binding and DNA accessibility (Eraslan2019Deep pages 4-5, Eraslan2019Deep pages 5-6). These models leverage DNA sequences as input data, effectively using neural networks to compute with DNA. While the provided excerpts do not explicitly mention protein-based neural network computation, they do highlight the use of neural networks in tasks related to protein sequences, such as predicting DNA-protein binding (Zeng2016Convolutional pages 1-2). However, the primary focus remains on DNA-based computation.
 
 ## What is PaperQA2
 
 PaperQA2 is engineered to be the best RAG model for working with scientific papers. Here are some features:
 
-- A simple interface to get good answers with grounded responses that have in-text citations.
-- State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
-- The ability to do agentic RAG which iteratively refines queries and answers.
-- Automatic redundant fetching of paper metadata, including citation and journal quality data from multiple providers.
+- A simple interface to get good answers with grounded responses containing in-text citations.
+- State-of-the-art implementation including document metadata-awareness
+  in embeddings and LLM-based re-ranking and contextual summarization (RCS).
+- Support for agentic RAG, where a language agent can iteratively refine queries and answers.
+- Automatic redundant fetching of paper metadata,
+  including citation and journal quality data from multiple providers.
 - A usable full-text search engine for a local repository of PDF/text files.
-- A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
+- A robust interface for customization, with default support for all [LiteLLM][LiteLLM providers] models.
+
+[LiteLLM providers]: https://docs.litellm.ai/docs/providers
+[LiteLLM general docs]: https://docs.litellm.ai/docs/
 
 By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a Numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
 
@@ -41,10 +49,10 @@ PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Her
 2. [Crossref](https://www.crossref.org/)
 3. [Unpaywall](https://unpaywall.org/)
 4. [Pydantic](https://docs.pydantic.dev/latest/)
-5. [tantivy](https://github.com/quickwit-oss/tantivy) and [tantivy-py](https://github.com/quickwit-oss/tantivy-py)
-6. [Litellm](https://github.com/BerriAI/litellm)
+5. [tantivy](https://github.com/quickwit-oss/tantivy)
+6. [LiteLLM][LiteLLM general docs]
 7. [pybtex](https://pybtex.org/)
-8. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
+8. [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/)
 
 ## Install
 
@@ -54,17 +62,43 @@ You can install PaperQA2 via pip:
 pip install paper-qa
 ```
 
-PaperQA2 uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile). Any LiteLLM compatible model can be configured to use with PaperQA2.
+PaperQA2 uses an LLM to operate,
+so you'll need to either set an appropriate [API key environment variable][LiteLLM providers] (i.e. `export OPENAI_API_KEY=sk-...`)
+or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile).
+Any LiteLLM compatible model can be configured to use with PaperQA2.
 
-If you need to index a large set of papers (100+), you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key), which will allow you to avoid hitting public rate limits using these metadata services. Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
+If you need to index a large set of papers (100+),
+you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key),
+which will allow you to avoid hitting public rate limits using these metadata services.
+Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
 
 ## PaperQA2 vs PaperQA
 
-We've been working on hard on engineering it for a while and tried to follow [SemVer](https://semver.org/), meaning we've incremented the major version number on each breaking change. This brings us to our current version number: v5.x.x. So why call it PaperQA2? We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai). So we arbitrarily call versions after v5 PaperQA2 and versions before it as PaperQA1 to denote the significant change in performance. We recognize that we are challenged at naming and counting at FutureHouse, so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+We've been working on hard on fundamental upgrades for a while and mostly followed [SemVer](https://semver.org/).
+meaning we've incremented the major version number on each breaking change.
+This brings us to the current major version number v5.
+So why call is the repo now called PaperQA2?
+We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai).
+So we arbitrarily call version 5 and onward PaperQA2,
+and versions before it as PaperQA1 to denote the significant change in performance.
+We recognize that we are challenged at naming and counting at FutureHouse,
+so we reserve the right at any time to arbitrarily change the name to PaperCrow.
 
-## What's New in PaperQA2 v5?
+## What's New in Version 5 (aka PaperQA2)?
 
-Version 5 added a CLI, agentic workflows, and removed much of the state from the `Docs` object. `Docs` objects pickled from prior versions of `PaperQA` are not compatible with version 5 and will need to be rebuilt.
+Version 5 added:
+
+- A CLI `pqa`
+- Agentic workflows invoking tools for
+  paper search, gathering evidence, and generating an answer
+- Removed much of the statefulness from the `Docs` object
+- A migration to LiteLLM for compatibility with many LLM providers
+  as well as centralized rate limits and cost tracking
+- A bundled set of configurations (read [here](#bundled-settings)))
+  containing known-good hyperparameters
+
+Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatible with version 5 and will need to be rebuilt.
+Also, our minimum Python version is now Python 3.11.
 
 ## Usage
 
@@ -81,7 +115,9 @@ To understand PaperQA2, let's start with the pieces of the underlying algorithm.
 | **3. Generate Answer** | - Put best summaries into prompt with context                             |
 |                        | - Generate answer with prompt                                             |
 
-The phases can go in any order. For example, an LLM agent might do a narrow and broad search, or using different phrasing for the gather evidence step from the generate answer step.
+The tools can be invoked in any order by a language agent.
+For example, an LLM agent might do a narrow and broad search,
+or using different phrasing for the gather evidence step from the generate answer step.
 
 ### CLI
 
@@ -144,6 +180,24 @@ or I can use the normal ask
 pqa -i nanomaterials ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
+Both the CLI and module have pre-configured settings based on prior performance and our publications, they can be invoked as follows:
+
+```bash
+pqa --settings <setting name> ask 'Are there nm scale features in thermoelectric materials?'
+```
+
+#### Bundled Settings
+
+Inside [`paperqa/configs`](paperqa/configs) we bundle known useful settings:
+
+| Setting Name | Description                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| high_quality | Highly performant, relatively expensive (due to having `evidence_k` = 15) query using a `ToolSelector` agent.                |
+| fast         | Setting to get answers cheaply and quickly.                                                                                  |
+| wikicrow     | Setting to emulate the Wikipedia article writing used in our WikiCrow publication.                                           |
+| contracrow   | Setting to find contradictions in papers, your query should be a claim that needs to be flagged as a contradiction (or not). |
+| debug        | Setting useful solely for debugging, but not in any actual application beyond debugging.                                     |
+
 ### Module Usage
 
 PaperQA2's full workflow can be accessed via Python directly:
@@ -164,7 +218,7 @@ from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    settings=Settings(temperature=0.5, paper_directory="my_papers/"),
+    settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
 
@@ -176,7 +230,7 @@ from paperqa import Settings, agent_query, QueryRequest
 answer = await agent_query(
     QueryRequest(
         query="What manufacturing challenges are unique to bispecific antibodies?",
-        settings=Settings(temperature=0.5, paper_directory="my_papers/"),
+        settings=Settings(temperature=0.5, paper_directory="my_papers"),
     )
 )
 ```
@@ -253,7 +307,7 @@ from paperqa import Settings, ask
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers/"
+        llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers"
     ),
 )
 ```

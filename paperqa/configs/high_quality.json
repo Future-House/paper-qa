@@ -1,0 +1,18 @@
+{
+  "answer": {
+    "evidence_k": 20,
+    "answer_max_sources": 5,
+    "max_concurrent_requests": 10
+  },
+  "parsing": {
+    "use_doc_details": true,
+    "chunk_size": 7000,
+    "overlap": 250
+  },
+  "prompts": {
+    "use_json": true
+  },
+  "agent": {
+    "agent_type": "ToolSelector"
+  }
+}

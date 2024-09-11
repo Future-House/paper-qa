@@ -36,9 +36,6 @@ from tenacity import (
 logger = logging.getLogger(__name__)
 
 
-StrPath = str | Path
-
-
 class ImpossibleParsingError(Exception):
     """Error to throw when a parsing is impossible."""
 
@@ -87,7 +84,7 @@ def strings_similarity(s1: str, s2: str) -> float:
     return len(ss1.intersection(ss2)) / len(ss1.union(ss2))
 
 
-def count_pdf_pages(file_path: StrPath) -> int:
+def count_pdf_pages(file_path: str | os.PathLike) -> int:
     with pymupdf.open(file_path) as doc:
         return len(doc)
 
@@ -98,7 +95,7 @@ def hexdigest(data: str | bytes) -> str:
     return hashlib.md5(data).hexdigest()  # noqa: S324
 
 
-def md5sum(file_path: StrPath) -> str:
+def md5sum(file_path: str | os.PathLike) -> str:
     with open(file_path, "rb") as f:
         return hexdigest(f.read())
 
