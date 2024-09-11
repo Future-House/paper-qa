@@ -611,6 +611,10 @@ are executed after the query and before the query. For example, you can use this
 
 ## FAQ
 
+### How come I get different results than your papers?
+
+Internally at FutureHouse, we have a slightly different set of tools. We're trying to get some of them, like citation traversral, into this repo. However, we have APIs and licenses to access research papers that we cannot share openly. Similarly, in our research papers' results we do not start with the known relevant PDFs. Our agent has to identify them using keyword search over all papers, rather than just a subset. We're gradually aligning these two versions of PaperQA, but until there is an open-source way to freely access papers (even just open source papers) you will need to provide PDFs yourself.
+
 ### How is this different from LlamaIndex?
 
 It's not that different! This is similar to the tree response method in LlamaIndex. We also support agentic workflows and local indexes for easier operations with the scientific literature. Another big difference is our strong focus on scientific papers and their underlying metadata.
