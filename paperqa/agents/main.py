@@ -65,7 +65,7 @@ async def agent_query(
     query: str | QueryRequest,
     docs: Docs | None = None,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
-    **env_kwargs,
+    **runner_kwargs,
 ) -> AnswerResponse:
     if isinstance(query, str):
         query = QueryRequest(query=query)
@@ -79,7 +79,7 @@ async def agent_query(
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 
-    response = await run_agent(docs, query, agent_type, **env_kwargs)
+    response = await run_agent(docs, query, agent_type, **runner_kwargs)
     agent_logger.debug(f"agent_response: {response}")
 
     agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
@@ -179,7 +179,7 @@ async def run_agent(
     docs: Docs,
     query: QueryRequest,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
-    **env_kwargs,
+    **runner_kwargs,
 ) -> AnswerResponse:
     """
     Run an agent.
@@ -189,7 +189,7 @@ async def run_agent(
         query: Query to answer.
         agent_type: Agent type (or fully qualified name to the type) to pass to
             AgentType.get_agent, or "fake" to TODOC.
-        env_kwargs: Keyword arguments to pass to Environment instantiation.
+        runner_kwargs: Keyword arguments to pass to the runner.
 
     Returns:
         Tuple of resultant answer, token counts, and agent status.
@@ -204,14 +204,14 @@ async def run_agent(
     )
 
     if agent_type == "fake":
-        answer, agent_status = await run_fake_agent(query, docs, **env_kwargs)
+        answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := to_aviary_tool_selector(agent_type, query.settings):
         answer, agent_status = await run_aviary_agent(
-            query, docs, tool_selector_or_none, **env_kwargs
+            query, docs, tool_selector_or_none, **runner_kwargs
         )
     elif ldp_agent_or_none := await to_ldp_agent(agent_type, query.settings):
         answer, agent_status = await run_ldp_agent(
-            query, docs, ldp_agent_or_none, **env_kwargs
+            query, docs, ldp_agent_or_none, **runner_kwargs
         )
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
