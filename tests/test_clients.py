@@ -345,8 +345,9 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             "crossref"
         }, "Should be from only crossref"
         assert crossref_details.source_quality == 2, "Should have source quality data"
-        assert crossref_details.citation == (
-            "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
+        assert (
+            crossref_details.citation
+            == "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and Philippe Schwaller. Augmenting large language models with"
             " chemistry tools. Nature Machine Intelligence, Unknown year. URL:"
             " https://doi.org/10.1038/s42256-024-00832-8,"
@@ -364,7 +365,9 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             ),
         )
         nejm_crossref_details = await crossref_client.query(
-            title="Beta-Blocker Interruption or Continuation after Myocardial Infarction",  # codespell:ignore
+            title=(
+                "Beta-Blocker Interruption or Continuation after Myocardial Infarction"  # codespell:ignore
+            ),
             fields=["title", "doi", "authors", "journal"],
         )
 

@@ -20,12 +20,9 @@ dependencies = [
     "PyCryptodome",
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
+    "fhaviary[llm]>=0.5",  # For ToolSelector
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
-    "langchain",
-    "langchain-community",
-    "langchain-core",
-    "langchain-openai",
     "litellm",
     "numpy",
     "pybtex",
@@ -52,6 +49,9 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
+ldp = [
+    "ldp>=0.4",
+]
 typing = [
     "types-PyYAML",
     "types-setuptools",
@@ -380,7 +380,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[typing]",
+    "paper-qa[ldp,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pytest-asyncio",
     "pytest-recording",
