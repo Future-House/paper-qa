@@ -23,7 +23,7 @@ dependencies = [
     "fhaviary[llm]>=0.6",  # For info on Message
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
-    "litellm",
+    "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",
