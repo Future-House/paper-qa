@@ -106,7 +106,7 @@ def crossref_headers() -> dict[str, str]:
     return {}
 
 
-def crossref_mailto() -> str:
+def get_crossref_mailto() -> str:
     """Crossref mailto if available, otherwise a default."""
     MAILTO = os.getenv("CROSSREF_MAILTO")
 
@@ -267,7 +267,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     inputs_msg = f"DOI {doi}" if doi is not None else f"title {title}"
 
-    CROSSREF_MAILTO = crossref_mailto()
+    CROSSREF_MAILTO = get_crossref_mailto()
     quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
     url = f"{CROSSREF_BASE_URL}/works{quoted_doi}"
     params = {"mailto": CROSSREF_MAILTO}
@@ -359,7 +359,7 @@ async def download_retracted_dataset(
 
     Saves the retraction dataset to `retraction_data_path`.
     """
-    url = f"https://api.labs.crossref.org/data/retractionwatch?{crossref_mailto()}"
+    url = f"https://api.labs.crossref.org/data/retractionwatch?{get_crossref_mailto()}"
 
     async with (
         aiohttp.ClientSession() as session,
