@@ -64,7 +64,6 @@ async def agent_query(
     query: str | QueryRequest,
     docs: Docs | None = None,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
-    verbosity: int = 0,
     **env_kwargs,
 ) -> AnswerResponse:
     if isinstance(query, str):
@@ -81,12 +80,8 @@ async def agent_query(
 
     response = await run_agent(docs, query, agent_type, **env_kwargs)
     agent_logger.debug(f"agent_response: {response}")
-    truncation_chars = 1_000_000 if verbosity > 1 else 1500 * (verbosity + 1)
-    agent_logger.info(
-        f"[bold blue]Answer: {response.answer.answer[:truncation_chars]}"
-        f"{'...(truncated)' if len(response.answer.answer) > truncation_chars else ''}"
-        "[/bold blue]"
-    )
+
+    agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
 
     await search_index.add_document(
         {

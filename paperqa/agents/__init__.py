@@ -92,7 +92,6 @@ def ask(query: str, settings: Settings) -> AnswerResponse:
     return get_loop().run_until_complete(
         agent_query(
             QueryRequest(query=query, settings=settings),
-            verbosity=settings.verbosity,
             agent_type=settings.agent.agent_type,
         )
     )
@@ -162,7 +161,7 @@ def main() -> None:
     parser.add_argument(
         "--settings",
         "-s",
-        default="default",
+        default="high_quality",
         help=(
             "Named settings to use. Will search in local, pqa directory, and package"
             " last"
