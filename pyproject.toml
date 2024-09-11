@@ -50,7 +50,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 ldp = [
-    "ldp>=0.4",
+    "ldp>=0.6",  # For LiteLLM 1.42.1 pinning's UnsupportedParamsError fix
 ]
 typing = [
     "types-PyYAML",
