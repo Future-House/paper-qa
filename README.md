@@ -144,6 +144,21 @@ or I can use the normal ask
 pqa -i nanomaterials ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
+Both the CLI and module have pre-configured settings based on prior performance and our publications, they can be invoked as follows:
+
+```
+pqa --settings <setting name> ask 'Are there nm scale features in thermoelectric materials?'
+```
+
+Here is a table of some useful settings:
+
+| Setting Name | Description                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| high_quality | Highly performant, relatively expensive (due to having `evidence_k` = 15) query using a `ToolSelector` agent.                |
+| fast         | Setting to get answers cheaply and quickly.                                                                                  |
+| wikicrow     | Setting to emulate the Wikipedia article writing used in our WikiCrow publication.                                           |
+| contracrow   | Setting to find contradictions in papers, your query should be a claim that needs to be flagged as a contradiction (or not). |
+
 ### Module Usage
 
 PaperQA2's full workflow can be accessed via Python directly:
