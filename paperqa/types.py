@@ -326,6 +326,7 @@ class DocDetails(Doc):
             " quality and None means it needs to be hydrated."
         ),
     )
+
     is_retracted: bool | None = Field(
         default=None, description="Flag for whether the paper is retracted."
     )
@@ -550,7 +551,14 @@ class DocDetails(Doc):
     def formatted_citation(self) -> str:
 
         if self.is_retracted:
-            return f"**RETRACTED ARTICLE** Citation: {self.citation} Retrieved from http://retractiondatabase.org/."
+            base_message = "**RETRACTED ARTICLE**"
+            retract_info = "Retrieved from http://retractiondatabase.org/."
+            citation_message = (
+                f"Citation: {self.citation}"
+                if self.citation
+                else f"Original DOI: {self.doi}"
+            )
+            return f"{base_message} {citation_message} {retract_info}"
 
         if (
             self.citation is None  # type: ignore[redundant-expr]
@@ -561,6 +569,7 @@ class DocDetails(Doc):
                 "Citation, citationCount, and sourceQuality are not set -- do you need"
                 " to call `hydrate`?"
             )
+
         quality = (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
             if self.source_quality >= 0

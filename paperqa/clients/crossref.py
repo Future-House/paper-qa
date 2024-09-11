@@ -11,6 +11,8 @@ from typing import Any
 from urllib.parse import quote
 
 import aiohttp
+from anyio import open_file
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
 from paperqa.utils import (
@@ -102,6 +104,20 @@ def crossref_headers() -> dict[str, str]:
         " apply."
     )
     return {}
+
+
+def get_crossref_mailto() -> str:
+    """Crossref mailto if available, otherwise a default."""
+    MAILTO = os.getenv("CROSSREF_MAILTO")
+
+    if not MAILTO:
+        logger.warning(
+            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
+            " apply."
+        )
+        return "test@example.com"
+
+    return MAILTO
 
 
 async def doi_to_bibtex(
@@ -251,12 +267,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     inputs_msg = f"DOI {doi}" if doi is not None else f"title {title}"
 
-    if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
-        logger.warning(
-            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
-            " apply."
-        )
-        CROSSREF_MAILTO = "test@example.com"
+    CROSSREF_MAILTO = get_crossref_mailto()
     quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
     url = f"{CROSSREF_BASE_URL}/works{quoted_doi}"
     params = {"mailto": CROSSREF_MAILTO}
@@ -333,6 +344,45 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
         raise DOINotFoundError(f"DOI ({inputs_msg}) not found in Crossref")
 
     return await parse_crossref_to_doc_details(message, session, query_bibtex)
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=5, min=5),
+    reraise=True,
+)
+async def download_retracted_dataset(
+    retraction_data_path: os.PathLike | str,
+) -> None:
+    """
+    Download the retraction dataset from Crossref.
+
+    Saves the retraction dataset to `retraction_data_path`.
+    """
+    url = f"https://api.labs.crossref.org/data/retractionwatch?{get_crossref_mailto()}"
+
+    async with (
+        aiohttp.ClientSession() as session,
+        session.get(
+            url,
+            timeout=aiohttp.ClientTimeout(total=300),
+        ) as response,
+    ):
+        response.raise_for_status()
+
+        logger.info(
+            f"Retraction data was not cashed. Downloading retraction data from {url}..."
+        )
+
+        async with await open_file(str(retraction_data_path), "wb") as f:
+            while True:
+                chunk = await response.content.read(1024)
+                if not chunk:
+                    break
+                await f.write(chunk)
+
+        if os.path.getsize(str(retraction_data_path)) == 0:
+            raise RuntimeError("Retraction data is empty")
 
 
 class CrossrefProvider(DOIOrTitleBasedProvider):

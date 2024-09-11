@@ -303,3 +303,8 @@ cython_debug/
 tests/*txt
 tests/*html
 tests/test_index/*
+tests/example.*
+tests/example2.*
+
+# Client data
+paperqa/clients/client_data/retractions.csv

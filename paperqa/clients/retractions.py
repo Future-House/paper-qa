@@ -5,14 +5,12 @@ import datetime
 import logging
 import os
 
-import aiohttp
-from anyio import open_file
 from pydantic import ValidationError
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 from paperqa.types import DocDetails
 
 from .client_models import DOIQuery, MetadataPostProcessor
+from .crossref import download_retracted_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -52,40 +50,6 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
     def _is_csv_cached(self) -> bool:
         return os.path.exists(self.retraction_data_path)
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=5, min=5),
-        reraise=True,
-    )
-    async def _download_retracted_dataset(self) -> None:
-
-        if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
-            CROSSREF_MAILTO = "test@example.com"
-        url = f"https://api.labs.crossref.org/data/retractionwatch?{CROSSREF_MAILTO}"
-
-        async with (
-            aiohttp.ClientSession() as session,
-            session.get(
-                url,
-                timeout=aiohttp.ClientTimeout(total=300),
-            ) as response,
-        ):
-            response.raise_for_status()
-
-            logger.info(
-                f"Retraction data was not cashed. Downloading retraction data from {url}..."
-            )
-
-            async with await open_file(self.retraction_data_path, "wb") as f:
-                while True:
-                    chunk = await response.content.read(1024)
-                    if not chunk:
-                        break
-                    await f.write(chunk)
-
-            if os.path.getsize(self.retraction_data_path) == 0:
-                raise RuntimeError("Retraction data is empty")
-
     def _filter_dois(self) -> None:
         with open(self.retraction_data_path, newline="", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
@@ -96,7 +60,7 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
 
     async def load_data(self) -> None:
         if not self._is_csv_cached() or self._has_cache_expired():
-            await self._download_retracted_dataset()
+            await download_retracted_dataset(self.retraction_data_path)
 
         self._filter_dois()
 
