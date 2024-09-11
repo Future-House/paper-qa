@@ -108,16 +108,16 @@ def crossref_headers() -> dict[str, str]:
 
 def crossref_mailto() -> str:
     """Crossref mailto if available, otherwise a default."""
-    crossref_mailto = os.getenv("CROSSREF_MAILTO")
+    MAILTO = os.getenv("CROSSREF_MAILTO")
 
-    if not crossref_mailto:
+    if not MAILTO:
         logger.warning(
             "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
             " apply."
         )
         return "test@example.com"
 
-    return crossref_mailto
+    return MAILTO
 
 
 async def doi_to_bibtex(
