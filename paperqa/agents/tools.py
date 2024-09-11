@@ -39,7 +39,7 @@ class EnvironmentState(BaseModel):
             f"Status: Paper Count={len(self.docs.docs)} | Relevant Papers="
             f"{len({c.text.doc.dockey for c in self.answer.contexts if c.score > self.RELEVANT_SCORE_CUTOFF})}"
             f" | Current Evidence={len([c for c in self.answer.contexts if c.score > self.RELEVANT_SCORE_CUTOFF])}"
-            f" | Current Cost=${self.answer.cost:.2f}"
+            f" | Current Cost=${self.answer.cost:.4f}"
         )
 
 
