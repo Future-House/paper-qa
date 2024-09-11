@@ -359,8 +359,7 @@ async def download_retracted_dataset(
 
     Saves the retraction dataset to `retraction_data_path`.
     """
-    CROSSREF_MAILTO = crossref_mailto()
-    url = f"https://api.labs.crossref.org/data/retractionwatch?{CROSSREF_MAILTO}"
+    url = f"https://api.labs.crossref.org/data/retractionwatch?{crossref_mailto()}"
 
     async with (
         aiohttp.ClientSession() as session,
