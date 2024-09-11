@@ -543,7 +543,7 @@ class DocDetails(Doc):
     def formatted_citation(self) -> str:
 
         if self.is_retracted:
-            return f"RETRACTED ARTICLE! Original doi: {self.doi}. Retrieved from http://retractiondatabase.org/."
+            return f"**RETRACTED ARTICLE** Citation: {self.citation} Retrieved from http://retractiondatabase.org/."
 
         if (
             self.citation is None  # type: ignore[redundant-expr]

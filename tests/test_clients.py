@@ -545,8 +545,6 @@ async def test_crossref_retraction_status():
             fields=["title", "doi", "authors", "journal"],
         )
 
-        assert (
-            crossref_details.formatted_citation  # type: ignore[union-attr]
-            == "RETRACTED ARTICLE! Original doi: 10.1155/2022/8341966. Retrieved from http://retractiondatabase.org/."
-        ), "Should inticate retraction status"
+        assert "**RETRACTED ARTICLE** Citation: Jiaye Han." in crossref_details.formatted_citation  # type: ignore[union-attr]
+
         assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]

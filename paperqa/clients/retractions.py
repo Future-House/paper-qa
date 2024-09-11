@@ -9,7 +9,6 @@ import aiohttp
 from anyio import open_file
 from pydantic import ValidationError
 from tenacity import retry, stop_after_attempt, wait_exponential
-from tqdm.asyncio import tqdm
 
 from paperqa.types import DocDetails
 
@@ -73,19 +72,19 @@ class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         ):
             response.raise_for_status()
 
-            async with await open_file(self.retraction_data_path, "wb") as f:
-                with tqdm(
-                    unit="iB", unit_scale=True, desc=self.retraction_data_path
-                ) as progress_bar:
-                    while True:
-                        chunk = await response.content.read(1024)
-                        if not chunk:
-                            break
-                        await f.write(chunk)
-                        progress_bar.update(len(chunk))
+            logger.info(
+                f"Retraction data was not cashed. Downloading retraction data from {url}..."
+            )
 
-                if os.path.getsize(self.retraction_data_path) == 0:
-                    raise RuntimeError("Retraction data is empty")
+            async with await open_file(self.retraction_data_path, "wb") as f:
+                while True:
+                    chunk = await response.content.read(1024)
+                    if not chunk:
+                        break
+                    await f.write(chunk)
+
+            if os.path.getsize(self.retraction_data_path) == 0:
+                raise RuntimeError("Retraction data is empty")
 
     def _filter_dois(self) -> None:
         with open(self.retraction_data_path, newline="", encoding="utf-8") as csvfile:
