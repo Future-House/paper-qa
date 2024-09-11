@@ -33,6 +33,7 @@ jobs:
           uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
       - run: uv run refurb paperqa tests
+      - run: uv run pylint paperqa
   test:
     runs-on: ubuntu-latest
     strategy:

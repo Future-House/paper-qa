@@ -85,8 +85,7 @@ class ZoteroDB(zotero.Zotero):
                     " from the text 'Your userID for use in API calls is [XXXXXX]'."
                     " Then, set the environment variable ZOTERO_USER_ID to this value."
                 )
-            else:  # noqa: RET506
-                library_id = os.environ["ZOTERO_USER_ID"]
+            library_id = os.environ["ZOTERO_USER_ID"]
 
         if api_key is None:
             self.logger.info("Attempting to get ZOTERO_API_KEY from `os.environ`...")
@@ -97,8 +96,7 @@ class ZoteroDB(zotero.Zotero):
                     " with access to your library."
                     " Then, set the environment variable ZOTERO_API_KEY to this value."
                 )
-            else:  # noqa: RET506
-                api_key = os.environ["ZOTERO_API_KEY"]
+            api_key = os.environ["ZOTERO_API_KEY"]
 
         self.logger.info(f"Using library ID: {library_id} with type: {library_type}.")
 
@@ -124,7 +122,7 @@ class ZoteroDB(zotero.Zotero):
             An item from `pyzotero`. Should have a `key` field, and also have an entry
             `links->attachment->attachmentType == application/pdf`.
         """
-        if type(item) != dict:  # noqa: E721
+        if not isinstance(item, dict):
             raise TypeError("Pass the full item of the paper. The item must be a dict.")
 
         pdf_key = _extract_pdf_key(item)
@@ -310,8 +308,7 @@ class ZoteroDB(zotero.Zotero):
 
 def _get_citation_key(item: dict) -> str:
     if (
-        "data" not in item
-        or "creators" not in item["data"]
+        "creators" not in item.get("data", {})
         or len(item["data"]["creators"]) == 0
         or "lastName" not in item["data"]["creators"][0]
         or "title" not in item["data"]
@@ -341,7 +338,7 @@ def _extract_pdf_key(item: dict) -> str | None:
 
     attachments = item["links"]["attachment"]
 
-    if type(attachments) != dict:  # noqa: E721
+    if not isinstance(attachments, dict):
         # Find first attachment with attachmentType == application/pdf:
         for attachment in attachments:
             # TODO: This assumes there's only one PDF attachment.
