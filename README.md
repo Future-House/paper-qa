@@ -41,9 +41,10 @@ PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Her
 2. [Crossref](https://www.crossref.org/)
 3. [Unpaywall](https://unpaywall.org/)
 4. [Pydantic](https://docs.pydantic.dev/latest/)
-5. [Litellm](https://github.com/BerriAI/litellm)
-6. [pybtex](https://pybtex.org/)
-7. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
+5. [tantivy](https://github.com/quickwit-oss/tantivy) and [tantivy-py](https://github.com/quickwit-oss/tantivy-py)
+6. [Litellm](https://github.com/BerriAI/litellm)
+7. [pybtex](https://pybtex.org/)
+8. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
 
 ## Install
 
@@ -59,7 +60,7 @@ If you need to index a large set of papers (100+), you will likely want an API k
 
 ## PaperQA2 vs PaperQA
 
-We've been working on hard on engineering it for a while and tried to follow [SemVer](https://semver.org/), meaning we're on version 5. However, we wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai). So we arbitrarily call versions after v5 PaperQA2 and versions before it as PaperQA1 to denote the significant change in performance. We recognize that we are challenged at naming and counting at FutureHouse, so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+We've been working on hard on engineering it for a while and tried to follow [SemVer](https://semver.org/), meaning we've incremented the major version number on each breaking change. This brings us to our current version number: v5.x.x. So why call it PaperQA2? We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai). So we arbitrarily call versions after v5 PaperQA2 and versions before it as PaperQA1 to denote the significant change in performance. We recognize that we are challenged at naming and counting at FutureHouse, so we reserve the right at any time to arbitrarily change the name to PaperCrow.
 
 ## What's New in PaperQA2 v5?
 
