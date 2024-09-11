@@ -151,21 +151,22 @@ class Environment(_Environment[EnvironmentState]):
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[list[Message], float, bool, bool]:
+
+        # add usage for actions that have usage
+        info = action.info
+        if info and "usage" in info and "model" in info:
+            r = LLMResult(
+                model=info["model"],
+                prompt_count=info["usage"][0],
+                completion_count=info["usage"][1],
+            )
+            self.state.answer.add_tokens(r)
+
         # If the action has empty tool_calls, the agent can later take that into account
         msgs = cast(
             list[Message],
             await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
         )
-        # add usage for any messages that has it
-        for msg in msgs:
-            info = msg.info
-            if info and "usage" in info and "model" in info:
-                r = LLMResult(
-                    model=info["model"],
-                    prompt_count=info["usage"][0],
-                    response_count=info["usage"][1],
-                )
-                self.state.answer.add_tokens(r)
         return (
             msgs,
             0,  # Reward is computed in post-processing, use 0 as a placeholder

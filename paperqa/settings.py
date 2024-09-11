@@ -239,6 +239,12 @@ class AgentSettings(BaseModel):
         default="gpt-4o-2024-08-06",
         description="Model to use for agent",
     )
+
+    agent_llm_config: dict | None = Field(
+        default=None,
+        description="Extra kwargs to pass to agent LLM model",
+    )
+
     agent_type: str = Field(
         default="fake",
         description="Type of agent to use",
@@ -498,6 +504,13 @@ class Settings(BaseSettings):
             name=self.summary_llm,
             config=self.summary_llm_config
             or self._default_litellm_router_settings(self.summary_llm),
+        )
+
+    def get_agent_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.agent.agent_llm,
+            config=self.agent.agent_llm_config
+            or self._default_litellm_router_settings(self.agent.agent_llm),
         )
 
     def get_embedding_model(self) -> EmbeddingModel:

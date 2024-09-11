@@ -109,7 +109,8 @@ def to_aviary_tool_selector(
         )
     ):
         return ToolSelector(
-            model=query.settings.agent.agent_llm,
+            model_name=query.settings.agent.agent_llm,
+            acompletion=query.settings.get_agent_llm().router.acompletion,
             **(query.settings.agent.agent_config or {}),
         )
     return None
@@ -220,7 +221,7 @@ async def run_agent(
         f"Finished agent {agent_type!r} run with question {query.query!r} and status"
         f" {agent_status}."
     )
-    return AnswerResponse(answer=answer, usage=answer.token_counts, status=agent_status)
+    return AnswerResponse(answer=answer, status=agent_status)
 
 
 async def run_fake_agent(
