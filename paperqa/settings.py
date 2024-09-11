@@ -242,7 +242,7 @@ class AgentSettings(BaseModel):
 
     agent_llm_config: dict | None = Field(
         default=None,
-        description="Extra kwargs to pass to agent LLM model",
+        description="Optional kwargs for LLM constructor",
     )
 
     agent_type: str = Field(
@@ -251,7 +251,7 @@ class AgentSettings(BaseModel):
     )
     agent_config: dict[str, Any] | None = Field(
         default=None,
-        description="Optional keyword argument configuration for the agent.",
+        description="Optional kwarg for AGENT constructor",
     )
 
     agent_system_prompt: str | None = Field(

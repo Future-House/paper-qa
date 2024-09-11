@@ -152,7 +152,7 @@ class Environment(_Environment[EnvironmentState]):
         self, action: ToolRequestMessage
     ) -> tuple[list[Message], float, bool, bool]:
 
-        # add usage for actions that have usage
+        # add usage for action if it has usage
         info = action.info
         if info and "usage" in info and "model" in info:
             r = LLMResult(
