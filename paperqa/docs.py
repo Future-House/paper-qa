@@ -7,6 +7,7 @@ import re
 import tempfile
 from collections.abc import Callable
 from datetime import datetime
+from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import Any, BinaryIO, cast
@@ -20,18 +21,19 @@ from pydantic import (
     field_validator,
 )
 
-from .clients import DEFAULT_CLIENTS, DocMetadataClient
-from .core import llm_parse_json, map_fxn_summary
-from .llms import (
+from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
+from paperqa.core import llm_parse_json, map_fxn_summary
+from paperqa.llms import (
     EmbeddingModel,
     LLMModel,
     NumpyVectorStore,
+    PromptRunner,
     VectorStore,
 )
-from .paths import PAPERQA_DIR
-from .readers import read_doc
-from .settings import MaybeSettings, get_settings
-from .types import (
+from paperqa.paths import PAPERQA_DIR
+from paperqa.readers import read_doc
+from paperqa.settings import MaybeSettings, get_settings
+from paperqa.types import (
     Answer,
     Doc,
     DocDetails,
@@ -40,7 +42,7 @@ from .types import (
     Text,
     set_llm_answer_ids,
 )
-from .utils import (
+from paperqa.utils import (
     gather_with_concurrency,
     get_loop,
     maybe_is_html,
@@ -52,11 +54,11 @@ from .utils import (
 
 
 # this is just to reduce None checks/type checks
-async def empty_callback(result: LLMResult):
+async def empty_callback(result: LLMResult) -> None:
     pass
 
 
-async def print_callback(result: LLMResult):
+async def print_callback(result: LLMResult) -> None:
     pass
 
 
@@ -83,7 +85,7 @@ class Docs(BaseModel):
             return PAPERQA_DIR / info.data["name"]
         return value
 
-    def clear_docs(self):
+    def clear_docs(self) -> None:
         self.texts = []
         self.docs = {}
         self.docnames = set()
@@ -107,8 +109,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd_file(
                 file,
                 citation=citation,
@@ -169,8 +170,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd_url(
                 url,
                 citation=citation,
@@ -222,8 +222,7 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd(
                 path,
                 citation=citation,
@@ -262,23 +261,21 @@ class Docs(BaseModel):
         if llm_model is None:
             llm_model = all_settings.get_llm()
         if citation is None:
-            # skip system because it's too hesitant to answer
-            cite_chain = llm_model.make_chain(
-                prompt=parse_config.citation_prompt,
-                skip_system=True,
-            )
-            # peak first chunk
-            fake_doc = Doc(docname="", citation="", dockey=dockey)
+            # Peek first chunk
             texts = read_doc(
                 path,
-                fake_doc,
+                Doc(docname="", citation="", dockey=dockey),  # Fake doc
                 chunk_chars=parse_config.chunk_size,
                 overlap=parse_config.overlap,
             )
-            if len(texts) == 0:
+            if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            chain_result = await cite_chain({"text": texts[0].text}, None, None)
-            citation = chain_result.text
+            result = await llm_model.run_prompt(
+                prompt=parse_config.citation_prompt,
+                data={"text": texts[0].text},
+                skip_system=True,  # skip system because it's too hesitant to answer
+            )
+            citation = result.text
             if (
                 len(citation) < 3  # noqa: PLR2004
                 or "Unknown" in citation
@@ -309,15 +306,13 @@ class Docs(BaseModel):
 
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
-            structured_cite_chain = llm_model.make_chain(
+            result = await llm_model.run_prompt(
                 prompt=parse_config.structured_citation_prompt,
+                data={"citation": citation},
                 skip_system=True,
             )
-            chain_result = await structured_cite_chain(
-                {"citation": citation}, None, None
-            )
             with contextlib.suppress(json.JSONDecodeError):
-                clean_text = chain_result.text.strip("`")
+                clean_text = result.text.strip("`")
                 if clean_text.startswith("json"):
                     clean_text = clean_text.replace("json", "", 1)
                 citation_json = json.loads(clean_text)
@@ -327,7 +322,6 @@ class Docs(BaseModel):
                     doi = citation_doi
                 if citation_author := citation_json.get("authors"):
                     authors = citation_author
-
         # see if we can upgrade to DocDetails
         # if not, we can progress with a normal Doc
         # if "overwrite_fields_from_metadata" is used:
@@ -349,7 +343,6 @@ class Docs(BaseModel):
                 query_kwargs["authors"] = authors
             if title:
                 query_kwargs["title"] = title
-
             doc = await metadata_client.upgrade_doc_to_doc_details(
                 doc, **(query_kwargs | kwargs)
             )
@@ -362,7 +355,7 @@ class Docs(BaseModel):
         )
         # loose check to see if document was loaded
         if (
-            len(texts) == 0
+            not texts
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
                 not parse_config.disable_doc_valid_check
@@ -370,7 +363,8 @@ class Docs(BaseModel):
             )
         ):
             raise ValueError(
-                f"This does not look like a text document: {path}. Pass disable_check to ignore this error."
+                f"This does not look like a text document: {path}. Pass disable_check"
+                " to ignore this error."
             )
         if await self.aadd_texts(texts, doc, all_settings, embedding_model):
             return docname
@@ -383,8 +377,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> bool:
-        loop = get_loop()
-        return loop.run_until_complete(
+        return get_loop().run_until_complete(
             self.aadd_texts(
                 texts, doc, settings=settings, embedding_model=embedding_model
             )
@@ -458,7 +451,7 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
-    def _build_texts_index(self):
+    def _build_texts_index(self) -> None:
         texts = [t for t in self.texts if t not in self.texts_index]
         self.texts_index.add_texts_and_embeddings(texts)
 
@@ -530,7 +523,7 @@ class Docs(BaseModel):
             else query
         )
 
-        if len(self.docs) == 0 and len(self.texts_index) == 0:
+        if not self.docs and len(self.texts_index) == 0:
             return answer
 
         if embedding_model is None:
@@ -564,17 +557,18 @@ class Docs(BaseModel):
             else matches
         )
 
-        summary_chain = None
-
+        prompt_runner: PromptRunner | None = None
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
-                summary_chain = summary_llm_model.make_chain(
-                    prompt=prompt_config.summary_json,
+                prompt_runner = partial(
+                    summary_llm_model.run_prompt,
+                    prompt_config.summary_json,
                     system_prompt=prompt_config.summary_json_system,
                 )
             else:
-                summary_chain = summary_llm_model.make_chain(
-                    prompt=prompt_config.summary,
+                prompt_runner = partial(
+                    summary_llm_model.run_prompt,
+                    prompt_config.summary,
                     system_prompt=prompt_config.system,
                 )
 
@@ -583,15 +577,15 @@ class Docs(BaseModel):
                 answer_config.max_concurrent_requests,
                 [
                     map_fxn_summary(
-                        m,
-                        answer.question,
-                        summary_chain,
-                        {
+                        text=m,
+                        question=answer.question,
+                        prompt_runner=prompt_runner,
+                        extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
                             "citation": f"{m.name}: {m.doc.citation}",
                         },
-                        llm_parse_json if prompt_config.use_json else None,
-                        callbacks,
+                        parser=llm_parse_json if prompt_config.use_json else None,
+                        callbacks=callbacks,
                     )
                     for m in matches
                 ],
@@ -663,12 +657,14 @@ class Docs(BaseModel):
             contexts = answer.contexts
         pre_str = None
         if prompt_config.pre is not None:
-            pre_chain = llm_model.make_chain(
-                prompt=prompt_config.pre,
-                system_prompt=prompt_config.system,
-            )
             with set_llm_answer_ids(answer.id):
-                pre = await pre_chain({"question": answer.question}, callbacks, "pre")
+                pre = await llm_model.run_prompt(
+                    prompt=prompt_config.pre,
+                    data={"question": answer.question},
+                    callbacks=callbacks,
+                    name="pre",
+                    system_prompt=prompt_config.system,
+                )
             answer.add_tokens(pre)
             pre_str = pre.text
 
@@ -703,20 +699,18 @@ class Docs(BaseModel):
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            qa_chain = llm_model.make_chain(
-                prompt=prompt_config.qa,
-                system_prompt=prompt_config.system,
-            )
             with set_llm_answer_ids(answer.id):
-                answer_result = await qa_chain(
-                    {
+                answer_result = await llm_model.run_prompt(
+                    prompt=prompt_config.qa,
+                    data={
                         "context": context_str,
                         "answer_length": answer_config.answer_length,
                         "question": answer.question,
                         "example_citation": prompt_config.EXAMPLE_CITATION,
                     },
-                    callbacks,
-                    "answer",
+                    callbacks=callbacks,
+                    name="answer",
+                    system_prompt=prompt_config.system,
                 )
             answer_text = answer_result.text
             answer.add_tokens(answer_result)
@@ -741,20 +735,22 @@ class Docs(BaseModel):
             )
 
         formatted_answer = f"Question: {answer.question}\n\n{answer_text}\n"
-        if len(bib) > 0:
+        if bib:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         if prompt_config.post is not None:
-            chain = llm_model.make_chain(
-                prompt=prompt_config.post,
-                system_prompt=prompt_config.system,
-            )
             with set_llm_answer_ids(answer.id):
-                post = await chain(answer.model_dump(), callbacks, "post")
+                post = await llm_model.run_prompt(
+                    prompt=prompt_config.post,
+                    data=answer.model_dump(),
+                    callbacks=callbacks,
+                    name="post",
+                    system_prompt=prompt_config.system,
+                )
             answer_text = post.text
             answer.add_tokens(post)
             formatted_answer = f"Question: {answer.question}\n\n{post}\n"
-            if len(bib) > 0:
+            if bib:
                 formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         # now at end we modify, so we could have retried earlier

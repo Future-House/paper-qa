@@ -1,4 +1,5 @@
-# This file gets PDF files from the user's Zotero library
+"""This module gets PDF files from the user's Zotero library."""
+
 import logging
 import os
 from pathlib import Path
@@ -8,10 +9,13 @@ from pydantic import BaseModel
 
 try:
     from pyzotero import zotero
-except ImportError:
-    raise ImportError("Please install pyzotero: `pip install pyzotero`")  # noqa: B904
-from ..paths import PAPERQA_DIR
-from ..utils import StrPath, count_pdf_pages
+except ImportError as e:
+    raise ImportError(
+        "zotero requires the 'zotero' extra for 'pyzotero'. Please:"
+        " `pip install paper-qa[zotero]`."
+    ) from e
+from paperqa.paths import PAPERQA_DIR
+from paperqa.utils import StrPath, count_pdf_pages
 
 
 class ZoteroPaper(BaseModel):
@@ -43,9 +47,9 @@ class ZoteroPaper(BaseModel):
     def __str__(self) -> str:
         """Return the title of the paper."""
         return (
-            f'ZoteroPaper(\n    key = "{self.key}",\n'
-            f'title = "{self.title}",\n    pdf = "{self.pdf}",\n    '
-            f'num_pages = {self.num_pages},\n    zotero_key = "{self.zotero_key}",\n    details = ...\n)'
+            f'ZoteroPaper(\n    key = "{self.key}",\ntitle = "{self.title}",\n    pdf ='
+            f' "{self.pdf}",\n    num_pages = {self.num_pages},\n    zotero_key ='
+            f' "{self.zotero_key}",\n    details = ...\n)'
         )
 
 
@@ -81,8 +85,7 @@ class ZoteroDB(zotero.Zotero):
                     " from the text 'Your userID for use in API calls is [XXXXXX]'."
                     " Then, set the environment variable ZOTERO_USER_ID to this value."
                 )
-            else:  # noqa: RET506
-                library_id = os.environ["ZOTERO_USER_ID"]
+            library_id = os.environ["ZOTERO_USER_ID"]
 
         if api_key is None:
             self.logger.info("Attempting to get ZOTERO_API_KEY from `os.environ`...")
@@ -93,8 +96,7 @@ class ZoteroDB(zotero.Zotero):
                     " with access to your library."
                     " Then, set the environment variable ZOTERO_API_KEY to this value."
                 )
-            else:  # noqa: RET506
-                api_key = os.environ["ZOTERO_API_KEY"]
+            api_key = os.environ["ZOTERO_API_KEY"]
 
         self.logger.info(f"Using library ID: {library_id} with type: {library_type}.")
 
@@ -120,7 +122,7 @@ class ZoteroDB(zotero.Zotero):
             An item from `pyzotero`. Should have a `key` field, and also have an entry
             `links->attachment->attachmentType == application/pdf`.
         """
-        if type(item) != dict:  # noqa: E721
+        if not isinstance(item, dict):
             raise TypeError("Pass the full item of the paper. The item must be a dict.")
 
         pdf_key = _extract_pdf_key(item)
@@ -203,9 +205,10 @@ class ZoteroDB(zotero.Zotero):
         if direction is not None:
             query_kwargs["direction"] = direction
 
-        if collection_name is not None and len(query_kwargs) > 0:
+        if collection_name is not None and query_kwargs:
             raise ValueError(
-                "You cannot specify a `collection_name` and search query simultaneously!"
+                "You cannot specify a `collection_name` and search query"
+                " simultaneously!"
             )
 
         max_limit = 100
@@ -305,8 +308,7 @@ class ZoteroDB(zotero.Zotero):
 
 def _get_citation_key(item: dict) -> str:
     if (
-        "data" not in item
-        or "creators" not in item["data"]
+        "creators" not in item.get("data", {})
         or len(item["data"]["creators"]) == 0
         or "lastName" not in item["data"]["creators"][0]
         or "title" not in item["data"]
@@ -336,7 +338,7 @@ def _extract_pdf_key(item: dict) -> str | None:
 
     attachments = item["links"]["attachment"]
 
-    if type(attachments) != dict:  # noqa: E721
+    if not isinstance(attachments, dict):
         # Find first attachment with attachmentType == application/pdf:
         for attachment in attachments:
             # TODO: This assumes there's only one PDF attachment.

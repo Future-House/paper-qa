@@ -15,9 +15,9 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa.clients.exceptions import DOINotFoundError
+from paperqa.types import DocDetails
 
-from ..types import DocDetails
+from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -111,15 +111,15 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
         # this service from failing us when it's down or slow.
         except DOINotFoundError:
             logger.warning(
-                f"Metadata not found for "
-                f"{client_query.doi if isinstance(client_query, DOIQuery) else client_query.title}"
-                f" in {self.__class__.__name__}."
+                "Metadata not found for"
+                f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
+                f" {self.__class__.__name__}."
             )
         except TimeoutError:
             logger.warning(
-                f"Request to {self.__class__.__name__} for "
-                f"{client_query.doi if isinstance(client_query, DOIQuery) else client_query.title}"
-                " timed out."
+                f"Request to {self.__class__.__name__} for"
+                f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} timed"
+                " out."
             )
         return None
 

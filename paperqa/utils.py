@@ -14,13 +14,13 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, ClassVar
 from uuid import UUID
 
 import aiohttp
 import httpx
 import litellm
-import pypdf
+import pymupdf
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -39,6 +39,12 @@ logger = logging.getLogger(__name__)
 StrPath = str | Path
 
 
+class ImpossibleParsingError(Exception):
+    """Error to throw when a parsing is impossible."""
+
+    LOG_METHOD_NAME: ClassVar[str] = "warning"
+
+
 def name_in_text(name: str, text: str) -> bool:
     sname = name.strip()
     pattern = rf"\b({re.escape(sname)})\b(?!\w)"
@@ -46,7 +52,7 @@ def name_in_text(name: str, text: str) -> bool:
 
 
 def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
-    if len(s) == 0:
+    if not s:
         return False
     # Calculate the entropy of the string
     entropy = 0.0
@@ -72,7 +78,7 @@ def maybe_is_html(file: BinaryIO) -> bool:
 
 
 def strings_similarity(s1: str, s2: str) -> float:
-    if len(s1) == 0 or len(s2) == 0:
+    if not s1 or not s2:
         return 0
     # break the strings into words
     ss1 = set(s1.split())
@@ -82,16 +88,8 @@ def strings_similarity(s1: str, s2: str) -> float:
 
 
 def count_pdf_pages(file_path: StrPath) -> int:
-    with open(file_path, "rb") as pdf_file:
-        try:  # try fitz by default
-            import fitz
-
-            doc = fitz.open(file_path)
-            num_pages = len(doc)
-        except ModuleNotFoundError:  # pypdf instead
-            pdf_reader = pypdf.PdfReader(pdf_file)
-            num_pages = len(pdf_reader.pages)
-    return num_pages
+    with pymupdf.open(file_path) as doc:
+        return len(doc)
 
 
 def hexdigest(data: str | bytes) -> str:
@@ -188,8 +186,7 @@ def extract_doi(reference: str) -> str:
     # If DOI is found in the reference, return the DOI link
     if doi_match:
         return "https://doi.org/" + doi_match.group()
-    else:  # noqa: RET505
-        return ""
+    return ""
 
 
 def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
@@ -203,16 +200,6 @@ def batch_iter(iterable: list, n: int = 1) -> Iterator[list]:
     length = len(iterable)
     for ndx in range(0, length, n):
         yield iterable[ndx : min(ndx + n, length)]
-
-
-def flatten(iteratble: list) -> list:
-    """
-    Flatten a list of lists.
-
-    :param l: The list of lists to flatten
-    :return: A flattened list
-    """
-    return [item for sublist in iteratble for item in sublist]
 
 
 def get_loop() -> asyncio.AbstractEventLoop:
@@ -381,13 +368,19 @@ def bibtex_field_extract(
         return missing_replacements.get(field, "")
 
 
+UNKNOWN_AUTHOR_KEY: str = "unknownauthors"
+
+
 def create_bibtex_key(author: list[str], year: str, title: str) -> str:
     FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
-    author_rep = (
-        author[0].split()[-1].casefold()
-        if "Unknown" not in author[0]
-        else "unknownauthors"
-    )
+    try:
+        author_rep = (
+            author[0].split()[-1].casefold()
+            if "Unknown" not in author[0]
+            else UNKNOWN_AUTHOR_KEY
+        )
+    except IndexError:
+        author_rep = UNKNOWN_AUTHOR_KEY
     # we don't want a bibtex-parsing induced line break in the key
     # so we cap it to 100+50+4 = 154 characters max
     # 50 for the author, 100 for the first three title words, 4 for the year
@@ -415,7 +408,7 @@ async def _get_with_retrying(
     params: dict[str, Any],
     session: aiohttp.ClientSession,
     headers: dict[str, str] | None = None,
-    timeout: float = 10.0,
+    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
@@ -479,6 +472,8 @@ def setup_default_logs() -> None:
                 "httpx": {"level": "WARNING"},
                 # SEE: https://github.com/BerriAI/litellm/issues/2256
                 "LiteLLM": {"level": "WARNING"},
+                "LiteLLM Router": {"level": "WARNING"},
+                "LiteLLM Proxy": {"level": "WARNING"},
             },
         }
     )

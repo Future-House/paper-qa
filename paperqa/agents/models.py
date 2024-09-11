@@ -4,14 +4,10 @@ import asyncio
 import logging
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime
-from enum import Enum
-from typing import Any, ClassVar
+from enum import StrEnum
+from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
-from langchain_core.callbacks import AsyncCallbackHandler
-from langchain_core.messages import BaseMessage, messages_to_dict
-from langchain_core.outputs import ChatGeneration, LLMResult
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -21,13 +17,11 @@ from pydantic import (
     computed_field,
     field_validator,
 )
-from typing_extensions import Protocol
 
 from paperqa.llms import LiteLLMModel
-
-from .. import Answer
-from ..settings import Settings
-from ..version import __version__
+from paperqa.settings import Settings
+from paperqa.types import Answer
+from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +34,7 @@ class SupportsPickle(Protocol):
     def __setstate__(self, state: object) -> None: ...
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     # FAIL - no answer could be generated
     FAIL = "fail"
     # SUCCESS - answer was generated
@@ -49,12 +43,6 @@ class AgentStatus(str, Enum):
     TIMEOUT = "timeout"
     # UNSURE - the agent was unsure, but an answer is present
     UNSURE = "unsure"
-
-
-class ImpossibleParsingError(Exception):
-    """Error to throw when a parsing is impossible."""
-
-    LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
 class MismatchedModelsError(Exception):
@@ -82,7 +70,7 @@ class QueryRequest(BaseModel):
     def apply_settings_template(cls, v: Settings, info: ValidationInfo) -> Settings:
         if info.data["settings_template"] and isinstance(v, Settings):
             base_settings = Settings.from_name(info.data["settings_template"])
-            return Settings(**{**base_settings.model_dump(), **v.model_dump()})
+            return Settings(**(base_settings.model_dump() | v.model_dump()))
         return v
 
     @computed_field  # type: ignore[prop-decorator]
@@ -97,7 +85,6 @@ class QueryRequest(BaseModel):
 
 class AnswerResponse(BaseModel):
     answer: Answer
-    usage: dict[str, list[int]]
     bibtex: dict[str, str] | None = None
     status: AgentStatus
     timing_info: dict[str, dict[str, float]] | None = None
@@ -116,17 +103,16 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model="gpt-4o") -> str:
+    async def get_summary(self, llm_model: str = "gpt-4o") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
         model = LiteLLMModel(name=llm_model)
-        chain = model.make_chain(
-            prompt="{question}\n\n{answer}", system_prompt=sys_prompt
-        )
-        result = await chain(  # type: ignore[call-arg]
-            {"question": self.answer.question, "answer": self.answer.answer},
+        result = await model.run_prompt(
+            prompt="{question}\n\n{answer}",
+            data={"question": self.answer.question, "answer": self.answer.answer},
+            system_prompt=sys_prompt,
         )
         return result.text.strip()
 
@@ -158,7 +144,8 @@ class SimpleProfiler(BaseModel):
             elapsed = end_time - start_time
             self.timers.setdefault(name, []).append(elapsed)
             logger.info(
-                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s | VERSION: {__version__}"
+                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s"
+                f" | VERSION: {__version__}"
             )
 
     def start(self, name: str) -> None:
@@ -167,7 +154,7 @@ class SimpleProfiler(BaseModel):
         except RuntimeError:  # No running event loop (not in async)
             self.running_timers[name] = TimerData(start_time=time.time())
 
-    def stop(self, name: str):
+    def stop(self, name: str) -> None:
         timer_data = self.running_timers.pop(name, None)
         if timer_data:
             try:
@@ -177,7 +164,8 @@ class SimpleProfiler(BaseModel):
             elapsed = t_stop - timer_data.start_time
             self.timers.setdefault(name, []).append(elapsed)
             logger.info(
-                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s | VERSION: {__version__}"
+                f"[Profiling] | UUID: {self.uid} | NAME: {name} | TIME: {elapsed:.3f}s"
+                f" | VERSION: {__version__}"
             )
         else:
             logger.warning(f"Timer {name} not running")
@@ -193,90 +181,3 @@ class SimpleProfiler(BaseModel):
                 "total": sum(durations),
             }
         return result
-
-
-class AgentCallback(AsyncCallbackHandler):
-    """
-    Callback handler used to monitor the agent, for debugging.
-
-    Its various capabilities include:
-    - Chain start --> error/stop: profile runtime
-    - Tool start: count tool invocations
-    - LLM start --> error/stop: insert into LLMResultDB
-
-    NOTE: this is not a thread safe implementation since start(s)/end(s) mutate self.
-    """
-
-    def __init__(
-        self, profiler: SimpleProfiler, name: str, answer_id: UUID, **kwargs
-    ) -> None:
-        super().__init__(**kwargs)
-        self.profiler = profiler
-        self.name = name
-        self._tool_starts: list[str] = []
-        self._answer_id = answer_id
-        # This will be None before/after a completion, and a dict during one
-        self._llm_result_db_kwargs: dict[str, Any] | None = None
-
-    @property
-    def tool_invocations(self) -> list[str]:
-        return self._tool_starts
-
-    async def on_chain_start(self, *args, **kwargs) -> None:
-        await super().on_chain_start(*args, **kwargs)
-        self.profiler.start(self.name)
-
-    async def on_chain_end(self, *args, **kwargs) -> None:
-        await super().on_chain_end(*args, **kwargs)
-        self.profiler.stop(self.name)
-
-    async def on_chain_error(self, *args, **kwargs) -> None:
-        await super().on_chain_error(*args, **kwargs)
-        self.profiler.stop(self.name)
-
-    async def on_tool_start(
-        self, serialized: dict[str, Any], input_str: str, **kwargs
-    ) -> None:
-        await super().on_tool_start(serialized, input_str, **kwargs)
-        self._tool_starts.append(serialized["name"])
-
-    async def on_chat_model_start(
-        self,
-        serialized: dict[str, Any],  # noqa: ARG002
-        messages: list[list[BaseMessage]],
-        **kwargs,
-    ) -> None:
-        # NOTE: don't call super(), as it changes semantics
-        if len(messages) != 1:
-            raise NotImplementedError(f"Didn't handle shape of messages {messages}.")
-        self._llm_result_db_kwargs = {
-            "answer_id": self._answer_id,
-            "name": f"tool_selection:{len(messages[0])}",
-            "prompt": {
-                "messages": messages_to_dict(messages[0]),
-                # SEE: https://platform.openai.com/docs/api-reference/chat/create#chat-create-functions
-                "functions": kwargs["invocation_params"]["functions"],
-                "tool_history": self.tool_invocations,
-            },
-            "model": kwargs["invocation_params"]["model"],
-            "date": datetime.now().isoformat(),
-        }
-
-    async def on_llm_end(self, response: LLMResult, **kwargs) -> None:
-        await super().on_llm_end(response, **kwargs)
-        if (
-            len(response.generations) != 1
-            or len(response.generations[0]) != 1
-            or not isinstance(response.generations[0][0], ChatGeneration)
-        ):
-            raise NotImplementedError(
-                f"Didn't handle shape of generations {response.generations}."
-            )
-        if self._llm_result_db_kwargs is None:
-            raise NotImplementedError(
-                "There should have been an LLM result populated here by now."
-            )
-        if not isinstance(response.llm_output, dict):
-            raise NotImplementedError(
-                f"Expected llm_output to be a dict, but got {response.llm_output}."
-            )

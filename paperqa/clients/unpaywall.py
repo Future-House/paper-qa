@@ -8,11 +8,9 @@ from urllib.parse import quote
 import aiohttp
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from ..types import DocDetails
-from ..utils import (
-    _get_with_retrying,
-    strings_similarity,
-)
+from paperqa.types import DocDetails
+from paperqa.utils import _get_with_retrying, strings_similarity
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
 
@@ -88,7 +86,9 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
             results = UnpaywallResponse(
                 **(
                     await _get_with_retrying(
-                        url=f"{UNPAYWALL_BASE_URL}{doi}?email={os.environ.get('UNPAYWALL_EMAIL', 'test@example.com')}",
+                        url=(
+                            f"{UNPAYWALL_BASE_URL}{doi}?email={os.environ.get('UNPAYWALL_EMAIL', 'test@example.com')}"
+                        ),
                         params={},
                         session=session,
                         timeout=UNPAYWALL_TIMEOUT,

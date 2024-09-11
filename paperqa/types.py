@@ -24,13 +24,13 @@ from pydantic import (
     model_validator,
 )
 
-from .utils import (
+from paperqa.utils import (
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citenames,
 )
-from .version import __version__ as pqa_version
+from paperqa.version import __version__ as pqa_version
 
 # Just for clarity
 # also in case one day we want to narrow
@@ -89,7 +89,7 @@ class LLMResult(BaseModel):
         default=0.0, description="Delta time (sec) to last response token's arrival."
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text
 
     @computed_field  # type: ignore[prop-decorator]
@@ -116,7 +116,9 @@ class Doc(Embeddable):
     dockey: DocKey
     overwrite_fields_from_metadata: bool = Field(
         default=True,
-        description="flag to overwrite fields from metadata when upgrading to a DocDetails",
+        description=(
+            "flag to overwrite fields from metadata when upgrading to a DocDetails"
+        ),
     )
 
     def __hash__(self) -> int:
@@ -163,7 +165,9 @@ class Answer(BaseModel):
     config_md5: str | None = Field(
         default=None,
         frozen=True,
-        description="MD5 hash of the settings used to generate the answer. Cannot change",
+        description=(
+            "MD5 hash of the settings used to generate the answer. Cannot change"
+        ),
     )
     model_config = ConfigDict(extra="ignore")
 
@@ -194,7 +198,7 @@ class Answer(BaseModel):
             raise ValueError(f"Could not find docname {name} in contexts.") from exc
         return doc.citation
 
-    def add_tokens(self, result: LLMResult):
+    def add_tokens(self, result: LLMResult) -> None:
         """Update the token counts for the given result."""
         if result.model not in self.token_counts:
             self.token_counts[result.model] = [
@@ -316,9 +320,14 @@ class DocDetails(Doc):
 
     source_quality: int | None = Field(
         default=None,
-        description="Quality of journal/venue of paper. "
-        " We use None as a sentinel for unset values (like for determining hydration) "
-        " So, we use -1 means unknown quality and None means it needs to be hydrated.",
+        description=(
+            "Quality of journal/venue of paper.  We use None as a sentinel for unset"
+            " values (like for determining hydration)  So, we use -1 means unknown"
+            " quality and None means it needs to be hydrated."
+        ),
+    )
+    is_retracted: bool | None = Field(
+        default=None, description="Flag for whether the paper is retracted."
     )
     is_retracted: bool | None = Field(
         default=None, description="Flag for whether the paper is retracted."
@@ -512,11 +521,12 @@ class DocDetails(Doc):
                     data["citation"] = None
             except Exception:
                 logger.warning(
-                    f"Failed to generate bibtex for {data.get('docname') or data.get('citation')}"
+                    "Failed to generate bibtex for"
+                    f" {data.get('docname') or data.get('citation')}"
                 )
         if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
-                data["bibtex"], clean=True, missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
+                data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
         elif not data.get("citation"):
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
@@ -551,7 +561,8 @@ class DocDetails(Doc):
             or self.source_quality is None
         ):
             raise ValueError(
-                "Citation, citationCount, and sourceQuality are not set -- do you need to call `hydrate`?"
+                "Citation, citationCount, and sourceQuality are not set -- do you need"
+                " to call `hydrate`?"
             )
         quality = (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
@@ -562,8 +573,8 @@ class DocDetails(Doc):
         if quality is None:
             return f"{self.citation} This article has {self.citation_count} citations."
         return (
-            f"{self.citation} This article has {self.citation_count} citations and is from a "
-            f"{quality}."
+            f"{self.citation} This article has {self.citation_count} citations and is"
+            f" from a {quality}."
         )
 
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
@@ -607,7 +618,7 @@ class DocDetails(Doc):
                 # Merge 'other' dictionaries
                 merged_data[field] = {**self.other, **other.other}
                 # handle the bibtex / sources as special fields
-                for field_to_combine in ["bibtex_source", "client_source"]:
+                for field_to_combine in ("bibtex_source", "client_source"):
                     if self.other.get(field_to_combine) and other.other.get(
                         field_to_combine
                     ):

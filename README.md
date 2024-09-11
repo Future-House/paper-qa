@@ -1,87 +1,219 @@
-# PaperQA
+# PaperQA2
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
 [![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
-This is a minimal package for doing question and answering from
-PDFs or text files (which can be raw HTML). It strives to give very good answers, with no hallucinations, by grounding responses with in-text citations.
+PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files, with a focus on the scientific literature. See our [recent paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like question answering, summarization, and contradiction detection.
 
-By default, it uses [OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings) with a simple numpy vector DB to embed and search documents. However, via [langchain](https://github.com/hwchase17/langchain) you can use open-source models or embeddings (see details below).
+## Quickstart
 
-paper-qa uses the process shown below:
+In this example we take a folder of research paper PDFs, magically get their metadata - including citation counts and a retraction check, then parse and cache PDFs into a full-text search index, and finally answer the user question with an LLM agent.
 
-1. embed docs into vectors
-2. embed query into vector
-3. search for top k passages in docs
-4. create summary of each passage relevant to query
-5. use an LLM to re-score and select only relevant summaries
-6. put summaries into prompt
-7. generate answer with prompt
-
-See our paper for more details:
-
-```bibtex
-@article{lala2023paperqa,
-  title={PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
-  author={L{\'a}la, Jakub and O'Donoghue, Odhran and Shtedritski, Aleksandar and Cox, Sam and Rodriques, Samuel G and White, Andrew D},
-  journal={arXiv preprint arXiv:2312.07559},
-  year={2023}
-}
+```bash
+pip install paper-qa
+cd my_papers
+pqa ask 'How can carbon nanotubes be manufactured at a large scale?'
 ```
 
-## Output Example
+### Example Output
 
-Question: How can carbon nanotubes be manufactured at a large scale?
+Question: Has anyone designed neural networks that compute with proteins or DNA?
 
-Carbon nanotubes can be manufactured at a large scale using the electric-arc technique (Journet6644). This technique involves creating an arc between two electrodes in a reactor under a helium atmosphere and using a mixture of a metallic catalyst and graphite powder in the anode. Yields of 80% of entangled carbon filaments can be achieved, which consist of smaller aligned SWNTs self-organized into bundle-like crystallites (Journet6644). Additionally, carbon nanotubes can be synthesized and self-assembled using various methods such as DNA-mediated self-assembly, nanoparticle-assisted alignment, chemical self-assembly, and electro-addressed functionalization (Tulevski2007). These methods have been used to fabricate large-area nanostructured arrays, high-density integration, and freestanding networks (Tulevski2007). 98% semiconducting CNT network solution can also be used and is separated from metallic nanotubes using a density gradient ultracentrifugation approach (Chen2014). The substrate is incubated in the solution and then rinsed with deionized water and dried with N2 air gun, leaving a uniform carbon network (Chen2014).
+The claim that neural networks have been designed to compute with DNA is supported by multiple sources. The work by Qian, Winfree, and Bruck demonstrates the use of DNA strand displacement cascades to construct neural network components, such as artificial neurons and associative memories, using a DNA-based system (Qian2011Neural pages 1-2, Qian2011Neural pages 15-16, Qian2011Neural pages 54-56). This research includes the implementation of a 3-bit XOR gate and a four-neuron Hopfield associative memory, showcasing the potential of DNA for neural network computation. Additionally, the application of deep learning techniques to genomics, which involves computing with DNA sequences, is well-documented. Studies have applied convolutional neural networks (CNNs) to predict genomic features such as transcription factor binding and DNA accessibility (Eraslan2019Deep pages 4-5, Eraslan2019Deep pages 5-6). These models leverage DNA sequences as input data, effectively using neural networks to compute with DNA. While the provided excerpts do not explicitly mention protein-based neural network computation, they do highlight the use of neural networks in tasks related to protein sequences, such as predicting DNA-protein binding (Zeng2016Convolutional pages 1-2). However, the primary focus remains on DNA-based computation.
 
-### References
+## What is PaperQA2
 
-Journet6644: Journet, Catherine, et al. "Large-scale production of single-walled carbon nanotubes by the electric-arc technique." nature 388.6644 (1997): 756-758.
+PaperQA2 is engineered to be the best RAG model for working with scientific papers. Here are some features:
 
-Tulevski2007: Tulevski, George S., et al. "Chemically assisted directed assembly of carbon nanotubes for the fabrication of large-scale device arrays." Journal of the American Chemical Society 129.39 (2007): 11964-11968.
+- A simple interface to get good answers with grounded responses that have in-text citations.
+- State-of-the-art implementation including metadata-awareness in document embeddings and LLM-based re-ranking and contextual summarization (RCS).
+- The ability to do agentic RAG which iteratively refines queries and answers.
+- Automatic redundant fetching of paper metadata, including citation and journal quality data from multiple providers.
+- A usable full-text search engine for a local repository of PDF/text files.
+- A robust interface for customization, with default support for all [LiteLLM](https://docs.litellm.ai/docs/providers) models.
 
-Chen2014: Chen, Haitian, et al. "Large-scale complementary macroelectronics using hybrid integration of carbon nanotubes and IGZO thin-film transistors." Nature communications 5.1 (2014): 4097.
+By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a Numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
 
-## What's New?
+PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Here are some in a random order:
 
-Version 4 removed langchain from the package because it no longer supports pickling. This also simplifies the package a bit - especially prompts. Langchain can still be used, but it's not required. You can use any LLMs from langchain, but you will need to use the `LangchainLLMModel` class to wrap the model.
+1. [Semantic Scholar](https://www.semanticscholar.org/)
+2. [Crossref](https://www.crossref.org/)
+3. [Unpaywall](https://unpaywall.org/)
+4. [Pydantic](https://docs.pydantic.dev/latest/)
+5. [tantivy](https://github.com/quickwit-oss/tantivy) and [tantivy-py](https://github.com/quickwit-oss/tantivy-py)
+6. [Litellm](https://github.com/BerriAI/litellm)
+7. [pybtex](https://pybtex.org/)
+8. [pymupdf](https://pymupdf.readthedocs.io/en/latest/)
 
 ## Install
 
-Install with pip:
+You can install PaperQA2 via pip:
 
 ```bash
 pip install paper-qa
 ```
 
-You need to have an LLM to use paper-qa. You can use OpenAI, llama.cpp (via Server), or any LLMs from langchain. OpenAI just works, as long as you have set your OpenAI API key (`export OPENAI_API_KEY=sk-...`). See instructions below for other LLMs.
+PaperQA2 uses an LLM to operate, so you'll need to either set an appropriate [API key environment variable](https://docs.litellm.ai/docs/providers) (i.e. `export OPENAI_API_KEY=sk-...`) or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile). Any LiteLLM compatible model can be configured to use with PaperQA2.
+
+If you need to index a large set of papers (100+), you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key), which will allow you to avoid hitting public rate limits using these metadata services. Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
+
+## PaperQA2 vs PaperQA
+
+We've been working on hard on engineering it for a while and tried to follow [SemVer](https://semver.org/), meaning we've incremented the major version number on each breaking change. This brings us to our current version number: v5.x.x. So why call it PaperQA2? We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai). So we arbitrarily call versions after v5 PaperQA2 and versions before it as PaperQA1 to denote the significant change in performance. We recognize that we are challenged at naming and counting at FutureHouse, so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+
+## What's New in PaperQA2 v5?
+
+Version 5 added a CLI, agentic workflows, and removed much of the state from the `Docs` object. `Docs` objects pickled from prior versions of `PaperQA` are not compatible with version 5 and will need to be rebuilt.
 
 ## Usage
 
-To use paper-qa, you need to have a list of paths/files/urls (valid extensions include: .pdf, .txt). You can then use the `Docs` class to add the documents and then query them. `Docs` will try to guess citation formats from the content of the files, but you can also provide them yourself.
+To understand PaperQA2, let's start with the pieces of the underlying algorithm. The default workflow of PaperQA2 is as follows:
+
+| Phase                  | PaperQA2 Actions                                                          |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
+|                        | - Chunk, embed, and add candidate papers to state                         |
+| **2. Gather Evidence** | - Embed query into vector                                                 |
+|                        | - Rank top _k_ document chunks in current state                           |
+|                        | - Create scored summary of each chunk in the context of the current query |
+|                        | - Use LLM to re-score and select most relevant summaries                  |
+| **3. Generate Answer** | - Put best summaries into prompt with context                             |
+|                        | - Generate answer with prompt                                             |
+
+The phases can go in any order. For example, an LLM agent might do a narrow and broad search, or using different phrasing for the gather evidence step from the generate answer step.
+
+### CLI
+
+The fastest way to test PaperQA2 is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
+
+```bash
+$ pqa ask 'What manufacturing challenges are unique to bispecific antibodies?'
+```
+
+You will see PaperQA2 index your local PDF files, gathering the necessary metadata for each of them (using [Crossref](https://www.crossref.org/) and [Semantic Scholar](https://www.semanticscholar.org/)),
+search over that index, then break the files into chunked evidence contexts, rank them, and ultimately generate an answer. The next time this directory is queried, your index will already be built (save for any differences detected, like new added papers), so it will skip the indexing and chunking steps.
+
+All prior answers will be indexed and stored, you can view them by querying via the `search` subcommand, or access them yourself in your `PQA_HOME` directory, which defaults to `~/.pqa/`.
+
+```bash
+$ pqa search -i 'answers' 'antibodies'
+```
+
+PaperQA2 is highly configurable, when running from the command line, `pqa --help` shows all options and short descriptions. For example to run with a higher temperature:
+
+```bash
+$ pqa --temperature 0.5 ask 'What manufacturing challenges are unique to bispecific antibodies?'
+```
+
+You can view all settings with `pqa view`. Another useful thing is to change to other templated settings - for example `fast` is a setting that answers more quickly and you can see it with `pqa -s fast view`
+
+Maybe you have some new settings you want to save? You can do that with
+
+```bash
+pqa -s my_new_settings --temperature 0.5 --llm foo-bar-5 save
+```
+
+and then you can use it with
+
+```bash
+pqa -s my_new_settings ask 'What manufacturing challenges are unique to bispecific antibodies?'
+```
+
+If you run `pqa` with a command which requires a new indexing, say if you change the default chunk_size, a new index will automatically be created for you.
+
+```bash
+pqa --parsing.chunk_size 5000 ask 'What manufacturing challenges are unique to bispecific antibodies?'
+```
+
+You can also use `pqa` to do full-text search with use of LLMs view the search command. For example, let's save the index from a directory and give it a name:
+
+```bash
+pqa -i nanomaterials index
+```
+
+Now I can search for papers about thermoelectrics:
+
+```bash
+pqa -i nanomaterials search thermoelectrics
+```
+
+or I can use the normal ask
+
+```bash
+pqa -i nanomaterials ask 'Are there nm scale features in thermoelectric materials?'
+```
+
+### Module Usage
+
+PaperQA2's full workflow can be accessed via Python directly:
 
 ```python
-from paperqa import Docs
+from paperqa import Settings, ask
 
-my_docs = ...  # get a list of paths
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(temperature=0.5),
+)
+```
+
+The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer). `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
+
+```python
+from paperqa import Settings, ask
+
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(temperature=0.5, paper_directory="my_papers/"),
+)
+```
+
+`ask` is just a convenience wrapper around the real entrypoint, which can be accessed if you'd like to run concurrent asynchronous workloads:
+
+```python
+from paperqa import Settings, agent_query, QueryRequest
+
+answer = await agent_query(
+    QueryRequest(
+        query="What manufacturing challenges are unique to bispecific antibodies?",
+        settings=Settings(temperature=0.5, paper_directory="my_papers/"),
+    )
+)
+```
+
+The default agent will use an LLM based agent,
+but you can also specify a `"fake"` agent to use a hard coded call path of search -> gather evidence -> answer to reduce token usage.
+
+### Adding Documents Manually
+
+If you prefer fine grained control, and you wish to add objects to the docs object yourself (rather than using the search tool), then the previously existing `Docs` object interface can be used:
+
+```python
+from paperqa import Docs, Settings
+
+# valid extensions include .pdf, .txt, and .html
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 docs = Docs()
-for d in my_docs:
-    docs.add(d)
+
+for doc in doc_paths:
+    doc.add(doc_paths)
+
+settings = Settings()
+settings.llm = "claude-3-5-sonnet-20240620"
+settings.answer.answer_max_sources = 3
 
 answer = docs.query(
-    "What manufacturing challenges are unique to bispecific antibodies?"
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=settings,
 )
+
 print(answer.formatted_answer)
 ```
 
-The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
-
 ### Async
 
-paper-qa is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
+PaperQA2 is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
 
 | Sync                | Async                |
 | ------------------- | -------------------- |
@@ -96,166 +228,135 @@ The synchronous version just call the async version in a loop. Most modern pytho
 ```python
 from paperqa import Docs
 
-my_docs = ...  # get a list of paths
+# valid extensions include .pdf, .txt, and .html
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 docs = Docs()
-for d in my_docs:
-    await docs.aadd(d)
+
+for doc in doc_paths:
+    await doc.aadd(doc_paths)
 
 answer = await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?"
 )
+
+print(answer.formatted_answer)
 ```
-
-### Adding Documents
-
-`add` will add from paths. You can also use `add_file` (expects a file object) or `add_url` to work with other sources.
 
 ### Choosing Model
 
-By default, it uses OpenAI models with a hybrid of `gpt-4o-mini` (for the re-ranking and summary step, `summary_llm` argument) and `gpt-4-turbo` (for the answering step, `llm` argument). You can adjust this:
+By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
 
 ```python
-docs = Docs(llm="gpt-4o-mini", summary_llm="gpt-4o")
-```
+from paperqa import Settings, ask
 
-You can use Anthropic models by specifying an Anthropic client:
-
-```python
-from paperqa import Docs
-from anthropic import AsyncAnthropic
-
-docs = Docs(
-    llm="claude-3-5-sonnet-20240620",
-    summary_llm="claude-3-5-sonnet-20240620",
-    client=AsyncAnthropic(),
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers/"
+    ),
 )
 ```
 
-Or you can use any other model available in [langchain](https://github.com/hwchase17/langchain):
+You can use Anthropic or any other model supported by `litellm`:
 
 ```python
-from paperqa import Docs
-from langchain_community.chat_models import ChatAnthropic
+from paperqa import Settings, ask
 
-docs = Docs(llm="langchain", client=ChatAnthropic())
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
+    ),
+)
 ```
-
-Note we split the model into the wrapper and `client`, which is `ChatAnthropic` here. This is because `client` stores the non-pickleable part and langchain LLMs are only sometimes serializable/pickleable. The paper-qa `Docs` must always serializable. Thus, we split the model into two parts.
-
-```python
-import pickle
-
-docs = Docs(llm="langchain", client=ChatAnthropic())
-model_str = pickle.dumps(docs)
-docs = pickle.loads(model_str)
-# but you have to set the client after loading
-docs.set_client(ChatAnthropic())
-```
-
-We also support using [Anyscale](https://docs.anyscale.com/examples/work-with-openai/#call-the-openai-endpoint-with-an-openai-api-key) to utilized hosted open source models. To use it, you only need to set your `ANYSCALE_API_KEY` and `ANYSCALE_BASE_URL` environment variables or use an OpenAI client initialized with your `api_key` and `base_url` arguments from Anyscale.
 
 #### Locally Hosted
 
-You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because paper-qa requires following a lot of instructions. You won't get good performance with 7B models.
+You can use llama.cpp to be the LLM. Note that you should be using relatively large models, because PaperQA2 requires following a lot of instructions. You won't get good performance with 7B models.
 
 The easiest way to get set-up is to download a [llama file](https://github.com/Mozilla-Ocho/llamafile) and execute it with `-cb -np 4 -a my-llm-model --embedding` which will enable continuous batching and embeddings.
 
 ```python
-from paperqa import Docs, LlamaEmbeddingModel
-from openai import AsyncOpenAI
+from paperqa import Settings, ask
 
-# start llamap.cpp client with
-
-local_client = AsyncOpenAI(
-    base_url="http://localhost:8080/v1", api_key="sk-no-key-required"
+local_llm_config = dict(
+    model_list=dict(
+        model_name="my_llm_model",
+        litellm_params=dict(
+            model="my-llm-model",
+            api_base="http://localhost:8080/v1",
+            api_key="sk-no-key-required",
+            temperature=0.1,
+            frequency_penalty=1.5,
+            max_tokens=512,
+        ),
+    )
 )
 
-docs = Docs(
-    client=local_client,
-    texts_index=NumpyVectorStore(embedding_model=LlamaEmbeddingModel()),
-    llm_model=OpenAILLMModel(
-        config=dict(
-            model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512
-        )
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="my-llm-model",
+        llm_config=local_llm_config,
+        summary_llm="my-llm-model",
+        summary_llm_config=local_llm_config,
     ),
 )
 ```
 
 ### Changing Embedding Model
 
-paper-qa defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Docs` object constructor:
+PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
 
 ```python
-from paperqa import Docs
+from paperqa import Settings, ask
 
-docs = Docs(embedding="text-embedding-3-large")
-```
-
-`embedding` accepts:
-
-- Any OpenAI embedding model name
-- [VoyageAI](https://docs.voyageai.com/docs/embeddings) model names (usable if `voyageai` is installed and `VOYAGE_API_KEY` is set)
-- `"sentence-transformers"` to use `multi-qa-MiniLM-L6-cos-v1` via [Sentence Transformers](https://huggingface.co/sentence-transformers)
-- `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, any OpenAI or VoyageAI model can be used in the dense model name
-- `"sparse"` to use a sparse keyword embedding only
-
-For deeper embedding customization, embedding models and vector stores can be built separately and passed into the `Docs` object. Embedding models are used to create paper-qa's index of the full-text embedding vectors (`texts_index` argument). They can both be specified as arguments when you create a new `Docs` object. You can use use any embedding model which implements paper-qa's `EmbeddingModel` class. For example, to use `text-embedding-3-large`:
-
-```python
-from paperqa import Docs, NumpyVectorStore, OpenAIEmbeddingModel
-
-docs = Docs(
-    texts_index=NumpyVectorStore(
-        embedding_model=OpenAIEmbeddingModel(name="text-embedding-3-large")
-    ),
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(embedding="text-embedding-3-large"),
 )
 ```
 
-Note that embedding models are specified as attributes of paper-qa's `VectorStore` base class. `NumpyVectorStore` is the best place to start, it's a simple in-memory store, without an index. If a larger-than-memory vector store is needed, you can use the `LangchainVectorStore` like this:
+`embedding` accepts any embedding model name supported by litellm. PaperQA2 also supports an embedding input of `"hybrid-<model_name>"` i.e. `"hybrid-text-embedding-3-small"` to use a hybrid sparse keyword (based on a token modulo embedding) and dense vector embedding, where any litellm model can be used in the dense model name. `"sparse"` can be used to use a sparse keyword embedding only.
+
+Embedding models are used to create PaperQA2's index of the full-text embedding vectors (`texts_index` argument). The embedding model can be specified as a setting when you are adding new papers to the `Docs` object:
 
 ```python
-from langchain_community.vectorstores.faiss import FAISS
-from langchain_openai import OpenAIEmbeddings
-from paperqa import Docs, LangchainVectorStore
+from paperqa import Docs, Settings
 
-docs = Docs(
-    texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
-)
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
+
+docs = Docs()
+
+for doc in doc_paths:
+    doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
 ```
 
-We support both local langchain embedding models and the [SentenceTransformer](https://www.sbert.net/) models. For example:
+Note that PaperQA2 uses Numpy as a dense vector store.
+Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
+Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
+However, if a larger-than-memory vector store is needed, we are currently lacking here.
+
+The hybrid embeddings can be customized:
 
 ```python
-from paperqa import Docs, SentenceTransformerEmbeddingModel
-from openai import AsyncOpenAI
-
-# start llamap.cpp client with
-
-local_client = AsyncOpenAI(
-    base_url="http://localhost:8080/v1", api_key="sk-no-key-required"
+from paperqa import (
+    Docs,
+    HybridEmbeddingModel,
+    SparseEmbeddingModel,
+    LiteLLMEmbeddingModel,
 )
 
-docs = Docs(
-    client=local_client,
-    texts_index=NumpyVectorStore(embedding_model=SentenceTransformerEmbeddingModel()),
-    llm_model=OpenAILLMModel(
-        config=dict(
-            model="my-llm-model", temperature=0.1, frequency_penalty=1.5, max_tokens=512
-        )
-    ),
+
+doc_paths = ("myfile.pdf", "myotherfile.pdf")
+
+model = HybridEmbeddingModel(
+    models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel(ndim=1024)]
 )
-```
-
-We also support hybrid keyword (sparse token modulo vectors) and dense embedding vectors. They can be specified as follows:
-
-```python
-from paperqa import Docs, HybridEmbeddingModel, SparseEmbeddingModel, NumpyVectorStore
-
-model = HybridEmbeddingModel(models=[OpenAIEmbeddingModel(), SparseEmbeddingModel()])
-docs = Docs(
-    texts_index=NumpyVectorStore(embedding_model=model),
-)
+docs = Docs()
+for doc in doc_paths:
+    doc.add(doc_paths, embedding_model=model)
 ```
 
 The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
@@ -265,10 +366,15 @@ The sparse embedding (keyword) models default to having 256 dimensions, but this
 You can adjust the numbers of sources (passages of text) to reduce token usage or add more context. `k` refers to the top k most relevant and diverse (may from different sources) passages. Each passage is sent to the LLM to summarize, or determine if it is irrelevant. After this step, a limit of `max_sources` is applied so that the final answer can fit into the LLM context window. Thus, `k` > `max_sources` and `max_sources` is the number of sources used in the final answer.
 
 ```python
+from paperqa import Settings
+
+settings = Settings()
+settings.answer.answer_max_sources = 3
+settings.answer.k = 5
+
 docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    k=5,
-    max_sources=2,
+    settings=settings,
 )
 ```
 
@@ -278,6 +384,8 @@ You do not need to use papers -- you can use code or raw HTML. Note that this to
 
 ```python
 import glob
+import os
+from paperqa import Docs
 
 source_files = glob.glob("**/*.js")
 
@@ -294,6 +402,8 @@ print(answer)
 You may want to cache parsed texts and embeddings in an external database or file. You can then build a Docs object from those directly:
 
 ```python
+from paperqa import Docs, Doc, Text
+
 docs = Docs()
 
 for ... in my_docs:
@@ -302,35 +412,25 @@ for ... in my_docs:
     docs.add_texts(texts, doc)
 ```
 
-If you want to use an external vector store, you can also do that directly via langchain. For example, to use the [FAISS](https://ai.meta.com/tools/faiss/) vector store from langchain:
-
-```python
-from paperqa import LangchainVectorStore, Docs
-from langchain_community.vector_store import FAISS
-from langchain_openai import OpenAIEmbeddings
-
-docs = Docs(
-    texts_index=LangchainVectorStore(cls=FAISS, embedding_model=OpenAIEmbeddings()),
-)
-```
-
 ## Where do I get papers?
 
 Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
 
 ### Zotero
 
+_It's been a while since we've tested this - so let us know if it runs into issues!_
+
 If you use [Zotero](https://www.zotero.org/) to organize your personal bibliography,
 you can use the `paperqa.contrib.ZoteroDB` to query papers from your library,
 which relies on [pyzotero](https://github.com/urschrei/pyzotero).
 
-Install `pyzotero` to use this feature:
+Install `pyzotero` via the `zotero` extra for this feature:
 
 ```bash
-pip install pyzotero
+pip install paperqa[zotero]
 ```
 
-First, note that `paperqa` parses the PDFs of papers to store in the database,
+First, note that PaperQA2 parses the PDFs of papers to store in the database,
 so all relevant papers should have PDFs stored inside your database.
 You can get Zotero to automatically do this by highlighting the references
 you wish to retrieve, right clicking, and selecting _"Find Available PDFs"_.
@@ -344,12 +444,13 @@ To download papers, you need to get an API key for your account.
 2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
    - The key will need read access to the library.
 
-With this, we can download papers from our library and add them to `paperqa`:
+With this, we can download papers from our library and add them to PaperQA2:
 
 ```python
+from paperqa import Docs
 from paperqa.contrib import ZoteroDB
 
-docs = paperqa.Docs()
+docs = Docs()
 zotero = ZoteroDB(library_type="user")  # "group" if group library
 
 for item in zotero.iterate(limit=20):
@@ -383,9 +484,11 @@ If you want to search for papers outside of your own collection, I've found an u
 like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
 
 ```python
+from paperqa import Docs
+
 keyword_search = "bispecific antibody manufacture"
 papers = paperscraper.search_papers(keyword_search)
-docs = paperqa.Docs()
+docs = Docs()
 for path, data in papers.items():
     try:
         docs.add(path)
@@ -398,45 +501,37 @@ answer = docs.query(
 print(answer)
 ```
 
-## PDF Reading Options
+## Callbacks
 
-By default [PyPDF](https://pypi.org/project/pypdf/) is used since it's pure python and easy to install. For faster PDF reading, paper-qa will detect and use [PymuPDF (fitz)](https://pymupdf.readthedocs.io/en/latest/):
-
-```sh
-pip install pymupdf
-```
-
-## Callbacks Factory
-
-To execute a function on each chunk of LLM completions, you need to provide a function that when called with the name of the step produces a list of functions to execute on each chunk. For example, to get a typewriter view of the completions, you can do:
+To execute a function on each chunk of LLM completions, you need to provide a function that can be executed on each chunk. For example, to get a typewriter view of the completions, you can do:
 
 ```python
-def make_typewriter(step_name):
-    def typewriter(chunk):
-        print(chunk, end="")
-
-    return [typewriter]  # <- note that this is a list of functions
+def typewriter(chunk: str) -> None:
+    print(chunk, end="")
 
 
-...
+docs = Docs()
+
+# add some docs...
+
 docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    get_callbacks=make_typewriter,
+    callbacks=[typewriter],
 )
 ```
 
 ### Caching Embeddings
 
-In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. See above for details on more explicit management of them.
+In general, embeddings are cached when you pickle a `Docs` regardless of what vector store you use. So as long as you save your underlying `Docs` object, you should be able to avoid re-embedding your documents.
 
 ## Customizing Prompts
 
-You can customize any of the prompts, using the `PromptCollection` class. For example, if you want to change the prompt for the question, you can do:
+You can customize any of the prompts using settings.
 
 ```python
-from paperqa import Docs, Answer, PromptCollection
+from paperqa import Docs, Settings
 
-my_qaprompt = (
+my_qa_prompt = (
     "Answer the question '{question}' "
     "Use the context below if helpful. "
     "You can cite the context using the key "
@@ -445,8 +540,14 @@ my_qaprompt = (
     "about how you cannot answer.\n\n"
     "Context: {context}\n\n"
 )
-prompts = PromptCollection(qa=my_qaprompt)
-docs = Docs(prompts=prompts)
+
+docs = Docs()
+settings = Settings()
+settings.prompts.qa = my_qa_prompt
+docs.query(
+    "Are covid-19 vaccines effective?",
+    settings=settings,
+)
 ```
 
 ### Pre and Post Prompts
@@ -458,11 +559,11 @@ are executed after the query and before the query. For example, you can use this
 
 ### How is this different from LlamaIndex?
 
-It's not that different! This is similar to the tree response method in LlamaIndex. I just have included some prompts I find useful, readers that give page numbers/line numbers, and am focused on one task - answering technical questions with cited sources.
+It's not that different! This is similar to the tree response method in LlamaIndex. We also support agentic workflows and local indexes for easier operations with the scientific literature. Another big difference is our strong focus on scientific papers and their underlying metadata.
 
 ### How is this different from LangChain?
 
-There has been some great work on retrievers in langchain and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary.
+There has been some great work on retrievers in LangChain, and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary. Another big difference is our strong focus on scientific papers and their underlying metadata.
 
 ### Can I save or load?
 
@@ -478,6 +579,35 @@ with open("my_docs.pkl", "wb") as f:
 # load
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
+```
 
-docs.set_client()  # defaults to OpenAI
+## Citation
+
+Please read and cite the following papers if you use this software:
+
+```bibtex
+@article{skarlinski2024language,
+  title={Language agents achieve superhuman synthesis of scientific knowledge},
+  author={
+    Michael D. Skarlinski and
+    Sam Cox and
+    Jon M. Laurent and
+    James D. Braza and
+    Michaela Hinks and
+    Michael J. Hammerling and
+    Manvitha Ponnapati and
+    Samuel G. Rodriques and
+    Andrew D. White},
+  year={2024},
+  journal={preprint},
+  url={https://paper.wikicrow.ai}
+}
+
+
+@article{lala2023paperqa,
+  title={PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
+  author={L{\'a}la, Jakub and O'Donoghue, Odhran and Shtedritski, Aleksandar and Cox, Sam and Rodriques, Samuel G and White, Andrew D},
+  journal={arXiv preprint arXiv:2312.07559},
+  year={2023}
+}
 ```

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import copy
 import json
 import logging
@@ -11,16 +12,17 @@ from urllib.parse import quote
 
 import aiohttp
 
-from ..clients.exceptions import DOINotFoundError
-from ..types import CITATION_FALLBACK_DATA, DocDetails
-from ..utils import (
+from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
+from paperqa.utils import (
     bibtex_field_extract,
     create_bibtex_key,
     remove_substrings,
     strings_similarity,
     union_collections_to_ordered_list,
 )
+
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
+from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +98,8 @@ def crossref_headers() -> dict[str, str]:
     if api_key := os.environ.get("CROSSREF_API_KEY"):
         return {CROSSREF_HEADER_KEY: f"Bearer {api_key}"}
     logger.warning(
-        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may apply."
+        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may"
+        " apply."
     )
     return {}
 
@@ -154,7 +157,7 @@ async def parse_crossref_to_doc_details(
     bibtex_source = "self_generated"
     bibtex = None
 
-    try:
+    with contextlib.suppress(DOINotFoundError):
         # get the title from the message, if it exists
         # rare circumstance, but bibtex may not have a title
         fallback_data = copy.copy(CITATION_FALLBACK_DATA)
@@ -171,9 +174,6 @@ async def parse_crossref_to_doc_details(
             )
             # track the origin of the bibtex entry for debugging
             bibtex_source = "crossref"
-
-    except DOINotFoundError:
-        pass
 
     authors = [
         f"{author.get('given', '')} {author.get('family', '')}".strip()
@@ -253,7 +253,8 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
         logger.warning(
-            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may apply."
+            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
+            " apply."
         )
         CROSSREF_MAILTO = "test@example.com"
     quoted_doi = f"/{quote(doi, safe='')}" if doi else ""

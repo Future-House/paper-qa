@@ -5,9 +5,9 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from .llms import Chain
-from .types import Context, LLMResult, Text
-from .utils import extract_score, strip_citations
+from paperqa.llms import PromptRunner
+from paperqa.types import Context, LLMResult, Text
+from paperqa.utils import extract_score, strip_citations
 
 
 def llm_parse_json(text: str) -> dict:
@@ -35,12 +35,12 @@ def llm_parse_json(text: str) -> dict:
 async def map_fxn_summary(
     text: Text,
     question: str,
-    chain: Chain | None,
-    extra_chain_kwargs: dict[str, str] | None = None,
+    prompt_runner: PromptRunner | None,
+    extra_prompt_data: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: list[Callable[[str], None]] | None = None,
 ) -> tuple[Context, LLMResult]:
-    """Parses the given text and returns a context object with the parser and chain.
+    """Parses the given text and returns a context object with the parser and prompt runner.
 
     The parser should at least return a dict with `summary`. A `relevant_score` will be used and any
     extra fields except `question` will be added to the context object. `question` is stripped
@@ -49,10 +49,11 @@ async def map_fxn_summary(
     Args:
         text: The text to parse.
         question: The question to use for the chain.
-        chain: The chain to execute - should have question, citation, summary_length, and text fields.
-        extra_chain_kwargs: Extra kwargs to pass to the chain.
+        prompt_runner: The prompt runner to call - should have question, citation,
+            summary_length, and text fields.
+        extra_prompt_data: Optional extra kwargs to pass to the prompt runner's data.
         parser: The parser to use for parsing - return empty dict on Failure to fallback to text parsing.
-        callbacks: LLM callbacks to execute in chain
+        callbacks: LLM callbacks to execute in the prompt runner.
 
     Returns:
         The context object and LLMResult to get info about the LLM execution.
@@ -63,14 +64,10 @@ async def map_fxn_summary(
     citation = text.name + ": " + text.doc.citation
     success = False
 
-    if chain:
-        llm_result = await chain(
-            {
-                "question": question,
-                "citation": citation,
-                "text": text.text,
-            }
-            | (extra_chain_kwargs or {}),
+    if prompt_runner:
+        llm_result = await prompt_runner(
+            {"question": question, "citation": citation, "text": text.text}
+            | (extra_prompt_data or {}),
             callbacks,
             "evidence:" + text.name,
         )
@@ -102,14 +99,16 @@ async def map_fxn_summary(
     if not success:
         score = extract_score(context)
 
-    c = Context(
-        context=context,
-        text=Text(
-            text=text.text,
-            name=text.name,
-            doc=text.doc.__class__(**text.doc.model_dump(exclude={"embedding"})),
+    return (
+        Context(
+            context=context,
+            text=Text(
+                text=text.text,
+                name=text.name,
+                doc=text.doc.__class__(**text.doc.model_dump(exclude={"embedding"})),
+            ),
+            score=score,  # pylint: disable=possibly-used-before-assignment
+            **extras,
         ),
-        score=score,
-        **extras,
+        llm_result,
     )
-    return c, llm_result

@@ -5,6 +5,7 @@ import os
 import shutil
 from collections.abc import Generator, Iterator
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -20,17 +21,17 @@ PAPER_DIRECTORY = Path(__file__).parent
 
 
 @pytest.fixture(autouse=True, scope="session")
-def _load_env():
+def _load_env() -> None:
     load_dotenv()
 
 
 @pytest.fixture(autouse=True)
-def _setup_default_logs():
+def _setup_default_logs() -> None:
     setup_default_logs()
 
 
-@pytest.fixture(scope="session")
-def vcr_config():
+@pytest.fixture(scope="session", name="vcr_config")
+def fixture_vcr_config() -> dict[str, Any]:
     return {
         "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
         "record_mode": "none",
@@ -41,9 +42,7 @@ def vcr_config():
 
 
 @pytest.fixture
-def tmp_path_cleanup(
-    tmp_path: Path,
-) -> Generator[Path, None, None]:
+def tmp_path_cleanup(tmp_path: Path) -> Iterator[Path]:
     yield tmp_path
     # Cleanup after the test
     if tmp_path.exists():
@@ -64,18 +63,19 @@ def agent_index_dir(agent_home_dir: Path) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
 
 
-@pytest.fixture
-def stub_data_dir() -> Path:
+@pytest.fixture(scope="session", name="stub_data_dir")
+def fixture_stub_data_dir() -> Path:
     return Path(__file__).parent / "stub_data"
 
 
 @pytest.fixture
 def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
-    settings = Settings()
-    settings.paper_directory = stub_data_dir
-    settings.index_directory = agent_index_dir
+    settings = Settings(
+        paper_directory=stub_data_dir,
+        index_directory=agent_index_dir,
+        embedding="sparse",
+    )
     settings.agent.search_count = 2
-    settings.embedding = "sparse"
     settings.answer.answer_max_sources = 2
     settings.answer.evidence_k = 10
     return settings
@@ -92,9 +92,9 @@ def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[
     # add some near duplicate files then removes them after testing
     for filename in ("bates.txt", "obama.txt"):
         if not (tmp_path / f"{filename}_modified.txt").exists():
-            with open(stub_data_dir / filename) as f:
+            with (stub_data_dir / filename).open() as f:
                 content = f.read()
-            with open(tmp_path / f"{Path(filename).stem}_modified.txt", "w") as f:
+            with (tmp_path / f"{Path(filename).stem}_modified.txt").open("w") as f:
                 f.write(content)
                 f.write("## MODIFIED FOR HASH")
 

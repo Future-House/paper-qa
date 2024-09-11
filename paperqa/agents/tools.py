@@ -1,193 +1,136 @@
-from __future__ import annotations
+"""Base classes for tools, implemented in a functional manner."""
+
 import inspect
 import logging
 import re
 import sys
 from typing import ClassVar
-from langchain_core.callbacks import BaseCallbackHandler
 
-from langchain.tools import BaseTool
-from paperqa import Answer, Docs
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
-# ruff: noqa: I001
-from pydantic.v1 import (  # TODO: move to Pydantic v2 after LangChain moves to Pydantic v2, SEE: https://github.com/langchain-ai/langchain/issues/16306
-    BaseModel as BaseModelV1,
-    Field as FieldV1,
-)
+from paperqa.docs import Docs
+from paperqa.llms import EmbeddingModel, LiteLLMModel
+from paperqa.settings import Settings
+from paperqa.types import Answer
 
-from .helpers import get_year
 from .search import get_directory_index
-from .models import QueryRequest, SimpleProfiler
-from ..settings import Settings
-from ..llms import EmbeddingModel, LiteLLMModel
 
 logger = logging.getLogger(__name__)
 
 
-async def status(docs: Docs, answer: Answer, relevant_score_cutoff: int = 5) -> str:
-    """Create a string that provides a summary of the input doc/answer."""
-    return (
-        f"Status: Paper Count={len(docs.docs)}"
-        f" | Relevant Papers={len({c.text.doc.dockey for c in answer.contexts if c.score > relevant_score_cutoff})}"
-        f" | Current Evidence={len([c for c in answer.contexts if c.score > relevant_score_cutoff])}"
-        f" | Current Cost=${answer.cost:.2f}"
-    )
+class EnvironmentState(BaseModel):
+    """State here contains documents and answer being populated."""
 
+    model_config = ConfigDict(extra="forbid")
 
-class SharedToolState(BaseModel):
-    """Shared collection of variables for collection of tools. We use this to avoid
-    the fact that pydantic treats dictionaries as values, instead of references.
-    """  # noqa: D205
-
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
-
-    POPULATE_FROM_SETTINGS: ClassVar[None] = None
-
-    answer: Answer
     docs: Docs
-    settings: Settings
-    profiler: SimpleProfiler = Field(default_factory=SimpleProfiler)
-    _llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS
-    _summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS
-    _embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS
+    answer: Answer
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
         r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+) \| Current Evidence=(\d+)"
     )
+    RELEVANT_SCORE_CUTOFF: ClassVar[int] = 5
 
-    async def get_status(self) -> str:
-        return await status(self.docs, self.answer)
-
+    @computed_field  # type: ignore[prop-decorator]
     @property
-    def llm_model(self) -> LiteLLMModel:
-        if self._llm_model is None:
-            self._llm_model = self.settings.get_llm()
-        return self._llm_model
-
-    @property
-    def summary_llm_model(self) -> LiteLLMModel:
-        if self._summary_llm_model is None:
-            self._summary_llm_model = self.settings.get_summary_llm()
-        return self._summary_llm_model
-
-    @property
-    def embedding_model(self) -> EmbeddingModel:
-        if self._embedding_model is None:
-            self._embedding_model = self.settings.get_embedding_model()
-        return self._embedding_model
-
-
-def _time_tool(func):
-    """Decorator to time the execution of a tool method.
-    Assumes that the tool has a shared state.
-    """  # noqa: D205
-
-    async def wrapper(self, *args, **kwargs):
-        async with self.shared_state.profiler.timer(self.name):
-            return await func(self, *args, **kwargs)
-
-    return wrapper
-
-
-class PaperSearchTool(BaseTool):
-    class InputSchema(
-        BaseModelV1  # TODO: move to Pydantic v2 after LangChain moves to Pydantic v2, SEE: https://github.com/langchain-ai/langchain/issues/16306
-    ):
-        query: str = FieldV1(
-            description=(
-                "A search query in this format: [query], [start year]-[end year]. "
-                "You may include years as the last word in the query, "
-                "e.g. 'machine learning 2020' or 'machine learning 2010-2020'. "
-                f"The current year is {get_year()}. "
-                "The query portion can be a specific phrase, complete sentence, "
-                "or general keywords, e.g. 'machine learning for immunology'."
-            )
+    def status(self) -> str:
+        return (
+            f"Status: Paper Count={len(self.docs.docs)} | Relevant Papers="
+            f"{len({c.text.doc.dockey for c in self.answer.contexts if c.score > self.RELEVANT_SCORE_CUTOFF})}"
+            f" | Current Evidence={len([c for c in self.answer.contexts if c.score > self.RELEVANT_SCORE_CUTOFF])}"
+            f" | Current Cost=${self.answer.cost:.4f}"
         )
 
-    name: str = "paper_search"
-    args_schema: type[BaseModelV1] | None = InputSchema
-    description: str = (
-        "Search for papers to increase the paper count. You can call this a second "
-        "time with an different search to gather more papers."
+
+class NamedTool(BaseModel):
+    """Base class to make looking up tools easier."""
+
+    TOOL_FN_NAME: ClassVar[str] = (
+        "# unpopulated"  # Comment symbol ensures no collisions
     )
 
-    shared_state: SharedToolState
-    return_paper_metadata: bool = False
-    # Second item being True means specify a year range in the search
-    search_type: tuple[str, bool] = ("google", False)
-    previous_searches: dict[str, int] = FieldV1(default_factory=dict)
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
-    def _run(self, query: str) -> str:
-        raise NotImplementedError
 
-    @_time_tool
-    async def _arun(self, query: str) -> str:
+class PaperSearch(NamedTool):
+    TOOL_FN_NAME = "paper_search"
+
+    settings: Settings
+    embedding_model: EmbeddingModel
+    previous_searches: dict[tuple[str, str | None], int] = Field(default_factory=dict)
+
+    async def paper_search(
+        self,
+        query: str,
+        min_year: int | None,
+        max_year: int | None,
+        state: EnvironmentState,
+    ) -> str:
         """
-        Run asynchronously, in-place mutating `self.shared_state.docs`.
+        Search for papers to increase the paper count.
+
+        Repeat previous calls with the same query and years to continue a search.
+        This tool can be called concurrently.
+        This tool introduces novel papers, so invoke this tool when just beginning or when unsatisfied with the current evidence.
 
         Args:
-            query: Search keywords followed by optional year or year range
-                (e.g. COVID-19 vaccines, 2022).
+            query: A search query, which can be a specific phrase, complete sentence,
+                or general keywords, e.g. 'machine learning for immunology'. Also can be
+                given search operators.
+            min_year: Filter for minimum publication year, or None for no minimum year.
+                The current year is {current_year}.
+            max_year: Filter for maximum publication year, or None for no maximum year.
+                The current year is {current_year}.
+            state: Current state.
 
         Returns:
             String describing searched papers and the current status.
-        """
+        """  # noqa: E501,W505
+        # Convert to date range (e.g. 2022-2022) if date is present
+        year = (
+            f"{min_year if min_year else ''}-{max_year if max_year else ''}"  # noqa: FURB110
+            if (min_year or max_year)
+            else None
+        )
         # get offset if we've done this search before (continuation of search)
         # or mark this search as new (so offset 0)
-        logger.info(f"Starting paper search for '{query}'.")
-        search_key = query
-        if search_key in self.previous_searches:
+        search_key = query, year
+        try:
             offset = self.previous_searches[search_key]
-        else:
+        except KeyError:
             offset = self.previous_searches[search_key] = 0
 
-        # Preprocess inputs to make ScrapeRequest
-        keywords = query.replace('"', "")  # Remove quotes
-        year: str | None = None
-        last_word = keywords.split(" ")[-1]
-        if re.match(r"\d{4}(-\d{4})?", last_word):
-            keywords = keywords[: -len(last_word)].removesuffix(",").strip()
-            if self.search_type[1]:
-                year = last_word
-                if "-" not in year:
-                    year = year + "-" + year  # Convert to date range (e.g. 2022-2022)
-        index = await get_directory_index(
-            settings=self.shared_state.settings,
-        )
-
+        logger.info(f"Starting paper search for {query!r}.")
+        index = await get_directory_index(settings=self.settings)
         results = await index.query(
-            keywords,
-            top_n=self.shared_state.settings.agent.search_count,
+            query,
+            top_n=self.settings.agent.search_count,
             offset=offset,
             field_subset=[f for f in index.fields if f != "year"],
         )
+        logger.info(
+            f"{self.TOOL_FN_NAME} for query {query!r} returned {len(results)} papers."
+        )
 
-        logger.info(f"Search for '{keywords}' returned {len(results)} papers.")
         # combine all the resulting doc objects into one and update the state
         # there's only one doc per result, so we can just take the first one
         all_docs = []
         for r in results:
             this_doc = next(iter(r.docs.values()))
             all_docs.append(this_doc)
-            await self.shared_state.docs.aadd_texts(
+            await state.docs.aadd_texts(
                 texts=r.texts,
                 doc=this_doc,
-                settings=self.shared_state.settings,
-                embedding_model=self.shared_state.embedding_model,
+                settings=self.settings,
+                embedding_model=self.embedding_model,
             )
 
-        status = await self.shared_state.get_status()
-
+        status = state.status
         logger.info(status)
-
         # mark how far we've searched so that continuation will start at the right place
-        self.previous_searches[
-            search_key
-        ] += self.shared_state.settings.agent.search_count
-
-        if self.return_paper_metadata:
+        self.previous_searches[search_key] += self.settings.agent.search_count
+        if self.settings.agent.return_paper_metadata:
             retrieved_papers = "\n".join([f"{x.title} ({x.year})" for x in all_docs])
             return f"Retrieved Papers:\n{retrieved_papers}\n\n{status}"
         return status
@@ -197,78 +140,69 @@ class EmptyDocsError(RuntimeError):
     """Error to throw when we needed docs to be present."""
 
 
-class GatherEvidenceTool(BaseTool):
-    class InputSchema(
-        BaseModelV1  # TODO: move to Pydantic v2 after LangChain moves to Pydantic v2, SEE: https://github.com/langchain-ai/langchain/issues/16306
-    ):
-        question: str = FieldV1(description="Specific question to gather evidence for.")
+class GatherEvidence(NamedTool):
+    TOOL_FN_NAME = "gather_evidence"
 
-    name: str = "gather_evidence"
-    args_schema: type[BaseModelV1] | None = InputSchema
-    description: str = (
-        "Gather evidence from previous papers given a specific question. "
-        "This will increase evidence and relevant paper counts. "
-        "Only invoke when paper count is above zero."
-    )
+    settings: Settings
+    summary_llm_model: LiteLLMModel
+    embedding_model: EmbeddingModel
 
-    shared_state: SharedToolState
-    query: QueryRequest
+    async def gather_evidence(self, question: str, state: EnvironmentState) -> str:
+        """
+        Gather evidence from previous papers given a specific question to increase evidence and relevant paper counts.
 
-    def _run(self, query: str) -> str:
-        raise NotImplementedError
+        A valuable time to invoke this tool is right after another tool increases paper count.
+        Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
+        Only invoke this tool when the paper count is above zero, or this tool will be useless.
 
-    @_time_tool
-    async def _arun(self, question: str) -> str:
-        if not self.shared_state.docs.docs:
+        Args:
+            question: Specific question to gather evidence for.
+            state: Current state.
+
+        Returns:
+            String describing gathered evidence and the current status.
+        """
+        if not state.docs.docs:
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
-        logger.info(f"Gathering and ranking evidence for '{question}'.")
+        logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
+        original_question = state.answer.question
+        try:
+            # Swap out the question with the more specific question
+            # TODO: remove this swap, as it prevents us from supporting parallel calls
+            state.answer.question = question
+            l0 = len(state.answer.contexts)
+            # TODO: refactor answer out of this...
+            state.answer = await state.docs.aget_evidence(
+                query=state.answer,
+                settings=self.settings,
+                embedding_model=self.embedding_model,
+                summary_llm_model=self.summary_llm_model,
+            )
+            l1 = len(state.answer.contexts)
+        finally:
+            state.answer.question = original_question
 
-        # swap out the question
-        # TODO: evaluate how often does the agent changes the question
-        original_question = self.shared_state.answer.question
-        self.shared_state.answer.question = question
-
-        # generator, so run it
-        l0 = len(self.shared_state.answer.contexts)
-
-        # TODO: refactor answer out of this...
-        self.shared_state.answer = await self.shared_state.docs.aget_evidence(
-            query=self.shared_state.answer,
-            settings=self.shared_state.settings,
-            embedding_model=self.shared_state.embedding_model,
-            summary_llm_model=self.shared_state.summary_llm_model,
-        )
-        l1 = len(self.shared_state.answer.contexts)
-        self.shared_state.answer.question = original_question
-        sorted_contexts = sorted(
-            self.shared_state.answer.contexts, key=lambda x: x.score, reverse=True
-        )
-        best_evidence = ""
-        if len(sorted_contexts) > 0:
-            best_evidence = f" Best evidence:\n\n{sorted_contexts[0].context}"
-        status = await self.shared_state.get_status()
+        status = state.status
         logger.info(status)
+        sorted_contexts = sorted(
+            state.answer.contexts, key=lambda x: x.score, reverse=True
+        )
+        best_evidence = (
+            f" Best evidence:\n\n{sorted_contexts[0].context}"
+            if sorted_contexts
+            else ""
+        )
         return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
 
 
-class GenerateAnswerTool(BaseTool):
-    class InputSchema(
-        BaseModelV1  # TODO: move to Pydantic v2 after LangChain moves to Pydantic v2, SEE: https://github.com/langchain-ai/langchain/issues/16306
-    ):
-        question: str = FieldV1(description="Question to be answered.")
+class GenerateAnswer(NamedTool):
+    TOOL_FN_NAME = "gen_answer"
 
-    name: str = "gen_answer"
-    args_schema: type[BaseModelV1] | None = InputSchema
-    description: str = (
-        "Ask a model to propose an answer answer using current evidence. "
-        "The tool may fail, "
-        "indicating that better or different evidence should be found. "
-        "Having more than one piece of evidence or relevant papers is best."
-    )
-    shared_state: SharedToolState
-    wipe_context_on_answer_failure: bool = True
-    query: QueryRequest
+    settings: Settings
+    llm_model: LiteLLMModel
+    summary_llm_model: LiteLLMModel
+    embedding_model: EmbeddingModel
 
     FAILED_TO_ANSWER: ClassVar[str] = "Failed to answer question."
 
@@ -276,36 +210,44 @@ class GenerateAnswerTool(BaseTool):
     def did_not_fail_to_answer(cls, message: str) -> bool:
         return not message.startswith(cls.FAILED_TO_ANSWER)
 
-    def _run(self, query: str) -> str:
-        raise NotImplementedError
+    async def gen_answer(
+        self, question: str, state: EnvironmentState  # noqa: ARG002
+    ) -> str:
+        """
+        Ask a model to propose an answer using current evidence.
 
-    @_time_tool
-    async def _arun(self, question: str) -> str:
-        logger.info(f"Generating answer for '{question}'.")
+        The tool may fail, indicating that better or different evidence should be found.
+        Aim for at least five pieces of evidence from multiple sources before invoking this tool.
+        Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
+
+        Args:
+            question: Question to be answered.
+            state: Current state.
+        """
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
-        self.shared_state.answer = await self.shared_state.docs.aquery(
-            self.shared_state.answer,
-            settings=self.shared_state.settings,
-            llm_model=self.shared_state.llm_model,
-            summary_llm_model=self.shared_state.summary_llm_model,
-            embedding_model=self.shared_state.embedding_model,
+        state.answer = await state.docs.aquery(
+            query=state.answer,
+            settings=self.settings,
+            llm_model=self.llm_model,
+            summary_llm_model=self.summary_llm_model,
+            embedding_model=self.embedding_model,
         )
 
-        if "cannot answer" in self.shared_state.answer.answer.lower():
-            if self.wipe_context_on_answer_failure:
-                self.shared_state.answer.contexts = []
-                self.shared_state.answer.context = ""
-            status = await self.shared_state.get_status()
-            logger.info(status)
-            return f"{self.FAILED_TO_ANSWER} | " + status
-        status = await self.shared_state.get_status()
+        if "cannot answer" in state.answer.answer.lower():
+            if self.settings.agent.wipe_context_on_answer_failure:
+                state.answer.contexts = []
+                state.answer.context = ""
+            answer = self.FAILED_TO_ANSWER
+        else:
+            answer = state.answer.answer
+        status = state.status
         logger.info(status)
-        return f"{self.shared_state.answer.answer} | {status}"
+        return f"{answer} | {status}"
 
     # NOTE: can match failure to answer or an actual answer
     ANSWER_SPLIT_REGEX_PATTERN: ClassVar[str] = (
-        r" \| " + SharedToolState.STATUS_SEARCH_REGEX_PATTERN
+        r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
     @classmethod
@@ -319,55 +261,12 @@ class GenerateAnswerTool(BaseTool):
         return answer
 
 
-AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[BaseTool]] = {
-    cls.__fields__["name"].default: cls
+AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
+    cls.TOOL_FN_NAME: cls
     for _, cls in inspect.getmembers(
         sys.modules[__name__],
         predicate=lambda v: inspect.isclass(v)
-        and issubclass(v, BaseTool)
-        and v is not BaseTool,
+        and issubclass(v, NamedTool)
+        and v is not NamedTool,
     )
 }
-
-
-def query_to_tools(
-    query: QueryRequest,
-    state: SharedToolState,
-    callbacks: list[BaseCallbackHandler] | None = None,
-) -> list[BaseTool]:
-    if query.settings.agent.tool_names is None:
-        tool_types: list[type[BaseTool]] = [
-            PaperSearchTool,
-            GatherEvidenceTool,
-            GenerateAnswerTool,
-        ]
-    else:
-        tool_types = [
-            AVAILABLE_TOOL_NAME_TO_CLASS[name]
-            for name in set(query.settings.agent.tool_names)
-        ]
-    tools: list[BaseTool] = []
-    for tool_type in tool_types:
-        if issubclass(tool_type, PaperSearchTool):
-            tools.append(
-                PaperSearchTool(
-                    shared_state=state,
-                    callbacks=callbacks,
-                )
-            )
-        elif issubclass(tool_type, GatherEvidenceTool):
-            tools.append(
-                GatherEvidenceTool(shared_state=state, query=query, callbacks=callbacks)
-            )
-        elif issubclass(tool_type, GenerateAnswerTool):
-            tools.append(
-                GenerateAnswerTool(
-                    shared_state=state,
-                    wipe_context_on_answer_failure=query.settings.agent.wipe_context_on_answer_failure,
-                    query=query,
-                    callbacks=callbacks,
-                )
-            )
-        else:
-            tools.append(tool_type(shared_state=state))
-    return tools

@@ -7,10 +7,9 @@ from typing import cast
 
 from rich.table import Table
 
-from .. import (
-    Docs,
-)
-from ..llms import LiteLLMModel
+from paperqa.docs import Docs
+from paperqa.llms import LiteLLMModel
+
 from .models import AnswerResponse
 
 logger = logging.getLogger(__name__)
@@ -30,40 +29,35 @@ async def litellm_get_search_query(
     llm: str = "gpt-4o-mini",
     temperature: float = 1.0,
 ) -> list[str]:
-    if isinstance(template, str):
-        if not (
-            "{count}" in template and "{question}" in template and "{date}" in template
-        ):
-            logger.warning(
-                "Template does not contain {count}, {question} and {date} variables. Ignoring template."
-            )
-            template = None
-
-        else:
-            # partial formatting
-            search_prompt = template.replace("{date}", get_year())
-
-    if template is None:
+    search_prompt = ""
+    if isinstance(template, str) and all(
+        x in template for x in ("{count}", "{question}", "{date}")
+    ):
+        # partial formatting
+        search_prompt = template.replace("{date}", get_year())
+    elif isinstance(template, str):
+        logger.warning(
+            "Template does not contain {count}, {question} and {date} variables."
+            " Ignoring template and using default search prompt."
+        )
+    if not search_prompt:
         search_prompt = (
-            "We want to answer the following question: {question} \n"
-            "Provide {count} unique keyword searches (one search per line) and year ranges "
-            "that will find papers to help answer the question. "
-            "Do not use boolean operators. "
-            "Make sure not to repeat searches without changing the keywords or year ranges. "
-            "Make some searches broad and some narrow. "
-            "Use this format: [keyword search], [start year]-[end year]. "
-            "where end year is optional. "
-            f"The current year is {get_year()}."
+            "We want to answer the following question: {question}\nProvide"
+            " {count} unique keyword searches (one search per line) and year ranges"
+            " that will find papers to help answer the question. Do not use boolean"
+            " operators. Make sure not to repeat searches without changing the"
+            " keywords or year ranges. Make some searches broad and some narrow. Use"
+            " this format: [keyword search], [start year]-[end year]. where end year"
+            f" is optional. The current year is {get_year()}."
         )
 
-    if "gpt" not in llm:
-        raise ValueError(
-            f"Invalid llm: {llm}, note a GPT model must be used for the fake agent search."
-        )
     model = LiteLLMModel(name=llm)
     model.config["model_list"][0]["litellm_params"].update({"temperature": temperature})
-    chain = model.make_chain(prompt=search_prompt, skip_system=True)
-    result = await chain({"question": question, "count": count})  # type: ignore[call-arg]
+    result = await model.run_prompt(
+        prompt=search_prompt,
+        data={"question": question, "count": count},
+        skip_system=True,
+    )
     search_query = result.text
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004
     # remove "2.", "3.", etc. -- https://regex101.com/r/W2f7F1/1
@@ -91,9 +85,11 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
-            table.add_row(
-                cast(Docs, obj).texts[0].doc.title[:max_chars_per_column], filename  # type: ignore[attr-defined]
-            )
+            try:
+                display_name = cast(Docs, obj).texts[0].doc.title  # type: ignore[attr-defined]
+            except AttributeError:
+                display_name = cast(Docs, obj).texts[0].doc.citation
+            table.add_row(display_name[:max_chars_per_column], filename)
         return table
     raise NotImplementedError(
         f"Object type {type(example_object)} can not be converted to table."

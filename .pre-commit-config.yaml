@@ -50,6 +50,10 @@ repos:
             paperqa/clients/client_data.*|
             tests/stub_data.*
           )$
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 3.0.0
+    hooks:
+      - id: check-mailmap
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.19
     hooks:
@@ -57,7 +61,7 @@ repos:
         additional_dependencies:
           - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.6
+    rev: 0.4.8
     hooks:
       - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
@@ -71,12 +75,16 @@ repos:
         args: [--pretty, --ignore-missing-imports]
         additional_dependencies:
           - aiohttp
+          - fhaviary[llm]>=0.6 # Match pyproject.toml
+          - ldp>=0.4 # Match pyproject.toml
+          - html2text
           - httpx
           - numpy
           - openai>=1 # Match pyproject.toml
           - pydantic~=2.0 # Match pyproject.toml
+          - pydantic-settings
+          - tantivy
           - tenacity
           - tiktoken>=0.4.0 # Match pyproject.toml
-          - types-requests
           - types-setuptools
           - types-PyYAML
