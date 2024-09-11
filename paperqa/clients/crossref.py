@@ -106,6 +106,20 @@ def crossref_headers() -> dict[str, str]:
     return {}
 
 
+def crossref_mailto() -> str:
+    """Crossref mailto if available, otherwise a default."""
+    crossref_mailto = os.getenv("CROSSREF_MAILTO")
+
+    if not crossref_mailto:
+        logger.warning(
+            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
+            " apply."
+        )
+        return "test@example.com"
+
+    return crossref_mailto
+
+
 async def doi_to_bibtex(
     doi: str,
     session: aiohttp.ClientSession,
@@ -253,12 +267,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     inputs_msg = f"DOI {doi}" if doi is not None else f"title {title}"
 
-    if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
-        logger.warning(
-            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
-            " apply."
-        )
-        CROSSREF_MAILTO = "test@example.com"
+    CROSSREF_MAILTO = crossref_mailto()
     quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
     url = f"{CROSSREF_BASE_URL}/works{quoted_doi}"
     params = {"mailto": CROSSREF_MAILTO}
@@ -350,8 +359,7 @@ async def download_retracted_dataset(
 
     Saves the retraction dataset to `retraction_data_path`.
     """
-    if not (CROSSREF_MAILTO := os.getenv("CROSSREF_MAILTO")):
-        CROSSREF_MAILTO = "test@example.com"
+    CROSSREF_MAILTO = crossref_mailto()
     url = f"https://api.labs.crossref.org/data/retractionwatch?{CROSSREF_MAILTO}"
 
     async with (
