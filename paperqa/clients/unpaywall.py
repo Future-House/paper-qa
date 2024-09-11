@@ -87,7 +87,8 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
                 **(
                     await _get_with_retrying(
                         url=(
-                            f"{UNPAYWALL_BASE_URL}{doi}?email={os.environ.get('UNPAYWALL_EMAIL', 'test@example.com')}"
+                            f"{UNPAYWALL_BASE_URL}{doi}"
+                            f"?email={os.environ.get('UNPAYWALL_EMAIL', 'example@papercrow.ai')}"
                         ),
                         params={},
                         session=session,
@@ -119,7 +120,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
                     await _get_with_retrying(
                         url=(
                             f"{UNPAYWALL_BASE_URL}search?query={quote(query)}"
-                            f"&email={os.environ.get('UNPAYWALL_EMAIL', 'test@example.com')}"
+                            f"&email={os.environ.get('UNPAYWALL_EMAIL', 'example@papercrow.ai')}"
                         ),
                         params={},
                         session=session,

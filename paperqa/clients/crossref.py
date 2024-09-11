@@ -115,7 +115,7 @@ def get_crossref_mailto() -> str:
             "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
             " apply."
         )
-        return "test@example.com"
+        return "example@papercrow.ai"
 
     return MAILTO
 

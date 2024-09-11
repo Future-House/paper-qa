@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
     response:
       body:
         string:
@@ -362,7 +362,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.unpaywall.org/v2/search?query=Augmenting%20large%20language%20models%20with%20chemistry%20tools&email=test@example.com
+      uri: https://api.unpaywall.org/v2/search?query=Augmenting%20large%20language%20models%20with%20chemistry%20tools&email=example@papercrow.ai
     response:
       body:
         string:

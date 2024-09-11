@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=askldjrq3rjaw938h&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=askldjrq3rjaw938h&rows=1
     response:
       body:
         string: '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":0,"items":[],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
@@ -147,7 +147,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+study&rows=1
     response:
       body:
         string:

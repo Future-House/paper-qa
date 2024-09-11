@@ -3,7 +3,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=test@example.com
+      uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=example@papercrow.ai
     response:
       body:
         string: '{"elapsed_seconds":0.018,"results":[]}
@@ -41,7 +41,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=test@example.com&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string:

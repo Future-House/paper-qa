@@ -66,7 +66,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=test@example.com
+      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=example@papercrow.ai
     response:
       body:
         string:
@@ -159,7 +159,7 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=test@example.com
+      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=example@papercrow.ai
     response:
       body:
         string:
