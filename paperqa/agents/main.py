@@ -325,7 +325,7 @@ async def run_aviary_agent(
                 obs, reward, done, truncated = await env.step(action)
                 if on_env_step_callback:
                     await on_env_step_callback(obs, reward, done, truncated)
-            status = AgentStatus.SUCCESS  # pylint: disable=redefined-outer-name
+            status = AgentStatus.SUCCESS
     except TimeoutError:
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
@@ -368,7 +368,7 @@ async def run_ldp_agent(
                 obs, reward, done, truncated = await env.step(action.value)
                 if on_env_step_callback:
                     await on_env_step_callback(obs, reward, done, truncated)
-            status = AgentStatus.SUCCESS  # pylint: disable=redefined-outer-name
+            status = AgentStatus.SUCCESS
     except TimeoutError:
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."

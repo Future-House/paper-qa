@@ -14,25 +14,22 @@ from paperqa.utils import gather_with_concurrency
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor
+from .retractions import RetrationDataPostProcessor
 from .semantic_scholar import SemanticScholarProvider
 from .unpaywall import UnpaywallProvider
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CLIENTS: (
-    Collection[type[MetadataPostProcessor | MetadataProvider]]
-    | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
-) = {
+DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
     CrossrefProvider,
     SemanticScholarProvider,
     JournalQualityPostProcessor,
 }
 
-ALL_CLIENTS: (
-    Collection[type[MetadataPostProcessor | MetadataProvider]]
-    | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
-) = DEFAULT_CLIENTS | {  # type: ignore[operator]
+ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
+    *DEFAULT_CLIENTS,
     UnpaywallProvider,
+    RetrationDataPostProcessor,
 }
 
 
@@ -63,7 +60,7 @@ class DocMetadataTask(BaseModel):
 
 
 class DocMetadataClient:
-    def __init__(
+    def __init__(  # pylint: disable=dangerous-default-value
         self,
         session: aiohttp.ClientSession | None = None,
         clients: (
