@@ -474,3 +474,9 @@ def setup_default_logs() -> None:
             },
         }
     )
+
+
+def extract_thought(content: str | None) -> str:
+    """Extract an Anthropic thought from a message's content."""
+    # SEE: https://regex101.com/r/bpJt05/1
+    return re.sub(r"<\/?thinking>", "", content or "")
