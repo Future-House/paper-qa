@@ -16,6 +16,7 @@ from paperqa.clients import (
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
+from paperqa.clients.retractions import RetrationDataPostProcessor
 
 
 @pytest.mark.vcr
@@ -98,7 +99,17 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]) -> None:
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session, clients=ALL_CLIENTS)
+        client_list = list(ALL_CLIENTS)
+        client_list.remove(RetrationDataPostProcessor)
+        client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                client_list,
+            ),
+        )
         details = await client.query(title=paper_attributes["title"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
@@ -194,7 +205,17 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]) -> None:
     async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session, clients=ALL_CLIENTS)
+        client_list = list(ALL_CLIENTS)
+        client_list.remove(RetrationDataPostProcessor)
+        client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                client_list,
+            ),
+        )
         details = await client.query(doi=paper_attributes["doi"])
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
@@ -550,3 +571,25 @@ async def test_ensure_sequential_run_early_stop(
             record_indices["semantic_scholar"] != -1
         ), "Semantic Scholar should be found"
         assert record_indices["early_stop"] != -1, "We should stop early."
+
+
+@pytest.mark.asyncio
+async def test_crossref_retraction_status():
+    async with aiohttp.ClientSession() as session:
+        crossref_client = DocMetadataClient(
+            session,
+            clients=cast(
+                Collection[
+                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
+                ],
+                [CrossrefProvider, RetrationDataPostProcessor],
+            ),
+        )
+        crossref_details = await crossref_client.query(
+            title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
+            fields=["title", "doi", "authors", "journal"],
+        )
+
+        assert "**RETRACTED ARTICLE** Citation: Jiaye Han." in crossref_details.formatted_citation  # type: ignore[union-attr]
+
+        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]
