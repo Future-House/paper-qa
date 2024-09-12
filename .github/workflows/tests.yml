@@ -1,9 +1,10 @@
-name: test
+name: Lint and Test
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   pre-commit:
@@ -46,9 +47,6 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
