@@ -76,3 +76,12 @@ Provide a summary of the relevant information that could help answer the questio
 
 where `summary` is relevant information from text - {summary_length} words and `relevance_score` is the relevance of `summary` to answer question (out of 10).
 """  # noqa: E501
+
+# Prompt templates for use with LitQA
+QA_PROMPT_TEMPLATE = "Q: {question}\n\nOptions:\n{options}"
+EVAL_PROMPT_TEMPLATE = (
+    "Extract the single letter answer from the following question and answer"
+    "\n\n{qa_prompt}"
+    "\n\n{qa_answer}"
+    "\n\nSingle Letter Answer:"
+)

@@ -81,6 +81,7 @@ repos:
           - httpx
           - numpy
           - openai>=1 # Match pyproject.toml
+          - pandas-stubs
           - pydantic~=2.0 # Match pyproject.toml
           - pydantic-settings
           - tantivy

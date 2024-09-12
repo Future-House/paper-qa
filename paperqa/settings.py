@@ -321,6 +321,18 @@ class AgentSettings(BaseModel):
         return v
 
 
+def make_default_litellm_router_settings(llm: str, temperature: float = 0.0) -> dict:
+    """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
+    return {
+        "model_list": [
+            {
+                "model_name": llm,
+                "litellm_params": {"model": llm, "temperature": temperature},
+            }
+        ]
+    }
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
@@ -482,35 +494,27 @@ class Settings(BaseSettings):
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")
 
-    def _default_litellm_router_settings(self, llm: str) -> dict:
-        """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
-        return {
-            "model_list": [
-                {
-                    "model_name": llm,
-                    "litellm_params": {"model": llm, "temperature": self.temperature},
-                }
-            ]
-        }
-
     def get_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.llm,
-            config=self.llm_config or self._default_litellm_router_settings(self.llm),
+            config=self.llm_config
+            or make_default_litellm_router_settings(self.llm, self.temperature),
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.summary_llm,
             config=self.summary_llm_config
-            or self._default_litellm_router_settings(self.summary_llm),
+            or make_default_litellm_router_settings(self.summary_llm, self.temperature),
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.agent.agent_llm,
             config=self.agent.agent_llm_config
-            or self._default_litellm_router_settings(self.agent.agent_llm),
+            or make_default_litellm_router_settings(
+                self.agent.agent_llm, self.temperature
+            ),
         )
 
     def get_embedding_model(self) -> EmbeddingModel:
