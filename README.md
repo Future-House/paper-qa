@@ -251,7 +251,7 @@ doc_paths = ("myfile.pdf", "myotherfile.pdf")
 docs = Docs()
 
 for doc in doc_paths:
-    doc.add(doc_paths)
+    docs.add(doc)
 
 settings = Settings()
 settings.llm = "claude-3-5-sonnet-20240620"
@@ -277,24 +277,29 @@ PaperQA2 is written to be used asynchronously. The synchronous API is just a wra
 | `Docs.get_evidence` | `Docs.aget_evidence` |
 | `Docs.query`        | `Docs.aquery`        |
 
-The synchronous version just call the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
+The synchronous version just calls the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
 
 ```python
+import asyncio
 from paperqa import Docs
 
-# valid extensions include .pdf, .txt, and .html
-doc_paths = ("myfile.pdf", "myotherfile.pdf")
+async def main():
+    # valid extensions include .pdf, .txt, and .html
+    doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
-docs = Docs()
+    docs = Docs()
 
-for doc in doc_paths:
-    await doc.aadd(doc_paths)
+    for doc in doc_paths:
+        await docs.aadd(doc)
 
-answer = await docs.aquery(
-    "What manufacturing challenges are unique to bispecific antibodies?"
-)
+    answer = await docs.aquery(
+        "What manufacturing challenges are unique to bispecific antibodies?"
+    )
 
-print(answer.formatted_answer)
+    print(answer.formatted_answer)
+
+asyncio.run(main())
+
 ```
 
 ### Choosing Model
@@ -613,7 +618,7 @@ are executed after the query and before the query. For example, you can use this
 
 ### How come I get different results than your papers?
 
-Internally at FutureHouse, we have a slightly different set of tools. We're trying to get some of them, like citation traversral, into this repo. However, we have APIs and licenses to access research papers that we cannot share openly. Similarly, in our research papers' results we do not start with the known relevant PDFs. Our agent has to identify them using keyword search over all papers, rather than just a subset. We're gradually aligning these two versions of PaperQA, but until there is an open-source way to freely access papers (even just open source papers) you will need to provide PDFs yourself.
+Internally at FutureHouse, we have a slightly different set of tools. We're trying to get some of them, like citation traversal, into this repo. However, we have APIs and licenses to access research papers that we cannot share openly. Similarly, in our research papers' results we do not start with the known relevant PDFs. Our agent has to identify them using keyword search over all papers, rather than just a subset. We're gradually aligning these two versions of PaperQA, but until there is an open-source way to freely access papers (even just open source papers) you will need to provide PDFs yourself.
 
 ### How is this different from LlamaIndex?
 
