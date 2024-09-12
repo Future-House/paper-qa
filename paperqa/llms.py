@@ -10,8 +10,8 @@ from typing import Any
 
 import numpy as np
 import tiktoken
-from litellm import Router, aembedding, token_counter
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from litellm import DeploymentTypedDict, Router, aembedding, token_counter
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from paperqa.prompts import default_system_prompt
 from paperqa.types import Embeddable, LLMResult
@@ -350,6 +350,10 @@ DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
     },
 ]
 
+_DeploymentTypedDictValidator = TypeAdapter(
+    list[DeploymentTypedDict], config=ConfigDict(arbitrary_types_allowed=True)
+)
+
 
 class LiteLLMModel(LLMModel):
     """A wrapper around the litellm library.
@@ -360,7 +364,6 @@ class LiteLLMModel(LLMModel):
         `router_kwargs`: kwargs for the Router class
 
     This way users can specify routing strategies, retries, etc.
-
     """
 
     config: dict = Field(default_factory=dict)
@@ -387,11 +390,12 @@ class LiteLLMModel(LLMModel):
                 "router_kwargs": {"num_retries": 3, "retry_after": 5},
             }
         # we only support one "model name" for now, here we validate
+        _DeploymentTypedDictValidator.validate_python(data["config"]["model_list"])
         if (
             "config" in data
             and len({m["model_name"] for m in data["config"]["model_list"]}) > 1
         ):
-            raise ValueError("Only one model name per router is supported for now")
+            raise ValueError("Only one model name per router is supported for now.")
         return data
 
     def __getstate__(self):
