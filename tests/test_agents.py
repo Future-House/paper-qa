@@ -87,7 +87,7 @@ async def test_agent_types(
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.summary_llm = "gpt-4o-mini"
     agent_test_settings.agent.agent_prompt += (
-        "\n\n Call each tool once in appropriate order and "
+        "\n\nCall each tool once in appropriate order and"
         " accept the answer for now, as we're in debug mode."
     )
     request = QueryRequest(query=question, settings=agent_test_settings)
