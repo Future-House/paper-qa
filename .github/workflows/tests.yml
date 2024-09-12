@@ -47,6 +47,12 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
+      - name: Cache datasets
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/datasets
+          key: ${{ runner.os }}-datasets-${{ hashFiles('paperqa') }}
+          restore-keys: ${{ runner.os }}-datasets-
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

@@ -49,10 +49,14 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
+datasets = [
+    "datasets",
+]
 ldp = [
     "ldp>=0.6",  # For LiteLLM 1.42.1 pinning's UnsupportedParamsError fix
 ]
 typing = [
+    "pandas-stubs",
     "types-PyYAML",
     "types-setuptools",
 ]
@@ -133,6 +137,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
+    "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
@@ -384,7 +389,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[ldp,typing]",
+    "paper-qa[datasets,ldp,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",

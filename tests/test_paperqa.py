@@ -425,19 +425,21 @@ async def test_chain_completion() -> None:
 
 @pytest.mark.asyncio
 async def test_chain_chat() -> None:
-    model_config = {
-        "model_list": [
-            {
-                "model_name": "gpt-4o-mini",
-                "litellm_params": {
-                    "model": "gpt-4o-mini",
-                    "temperature": 0,
-                    "max_tokens": 56,
-                },
-            }
-        ]
-    }
-    llm = LiteLLMModel(name="gpt-4o-mini", config=model_config)
+    llm = LiteLLMModel(
+        name="gpt-4o-mini",
+        config={
+            "model_list": [
+                {
+                    "model_name": "gpt-4o-mini",
+                    "litellm_params": {
+                        "model": "gpt-4o-mini",
+                        "temperature": 0,
+                        "max_tokens": 56,
+                    },
+                }
+            ]
+        },
+    )
 
     outputs = []
 
