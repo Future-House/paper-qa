@@ -283,6 +283,7 @@ The synchronous version just calls the async version in a loop. Most modern pyth
 import asyncio
 from paperqa import Docs
 
+
 async def main():
     # valid extensions include .pdf, .txt, and .html
     doc_paths = ("myfile.pdf", "myotherfile.pdf")
@@ -298,8 +299,8 @@ async def main():
 
     print(answer.formatted_answer)
 
-asyncio.run(main())
 
+asyncio.run(main())
 ```
 
 ### Choosing Model
