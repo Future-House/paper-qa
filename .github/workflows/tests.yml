@@ -1,9 +1,10 @@
-name: test
+name: Lint and Test
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   pre-commit:
