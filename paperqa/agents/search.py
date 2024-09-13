@@ -353,6 +353,9 @@ async def maybe_get_manifest(filename: anyio.Path | None) -> dict[str, DocDetail
     return {}
 
 
+FAILED_DOCUMENT_ADD_ID = "ERROR"
+
+
 async def process_file(
     file_path: anyio.Path,
     search_index: SearchIndex,
@@ -382,7 +385,9 @@ async def process_file(
                 logger.exception(
                     f"Error parsing {file_name}, skipping index for this file."
                 )
-                (await search_index.index_files)[str(file_path)] = "ERROR"
+                (await search_index.index_files)[
+                    str(file_path)
+                ] = FAILED_DOCUMENT_ADD_ID
                 await search_index.save_index()
                 return
 

@@ -21,7 +21,7 @@ from pytest_subtests import SubTests
 from paperqa.agents import agent_query
 from paperqa.agents.env import settings_to_tools
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
-from paperqa.agents.search import get_directory_index
+from paperqa.agents.search import FAILED_DOCUMENT_ADD_ID, get_directory_index
 from paperqa.agents.tools import (
     EnvironmentState,
     GatherEvidence,
@@ -44,8 +44,12 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         "title",
         "year",
     ], "Incorrect fields in index"
-    # paper.pdf + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
+    # but empty.txt fails to be added
+    path_to_id = await index.index_files
+    assert (
+        sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
+    ), "Incorrect number of parsed index files"
     results = await index.query(query="who is Frederick Bates?")
     paper_dir = cast(Path, agent_test_settings.paper_directory)
     assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
@@ -63,8 +67,8 @@ async def test_get_directory_index_w_manifest(
         "title",
         "year",
     ], "Incorrect fields in index"
-    # paper.pdf + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt
+    assert len(await index.index_files) == 5, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
     paper_dir = cast(Path, agent_test_settings.paper_directory)

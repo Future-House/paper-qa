@@ -48,7 +48,8 @@ def chunk_pdf(
 
     if not parsed_text.content:
         raise ImpossibleParsingError(
-            "No text was parsed from the document: either empty or corrupted."
+            f"No text was parsed from the document named {doc.docname!r}, either empty"
+            " or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():
@@ -117,17 +118,19 @@ def parse_text(
 
 
 def chunk_text(
-    parsed_text: ParsedText, doc: Doc, chunk_chars: int, overlap: int, use_tiktoken=True
+    parsed_text: ParsedText,
+    doc: Doc,
+    chunk_chars: int,
+    overlap: int,
+    use_tiktoken: bool = True,
 ) -> list[Text]:
     """Parse a document into chunks, based on tiktoken encoding.
 
     NOTE: We get some byte continuation errors.
-    Currently ignored, but should explore more to make sure we
-    don't miss anything.
+    Currently ignored, but should explore more to make sure we don't miss anything.
     """
     texts: list[Text] = []
     enc = tiktoken.get_encoding("cl100k_base")
-    split = []
 
     if not isinstance(parsed_text.content, str):
         raise NotImplementedError(
@@ -135,6 +138,11 @@ def chunk_text(
         )
 
     content = parsed_text.content if not use_tiktoken else parsed_text.encode_content()
+    if not content:  # Avoid div0 in token calculations
+        raise ImpossibleParsingError(
+            f"No text was parsed from the document named {doc.docname!r}, either empty"
+            " or corrupted."
+        )
 
     # convert from characters to chunks
     char_count = parsed_text.metadata.total_parsed_text_length  # e.g., 25,000
