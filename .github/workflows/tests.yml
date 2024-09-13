@@ -1,9 +1,10 @@
-name: test
+name: Lint and Test
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   pre-commit:
@@ -11,7 +12,7 @@ jobs:
     if: github.event_name == 'pull_request' # pre-commit-ci/lite-action only runs here
     strategy:
       matrix:
-        python-version: [3.12] # Our min and max supported Python versions
+        python-version: [3.11, 3.12] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.12] # Our min and max supported Python versions
+        python-version: [3.11, 3.12] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
       - name: Set up uv
@@ -46,9 +47,12 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
-      - uses: google-github-actions/auth@v2
+      - name: Cache datasets
+        uses: actions/cache@v4
         with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+          path: ~/.cache/huggingface/datasets
+          key: ${{ runner.os }}-datasets-${{ hashFiles('paperqa') }}
+          restore-keys: ${{ runner.os }}-datasets-
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

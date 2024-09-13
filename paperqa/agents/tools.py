@@ -18,6 +18,16 @@ from .search import get_directory_index
 logger = logging.getLogger(__name__)
 
 
+def make_status(
+    total_paper_count: int, relevant_paper_count: int, evidence_count: int, cost: float
+) -> str:
+    return (
+        f"Status: Paper Count={total_paper_count}"
+        f" | Relevant Papers={relevant_paper_count} | Current Evidence={evidence_count}"
+        f" | Current Cost=${cost:.4f}"
+    )
+
+
 class EnvironmentState(BaseModel):
     """State here contains documents and answer being populated."""
 
@@ -35,11 +45,23 @@ class EnvironmentState(BaseModel):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def status(self) -> str:
-        return (
-            f"Status: Paper Count={len(self.docs.docs)} | Relevant Papers="
-            f"{len({c.text.doc.dockey for c in self.answer.contexts if c.score > self.RELEVANT_SCORE_CUTOFF})}"
-            f" | Current Evidence={len([c for c in self.answer.contexts if c.score > self.RELEVANT_SCORE_CUTOFF])}"
-            f" | Current Cost=${self.answer.cost:.4f}"
+        return make_status(
+            total_paper_count=len(self.docs.docs),
+            relevant_paper_count=len(
+                {
+                    c.text.doc.dockey
+                    for c in self.answer.contexts
+                    if c.score > self.RELEVANT_SCORE_CUTOFF
+                }
+            ),
+            evidence_count=len(
+                [
+                    c
+                    for c in self.answer.contexts
+                    if c.score > self.RELEVANT_SCORE_CUTOFF
+                ]
+            ),
+            cost=self.answer.cost,
         )
 
 

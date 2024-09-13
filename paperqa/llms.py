@@ -6,12 +6,13 @@ from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
 from enum import StrEnum
 from inspect import signature
+from sys import version_info
 from typing import Any
 
 import numpy as np
 import tiktoken
-from litellm import Router, aembedding, token_counter
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from litellm import DeploymentTypedDict, Router, aembedding, token_counter
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from paperqa.prompts import default_system_prompt
 from paperqa.types import Embeddable, LLMResult
@@ -351,6 +352,13 @@ DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
 ]
 
 
+IS_PYTHON_BELOW_312 = version_info < (3, 12)
+if not IS_PYTHON_BELOW_312:
+    _DeploymentTypedDictValidator = TypeAdapter(
+        list[DeploymentTypedDict], config=ConfigDict(arbitrary_types_allowed=True)
+    )
+
+
 class LiteLLMModel(LLMModel):
     """A wrapper around the litellm library.
 
@@ -360,7 +368,6 @@ class LiteLLMModel(LLMModel):
         `router_kwargs`: kwargs for the Router class
 
     This way users can specify routing strategies, retries, etc.
-
     """
 
     config: dict = Field(default_factory=dict)
@@ -387,11 +394,16 @@ class LiteLLMModel(LLMModel):
                 "router_kwargs": {"num_retries": 3, "retry_after": 5},
             }
         # we only support one "model name" for now, here we validate
-        if (
-            "config" in data
-            and len({m["model_name"] for m in data["config"]["model_list"]}) > 1
-        ):
-            raise ValueError("Only one model name per router is supported for now")
+        model_list = data["config"]["model_list"]
+        if IS_PYTHON_BELOW_312:
+            if not isinstance(model_list, list):
+                # Work around https://github.com/BerriAI/litellm/issues/5664
+                raise TypeError(f"model_list must be a list, not a {type(model_list)}.")
+        else:
+            # pylint: disable-next=possibly-used-before-assignment
+            _DeploymentTypedDictValidator.validate_python(model_list)
+        if "config" in data and len({m["model_name"] for m in model_list}) > 1:
+            raise ValueError("Only one model name per router is supported for now.")
         return data
 
     def __getstate__(self):

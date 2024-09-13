@@ -3,30 +3,36 @@ from __future__ import annotations
 import itertools
 import json
 import re
+import time
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
 
+import ldp.agent
 import pytest
-from aviary.tools import ToolsAdapter, ToolSelector
-from ldp.agent import SimpleAgent
+from aviary.tools import ToolRequestMessage, ToolsAdapter, ToolSelector
+from ldp.agent import MemoryAgent, SimpleAgent
+from ldp.graph.memory import Memory, UIndexMemoryModel
+from ldp.graph.ops import OpResult
+from ldp.llms import EmbeddingModel, MultipleCompletionLLMModel
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
 from paperqa.agents import agent_query
 from paperqa.agents.env import settings_to_tools
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
-from paperqa.agents.search import get_directory_index
+from paperqa.agents.search import FAILED_DOCUMENT_ADD_ID, get_directory_index
 from paperqa.agents.tools import (
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
     PaperSearch,
+    make_status,
 )
 from paperqa.docs import Docs
 from paperqa.settings import AgentSettings, Settings
 from paperqa.types import Answer, Context, Doc, Text
-from paperqa.utils import get_year, md5sum
+from paperqa.utils import extract_thought, get_year, md5sum
 
 
 @pytest.mark.asyncio
@@ -38,8 +44,12 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         "title",
         "year",
     ], "Incorrect fields in index"
-    # paper.pdf + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
+    # but empty.txt fails to be added
+    path_to_id = await index.index_files
+    assert (
+        sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
+    ), "Incorrect number of parsed index files"
     results = await index.query(query="who is Frederick Bates?")
     paper_dir = cast(Path, agent_test_settings.paper_directory)
     assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
@@ -57,8 +67,8 @@ async def test_get_directory_index_w_manifest(
         "title",
         "year",
     ], "Incorrect fields in index"
-    # paper.pdf + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt
+    assert len(await index.index_files) == 5, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
     paper_dir = cast(Path, agent_test_settings.paper_directory)
@@ -81,7 +91,7 @@ async def test_agent_types(
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.summary_llm = "gpt-4o-mini"
     agent_test_settings.agent.agent_prompt += (
-        "\n\n Call each tool once in appropriate order and "
+        "\n\nCall each tool once in appropriate order and"
         " accept the answer for now, as we're in debug mode."
     )
     request = QueryRequest(query=question, settings=agent_test_settings)
@@ -104,7 +114,86 @@ async def test_agent_types(
 
 
 @pytest.mark.asyncio
-async def test_timeout(agent_test_settings: Settings) -> None:
+async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
+    tic = time.perf_counter()
+    memory_id = "call_Wtmv95JbNcQ2nRQCZBoOfcJy"  # Stub value
+    memory = Memory(
+        query=(
+            "Use the tools to answer the question: How can you use XAI for chemical"
+            " property prediction?\n\nThe gen_answer tool output is visible to the"
+            " user, so you do not need to restate the answer and can simply"
+            " terminate if the answer looks sufficient. The current status of"
+            " evidence/papers/cost is "
+            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Started 0
+            "\n\nTool request message '' for tool calls: paper_search(query='XAI for"
+            " chemical property prediction', min_year='2018', max_year='2024')"
+            f" [id={memory_id}]\n\nTool response message '"
+            f"{make_status(total_paper_count=2, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Found 2
+            f"' for tool call ID {memory_id} of tool 'paper_search'"
+        ),
+        input=(
+            "Use the tools to answer the question: How can you use XAI for chemical"
+            " property prediction?\n\nThe gen_answer tool output is visible to the"
+            " user, so you do not need to restate the answer and can simply terminate"
+            " if the answer looks sufficient. The current status of"
+            " evidence/papers/cost is "
+            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"
+        ),
+        output=(
+            "Tool request message '' for tool calls: paper_search(query='XAI for"
+            " chemical property prediction', min_year='2018', max_year='2024')"
+            f" [id={memory_id}]"
+        ),
+        value=5.0,  # Stub value
+        template="Input: {input}\n\nOutput: {output}\n\nDiscounted Reward: {value}",
+    )
+    memory_model = UIndexMemoryModel(
+        embedding_model=EmbeddingModel.from_name("text-embedding-3-small")
+    )
+    await memory_model.add_memory(memory)
+    serialized_memory_model = memory_model.model_dump(exclude_none=True)
+    query = QueryRequest(
+        query="How can you use XAI for chemical property prediction?",
+        settings=agent_test_settings,
+    )
+    # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
+    query.settings.agent.agent_llm = "claude-3-5-sonnet-20240620"
+    query.settings.agent.agent_config = {
+        "memories": serialized_memory_model.pop("memories"),
+        "memory_model": serialized_memory_model,
+    }
+
+    thoughts: list[str] = []
+    orig_llm_model_call = MultipleCompletionLLMModel.call
+
+    async def on_agent_action(action: OpResult[ToolRequestMessage], *_) -> None:
+        thoughts.append(extract_thought(content=action.value.content))
+
+    async def llm_model_call(*args, **kwargs):
+        # NOTE: "required" will not lead to thoughts being emitted, it has to be "auto"
+        # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
+        kwargs.pop("tool_choice", MultipleCompletionLLMModel.TOOL_CHOICE_REQUIRED)
+        return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore[misc]
+
+    with patch.object(
+        MultipleCompletionLLMModel, "call", side_effect=llm_model_call, autospec=True
+    ):
+        response = await agent_query(
+            query,
+            Docs(),
+            agent_type=f"{ldp.agent.__name__}.{MemoryAgent.__name__}",
+            on_agent_action_callback=on_agent_action,
+        )
+    assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
+    assert (
+        time.perf_counter() - tic <= query.settings.agent.timeout
+    ), "Agent should not have timed out"
+    assert all(thought and "<thinking>" not in thought for thought in thoughts)
+
+
+@pytest.mark.parametrize("agent_type", [ToolSelector, SimpleAgent])
+@pytest.mark.asyncio
+async def test_timeout(agent_test_settings: Settings, agent_type: str | type) -> None:
     agent_test_settings.prompts.pre = None
     agent_test_settings.agent.timeout = 0.001
     agent_test_settings.llm = "gpt-4o-mini"
@@ -112,7 +201,8 @@ async def test_timeout(agent_test_settings: Settings) -> None:
     response = await agent_query(
         QueryRequest(
             query="Are COVID-19 vaccines effective?", settings=agent_test_settings
-        )
+        ),
+        agent_type=agent_type,
     )
     # ensure that GenerateAnswerTool was called
     assert response.status == AgentStatus.TIMEOUT, "Agent did not timeout"

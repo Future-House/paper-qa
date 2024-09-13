@@ -425,19 +425,21 @@ async def test_chain_completion() -> None:
 
 @pytest.mark.asyncio
 async def test_chain_chat() -> None:
-    model_config = {
-        "model_list": [
-            {
-                "model_name": "gpt-4o-mini",
-                "litellm_params": {
-                    "model": "gpt-4o-mini",
-                    "temperature": 0,
-                    "max_tokens": 56,
-                },
-            }
-        ]
-    }
-    llm = LiteLLMModel(name="gpt-4o-mini", config=model_config)
+    llm = LiteLLMModel(
+        name="gpt-4o-mini",
+        config={
+            "model_list": [
+                {
+                    "model_name": "gpt-4o-mini",
+                    "litellm_params": {
+                        "model": "gpt-4o-mini",
+                        "temperature": 0,
+                        "max_tokens": 56,
+                    },
+                }
+            ]
+        },
+    )
 
     outputs = []
 
@@ -835,13 +837,15 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
+@pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
 def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
         answer = docs.query("Are counterfactuals actionable?[yes/no]")
-        assert "yes" in answer.answer or "Yes" in answer.answer
+        assert any(
+            w in answer.answer for w in ("yes", "Yes")
+        ), f"Incorrect answer: {answer.answer}"
 
 
 def test_fileio_reader_txt(stub_data_dir: Path) -> None:

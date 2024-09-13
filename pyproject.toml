@@ -50,10 +50,14 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
+datasets = [
+    "datasets",
+]
 ldp = [
     "ldp>=0.6",  # For LiteLLM 1.42.1 pinning's UnsupportedParamsError fix
 ]
 typing = [
+    "pandas-stubs",
     "types-PyYAML",
     "types-setuptools",
 ]
@@ -134,6 +138,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
+    "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
@@ -223,6 +228,14 @@ score = false
 min-similarity-lines = 12
 
 [tool.pytest.ini_options]
+# Sets a list of filters and actions that should be taken for matched warnings.
+# By default all warnings emitted during the test session will be displayed in
+# a summary at the end of the test session.
+filterwarnings = [
+    "ignore:'imghdr' is deprecated and slated for removal in Python 3.13:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/2929#issuecomment-2345224633
+    "ignore:Support for class-based `config` is deprecated, use ConfigDict instead",  # SEE: https://github.com/BerriAI/litellm/issues/5648
+    'ignore:open_text is deprecated. Use files\(\) instead:DeprecationWarning',  # SEE: https://github.com/BerriAI/litellm/issues/5647
+]
 # List of directories that should be searched for tests when no specific directories,
 # files or test ids are given in the command line when executing pytest from the rootdir
 # directory. File system paths may use shell-style wildcards, including the recursive **
@@ -340,6 +353,7 @@ unfixable = [
     "ERA001",  # While debugging, temporarily commenting code can be useful
     "F401",  # While debugging, unused imports can be useful
     "F841",  # While debugging, unused locals can be useful
+    "TCH004",  # While debugging, it can be nice to keep TYPE_CHECKING in tact
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -385,7 +399,7 @@ dev-dependencies = [
     "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[ldp,typing]",
+    "paper-qa[datasets,ldp,typing]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",
