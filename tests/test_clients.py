@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Collection, Sequence
 from typing import Any, cast
+from unittest.mock import patch
 
 import aiohttp
 import pytest
@@ -473,13 +474,11 @@ async def test_odd_client_requests() -> None:
 
 
 @pytest.mark.asyncio
-async def test_ensure_robust_to_timeouts(monkeypatch) -> None:
-    # 0.15 should be short enough to not get a response in time.
-    monkeypatch.setattr(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.05)
-    monkeypatch.setattr(
-        paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.05
-    )
-
+@patch.object(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.05)
+@patch.object(
+    paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.05
+)
+async def test_ensure_robust_to_timeouts() -> None:
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
         details = await client.query(
