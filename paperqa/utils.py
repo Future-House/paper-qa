@@ -464,8 +464,9 @@ def setup_default_logs() -> None:
                     "stream": "ext://sys.stdout",
                 },
             },
-            # Lower level for httpx and LiteLLM
+            # Lower level for verbose logs
             "loggers": {
+                "httpcore": {"level": "WARNING"},
                 "httpx": {"level": "WARNING"},
                 # SEE: https://github.com/BerriAI/litellm/issues/2256
                 "LiteLLM": {"level": "WARNING"},
