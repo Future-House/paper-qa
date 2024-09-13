@@ -67,8 +67,8 @@ async def test_get_directory_index_w_manifest(
         "title",
         "year",
     ], "Incorrect fields in index"
-    # paper.pdf + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt
+    assert len(await index.index_files) == 5, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
     paper_dir = cast(Path, agent_test_settings.paper_directory)
