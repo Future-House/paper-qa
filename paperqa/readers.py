@@ -117,17 +117,19 @@ def parse_text(
 
 
 def chunk_text(
-    parsed_text: ParsedText, doc: Doc, chunk_chars: int, overlap: int, use_tiktoken=True
+    parsed_text: ParsedText,
+    doc: Doc,
+    chunk_chars: int,
+    overlap: int,
+    use_tiktoken: bool = True,
 ) -> list[Text]:
     """Parse a document into chunks, based on tiktoken encoding.
 
     NOTE: We get some byte continuation errors.
-    Currently ignored, but should explore more to make sure we
-    don't miss anything.
+    Currently ignored, but should explore more to make sure we don't miss anything.
     """
     texts: list[Text] = []
     enc = tiktoken.get_encoding("cl100k_base")
-    split = []
 
     if not isinstance(parsed_text.content, str):
         raise NotImplementedError(
