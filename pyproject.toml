@@ -29,6 +29,7 @@ dependencies = [
     "pydantic-settings",
     "pydantic~=2.0",
     "pymupdf",
+    "python-docx>=1.1.2",
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",

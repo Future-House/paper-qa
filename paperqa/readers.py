@@ -4,6 +4,7 @@ from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
+import docx
 import pymupdf
 import tiktoken
 from html2text import __version__ as html2text_version
@@ -32,6 +33,17 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
         parse_type="pdf",
     )
     return ParsedText(content=pages, metadata=metadata)
+
+def parse_docx_to_text(path: Path) -> ParsedText:
+    doc = docx.Document(path)
+    text = "\n".join([para.text for para in doc.paragraphs])
+    metadata = ParsedMetadata(
+        parsing_libraries=[f"python-docx ({docx.__version__})"],
+        paperqa_version=pqa_version,
+        total_parsed_text_length=len(text),
+        parse_type="docx",
+    )
+    return ParsedText(content=text, metadata=metadata)
 
 
 def chunk_pdf(
@@ -264,12 +276,13 @@ def read_doc(
     parsed_text = None
 
     # start with parsing -- users may want to store this separately
-    if str_path.endswith(".pdf"):
+    if str_path.lower().endswith(".pdf"):
         parsed_text = parse_pdf_to_pages(path)
-
-    elif str_path.endswith(".txt"):
+    elif str_path.lower().endswith((".doc", ".docx")):
+        parsed_text = parse_docx_to_text(path)
+    elif str_path.lower().endswith(".txt"):
         parsed_text = parse_text(path)
-    elif str_path.endswith(".html"):
+    elif str_path.lower().endswith(".html"):
         parsed_text = parse_text(path, html=True)
     else:
         parsed_text = parse_text(path, split_lines=True, use_tiktoken=False)
@@ -278,16 +291,19 @@ def read_doc(
         return parsed_text
 
     # next chunk the parsed text
-    if str_path.endswith(".pdf"):
+    if str_path.lower().endswith(".pdf"):
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap_pdf_by_page"
         )
-    elif str_path.endswith((".txt", ".html")):
+    elif str_path.lower().endswith((".txt", ".html", ".doc", ".docx")):
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        )
+        chunk_metadata = ChunkMetadata(
+            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
