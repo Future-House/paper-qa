@@ -130,8 +130,8 @@ class SimpleProfiler(BaseModel):
     # [Profiling] {**name** of timer} | {**elapsed** time of function} | {**__version__** of PaperQA}
     """
 
-    timers: dict[str, list[float]] = {}
-    running_timers: dict[str, TimerData] = {}
+    timers: dict[str, list[float]] = Field(default_factory=dict)
+    running_timers: dict[str, TimerData] = Field(default_factory=dict)
     uid: UUID = Field(default_factory=uuid4)
 
     @asynccontextmanager
