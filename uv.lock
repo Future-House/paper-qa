@@ -843,7 +843,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.44.26"
+version = "1.45.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -858,9 +858,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/2b/e3bde03841a23272510d543daf0f2197a9164753406f07350714c2b2c3a5/litellm-1.44.26.tar.gz", hash = "sha256:10856ad8e9b5fed96f2f4ad62dd3266240c2d996ef20ee9e233a2140e9c1eb5b", size = 8350491 }
+sdist = { url = "https://files.pythonhosted.org/packages/0d/8f/5c61d9e34f4ecad668e815271d0ce3300d88bda60fcdc6009f5433d7525d/litellm-1.45.0.tar.gz", hash = "sha256:21285496e72b9b16ff9d3d1332965c3d1a9b0ae8dbb26f27a7080af28a117174", size = 8363398 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/53/66/4a5adb213b98d0b66b8abe857a6aeb4db5c66015a0003b551c88785c2532/litellm-1.44.26-py3-none-any.whl", hash = "sha256:de63115a19e1432a44e38b9a2d8d8dfb77d5745370ef80d45327017b7341dea5", size = 8662794 },
+    { url = "https://files.pythonhosted.org/packages/c4/09/ad9a7e22e69ad822626127c0ca54c163f9346e56ff56d9ea8ff015077a84/litellm-1.45.0-py3-none-any.whl", hash = "sha256:87d712beabc6cbf24437557186c5b266729f3139bf7dd2e54573e1e9845b905a", size = 8675266 },
 ]
 
 [[package]]
@@ -1217,7 +1217,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.2.dev5+g9ada9e3.d20240912"
+version = "5.0.3.dev3+g5363d94"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -2255,11 +2255,11 @@ wheels = [
 
 [[package]]
 name = "types-pytz"
-version = "2024.1.0.20240417"
+version = "2024.2.0.20240913"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9b/b0/079f6f340c0051fbe03ac3a6d9fce323c9797b85380d455e1566eaf2716b/types-pytz-2024.1.0.20240417.tar.gz", hash = "sha256:6810c8a1f68f21fdf0f4f374a432487c77645a0ac0b31de4bf4690cf21ad3981", size = 5459 }
+sdist = { url = "https://files.pythonhosted.org/packages/da/cf/a4811b07d7309d9eecf0f383ca5747ce90f8a0d860acb2050bc57f3c9379/types-pytz-2024.2.0.20240913.tar.gz", hash = "sha256:4433b5df4a6fc587bbed41716d86a5ba5d832b4378e506f40d34bc9c81df2c24", size = 5462 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/8d/f5dc5239d59bb4a7b58e2b6d0dc6f2c2ba797b110f83cdda8479508c63dd/types_pytz-2024.1.0.20240417-py3-none-any.whl", hash = "sha256:8335d443310e2db7b74e007414e74c4f53b67452c0cb0d228ca359ccfba59659", size = 5246 },
+    { url = "https://files.pythonhosted.org/packages/b6/a6/8846372f55c6bb470ff7207e4dc601017e264e5fe7d79a441ece3545b36c/types_pytz-2024.2.0.20240913-py3-none-any.whl", hash = "sha256:a1eebf57ebc6e127a99d2fa2ba0a88d2b173784ef9b3defcc2004ab6855a44df", size = 5251 },
 ]
 
 [[package]]
@@ -2516,9 +2516,9 @@ wheels = [
 
 [[package]]
 name = "zipp"
-version = "3.20.1"
+version = "3.20.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d3/8b/1239a3ef43a0d0ebdca623fb6413bc7702c321400c5fdd574f0b7aa0fbb4/zipp-3.20.1.tar.gz", hash = "sha256:c22b14cc4763c5a5b04134207736c107db42e9d3ef2d9779d465f5f1bcba572b", size = 23848 }
+sdist = { url = "https://files.pythonhosted.org/packages/54/bf/5c0000c44ebc80123ecbdddba1f5dcd94a5ada602a9c225d84b5aaa55e86/zipp-3.20.2.tar.gz", hash = "sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29", size = 24199 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/07/9e/c96f7a4cd0bf5625bb409b7e61e99b1130dc63a98cb8b24aeabae62d43e8/zipp-3.20.1-py3-none-any.whl", hash = "sha256:9960cd8967c8f85a56f920d5d507274e74f9ff813a0ab8889a5b5be2daf44064", size = 8988 },
+    { url = "https://files.pythonhosted.org/packages/62/8b/5ba542fa83c90e09eac972fc9baca7a88e7e7ca4b221a89251954019308b/zipp-3.20.2-py3-none-any.whl", hash = "sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350", size = 9200 },
 ]
