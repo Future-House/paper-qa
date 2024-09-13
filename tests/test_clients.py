@@ -575,6 +575,7 @@ async def test_ensure_sequential_run_early_stop(
         assert record_indices["early_stop"] != -1, "We should stop early."
 
 
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_retraction_status() -> None:
     async with aiohttp.ClientSession() as session:
