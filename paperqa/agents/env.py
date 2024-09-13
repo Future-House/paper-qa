@@ -92,7 +92,7 @@ def settings_to_tools(
 
 
 class Environment(_Environment[EnvironmentState]):
-    """Environment to connect agents with paper-qa."""
+    """Environment connecting paper-qa's tools with state."""
 
     def __init__(
         self,
