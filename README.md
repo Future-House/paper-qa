@@ -54,13 +54,17 @@ PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Her
 7. [pybtex](https://pybtex.org/)
 8. [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/)
 
-## Install
+## Installation
 
-You can install PaperQA2 via pip:
+For a non-development setup,
+install PaperQA2 from [PyPI](https://pypi.org/project/paper-qa/):
 
 ```bash
 pip install paper-qa
 ```
+
+For development setup,
+please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 PaperQA2 uses an LLM to operate,
 so you'll need to either set an appropriate [API key environment variable][LiteLLM providers] (i.e. `export OPENAI_API_KEY=sk-...`)
