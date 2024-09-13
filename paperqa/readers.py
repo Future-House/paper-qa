@@ -48,7 +48,7 @@ def chunk_pdf(
 
     if not parsed_text.content:
         raise ImpossibleParsingError(
-            "No text was parsed from the document: either empty or corrupted."
+            f"No text was parsed from the document {doc}, either empty or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():
@@ -135,6 +135,10 @@ def chunk_text(
         )
 
     content = parsed_text.content if not use_tiktoken else parsed_text.encode_content()
+    if not content:  # Avoid div0 in token calculations
+        raise ImpossibleParsingError(
+            f"No text was parsed from the document {doc}, either empty or corrupted."
+        )
 
     # convert from characters to chunks
     char_count = parsed_text.metadata.total_parsed_text_length  # e.g., 25,000
