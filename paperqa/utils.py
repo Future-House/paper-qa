@@ -464,8 +464,9 @@ def setup_default_logs() -> None:
                     "stream": "ext://sys.stdout",
                 },
             },
-            # Lower level for httpx and LiteLLM
+            # Lower level for verbose logs
             "loggers": {
+                "httpcore": {"level": "WARNING"},
                 "httpx": {"level": "WARNING"},
                 # SEE: https://github.com/BerriAI/litellm/issues/2256
                 "LiteLLM": {"level": "WARNING"},
@@ -474,3 +475,9 @@ def setup_default_logs() -> None:
             },
         }
     )
+
+
+def extract_thought(content: str | None) -> str:
+    """Extract an Anthropic thought from a message's content."""
+    # SEE: https://regex101.com/r/bpJt05/1
+    return re.sub(r"<\/?thinking>", "", content or "")
