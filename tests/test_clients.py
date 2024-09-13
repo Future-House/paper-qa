@@ -391,8 +391,10 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             ),
             fields=["title", "doi", "authors", "journal"],
         )
-
-        assert nejm_crossref_details.source_quality == 3, "Should have source quality data"  # type: ignore[union-attr]
+        assert nejm_crossref_details
+        assert (
+            nejm_crossref_details.source_quality == 3
+        ), "Should have source quality data"
 
 
 @pytest.mark.vcr
@@ -574,7 +576,7 @@ async def test_ensure_sequential_run_early_stop(
 
 
 @pytest.mark.asyncio
-async def test_crossref_retraction_status():
+async def test_crossref_retraction_status() -> None:
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
             session,
@@ -589,7 +591,9 @@ async def test_crossref_retraction_status():
             title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
             fields=["title", "doi", "authors", "journal"],
         )
-
-        assert "**RETRACTED ARTICLE** Citation: Jiaye Han." in crossref_details.formatted_citation  # type: ignore[union-attr]
-
-        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]
+        assert crossref_details
+        assert (
+            "**RETRACTED ARTICLE** Citation: Jiaye Han."
+            in crossref_details.formatted_citation
+        )
+        assert crossref_details.is_retracted is True, "Should be retracted"
