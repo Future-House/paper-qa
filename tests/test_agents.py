@@ -110,7 +110,7 @@ async def test_agent_types(
 
 
 @pytest.mark.asyncio
-async def test_successful_memory_agent() -> None:
+async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     tic = time.perf_counter()
     memory_id = "call_Wtmv95JbNcQ2nRQCZBoOfcJy"  # Stub value
     memory = Memory(
@@ -148,7 +148,10 @@ async def test_successful_memory_agent() -> None:
     )
     await memory_model.add_memory(memory)
     serialized_memory_model = memory_model.model_dump(exclude_none=True)
-    query = QueryRequest(query="How can you use XAI for chemical property prediction?")
+    query = QueryRequest(
+        query="How can you use XAI for chemical property prediction?",
+        settings=agent_test_settings,
+    )
     # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
     query.settings.agent.agent_llm = "claude-3-5-sonnet-20240620"
     query.settings.agent.agent_config = {
