@@ -155,7 +155,7 @@ class Answer(BaseModel):
     question: str
     answer: str = ""
     context: str = ""
-    contexts: list[Context] = []
+    contexts: list[Context] = Field(default_factory=list)
     references: str = ""
     formatted_answer: str = ""
     cost: float = 0.0
