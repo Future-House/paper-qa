@@ -18,12 +18,16 @@ classifiers = [
 ]
 dependencies = [
     "PyCryptodome",
-    "aiohttp",  # TODO: remove in favor of httpx
+    "aiohttp",
+    # TODO: remove in favor of httpx
     "anyio",
-    "fhaviary[llm]>=0.6",  # For info on Message
-    "html2text",  # TODO: evaluate moving to an opt-in dependency
+    "fhaviary[llm]>=0.6",
+    # For info on Message
+    "html2text",
+    # TODO: evaluate moving to an opt-in dependency
     "httpx",
-    "litellm>=1.44",  # to prevent sys.stdout on router creation
+    "litellm>=1.44",
+    # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",
@@ -31,7 +35,8 @@ dependencies = [
     "pymupdf",
     "python-docx>=1.1.2",
     "rich",
-    "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
+    "setuptools",
+    # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",

@@ -313,9 +313,6 @@ def read_doc(
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
         )
-        chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
-        )
     else:
         chunked_text = chunk_code_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
