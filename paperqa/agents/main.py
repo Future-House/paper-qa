@@ -10,10 +10,10 @@ from aviary.tools import (
     Tool,
     ToolCall,
     ToolRequestMessage,
-    ToolResponseMessage,
     ToolSelector,
+    ToolSelectorLedger,
 )
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import BaseModel, TypeAdapter
 from tenacity import (
     Retrying,
     before_sleep_log,
@@ -266,19 +266,6 @@ async def run_fake_agent(
     await step(gather_evidence_tool, question=question)
     await step(generate_answer_tool, question=question)
     return env.state.answer, AgentStatus.SUCCESS
-
-
-class ToolSelectorLedger(BaseModel):
-    """
-    Simple ledger to record tools and messages.
-
-    TODO: remove this after it's upstreamed into aviary.
-    """
-
-    tools: list[Tool] = Field(default_factory=list)
-    messages: list[ToolRequestMessage | ToolResponseMessage | Message] = Field(
-        default_factory=list
-    )
 
 
 async def run_aviary_agent(
