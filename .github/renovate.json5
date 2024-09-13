@@ -1,0 +1,11 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended", ":enablePreCommit", "group:allNonMajor"],
+  schedule: ["* 2 * * 1"],
+  prHourlyLimit: 4,
+  timezone: "America/Los_Angeles",
+  rangeStrategy: "widen",
+  lockFileMaintenance: {
+    enabled: true,
+  },
+}
