@@ -34,6 +34,7 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
     )
     return ParsedText(content=pages, metadata=metadata)
 
+
 def parse_docx_to_text(path: Path) -> ParsedText:
     doc = docx.Document(path)
     text = "\n".join([para.text for para in doc.paragraphs])
