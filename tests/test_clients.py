@@ -496,7 +496,7 @@ async def test_bad_init() -> None:
     with pytest.raises(
         ValueError, match="At least one MetadataProvider must be provided."
     ):
-        client = DocMetadataClient(clients=[])  # noqa: F841
+        _ = DocMetadataClient(clients=[])
 
 
 @pytest.mark.vcr
