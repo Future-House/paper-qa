@@ -44,8 +44,8 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         "title",
         "year",
     ], "Incorrect fields in index"
-    # paper.pdf + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 4, "Incorrect number of index files"
+    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt
+    assert len(await index.index_files) == 5, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     paper_dir = cast(Path, agent_test_settings.paper_directory)
     assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
