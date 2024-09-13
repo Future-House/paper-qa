@@ -1,8 +1,7 @@
 import logging
 from typing import cast
 
-from aviary.env import Environment as _Environment
-from aviary.env import Frame
+from aviary.env import Environment, Frame
 from aviary.message import Message
 from aviary.tools import Tool, ToolRequestMessage, ToolResponseMessage
 
@@ -91,7 +90,7 @@ def settings_to_tools(
     return tools
 
 
-class Environment(_Environment[EnvironmentState]):
+class PaperQAEnvironment(Environment[EnvironmentState]):
     """Environment connecting paper-qa's tools with state."""
 
     def __init__(

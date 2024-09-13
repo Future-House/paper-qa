@@ -1,12 +1,18 @@
+__all__ = [
+    "ENV_NAME",
+    "TASK_DATASET_NAME",
+    "GradablePaperQAEnvironment",
+    "LitQATaskDataset",
+    "LitQAv2TaskDataset",
+    "LitQAv2TaskSplit",
+]
+
 from abc import ABC
 from collections.abc import Awaitable, Callable, Sequence
 from enum import StrEnum
 from typing import TYPE_CHECKING, assert_never
 
-from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame
-from aviary.env import (
-    TaskDataset as _TaskDataset,
-)
+from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame, TaskDataset
 from aviary.message import Message
 from aviary.tools import ToolRequestMessage, ToolResponseMessage
 
@@ -29,8 +35,7 @@ from paperqa.litqa import (
 from paperqa.llms import EmbeddingModel, LiteLLMModel, LLMModel
 from paperqa.types import Answer
 
-from .env import POPULATE_FROM_SETTINGS
-from .env import Environment as _Environment
+from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .models import QueryRequest
 from .tools import GenerateAnswer
 
@@ -38,7 +43,7 @@ if TYPE_CHECKING:
     from ldp.data_structures import Trajectory
 
 
-class GradableEnvironment(_Environment):
+class GradablePaperQAEnvironment(PaperQAEnvironment):
     """Extended environment that can grade answers."""
 
     def __init__(
@@ -96,11 +101,14 @@ class GradableEnvironment(_Environment):
 
 
 ENV_NAME = "paperqa-local"
-ENV_REGISTRY[ENV_NAME] = GradableEnvironment.__module__, GradableEnvironment.__name__
+ENV_REGISTRY[ENV_NAME] = (
+    GradablePaperQAEnvironment.__module__,
+    GradablePaperQAEnvironment.__name__,
+)
 
 
 class LitQATaskDataset(
-    _TaskDataset[GradableEnvironment], ComputeTrajectoryMetricsMixin, ABC
+    TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin, ABC
 ):
     """
     Abstract base class for a task dataset of LitQA v1 or v2 questions.
@@ -127,7 +135,7 @@ class LitQATaskDataset(
         distractors: str | list[str],
         question: str,
         use_unsure: bool = True,
-    ) -> GradableEnvironment:
+    ) -> GradablePaperQAEnvironment:
         qa_prompt, evaluation_from_answer = LitQAEvaluation.from_question(
             ideal=ideal,
             distractors=distractors,
@@ -137,7 +145,7 @@ class LitQATaskDataset(
         )
         query_request = self._base_query_request.model_copy()
         query_request.query = qa_prompt
-        return GradableEnvironment(
+        return GradablePaperQAEnvironment(
             query=query_request,
             evaluation_from_answer=evaluation_from_answer,
             rewards=self._rewards,
@@ -183,7 +191,7 @@ class LitQAv2TaskDataset(LitQATaskDataset):
         else:
             assert_never(split)
 
-    def get_new_env_by_idx(self, idx: int) -> GradableEnvironment:
+    def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         return self._make_gradable_environment(
             ideal=self.data.iloc[idx].ideal,
             distractors=self.data.iloc[idx].distractors,

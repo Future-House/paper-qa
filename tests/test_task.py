@@ -6,7 +6,7 @@ from ldp.alg.runners import Evaluator, EvaluatorConfig
 
 from paperqa import Docs, QueryRequest, Settings
 from paperqa.agents.task import (
-    GradableEnvironment,
+    GradablePaperQAEnvironment,
     LitQATaskDataset,
     LitQAv2TaskDataset,
     LitQAv2TaskSplit,
@@ -40,7 +40,7 @@ class StubLitQADataset(LitQATaskDataset):
             ),
         ]
 
-    def get_new_env_by_idx(self, idx: int) -> GradableEnvironment:
+    def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         return self._make_gradable_environment(
             ideal=self.data[idx][0],
             distractors=self.data[idx][1],
