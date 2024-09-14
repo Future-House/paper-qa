@@ -572,16 +572,18 @@ async def test_ensure_sequential_run_early_stop(
         assert record_indices["early_stop"] != -1, "We should stop early."
 
 
+@pytest.mark.vcr(record_mode="once")
 @pytest.mark.asyncio
 async def test_crossref_retraction_status():
     async with aiohttp.ClientSession() as session:
+        retractprocessor = RetrationDataPostProcessor("stub_data/stub_retractions.csv")
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
                 Collection[
                     type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
                 ],
-                [CrossrefProvider, RetrationDataPostProcessor],
+                [CrossrefProvider, retractprocessor],
             ),
         )
         crossref_details = await crossref_client.query(

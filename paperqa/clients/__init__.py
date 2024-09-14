@@ -89,12 +89,19 @@ class DocMetadataClient:
                 self.tasks.append(
                     DocMetadataTask(
                         providers=[
-                            c() for c in sub_clients if issubclass(c, MetadataProvider)
+                            c if isinstance(c, MetadataProvider) else c()
+                            for c in sub_clients
+                            if (isinstance(c, type) and issubclass(c, MetadataProvider))
+                            or isinstance(c, MetadataProvider)
                         ],
                         processors=[
-                            c()
+                            c if isinstance(c, MetadataPostProcessor) else c()
                             for c in sub_clients
-                            if issubclass(c, MetadataPostProcessor)
+                            if (
+                                isinstance(c, type)
+                                and issubclass(c, MetadataPostProcessor)
+                            )
+                            or isinstance(c, MetadataPostProcessor)
                         ],
                     )
                 )
@@ -102,9 +109,19 @@ class DocMetadataClient:
         if not self.tasks and all(not isinstance(c, Collection) for c in clients):
             self.tasks.append(
                 DocMetadataTask(
-                    providers=[c() for c in clients if issubclass(c, MetadataProvider)],  # type: ignore[operator, arg-type]
+                    providers=[
+                        c if isinstance(c, MetadataProvider) else c()  # type: ignore[redundant-expr]
+                        for c in clients
+                        if (isinstance(c, type) and issubclass(c, MetadataProvider))
+                        or isinstance(c, MetadataProvider)
+                    ],
                     processors=[
-                        c() for c in clients if issubclass(c, MetadataPostProcessor)  # type: ignore[operator, arg-type]
+                        c if isinstance(c, MetadataPostProcessor) else c()  # type: ignore[redundant-expr]
+                        for c in clients
+                        if (
+                            isinstance(c, type) and issubclass(c, MetadataPostProcessor)
+                        )
+                        or isinstance(c, MetadataPostProcessor)
                     ],
                 )
             )
