@@ -344,6 +344,8 @@ class DocDetails(Doc):
         "http://dx.doi.org/",
     }
     AUTHOR_NAMES_TO_REMOVE: ClassVar[Collection[str]] = {"et al", "et al."}
+    # https://regex101.com/r/ihzNqt/1
+    CITATION_COUNT_REGEX_PATTERN: ClassVar[str] = r"This article has \d+ citations?"
 
     @field_validator("key")
     @classmethod

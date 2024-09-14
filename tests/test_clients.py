@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from collections.abc import Collection, Sequence
 from typing import Any, cast
 from unittest.mock import patch
@@ -18,8 +19,8 @@ from paperqa.clients import (
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.clients.retractions import RetrationDataPostProcessor
+from paperqa.types import DocDetails
 
-from utils.paper_helpers import compare_formatted_citations
 
 @pytest.mark.vcr
 @pytest.mark.parametrize(
@@ -113,12 +114,39 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             ),
         )
         details = await client.query(title=paper_attributes["title"])
-        
-        # compares the citation without the specific number of citations
-        assert compare_formatted_citations(
-            paper_attributes['formatted_citation'], details.formatted_citation
-        ), "Formatted citation should match"
-        
+
+        # matches the citation pattern, not the specific citation count
+        # search because the count will be somewhere in the middle of the string
+        expected_citation_format = re.search(
+            DocDetails.CITATION_COUNT_REGEX_PATTERN,
+            paper_attributes["formatted_citation"],
+        )
+        actual_citation_format = re.search(
+            DocDetails.CITATION_COUNT_REGEX_PATTERN,
+            details.formatted_citation,  # type: ignore[union-attr]
+        )
+        assert (
+            expected_citation_format is not None
+        ), "Expected string should match the citation pattern"
+        assert (
+            actual_citation_format is not None
+        ), "Actual string should match the citation pattern"
+
+        expected_remaining = (
+            paper_attributes["formatted_citation"][: expected_citation_format.start()]
+            + paper_attributes["formatted_citation"][expected_citation_format.end() :]
+        )
+
+        actual_remaining = (
+            details.formatted_citation[: actual_citation_format.start()]  # type: ignore[union-attr]
+            + details.formatted_citation[actual_citation_format.end() :]  # type: ignore[union-attr]
+        )
+
+        # Assert that the parts of the strings outside the citation count are identical
+        assert (
+            expected_remaining == actual_remaining
+        ), "Formatted citation text should match except for citation count"
+
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
