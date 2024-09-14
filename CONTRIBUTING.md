@@ -26,7 +26,7 @@ pip install -e .
 
 Use the following commands:
 
-- Run tests:
+- Run tests (requires an OpenAI key in your environment)
 
   ```bash
   pytest
