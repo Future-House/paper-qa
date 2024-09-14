@@ -52,6 +52,9 @@ requires-python = ">=3.11"
 datasets = [
     "datasets",
 ]
+docx = [
+    "python-docx",
+]
 ldp = [
     "ldp>=0.6",  # For LiteLLM 1.42.1 pinning's UnsupportedParamsError fix
 ]
@@ -62,9 +65,6 @@ typing = [
 ]
 zotero = [
     "pyzotero",
-]
-docx = [
-    "python-docx",
 ]
 
 [project.scripts]
@@ -141,11 +141,11 @@ ignore_missing_imports = true
 # Per-module configuration options
 module = [
     "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
+    "docx",  # SEE: https://github.com/python-openxml/python-docx/issues/1432
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3361
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
-    "docx",  # SEE: https://github.com/python-openxml/python-docx/issues/1432
 ]
 
 [tool.pylint]
@@ -415,9 +415,9 @@ dev-dependencies = [
     "pytest-timer[colorama]",
     "pytest-xdist",
     "pytest>=8",  # Pin to keep recent
+    "python-docx",
     "python-dotenv",
     "pyzotero",
-    "python-docx",
     "refurb>=2",  # Pin to keep recent
     "requests",
 ]

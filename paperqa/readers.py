@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import os
 from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
-import os
 import pymupdf
 import tiktoken
 from html2text import __version__ as html2text_version
@@ -34,14 +34,15 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
     )
     return ParsedText(content=pages, metadata=metadata)
 
+
 def parse_docx_to_text(path: str | os.PathLike) -> ParsedText:
     try:
         import docx
     except ImportError as e:
         raise ImportError(
-        "python-docx is required for reading docx files. Please install using:"
-        " `pip3 install paper-qa[python-docx]`."
-    ) from e
+            "python-docx is required for reading docx files. Please install using:"
+            " `pip3 install paper-qa[python-docx]`."
+        ) from e
     doc = docx.Document(path)
     text = "\n".join([para.text for para in doc.paragraphs])
     metadata = ParsedMetadata(
