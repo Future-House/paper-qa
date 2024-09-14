@@ -4,7 +4,7 @@ from math import ceil
 from pathlib import Path
 from typing import Literal, overload
 
-import docx
+import os
 import pymupdf
 import tiktoken
 from html2text import __version__ as html2text_version
@@ -34,7 +34,14 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
     )
     return ParsedText(content=pages, metadata=metadata)
 
-def parse_docx_to_text(path: Path) -> ParsedText:
+def parse_docx_to_text(path: str | os.PathLike) -> ParsedText:
+    try:
+        import docx
+    except ImportError as e:
+        raise ImportError(
+        "python-docx is required for reading docx files. Please install using:"
+        " `pip3 install paper-qa[python-docx]`."
+    ) from e
     doc = docx.Document(path)
     text = "\n".join([para.text for para in doc.paragraphs])
     metadata = ParsedMetadata(
@@ -280,17 +287,18 @@ def read_doc(
         parsed_text_only: return parsed text without chunking
         include_metadata: return a tuple
     """
-    str_path = str(path)
+    # Convert to lowercase for case-insensitive file extension matching
+    str_path = str(path).lower()
     parsed_text = None
 
     # start with parsing -- users may want to store this separately
-    if str_path.lower().endswith(".pdf"):
+    if str_path.endswith(".pdf"):
         parsed_text = parse_pdf_to_pages(path)
-    elif str_path.lower().endswith((".doc", ".docx")):
+    elif str_path.endswith((".doc", ".docx")):
         parsed_text = parse_docx_to_text(path)
-    elif str_path.lower().endswith(".txt"):
+    elif str_path.endswith(".txt"):
         parsed_text = parse_text(path)
-    elif str_path.lower().endswith(".html"):
+    elif str_path.endswith(".html"):
         parsed_text = parse_text(path, html=True)
     else:
         parsed_text = parse_text(path, split_lines=True, use_tiktoken=False)
@@ -299,14 +307,14 @@ def read_doc(
         return parsed_text
 
     # next chunk the parsed text
-    if str_path.lower().endswith(".pdf"):
+    if str_path.endswith(".pdf"):
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap_pdf_by_page"
         )
-    elif str_path.lower().endswith((".txt", ".html", ".doc", ".docx")):
+    elif str_path.endswith((".txt", ".html", ".doc", ".docx")):
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )

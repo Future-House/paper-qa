@@ -18,25 +18,19 @@ classifiers = [
 ]
 dependencies = [
     "PyCryptodome",
-    "aiohttp",
-    # TODO: remove in favor of httpx
+    "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
-    "fhaviary[llm]>=0.6",
-    # For info on Message
-    "html2text",
-    # TODO: evaluate moving to an opt-in dependency
+    "fhaviary[llm]>=0.6",  # For info on Message
+    "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
-    "litellm>=1.44",
-    # to prevent sys.stdout on router creation
+    "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
     "pymupdf",
-    "python-docx>=1.1.2",
     "rich",
-    "setuptools",
-    # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
+    "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",
@@ -68,6 +62,9 @@ typing = [
 ]
 zotero = [
     "pyzotero",
+]
+docx = [
+    "python-docx",
 ]
 
 [project.scripts]
@@ -146,7 +143,9 @@ module = [
     "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
     "litellm",  # SEE: https://github.com/BerriAI/litellm/issues/825
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
+    "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3361
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
+    "docx",  # SEE: https://github.com/python-openxml/python-docx/issues/1432
 ]
 
 [tool.pylint]
@@ -418,6 +417,7 @@ dev-dependencies = [
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "pyzotero",
+    "python-docx",
     "refurb>=2",  # Pin to keep recent
     "requests",
 ]

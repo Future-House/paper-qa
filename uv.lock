@@ -1276,7 +1276,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.3.dev3+gcd82b52.d20240913"
+version = "5.0.3.dev4+g6515493.d20240914"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1291,7 +1291,6 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pymupdf" },
-    { name = "python-docx" },
     { name = "rich" },
     { name = "setuptools" },
     { name = "tantivy" },
@@ -1302,6 +1301,9 @@ dependencies = [
 [package.optional-dependencies]
 datasets = [
     { name = "datasets" },
+]
+docx = [
+    { name = "python-docx" },
 ]
 ldp = [
     { name = "ldp" },
@@ -1334,6 +1336,7 @@ dev = [
     { name = "pytest-sugar" },
     { name = "pytest-timer", extra = ["colorama"] },
     { name = "pytest-xdist" },
+    { name = "python-docx" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
     { name = "refurb" },
@@ -1359,7 +1362,7 @@ requires-dist = [
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pydantic-settings" },
     { name = "pymupdf" },
-    { name = "python-docx", specifier = ">=1.1.2" },
+    { name = "python-docx", marker = "extra == 'docx'" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
     { name = "rich" },
     { name = "setuptools" },
@@ -1387,6 +1390,7 @@ dev = [
     { name = "pytest-sugar" },
     { name = "pytest-timer", extras = ["colorama"] },
     { name = "pytest-xdist" },
+    { name = "python-docx" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
     { name = "refurb", specifier = ">=2" },

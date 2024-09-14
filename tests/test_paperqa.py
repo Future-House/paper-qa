@@ -1018,3 +1018,44 @@ def test_external_doc_index(stub_data_dir: Path) -> None:
     docs2 = Docs(texts_index=docs.texts_index)
     assert not docs2.docs
     assert docs2.get_evidence("What is the date of flag day?").contexts
+
+
+def test_docx_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
+    docs = Docs()
+    docs.add(stub_data_dir / "paper.docx", "Wellawatte et al, XAI Review, 2023")
+    # doc will be a DocDetails object, but nothing can be found
+    # thus, we retain the prior citation data
+    assert (
+        next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
+    )
+
+
+def test_docx_reader_match_doc_details(stub_data_dir: Path) -> None:
+    doc_path = stub_data_dir / "paper.docx"
+    docs = Docs()
+    # we limit to only crossref since s2 is too flaky
+    docs.add(
+        doc_path,
+        "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
+        " Models, XAI Review, 2023",
+        use_doc_details=True,
+        clients={CrossrefProvider},
+        fields=["author", "journal"],
+    )
+    doc_details = next(iter(docs.docs.values()))
+    assert doc_details.dockey in {
+        "41f786fcc56d27ff0c1507153fae3774",  # From file contents
+        "5300ef1d5fb960d7",  # Or from crossref data
+    }
+    # note year is unknown because citation string is only parsed for authors/title/doi
+    # AND we do not request it back from the metadata sources
+    assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
+    assert set(doc_details.authors) == {  # type: ignore[attr-defined]
+        "Geemi P. Wellawatte",
+        "Heta A. Gandhi",
+        "Aditi Seshadri",
+        "Andrew D. White",
+    }
+    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"  # type: ignore[attr-defined]
+    answer = docs.query("Are counterfactuals actionable? [yes/no]")
+    assert "yes" in answer.answer or "Yes" in answer.answer
