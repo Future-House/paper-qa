@@ -68,15 +68,15 @@ class Docs(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: UUID = Field(default_factory=uuid4)
-    docs: dict[DocKey, Doc | DocDetails] = {}
-    texts: list[Text] = []
-    docnames: set[str] = set()
+    docs: dict[DocKey, Doc | DocDetails] = Field(default_factory=dict)
+    texts: list[Text] = Field(default_factory=list)
+    docnames: set[str] = Field(default_factory=set)
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = Field(default="default", description="Name of this docs collection")
     index_path: Path | None = Field(
         default=PAPERQA_DIR, description="Path to save index", validate_default=True
     )
-    deleted_dockeys: set[DocKey] = set()
+    deleted_dockeys: set[DocKey] = Field(default_factory=set)
 
     @field_validator("index_path")
     @classmethod
