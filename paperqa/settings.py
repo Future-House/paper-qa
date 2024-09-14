@@ -1,11 +1,40 @@
+import asyncio
 import importlib.resources
 import os
 from enum import StrEnum
 from pathlib import Path
+from pydoc import locate
 from typing import Any, ClassVar, assert_never, cast
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+from aviary.tools import ToolSelector
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    TypeAdapter,
+    computed_field,
+    field_validator,
+)
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
+
+try:
+    from ldp.agent import (
+        Agent,
+        HTTPAgentClient,
+        MemoryAgent,
+        ReActAgent,
+        SimpleAgent,
+        SimpleAgentState,
+    )
+    from ldp.graph.memory import Memory, UIndexMemoryModel
+    from ldp.graph.op_utils import set_training_mode
+    from ldp.llms import EmbeddingModel as LDPEmbeddingModel
+
+    _Memories = TypeAdapter(dict[int, Memory] | list[Memory])  # type: ignore[var-annotated]
+
+    HAS_LDP_INSTALLED = True
+except ImportError:
+    HAS_LDP_INSTALLED = False
 
 from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from paperqa.prompts import (
@@ -519,6 +548,89 @@ class Settings(BaseSettings):
 
     def get_embedding_model(self) -> EmbeddingModel:
         return embedding_model_factory(self.embedding, **(self.embedding_config or {}))
+
+    def make_aviary_tool_selector(self, agent_type: str | type) -> ToolSelector | None:
+        """Attempt to convert the input agent type to an aviary ToolSelector."""
+        if agent_type is ToolSelector or (
+            isinstance(agent_type, str)
+            and (
+                agent_type == ToolSelector.__name__
+                or (
+                    agent_type.startswith(
+                        ToolSelector.__module__.split(".", maxsplit=1)[0]
+                    )
+                    and locate(agent_type) is ToolSelector
+                )
+            )
+        ):
+            return ToolSelector(
+                model_name=self.agent.agent_llm,
+                acompletion=self.get_agent_llm().router.acompletion,
+                **(self.agent.agent_config or {}),
+            )
+        return None
+
+    async def make_ldp_agent(
+        self, agent_type: str | type
+    ) -> "Agent[SimpleAgentState] | None":
+        """Attempt to convert the input agent type to an ldp Agent."""
+        if not isinstance(agent_type, str):  # Convert to fully qualified name
+            agent_type = f"{agent_type.__module__}.{agent_type.__name__}"
+        if not agent_type.startswith("ldp"):
+            return None
+        if not HAS_LDP_INSTALLED:
+            raise ImportError(
+                "ldp agents requires the 'ldp' extra for 'ldp'. Please:"
+                " `pip install paper-qa[ldp]`."
+            )
+
+        # TODO: support general agents
+        agent_cls = cast(type[Agent], locate(agent_type))
+        agent_settings = self.agent
+        agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
+        if issubclass(agent_cls, ReActAgent | MemoryAgent):
+            if (
+                issubclass(agent_cls, MemoryAgent)
+                and "memory_model" in config
+                and "memories" in config
+            ):
+                if "embedding_model" in config["memory_model"]:
+                    # Work around LDPEmbeddingModel not yet supporting deserialization
+                    config["memory_model"]["embedding_model"] = (
+                        LDPEmbeddingModel.from_name(
+                            embedding=config["memory_model"].pop("embedding_model")[
+                                "name"
+                            ]
+                        )
+                    )
+                config["memory_model"] = UIndexMemoryModel(**config["memory_model"])
+                memories = _Memories.validate_python(config.pop("memories"))
+                await asyncio.gather(
+                    *(
+                        config["memory_model"].add_memory(memory)
+                        for memory in (
+                            memories.values()
+                            if isinstance(memories, dict)
+                            else memories
+                        )
+                    )
+                )
+            return agent_cls(
+                llm_model={"model": agent_llm, "temperature": self.temperature},
+                **config,
+            )
+        if issubclass(agent_cls, SimpleAgent):
+            return agent_cls(
+                llm_model={"model": agent_llm, "temperature": self.temperature},
+                sys_prompt=agent_settings.agent_system_prompt,
+                **config,
+            )
+        if issubclass(agent_cls, HTTPAgentClient):
+            set_training_mode(False)
+            return HTTPAgentClient[SimpleAgentState](
+                agent_state_type=SimpleAgentState, **config
+            )
+        raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
 
 MaybeSettings = Settings | str | None
