@@ -46,7 +46,7 @@ from paperqa.settings import Settings
 from paperqa.types import Answer
 from paperqa.utils import pqa_directory
 
-from .env import Environment
+from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
 from .models import AgentStatus, AnswerResponse, QueryRequest, SimpleProfiler
 from .search import SearchDocumentStorage, SearchIndex
@@ -235,7 +235,7 @@ async def run_fake_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
-    env = Environment(query, docs, **env_kwargs)
+    env = PaperQAEnvironment(query, docs, **env_kwargs)
     _, tools = await env.reset()
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
@@ -281,7 +281,7 @@ async def run_aviary_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
-    env = Environment(query, docs, **env_kwargs)
+    env = PaperQAEnvironment(query, docs, **env_kwargs)
     done = False
 
     try:
@@ -345,7 +345,7 @@ async def run_ldp_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
-    env = Environment(query, docs, **env_kwargs)
+    env = PaperQAEnvironment(query, docs, **env_kwargs)
     done = False
 
     try:
