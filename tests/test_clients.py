@@ -117,7 +117,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
         # compares the citation without the specific number of citations
         assert compare_formatted_citations(
             paper_attributes['formatted_citation'], details.formatted_citation
-        ), "Formatted citation does not match except for citation count."
+        ), "Formatted citation should match"
         
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
