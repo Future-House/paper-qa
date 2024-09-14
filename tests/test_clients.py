@@ -113,44 +113,29 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
                 client_list,
             ),
         )
-        details = await client.query(title=paper_attributes["title"])
 
-        # matches the citation pattern, not the specific citation count
-        # search because the count will be somewhere in the middle of the string
-        expected_citation_format = re.search(
+        details = await client.query(title=paper_attributes["title"])
+        expected_citation_str = re.sub(
             DocDetails.CITATION_COUNT_REGEX_PATTERN,
+            r"\1n\2",
             paper_attributes["formatted_citation"],
         )
-        actual_citation_format = re.search(
+        actual_citation_str = re.sub(
             DocDetails.CITATION_COUNT_REGEX_PATTERN,
+            r"\1n\2",
             details.formatted_citation,  # type: ignore[union-attr]
         )
-        assert (
-            expected_citation_format is not None
-        ), "Expected string should match the citation pattern"
-        assert (
-            actual_citation_format is not None
-        ), "Actual string should match the citation pattern"
 
-        expected_remaining = (
-            paper_attributes["formatted_citation"][: expected_citation_format.start()]
-            + paper_attributes["formatted_citation"][expected_citation_format.end() :]
-        )
-
-        actual_remaining = (
-            details.formatted_citation[: actual_citation_format.start()]  # type: ignore[union-attr]
-            + details.formatted_citation[actual_citation_format.end() :]  # type: ignore[union-attr]
-        )
-
-        # Assert that the parts of the strings outside the citation count are identical
+        # Assert that the normalized strings are identical
         assert (
-            expected_remaining == actual_remaining
+            expected_citation_str == actual_citation_str
         ), "Formatted citation text should match except for citation count"
 
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
+            # Equality check all attributes but the ones in the below set
             if key not in {"is_oa", "source", "formatted_citation"}:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
             elif key == "is_oa":
