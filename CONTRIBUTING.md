@@ -52,6 +52,27 @@ Use the following commands:
 
 See our GitHub Actions [`tests.yml`](.github/workflows/tests.yml) for further reference.
 
+## Using `pytest-recording` and VCR cassettes
+
+We use the [`pytest-recording`](https://github.com/kiwicom/pytest-recording) plugin
+to create VCR cassettes to cache HTTP requests,
+making our unit tests more deterministic.
+
+To record a new VCR cassette:
+
+```bash
+uv run pytest tests/desired_test_module.py
+```
+
+And the new cassette(s) should appear in [`tests/cassettes`](tests/cassettes).
+
+Our configuration for `pytest-recording` can be found in [`tests/conftest.py`](tests/conftest.py).
+This includes header removals (e.g. OpenAI `authorization` key)
+from responses to ensure sensitive information is excluded from the cassettes.
+
+Please ensure cassettes are less than 1 MB
+to keep tests loading quickly.
+
 ## Additional resources
 
 For more information on contributing, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file in the repository.
