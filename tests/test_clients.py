@@ -100,8 +100,9 @@ from paperqa.clients.retractions import RetractionDataPostProcessor
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]) -> None:
     async with aiohttp.ClientSession() as session:
-        client_list = list(ALL_CLIENTS)
-        client_list.remove(RetractionDataPostProcessor)
+        client_list = [
+            client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
+        ]
         client = DocMetadataClient(
             session,
             clients=cast(
@@ -206,8 +207,9 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]) -> None:
     async with aiohttp.ClientSession() as session:
-        client_list = list(ALL_CLIENTS)
-        client_list.remove(RetractionDataPostProcessor)
+        client_list = [
+            client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
+        ]
         client = DocMetadataClient(
             session,
             clients=cast(
@@ -572,18 +574,20 @@ async def test_ensure_sequential_run_early_stop(
         assert record_indices["early_stop"] != -1, "We should stop early."
 
 
-@pytest.mark.vcr(record_mode="once")
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_retraction_status():
     async with aiohttp.ClientSession() as session:
-        retractprocessor = RetractionDataPostProcessor("stub_data/stub_retractions.csv")
+        retract_processor = RetractionDataPostProcessor(
+            "stub_data/stub_retractions.csv"
+        )
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
                 Collection[
                     type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
                 ],
-                [CrossrefProvider, retractprocessor],
+                [CrossrefProvider, retract_processor],
             ),
         )
         crossref_details = await crossref_client.query(
