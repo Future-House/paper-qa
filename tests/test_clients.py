@@ -595,7 +595,9 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
             title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
             fields=["title", "doi", "authors", "journal"],
         )
-
-        assert "**RETRACTED ARTICLE** Citation: Jiaye Han." in crossref_details.formatted_citation  # type: ignore[union-attr]
-
-        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]
+        assert crossref_details
+        assert (
+            "**RETRACTED ARTICLE** Citation: Jiaye Han."
+            in crossref_details.formatted_citation
+        )
+        assert crossref_details.is_retracted is True, "Should be retracted"
