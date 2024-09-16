@@ -652,6 +652,10 @@ class DocDetails(Doc):
 
             elif field in {"citation_count", "year", "publication_date"}:
                 # get the latest data
+                # this conditional is written in a way to handle if multiple doc objects
+                # are provided, we'll use the highest value
+                # if there's only one valid value, we'll use that regardless even if
+                # that value is 0
                 if self_value is None or other_value is None:
                     merged_data[field] = (
                         # if self_value is 0, it's evaluated as falsy and will fallback,
