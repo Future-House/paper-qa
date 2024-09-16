@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2296021,"items":[{"DOI":"10.1038\/s42256-024-00832-8","author":[{"given":"Andres","family":"M.
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2302136,"items":[{"DOI":"10.1038\/s42256-024-00832-8","author":[{"given":"Andres","family":"M.
           Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
           D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"container-title":["Nature
           Machine Intelligence"],"title":["Augmenting large language models with chemistry
@@ -29,23 +29,371 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:23 GMT
+          - Mon, 16 Sep 2024 18:42:05 GMT
         Server:
           - Jetty(9.4.40.v20210413)
+        Set-Cookie:
+          - AWSALB=OGj1mabDBjYNxdPibzyS2iwNEvWxHNlp3aKkjYKvxi0XdL30q39xfaQi6VZWqPdsAKu0fSsItSTb8Ulbb+rI/UodCxQDDI87GOVhUoeIrvkqpiSf+ORBpq7908SL;
+            Expires=Mon, 23 Sep 2024 18:42:04 GMT; Path=/
+          - AWSALBCORS=OGj1mabDBjYNxdPibzyS2iwNEvWxHNlp3aKkjYKvxi0XdL30q39xfaQi6VZWqPdsAKu0fSsItSTb8Ulbb+rI/UodCxQDDI87GOVhUoeIrvkqpiSf+ORBpq7908SL;
+            Expires=Mon, 23 Sep 2024 18:42:04 GMT; Path=/; SameSite=None
         Vary:
           - Accept-Encoding
         permissions-policy:
           - interest-cohort=()
         x-api-pool:
-          - plus
+          - polite
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
+          - "50"
         x-ratelimit-interval:
           - 1s
         x-ratelimit-limit:
-          - "150"
+          - "50"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Beta-Blocker+Interruption+or+Continuation+after+Myocardial+Infarction&rows=1&select=DOI,author,container-title,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":1782626,"items":[{"DOI":"10.1056\/nejmoa2404204","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-1901-2808","authenticated-orcid":false,"given":"Johanne","family":"Silvain","sequence":"first","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Guillaume","family":"Cayla","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Emile","family":"Ferrari","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Gr\u00e9goire","family":"Range","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Etienne","family":"Puymirat","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Nicolas","family":"Delarche","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Paul","family":"Guedeney","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Thomas","family":"Cuisset","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Fabrice","family":"Ivanes","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Thibault","family":"Lhermusier","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Thibault","family":"Petroni","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Gilles","family":"Lemesle","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Fran\u00e7ois","family":"Bresoles","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Jean-No\u00ebl","family":"Labeque","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Thibaut","family":"Pommier","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Jean-Guillaume","family":"Dillinger","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Florence","family":"Leclercq","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Franck","family":"Boccara","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Pascal","family":"Lim","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Timoth\u00e9e","family":"Besseyre
+          des Horts","sequence":"additional","affiliation":[{"name":"From Sorbonne Universit\u00e9,
+          ACTION Group, INSERM Unit\u00e9 Mixte de Recherche (UMRS) 1166, H\u00f4pital
+          Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance Publique\u2013H\u00f4pitaux
+          de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.), the Department of Cardiology,
+          H\u00f4pital Europ\u00e9en Georges Pompidou, AP-HP, Universit\u00e9 Paris
+          Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular Trials) (G.L.),
+          the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9, H\u00f4pital
+          Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the Cardiology
+          Department, H\u00f4pital Saint..."}]},{"given":"Thierry","family":"Fourme","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Fran\u00e7ois","family":"Jourda","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Alain","family":"Furber","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Benoit","family":"Lattuca","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Nassim","family":"Redjimi","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3134-6875","authenticated-orcid":false,"given":"Christophe","family":"Thuaire","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"ORCID":"http:\/\/orcid.org\/0000-0001-5910-3002","authenticated-orcid":false,"given":"Pierre","family":"Deharo","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Niki","family":"Procopi","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Raphaelle","family":"Dumaine","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Michel","family":"Slama","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Laurent","family":"Payot","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Mohamad","family":"El
+          Kasty","sequence":"additional","affiliation":[{"name":"From Sorbonne Universit\u00e9,
+          ACTION Group, INSERM Unit\u00e9 Mixte de Recherche (UMRS) 1166, H\u00f4pital
+          Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance Publique\u2013H\u00f4pitaux
+          de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.), the Department of Cardiology,
+          H\u00f4pital Europ\u00e9en Georges Pompidou, AP-HP, Universit\u00e9 Paris
+          Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular Trials) (G.L.),
+          the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9, H\u00f4pital
+          Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the Cardiology
+          Department, H\u00f4pital Saint..."}]},{"given":"Karim","family":"Aacha","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Abdourahmane","family":"Diallo","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Eric","family":"Vicaut","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]},{"given":"Gilles","family":"Montalescot","sequence":"additional","affiliation":[{"name":"From
+          Sorbonne Universit\u00e9, ACTION Group, INSERM Unit\u00e9 Mixte de Recherche
+          (UMRS) 1166, H\u00f4pital Piti\u00e9\u2013Salp\u00eatri\u00e8re Assistance
+          Publique\u2013H\u00f4pitaux de Paris (AP-HP) (J.S., P.G., N.P., K.A., G.M.),
+          the Department of Cardiology, H\u00f4pital Europ\u00e9en Georges Pompidou,
+          AP-HP, Universit\u00e9 Paris Cit\u00e9 (E.P.), FACT (French Alliance for Cardiovascular
+          Trials) (G.L.), the Department of Cardiology, Universit\u00e9 Paris Cit\u00e9,
+          H\u00f4pital Lariboisi\u00e8re, AP-HP, INSERM Unit\u00e9 942 (J.-G.D.), the
+          Cardiology Department, H\u00f4pital Saint..."}]}],"container-title":["New
+          England Journal of Medicine"],"title":["Beta-Blocker Interruption or Continuation
+          after Myocardial Infarction"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1356"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 16 Sep 2024 18:42:07 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Set-Cookie:
+          - AWSALB=X55bRq6IDdtR62kKyYOZqrCN+lrEjWdZCpUUSGg6bfOUJx96s2NwT9w7AqnQAzv5HXRyLnV8nF0YkXj21iE35S+Ko1Xct5YWoq6t4UVz7k57UrB5zCVeCh6oamg+;
+            Expires=Mon, 23 Sep 2024 18:42:05 GMT; Path=/
+          - AWSALBCORS=X55bRq6IDdtR62kKyYOZqrCN+lrEjWdZCpUUSGg6bfOUJx96s2NwT9w7AqnQAzv5HXRyLnV8nF0YkXj21iE35S+Ko1Xct5YWoq6t4UVz7k57UrB5zCVeCh6oamg+;
+            Expires=Mon, 23 Sep 2024 18:42:05 GMT; Path=/; SameSite=None
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - polite
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "50"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "50"
       status:
         code: 200
         message: OK
