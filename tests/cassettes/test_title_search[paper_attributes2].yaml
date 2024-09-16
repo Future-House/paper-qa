@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2296021,"items":[{"indexed":{"date-parts":[[2024,9,4]],"date-time":"2024-09-04T17:39:08Z","timestamp":1725471548702},"reference-count":103,"publisher":"Springer
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2302135,"items":[{"indexed":{"date-parts":[[2024,9,13]],"date-time":"2024-09-13T07:49:27Z","timestamp":1726213767507},"reference-count":103,"publisher":"Springer
           Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
           Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
           Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
@@ -24,7 +24,7 @@ interactions:
           both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
           in automating a diverse set of chemical tasks. Our work not only aids expert
           chemists and lowers barriers for non-experts but also fosters scientific advancement
-          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":17,"title":["Augmenting
+          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":20,"title":["Augmenting
           large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
           Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
           D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
@@ -313,7 +313,7 @@ interactions:
           (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
           A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
           Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.731644,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.488018,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
           September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
@@ -334,11 +334,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "10574"
+          - "10575"
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:22 GMT
+          - Mon, 16 Sep 2024 14:27:33 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -366,7 +366,7 @@ interactions:
     response:
       body:
         string:
-          '{"elapsed_seconds":0.298,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
+          '{"elapsed_seconds":0.315,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
           (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"data_standard":2,"doi":"10.1038/s42256-024-00832-8","doi_url":"https://doi.org/10.1038/s42256-024-00832-8","first_oa_location":{"endpoint_id":null,"evidence":"open
           (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"genre":"journal-article","has_repository_copy":true,"is_oa":true,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"2522-5839","journal_issns":"2522-5839","journal_name":"Nature
           Machine Intelligence","oa_locations":[{"endpoint_id":null,"evidence":"open
@@ -1936,17 +1936,17 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "39585"
+          - "39584"
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:22 GMT
+          - Mon, 16 Sep 2024 14:27:33 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490461&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=j0vwwBQJBKSjl7xJkMYB4ksAyr6H3jKPUYltKx2FaWA%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1726496853&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=sp2SR2LAkKeYFx5X3Aha4VFoyxSXyXrEe1am8ilyHDk%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1725490461&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=j0vwwBQJBKSjl7xJkMYB4ksAyr6H3jKPUYltKx2FaWA%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1726496853&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=sp2SR2LAkKeYFx5X3Aha4VFoyxSXyXrEe1am8ilyHDk%3D
         Server:
           - gunicorn
         Vary:
@@ -1969,7 +1969,7 @@ interactions:
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
           "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 191, "influentialCitationCount":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 196, "influentialCitationCount":
           12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
           "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
           "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
@@ -1982,7 +1982,7 @@ interactions:
           M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
           "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
           {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 179.3787}]}
+          "name": "P. Schwaller"}], "matchScore": 177.60979}]}
 
           '
       headers:
@@ -1991,31 +1991,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1550"
+          - "1551"
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:22 GMT
+          - Mon, 16 Sep 2024 14:27:33 GMT
         Via:
-          - 1.1 62c71b579b931f194fbc7abcc843d132.cloudfront.net (CloudFront)
+          - 1.1 0f4013a0af68dcba176ca4372e470df4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - VwbnXhY_A5M45lRneO76qNYDmL4RnBGAb0pjfkEcjJruMewyZUvaQQ==
+          - dd4-81xSX7SU7omkJU1Mlys_dal7O5oWEAfaDWM3J1pAk_F4JBFIbg==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmi8sEt4vHcEvHw=
+          - eM79WGChvHcElGQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1550"
+          - "1551"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:54:22 GMT
+          - Mon, 16 Sep 2024 14:27:33 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 797ca22d-1ce8-48ae-b214-3271d15e4a9e
+          - 9c34751f-334f-48b1-a2ed-ceb7953d2e78
       status:
         code: 200
         message: OK
@@ -2045,7 +2045,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 04 Sep 2024 22:54:22 GMT
+          - Mon, 16 Sep 2024 14:27:36 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

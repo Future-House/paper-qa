@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import re
 from collections.abc import Collection, Sequence
 from typing import Any, cast
 from unittest.mock import patch
@@ -18,8 +17,7 @@ from paperqa.clients import (
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
-from paperqa.clients.retractions import RetrationDataPostProcessor
-from paperqa.types import DocDetails
+from paperqa.clients.retractions import RetractionDataPostProcessor
 
 
 @pytest.mark.vcr
@@ -68,7 +66,7 @@ from paperqa.types import DocDetails
                 " Samuel G. Rodriques, and Andrew D. White. Paperqa:"
                 " retrieval-augmented generative agent for scientific research. ArXiv,"
                 " Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559,"
-                " doi:10.48550/arxiv.2312.07559. This article has 23 citations."
+                " doi:10.48550/arxiv.2312.07559. This article has 25 citations."
             ),
             "is_oa": None,
         },
@@ -92,7 +90,7 @@ from paperqa.types import DocDetails
                 " White, and Philippe Schwaller. Augmenting large language models with"
                 " chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
-                " doi:10.1038/s42256-024-00832-8. This article has 191 citations and is"
+                " doi:10.1038/s42256-024-00832-8. This article has 196 citations and is"
                 " from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
@@ -102,8 +100,9 @@ from paperqa.types import DocDetails
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]) -> None:
     async with aiohttp.ClientSession() as session:
-        client_list = list(ALL_CLIENTS)
-        client_list.remove(RetrationDataPostProcessor)
+        client_list = [
+            client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
+        ]
         client = DocMetadataClient(
             session,
             clients=cast(
@@ -113,30 +112,12 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
                 client_list,
             ),
         )
-
         details = await client.query(title=paper_attributes["title"])
-        expected_citation_str = re.sub(
-            DocDetails.CITATION_COUNT_REGEX_PATTERN,
-            r"\1n\2",
-            paper_attributes["formatted_citation"],
-        )
-        actual_citation_str = re.sub(
-            DocDetails.CITATION_COUNT_REGEX_PATTERN,
-            r"\1n\2",
-            details.formatted_citation,  # type: ignore[union-attr]
-        )
-
-        # Assert that the normalized strings are identical
-        assert (
-            expected_citation_str == actual_citation_str
-        ), "Formatted citation text should match except for citation count"
-
         assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
-            # Equality check all attributes but the ones in the below set
-            if key not in {"is_oa", "source", "formatted_citation"}:
+            if key not in {"is_oa", "source"}:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
             elif key == "is_oa":
                 assert (
@@ -226,8 +207,9 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str]) -> None:
     async with aiohttp.ClientSession() as session:
-        client_list = list(ALL_CLIENTS)
-        client_list.remove(RetrationDataPostProcessor)
+        client_list = [
+            client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
+        ]
         client = DocMetadataClient(
             session,
             clients=cast(
@@ -592,16 +574,20 @@ async def test_ensure_sequential_run_early_stop(
         assert record_indices["early_stop"] != -1, "We should stop early."
 
 
+@pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_retraction_status():
     async with aiohttp.ClientSession() as session:
+        retract_processor = RetractionDataPostProcessor(
+            "stub_data/stub_retractions.csv"
+        )
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
                 Collection[
                     type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
                 ],
-                [CrossrefProvider, RetrationDataPostProcessor],
+                [CrossrefProvider, retract_processor],
             ),
         )
         crossref_details = await crossref_client.query(

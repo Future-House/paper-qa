@@ -14,7 +14,7 @@ from paperqa.utils import gather_with_concurrency
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor
-from .retractions import RetrationDataPostProcessor
+from .retractions import RetractionDataPostProcessor
 from .semantic_scholar import SemanticScholarProvider
 from .unpaywall import UnpaywallProvider
 
@@ -29,7 +29,7 @@ DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
 ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
     *DEFAULT_CLIENTS,
     UnpaywallProvider,
-    RetrationDataPostProcessor,
+    RetractionDataPostProcessor,
 }
 
 
@@ -89,12 +89,19 @@ class DocMetadataClient:
                 self.tasks.append(
                     DocMetadataTask(
                         providers=[
-                            c() for c in sub_clients if issubclass(c, MetadataProvider)
+                            c if isinstance(c, MetadataProvider) else c()
+                            for c in sub_clients
+                            if (isinstance(c, type) and issubclass(c, MetadataProvider))
+                            or isinstance(c, MetadataProvider)
                         ],
                         processors=[
-                            c()
+                            c if isinstance(c, MetadataPostProcessor) else c()
                             for c in sub_clients
-                            if issubclass(c, MetadataPostProcessor)
+                            if (
+                                isinstance(c, type)
+                                and issubclass(c, MetadataPostProcessor)
+                            )
+                            or isinstance(c, MetadataPostProcessor)
                         ],
                     )
                 )
@@ -102,9 +109,19 @@ class DocMetadataClient:
         if not self.tasks and all(not isinstance(c, Collection) for c in clients):
             self.tasks.append(
                 DocMetadataTask(
-                    providers=[c() for c in clients if issubclass(c, MetadataProvider)],  # type: ignore[operator, arg-type]
+                    providers=[
+                        c if isinstance(c, MetadataProvider) else c()  # type: ignore[redundant-expr]
+                        for c in clients
+                        if (isinstance(c, type) and issubclass(c, MetadataProvider))
+                        or isinstance(c, MetadataProvider)
+                    ],
                     processors=[
-                        c() for c in clients if issubclass(c, MetadataPostProcessor)  # type: ignore[operator, arg-type]
+                        c if isinstance(c, MetadataPostProcessor) else c()  # type: ignore[redundant-expr]
+                        for c in clients
+                        if (
+                            isinstance(c, type) and issubclass(c, MetadataPostProcessor)
+                        )
+                        or isinstance(c, MetadataPostProcessor)
                     ],
                 )
             )

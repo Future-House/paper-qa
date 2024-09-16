@@ -344,8 +344,6 @@ class DocDetails(Doc):
         "http://dx.doi.org/",
     }
     AUTHOR_NAMES_TO_REMOVE: ClassVar[Collection[str]] = {"et al", "et al."}
-    # https://regex101.com/r/3LE9Mt/1
-    CITATION_COUNT_REGEX_PATTERN: ClassVar[str] = r"(This article has )\d+( citations?)"
 
     @field_validator("key")
     @classmethod
@@ -567,6 +565,7 @@ class DocDetails(Doc):
             or self.citation_count is None
             or self.source_quality is None
         ):
+            print(f"citation: {self.citation}, citation_count: {self.citation_count}")
             raise ValueError(
                 "Citation, citationCount, and sourceQuality are not set -- do you need"
                 " to call `hydrate`?"
@@ -606,7 +605,9 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(self, other: DocDetails | int) -> DocDetails:
+    def __add__(
+        self, other: DocDetails | int
+    ) -> DocDetails:  # pylint: disable=too-many-branches
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
@@ -652,13 +653,16 @@ class DocDetails(Doc):
                 # if we have multiple keys, we wipe them and allow regeneration
                 merged_data[field] = None  # type: ignore[assignment]
 
-            elif (
-                field in {"citation_count", "year", "publication_date"}
-                and self_value is not None
-                and other_value is not None
-            ):
+            elif field in {"citation_count", "year", "publication_date"}:
                 # get the latest data
-                merged_data[field] = max(self_value, other_value)
+                if self_value is None or other_value is None:
+                    merged_data[field] = (
+                        # if self_value is 0, it's evaluated as falsy and will fallback to other_value even if other_value is None
+                        # 0 is a valid value here
+                        self_value if self_value is not None else other_value
+                    )
+                else:
+                    merged_data[field] = max(self_value, other_value)
 
             else:
                 # Prefer non-null values, default preference for 'other' object.
