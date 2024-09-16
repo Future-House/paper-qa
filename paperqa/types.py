@@ -565,7 +565,6 @@ class DocDetails(Doc):
             or self.citation_count is None
             or self.source_quality is None
         ):
-            print(f"citation: {self.citation}, citation_count: {self.citation_count}")
             raise ValueError(
                 "Citation, citationCount, and sourceQuality are not set -- do you need"
                 " to call `hydrate`?"
