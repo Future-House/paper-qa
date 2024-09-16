@@ -604,9 +604,8 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(
-        self, other: DocDetails | int
-    ) -> DocDetails:  # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches
+    def __add__(self, other: DocDetails | int) -> DocDetails:
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
@@ -656,9 +655,12 @@ class DocDetails(Doc):
                 # get the latest data
                 if self_value is None or other_value is None:
                     merged_data[field] = (
-                        # if self_value is 0, it's evaluated as falsy and will fallback to other_value even if other_value is None
+                        # if self_value is 0, it's evaluated as falsy and will fallback,
+                        # to other_value even if other_value is None
                         # 0 is a valid value here
-                        self_value if self_value is not None else other_value
+                        self_value
+                        if self_value is not None
+                        else other_value
                     )
                 else:
                     merged_data[field] = max(self_value, other_value)
