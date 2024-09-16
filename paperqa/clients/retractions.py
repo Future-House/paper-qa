@@ -15,7 +15,7 @@ from .crossref import download_retracted_dataset
 logger = logging.getLogger(__name__)
 
 
-class RetrationDataPostProcessor(MetadataPostProcessor[DOIQuery]):
+class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
     def __init__(self, retraction_data_path: os.PathLike | str | None = None) -> None:
 
         if retraction_data_path is None:
