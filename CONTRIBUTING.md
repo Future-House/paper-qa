@@ -61,7 +61,7 @@ making our unit tests more deterministic.
 To record a new VCR cassette:
 
 ```bash
-uv run pytest tests/desired_test_module.py
+uv run pytest --record-mode=once tests/desired_test_module.py
 ```
 
 And the new cassette(s) should appear in [`tests/cassettes`](tests/cassettes).
