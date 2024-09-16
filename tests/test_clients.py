@@ -67,7 +67,7 @@ from paperqa.clients.retractions import RetractionDataPostProcessor
                 " Samuel G. Rodriques, and Andrew D. White. Paperqa:"
                 " retrieval-augmented generative agent for scientific research. ArXiv,"
                 " Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559,"
-                " doi:10.48550/arxiv.2312.07559. This article has 23 citations."
+                " doi:10.48550/arxiv.2312.07559. This article has 25 citations."
             ),
             "is_oa": None,
         },
@@ -91,7 +91,7 @@ from paperqa.clients.retractions import RetractionDataPostProcessor
                 " White, and Philippe Schwaller. Augmenting large language models with"
                 " chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
-                " doi:10.1038/s42256-024-00832-8. This article has 191 citations and is"
+                " doi:10.1038/s42256-024-00832-8. This article has 196 citations and is"
                 " from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
