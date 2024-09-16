@@ -604,7 +604,7 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    def __add__(self, other: DocDetails | int) -> DocDetails:
+    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: PLR0912
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
@@ -650,13 +650,20 @@ class DocDetails(Doc):
                 # if we have multiple keys, we wipe them and allow regeneration
                 merged_data[field] = None  # type: ignore[assignment]
 
-            elif (
-                field in {"citation_count", "year", "publication_date"}
-                and self_value is not None
-                and other_value is not None
-            ):
+            elif field in {"citation_count", "year", "publication_date"}:
                 # get the latest data
-                merged_data[field] = max(self_value, other_value)
+                # this conditional is written in a way to handle if multiple doc objects
+                # are provided, we'll use the highest value
+                # if there's only one valid value, we'll use that regardless even if
+                # that value is 0
+                if self_value is None or other_value is None:
+                    merged_data[field] = (
+                        self_value
+                        if self_value is not None  # Dance around 0
+                        else other_value
+                    )
+                else:
+                    merged_data[field] = max(self_value, other_value)
 
             else:
                 # Prefer non-null values, default preference for 'other' object.
