@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Collection, Sequence
+from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
 
@@ -576,10 +577,10 @@ async def test_ensure_sequential_run_early_stop(
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_crossref_retraction_status():
+async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
     async with aiohttp.ClientSession() as session:
         retract_processor = RetractionDataPostProcessor(
-            "stub_data/stub_retractions.csv"
+            f"{stub_data_dir}/stub_retractions.csv"
         )
         crossref_client = DocMetadataClient(
             session,
