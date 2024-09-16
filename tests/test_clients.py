@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Collection, Sequence
+from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
 
@@ -576,10 +577,10 @@ async def test_ensure_sequential_run_early_stop(
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_crossref_retraction_status():
+async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
     async with aiohttp.ClientSession() as session:
         retract_processor = RetractionDataPostProcessor(
-            "stub_data/stub_retractions.csv"
+            f"{stub_data_dir}/stub_retractions.csv"
         )
         crossref_client = DocMetadataClient(
             session,
@@ -594,7 +595,9 @@ async def test_crossref_retraction_status():
             title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
             fields=["title", "doi", "authors", "journal"],
         )
-
-        assert "**RETRACTED ARTICLE** Citation: Jiaye Han." in crossref_details.formatted_citation  # type: ignore[union-attr]
-
-        assert crossref_details.is_retracted is True, "Should be retracted"  # type: ignore[union-attr]
+        assert crossref_details
+        assert (
+            "**RETRACTED ARTICLE** Citation: Jiaye Han."
+            in crossref_details.formatted_citation
+        )
+        assert crossref_details.is_retracted is True, "Should be retracted"

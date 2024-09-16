@@ -1,0 +1,53 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=The+Dilemma+and+Countermeasures+of+Music+Education+under+the+Background+of+Big+Data&rows=1&select=DOI,author,container-title,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4250430,"items":[{"DOI":"10.1155\/2022\/8341966","author":[{"ORCID":"http:\/\/orcid.org\/0000-0003-3902-2613","authenticated-orcid":true,"given":"Jiaye","family":"Han","sequence":"first","affiliation":[{"name":"Pingdingshan
+          Polytechnic College, PingDingShan, Henan 467001, China"},{"name":"National
+          University of Life and Environmental Sciences of Ukraine, Kyiv 03041, Ukraine"}]}],"container-title":["Wireless
+          Communications and Mobile Computing"],"title":["The Dilemma and Countermeasures
+          of Music Education under the Background of Big Data"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 14 Sep 2024 21:41:42 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Set-Cookie:
+          - AWSALB=WoXDQTOarfiX9ISjhdhDDDhyB7XX/E7HBTVazMznn5Y6fEM/3cK4quSmODhVa3+NgmM5t55XUJ4A+VQvKNl0sVn/IruGSlBknqgHGQlZzQWJIoM+LAwTmPaUGhdR;
+            Expires=Sat, 21 Sep 2024 21:41:39 GMT; Path=/
+          - AWSALBCORS=WoXDQTOarfiX9ISjhdhDDDhyB7XX/E7HBTVazMznn5Y6fEM/3cK4quSmODhVa3+NgmM5t55XUJ4A+VQvKNl0sVn/IruGSlBknqgHGQlZzQWJIoM+LAwTmPaUGhdR;
+            Expires=Sat, 21 Sep 2024 21:41:39 GMT; Path=/; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - polite
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "50"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "50"
+      status:
+        code: 200
+        message: OK
+version: 1
