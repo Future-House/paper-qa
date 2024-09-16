@@ -604,8 +604,7 @@ class DocDetails(Doc):
         if self.doi:
             self.doc_id = encode_id(self.doi)
 
-    # pylint: disable=too-many-branches
-    def __add__(self, other: DocDetails | int) -> DocDetails:
+    def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: PLR0912
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
         if isinstance(other, int):
