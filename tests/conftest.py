@@ -34,7 +34,6 @@ def _setup_default_logs() -> None:
 def fixture_vcr_config() -> dict[str, Any]:
     return {
         "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
-        "record_mode": "none",
         "match_on": ["method", "host", "path", "query"],
         "allow_playback_repeats": True,
         "cassette_library_dir": "tests/cassettes",
