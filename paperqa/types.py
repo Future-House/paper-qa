@@ -658,11 +658,8 @@ class DocDetails(Doc):
                 # that value is 0
                 if self_value is None or other_value is None:
                     merged_data[field] = (
-                        # if self_value is 0, it's evaluated as falsy and will fallback,
-                        # to other_value even if other_value is None
-                        # 0 is a valid value here
                         self_value
-                        if self_value is not None
+                        if self_value is not None  # Dance around 0
                         else other_value
                     )
                 else:
