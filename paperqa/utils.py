@@ -469,6 +469,7 @@ def setup_default_logs() -> None:
                 "httpcore": {"level": "WARNING"},
                 "httpx": {"level": "WARNING"},
                 # SEE: https://github.com/BerriAI/litellm/issues/2256
+                "LiteLLM.Info": {"level": "WARNING"},
                 "LiteLLM": {"level": "WARNING"},
                 "LiteLLM Router": {"level": "WARNING"},
                 "LiteLLM Proxy": {"level": "WARNING"},

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import contextvars
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
 from enum import StrEnum
@@ -332,26 +333,6 @@ class LLMModel(ABC, BaseModel):
         return result
 
 
-DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_ONLY_HIGH",
-    },
-]
-
-
 IS_PYTHON_BELOW_312 = version_info < (3, 12)
 if not IS_PYTHON_BELOW_312:
     _DeploymentTypedDictValidator = TypeAdapter(
@@ -360,69 +341,10 @@ if not IS_PYTHON_BELOW_312:
 
 
 class LiteLLMModel(LLMModel):
-    """A wrapper around the litellm library.
+    """A wrapper around the litellm library."""
 
-    `config` should have two high level keys:
-        `model_list`: stores a list of all model configurations
-          (see https://docs.litellm.ai/docs/routing)
-        `router_kwargs`: kwargs for the Router class
-
-    This way users can specify routing strategies, retries, etc.
-    """
-
-    config: dict = Field(default_factory=dict)
-    name: str = "gpt-4o-mini"
-    _router: Router | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def maybe_set_config_attribute(cls, data: dict[str, Any]) -> dict[str, Any]:
-        """If a user only gives a name, make a sensible config dict for them."""
-        if "name" in data and "config" not in data:
-            data["config"] = {
-                "model_list": [
-                    {
-                        "model_name": data["name"],
-                        "litellm_params": {"model": data["name"]}
-                        | (
-                            {}
-                            if "gemini" not in data["name"]
-                            else {"safety_settings": DEFAULT_VERTEX_SAFETY_SETTINGS}
-                        ),
-                    }
-                ],
-                "router_kwargs": {"num_retries": 3, "retry_after": 5},
-            }
-        # we only support one "model name" for now, here we validate
-        model_list = data["config"]["model_list"]
-        if IS_PYTHON_BELOW_312:
-            if not isinstance(model_list, list):
-                # Work around https://github.com/BerriAI/litellm/issues/5664
-                raise TypeError(f"model_list must be a list, not a {type(model_list)}.")
-        else:
-            # pylint: disable-next=possibly-used-before-assignment
-            _DeploymentTypedDictValidator.validate_python(model_list)
-        if "config" in data and len({m["model_name"] for m in model_list}) > 1:
-            raise ValueError("Only one model name per router is supported for now.")
-        return data
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        # Remove the _router attribute as it's not picklable
-        state["_router"] = None
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-
-    @property
-    def router(self):
-        if self._router is None:
-            self._router = Router(
-                model_list=self.config["model_list"],
-                **self.config.get("router_kwargs", {}),
-            )
-        return self._router
+    name: str
+    router: Router = Field(exclude=True)
 
     async def acomplete(self, prompt: str) -> Chunk:
         response = await self.router.atext_completion(model=self.name, prompt=prompt)
@@ -476,10 +398,10 @@ class LiteLLMModel(LLMModel):
             )
 
     def infer_llm_type(self) -> str:
-        if all(
-            "text-completion" in m.get("litellm_params", {}).get("model", "")
-            for m in self.config["model_list"]
-        ):
+        m = next(
+            (m for m in self.router.model_list if m["model_name"] == self.name), {}
+        )
+        if "text-completion" in m.get("model", ""):
             return "completion"
         return "chat"
 

@@ -7,7 +7,7 @@
     "evidence_summary_length": "25 to 50 words",
     "answer_max_sources": 2,
     "answer_length": "50 to 100 words",
-    "max_concurrent_requests": 5
+    "max_concurrent_requests": 4
   },
   "parsing": {
     "use_doc_details": false

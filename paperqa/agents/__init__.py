@@ -35,9 +35,9 @@ def configure_cli_logging(verbosity: int = 0) -> None:
             "httpx": logging.WARNING,
             "paperqa.agents.models": logging.WARNING,
             "paperqa.agents.search": logging.INFO,
-            "litellm": logging.WARNING,
-            "LiteLLM Router": logging.WARNING,
-            "LiteLLM Proxy": logging.WARNING,
+            "LiteLLM": logging.CRITICAL,
+            "LiteLLM Router": logging.CRITICAL,
+            "LiteLLM Proxy": logging.CRITICAL,
         }
     }
 
@@ -52,13 +52,15 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         "paperqa.agents.main.agent_callers": logging.DEBUG,
         "paperqa.models": logging.DEBUG,
         "paperqa.agents.search": logging.DEBUG,
-        "litellm": logging.INFO,
+        "LiteLLM": logging.INFO,
         "LiteLLM Router": logging.INFO,
         "LiteLLM Proxy": logging.INFO,
     }
 
     verbosity_map[3] = verbosity_map[2] | {
-        "litellm": logging.DEBUG,  # <-- every single LLM call
+        "LiteLLM": logging.DEBUG,  # <-- every single LLM call
+        "LiteLLM Router": logging.DEBUG,
+        "LiteLLM Proxy": logging.DEBUG,
     }
 
     rich_handler = RichHandler(
@@ -78,7 +80,7 @@ def configure_cli_logging(verbosity: int = 0) -> None:
 
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
-            log_level := verbosity_map.get(min(verbosity, 2), {}).get(logger_name)
+            log_level := verbosity_map.get(min(verbosity, 3), {}).get(logger_name)
         ):
             logger_.setLevel(log_level)
 

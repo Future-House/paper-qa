@@ -7,6 +7,7 @@ from pydoc import locate
 from typing import Any, ClassVar, assert_never, cast
 
 from aviary.tools import ToolSelector
+from litellm import Router
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -49,6 +50,43 @@ from paperqa.prompts import (
 )
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
+
+DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_ONLY_HIGH",
+    },
+]
+
+# RPM, TPM
+# Just put a few - if yours are not here
+# set it manually
+TIER_1_USAGE_LIMITS = {
+    "gpt-4o": [500, 30000],
+    "gpt-4o-2024-08-06": [500, 30000],
+    "gpt-4o-mini": [500, 200000],
+    "gpt-4o-mini-2024-07-18": [500, 200000],
+    "gpt-4-turbo": [500, 30000],
+    "gpt-4": [500, 10000],
+    "gpt-3.5-turbo": [3500, 200000],
+    "text-embedding-3-large": [3000, 1000000],
+    "text-embedding-3-small": [3000, 1000000],
+    "text-embedding-ada-002": [3000, 1000000],
+    "o1-preview": [5, 30000],  # <- these are kind of made up
+    "o1-mini": [5, 200000],
+}
 
 
 class AnswerSettings(BaseModel):
@@ -271,7 +309,9 @@ class AgentSettings(BaseModel):
 
     agent_llm_config: dict | None = Field(
         default=None,
-        description="Optional kwargs for LLM constructor",
+        description="LiteLLM Router configuration to pass to LiteLLMModel, must have"
+        " `model_list` key (corresponding to model_list inputs here:"
+        " https://docs.litellm.ai/docs/routing)",
     )
 
     agent_type: str = Field(
@@ -330,7 +370,7 @@ class AgentSettings(BaseModel):
     )
 
     index_concurrency: int = Field(
-        default=30,
+        default=10,
         description="Number of concurrent filesystem reads for indexing",
     )
 
@@ -350,15 +390,22 @@ class AgentSettings(BaseModel):
         return v
 
 
-def make_default_litellm_router_settings(llm: str, temperature: float = 0.0) -> dict:
+def make_default_litellm_model_config(llm: str, temperature: float = 0.0) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
+    extra_model_kwargs = {}
+    if llm in TIER_1_USAGE_LIMITS:
+        extra_model_kwargs["rpm"] = TIER_1_USAGE_LIMITS[llm][0]
+        extra_model_kwargs["tpm"] = TIER_1_USAGE_LIMITS[llm][1]
+
     return {
-        "model_list": [
-            {
-                "model_name": llm,
-                "litellm_params": {"model": llm, "temperature": temperature},
-            }
-        ]
+        "model_name": llm,
+        "litellm_params": {"model": llm, "temperature": temperature}
+        | (
+            {}
+            if "gemini" not in llm
+            else {"safety_settings": DEFAULT_VERTEX_SAFETY_SETTINGS}
+        ),
+        **extra_model_kwargs,
     }
 
 
@@ -377,7 +424,7 @@ class Settings(BaseSettings):
             "LiteLLM Router configuration to pass to LiteLLMModel, must have"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. (only the llm_config router kwargs are used)"
         ),
     )
     summary_llm: str = Field(
@@ -389,8 +436,7 @@ class Settings(BaseSettings):
         description=(
             "LiteLLM Router configuration to pass to LiteLLMModel, must have"
             " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " https://docs.litellm.ai/docs/routing)"
         ),
     )
     embedding: str = Field(
@@ -442,6 +488,7 @@ class Settings(BaseSettings):
             "Local directory which contains the papers to be indexed and searched."
         ),
     )
+    _router: Router | None = None
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -523,27 +570,50 @@ class Settings(BaseSettings):
 
         raise FileNotFoundError(f"No configuration file found for {config_name}")
 
+    def get_router(self) -> Router:
+        if self._router:
+            return self._router
+        # Note we are intentionally overwrite config_values here
+        # if they have conflicting configs.
+        # The alternative would be unshared TPM/RPM
+        models = {
+            self.llm: self.llm_config
+            or make_default_litellm_model_config(self.llm, self.temperature),
+            self.summary_llm: self.summary_llm_config
+            or make_default_litellm_model_config(self.summary_llm, self.temperature),
+            self.agent.agent_llm: self.agent.agent_llm_config
+            or make_default_litellm_model_config(
+                self.agent.agent_llm, self.temperature
+            ),
+        }
+        router_kwargs = (
+            self.llm_config.get("router_kwargs")
+            if self.llm_config
+            else {
+                "num_retries": 3,
+                "retry_after": 10,
+                "enable_pre_call_checks": True,
+            }
+        )
+        self._router = Router(model_list=list(models.values()), **router_kwargs)
+        return self._router
+
     def get_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.llm,
-            config=self.llm_config
-            or make_default_litellm_router_settings(self.llm, self.temperature),
+            router=self.get_router(),
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.summary_llm,
-            config=self.summary_llm_config
-            or make_default_litellm_router_settings(self.summary_llm, self.temperature),
+            router=self.get_router(),
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.agent.agent_llm,
-            config=self.agent.agent_llm_config
-            or make_default_litellm_router_settings(
-                self.agent.agent_llm, self.temperature
-            ),
+            router=self.get_router(),
         )
 
     def get_embedding_model(self) -> EmbeddingModel:

@@ -649,6 +649,18 @@ with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
 ```
 
+### Rate limits/PQA Speed
+
+For ease of use, we've tried to tune the library for a typical Tier 1 OpenAI account (typical spend of $5 / month). That means we've reduced the speed of a few things. If you have a high tier account and S2/Crossref keys, you can increase the `index_concurrency` setting to 30-50 and increase the TPM/RPM via a complete specification
+
+```python
+llm_config = dict(
+    model_list=dict(model_name="o1-preview", router_kwargs=dict(tpm=30_000_000, rpm=5))
+)
+
+settings = Settings(llm_config=llm_config)
+```
+
 ## Citation
 
 Please read and cite the following papers if you use this software:

@@ -2,7 +2,7 @@
   "answer": {
     "evidence_k": 20,
     "answer_max_sources": 5,
-    "max_concurrent_requests": 10
+    "max_concurrent_requests": 4
   },
   "parsing": {
     "use_doc_details": true,

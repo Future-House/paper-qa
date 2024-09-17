@@ -52,6 +52,6 @@
     "timeout": 500.0,
     "should_pre_search": false,
     "tool_names": null,
-    "index_concurrency": 30
+    "index_concurrency": 10
   }
 }
