@@ -1203,7 +1203,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.4.dev12+g3a56160.d20240917"
+version = "5.0.4.dev13+g9919c4a.d20240917"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1261,7 +1261,6 @@ dev = [
     { name = "python-dotenv" },
     { name = "pyzotero" },
     { name = "refurb" },
-    { name = "requests" },
     { name = "types-pyyaml" },
     { name = "types-setuptools" },
 ]
@@ -1310,7 +1309,6 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "refurb", specifier = ">=2" },
-    { name = "requests" },
 ]
 
 [[package]]

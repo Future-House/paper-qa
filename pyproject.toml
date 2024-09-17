@@ -412,5 +412,4 @@ dev-dependencies = [
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "refurb>=2",  # Pin to keep recent
-    "requests",
 ]
