@@ -69,9 +69,7 @@ class TestTaskDataset:
         expected_length: int,
         base_query_request: QueryRequest,
     ) -> None:
-        task_dataset = LitQAv2TaskDataset(
-            base_query_request=base_query_request, split=split
-        )
+        task_dataset = LitQAv2TaskDataset(base_query=base_query_request, split=split)
         assert len(task_dataset) == expected_length
 
     @pytest.mark.asyncio
@@ -79,9 +77,7 @@ class TestTaskDataset:
         agent = SimpleAgent()
         docs = Docs()
         dataset = TaskDataset.from_name(
-            STUB_TASK_DATASET_NAME,
-            base_query_request=base_query_request,
-            docs=docs,
+            STUB_TASK_DATASET_NAME, base_query=base_query_request, base_docs=docs
         )
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
@@ -96,5 +92,5 @@ class TestTaskDataset:
         assert (
             not base_query_request.query
         ), "Should not have mutated query in base request"
-        assert docs.docs, "Expected to have added content"
+        assert not docs.docs, "Should not have mutated docs in base docs"
         assert isinstance(metrics_callback.eval_means["reward"], float)

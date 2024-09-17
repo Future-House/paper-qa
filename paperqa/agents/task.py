@@ -119,12 +119,14 @@ class LitQATaskDataset(
 
     def __init__(
         self,
-        base_query_request: QueryRequest,
+        base_query: QueryRequest | None = None,
+        base_docs: Docs | None = None,
         rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         **env_kwargs,
     ):
-        self._base_query_request = base_query_request
+        self._base_query = base_query or QueryRequest()
+        self._base_docs = base_docs or Docs()
         self._rewards = rewards
         self._env_kwargs = env_kwargs
         self._eval_model = eval_model
@@ -143,10 +145,11 @@ class LitQATaskDataset(
             use_unsure=use_unsure,
             eval_model=self._eval_model,
         )
-        query_request = self._base_query_request.model_copy()
-        query_request.query = qa_prompt
+        query = self._base_query.model_copy()
+        query.query = qa_prompt
         return GradablePaperQAEnvironment(
-            query=query_request,
+            query=query,
+            docs=self._base_docs.model_copy(),
             evaluation_from_answer=evaluation_from_answer,
             rewards=self._rewards,
             **self._env_kwargs,
