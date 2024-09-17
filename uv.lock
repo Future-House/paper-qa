@@ -1203,7 +1203,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.4.dev11+ga48a2ea.d20240917"
+version = "5.0.4.dev12+g3a56160.d20240917"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1296,7 +1296,7 @@ requires-dist = [
 dev = [
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
-    { name = "paper-qa", extras = ["datasets", "ldp", "typing"] },
+    { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero"] },
     { name = "pre-commit", specifier = "~=3.4" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pylint-pydantic" },
@@ -1309,7 +1309,6 @@ dev = [
     { name = "pytest-timer", extras = ["colorama"] },
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
-    { name = "pyzotero" },
     { name = "refurb", specifier = ">=2" },
     { name = "requests" },
 ]

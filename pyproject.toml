@@ -398,7 +398,7 @@ trailing_comma_inline_array = true
 dev-dependencies = [
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[datasets,ldp,typing]",
+    "paper-qa[datasets,ldp,typing,zotero]",
     "pre-commit~=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",
@@ -411,7 +411,6 @@ dev-dependencies = [
     "pytest-xdist",
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
-    "pyzotero",
     "refurb>=2",  # Pin to keep recent
     "requests",
 ]
