@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-from typing import Any
+from typing import Any, Final
 
 from pydantic_settings import CliSettingsSource
 from rich.console import Console
@@ -97,6 +97,9 @@ def ask(query: str, settings: Settings) -> AnswerResponse:
     )
 
 
+AUTOGENERATE_INDEX_NAME: Final[str] = "default"
+
+
 def search_query(
     query: str,
     index_name: str,
@@ -104,7 +107,7 @@ def search_query(
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
     """Search using a pre-built PaperQA index."""
     configure_cli_logging(verbosity=settings.verbosity)
-    if index_name == "default":
+    if index_name == AUTOGENERATE_INDEX_NAME:
         index_name = settings.get_index_name()
     return get_loop().run_until_complete(
         index_search(
@@ -122,7 +125,7 @@ def build_index(
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
     settings = get_settings(settings)
-    if index_name == "default":
+    if index_name == AUTOGENERATE_INDEX_NAME:
         index_name = None
     configure_cli_logging(verbosity=settings.verbosity)
     if directory:
@@ -171,7 +174,10 @@ def main() -> None:
     )
 
     parser.add_argument(
-        "--index", "-i", default="default", help="Index name to search or create"
+        "--index",
+        "-i",
+        default=AUTOGENERATE_INDEX_NAME,
+        help="Index name to search or create",
     )
 
     subparsers = parser.add_subparsers(
