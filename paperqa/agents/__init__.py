@@ -123,7 +123,7 @@ def build_index(
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
     settings = get_settings(settings)
     if index_name == "default":
-        index_name = settings.get_index_name()
+        index_name = None
     configure_cli_logging(verbosity=settings.verbosity)
     if directory:
         settings.paper_directory = directory
