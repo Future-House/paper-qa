@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "PyCryptodome",
+    "PyMuPDF>=1.24.3",  # python -c "import pymupdf" won't run before version 1.24.3
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "fhaviary[llm]>=0.6",  # For info on Message
@@ -28,7 +29,6 @@ dependencies = [
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
-    "pymupdf",
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",
