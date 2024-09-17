@@ -396,7 +396,6 @@ trailing_comma_inline_array = true
 
 [tool.uv]
 dev-dependencies = [
-    "build",  # TODO: remove after https://github.com/astral-sh/uv/issues/6278
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[datasets,ldp,typing]",

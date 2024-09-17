@@ -159,20 +159,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/25/06/f710a276e4e018b02fe17b39313629213a43c365401179bc437e0ab24425/bibtexparser-1.4.1.tar.gz", hash = "sha256:e00e29e24676c4808e0b4333b37bb55cca9cbb7871a56f63058509281588d789", size = 55102 }
 
 [[package]]
-name = "build"
-version = "1.2.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "colorama", marker = "os_name == 'nt'" },
-    { name = "packaging" },
-    { name = "pyproject-hooks" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/bb/4a1b7e3a7520e310cf7bfece43788071604e1ccf693a7f0c4638c59068d6/build-1.2.2.tar.gz", hash = "sha256:119b2fb462adef986483438377a13b2f42064a2a3a4161f24a0cca698a07ac8c", size = 46516 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/91/fd/e4bda6228637ecae5732162b5ac2a5a822e2ba8e546eb4997cde51b231a3/build-1.2.2-py3-none-any.whl", hash = "sha256:277ccc71619d98afdd841a0e96ac9fe1593b823af481d3b0cea748e8894e0613", size = 22823 },
-]
-
-[[package]]
 name = "certifi"
 version = "2024.8.30"
 source = { registry = "https://pypi.org/simple" }
@@ -1217,7 +1203,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.4.dev10+g8664700.d20240917"
+version = "5.0.4.dev11+ga48a2ea.d20240917"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1256,7 +1242,6 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "build" },
     { name = "datasets" },
     { name = "ipython" },
     { name = "ldp" },
@@ -1309,7 +1294,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "build" },
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
     { name = "paper-qa", extras = ["datasets", "ldp", "typing"] },
@@ -1668,15 +1652,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/83/08/13f3bce01b2061f2bbd582c9df82723de943784cf719a35ac886c652043a/pyparsing-3.1.4.tar.gz", hash = "sha256:f86ec8d1a83f11977c9a6ea7598e8c27fc5cddfa5b07ea2241edbbde1d7bc032", size = 900231 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/0c/0e3c05b1c87bb6a1c76d281b0f35e78d2d80ac91b5f8f524cebf77f51049/pyparsing-3.1.4-py3-none-any.whl", hash = "sha256:a6a7ee4235a3f944aa1fa2249307708f893fe5717dc603503c6c7969c070fb7c", size = 104100 },
-]
-
-[[package]]
-name = "pyproject-hooks"
-version = "1.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c7/07/6f63dda440d4abb191b91dc383b472dae3dd9f37e4c1e4a5c3db150531c6/pyproject_hooks-1.1.0.tar.gz", hash = "sha256:4b37730834edbd6bd37f26ece6b44802fb1c1ee2ece0e54ddff8bfc06db86965", size = 7838 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ae/f3/431b9d5fe7d14af7a32340792ef43b8a714e7726f1d7b69cc4e8e7a3f1d7/pyproject_hooks-1.1.0-py3-none-any.whl", hash = "sha256:7ceeefe9aec63a1064c18d939bdc3adf2d8aa1988a510afec15151578b232aa2", size = 9184 },
 ]
 
 [[package]]
