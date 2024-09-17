@@ -9,7 +9,7 @@ from pydantic_settings import CliSettingsSource
 from rich.console import Console
 from rich.logging import RichHandler
 
-from paperqa.settings import Settings
+from paperqa.settings import Settings, get_settings
 from paperqa.utils import get_loop, pqa_directory, setup_default_logs
 from paperqa.version import __version__
 
@@ -116,15 +116,17 @@ def search_query(
 
 
 def build_index(
-    index_name: str,
-    directory: str | os.PathLike,
-    settings: Settings,
+    index_name: str | None = None,
+    directory: str | os.PathLike | None = None,
+    settings: Settings | None = None,
 ) -> SearchIndex:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
+    settings = get_settings(settings)
     if index_name == "default":
         index_name = settings.get_index_name()
     configure_cli_logging(verbosity=settings.verbosity)
-    settings.paper_directory = directory
+    if directory:
+        settings.paper_directory = directory
     return get_loop().run_until_complete(
         get_directory_index(index_name=index_name, settings=settings)
     )
