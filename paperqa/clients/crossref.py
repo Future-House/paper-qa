@@ -94,15 +94,19 @@ CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING: dict[str, str] = {
     "other": "article",  # Assume an article if we don't know the type
 }
 
+_ISSUED_WARNINGS = [False, False]  # 0 is API key, 1 is email
+
 
 def crossref_headers() -> dict[str, str]:
     """Crossref API key if available, otherwise nothing."""
     if api_key := os.environ.get("CROSSREF_API_KEY"):
         return {CROSSREF_HEADER_KEY: f"Bearer {api_key}"}
-    logger.warning(
-        "CROSSREF_API_KEY environment variable not set. Crossref API rate limits may"
-        " apply."
-    )
+    if not _ISSUED_WARNINGS[0]:
+        _ISSUED_WARNINGS[0] = True
+        logger.warning(
+            "CROSSREF_API_KEY environment variable not set."
+            " Crossref API rate limits may apply."
+        )
     return {}
 
 
@@ -111,10 +115,12 @@ def get_crossref_mailto() -> str:
     MAILTO = os.getenv("CROSSREF_MAILTO")
 
     if not MAILTO:
-        logger.warning(
-            "CROSSREF_MAILTO environment variable not set. Crossref API rate limits may"
-            " apply."
-        )
+        if not _ISSUED_WARNINGS[1]:
+            logger.warning(
+                "CROSSREF_MAILTO environment variable not set."
+                " Crossref API rate limits may apply."
+            )
+            _ISSUED_WARNINGS[1] = True
         return "example@papercrow.ai"
 
     return MAILTO
