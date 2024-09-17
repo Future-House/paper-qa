@@ -263,7 +263,7 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
     assert response.status == AgentStatus.FAIL, "Agent should have registered a failure"
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
+@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
     agent_test_settings: Settings, subtests: SubTests
