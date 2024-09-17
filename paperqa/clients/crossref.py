@@ -99,22 +99,23 @@ _ISSUED_WARNINGS = [False, False]  # 0 is API key, 1 is email
 
 def crossref_headers() -> dict[str, str]:
     """Crossref API key if available, otherwise nothing."""
-    if api_key := os.environ.get("CROSSREF_API_KEY"):
-        return {CROSSREF_HEADER_KEY: f"Bearer {api_key}"}
-    if not _ISSUED_WARNINGS[0]:
-        _ISSUED_WARNINGS[0] = True
-        logger.warning(
-            "CROSSREF_API_KEY environment variable not set."
-            " Crossref API rate limits may apply."
-        )
-    return {}
+    try:
+        return {CROSSREF_HEADER_KEY: f"Bearer {os.environ['CROSSREF_API_KEY']}"}
+    except KeyError:
+        if not _ISSUED_WARNINGS[0]:
+            _ISSUED_WARNINGS[0] = True
+            logger.warning(
+                "CROSSREF_API_KEY environment variable not set."
+                " Crossref API rate limits may apply."
+            )
+        return {}
 
 
 def get_crossref_mailto() -> str:
     """Crossref mailto if available, otherwise a default."""
-    MAILTO = os.getenv("CROSSREF_MAILTO")
-
-    if not MAILTO:
+    try:
+        return os.environ["CROSSREF_MAILTO"]
+    except KeyError:
         if not _ISSUED_WARNINGS[1]:
             logger.warning(
                 "CROSSREF_MAILTO environment variable not set."
@@ -122,8 +123,6 @@ def get_crossref_mailto() -> str:
             )
             _ISSUED_WARNINGS[1] = True
         return "example@papercrow.ai"
-
-    return MAILTO
 
 
 async def doi_to_bibtex(
