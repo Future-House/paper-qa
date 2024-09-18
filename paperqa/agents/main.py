@@ -23,7 +23,6 @@ from tenacity import (
 
 from paperqa.docs import Docs
 from paperqa.types import Answer
-from paperqa.utils import pqa_directory
 
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
@@ -289,7 +288,7 @@ async def index_search(
     search_index = SearchIndex(
         fields=fields,
         index_name=index_name,
-        index_directory=index_directory or pqa_directory("indexes"),
+        index_directory=index_directory,
         storage=(
             SearchDocumentStorage.JSON_MODEL_DUMP
             if index_name == "answers"
