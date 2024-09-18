@@ -14,9 +14,9 @@ question answering, summarization, and contradiction detection.
 - [Quickstart](#quickstart)
   - [Example Output](#example-output)
 - [What is PaperQA2](#what-is-paperqa2)
+  - [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
+  - [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
 - [Installation](#installation)
-- [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
-- [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
 - [Usage](#usage)
   - [CLI](#cli)
     - [Bundled Settings](#bundled-settings)
@@ -65,7 +65,8 @@ Question: Has anyone designed neural networks that compute with proteins or DNA?
 
 ## What is PaperQA2
 
-PaperQA2 is engineered to be the best RAG model for working with scientific papers. Here are some features:
+PaperQA2 is engineered to be the best agentic RAG model for working with scientific papers.
+Here are some features:
 
 - A simple interface to get good answers with grounded responses containing in-text citations.
 - State-of-the-art implementation including document metadata-awareness
@@ -81,7 +82,8 @@ PaperQA2 is engineered to be the best RAG model for working with scientific pape
 
 By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a Numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
 
-PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Here are some in a random order:
+PaperQA2 depends on some awesome libraries/APIs that make our repo possible.
+Here are some in no particular order:
 
 1. [Semantic Scholar](https://www.semanticscholar.org/)
 2. [Crossref](https://www.crossref.org/)
@@ -91,6 +93,35 @@ PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Her
 6. [LiteLLM][LiteLLM general docs]
 7. [pybtex](https://pybtex.org/)
 8. [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/)
+
+### PaperQA2 vs PaperQA
+
+We've been working on hard on fundamental upgrades for a while and mostly followed [SemVer](https://semver.org/).
+meaning we've incremented the major version number on each breaking change.
+This brings us to the current major version number v5.
+So why call is the repo now called PaperQA2?
+We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai).
+So we arbitrarily call version 5 and onward PaperQA2,
+and versions before it as PaperQA1 to denote the significant change in performance.
+We recognize that we are challenged at naming and counting at FutureHouse,
+so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+
+### What's New in Version 5 (aka PaperQA2)?
+
+Version 5 added:
+
+- A CLI `pqa`
+- Agentic workflows invoking tools for
+  paper search, gathering evidence, and generating an answer
+- Removed much of the statefulness from the `Docs` object
+- A migration to LiteLLM for compatibility with many LLM providers
+  as well as centralized rate limits and cost tracking
+- A bundled set of configurations (read [here](#bundled-settings)))
+  containing known-good hyperparameters
+
+Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatible with version 5,
+and will need to be rebuilt.
+Also, our minimum Python version was increased to Python 3.11.
 
 ## Installation
 
@@ -113,34 +144,6 @@ If you need to index a large set of papers (100+),
 you will likely want an API key for both [Crossref](https://www.crossref.org/documentation/metadata-plus/metadata-plus-keys/) and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key),
 which will allow you to avoid hitting public rate limits using these metadata services.
 Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
-
-## PaperQA2 vs PaperQA
-
-We've been working on hard on fundamental upgrades for a while and mostly followed [SemVer](https://semver.org/).
-meaning we've incremented the major version number on each breaking change.
-This brings us to the current major version number v5.
-So why call is the repo now called PaperQA2?
-We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai).
-So we arbitrarily call version 5 and onward PaperQA2,
-and versions before it as PaperQA1 to denote the significant change in performance.
-We recognize that we are challenged at naming and counting at FutureHouse,
-so we reserve the right at any time to arbitrarily change the name to PaperCrow.
-
-## What's New in Version 5 (aka PaperQA2)?
-
-Version 5 added:
-
-- A CLI `pqa`
-- Agentic workflows invoking tools for
-  paper search, gathering evidence, and generating an answer
-- Removed much of the statefulness from the `Docs` object
-- A migration to LiteLLM for compatibility with many LLM providers
-  as well as centralized rate limits and cost tracking
-- A bundled set of configurations (read [here](#bundled-settings)))
-  containing known-good hyperparameters
-
-Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatible with version 5 and will need to be rebuilt.
-Also, our minimum Python version is now Python 3.11.
 
 ## Usage
 
