@@ -9,6 +9,42 @@ with a focus on the scientific literature.
 See our [recent 2024 paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like
 question answering, summarization, and contradiction detection.
 
+<!--TOC-->
+
+- [Quickstart](#quickstart)
+  - [Example Output](#example-output)
+- [What is PaperQA2](#what-is-paperqa2)
+- [Installation](#installation)
+- [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
+- [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
+- [Usage](#usage)
+  - [CLI](#cli)
+    - [Bundled Settings](#bundled-settings)
+  - [Module Usage](#module-usage)
+  - [Adding Documents Manually](#adding-documents-manually)
+  - [Async](#async)
+  - [Choosing Model](#choosing-model)
+    - [Locally Hosted](#locally-hosted)
+  - [Changing Embedding Model](#changing-embedding-model)
+  - [Adjusting number of sources](#adjusting-number-of-sources)
+  - [Using Code or HTML](#using-code-or-html)
+  - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
+- [Where do I get papers?](#where-do-i-get-papers)
+  - [Zotero](#zotero)
+  - [Paper Scraper](#paper-scraper)
+- [Callbacks](#callbacks)
+  - [Caching Embeddings](#caching-embeddings)
+- [Customizing Prompts](#customizing-prompts)
+  - [Pre and Post Prompts](#pre-and-post-prompts)
+- [FAQ](#faq)
+  - [How come I get different results than your papers?](#how-come-i-get-different-results-than-your-papers)
+  - [How is this different from LlamaIndex?](#how-is-this-different-from-llamaindex)
+  - [How is this different from LangChain?](#how-is-this-different-from-langchain)
+  - [Can I save or load?](#can-i-save-or-load)
+- [Citation](#citation)
+
+<!--TOC-->
+
 ## Quickstart
 
 In this example we take a folder of research paper PDFs, magically get their metadata - including citation counts and a retraction check, then parse and cache PDFs into a full-text search index, and finally answer the user question with an LLM agent.
