@@ -31,6 +31,7 @@ question answering, summarization, and contradiction detection.
   - [Using Code or HTML](#using-code-or-html)
   - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
   - [Reusing Index](#reusing-index)
+  - [Running on LitQA v2](#running-on-litqa-v2)
 - [Where do I get papers?](#where-do-i-get-papers)
   - [Zotero](#zotero)
   - [Paper Scraper](#paper-scraper)
@@ -558,6 +559,46 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
             settings=settings,
         )
     )
+```
+
+### Running on LitQA v2
+
+In [`paperqa/agents/task.py`](paperqa/agents/task.py), you will find:
+
+1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
+2. `LitQAv2TaskDataset`: a task dataset designed to pull LitQA v2 from Hugging Face,
+   and create one `GradablePaperQAEnvironment` per question
+
+Here is an example of how to use them:
+
+```python
+import os
+
+from aviary.env import TaskDataset
+from ldp.agent import SimpleAgent
+from ldp.alg.callbacks import MeanMetricsCallback
+from ldp.alg.runners import Evaluator, EvaluatorConfig
+
+from paperqa import QueryRequest, Settings
+from paperqa.agents.task import TASK_DATASET_NAME
+
+
+async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
+    base_query = QueryRequest(
+        settings=Settings(paper_directory=folder_of_litqa_v2_papers)
+    )
+    dataset = TaskDataset.from_name(TASK_DATASET_NAME, base_query=base_query)
+    metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
+
+    evaluator = Evaluator(
+        config=EvaluatorConfig(batch_size=3),
+        agent=SimpleAgent(),
+        dataset=dataset,
+        callbacks=[metrics_callback],
+    )
+    await evaluator.evaluate()
+
+    print(metrics_callback.eval_means)
 ```
 
 ## Where do I get papers?
