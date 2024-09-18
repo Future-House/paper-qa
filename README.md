@@ -38,8 +38,7 @@ question answering, summarization, and contradiction detection.
   - [Pre and Post Prompts](#pre-and-post-prompts)
 - [FAQ](#faq)
   - [How come I get different results than your papers?](#how-come-i-get-different-results-than-your-papers)
-  - [How is this different from LlamaIndex?](#how-is-this-different-from-llamaindex)
-  - [How is this different from LangChain?](#how-is-this-different-from-langchain)
+  - [How is this different from LlamaIndex or LangChain?](#how-is-this-different-from-llamaindex-or-langchain)
   - [Can I save or load?](#can-i-save-or-load)
 - [Citation](#citation)
 
@@ -47,7 +46,10 @@ question answering, summarization, and contradiction detection.
 
 ## Quickstart
 
-In this example we take a folder of research paper PDFs, magically get their metadata - including citation counts and a retraction check, then parse and cache PDFs into a full-text search index, and finally answer the user question with an LLM agent.
+In this example we take a folder of research paper PDFs,
+magically get their metadata - including citation counts with a retraction check,
+then parse and cache PDFs into a full-text search index,
+and finally answer the user question with an LLM agent.
 
 ```bash
 pip install paper-qa
@@ -661,13 +663,22 @@ are executed after the query and before the query. For example, you can use this
 
 Internally at FutureHouse, we have a slightly different set of tools. We're trying to get some of them, like citation traversal, into this repo. However, we have APIs and licenses to access research papers that we cannot share openly. Similarly, in our research papers' results we do not start with the known relevant PDFs. Our agent has to identify them using keyword search over all papers, rather than just a subset. We're gradually aligning these two versions of PaperQA, but until there is an open-source way to freely access papers (even just open source papers) you will need to provide PDFs yourself.
 
-### How is this different from LlamaIndex?
+### How is this different from LlamaIndex or LangChain?
 
-It's not that different! This is similar to the tree response method in LlamaIndex. We also support agentic workflows and local indexes for easier operations with the scientific literature. Another big difference is our strong focus on scientific papers and their underlying metadata.
+[LangChain](https://github.com/langchain-ai/langchain)
+and [LlamaIndex](https://github.com/run-llama/llama_index)
+are both frameworks for working with LLM applications,
+with abstractions made for agentic workflows and retrieval augmented generation.
 
-### How is this different from LangChain?
+Over time, the PaperQA team over time chose to become framework-agnostic,
+instead outsourcing LLM drivers to [LiteLLM][LiteLLM general docs]
+and no framework besides Pydantic for its tools.
+PaperQA focuses on scientific papers and their metadata.
 
-There has been some great work on retrievers in LangChain, and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary. Another big difference is our strong focus on scientific papers and their underlying metadata.
+PaperQA can be reimplemented using either LlamaIndex or LangChain.
+For example, our `GatherEvidence` tool can be reimplemented
+as a retriever with an LLM-based re-ranking and contextual summary.
+There is similar work with the tree response method in LlamaIndex.
 
 ### Can I save or load?
 
