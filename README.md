@@ -21,6 +21,7 @@ question answering, summarization, and contradiction detection.
   - [CLI Usage](#cli-usage)
     - [Bundled Settings](#bundled-settings)
 - [Library Usage](#library-usage)
+  - [`ask` manually](#ask-manually)
   - [Adding Documents Manually](#adding-documents-manually)
   - [Async](#async)
   - [Choosing Model](#choosing-model)
@@ -253,11 +254,16 @@ from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    settings=Settings(temperature=0.5),
+    settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
 
-The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer). `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
+Please see our [installation docs](#installation) for how to install the package from PyPI.
+
+### `ask` manually
+
+The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
+`ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
 
 ```python
 from paperqa import Settings, ask
@@ -313,7 +319,9 @@ print(answer.formatted_answer)
 
 ### Async
 
-PaperQA2 is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
+PaperQA2 is written to be used asynchronously.
+The synchronous API is just a wrapper around the async.
+Here are the methods and their `async` equivalents:
 
 | Sync                | Async                |
 | ------------------- | -------------------- |
@@ -323,26 +331,24 @@ PaperQA2 is written to be used asynchronously. The synchronous API is just a wra
 | `Docs.get_evidence` | `Docs.aget_evidence` |
 | `Docs.query`        | `Docs.aquery`        |
 
-The synchronous version just calls the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
+The synchronous version just calls the async version in a loop.
+Most modern python environments support `async` natively (including Jupyter notebooks!).
+So you can do this in a Jupyter Notebook:
 
 ```python
 import asyncio
 from paperqa import Docs
 
 
-async def main():
-    # valid extensions include .pdf, .txt, and .html
-    doc_paths = ("myfile.pdf", "myotherfile.pdf")
-
+async def main() -> None:
     docs = Docs()
-
-    for doc in doc_paths:
+    # valid extensions include .pdf, .txt, and .html
+    for doc in ("myfile.pdf", "myotherfile.pdf"):
         await docs.aadd(doc)
 
     answer = await docs.aquery(
         "What manufacturing challenges are unique to bispecific antibodies?"
     )
-
     print(answer.formatted_answer)
 
 
@@ -431,12 +437,9 @@ Embedding models are used to create PaperQA2's index of the full-text embedding 
 ```python
 from paperqa import Docs, Settings
 
-doc_paths = ("myfile.pdf", "myotherfile.pdf")
-
 docs = Docs()
-
-for doc in doc_paths:
-    doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
+for doc in ("myfile.pdf", "myotherfile.pdf"):
+    docs.add(doc, settings=Settings(embedding="text-embedding-large-3"))
 ```
 
 Note that PaperQA2 uses Numpy as a dense vector store.
@@ -455,14 +458,12 @@ from paperqa import (
 )
 
 
-doc_paths = ("myfile.pdf", "myotherfile.pdf")
-
 model = HybridEmbeddingModel(
     models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel(ndim=1024)]
 )
 docs = Docs()
-for doc in doc_paths:
-    doc.add(doc_paths, embedding_model=model)
+for doc in ("myfile.pdf", "myotherfile.pdf"):
+    docs.add(doc, embedding_model=model)
 ```
 
 The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
@@ -638,22 +639,18 @@ You can customize any of the prompts using settings.
 from paperqa import Docs, Settings
 
 my_qa_prompt = (
-    "Answer the question '{question}' "
+    "Answer the question '{question}'\n"
     "Use the context below if helpful. "
-    "You can cite the context using the key "
-    "like (Example2012). "
+    "You can cite the context using the key like (Example2012). "
     "If there is insufficient context, write a poem "
     "about how you cannot answer.\n\n"
-    "Context: {context}\n\n"
+    "Context: {context}"
 )
 
 docs = Docs()
 settings = Settings()
 settings.prompts.qa = my_qa_prompt
-docs.query(
-    "Are covid-19 vaccines effective?",
-    settings=settings,
-)
+docs.query("Are covid-19 vaccines effective?", settings=settings)
 ```
 
 ### Pre and Post Prompts
