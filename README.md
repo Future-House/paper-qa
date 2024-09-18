@@ -16,11 +16,11 @@ question answering, summarization, and contradiction detection.
 - [What is PaperQA2](#what-is-paperqa2)
   - [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
   - [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
+  - [PaperQA2 Algorithm](#paperqa2-algorithm)
 - [Installation](#installation)
-- [Usage](#usage)
-  - [CLI](#cli)
+  - [CLI Usage](#cli-usage)
     - [Bundled Settings](#bundled-settings)
-  - [Module Usage](#module-usage)
+- [Library Usage](#library-usage)
   - [Adding Documents Manually](#adding-documents-manually)
   - [Async](#async)
   - [Choosing Model](#choosing-model)
@@ -123,6 +123,26 @@ Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatib
 and will need to be rebuilt.
 Also, our minimum Python version was increased to Python 3.11.
 
+### PaperQA2 Algorithm
+
+To understand PaperQA2, let's start with the pieces of the underlying algorithm.
+The default workflow of PaperQA2 is as follows:
+
+| Phase                  | PaperQA2 Actions                                                          |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
+|                        | - Chunk, embed, and add candidate papers to state                         |
+| **2. Gather Evidence** | - Embed query into vector                                                 |
+|                        | - Rank top _k_ document chunks in current state                           |
+|                        | - Create scored summary of each chunk in the context of the current query |
+|                        | - Use LLM to re-score and select most relevant summaries                  |
+| **3. Generate Answer** | - Put best summaries into prompt with context                             |
+|                        | - Generate answer with prompt                                             |
+
+The tools can be invoked in any order by a language agent.
+For example, an LLM agent might do a narrow and broad search,
+or using different phrasing for the gather evidence step from the generate answer step.
+
 ## Installation
 
 For a non-development setup,
@@ -145,26 +165,7 @@ you will likely want an API key for both [Crossref](https://www.crossref.org/doc
 which will allow you to avoid hitting public rate limits using these metadata services.
 Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
 
-## Usage
-
-To understand PaperQA2, let's start with the pieces of the underlying algorithm. The default workflow of PaperQA2 is as follows:
-
-| Phase                  | PaperQA2 Actions                                                          |
-| ---------------------- | ------------------------------------------------------------------------- |
-| **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
-|                        | - Chunk, embed, and add candidate papers to state                         |
-| **2. Gather Evidence** | - Embed query into vector                                                 |
-|                        | - Rank top _k_ document chunks in current state                           |
-|                        | - Create scored summary of each chunk in the context of the current query |
-|                        | - Use LLM to re-score and select most relevant summaries                  |
-| **3. Generate Answer** | - Put best summaries into prompt with context                             |
-|                        | - Generate answer with prompt                                             |
-
-The tools can be invoked in any order by a language agent.
-For example, an LLM agent might do a narrow and broad search,
-or using different phrasing for the gather evidence step from the generate answer step.
-
-### CLI
+### CLI Usage
 
 The fastest way to test PaperQA2 is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
 
@@ -243,7 +244,7 @@ Inside [`paperqa/configs`](paperqa/configs) we bundle known useful settings:
 | contracrow   | Setting to find contradictions in papers, your query should be a claim that needs to be flagged as a contradiction (or not). |
 | debug        | Setting useful solely for debugging, but not in any actual application beyond debugging.                                     |
 
-### Module Usage
+## Library Usage
 
 PaperQA2's full workflow can be accessed via Python directly:
 
