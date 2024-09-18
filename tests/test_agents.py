@@ -20,6 +20,7 @@ from pytest_subtests import SubTests
 
 from paperqa.agents import agent_query
 from paperqa.agents.env import settings_to_tools
+from paperqa.agents.main import FAKE_AGENT_TYPE
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
 from paperqa.agents.search import FAILED_DOCUMENT_ADD_ID, get_directory_index
 from paperqa.agents.tools import (
@@ -78,7 +79,7 @@ async def test_get_directory_index_w_manifest(
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
-@pytest.mark.parametrize("agent_type", ["fake", ToolSelector, SimpleAgent])
+@pytest.mark.parametrize("agent_type", [FAKE_AGENT_TYPE, ToolSelector, SimpleAgent])
 @pytest.mark.asyncio
 async def test_agent_types(
     agent_test_settings: Settings, agent_type: str | type
@@ -102,8 +103,7 @@ async def test_agent_types(
     assert response.answer.question == question
     agent_llm = request.settings.agent.agent_llm
     # TODO: once LDP can track tokens, we can remove this check
-    if agent_type not in {"fake", SimpleAgent}:
-        print(response.answer.token_counts)
+    if agent_type not in {FAKE_AGENT_TYPE, SimpleAgent}:
         assert (
             response.answer.token_counts[agent_llm][0] > 1000
         ), "Expected many prompt tokens"
@@ -232,7 +232,7 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     query = QueryRequest(
         query="What is is a self-explanatory model?", settings=agent_test_settings
     )
-    response = await agent_query(query, agent_type="fake")
+    response = await agent_query(query, agent_type=FAKE_AGENT_TYPE)
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
     result = response.answer
     assert len(result.answer) > 200, "Answer did not return any results"
