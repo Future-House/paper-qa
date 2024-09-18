@@ -75,6 +75,9 @@ async def agent_query(
     return response
 
 
+FAKE_AGENT_TYPE = "fake"  # No agent, just invoke tools in deterministic order
+
+
 async def run_agent(
     docs: Docs,
     query: QueryRequest,
@@ -103,7 +106,7 @@ async def run_agent(
         f" query {query.model_dump()}."
     )
 
-    if agent_type == "fake":
+    if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):
         answer, agent_status = await run_aviary_agent(
