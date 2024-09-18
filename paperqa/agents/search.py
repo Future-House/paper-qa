@@ -33,7 +33,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import MaybeSettings, Settings, get_settings
 from paperqa.types import DocDetails
-from paperqa.utils import ImpossibleParsingError, hexdigest, pqa_directory
+from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
 
@@ -105,7 +105,7 @@ class SearchIndex:
                 f"{self.REQUIRED_FIELDS} must be included in search index fields."
             )
         if index_directory is None:
-            index_directory = pqa_directory("indexes")
+            index_directory = Settings.model_fields["index_directory"].default
         self.index_name = index_name
         self._index_directory = index_directory
         self._schema = None
