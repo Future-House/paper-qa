@@ -94,3 +94,4 @@ class TestTaskDataset:
         ), "Should not have mutated query in base request"
         assert not docs.docs, "Should not have mutated docs in base docs"
         assert isinstance(metrics_callback.eval_means["reward"], float)
+        assert isinstance(metrics_callback.eval_means["total_paper_count"], float)

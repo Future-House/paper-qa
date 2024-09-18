@@ -7,6 +7,8 @@ __all__ = [
     "LitQAv2TaskSplit",
 ]
 
+import logging
+import re
 from abc import ABC
 from collections.abc import Awaitable, Callable, Sequence
 from enum import StrEnum
@@ -41,6 +43,8 @@ from .tools import GenerateAnswer
 
 if TYPE_CHECKING:
     from ldp.data_structures import Trajectory
+
+logger = logging.getLogger(__name__)
 
 
 class GradablePaperQAEnvironment(PaperQAEnvironment):
@@ -158,13 +162,38 @@ class LitQATaskDataset(
     def compute_trajectory_metrics(
         self, trajectories: "Sequence[Trajectory]"
     ) -> dict[str, list[float]]:
+        total_paper_count: list[float] = []
+        relevant_paper_count: list[float] = []
+        evidence_count: list[float] = []
+        for t in trajectories:
+            split_answers = [
+                re.split(
+                    pattern=GenerateAnswer.ANSWER_SPLIT_REGEX_PATTERN,
+                    string=obs.content,
+                )
+                for obs in t.steps[-1].next_observation
+                if (
+                    isinstance(obs, ToolResponseMessage)
+                    and obs.name == GenerateAnswer.TOOL_FN_NAME
+                )
+            ]
+            for i, metric_list in enumerate(
+                (total_paper_count, relevant_paper_count, evidence_count),
+                start=1,  # Regex extraction of status starts after answer
+            ):
+                metric_list.append(  # Use mean to allow for multiple answers
+                    sum(int(sa[i]) for sa in split_answers) / len(split_answers)
+                )
         return super().compute_trajectory_metrics(trajectories) | {
+            "total_paper_count": total_paper_count,
+            "relevant_paper_count": relevant_paper_count,
+            "evidence_count": evidence_count,
             "correct": [
-                int(traj.steps[-1].reward == self._rewards[0]) for traj in trajectories
+                int(t.steps[-1].reward == self._rewards[0]) for t in trajectories
             ],
             "correct_unsure": [
-                int(traj.steps[-1].reward in {self._rewards[0], self._rewards[1]})
-                for traj in trajectories
+                int(t.steps[-1].reward in {self._rewards[0], self._rewards[1]})
+                for t in trajectories
             ],
         }
 
