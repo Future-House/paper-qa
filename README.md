@@ -9,9 +9,50 @@ with a focus on the scientific literature.
 See our [recent 2024 paper](https://paper.wikicrow.ai) to see examples of PaperQA2's superhuman performance in scientific tasks like
 question answering, summarization, and contradiction detection.
 
+<!--TOC-->
+
+- [Quickstart](#quickstart)
+  - [Example Output](#example-output)
+- [What is PaperQA2](#what-is-paperqa2)
+  - [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
+  - [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
+  - [PaperQA2 Algorithm](#paperqa2-algorithm)
+- [Installation](#installation)
+  - [CLI Usage](#cli-usage)
+    - [Bundled Settings](#bundled-settings)
+- [Library Usage](#library-usage)
+  - [`ask` manually](#ask-manually)
+  - [Adding Documents Manually](#adding-documents-manually)
+  - [Async](#async)
+  - [Choosing Model](#choosing-model)
+    - [Locally Hosted](#locally-hosted)
+  - [Changing Embedding Model](#changing-embedding-model)
+  - [Adjusting number of sources](#adjusting-number-of-sources)
+  - [Using Code or HTML](#using-code-or-html)
+  - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
+  - [Reusing Index](#reusing-index)
+  - [Running on LitQA v2](#running-on-litqa-v2)
+- [Where do I get papers?](#where-do-i-get-papers)
+  - [Zotero](#zotero)
+  - [Paper Scraper](#paper-scraper)
+- [Callbacks](#callbacks)
+  - [Caching Embeddings](#caching-embeddings)
+- [Customizing Prompts](#customizing-prompts)
+  - [Pre and Post Prompts](#pre-and-post-prompts)
+- [FAQ](#faq)
+  - [How come I get different results than your papers?](#how-come-i-get-different-results-than-your-papers)
+  - [How is this different from LlamaIndex or LangChain?](#how-is-this-different-from-llamaindex-or-langchain)
+  - [Can I save or load?](#can-i-save-or-load)
+- [Citation](#citation)
+
+<!--TOC-->
+
 ## Quickstart
 
-In this example we take a folder of research paper PDFs, magically get their metadata - including citation counts and a retraction check, then parse and cache PDFs into a full-text search index, and finally answer the user question with an LLM agent.
+In this example we take a folder of research paper PDFs,
+magically get their metadata - including citation counts with a retraction check,
+then parse and cache PDFs into a full-text search index,
+and finally answer the user question with an LLM agent.
 
 ```bash
 pip install paper-qa
@@ -27,7 +68,8 @@ Question: Has anyone designed neural networks that compute with proteins or DNA?
 
 ## What is PaperQA2
 
-PaperQA2 is engineered to be the best RAG model for working with scientific papers. Here are some features:
+PaperQA2 is engineered to be the best agentic RAG model for working with scientific papers.
+Here are some features:
 
 - A simple interface to get good answers with grounded responses containing in-text citations.
 - State-of-the-art implementation including document metadata-awareness
@@ -43,7 +85,8 @@ PaperQA2 is engineered to be the best RAG model for working with scientific pape
 
 By default, it uses [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [models](https://platform.openai.com/docs/models) with a Numpy vector DB to embed and search documents. However, you can easily use other closed-source, open-source models or embeddings (see details below).
 
-PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Here are some in a random order:
+PaperQA2 depends on some awesome libraries/APIs that make our repo possible.
+Here are some in no particular order:
 
 1. [Semantic Scholar](https://www.semanticscholar.org/)
 2. [Crossref](https://www.crossref.org/)
@@ -53,6 +96,55 @@ PaperQA2 depends on some awesome libraries/APIs that make our repo possible. Her
 6. [LiteLLM][LiteLLM general docs]
 7. [pybtex](https://pybtex.org/)
 8. [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/)
+
+### PaperQA2 vs PaperQA
+
+We've been working on hard on fundamental upgrades for a while and mostly followed [SemVer](https://semver.org/).
+meaning we've incremented the major version number on each breaking change.
+This brings us to the current major version number v5.
+So why call is the repo now called PaperQA2?
+We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai).
+So we arbitrarily call version 5 and onward PaperQA2,
+and versions before it as PaperQA1 to denote the significant change in performance.
+We recognize that we are challenged at naming and counting at FutureHouse,
+so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+
+### What's New in Version 5 (aka PaperQA2)?
+
+Version 5 added:
+
+- A CLI `pqa`
+- Agentic workflows invoking tools for
+  paper search, gathering evidence, and generating an answer
+- Removed much of the statefulness from the `Docs` object
+- A migration to LiteLLM for compatibility with many LLM providers
+  as well as centralized rate limits and cost tracking
+- A bundled set of configurations (read [here](#bundled-settings)))
+  containing known-good hyperparameters
+
+Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatible with version 5,
+and will need to be rebuilt.
+Also, our minimum Python version was increased to Python 3.11.
+
+### PaperQA2 Algorithm
+
+To understand PaperQA2, let's start with the pieces of the underlying algorithm.
+The default workflow of PaperQA2 is as follows:
+
+| Phase                  | PaperQA2 Actions                                                          |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
+|                        | - Chunk, embed, and add candidate papers to state                         |
+| **2. Gather Evidence** | - Embed query into vector                                                 |
+|                        | - Rank top _k_ document chunks in current state                           |
+|                        | - Create scored summary of each chunk in the context of the current query |
+|                        | - Use LLM to re-score and select most relevant summaries                  |
+| **3. Generate Answer** | - Put best summaries into prompt with context                             |
+|                        | - Generate answer with prompt                                             |
+
+The tools can be invoked in any order by a language agent.
+For example, an LLM agent might do a narrow and broad search,
+or using different phrasing for the gather evidence step from the generate answer step.
 
 ## Installation
 
@@ -76,54 +168,7 @@ you will likely want an API key for both [Crossref](https://www.crossref.org/doc
 which will allow you to avoid hitting public rate limits using these metadata services.
 Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
 
-## PaperQA2 vs PaperQA
-
-We've been working on hard on fundamental upgrades for a while and mostly followed [SemVer](https://semver.org/).
-meaning we've incremented the major version number on each breaking change.
-This brings us to the current major version number v5.
-So why call is the repo now called PaperQA2?
-We wanted to remark on the fact though that we've exceeded human performance on [many important metrics](https://paper.wikicrow.ai).
-So we arbitrarily call version 5 and onward PaperQA2,
-and versions before it as PaperQA1 to denote the significant change in performance.
-We recognize that we are challenged at naming and counting at FutureHouse,
-so we reserve the right at any time to arbitrarily change the name to PaperCrow.
-
-## What's New in Version 5 (aka PaperQA2)?
-
-Version 5 added:
-
-- A CLI `pqa`
-- Agentic workflows invoking tools for
-  paper search, gathering evidence, and generating an answer
-- Removed much of the statefulness from the `Docs` object
-- A migration to LiteLLM for compatibility with many LLM providers
-  as well as centralized rate limits and cost tracking
-- A bundled set of configurations (read [here](#bundled-settings)))
-  containing known-good hyperparameters
-
-Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatible with version 5 and will need to be rebuilt.
-Also, our minimum Python version is now Python 3.11.
-
-## Usage
-
-To understand PaperQA2, let's start with the pieces of the underlying algorithm. The default workflow of PaperQA2 is as follows:
-
-| Phase                  | PaperQA2 Actions                                                          |
-| ---------------------- | ------------------------------------------------------------------------- |
-| **1. Paper Search**    | - Get candidate papers from LLM-generated keyword query                   |
-|                        | - Chunk, embed, and add candidate papers to state                         |
-| **2. Gather Evidence** | - Embed query into vector                                                 |
-|                        | - Rank top _k_ document chunks in current state                           |
-|                        | - Create scored summary of each chunk in the context of the current query |
-|                        | - Use LLM to re-score and select most relevant summaries                  |
-| **3. Generate Answer** | - Put best summaries into prompt with context                             |
-|                        | - Generate answer with prompt                                             |
-
-The tools can be invoked in any order by a language agent.
-For example, an LLM agent might do a narrow and broad search,
-or using different phrasing for the gather evidence step from the generate answer step.
-
-### CLI
+### CLI Usage
 
 The fastest way to test PaperQA2 is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
 
@@ -202,7 +247,7 @@ Inside [`paperqa/configs`](paperqa/configs) we bundle known useful settings:
 | contracrow   | Setting to find contradictions in papers, your query should be a claim that needs to be flagged as a contradiction (or not). |
 | debug        | Setting useful solely for debugging, but not in any actual application beyond debugging.                                     |
 
-### Module Usage
+## Library Usage
 
 PaperQA2's full workflow can be accessed via Python directly:
 
@@ -211,11 +256,16 @@ from paperqa import Settings, ask
 
 answer = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
-    settings=Settings(temperature=0.5),
+    settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
 
-The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer). `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
+Please see our [installation docs](#installation) for how to install the package from PyPI.
+
+### `ask` manually
+
+The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
+`ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
 
 ```python
 from paperqa import Settings, ask
@@ -271,7 +321,9 @@ print(answer.formatted_answer)
 
 ### Async
 
-PaperQA2 is written to be used asynchronously. The synchronous API is just a wrapper around the async. Here are the methods and their async equivalents:
+PaperQA2 is written to be used asynchronously.
+The synchronous API is just a wrapper around the async.
+Here are the methods and their `async` equivalents:
 
 | Sync                | Async                |
 | ------------------- | -------------------- |
@@ -281,26 +333,24 @@ PaperQA2 is written to be used asynchronously. The synchronous API is just a wra
 | `Docs.get_evidence` | `Docs.aget_evidence` |
 | `Docs.query`        | `Docs.aquery`        |
 
-The synchronous version just calls the async version in a loop. Most modern python environments support async natively (including Jupyter notebooks!). So you can do this in a Jupyter Notebook:
+The synchronous version just calls the async version in a loop.
+Most modern python environments support `async` natively (including Jupyter notebooks!).
+So you can do this in a Jupyter Notebook:
 
 ```python
 import asyncio
 from paperqa import Docs
 
 
-async def main():
-    # valid extensions include .pdf, .txt, and .html
-    doc_paths = ("myfile.pdf", "myotherfile.pdf")
-
+async def main() -> None:
     docs = Docs()
-
-    for doc in doc_paths:
+    # valid extensions include .pdf, .txt, and .html
+    for doc in ("myfile.pdf", "myotherfile.pdf"):
         await docs.aadd(doc)
 
     answer = await docs.aquery(
         "What manufacturing challenges are unique to bispecific antibodies?"
     )
-
     print(answer.formatted_answer)
 
 
@@ -345,17 +395,19 @@ The easiest way to get set-up is to download a [llama file](https://github.com/M
 from paperqa import Settings, ask
 
 local_llm_config = dict(
-    model_list=dict(
-        model_name="my_llm_model",
-        litellm_params=dict(
-            model="my-llm-model",
-            api_base="http://localhost:8080/v1",
-            api_key="sk-no-key-required",
-            temperature=0.1,
-            frequency_penalty=1.5,
-            max_tokens=512,
-        ),
-    )
+    model_list=[
+        dict(
+            model_name="my_llm_model",
+            litellm_params=dict(
+                model="my-llm-model",
+                api_base="http://localhost:8080/v1",
+                api_key="sk-no-key-required",
+                temperature=0.1,
+                frequency_penalty=1.5,
+                max_tokens=512,
+            ),
+        )
+    ]
 )
 
 answer = ask(
@@ -389,12 +441,9 @@ Embedding models are used to create PaperQA2's index of the full-text embedding 
 ```python
 from paperqa import Docs, Settings
 
-doc_paths = ("myfile.pdf", "myotherfile.pdf")
-
 docs = Docs()
-
-for doc in doc_paths:
-    doc.add(doc_paths, Settings(embedding="text-embedding-large-3"))
+for doc in ("myfile.pdf", "myotherfile.pdf"):
+    docs.add(doc, settings=Settings(embedding="text-embedding-large-3"))
 ```
 
 Note that PaperQA2 uses Numpy as a dense vector store.
@@ -413,14 +462,12 @@ from paperqa import (
 )
 
 
-doc_paths = ("myfile.pdf", "myotherfile.pdf")
-
 model = HybridEmbeddingModel(
     models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel(ndim=1024)]
 )
 docs = Docs()
-for doc in doc_paths:
-    doc.add(doc_paths, embedding_model=model)
+for doc in ("myfile.pdf", "myotherfile.pdf"):
+    docs.add(doc, embedding_model=model)
 ```
 
 The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
@@ -474,6 +521,86 @@ for ... in my_docs:
     doc = Doc(docname=..., citation=..., dockey=..., citation=...)
     texts = [Text(text=..., name=..., doc=doc) for ... in my_texts]
     docs.add_texts(texts, doc)
+```
+
+### Reusing Index
+
+The local search indexes are built based on a hash of the current `Settings` object.
+So make sure you properly specify the `paper_directory` to your `Settings` object.
+In general, it's advisable to:
+
+1. Pre-build an index given a folder of papers (can take several minutes)
+2. Reuse the index to perform many queries
+
+```python
+import os
+
+from paperqa import Settings
+from paperqa.agents.main import agent_query
+from paperqa.agents.models import QueryRequest
+from paperqa.agents.search import get_directory_index
+
+
+async def amain(folder_of_papers: str | os.PathLike) -> None:
+    settings = Settings(paper_directory=folder_of_papers)
+
+    # 1. Build the index. Note an index name is autogenerated when unspecified
+    built_index = await get_directory_index(settings=settings)
+    print(settings.get_index_name())  # Display the autogenerated index name
+    print(await built_index.index_files)  # Display the index contents
+
+    # 2. Use the settings as many times as you want with ask
+    answer_response_1 = await agent_query(
+        query=QueryRequest(
+            query="What is the best way to make a vaccine?", settings=settings
+        )
+    )
+    answer_response_2 = await agent_query(
+        query=QueryRequest(
+            query="What manufacturing challenges are unique to bispecific antibodies?",
+            settings=settings,
+        )
+    )
+```
+
+### Running on LitQA v2
+
+In [`paperqa/agents/task.py`](paperqa/agents/task.py), you will find:
+
+1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
+2. `LitQAv2TaskDataset`: a task dataset designed to pull LitQA v2 from Hugging Face,
+   and create one `GradablePaperQAEnvironment` per question
+
+Here is an example of how to use them:
+
+```python
+import os
+
+from aviary.env import TaskDataset
+from ldp.agent import SimpleAgent
+from ldp.alg.callbacks import MeanMetricsCallback
+from ldp.alg.runners import Evaluator, EvaluatorConfig
+
+from paperqa import QueryRequest, Settings
+from paperqa.agents.task import TASK_DATASET_NAME
+
+
+async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
+    base_query = QueryRequest(
+        settings=Settings(paper_directory=folder_of_litqa_v2_papers)
+    )
+    dataset = TaskDataset.from_name(TASK_DATASET_NAME, base_query=base_query)
+    metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
+
+    evaluator = Evaluator(
+        config=EvaluatorConfig(batch_size=3),
+        agent=SimpleAgent(),
+        dataset=dataset,
+        callbacks=[metrics_callback],
+    )
+    await evaluator.evaluate()
+
+    print(metrics_callback.eval_means)
 ```
 
 ## Where do I get papers?
@@ -596,22 +723,18 @@ You can customize any of the prompts using settings.
 from paperqa import Docs, Settings
 
 my_qa_prompt = (
-    "Answer the question '{question}' "
+    "Answer the question '{question}'\n"
     "Use the context below if helpful. "
-    "You can cite the context using the key "
-    "like (Example2012). "
+    "You can cite the context using the key like (Example2012). "
     "If there is insufficient context, write a poem "
     "about how you cannot answer.\n\n"
-    "Context: {context}\n\n"
+    "Context: {context}"
 )
 
 docs = Docs()
 settings = Settings()
 settings.prompts.qa = my_qa_prompt
-docs.query(
-    "Are covid-19 vaccines effective?",
-    settings=settings,
-)
+docs.query("Are covid-19 vaccines effective?", settings=settings)
 ```
 
 ### Pre and Post Prompts
@@ -625,13 +748,22 @@ are executed after the query and before the query. For example, you can use this
 
 Internally at FutureHouse, we have a slightly different set of tools. We're trying to get some of them, like citation traversal, into this repo. However, we have APIs and licenses to access research papers that we cannot share openly. Similarly, in our research papers' results we do not start with the known relevant PDFs. Our agent has to identify them using keyword search over all papers, rather than just a subset. We're gradually aligning these two versions of PaperQA, but until there is an open-source way to freely access papers (even just open source papers) you will need to provide PDFs yourself.
 
-### How is this different from LlamaIndex?
+### How is this different from LlamaIndex or LangChain?
 
-It's not that different! This is similar to the tree response method in LlamaIndex. We also support agentic workflows and local indexes for easier operations with the scientific literature. Another big difference is our strong focus on scientific papers and their underlying metadata.
+[LangChain](https://github.com/langchain-ai/langchain)
+and [LlamaIndex](https://github.com/run-llama/llama_index)
+are both frameworks for working with LLM applications,
+with abstractions made for agentic workflows and retrieval augmented generation.
 
-### How is this different from LangChain?
+Over time, the PaperQA team over time chose to become framework-agnostic,
+instead outsourcing LLM drivers to [LiteLLM][LiteLLM general docs]
+and no framework besides Pydantic for its tools.
+PaperQA focuses on scientific papers and their metadata.
 
-There has been some great work on retrievers in LangChain, and you could say this is an example of a retriever with an LLM-based re-ranking and contextual summary. Another big difference is our strong focus on scientific papers and their underlying metadata.
+PaperQA can be reimplemented using either LlamaIndex or LangChain.
+For example, our `GatherEvidence` tool can be reimplemented
+as a retriever with an LLM-based re-ranking and contextual summary.
+There is similar work with the tree response method in LlamaIndex.
 
 ### Can I save or load?
 
