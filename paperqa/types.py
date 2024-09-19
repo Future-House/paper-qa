@@ -334,6 +334,11 @@ class DocDetails(Doc):
     doi_url: str | None = None
     doc_id: str | None = None
     file_location: str | os.PathLike | None = None
+    license: str | None = Field(
+        default=None,
+        description="string indicating license. None means unknown/unset.",
+    )
+    pdf_url: str | None = None
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
@@ -570,17 +575,20 @@ class DocDetails(Doc):
                 " to call `hydrate`?"
             )
 
-        quality = (
-            SOURCE_QUALITY_MESSAGES[self.source_quality]
-            if self.source_quality >= 0
-            else None
-        )
+        if self.source_quality_str:
+            return (
+                f"{self.citation} This article has {self.citation_count} citations and is"
+                f" from a {self.source_quality_str}."
+            )
+        return f"{self.citation} This article has {self.citation_count} citations."
 
-        if quality is None:
-            return f"{self.citation} This article has {self.citation_count} citations."
+    @property
+    def source_quality_str(self) -> str:
+        """Return the source quality as a string."""
         return (
-            f"{self.citation} This article has {self.citation_count} citations and is"
-            f" from a {quality}."
+            SOURCE_QUALITY_MESSAGES[self.source_quality]
+            if self.source_quality is not None
+            else ""
         )
 
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
