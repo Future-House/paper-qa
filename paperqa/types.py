@@ -336,7 +336,8 @@ class DocDetails(Doc):
     file_location: str | os.PathLike | None = None
     license: str | None = Field(
         default=None,
-        description="string indicating license. None means unknown/unset.",
+        description="string indicating license."
+        " Should refer specifically to pdf_url (since that could be preprint). None means unknown/unset.",
     )
     pdf_url: str | None = None
     other: dict[str, Any] = Field(
@@ -584,7 +585,6 @@ class DocDetails(Doc):
 
     @property
     def source_quality_str(self) -> str:
-        """Return the source quality as a string."""
         return (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
             if self.source_quality is not None
