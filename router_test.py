@@ -24,7 +24,7 @@ async def test(router):
         [
             {
                 "role": "user",
-                "content": f"{pre_fill}\n\nRecite the Declaration of independence at a speed of {random.random() * 100} words per minute.",
+                "content": f"{pre_fill * 3}\n\nRecite the Declaration of independence at a speed of {random.random() * 100} words per minute.",
             }
         ],
         stream=True,
