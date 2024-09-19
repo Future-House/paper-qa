@@ -576,15 +576,15 @@ class DocDetails(Doc):
                 " to call `hydrate`?"
             )
 
-        if self.source_quality_str:
+        if self.source_quality_message:
             return (
                 f"{self.citation} This article has {self.citation_count} citations and is"
-                f" from a {self.source_quality_str}."
+                f" from a {self.source_quality_message}."
             )
         return f"{self.citation} This article has {self.citation_count} citations."
 
     @property
-    def source_quality_str(self) -> str:
+    def source_quality_message(self) -> str:
         return (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
             if self.source_quality is not None  # note - zero is a valid value
