@@ -183,6 +183,8 @@ class LitQATaskDataset(
             ):
                 metric_list.append(  # Use mean to allow for multiple answers
                     sum(int(sa[i]) for sa in split_answers) / len(split_answers)
+                    if split_answers  # Avoid div0 (when no answer was made)
+                    else 0
                 )
         return super().compute_trajectory_metrics(trajectories) | {
             "total_paper_count": total_paper_count,
