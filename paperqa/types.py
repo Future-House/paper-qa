@@ -587,7 +587,7 @@ class DocDetails(Doc):
     def source_quality_str(self) -> str:
         return (
             SOURCE_QUALITY_MESSAGES[self.source_quality]
-            if self.source_quality is not None
+            if self.source_quality is not None  # note - zero is a valid value
             else ""
         )
 
