@@ -622,7 +622,7 @@ print(details.formatted_citation)
 # This article has 243 citations and is from a domain leading peer-reviewed journal.
 
 print(details.citation_count)
-# 20
+# 243
 
 print(details.license)
 # cc-by
