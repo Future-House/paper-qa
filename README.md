@@ -643,7 +643,7 @@ details = await client.query(
 )
 ```
 
-will return much faster than the first query and we'll be certain the authors match. We hope to add more documentation and examples soon about this cool feature!
+will return much faster than the first query and we'll be certain the authors match.
 
 ## Where do I get papers?
 
