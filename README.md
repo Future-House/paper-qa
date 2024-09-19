@@ -32,7 +32,7 @@ question answering, summarization, and contradiction detection.
   - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
   - [Reusing Index](#reusing-index)
   - [Running on LitQA v2](#running-on-litqa-v2)
-  - [Using Clients Separately](#using-clients-separately)
+  - [Using Clients Directly](#using-clients-directly)
 - [Where do I get papers?](#where-do-i-get-papers)
   - [Zotero](#zotero)
   - [Paper Scraper](#paper-scraper)
@@ -604,7 +604,7 @@ async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
     print(metrics_callback.eval_means)
 ```
 
-### Using Clients Separately
+### Using Clients Directly
 
 One of the most powerful features of PaperQA2 is its ability to combine data from multiple metadata sources. For example, [Unpaywall](https://unpaywall.org/) can provide open access status/direct links to PDFs, [Crossref](https://www.crossref.org/) can provide bibtex, and [Semantic Scholar](https://www.semanticscholar.org/) can provide citation licenses. Here's a short demo of how to do this:
 
@@ -615,7 +615,11 @@ client = DocMetadataClient(clients=ALL_CLIENTS)
 details = await client.query(title="Augmenting language models with chemistry tools")
 
 print(details.formatted_citation)
-# Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and Philippe Schwaller. Augmenting large language models with chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8, doi:10.1038/s42256-024-00832-8. This article has 243 citations and is from a domain leading peer-reviewed journal.
+# Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D. White, and Philippe Schwaller.
+#  Augmenting large language models with chemistry tools. Nature Machine Intelligence,
+# 6:525-535, May 2024. URL: https://doi.org/10.1038/s42256-024-00832-8,
+# doi:10.1038/s42256-024-00832-8.
+# This article has 243 citations and is from a domain leading peer-reviewed journal.
 
 print(details.citation_count)
 # 20
