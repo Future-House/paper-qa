@@ -158,6 +158,12 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
         return details
 
     def _create_doc_details(self, data: UnpaywallResponse) -> DocDetails:
+        # extract pdf location if present
+        pdf_url: str | None = None
+        license: str | None = None  # noqa: A001
+        if data.best_oa_location:
+            pdf_url = data.best_oa_location.url_for_pdf
+            license = data.best_oa_location.license  # noqa: A001
         return DocDetails(  # type: ignore[call-arg]
             authors=[
                 f"{author.given} {author.family}" for author in (data.z_authors or [])
@@ -174,6 +180,8 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
             title=data.title,
             doi=data.doi,
             doi_url=data.doi_url,
+            license=license,
+            pdf_url=pdf_url,
             other={
                 "genre": data.genre,
                 "is_paratext": data.is_paratext,
