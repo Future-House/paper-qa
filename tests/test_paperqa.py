@@ -815,15 +815,13 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
 
 
 def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
-    doc_path = stub_data_dir / "paper.pdf"
     docs = Docs()
-    # we limit to only crossref since s2 is too flaky
     docs.add(
-        doc_path,
+        stub_data_dir / "paper.pdf",
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
         " Models, XAI Review, 2023",
         use_doc_details=True,
-        clients={CrossrefProvider},
+        clients={CrossrefProvider},  # Limit to only crossref since s2 is too flaky
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
@@ -844,7 +842,9 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     }
     assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"
     answer = docs.query("Are counterfactuals actionable? [yes/no]")
-    assert "yes" in answer.answer or "Yes" in answer.answer
+    assert any(
+        w in answer.answer for w in ("yes", "Yes")
+    ), f"Incorrect answer: {answer.answer}"
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
