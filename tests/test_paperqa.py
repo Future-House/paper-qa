@@ -842,7 +842,7 @@ def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
-        answer = docs.query("Are counterfactuals actionable?[yes/no]")
+        answer = docs.query("Are counterfactuals actionable? [yes/no]")
         assert any(
             w in answer.answer for w in ("yes", "Yes")
         ), f"Incorrect answer: {answer.answer}"
