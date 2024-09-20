@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import contextlib
 import json
+import logging
 import os
 import re
 import tempfile
@@ -51,6 +51,8 @@ from paperqa.utils import (
     md5sum,
     name_in_text,
 )
+
+logger = logging.getLogger(__name__)
 
 
 # this is just to reduce None checks/type checks
@@ -311,10 +313,10 @@ class Docs(BaseModel):
                 data={"citation": citation},
                 skip_system=True,
             )
-            with contextlib.suppress(json.JSONDecodeError):
-                clean_text = result.text.strip("`")
-                if clean_text.startswith("json"):
-                    clean_text = clean_text.replace("json", "", 1)
+            clean_text = result.text.strip("`")
+            if clean_text.startswith("json"):
+                clean_text = clean_text.replace("json", "", 1)
+            try:
                 citation_json = json.loads(clean_text)
                 if citation_title := citation_json.get("title"):
                     title = citation_title
@@ -322,6 +324,17 @@ class Docs(BaseModel):
                     doi = citation_doi
                 if citation_author := citation_json.get("authors"):
                     authors = citation_author
+            except (json.JSONDecodeError, AttributeError):
+                # json.JSONDecodeError: clean_text was not actually JSON
+                # AttributeError: citation_json was not a dict (e.g. a list)
+                # NOTE: we only want to warning log when we fail on title and
+                # authors we may not care if we fail on DOI here
+                logger.exception(
+                    "Failed to parse all of title, DOI, and authors from the"
+                    " ParsingSettings.structured_citation_prompt's response"
+                    f" {clean_text}, consider using a manifest file or specifying a"
+                    " different citation prompt."
+                )
         # see if we can upgrade to DocDetails
         # if not, we can progress with a normal Doc
         # if "overwrite_fields_from_metadata" is used:
