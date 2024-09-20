@@ -12,7 +12,13 @@ from urllib.parse import quote
 
 import aiohttp
 from anyio import open_file
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
 from paperqa.utils import (
@@ -28,7 +34,8 @@ from .exceptions import DOINotFoundError
 
 logger = logging.getLogger(__name__)
 
-CROSSREF_BASE_URL = "https://api.crossref.org"
+CROSSREF_HOST = "api.crossref.org"
+CROSSREF_BASE_URL = f"https://{CROSSREF_HOST}"
 CROSSREF_HEADER_KEY = "Crossref-Plus-API-Token"
 CROSSREF_API_REQUEST_TIMEOUT = 5.0
 CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
@@ -250,6 +257,18 @@ async def parse_crossref_to_doc_details(
     return doc_details
 
 
+@retry(
+    # Retry upon this flaky Crossref failure:
+    # > aiohttp.client_exceptions.ClientConnectorError:
+    # > Cannot connect to host api.crossref.org:443 ssl:default [nodename nor servname provided, or not known]
+    # SEE: https://github.com/aio-libs/aiohttp/blob/v3.10.5/aiohttp/client_exceptions.py#L193-L196
+    retry=retry_if_exception(
+        lambda x: isinstance(x, aiohttp.ClientConnectorError)
+        and x.host == CROSSREF_HOST
+    ),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    stop=stop_after_attempt(3),
+)
 async def get_doc_details_from_crossref(  # noqa: PLR0912
     session: aiohttp.ClientSession,
     doi: str | None = None,
@@ -263,8 +282,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     SEE: https://api.crossref.org/swagger-ui/index.html#/Works
     """
-    if authors is None:
-        authors = []
+    authors = authors or []
     if doi is title is None:
         raise ValueError("Either a DOI or title must be provided.")
     if doi is not None and title is not None:
@@ -272,13 +290,12 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     inputs_msg = f"DOI {doi}" if doi is not None else f"title {title}"
 
-    CROSSREF_MAILTO = get_crossref_mailto()
-    quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
-    url = f"{CROSSREF_BASE_URL}/works{quoted_doi}"
-    params = {"mailto": CROSSREF_MAILTO}
+    url = f"{CROSSREF_BASE_URL}/works"
+    if doi:
+        url += f"/{quote(doi, safe='')}"
+    params = {"mailto": get_crossref_mailto()}
     if title:
         params.update({"query.title": title, "rows": "1"})
-
     if authors:
         params.update(
             {"query.author": " ".join([a.strip() for a in authors if len(a) > 1])}
@@ -353,6 +370,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
 @retry(
     stop=stop_after_attempt(3),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
     wait=wait_exponential(multiplier=5, min=5),
     reraise=True,
 )
