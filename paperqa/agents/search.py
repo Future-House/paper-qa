@@ -421,11 +421,15 @@ async def get_directory_index(
     settings: MaybeSettings = None,
 ) -> SearchIndex:
     """
-    Create a Tantivy index from a directory of text files.
+    Create a Tantivy index by reading from a directory of text files.
+
+    This function only reads from the source directory, not edits or writes to it.
 
     Args:
-        sync_index_w_directory: Sync the index with the directory. (i.e. delete files not in directory)
-        index_name: Name of the index. If not given, the name will be taken from the settings
+        index_name: Override on the name of the index. If unspecified, the default
+            behavior is to generate the name from the input settings.
+        sync_index_w_directory: Sync the index with the directory (i.e. delete index
+            files if the file isn't in the source directory).
         settings: Application settings.
     """
     _settings = get_settings(settings)

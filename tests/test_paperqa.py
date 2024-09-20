@@ -10,7 +10,15 @@ import httpx
 import numpy as np
 import pytest
 
-from paperqa import Answer, Doc, Docs, NumpyVectorStore, Settings, print_callback
+from paperqa import (
+    Answer,
+    Doc,
+    DocDetails,
+    Docs,
+    NumpyVectorStore,
+    Settings,
+    print_callback,
+)
 from paperqa.clients import CrossrefProvider
 from paperqa.core import llm_parse_json
 from paperqa.llms import (
@@ -807,15 +815,13 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
 
 
 def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
-    doc_path = stub_data_dir / "paper.pdf"
     docs = Docs()
-    # we limit to only crossref since s2 is too flaky
     docs.add(
-        doc_path,
+        stub_data_dir / "paper.pdf",
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
         " Models, XAI Review, 2023",
         use_doc_details=True,
-        clients={CrossrefProvider},
+        clients={CrossrefProvider},  # Limit to only crossref since s2 is too flaky
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
@@ -823,29 +829,36 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         "41f786fcc56d27ff0c1507153fae3774",  # From file contents
         "5300ef1d5fb960d7",  # Or from crossref data
     }
+    assert isinstance(doc_details, DocDetails)
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
     assert doc_details.docname == "wellawatteUnknownyearaperspectiveon"
-    assert set(doc_details.authors) == {  # type: ignore[attr-defined]
+    assert doc_details.authors
+    assert set(doc_details.authors) == {
         "Geemi P. Wellawatte",
         "Heta A. Gandhi",
         "Aditi Seshadri",
         "Andrew D. White",
     }
-    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"  # type: ignore[attr-defined]
-    answer = docs.query("Are counterfactuals actionable? [yes/no]")
-    assert "yes" in answer.answer or "Yes" in answer.answer
+    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"
+    num_retries = 3
+    for _ in range(num_retries):
+        answer = docs.query("Are counterfactuals actionable? [yes/no]")
+        if any(w in answer.answer for w in ("yes", "Yes")):
+            return
+    raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
 
-@pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
 def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
-        answer = docs.query("Are counterfactuals actionable?[yes/no]")
-        assert any(
-            w in answer.answer for w in ("yes", "Yes")
-        ), f"Incorrect answer: {answer.answer}"
+    num_retries = 3
+    for _ in range(num_retries):
+        answer = docs.query("Are counterfactuals actionable? [yes/no]")
+        if any(w in answer.answer for w in ("yes", "Yes")):
+            return
+    raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
 
 def test_fileio_reader_txt(stub_data_dir: Path) -> None:
