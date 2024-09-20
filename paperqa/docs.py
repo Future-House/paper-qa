@@ -308,6 +308,7 @@ class Docs(BaseModel):
 
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
+            # TODO: specify a JSON schema here when many LLM providers support this
             result = await llm_model.run_prompt(
                 prompt=parse_config.structured_citation_prompt,
                 data={"citation": citation},
