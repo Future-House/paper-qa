@@ -282,8 +282,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     SEE: https://api.crossref.org/swagger-ui/index.html#/Works
     """
-    if authors is None:
-        authors = []
+    authors = authors or []
     if doi is title is None:
         raise ValueError("Either a DOI or title must be provided.")
     if doi is not None and title is not None:
@@ -291,13 +290,12 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
     inputs_msg = f"DOI {doi}" if doi is not None else f"title {title}"
 
-    CROSSREF_MAILTO = get_crossref_mailto()
-    quoted_doi = f"/{quote(doi, safe='')}" if doi else ""
-    url = f"{CROSSREF_BASE_URL}/works{quoted_doi}"
-    params = {"mailto": CROSSREF_MAILTO}
+    url = f"{CROSSREF_BASE_URL}/works"
+    if doi:
+        url += f"/{quote(doi, safe='')}"
+    params = {"mailto": get_crossref_mailto()}
     if title:
         params.update({"query.title": title, "rows": "1"})
-
     if authors:
         params.update(
             {"query.author": " ".join([a.strip() for a in authors if len(a) > 1])}
@@ -372,6 +370,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
 
 @retry(
     stop=stop_after_attempt(3),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
     wait=wait_exponential(multiplier=5, min=5),
     reraise=True,
 )
