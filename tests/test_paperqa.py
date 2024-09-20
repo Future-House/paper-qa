@@ -841,21 +841,24 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         "Andrew D. White",
     }
     assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"
-    answer = docs.query("Are counterfactuals actionable? [yes/no]")
-    assert any(
-        w in answer.answer for w in ("yes", "Yes")
-    ), f"Incorrect answer: {answer.answer}"
+    num_retries = 3
+    for _ in range(num_retries):
+        answer = docs.query("Are counterfactuals actionable? [yes/no]")
+        if any(w in answer.answer for w in ("yes", "Yes")):
+            return
+    raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
 
-@pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
 def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
         docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+    num_retries = 3
+    for _ in range(num_retries):
         answer = docs.query("Are counterfactuals actionable? [yes/no]")
-        assert any(
-            w in answer.answer for w in ("yes", "Yes")
-        ), f"Incorrect answer: {answer.answer}"
+        if any(w in answer.answer for w in ("yes", "Yes")):
+            return
+    raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
 
 def test_fileio_reader_txt(stub_data_dir: Path) -> None:
