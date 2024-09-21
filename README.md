@@ -18,8 +18,8 @@ question answering, summarization, and contradiction detection.
   - [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
   - [PaperQA2 Algorithm](#paperqa2-algorithm)
 - [Installation](#installation)
-  - [CLI Usage](#cli-usage)
-    - [Bundled Settings](#bundled-settings)
+- [CLI Usage](#cli-usage)
+  - [Bundled Settings](#bundled-settings)
 - [Library Usage](#library-usage)
   - [`ask` manually](#ask-manually)
   - [Adding Documents Manually](#adding-documents-manually)
@@ -30,6 +30,8 @@ question answering, summarization, and contradiction detection.
   - [Adjusting number of sources](#adjusting-number-of-sources)
   - [Using Code or HTML](#using-code-or-html)
   - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
+  - [Creating Index](#creating-index)
+    - [Manifest Files](#manifest-files)
   - [Reusing Index](#reusing-index)
   - [Running on LitQA v2](#running-on-litqa-v2)
   - [Using Clients Directly](#using-clients-directly)
@@ -169,7 +171,7 @@ you will likely want an API key for both [Crossref](https://www.crossref.org/doc
 which will allow you to avoid hitting public rate limits using these metadata services.
 Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
 
-### CLI Usage
+## CLI Usage
 
 The fastest way to test PaperQA2 is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
 
@@ -236,7 +238,7 @@ Both the CLI and module have pre-configured settings based on prior performance 
 pqa --settings <setting name> ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
-#### Bundled Settings
+### Bundled Settings
 
 Inside [`paperqa/configs`](paperqa/configs) we bundle known useful settings:
 
@@ -523,6 +525,32 @@ for ... in my_docs:
     texts = [Text(text=..., name=..., doc=doc) for ... in my_texts]
     docs.add_texts(texts, doc)
 ```
+
+### Creating Index
+
+Indexes will be placed in the [home directory][home dir] by default.
+This can be controlled via the `PQA_HOME` environment variable.
+
+Indexes are made by reading files in the `Settings.paper_directory`.
+By default, we recursively read from subdirectories of the paper directory,
+unless disabled using `Settings.index_recursively`.
+The paper directory is not modified in any way, it's just read from.
+
+[home dir]: https://docs.python.org/3/library/pathlib.html#pathlib.Path.home
+
+#### Manifest Files
+
+The indexing process attempts to infer paper metadata like title and DOI
+using LLM-powered text processing.
+You can avoid this point of uncertainty using a "manifest" file,
+which is a CSV containing three columns (order doesn't matter):
+
+- `file_location`: relative path to the paper's PDF within the index directory
+- `doi`: DOI of the paper
+- `title`: title of the paper
+
+By providing this information,
+we ensure queries to metadata providers like Crossref are accurate.
 
 ### Reusing Index
 
