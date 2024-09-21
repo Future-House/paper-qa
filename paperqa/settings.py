@@ -432,7 +432,7 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional manifest CSV, containing columns which are attributes for a"
-            " DocDetails object. Only 'file_location','doi', and 'title' will be used"
+            " DocDetails object. Only 'file_location', 'doi', and 'title' will be used"
             " when indexing."
         ),
     )
