@@ -333,16 +333,17 @@ class SearchIndex:
         ]
 
 
-async def maybe_get_manifest(filename: anyio.Path | None) -> dict[str, DocDetails]:
+async def maybe_get_manifest(
+    filename: anyio.Path | None = None,
+) -> dict[str, DocDetails]:
     if not filename:
         return {}
     if filename.suffix == ".csv":
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
-                reader = csv.DictReader(StringIO(content))
-                records = [DocDetails(**row) for row in reader]
-                return {str(r.file_location): r for r in records if r.file_location}
+            records = [DocDetails(**row) for row in csv.DictReader(StringIO(content))]
+            return {str(r.file_location): r for r in records if r.file_location}
         except FileNotFoundError:
             logging.warning(f"Manifest file at {filename} could not be found.")
         except Exception:
