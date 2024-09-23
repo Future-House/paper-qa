@@ -198,6 +198,7 @@ disable = [
     "too-many-instance-attributes",  # Don't care to enforce this
     "too-many-lines",  # Don't care to enforce this
     "too-many-locals",  # Rely on ruff PLR0914 for this
+    "too-many-positional-arguments",  # Don't care to enforce this
     "too-many-return-statements",  # Rely on ruff PLR0911 for this
     "too-many-statements",  # Rely on ruff PLR0915 for this
     "undefined-loop-variable",  # Don't care to enforce this
