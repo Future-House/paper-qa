@@ -152,10 +152,11 @@ or using different phrasing for the gather evidence step from the generate answe
 ## Installation
 
 For a non-development setup,
-install PaperQA2 from [PyPI](https://pypi.org/project/paper-qa/):
+install PaperQA2 (aka version 5) from [PyPI](https://pypi.org/project/paper-qa/).
+Note version 5 requires Python 3.11+.
 
 ```bash
-pip install paper-qa
+pip install paper-qa>=5
 ```
 
 For development setup,
