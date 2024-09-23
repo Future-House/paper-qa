@@ -810,7 +810,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.7.0"
+version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -828,9 +828,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/63/8c98d12aea67ee3ad9dccfa991e01e8b8f579038b4a74edb2dcbf4cafbca/ldp-0.7.0.tar.gz", hash = "sha256:981b7acdaec8dd113392aa2f7707b4ff278520c25865c69a89352207a946aceb", size = 248395 }
+sdist = { url = "https://files.pythonhosted.org/packages/18/b0/95b85a9117af6dddb102d706ee853779dadd9d72ea9ffac317b2a353998c/ldp-0.7.2.tar.gz", hash = "sha256:f6aaf7866ae7424d0452d8ab3784b77f50a4b8d2b4b40634bbd27f2d32525793", size = 270009 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0f/b2/f61b4cba627253e38a1351a6026f6f8a3e8f85a45df03a97e823663ee0d7/ldp-0.7.0-py3-none-any.whl", hash = "sha256:e314da2b0f51827784ba37fa2da231719c6af4f38f068332031ba63da4b0a6c8", size = 87037 },
+    { url = "https://files.pythonhosted.org/packages/67/5d/4ebc53282757815e7e7880f227f64e6ccab6fbc0f1cc4b554dfa32c6b5e4/ldp-0.7.2-py3-none-any.whl", hash = "sha256:da8916dc79f86eaf3ae0eb998ab91a013e963d2087601a12a096759fe0f1a3cb", size = 87163 },
 ]
 
 [[package]]
@@ -1222,7 +1222,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.8.dev2+g3d2ffac.d20240923"
+version = "5.0.8.dev3+gcdfa436.d20240923"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
