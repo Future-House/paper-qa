@@ -30,10 +30,20 @@ def _setup_default_logs() -> None:
     setup_default_logs()
 
 
+OPENAI_API_KEY_HEADER = "authorization"
+ANTHROPIC_API_KEY_HEADER = "x-api-key"
+
+
 @pytest.fixture(scope="session", name="vcr_config")
 def fixture_vcr_config() -> dict[str, Any]:
     return {
-        "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
+        "filter_headers": [
+            CROSSREF_HEADER_KEY,
+            SEMANTIC_SCHOLAR_HEADER_KEY,
+            OPENAI_API_KEY_HEADER,
+            ANTHROPIC_API_KEY_HEADER,
+            "cookie",
+        ],
         "match_on": ["method", "host", "path", "query"],
         "allow_playback_repeats": True,
         "cassette_library_dir": "tests/cassettes",
