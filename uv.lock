@@ -1140,7 +1140,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.47.1"
+version = "1.46.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1152,9 +1152,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/89/2c/b26f179a15ddc1b9c6b986db9a71b121e77a11b82c5e9d3bb740edf95223/openai-1.47.1.tar.gz", hash = "sha256:62c8f5f478f82ffafc93b33040f8bb16a45948306198bd0cba2da2ecd9cf7323", size = 297985 }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/6b/470673304605c4aa4ee899dbab6ea12f6a0844e3ee7970ce7ecae0c89aea/openai-1.46.1.tar.gz", hash = "sha256:e5cf7f268bf516de23686d496c9dae7f0dcdcd0e87af4d288deeab8329fcbbaf", size = 297547 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/a1/601773020ad98d6d55f45c4482ea0c30af1351827eaab98cbc7d27b4716d/openai-1.47.1-py3-none-any.whl", hash = "sha256:34277583bf268bb2494bc03f48ac123788c5e2a914db1d5a23d5edc29d35c825", size = 375614 },
+    { url = "https://files.pythonhosted.org/packages/da/14/aabc614d8c446cb32043ed397dd8536a8f4c43a92c6609c05a958be9b960/openai-1.46.1-py3-none-any.whl", hash = "sha256:7517f07117cf66012bbc55c49fd6b983eaac0f3d2a09c90cba1140d4455e4290", size = 375150 },
 ]
 
 [[package]]
@@ -1222,7 +1222,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.8.dev2+g95b845f.d20240923"
+version = "5.0.8.dev2+g3d2ffac.d20240923"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1232,6 +1232,7 @@ dependencies = [
     { name = "httpx" },
     { name = "litellm" },
     { name = "numpy" },
+    { name = "openai" },
     { name = "pybtex" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1295,6 +1296,7 @@ requires-dist = [
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.6" },
     { name = "litellm", specifier = ">=1.44" },
     { name = "numpy" },
+    { name = "openai", specifier = "<1.47" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0" },
