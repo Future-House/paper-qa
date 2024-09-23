@@ -98,6 +98,7 @@ class TestTaskDataset:
         assert isinstance(metrics_callback.eval_means["reward"], float)
         assert isinstance(metrics_callback.eval_means["total_paper_count"], float)
 
+    @pytest.mark.vcr
     @pytest.mark.asyncio
     async def test_tool_failure(self, base_query_request: QueryRequest) -> None:
         docs = Docs()
@@ -120,6 +121,9 @@ class TestTaskDataset:
             side_effect=Exception("Totally unexpected but retryable error."),
         ) as mock_query:
             await evaluator.evaluate()  # Confirm this does not crash
-        mock_query.assert_awaited()
+        assert (
+            metrics_callback.eval_means["truncation_rate"] == 1.0
+        ), "Expected 100% truncations due to max_rollout_steps"
+        mock_query.assert_awaited(), "Expected failures to come from unit test"
         assert metrics_callback.eval_means["correct"] == 0.0
         assert metrics_callback.eval_means["correct_unsure"] == 0.0
