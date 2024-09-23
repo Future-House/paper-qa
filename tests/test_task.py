@@ -98,6 +98,7 @@ class TestTaskDataset:
         assert isinstance(metrics_callback.eval_means["reward"], float)
         assert isinstance(metrics_callback.eval_means["total_paper_count"], float)
 
+    @pytest.mark.vcr
     @pytest.mark.asyncio
     async def test_tool_failure(self, base_query_request: QueryRequest) -> None:
         docs = Docs()
