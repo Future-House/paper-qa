@@ -7,7 +7,8 @@ from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequen
 from enum import StrEnum
 from inspect import signature
 from sys import version_info
-from typing import Any
+from typing import Any, ClassVar
+from xml.dom.pulldom import CHARACTERS
 
 import numpy as np
 import tiktoken
@@ -17,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 from paperqa.prompts import default_system_prompt
 from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
+from paperqa.rate_limiter import GLOBAL_LIMITER
 
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
@@ -366,6 +368,8 @@ class LiteLLMModel(LLMModel):
         `model_list`: stores a list of all model configurations
           (see https://docs.litellm.ai/docs/routing)
         `router_kwargs`: kwargs for the Router class
+        `rate_limits`: (Optional) dictionary keyed by model group name
+            with values of type limits.RateLimitItem (in tokens / minute)
 
     This way users can specify routing strategies, retries, etc.
     """
@@ -373,6 +377,7 @@ class LiteLLMModel(LLMModel):
     config: dict = Field(default_factory=dict)
     name: str = "gpt-4o-mini"
     _router: Router | None = None
+    CHARACTERS_PER_TOKEN: ClassVar[float] = 4.0
 
     @model_validator(mode="before")
     @classmethod
@@ -424,8 +429,15 @@ class LiteLLMModel(LLMModel):
             )
         return self._router
 
+    async def check_rate_limit(self, token_count: float):
+        await GLOBAL_LIMITER.try_acquire(('client', self.name), 
+                                    self.config.get("rate_limits", {}).get(self.name, None), 
+                                    weight=token_count)
+
     async def acomplete(self, prompt: str) -> Chunk:
+        await self.check_rate_limit(len(prompt) / self.CHARACTERS_PER_TOKEN)
         response = await self.router.atext_completion(model=self.name, prompt=prompt)
+        await self.check_rate_limit(response.usage.completion_tokens)
         return Chunk(
             text=response.choices[0].text,
             prompt_tokens=response.usage.prompt_tokens,
@@ -433,6 +445,7 @@ class LiteLLMModel(LLMModel):
         )
 
     async def acomplete_iter(self, prompt: str) -> AsyncIterable[Chunk]:
+        await self.check_rate_limit(len(prompt) / self.CHARACTERS_PER_TOKEN)
         completion = await self.router.atext_completion(
             model=self.name,
             prompt=prompt,
@@ -440,16 +453,21 @@ class LiteLLMModel(LLMModel):
             stream_options={"include_usage": True},
         )
         async for chunk in completion:
+            await self.check_rate_limit(len(chunk.choices[0].text) / self.CHARACTERS_PER_TOKEN)
             yield Chunk(
                 text=chunk.choices[0].text, prompt_tokens=0, completion_tokens=0
             )
         if hasattr(chunk, "usage") and hasattr(chunk.usage, "prompt_tokens"):
+            #TODO: should this access chunk.usage and chunk.usage.prompt_tokens?
+            await self.check_rate_limit(len(chunk.choices[0].text) / self.CHARACTERS_PER_TOKEN)
             yield Chunk(
                 text=chunk.choices[0].text, prompt_tokens=0, completion_tokens=0
             )
 
     async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
+        await self.check_rate_limit(len(str(messages)) / self.CHARACTERS_PER_TOKEN)
         response = await self.router.acompletion(self.name, messages)
+        await self.check_rate_limit(response.usage.completion_tokens)
         return Chunk(
             text=response.choices[0].message.content,
             prompt_tokens=response.usage.prompt_tokens,
@@ -459,16 +477,19 @@ class LiteLLMModel(LLMModel):
     async def achat_iter(
         self, messages: Iterable[dict[str, str]]
     ) -> AsyncIterable[Chunk]:
+        await self.check_rate_limit(len(str(messages)) / self.CHARACTERS_PER_TOKEN)
         completion = await self.router.acompletion(
             self.name, messages, stream=True, stream_options={"include_usage": True}
         )
         async for chunk in completion:
+            await self.check_rate_limit(len(chunk.choices[0].delta.content) / self.CHARACTERS_PER_TOKEN)
             yield Chunk(
                 text=chunk.choices[0].delta.content,
                 prompt_tokens=0,
                 completion_tokens=0,
             )
         if hasattr(chunk, "usage") and hasattr(chunk.usage, "prompt_tokens"):
+            await self.check_rate_limit(chunk.usage.completion_tokens)
             yield Chunk(
                 text=None,
                 prompt_tokens=chunk.usage.prompt_tokens,

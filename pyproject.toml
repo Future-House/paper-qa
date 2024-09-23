@@ -20,9 +20,11 @@ dependencies = [
     "PyMuPDF>=1.24.3",  # python -c "import pymupdf" won't run before version 1.24.3
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
+    "coredis",
     "fhaviary[llm]>=0.6",  # For info on Message
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
+    "limits",
     "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
