@@ -25,6 +25,7 @@ dependencies = [
     "httpx",
     "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
+    "openai<1.47",  # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
