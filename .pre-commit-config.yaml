@@ -23,7 +23,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.5
+    rev: v0.6.7
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -61,7 +61,7 @@ repos:
         additional_dependencies:
           - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.12
+    rev: 0.4.15
     hooks:
       - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
@@ -69,7 +69,7 @@ repos:
     hooks:
       - id: blacken-docs
   - repo: https://github.com/jsh9/markdown-toc-creator
-    rev: 0.0.7
+    rev: 0.0.8
     hooks:
       - id: markdown-toc-creator
   - repo: https://github.com/pre-commit/mirrors-mypy
