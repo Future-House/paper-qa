@@ -132,7 +132,8 @@ class PaperSearch(NamedTool):
             field_subset=[f for f in index.fields if f != "year"],
         )
         logger.info(
-            f"{self.TOOL_FN_NAME} for query {query!r} returned {len(results)} papers."
+            f"{self.TOOL_FN_NAME} for query {query!r} and offset {offset} returned"
+            f" {len(results)} papers."
         )
 
         # combine all the resulting doc objects into one and update the state
