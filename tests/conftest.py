@@ -77,11 +77,9 @@ def fixture_stub_data_dir() -> Path:
 
 @pytest.fixture
 def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
-    settings = Settings(
-        paper_directory=stub_data_dir,
-        index_directory=agent_index_dir,
-        embedding="sparse",
-    )
+    # NOTE: originally here we had usage of embedding="sparse", but this was
+    # shown to be too crappy of an embedding to get past the Obama article
+    settings = Settings(paper_directory=stub_data_dir, index_directory=agent_index_dir)
     settings.agent.search_count = 2
     settings.answer.answer_max_sources = 2
     settings.answer.evidence_k = 10
