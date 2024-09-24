@@ -53,7 +53,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.47.1
+          - AsyncOpenAI/Python 1.46.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -63,7 +63,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.47.1
+          - 1.46.1
         x-stainless-raw-response:
           - "true"
         x-stainless-runtime:
@@ -75,20 +75,20 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//dFJNb5tAFLzzK1bvbFcY7Ljm5kZJ61PbSG3SlgitlwdeZ7+6u1hGlv97
-          BThArJQDQjPMm9nZdwoIAZ5DQoDtqGfSiOl6vT/6Q0yfjptHVJ8fii+4ueNF9TS7/7GCSaPQ2z0y
-          /6r6wLQ0Aj3XqqOZReqxmTpbRstZFMdx3BJS5ygaWWn8dK6nURjNp+HHaXhzEe40Z+ggIX8CQgg5
-          te8mosrxCAkJJ6+IROdoiZD0PxECVosGAeocd54qD5OBZFp5VE1qVQkxIrzWImNUiMG4e06j76En
-          KkR2uy7q33Lz6/vt4XH18HV3qH5ui7tv+5FfN7o2baCiUqzvZ8T3eHJlRggoKlutoQZt5pBatrvS
-          EwLUlpVE5ZvscErhb4W2TiFJ4d5ijpazF/KJenQpTFKQXGU1UptC0paQgqTHMXKGNwbn4L3v51F5
-          FovKUXFp9YKf+2sSujRWb91V61Bwxd0us0hde3pwXpvOu/FpHaB6c8NgrJbGZ16/oGoGzlfLbh4M
-          Cziw0eJCeu2pGPBFFP1PleXoKW/XoN+8LiFX5TAh7GO25wRXO48yK7gq0RrL2x2DwmSLcBFG8Q3b
-          5hCcg38AAAD//wMAw2VXXmwDAAA=
+          H4sIAAAAAAAAA3RS0W6bMBR9z1dY9zlMhAZIeGuqVd3b1k2qmjIhx1zAibEd22iNovz7BKRAo40H
+          hM7h3HN8fM8zQoDnkBBgFXWs1sK738RP4Tf35/X1+Avd9uHn/kkcV9+Dl6h82MK8VajdHpn7UH1h
+          qtYCHVeyp5lB6rCduoiDOFgE67uwI2qVo2hlpXbeUnmBHyw9f+X50VVYKc7QQkLeZoQQcu7ebUSZ
+          4zskxJ9/IDVaS0uEZPiJEDBKtAhQa7l1VDqYjyRT0qFsU8tGiAnhlBIZo0KMxv1znnyPPVEhsn31
+          Umz3X+8Ozf1z9GPRPEbxrio2zxO/fvRJd4GKRrKhnwk/4MmNGSEgad1pNdVoMovUsOpGTwhQUzY1
+          Stdmh3MKxwbNKYUkhUeDORrODmRDHdoU5inUXGYnpCaFpCshhZq+T5ELfDK4zP71/XtSnsGisVRc
+          W73il+GahCq1UTt70zoUXHJbZQap7U4P1inde7c+nQM0n24YtFG1dplTB5TtwOU67ufBuIAjG4RX
+          0ilHxYiHQfA/VZajo7xbg2Hz+oRcluMEf4jZnRPsyTqss4LLEo02vNsxKHQWh9EqX0b+eg2zy+wv
+          AAAA//8DANDCsEhsAwAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8c7d48a45f6b1574-SJC
+          - 8c85d42d78cb7e25-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -96,14 +96,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:54 GMT
+          - Tue, 24 Sep 2024 21:22:16 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=pUVZr5fHrragLrnhgo0fs.mC8TQTmmaOG3UUe48NnDM-1727123334-1.0.1.1-6d4l70w0QlQ4OYuHxkjXkp0yvtQyPUJ5W_tHGrSSoOst3Afh4iA5L5hcqOBDrDWf9wpMbDNHef6Nfw96vqKgXw;
-            path=/; expires=Mon, 23-Sep-24 20:58:54 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=lO6q5yU3msZc0ua1Mj7X_ZpNQQhU9qn5.z3B7DlGyCg-1727212936-1.0.1.1-xkjRCYXLptyEGIc_Up3IXo22QgquT.EnIPD6ui_u32fmt9aieEFu.RY2XFq_WxkSEQ8hFMdqEbvqrJJtlA8CPg;
+            path=/; expires=Tue, 24-Sep-24 21:52:16 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=anzCkqd8zjHwB2ExNfJr.qYFHBuODWdFupY458Udse0-1727123334295-0.0.1.1-604800000;
+          - _cfuvid=f7kPIkexTaQh34Rqfqd8We0Z4.XVU5p4DlgDn0DtthM-1727212936024-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -116,462 +116,25 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "368"
+          - "448"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
+          - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
           - "30000000"
         x-ratelimit-remaining-requests:
-          - "9998"
+          - "9999"
         x-ratelimit-remaining-tokens:
           - "29999869"
         x-ratelimit-reset-requests:
-          - 8ms
-        x-ratelimit-reset-tokens:
-          - 0s
-        x-request-id:
-          - req_27c9b024bd388ad1ed4eea142b270e26
-      status:
-        code: 200
-        message: OK
-  - request:
-      body:
-        '{"messages": [{"role": "user", "content": "Provide the citation for the
-        following text in MLA Format. Do not write an introductory sentence. If reporting
-        date accessed, the current year is 2024\n\nA Perspective on Explanations of
-        Molecular\nPrediction Models\nGeemi P. Wellawatte,\u2020\nHeta A. Gandhi,\u2021\nAditi
-        Seshadri,\u2021 and\nAndrew\nD. White\u2217,\u2021\n\u2020Department of Chemistry,
-        University of Rochester, Rochester, NY, 14627\n\u2021Department of Chemical
-        Engineering, University of Rochester, Rochester, NY, 14627\n\u00b6Vial Health
-        Technology, Inc., San Francisco, CA 94111\nE-mail: andrew.white@rochester.edu\nAbstract\nChemists
-        can be skeptical in using deep learning (DL) in decision making, due to\nthe
-        lack of interpretability in \u201cblack-box\u201d models. Explainable artificial
-        intelligence\n(XAI) is a branch of AI which addresses this drawback by providing
-        tools to interpret\nDL models and their predictions. We review the principles
-        of XAI in the domain of\nchemistry and emerging methods for creating and evaluating
-        explanations. Then we\nfocus on methods developed by our group and their applications
-        in predicting solubil-\nity, blood-brain barrier permeability, and the scent
-        of molecules. We show that XAI\nmethods like chemical counterfactuals and descriptor
-        explanations can explain DL pre-\ndictions while giving insight into structure-property
-        relationships. Finally, we discuss\nhow a two-step process of developing a black-box
-        model and explaining predictions can\nuncover structure-property relationships.\n1\nIntroduction\nDeep
-        learning (DL) is advancing the boundaries of computational chemistry because
-        it can\naccurately model non-linear structure-function relationships.1\u20133
-        Applications of DL can be\nfound in a broad spectrum spanning from quantum computing4,5
-        to drug discovery6\u201310 to\nmaterials design.11,12 According to Kre 13, DL
-        models can contribute to scientific discovery\nin three \u201cdimensions\u201d
-        - 1) as a \u2018computational microscope\u2019 to gain insight which are not\nattainable
-        through experiments 2) as a \u2018resource of inspiration\u2019 to motivate
-        scientific thinking\n3) as an \u2018agent of understanding\u2019 to uncover
-        new observations. However, the rationale of\na DL prediction is not always apparent
-        due to the model architecture consisting a large\nparameter count.14,15 DL models
-        are thus often termed\u201cblack box\u201d models. We can only\nreason about
-        the input and output of an DL model, not the underlying cause that leads to\na
-        specific prediction.\nIt is routine in chemistry now for DL to exceed human
-        level performance \u2014 humans are\nnot good at predicting solubility from
-        structure for example161 \u2014 and so understanding how\na model makes predictions
-        can guide hypotheses. This is in contrast to a topic like finding\na stop sign
-        in an image, where there is little new to be learned about visual perception\nby
-        explaining a DL model. However, the black box nature of DL has its own limitations.\nUsers
-        are more likely to trust and use predictions from a model if they can understand
-        why\nthe prediction was made.17 Explaining predictions can help developers of
-        DL models ensure\nthe model is not learning spurious correlations.18,19 Two
-        infamous examples are, 1)neural\nnetworks that learned to recognize horses by
-        looking for a photogr\n\nCitation:"}], "model": "gpt-4o-2024-08-06", "stream":
-        false, "temperature": 0.0}'
-      headers:
-        accept:
-          - application/json
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        content-length:
-          - "3445"
-        content-type:
-          - application/json
-        host:
-          - api.openai.com
-        user-agent:
-          - AsyncOpenAI/Python 1.47.1
-        x-stainless-arch:
-          - arm64
-        x-stainless-async:
-          - async:asyncio
-        x-stainless-lang:
-          - python
-        x-stainless-os:
-          - MacOS
-        x-stainless-package-version:
-          - 1.47.1
-        x-stainless-raw-response:
-          - "true"
-        x-stainless-runtime:
-          - CPython
-        x-stainless-runtime-version:
-          - 3.12.5
-      method: POST
-      uri: https://api.openai.com/v1/chat/completions
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3SRTW/bMAyG7/4VhI6FY7h2Ptbcgm3YKUPQoRi2tjAUmbGVypImMl8r8t8LOWnS
-          HXbh4X34EuTL1wRA6FpMQahWsuq8Gcxm6/12uf79sru7L8sH9/0P/vjldxO5+dvNRRodbrlGxe+u
-          TLnOG2Tt7AmrgJIxTr2dFJPboizLUQ86V6OJtsbzYOgGRV4MB/mnQT4+G1unFZKYwmMCAPDa17ii
-          rXEvppCn70qHRLJBMb00AYjgTFSEJNLE0rJIr1A5y2j7rX+iMXInmTGFb4idhkWWAjJIk8GTmMEC
-          A3lUrLcIzsLXvTfSynghgVvB3BlUGyMDLALWWkUA83gcZU8Cbr6gl4E7tBy7P7fYaeJwSOHB6i0G
-          0nyI4N6pFokx3KQQo8hgphQSYQ2P2hIGhloyxlbZg+fs40EBVxuSMU+7MeasHy8JGdf44JZ05hd9
-          pa2mtgooydmYBrHzoqfHBOC5/8Tmn3CFD67zXLF7QRsHju+K0zxx/f2VDodnyI6lueqTcvw/V1Uj
-          S23owz/FaUNtm+uE/LJmf6egAzF21UrbBoMP+vTela9G+SgvyrFa1iI5Jm8AAAD//wMA6HxyNucC
-          AAA=
-      headers:
-        CF-Cache-Status:
-          - DYNAMIC
-        CF-RAY:
-          - 8c7d48ab48cd67f5-SJC
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 23 Sep 2024 20:28:55 GMT
-        Server:
-          - cloudflare
-        Set-Cookie:
-          - __cf_bm=n7ZZ29QB30CmVe23DvNrY2AD1g4.y59e0WOnLIUp5x0-1727123335-1.0.1.1-HzalQpcd2nxiHoYz35M1bftaoM9u3o2vkB9ytcps0qUHFht1Wwi0qSnO6yl5Mw106yJdmKmuM.qMleupjAm.vQ;
-            path=/; expires=Mon, 23-Sep-24 20:58:55 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=G5GORHEo2D2V1.GQffzh0jQjucch03A89yfc.UaYG.U-1727123335804-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
-        Transfer-Encoding:
-          - chunked
-        X-Content-Type-Options:
-          - nosniff
-        access-control-expose-headers:
-          - X-Request-ID
-        alt-svc:
-          - h3=":443"; ma=86400
-        openai-organization:
-          - future-house-xr4tdh
-        openai-processing-ms:
-          - "621"
-        openai-version:
-          - "2020-10-01"
-        strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
-        x-ratelimit-limit-requests:
-          - "10000"
-        x-ratelimit-limit-tokens:
-          - "30000000"
-        x-ratelimit-remaining-requests:
-          - "9999"
-        x-ratelimit-remaining-tokens:
-          - "29999180"
-        x-ratelimit-reset-requests:
-          - 6ms
-        x-ratelimit-reset-tokens:
-          - 1ms
-        x-request-id:
-          - req_b40ff3ecc0e9f84a03408e70c3c565b4
-      status:
-        code: 200
-        message: OK
-  - request:
-      body:
-        '{"messages": [{"role": "user", "content": "Extract the title, authors,
-        and doi as a JSON from this MLA citation. If any field can not be found, return
-        it as null. Use title, authors, and doi as keys, author''s value should be a
-        list of authors. Wellawatte, Geemi P., et al. \"A Perspective on Explanations
-        of Molecular Prediction Models.\" *Department of Chemistry, University of Rochester*,
-        2024. Accessed [insert date of access].\n\nCitation JSON:"}], "model": "gpt-4o-2024-08-06",
-        "stream": false, "temperature": 0.0}'
-      headers:
-        accept:
-          - application/json
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        content-length:
-          - "519"
-        content-type:
-          - application/json
-        host:
-          - api.openai.com
-        user-agent:
-          - AsyncOpenAI/Python 1.47.1
-        x-stainless-arch:
-          - arm64
-        x-stainless-async:
-          - async:asyncio
-        x-stainless-lang:
-          - python
-        x-stainless-os:
-          - MacOS
-        x-stainless-package-version:
-          - 1.47.1
-        x-stainless-raw-response:
-          - "true"
-        x-stainless-runtime:
-          - CPython
-        x-stainless-runtime-version:
-          - 3.12.5
-      method: POST
-      uri: https://api.openai.com/v1/chat/completions
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3SRT4/aMBDF73yK0ZwJCuHPrnJDq6pVpZXooe1hvSLGmYCpY1v2ZJcW8d0rhyzQ
-          Qy8+vJ/f07yZ0wgAdY0loNpLVq032Wp1OL41X9fvusu/TN13zdNvf44/nlR8Io/j5HDbAyn+cE2U
-          a70h1s5esAokmVLq9KF4mBaz2WzRg9bVZJJt5zmbu6zIi3mWP2b5cjDunVYUsYSXEQDAqX/TiLam
-          I5aQjz+UlmKUO8Ly+gkAgzNJQRmjjiwt4/gGlbNMtp+6qqpDdFbYk7AAAlmzIYElCFzBmkL0pFi/
-          ETgLn47eSCtTuwiugWdnSHVGBlgHqrVKAJ5TsShwfMmTHe9diCnxReBnolbDegI/yRj5LplJ4BgE
-          EoM0E4Gvg612OllsZ4ywZ2GrqrovEKjpojTDj0E/Xzdi3M4Ht40Dv+qNtjruN4FkdDa1j+w89vQ8
-          AnjtN9/9s0z0wbWeN+x+kU2B07y45OHt1jc6Xw6QHUtz55o//s+1qYmlNvHufniZUNvdLSG/jtn3
-          xPg7MrWbRtsdBR/05ZyN3yzyRV7Mlmpb4+g8+gsAAP//AwDBSu2y1wIAAA==
-      headers:
-        CF-Cache-Status:
-          - DYNAMIC
-        CF-RAY:
-          - 8c7d48b0de9267f5-SJC
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 23 Sep 2024 20:28:56 GMT
-        Server:
-          - cloudflare
-        Transfer-Encoding:
-          - chunked
-        X-Content-Type-Options:
-          - nosniff
-        access-control-expose-headers:
-          - X-Request-ID
-        alt-svc:
-          - h3=":443"; ma=86400
-        openai-organization:
-          - future-house-xr4tdh
-        openai-processing-ms:
-          - "529"
-        openai-version:
-          - "2020-10-01"
-        strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
-        x-ratelimit-limit-requests:
-          - "10000"
-        x-ratelimit-limit-tokens:
-          - "30000000"
-        x-ratelimit-remaining-requests:
-          - "9999"
-        x-ratelimit-remaining-tokens:
-          - "29999881"
-        x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_7f16a2d9f0a190aeb6a234b039e2b23a
-      status:
-        code: 200
-        message: OK
-  - request:
-      body:
-        '{"messages": [{"role": "user", "content": "Provide the citation for the
-        following text in MLA Format. Do not write an introductory sentence. If reporting
-        date accessed, the current year is 2024\n\nJump to content\n\nMain menu\n\nMain
-        menu\n\nmove to sidebar  hide\n\nNavigation\n\n  * [Main page](/wiki/Main_Page
-        \"Visit the main page \\[z\\]\")\n  * [Contents](/wiki/Wikipedia:Contents \"Guides
-        to browsing Wikipedia\")\n  * [Current events](/wiki/Portal:Current_events \"Articles
-        related to current events\")\n  * [Random article](/wiki/Special:Random \"Visit
-        a randomly selected article \\[x\\]\")\n  * [About Wikipedia](/wiki/Wikipedia:About
-        \"Learn about Wikipedia and how it works\")\n  * [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us
-        \"How to contact Wikipedia\")\n  * [Donate](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en
-        \"Support us by donating to the Wikimedia Foundation\")\n\nContribute\n\n  *
-        [Help](/wiki/Help:Contents \"Guidance on how to use and edit Wikipedia\")\n  *
-        [Learn to edit](/wiki/Help:Introduction \"Learn how to edit Wikipedia\")\n  *
-        [Community portal](/wiki/Wikipedia:Community_portal \"The hub for editors\")\n  *
-        [Recent changes](/wiki/Special:RecentChanges \"A list of recent changes to Wikipedia
-        \\[r\\]\")\n  * [Upload file](/wiki/Wikipedia:File_upload_wizard \"Add images
-        or other media for use on Wikipedia\")\n\n[ ![](/static/images/icons/wikipedia.png)\n![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
-        ![The\nFree Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)\n](/wiki/Main_Page)\n\n[
-        Search ](/wiki/Special:Search \"Search Wikipedia \\[f\\]\")\n\nSearch\n\nAppearance\n\n  *
-        [Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
-        \"You are encouraged to create an account and log in; however, it is not mandatory\")\n  *
-        [Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
-        \"You''re encouraged to log in; however, it''s not mandatory. \\[o\\]\")\n\nPersonal
-        tools\n\n  * [ Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
-        \"You are encouraged to create an account and log in; however, it is not mandatory\")\n  *
-        [ Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
-        \"You''re encouraged to log in; however, it''s not mandatory. \\[o\\]\")\n\nPages
-        for logged out editors [learn more](/wiki/Help:Introduction)\n\n  * [Contributions](/wiki/Special:MyContributions
-        \"A list of edits made from this IP address \\[y\\]\")\n  * [Talk](/wiki/Special:MyTalk
-        \"Discussion about edits from this IP address \\[n\\]\")\n\n## Contents\n\nmove
-        to sidebar  hide\n\n  * (Top)\n  * 1 History Toggle History subsection\n    *
-        1.1 Background\n    * 1.2 Flag Day\n  * 2 See also\n  * 3 Footnotes\n  * 4 External
-        links\n\nToggle the table of contents\n\n#  National Flag of Canada Day\n\n7
-        languages\n\n  * [\u0627\u0644\u0639\u0631\u0628\u064a\u0629](https://ar.wikipedia.org/wiki/%D9%8A%D9%88%D9%85_%D8%B9%D9%84%D9%85_%D9%83%D9%86%D8%AF%D8%A7_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A
-        \"\u064a\u0648\u0645 \u0639\u0644\u0645 \u0643\u0646\u062f\u0627 \u0627\u0644\u0648\u0637\u0646\u064a
-        \u2013 Arabic\")\n  * [Espa\u00f1ol](https://es.wikipedia.org/wiki/D%C3%ADa_de_la_Bandera_Nacional_de_Canad%C3%A1
-        \"D\u00eda de la Bandera Nacional de Canad\u00e1 \u2013 Spanish\")\n  * [Fran\u00e7ais](https://fr.wikipedia.org/wiki/Jour_du_drapeau_national_du_Canada
-        \"Jour\n\nCitation:"}], "model": "gpt-4o-2024-08-06", "stream": false, "temperature":
-        0.0}'
-      headers:
-        accept:
-          - application/json
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        content-length:
-          - "3666"
-        content-type:
-          - application/json
-        host:
-          - api.openai.com
-        user-agent:
-          - AsyncOpenAI/Python 1.47.1
-        x-stainless-arch:
-          - arm64
-        x-stainless-async:
-          - async:asyncio
-        x-stainless-lang:
-          - python
-        x-stainless-os:
-          - MacOS
-        x-stainless-package-version:
-          - 1.47.1
-        x-stainless-raw-response:
-          - "true"
-        x-stainless-runtime:
-          - CPython
-        x-stainless-runtime-version:
-          - 3.12.5
-      method: POST
-      uri: https://api.openai.com/v1/chat/completions
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAAwAAAP//dFHLbtswELz7KxY8BrIiS7aT+GYk8KEIWiAokCIPCDS5khlTXIJctw4C
-          /3tB+dlDLwS5w5mdnf0aAAijxQyEWklWnbfD+fxj+/tXxfLH4oV/hvXT06P/Vq4ecbqdPossMWj5
-          gYqPrFxR5y2yIbeHVUDJmFRHN+XNqKyqatIDHWm0idZ6Ho5pWBbleFjcDovpgbgiozCKGbwOAAC+
-          +jNZdBq3YgZFdqx0GKNsUcxOnwBEIJsqQsZoIkvHIjuDihyj612/ie8y2ZUWFla2QA3cSye1hAf5
-          mb8JuHo2a+NRG3mVQbp36Q4L2jjdMzN4NS5iYNCSMQlYGRk60qYxqv/yngG6/M9RKKfQXqfX9bF3
-          nXrX1NT73nXqDXOlMEbUkLLJL/0HbDZRpvjcxtpDfXcKxFLrAy3jAT/VG+NMXNUBZSSXho9MXvTo
-          bgDw3ge/+SdL4QN1nmumNbokeFfd7fXEedVndDw6gEws7QXrtvgfq9bI0th4sT6xd2hce1YoTjb7
-          OUX8jIxd3RjXYvDB7LfZ+HpSTIqymqqlFoPd4C8AAAD//wMAIhElmtYCAAA=
-      headers:
-        CF-Cache-Status:
-          - DYNAMIC
-        CF-RAY:
-          - 8c7d48ab48b42386-SJC
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 23 Sep 2024 20:28:56 GMT
-        Server:
-          - cloudflare
-        Set-Cookie:
-          - __cf_bm=5fMh5d10onyd3LQuwsQ5xWsR.SallqCOQpMCvc6I618-1727123336-1.0.1.1-pz6uIMSDF5jeYHCdmWQ1p3f32uOBluX95DuibJULLkegt8kdtI0WgnhbqxincVJWhXYWe2K6nPELg55CbgawIQ;
-            path=/; expires=Mon, 23-Sep-24 20:58:56 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=RJPOVIE8THArv1d6.SLuIzIRIeio4bjT4XEi0cwyH1Q-1727123336609-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
-        Transfer-Encoding:
-          - chunked
-        X-Content-Type-Options:
-          - nosniff
-        access-control-expose-headers:
-          - X-Request-ID
-        alt-svc:
-          - h3=":443"; ma=86400
-        openai-organization:
-          - future-house-xr4tdh
-        openai-processing-ms:
-          - "934"
-        openai-version:
-          - "2020-10-01"
-        strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
-        x-ratelimit-limit-requests:
-          - "10000"
-        x-ratelimit-limit-tokens:
-          - "30000000"
-        x-ratelimit-remaining-requests:
-          - "9997"
-        x-ratelimit-remaining-tokens:
-          - "29996969"
-        x-ratelimit-reset-requests:
-          - 15ms
-        x-ratelimit-reset-tokens:
-          - 6ms
-        x-request-id:
-          - req_d4c29b0bfe4bc62f8637098731bfda5f
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&rows=1&query.author=Geemi+P.+Wellawatte+et+al.&select=DOI,author,container-title,published,title
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":17242,"items":[{"DOI":"10.26434\/chemrxiv-2022-qfv02","author":[{"given":"Geemi
-          P.","family":"Wellawatte","sequence":"first","affiliation":[{"name":"University
-          of Rochester"}]},{"given":"Heta A.","family":"Gandhi","sequence":"additional","affiliation":[{"name":"University
-          of Rochester"}]},{"given":"Aditi","family":"Seshadri","sequence":"additional","affiliation":[{"name":"University
-          of Rochester"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
-          D.","family":"White","sequence":"additional","affiliation":[{"name":"University
-          of Rochester"}]}],"published":{"date-parts":[[2022,12,9]]},"title":["A Perspective
-          on Explanations of Molecular Prediction Models"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "451"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 23 Sep 2024 20:28:56 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
+          - req_bf0b1b13a29ff46c8aead077f0f87ef0
       status:
         code: 200
         message: OK
@@ -647,7 +210,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.47.1
+          - AsyncOpenAI/Python 1.46.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -657,7 +220,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.47.1
+          - 1.46.1
         x-stainless-raw-response:
           - "true"
         x-stainless-runtime:
@@ -669,19 +232,19 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA3RRy27bMBC86ysWewwkhZb8im/OwUAPRYAeWhRNINDkSmZMkQRJtzEC/3tBya8e
-          eiGWMzuD2d3PDACVxBWg2PEoeqeL9fr94/f051PV8u9L5o6bb/VXuXzWevPy5Yh5UtjtO4l4UZXC
-          9k5TVNaMtPDEIyXXyaJaTKq6rmcD0VtJOsk6F4upLSpWTQu2LNj8LNxZJSjgCn5lAACfw5siGkkf
-          uAKWX5CeQuAd4eraBIDe6oQgD0GFyE3E/EYKayKZIfUrPnPPxR5etrzn5SvCww+1V46k4g85pLpP
-          NWzswUieJsshhc2BTPnn0lpa3z2m3+No14x2sBaCQiA5SMr7DJ7aQ+BpBeag9Rk/XYfStnPebsOZ
-          v+KtMirsGk88WJMGCNE6HNhTBvA2LO/wzz7Qedu72ES7J5MMJ2w+Hw3xdq8bXU/OZLSR63vZ0+J/
-          skZS5EqHuyPgmFGZ7mbBrkGHSTEcQ6S+aZXpyDuvxpu0rpmxGavqudhKzE7ZXwAAAP//AwDOMsPC
-          nAIAAA==
+          H4sIAAAAAAAAAwAAAP//dFFNa+MwEL37VwxzDLarOG28zS2hlO5lu5RCCtvFKPLEUaMvJIVtKfnv
+          RXa+9tCLGL037/Fm5jMDQNniDFBseBTaqWK+qB/qj8nz429pflZPv+6Wd1W91GyxuX95wDwp7OqN
+          RDyqSmG1UxSlNQMtPPFIyXVcV3U1rm4ndU9o25JKss7F4toWFauuC/ajYNODcGOloIAz+JMBAHz2
+          b4poWnrHGbD8iGgKgXeEs1MTAHqrEoI8BBkiNxHzMymsiWT61K+44J6LLTyuuOblK8JoKbfSUSv5
+          KIdU61TDvd2ZlqfJckhhcyBT/ju2ltZ3V+l3Ndg1gx3MhaAQqO0l5WUGT+td4GkFZqfUAd+fhlK2
+          c96uwoE/4WtpZNg0nniwJg0QonXYs/sM4G+/vN1/+0DnrXaxiXZLJhmO2XQ6GOL5Xmd6Mj6Q0Uau
+          LmW39XeypqXIpQoXR8AhozTd2YKdgvaTYvgIkXSzlqYj77wcbrJ2zQ27YdVkKlYtZvvsCwAA//8D
+          AKuFnUmcAgAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8c7d48ab4b3ff94f-SJC
+          - 8c85d435b9c2cf9b-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -689,14 +252,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
+          - Tue, 24 Sep 2024 21:22:17 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=Fj2O7FuSRNQvv2yhm4iXOIBKPWoDIDsC6W63yu5PO44-1727123337-1.0.1.1-OAU8dFHBQ1VQv0hBVu5ZVJZ62Jax2KVE83UIreTeIMqmbPvr9CbAtNvRlI9Xeyr8yD3zVD1NjjdaMNsN2geynQ;
-            path=/; expires=Mon, 23-Sep-24 20:58:57 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=TOARXI6K7P3JFe9tk_9gigMn.ZQ82hjB3OMjJikyHbc-1727212937-1.0.1.1-ipHUdHnmASaZYI4NQrQeDD3vu8Gc5qHuyeJ7oGzwwei1LLRMzpomqgtR_81zb0ip6pUeLDbQkRpEwnLAaPaBnA;
+            path=/; expires=Tue, 24-Sep-24 21:52:17 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=eq5T69invV5_15aj4_Li_mvtKJVjZ07t8qkYKotxYpE-1727123337043-0.0.1.1-604800000;
+          - _cfuvid=4.r_pHqxfgk.Cy6q1Fg.REZUIDRnxTwzycFNGqeui3E-1727212937607-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -709,11 +272,11 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "1696"
+          - "541"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
+          - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
@@ -727,60 +290,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 2ms
         x-request-id:
-          - req_1d3ac249ca354057916b864a8e92de3a
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&fields=authors,externalIds,journal,title,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "1db1bde653658ec9b30858ae14650b8f9c9d438b", "externalIds":
-          {"PubMedCentral": "10134429", "DOI": "10.1021/acs.jctc.2c01235", "CorpusId":
-          257786462, "PubMed": "36972469"}, "title": "A Perspective on Explanations
-          of Molecular Prediction Models", "year": 2023, "journal": {"name": "Journal
-          of Chemical Theory and Computation", "pages": "2149 - 2160", "volume": "19"},
-          "authors": [{"authorId": "1805407482", "name": "Geemi P Wellawatte"}, {"authorId":
-          "95666896", "name": "Heta A. Gandhi"}, {"authorId": "1481244794", "name":
-          "Aditi Seshadri"}, {"authorId": "2257535", "name": "A. White"}], "matchScore":
-          172.4917}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "634"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
-        Via:
-          - 1.1 68914922a694954838e87fc9b0aa10fe.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - aDgWInE-egiBN-8a2JjdOT_W6LEka4W8dXyEuLtBosT34YHqpjViRQ==
-        X-Amz-Cf-Pop:
-          - SFO53-C1
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - ek1dYGfrPHcEfVg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "634"
-        x-amzn-Remapped-Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - b1957103-fcde-4d38-a781-e39a8d3003fa
+          - req_bef403584142068861dd4ce958bbd04c
       status:
         code: 200
         message: OK
@@ -833,7 +343,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.47.1
+          - AsyncOpenAI/Python 1.46.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -843,7 +353,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.47.1
+          - 1.46.1
         x-stainless-raw-response:
           - "true"
         x-stainless-runtime:
@@ -855,19 +365,19 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA3RRsW7bMBDd9RUHTmkgKZQU24k3d/DQAhnaIUCTQqCos8yY4hEk1aQI/O8FZVtK
-          hi7E8b17D+/u3hMAplq2Bib3Isje6myzeXn7Uz48qp98+PbQHJrv+GO7/NW/io0oWRoV1LygDBdV
-          Lqm3GoMic6KlQxEwuharclWUVVUtRqKnFnWUdTZkt5SVvLzN+F3Gl2fhnpREz9bwlAAAvI9vjGha
-          fGNr4OkF6dF70SFbT00AzJGOCBPeKx+ECSydSUkmoBlTP7Otwxadkgf4KgJ6uLKkVVBSCfMlf2Zw
-          /agOymKrxHUKse5jDVsaTCvipCnE8CmgyV8vrTm57ib+bib7erSvP9nDRkr0HtvRIv+Y0eFu8CKu
-          yAxan/HjNLSmzjpq/Jmf8J0yyu9rh8KTiQP6QJaN7DEB+D0ud/i0L2Yd9TbUgQ5oouH9qjj5sfmc
-          M1vdn8lAQegZL3jB/yerWwxCaf/hRuwUUZlutuBTznFQ5v/6gH29U6ZDZ506nWxn6wVf8LJayqZl
-          yTH5BwAA//8DAMgCf/G7AgAA
+          H4sIAAAAAAAAAwAAAP//dFHBbtswDL37KwidtsJ2ZcdN1twaDMWAARt2GDZgHQxFoh0tsihICrq1
+          yL8XchK7PewiUO/xPTySzxkA04qtgcmdiHJwprjbrD4tTbfFj1+evu+Fq5++Ibebx4bMz88sTwra
+          /kEZL6pS0uAMRk32REuPImJyrVb1qq7q28VyJAZSaJKsd7FoqKh53RT8Q8GXZ+GOtMTA1vArAwB4
+          Ht8U0Sr8y9bA8wsyYAiiR7aemgCYJ5MQJkLQIQobWT6TkmxEO6Z+YPceFXot97AREQO8c2R01FIL
+          +758YHD1Q++1Q6XFVQ6pHlIN93SwSqRJc0jhc0BbPl5aS/L9dfpdT/btaN++sYc7KTEEVFA38FXG
+          crQqX2f12B2CSKuyB2PO+HEa3lDvPG3DmZ/wTlsddq1HEcimQUMkx0b2mAH8Hpd8eLM35jwNLraR
+          9miT4e2qOvmx+awz2yzOZKQozIxXvGr+J2sVRqFNeHUrdoqobT9b8CnnOCgL/0LEoe207dE7r0+n
+          61x7w294vVjKrWLZMXsBAAD//wMAANhU4MMCAAA=
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8c7d48ab4fc87af8-SJC
+          - 8c85d435ba60cf51-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -875,14 +385,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
+          - Tue, 24 Sep 2024 21:22:17 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=XH2PneOCTDSIW.TmuNRYJG4BeIIIXcqhRRy4XMN1VKA-1727123337-1.0.1.1-KknzLdo2FOijHxcC26fmPFSe86oADc1Ie1MXHsC9RyPbWidY06ntzv2scpkBoQ_a47BXMrLhl56kw6L278MAzw;
-            path=/; expires=Mon, 23-Sep-24 20:58:57 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=d7mQX3fTnRVmqmuVcUhqM5FpyEu.ZqtlJTgPNA9Txfs-1727212937-1.0.1.1-abmYqOYa3rwTDPmYpiHznFWbh3vobCJKNkVoqliYQt4IxYHYSahMU3ibw0D723zsgKBpjirQlAm.AR9BiCOLxA;
+            path=/; expires=Tue, 24-Sep-24 21:52:17 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=BHp8o2zj8jBejM5ndVLxqHC89_eD55gXjr1bQMctywA-1727123337143-0.0.1.1-604800000;
+          - _cfuvid=0zK3cbLEPduOkU0i.jTBImDZKOKCI5S3UrBSqQZKSwQ-1727212937695-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -895,17 +405,17 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "1892"
+          - "716"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
+          - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
           - "30000000"
         x-ratelimit-remaining-requests:
-          - "9998"
+          - "9999"
         x-ratelimit-remaining-tokens:
           - "29998968"
         x-ratelimit-reset-requests:
@@ -913,7 +423,390 @@ interactions:
         x-ratelimit-reset-tokens:
           - 2ms
         x-request-id:
-          - req_21149d9df93dd1cc611c7282557190f3
+          - req_e757e1900aa6e12d11e314811ade704d
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Provide the citation for the
+        following text in MLA Format. Do not write an introductory sentence. If reporting
+        date accessed, the current year is 2024\n\nJump to content\n\nMain menu\n\nMain
+        menu\n\nmove to sidebar  hide\n\nNavigation\n\n  * [Main page](/wiki/Main_Page
+        \"Visit the main page \\[z\\]\")\n  * [Contents](/wiki/Wikipedia:Contents \"Guides
+        to browsing Wikipedia\")\n  * [Current events](/wiki/Portal:Current_events \"Articles
+        related to current events\")\n  * [Random article](/wiki/Special:Random \"Visit
+        a randomly selected article \\[x\\]\")\n  * [About Wikipedia](/wiki/Wikipedia:About
+        \"Learn about Wikipedia and how it works\")\n  * [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us
+        \"How to contact Wikipedia\")\n  * [Donate](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en
+        \"Support us by donating to the Wikimedia Foundation\")\n\nContribute\n\n  *
+        [Help](/wiki/Help:Contents \"Guidance on how to use and edit Wikipedia\")\n  *
+        [Learn to edit](/wiki/Help:Introduction \"Learn how to edit Wikipedia\")\n  *
+        [Community portal](/wiki/Wikipedia:Community_portal \"The hub for editors\")\n  *
+        [Recent changes](/wiki/Special:RecentChanges \"A list of recent changes to Wikipedia
+        \\[r\\]\")\n  * [Upload file](/wiki/Wikipedia:File_upload_wizard \"Add images
+        or other media for use on Wikipedia\")\n\n[ ![](/static/images/icons/wikipedia.png)\n![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
+        ![The\nFree Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)\n](/wiki/Main_Page)\n\n[
+        Search ](/wiki/Special:Search \"Search Wikipedia \\[f\\]\")\n\nSearch\n\nAppearance\n\n  *
+        [Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \"You are encouraged to create an account and log in; however, it is not mandatory\")\n  *
+        [Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \"You''re encouraged to log in; however, it''s not mandatory. \\[o\\]\")\n\nPersonal
+        tools\n\n  * [ Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \"You are encouraged to create an account and log in; however, it is not mandatory\")\n  *
+        [ Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \"You''re encouraged to log in; however, it''s not mandatory. \\[o\\]\")\n\nPages
+        for logged out editors [learn more](/wiki/Help:Introduction)\n\n  * [Contributions](/wiki/Special:MyContributions
+        \"A list of edits made from this IP address \\[y\\]\")\n  * [Talk](/wiki/Special:MyTalk
+        \"Discussion about edits from this IP address \\[n\\]\")\n\n## Contents\n\nmove
+        to sidebar  hide\n\n  * (Top)\n  * 1 History Toggle History subsection\n    *
+        1.1 Background\n    * 1.2 Flag Day\n  * 2 See also\n  * 3 Footnotes\n  * 4 External
+        links\n\nToggle the table of contents\n\n#  National Flag of Canada Day\n\n7
+        languages\n\n  * [\u0627\u0644\u0639\u0631\u0628\u064a\u0629](https://ar.wikipedia.org/wiki/%D9%8A%D9%88%D9%85_%D8%B9%D9%84%D9%85_%D9%83%D9%86%D8%AF%D8%A7_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A
+        \"\u064a\u0648\u0645 \u0639\u0644\u0645 \u0643\u0646\u062f\u0627 \u0627\u0644\u0648\u0637\u0646\u064a
+        \u2013 Arabic\")\n  * [Espa\u00f1ol](https://es.wikipedia.org/wiki/D%C3%ADa_de_la_Bandera_Nacional_de_Canad%C3%A1
+        \"D\u00eda de la Bandera Nacional de Canad\u00e1 \u2013 Spanish\")\n  * [Fran\u00e7ais](https://fr.wikipedia.org/wiki/Jour_du_drapeau_national_du_Canada
+        \"Jour\n\nCitation:"}], "model": "gpt-4o-2024-08-06", "stream": false, "temperature":
+        0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "3666"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.46.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.46.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.5
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA3RSTU/jMBC951eMfERJCOlHaG8sqMsJaU8coIpce5IaHI+xHVEW9b+vnPRrtdqL
+          Zc/ze/P8xt8JAFOSLYGJLQ+iszq7+1E9Vqvdw++d+BRlN/sVPt5+KvX4LCb9E0sjgzZvKMKRlQvq
+          rMagyIywcMgDRtWbqqzKm3IxqQagI4k60lobsillZVFOs+I2K+YH4paUQM+W8JIAAHwPa7RoJO7Y
+          Eor0WOnQe94iW54uATBHOlYY9175wE1g6RkUZAKawfUre+LRLtew0rwFauCeGy45PPCv/JXB1bN6
+          Vxal4lcpxH0X97Ci3siBmcKLMh5dAMkDRgHNfYCOpGqUGK6sU0CTfx6FcnLtdTxdH3vXsXdNTT32
+          rmNvuBMCvUf5jz4fgHUKMbT88mEOm97zmKvptT7U96ekNLXW0cYf8FO9UUb5be2QezIxFR/IsgHd
+          JwDrYSL9XyEz66izoQ70jiYKLiaLUY+d/8AZnVYHMFDg+oJ1O/8fq5YYuNL+Yq5sdKhMe1YoTjaH
+          dzL/5QN2daNMi846NY65sfWsmBXlZC42kiX75A8AAAD//wMAOb//M+8CAAA=
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8c85d435b8d4cf1a-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 24 Sep 2024 21:22:17 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=fJxT06DQul_M0wIn1RPH2NJBbh_TJOJBTh061T6p9QY-1727212937-1.0.1.1-RyLGfFBnOLdgXgKli2kgHUpATc5aAS48xCoZbxulEYFhvLpvTVBZpFwNvli9uwRlf2Jy_Xs0LinFLUT3XqYohw;
+            path=/; expires=Tue, 24-Sep-24 21:52:17 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=yWcMiVXLiU7kUKLFu1jVOpw0uyT01Vsdw.NqbsdOzWE-1727212937854-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "422"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9995"
+        x-ratelimit-remaining-tokens:
+          - "29991328"
+        x-ratelimit-reset-requests:
+          - 25ms
+        x-ratelimit-reset-tokens:
+          - 17ms
+        x-request-id:
+          - req_97b5f900daa7be47986b9500da87ad64
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Provide the citation for the
+        following text in MLA Format. Do not write an introductory sentence. If reporting
+        date accessed, the current year is 2024\n\nA Perspective on Explanations of
+        Molecular\nPrediction Models\nGeemi P. Wellawatte,\u2020\nHeta A. Gandhi,\u2021\nAditi
+        Seshadri,\u2021 and\nAndrew\nD. White\u2217,\u2021\n\u2020Department of Chemistry,
+        University of Rochester, Rochester, NY, 14627\n\u2021Department of Chemical
+        Engineering, University of Rochester, Rochester, NY, 14627\n\u00b6Vial Health
+        Technology, Inc., San Francisco, CA 94111\nE-mail: andrew.white@rochester.edu\nAbstract\nChemists
+        can be skeptical in using deep learning (DL) in decision making, due to\nthe
+        lack of interpretability in \u201cblack-box\u201d models. Explainable artificial
+        intelligence\n(XAI) is a branch of AI which addresses this drawback by providing
+        tools to interpret\nDL models and their predictions. We review the principles
+        of XAI in the domain of\nchemistry and emerging methods for creating and evaluating
+        explanations. Then we\nfocus on methods developed by our group and their applications
+        in predicting solubil-\nity, blood-brain barrier permeability, and the scent
+        of molecules. We show that XAI\nmethods like chemical counterfactuals and descriptor
+        explanations can explain DL pre-\ndictions while giving insight into structure-property
+        relationships. Finally, we discuss\nhow a two-step process of developing a black-box
+        model and explaining predictions can\nuncover structure-property relationships.\n1\nIntroduction\nDeep
+        learning (DL) is advancing the boundaries of computational chemistry because
+        it can\naccurately model non-linear structure-function relationships.1\u20133
+        Applications of DL can be\nfound in a broad spectrum spanning from quantum computing4,5
+        to drug discovery6\u201310 to\nmaterials design.11,12 According to Kre 13, DL
+        models can contribute to scientific discovery\nin three \u201cdimensions\u201d
+        - 1) as a \u2018computational microscope\u2019 to gain insight which are not\nattainable
+        through experiments 2) as a \u2018resource of inspiration\u2019 to motivate
+        scientific thinking\n3) as an \u2018agent of understanding\u2019 to uncover
+        new observations. However, the rationale of\na DL prediction is not always apparent
+        due to the model architecture consisting a large\nparameter count.14,15 DL models
+        are thus often termed\u201cblack box\u201d models. We can only\nreason about
+        the input and output of an DL model, not the underlying cause that leads to\na
+        specific prediction.\nIt is routine in chemistry now for DL to exceed human
+        level performance \u2014 humans are\nnot good at predicting solubility from
+        structure for example161 \u2014 and so understanding how\na model makes predictions
+        can guide hypotheses. This is in contrast to a topic like finding\na stop sign
+        in an image, where there is little new to be learned about visual perception\nby
+        explaining a DL model. However, the black box nature of DL has its own limitations.\nUsers
+        are more likely to trust and use predictions from a model if they can understand
+        why\nthe prediction was made.17 Explaining predictions can help developers of
+        DL models ensure\nthe model is not learning spurious correlations.18,19 Two
+        infamous examples are, 1)neural\nnetworks that learned to recognize horses by
+        looking for a photogr\n\nCitation:"}], "model": "gpt-4o-2024-08-06", "stream":
+        false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "3445"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.46.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.46.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.5
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA3SRT2vbQBDF7/oUwx6DbGTZsWrf3LRNGhpwC6XQpoj1aiRts9pddsZOTPB3Lyv5
+          T3roRaD32ze8efOaAAhdiSUI1UpWnTej1fvirtg/PX+6v8nU7eJzvrvLf86/NF8n934t0uhwmz+o
+          +OQaK9d5g6ydHbAKKBnj1EmRF/kkX0yLHnSuQhNtjefRzI3yLJ+NsnejbH40tk4rJLGEXwkAwGv/
+          jRFthS9iCVl6Ujokkg2K5fkRgAjOREVIIk0sLYv0ApWzjLZP/QONkc+SGVO4Rew0rMcpIIM0Y3gU
+          K1hjII+K9Q7BWfj44o20Mm5I4Gp4cAbV1sgA64CVVhHAQ1yOxo8Crj6gl4E7tBxf37TYaeKwT+G7
+          1TsMpHkfwTenWiTGcJVCrGIMK6WQCKvh9236gPWWZCzPbo056odzHcY1PrgNHflZr7XV1JYBJTkb
+          Vyd2XvT0kAD87mvf/tOk8MF1nkt2T2jjwPkiH+aJy6EvdHaC7Fiai15MZ/9zlRWy1IbeHE8MCbVt
+          LhOyc8x+T0F7YuzKWtsGgw96uGXty+vsOsunc7WpRHJI/gIAAP//AwAUGjTT1AIAAA==
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8c85d435bbae9e68-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 24 Sep 2024 21:22:18 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=0I.Wb6qO4XtdbY7EZ8i7GAK3U510kbBRAXtuQ6zJW50-1727212938-1.0.1.1-8JvdquUjciTbKgy.q7PSwi9owKphGgIRPmYD76IGPRhK8toz_Hnlx5Io3BevYLtWbp5GhovyWQzBcS._ixgegw;
+            path=/; expires=Tue, 24-Sep-24 21:52:18 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=K4tSxcJrBtgHAH5ECk75TzZ9uLE5rEw4AIZfZEYheJ4-1727212938173-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1172"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9997"
+        x-ratelimit-remaining-tokens:
+          - "29997693"
+        x-ratelimit-reset-requests:
+          - 17ms
+        x-ratelimit-reset-tokens:
+          - 4ms
+        x-request-id:
+          - req_49f3d3a89edeef356edfb518ee2ea0b7
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the title, authors,
+        and doi as a JSON from this MLA citation. If any field can not be found, return
+        it as null. Use title, authors, and doi as keys, author''s value should be a
+        list of authors. \"National Flag of Canada Day.\" *Wikipedia*, Wikimedia Foundation,
+        [insert date of last modification], en.wikipedia.org/wiki/National_Flag_of_Canada_Day.
+        Accessed [insert date of access], 2024.\n\nCitation JSON:"}], "model": "gpt-4o-2024-08-06",
+        "stream": false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "527"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.46.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.46.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.5
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAAwAAAP//dFHLbtswELzrKxZ7tgpZtmNHt/QRJJcWCHopqkKiJUqmQ3EFctVGNfzv
+          BfWw3UMuPMzsDGd2TwEAqhITwOIguGhaHT583D7tXvr+9/e/cnlkph8v3Z9vm+e3Lz1ZXHgF7Y+y
+          4Fn1oaCm1ZIVmZEurBQsvetyG2/jZXy/2g1EQ6XUXla3HK4pjKN4HUa7MLqbhAdShXSYwM8AAOA0
+          vD6iKeUbJhAtZqSRzolaYnIZAkBL2iMonFOOhWFcXMmCDEszpM7z/OjIpOaUGoAUWbGWKSaQ4lfh
+          ewgNj1rUQBV8EkaUAj6LPsXFOC46PpB1XmA6rSe0JDUjqTmnJs/z2++trDon9DQx4edLH011a2nv
+          Zs8Zr5RR7pBZKRwZn90xtTiw5wDg17C37r9VYGupaTljepXGGy6jzeiH10td2fh+IplY6BvVav2e
+          KislC6XdzfZxTKhMfXWILjGHnuh6x7LJKmVqaVurxmNUbbaJNlG8uiv2JQbn4B8AAAD//wMAJmEs
+          cJUCAAA=
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8c85d43dbb05cf1a-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 24 Sep 2024 21:22:18 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "373"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29999880"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 0s
+        x-request-id:
+          - req_24728a077f67f6a921f21f4b0d0e69f4
       status:
         code: 200
         message: OK
@@ -939,7 +832,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.47.1
+          - AsyncOpenAI/Python 1.46.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -949,7 +842,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.47.1
+          - 1.46.1
         x-stainless-raw-response:
           - "true"
         x-stainless-runtime:
@@ -961,18 +854,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA3SRP4+bQBDFez7FamoTAXbApnNyxZ0U5ZqkChGsYYzXt+ysdseKE8vfPeKfuRRp
-          KN5v3uPN7C0QAlQDuYD6JLnurA73+/P1+vwa/8HvX/dbn/xK2xd8Sp9l/OXbZ1j1DjqcsebZ9aGm
-          zmpkRWbEtUPJ2KfGWZLFyXq9zgbQUYO6t7WWww2FSZRswmgbRulkPJGq0UMufgRCCHEbvn1F0+AV
-          chGtZqVD72WLkD+GhABHuldAeq88S8OwWmBNhtEMrauqOnsyhbkVRogCWLHGAnJRwCfpZP0mXg+y
-          kwWsRi4vfCLn+wlz0XpSG1KzUph7Yaqqev8/h8eLl3qamPT7YwFNrXV08HPmrB+VUf5UOpSeTF/W
-          M1kY6D0Q4udwqMs/u4N11Fkumd7Q9IHb3RgHy8ssMMkmyMRSL3ocp/9zlQ2yVNq/uzaMBZVpl4To
-          0XJYE/xvz9iVR2VadNap8fhHW2Yf022zSaPdDoJ78BcAAP//AwCJOJdHhQIAAA==
+          H4sIAAAAAAAAAwAAAP//dJFLb9swEITv+hXEnq1AUhw/dGvQADmlFx8KRIVEU2uJDsVlyTWQwvB/
+          L/Sy0kMvOsy3M5pdXiMhQNeQC1CtZNU5E3973r7uusa/dIffT/5NH5r1z++fR70/tOcDrHoHHc+o
+          eHY9KOqcQdZkR6w8SsY+Nd1m2yzN9o+7AXRUo+ltjeN4TXGWZOs42cXJZjK2pBUGyMV7JIQQ1+Hb
+          V7Q1fkIuktWsdBiCbBDy+5AQ4Mn0CsgQdGBpGVYLVGQZ7dC6qqpzIFvYa2GFKIA1GywgFwU8Sy/V
+          h/hxlJ0sYDVyeeGWfOgn7MWYSa1Jz0phb4Wtqurr/zyeLkGaaWLSb/cFDDXO0zHMmbN+0laHtvQo
+          A9m+bGByMNBbJMSv4VCXf3YH56lzXDJ9oO0Dd/sxDpaXWWC2nSATS7Poabr5n6uskaU24cu1YSyo
+          bbMkJPeWw5oQ/gTGrjxp26B3Xo/HP7lyj+mTUvVGriG6RX8BAAD//wMAi6ZvnIUCAAA=
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8c7d48b8b90af94f-SJC
+          - 8c85d43ce900cf9b-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -980,7 +873,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
+          - Tue, 24 Sep 2024 21:22:18 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -994,11 +887,11 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "410"
+          - "591"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
+          - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
@@ -1012,7 +905,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_a87790f6c7b85b944d409e40f5f09559
+          - req_d8049ba5998a732a5f718396d11ddeb7
       status:
         code: 200
         message: OK
@@ -1022,7 +915,7 @@ interactions:
         and doi as a JSON from this MLA citation. If any field can not be found, return
         it as null. Use title, authors, and doi as keys, author''s value should be a
         list of authors. \"Frederick Bates (politician).\" *Wikipedia*, Wikimedia Foundation,
-        2024, en.wikipedia.org/wiki/Frederick_Bates_(politician). Accessed 2024.\n\nCitation
+        2024, en.wikipedia.org/wiki/Frederick_Bates_(politician). Accessed 24 Oct. 2024.\n\nCitation
         JSON:"}], "model": "gpt-4o-2024-08-06", "stream": false, "temperature": 0.0}'
       headers:
         accept:
@@ -1032,13 +925,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "474"
+          - "482"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.47.1
+          - AsyncOpenAI/Python 1.46.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -1048,7 +941,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.47.1
+          - 1.46.1
         x-stainless-raw-response:
           - "true"
         x-stainless-runtime:
@@ -1060,19 +953,19 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//dFE7b9swEN71K4ibGsAq9HDiRJszZEgboEORpQokmjrLtCkeQZ4LF4b/
-          eyFZstKhC4fvxe/uzpEQoBsoBKidZNU5E6/X+9Pp2/tPfn16/X14ezPrNHlPl/n3Pf14hkXvoM0e
-          FU+ur4o6Z5A12SutPErGPjVdZas0y/N8NRAdNWh6W+s4XlKcJdkyTh7j5GE07kgrDFCIX5EQQpyH
-          t69oGzxBIZLFhHQYgmwRiptICPBkegRkCDqwtAyLmVRkGe3Quq7rfSBb2nNphSiBNRssoRAlvHhs
-          0Gt1EM+SMYgvjoxmrbS0dyUsrnp55B350Dvs0ZgRbUhPSGkvpa3r+vP/HrfHIM2oGPHLbSBDrfO0
-          CVPmhG+11WFXeZSBbF8+MDkY2EskxMewuOM/uwDnqXNcMR3Q9oFPq2sczJeayTwdSSaWZsbT7PF/
-          rqpBltqET9uHa0Ft2zkhubUcxoTwJzB21VbbFr3z+nqMravuk/skyx/UpoHoEv0FAAD//wMANl/y
-          g5UCAAA=
+          H4sIAAAAAAAAAwAAAP//dFFNi9swEL37V4g5bSEujpPGsW+7C6Es9FAovdTF1toTR7vyjCpNoCXk
+          vxfbcZIeetHhfenNzClSCkwLhYLmoKXpnY0fn7LP2+fnlzzv8i+7F9t9zcinwrvvv5JvsBgc/PqG
+          jcyujw33zqIYpoluPGrBIXWZpVm6TPPVdiR6btEOts5JvOY4TdJ1nGzjZHMxHtg0GKBQPyKllDqN
+          71CRWvwNhUoWM9JjCLpDKK4ipcCzHRDQIZggmgQWN7JhEqSxdV3Xb4GppFNJSpUgRiyWUKgSdh5b
+          9KZ5V09aMKgHx9aIaYymDyUsJr0+yoF9GBx0tPaCtmxmpKRzSXVd3//vcX8M2l4UF/x8Hchy5zy/
+          hjlzxveGTDhUHnVgGsoHYQcje46U+jku7vjPLsB57p1Uwu9IQ+AyWU55cDvVjV3NpLBoe+dapf9z
+          VS2KNjbcrR+mhoa6W0JyrTnOCeFPEOyrvaEOvfNmusbeVdmnzbZdb5I8h+gc/QUAAP//AwDR5+Yg
+          lgIAAA==
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8c7d48b94fb47af8-SJC
+          - 8c85d43ce8c3cf51-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1080,7 +973,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
+          - Tue, 24 Sep 2024 21:22:18 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -1094,70 +987,25 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "383"
+          - "335"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
+          - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
           - "30000000"
         x-ratelimit-remaining-requests:
-          - "9999"
+          - "9998"
         x-ratelimit-remaining-tokens:
-          - "29999894"
+          - "29999891"
         x-ratelimit-reset-requests:
-          - 6ms
+          - 10ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_f5f05466c848ca804fc5859573c9e777
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1021%2Facs.jctc.2c01235/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{Wellawatte_2023, title={A Perspective on Explanations of
-          Molecular Prediction Models}, volume={19}, ISSN={1549-9626}, url={http://dx.doi.org/10.1021/acs.jctc.2c01235},
-          DOI={10.1021/acs.jctc.2c01235}, number={8}, journal={Journal of Chemical Theory
-          and Computation}, publisher={American Chemical Society (ACS)}, author={Wellawatte,
-          Geemi P. and Gandhi, Heta A. and Seshadri, Aditi and White, Andrew D.}, year={2023},
-          month=mar, pages={2149\u20132160} }\n"
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
+          - req_2956c05ef3d776c7114190f803cd3240
       status:
         code: 200
         message: OK
@@ -1184,7 +1032,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:57 GMT
+          - Tue, 24 Sep 2024 21:22:18 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -1208,13 +1056,15 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Barack+Obama&fields=externalIds,journal,title,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=National+Flag+of+Canada+Day&fields=externalIds,journal,title,year
     response:
       body:
         string:
-          '{"data": [{"paperId": "aa30fd24d6c0290bed800d99cc56e806e96aed4c", "externalIds":
-          {"DOI": "10.2307/j.ctt18z4hr9.10", "CorpusId": 144104450}, "title": "Barack
-          Obama", "year": 2022, "journal": null, "matchScore": 68.615616}]}
+          '{"data": [{"paperId": "2825ef76fbc2d0001226a7b98d2f7e6d28d72f7f", "externalIds":
+          {"MAG": "2891797987", "DOI": "10.3138/9781442621534-019", "CorpusId": 166149247},
+          "title": "16. Marketing the Maple Leaf: The Curious Case of National Flag
+          of Canada Day", "year": 2016, "journal": {"name": "", "pages": "405-436",
+          "volume": ""}, "matchScore": 106.03979}]}
 
           '
       headers:
@@ -1223,31 +1073,122 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "223"
+          - "353"
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         Via:
-          - 1.1 61770d955dae13eda6e8f1b3baae4d1e.cloudfront.net (CloudFront)
+          - 1.1 62c71b579b931f194fbc7abcc843d132.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - Hyyd_vxvJxTxcNzDFlF9nSDY-6KRSANaweeikZl6SrpbzrKIGprVyA==
+          - -1p1_7Kx5qPTwgLt366BWPuCvFwIoEgYhRIvn7npGz6k6HGzTa0HQQ==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - ek1djE46vHcEKng=
+          - eoQNtGWoPHcEXhg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "223"
+          - "353"
         x-amzn-Remapped-Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 296f1855-d4c4-40d2-b75e-a90563a2865d
+          - b4a81556-fa43-4505-8241-0a9ad7a46226
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Barack+Obama&fields=externalIds,journal,title,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "aa30fd24d6c0290bed800d99cc56e806e96aed4c", "externalIds":
+          {"DOI": "10.2307/j.ctt18z4hr9.10", "CorpusId": 144104450}, "title": "Barack
+          Obama", "year": 2022, "journal": null, "matchScore": 68.74852}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "222"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 24 Sep 2024 21:22:19 GMT
+        Via:
+          - 1.1 771001bf23680c4bf66e77caba3ceaba.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - kT8IAqqMQdNedzwulNCA7LY5h1ylSRyTkYDC-WlJJkC4y_TpjAE1fg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - eoQNtFKNvHcEClw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "222"
+        x-amzn-Remapped-Date:
+          - Tue, 24 Sep 2024 21:22:19 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - e90a1fcc-3b34-413a-b929-dd87d0f2c880
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1&select=DOI,container-title,published,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":842102,"items":[{"DOI":"10.3138\/9781442621534-019","container-title":["Celebrating
+          Canada"],"published":{"date-parts":[[2016,12,31]]},"title":["16. Marketing
+          the Maple Leaf: The Curious Case of National Flag of Canada Day"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 24 Sep 2024 21:22:19 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
       status:
         code: 200
         message: OK
@@ -1275,7 +1216,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -1315,30 +1256,131 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         Via:
-          - 1.1 abc09cc7557c1b633f2222f0c307d884.cloudfront.net (CloudFront)
+          - 1.1 c3d007e42510cc2bd48d2a205774e488.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - SviXo-FOECElA8jXlwdP_bN8egTjw2b2aRYDQbxU99ifhamg0grHPA==
+          - mBVsvVatB3TdzLbUqVWTlzqJXjrwwxhX8ZGgfmVdRTL-R9fQuZvV4Q==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Error from cloudfront
         x-amz-apigw-id:
-          - ek1dlE4XvHcEqBQ=
+          - eoQNxE1hvHcEHVg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "34"
         x-amzn-Remapped-Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 93f786db-e89c-483c-a9fc-40996ef339e6
+          - b2c81ec9-4cc6-45f8-97ff-d29000e91e58
       status:
         code: 404
         message: Not Found
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the title, authors,
+        and doi as a JSON from this MLA citation. If any field can not be found, return
+        it as null. Use title, authors, and doi as keys, author''s value should be a
+        list of authors. Wellawatte, Geemi P., et al. \"A Perspective on Explanations
+        of Molecular Prediction Models.\" *Department of Chemistry, University of Rochester*,
+        2024. Accessed 2024.\n\nCitation JSON:"}], "model": "gpt-4o-2024-08-06", "stream":
+        false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "500"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.46.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.46.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.5
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAAwAAAP//ZJHNbxoxEMXv/BWjOS9oWT7LLVE/UimRUFuJQxyxxjuAqddj2d4mFeJ/
+          j7xsgKoXH97P72nezLEHgLrCBaDay6hqZ/p397OH+ffHh3vi5Y/x11+r1fD1cdS4z4efswlmycGb
+          A6n44Roorp2hqNmesfIkI6XU4ayYFcPi02jegporMsm2c7E/5n6RF+N+Pu/n0864Z60o4AKeewAA
+          x/ZNI9qK3nABefah1BSC3BEuLp8A0LNJCsoQdIjSRsyuULGNZNupy7I8BLbCHoUFEBh1NCRwAQLv
+          YEk+OFJR/yFgC1/enJFWpnYBeAtPbEg1RnpYeqq0SgCeUrEgMDvnySbu2YeU+CzwG1GtYTmAFRkj
+          X2WMJDADgRRBmoHAl85WsU4W2xgj7EnYsixvC3jaNkGa7kenny4bMbxznjeh4xd9q60O+7UnGdim
+          9iGyw5aeegAv7eabf5aJznPt4jryb7IpcJh3m8frra90PO1g5CjNjesC/nOtK4pSm3BzPzxPqO3u
+          mpBfxmx7YvgbItXrrbY78s7r8zm3bj3JJ3kxmqpNhb1T7x0AAP//AwBZnH2B1wIAAA==
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8c85d4400eb99e68-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 24 Sep 2024 21:22:19 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1066"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29999886"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 0s
+        x-request-id:
+          - req_b63dfc0f710193fb2d2a43f37a59a57f
+      status:
+        code: 200
+        message: OK
   - request:
       body: null
       headers: {}
@@ -1361,7 +1403,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -1382,116 +1424,21 @@ interactions:
         code: 200
         message: OK
   - request:
-      body:
-        '{"messages": [{"role": "user", "content": "Extract the title, authors,
-        and doi as a JSON from this MLA citation. If any field can not be found, return
-        it as null. Use title, authors, and doi as keys, author''s value should be a
-        list of authors. \"National Flag of Canada Day.\" *Wikipedia*, Wikimedia Foundation,
-        [insert date of last modification], en.wikipedia.org/wiki/National_Flag_of_Canada_Day.
-        Accessed 2024.\n\nCitation JSON:"}], "model": "gpt-4o-2024-08-06", "stream":
-        false, "temperature": 0.0}'
-      headers:
-        accept:
-          - application/json
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        content-length:
-          - "502"
-        content-type:
-          - application/json
-        host:
-          - api.openai.com
-        user-agent:
-          - AsyncOpenAI/Python 1.47.1
-        x-stainless-arch:
-          - arm64
-        x-stainless-async:
-          - async:asyncio
-        x-stainless-lang:
-          - python
-        x-stainless-os:
-          - MacOS
-        x-stainless-package-version:
-          - 1.47.1
-        x-stainless-raw-response:
-          - "true"
-        x-stainless-runtime:
-          - CPython
-        x-stainless-runtime-version:
-          - 3.12.5
-      method: POST
-      uri: https://api.openai.com/v1/chat/completions
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RRTXObMBC98yt29mw6GCdOzM2Tj0lyaE+9tGRAgAARodWg9TSJx/+9IzAmPfSi
-          w3v7nt7bPQYAqCpMAMtWcNlbHe733fuftnt4enr5+Ww/6ZO73Y8786twxXqPK6+gopMlz6pvJfVW
-          S1ZkJrocpGDpXdc38c063mw225HoqZLayxrL4RWFcRRfhdFtGG3PwpZUKR0m8DsAADiOr49oKvmO
-          CUSrGemlc6KRmFyGAHAg7REUzinHwjCuFrIkw9KMqfM87xyZ1BxTA5AiK9YyxQRS/C58D6HhUYsG
-          qIY7YUQl4F58pLiaxsWBWxqcF5iD1me0IjUjqTmlJs/zr98Psj44oc8TZ/x06aOpsQMVbvac8VoZ
-          5dpskMKR8dkdk8WRPQUAr+PeDv+sAu1AveWM6U0ab7jbTXa4HGoh45lkYqEXfB3f/k+VVZKF0u7L
-          8nEKqEyzOESXlGNNdB+OZZ/VyjRysIOablHb7Dq6juLNtiwqDE7BXwAAAP//AwAfjb8XlAIAAA==
-      headers:
-        CF-Cache-Status:
-          - DYNAMIC
-        CF-RAY:
-          - 8c7d48b60ba22386-SJC
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 23 Sep 2024 20:28:58 GMT
-        Server:
-          - cloudflare
-        Transfer-Encoding:
-          - chunked
-        X-Content-Type-Options:
-          - nosniff
-        access-control-expose-headers:
-          - X-Request-ID
-        alt-svc:
-          - h3=":443"; ma=86400
-        openai-organization:
-          - future-house-xr4tdh
-        openai-processing-ms:
-          - "1716"
-        openai-version:
-          - "2020-10-01"
-        strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
-        x-ratelimit-limit-requests:
-          - "10000"
-        x-ratelimit-limit-tokens:
-          - "30000000"
-        x-ratelimit-remaining-requests:
-          - "9999"
-        x-ratelimit-remaining-tokens:
-          - "29999886"
-        x-ratelimit-reset-requests:
-          - 6ms
-        x-ratelimit-reset-tokens:
-          - 0s
-        x-request-id:
-          - req_0ee49b8e98047f26b29be15d680d785b
-      status:
-        code: 200
-        message: OK
-  - request:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1&select=DOI,container-title,published,title
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&rows=1&query.author=Geemi+P.+Wellawatte+et+al.&select=DOI,author,container-title,published,title
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":841995,"items":[{"DOI":"10.3138\/9781442621534-019","container-title":["Celebrating
-          Canada"],"published":{"date-parts":[[2016,12,31]]},"title":["16. Marketing
-          the Maple Leaf: The Curious Case of National Flag of Canada Day"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":17250,"items":[{"DOI":"10.26434\/chemrxiv-2022-qfv02","author":[{"given":"Geemi
+          P.","family":"Wellawatte","sequence":"first","affiliation":[{"name":"University
+          of Rochester"}]},{"given":"Heta A.","family":"Gandhi","sequence":"additional","affiliation":[{"name":"University
+          of Rochester"}]},{"given":"Aditi","family":"Seshadri","sequence":"additional","affiliation":[{"name":"University
+          of Rochester"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
+          D.","family":"White","sequence":"additional","affiliation":[{"name":"University
+          of Rochester"}]}],"published":{"date-parts":[[2022,12,9]]},"title":["A Perspective
+          on Explanations of Molecular Prediction Models"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -1502,14 +1449,18 @@ interactions:
           - Link
         Connection:
           - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "451"
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:59 GMT
+          - Tue, 24 Sep 2024 21:22:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
+        Vary:
+          - Accept-Encoding
         permissions-policy:
           - interest-cohort=()
         x-api-pool:
@@ -1529,15 +1480,19 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=National+Flag+of+Canada+Day&fields=externalIds,journal,title,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&fields=authors,externalIds,journal,title,year
     response:
       body:
         string:
-          '{"data": [{"paperId": "2825ef76fbc2d0001226a7b98d2f7e6d28d72f7f", "externalIds":
-          {"MAG": "2891797987", "DOI": "10.3138/9781442621534-019", "CorpusId": 166149247},
-          "title": "16. Marketing the Maple Leaf: The Curious Case of National Flag
-          of Canada Day", "year": 2016, "journal": {"name": "", "pages": "405-436",
-          "volume": ""}, "matchScore": 106.03593}]}
+          '{"data": [{"paperId": "1db1bde653658ec9b30858ae14650b8f9c9d438b", "externalIds":
+          {"PubMedCentral": "10134429", "DOI": "10.1021/acs.jctc.2c01235", "CorpusId":
+          257786462, "PubMed": "36972469"}, "title": "A Perspective on Explanations
+          of Molecular Prediction Models", "year": 2023, "journal": {"name": "Journal
+          of Chemical Theory and Computation", "pages": "2149 - 2160", "volume": "19"},
+          "authors": [{"authorId": "1805407482", "name": "Geemi P Wellawatte"}, {"authorId":
+          "95666896", "name": "Heta A. Gandhi"}, {"authorId": "1481244794", "name":
+          "Aditi Seshadri"}, {"authorId": "2257535", "name": "A. White"}], "matchScore":
+          172.49347}]}
 
           '
       headers:
@@ -1546,31 +1501,76 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "353"
+          - "635"
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:28:59 GMT
+          - Tue, 24 Sep 2024 21:22:20 GMT
         Via:
-          - 1.1 ac3f0425be668a2439884bb8cbd3ccd8.cloudfront.net (CloudFront)
+          - 1.1 0f4013a0af68dcba176ca4372e470df4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - ctm2flcrGJLYUdaZffXWhsVJMefE3SG2SqHetrf7j99DseZaSW0lGw==
+          - Fi9mk0gTNtg8gic_y28i3i4av13GaJ_Z8SoBoIwG6PX76rSMZvZJbg==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - ek1dxEQLvHcEgXw=
+          - eoQN2Ga7PHcEQ_g=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "353"
+          - "635"
         x-amzn-Remapped-Date:
-          - Mon, 23 Sep 2024 20:28:59 GMT
+          - Tue, 24 Sep 2024 21:22:20 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 089a1a95-50e2-44c1-ab96-1d87a9249fb2
+          - 35825689-76a3-4e02-baaa-9fc60cc98970
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1021%2Facs.jctc.2c01235/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Wellawatte_2023, title={A Perspective on Explanations of
+          Molecular Prediction Models}, volume={19}, ISSN={1549-9626}, url={http://dx.doi.org/10.1021/acs.jctc.2c01235},
+          DOI={10.1021/acs.jctc.2c01235}, number={8}, journal={Journal of Chemical Theory
+          and Computation}, publisher={American Chemical Society (ACS)}, author={Wellawatte,
+          Geemi P. and Gandhi, Heta A. and Seshadri, Aditi and White, Andrew D.}, year={2023},
+          month=mar, pages={2149\u20132160} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Tue, 24 Sep 2024 21:22:20 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
       status:
         code: 200
         message: OK
@@ -1583,11 +1583,11 @@ interactions:
         and can simply terminate if the answer looks sufficient. The current status
         of evidence/papers/cost is Status: Paper Count=0 | Relevant Papers=0 | Current
         Evidence=0 | Current Cost=$0.0000"}, {"role": "assistant", "content": null,
-        "function_call": null, "tool_calls": [{"id": "call_CAfyZmIYQCvW9ROhvuVbfEPj",
+        "function_call": null, "tool_calls": [{"id": "call_jhWfZjE3kuAR6Q1uF67bhfBR",
         "type": "function", "function": {"arguments": "{\"query\": \"Frederick Bates\",
         \"min_year\": null, \"max_year\": null}", "name": "paper_search"}}]}, {"role":
         "tool", "content": "Failed to execute tool call for tool paper_search:\nTotally
-        unexpected but retryable error.", "name": "paper_search", "tool_call_id": "call_CAfyZmIYQCvW9ROhvuVbfEPj"}],
+        unexpected but retryable error.", "name": "paper_search", "tool_call_id": "call_jhWfZjE3kuAR6Q1uF67bhfBR"}],
         "model": "gpt-4o-2024-08-06", "temperature": 0.1, "tool_choice": "required",
         "tools": [{"type": "function", "function": {"name": "gather_evidence", "description":
         "Gather evidence from previous papers given a specific question to increase
@@ -1633,7 +1633,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.47.1
+          - AsyncOpenAI/Python 1.46.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -1643,7 +1643,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.47.1
+          - 1.46.1
         x-stainless-raw-response:
           - "true"
         x-stainless-runtime:
@@ -1655,20 +1655,20 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//dFJNb6MwFLzzK6x3DisCIWm4JYc99LKH7ErdLivkmAdx66/aRgqN8t9X
-          QAo06vpgWW88b8bjdwkIAV5CRoCdqGfSiHC3ezm/b5lKkt+t/uXx+X1fH5LV44/tfv0Ai46hjy/I
-          /AfrG9PSCPRcqwFmFqnHrutyE2+WcZIk2x6QukTR0Wrjw5UO4yhehdFDGK1vxJPmDB1k5E9ACCGX
-          fu8sqhLPkJFo8VGR6BytEbLxEiFgtegqQJ3jzlPlYTGBTCuPqnOtGiFmgNdaFIwKMQkP6zI7TzlR
-          IYonvTfJ4/PqXP48iOXuKTnIt2i5ljO9oXVrekNVo9iYzwwf69mdGCGgqOy5hhq0hUNq2emOTwhQ
-          WzcSle+8wyWHtwZtm0OWw3eLJVrOXsmeenQ5LHKQXBUtUptD1oeQg6TneeUKnwSuwVfnv7PwLFaN
-          o+KW6q1+Hb9J6NpYfXR3qUPFFXenwiJ1/evBeW0G7U6nV4Dm0w+DsVoaX3j9iqprmKa3cYBpACc0
-          Tm+g156KGWuT/o9VlOgp78dgnLzBIVf11CEabfbvBNc6j7KouKrRGsv7GYPKFGmURnGyZscSgmvw
-          DwAA//8DAAfA/jdsAwAA
+          H4sIAAAAAAAAA3RSy27bMBC86yuIPVuFrFqRo1uMNijQAukjBxdVIdDUSmLCV0mqjWv43wM9IilG
+          ywNB7HB2hsM9BYQALyEjwBrqmTQivNmlH3a3/s7XSL9v0+v93cO3z9oc339qbxJYdQx9eEDmX1hv
+          mJZGoOdaDTCzSD12XddpnMbr+Hqz7gGpSxQdrTY+3OgwjuJNGG3D6GokNpozdJCRHwEhhJz6vbOo
+          SnyCjESrl4pE52iNkE2XCAGrRVcB6hx3nioPqxlkWnlUnWvVCrEAvNaiYFSIWXhYp8V5zokKUUj1
+          cfe1ad5tq82X/f3vfWsO91X8989Cb2h9NL2hqlVsymeBT/XsQowQUFT2XEMN2sIhtay54BMC1Nat
+          ROU773DK4VeL9phDlsOtxRItZ49kRz26HFY5SK6KI1KbQ9aHkIOkT8vKGV4JnIN/nX8uwrNYtY6K
+          MdWxfp6+SejaWH1wF6lDxRV3TWGRuv714Lw2g3an0ytA++qHwVgtjS+8fkTVNUyScRxgHsAZjZMR
+          9NpTsWClyf9YRYme8n4MpskbHHJVzx2iyWb/TnBH51EWFVc1WmN5P2NQmSKJkih+e8UOJQTn4BkA
+          AP//AwBf4tambAMAAA==
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8c7d48c8698e984f-SJC
+          - 8c85d451ac466459-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1676,7 +1676,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 23 Sep 2024 20:29:00 GMT
+          - Tue, 24 Sep 2024 21:22:21 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -1690,11 +1690,11 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "412"
+          - "451"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
-          - max-age=15552000; includeSubDomains; preload
+          - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
@@ -1702,13 +1702,13 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999845"
+          - "29999846"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_7be8beb1566cacb0ce14534256151f3c
+          - req_24f03cc29f4d78a0220b80b2582e1b56
       status:
         code: 200
         message: OK
