@@ -313,14 +313,14 @@ class SearchIndex:
         query_fields = list(field_subset or self.fields)
         searcher = await self.searcher
         index = await self.index
-        results = [
+        addresses = [
             s[1]
             for s in searcher.search(
                 index.parse_query(self.clean_query(query), query_fields), top_n
             ).hits
             if s[0] > min_score
         ][offset : offset + top_n]
-        search_index_docs = [searcher.doc(result) for result in results]
+        search_index_docs = [searcher.doc(address) for address in addresses]
         return [
             result
             for result in [
