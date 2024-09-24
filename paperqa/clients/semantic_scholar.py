@@ -108,7 +108,7 @@ class SematicScholarSearchType(IntEnum):
         raise NotImplementedError
 
 
-def s2_authors_match(authors: list[str], data: dict):
+def s2_authors_match(authors: list[str], data: dict) -> bool:
     """Check if the authors in the data match the authors in the paper."""
     AUTHOR_NAME_MIN_LENGTH = 2
     s2_authors_noinit = [
@@ -225,9 +225,16 @@ async def s2_title_search(
             HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {title}.")
         },
     )
-
-    if authors and not s2_authors_match(authors, data["data"][0]):
-        raise DOINotFoundError(f"Could not find DOI for {title} - author disagreement.")
+    try:
+        if authors and not s2_authors_match(authors, data=data["data"][0]):
+            raise DOINotFoundError(
+                f"Could not find DOI for {title} - author disagreement."
+            )
+    except KeyError as exc:  # Very rare, but "data" may not be in data
+        raise DOINotFoundError(
+            f"Unexpected Semantic Scholar search/match endpoint shape for {title}"
+            f" given data {data}."
+        ) from exc
     # need to check if nested under a 'data' key or not (depends on filtering)
     if (
         strings_similarity(
