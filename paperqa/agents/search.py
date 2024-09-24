@@ -343,6 +343,10 @@ async def maybe_get_manifest(
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
             records = [DocDetails(**row) for row in csv.DictReader(StringIO(content))]
+            logger.info(
+                f"Found manifest file at {filename} and read {len(records)} records"
+                " from it."
+            )
             return {str(r.file_location): r for r in records if r.file_location}
         except FileNotFoundError:
             logging.warning(f"Manifest file at {filename} could not be found.")
@@ -450,8 +454,9 @@ async def get_directory_index(
     manifest_file = (
         anyio.Path(_settings.manifest_file) if _settings.manifest_file else None
     )
-    # check if it doesn't exist - if so, try to make it relative
     if manifest_file and not await manifest_file.exists():
+        # If the manifest file was specified but doesn't exist,
+        # perhaps it was specified as a relative path from the paper_directory
         manifest_file = directory / manifest_file
 
     metadata = await maybe_get_manifest(manifest_file)

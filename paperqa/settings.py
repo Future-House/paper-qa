@@ -431,9 +431,10 @@ class Settings(BaseSettings):
     manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(
-            "Optional manifest CSV, containing columns which are attributes for a"
-            " DocDetails object. Only 'file_location', 'doi', and 'title' will be used"
-            " when indexing."
+            "Optional absolute path to a manifest CSV, or a relative path from the"
+            " paper_directory to a manifest CSV. A manifest CSV contains columns which"
+            " are attributes for a DocDetails object. Only 'file_location', 'doi', and"
+            " 'title' will be used when indexing, others are discarded."
         ),
     )
     paper_directory: str | os.PathLike = Field(
@@ -458,24 +459,20 @@ class Settings(BaseSettings):
 
         This index is where parsings are stored based on parsing/embedding strategy.
         """
-        # index name should use an absolute path
-        # this way two different folders where the
-        # user locally uses '.' will make different indexes
-        paper_directory = self.paper_directory
-        if isinstance(paper_directory, Path):
-            paper_directory = str(paper_directory.absolute())
-
-        index_fields = "|".join(
-            [
-                str(paper_directory),
-                self.embedding,
-                str(self.parsing.chunk_size),
-                str(self.parsing.overlap),
-                self.parsing.chunking_algorithm,
-            ]
-        )
-
-        return f"pqa_index_{hexdigest(index_fields)}"
+        if isinstance(self.paper_directory, Path):
+            # Here we use an absolute path so that where the user locally
+            # uses '.', two different folders will make different indexes
+            first_segment: str = str(self.paper_directory.absolute())
+        else:
+            first_segment = str(self.paper_directory)
+        segments = [
+            first_segment,
+            self.embedding,
+            str(self.parsing.chunk_size),
+            str(self.parsing.overlap),
+            self.parsing.chunking_algorithm,
+        ]
+        return f"pqa_index_{hexdigest('|'.join(segments))}"
 
     @classmethod
     def from_name(
