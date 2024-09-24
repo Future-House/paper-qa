@@ -132,6 +132,19 @@ def get_crossref_mailto() -> str:
         return "example@papercrow.ai"
 
 
+def is_flaky_crossref_ssl_error(exc: BaseException) -> bool:
+    """Get if we should retry upon known flaky Crossref failures."""
+    # > aiohttp.client_exceptions.ClientConnectorError:
+    # > Cannot connect to host api.crossref.org:443 ssl:default [nodename nor servname provided, or not known]
+    # SEE: https://github.com/aio-libs/aiohttp/blob/v3.10.5/aiohttp/client_exceptions.py#L193-L196
+    return isinstance(exc, aiohttp.ClientConnectorError) and exc.host == CROSSREF_HOST
+
+
+@retry(
+    retry=retry_if_exception(is_flaky_crossref_ssl_error),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    stop=stop_after_attempt(3),
+)
 async def doi_to_bibtex(
     doi: str,
     session: aiohttp.ClientSession,
@@ -147,8 +160,10 @@ async def doi_to_bibtex(
         missing_replacements = {}
     FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/"}
     # get DOI via crossref
-    url = f"https://api.crossref.org/works/{quote(doi, safe='')}/transform/application/x-bibtex"
-    async with session.get(url, headers=crossref_headers()) as r:
+    async with session.get(
+        f"https://api.crossref.org/works/{quote(doi, safe='')}/transform/application/x-bibtex",
+        headers=crossref_headers(),
+    ) as r:
         if not r.ok:
             raise DOINotFoundError(
                 f"Per HTTP status code {r.status}, could not resolve DOI {doi}."
@@ -258,14 +273,7 @@ async def parse_crossref_to_doc_details(
 
 
 @retry(
-    # Retry upon this flaky Crossref failure:
-    # > aiohttp.client_exceptions.ClientConnectorError:
-    # > Cannot connect to host api.crossref.org:443 ssl:default [nodename nor servname provided, or not known]
-    # SEE: https://github.com/aio-libs/aiohttp/blob/v3.10.5/aiohttp/client_exceptions.py#L193-L196
-    retry=retry_if_exception(
-        lambda x: isinstance(x, aiohttp.ClientConnectorError)
-        and x.host == CROSSREF_HOST
-    ),
+    retry=retry_if_exception(is_flaky_crossref_ssl_error),
     before_sleep=before_sleep_log(logger, logging.WARNING),
     stop=stop_after_attempt(3),
 )
