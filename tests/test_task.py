@@ -95,8 +95,12 @@ class TestTaskDataset:
             not base_query_request.query
         ), "Should not have mutated query in base request"
         assert not docs.docs, "Should not have mutated docs in base docs"
-        assert isinstance(metrics_callback.eval_means["reward"], float)
-        assert isinstance(metrics_callback.eval_means["total_paper_count"], float)
+        assert (
+            isinstance(metrics_callback.eval_means["total_paper_count"], float) > 0
+        ), "Expected some papers to help us answer questions"
+        assert (
+            isinstance(metrics_callback.eval_means["reward"], float) > 0
+        ), "Expected some wins"
 
     @pytest.mark.vcr
     @pytest.mark.asyncio
