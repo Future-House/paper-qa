@@ -4,14 +4,14 @@ import inspect
 import logging
 import re
 import sys
-from typing import ClassVar
+from typing import ClassVar, cast
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import Answer, DocDetails
 
 from .search import get_directory_index
 
@@ -125,25 +125,26 @@ class PaperSearch(NamedTool):
 
         logger.info(f"Starting paper search for {query!r}.")
         index = await get_directory_index(settings=self.settings)
-        results = await index.query(
+        results: list[Docs] = await index.query(
             query,
             top_n=self.settings.agent.search_count,
             offset=offset,
             field_subset=[f for f in index.fields if f != "year"],
         )
         logger.info(
-            f"{self.TOOL_FN_NAME} for query {query!r} returned {len(results)} papers."
+            f"{self.TOOL_FN_NAME} for query {query!r} and offset {offset} returned"
+            f" {len(results)} papers."
         )
 
         # combine all the resulting doc objects into one and update the state
-        # there's only one doc per result, so we can just take the first one
-        all_docs = []
+        all_doc_details: list[DocDetails] = []
         for r in results:
-            this_doc = next(iter(r.docs.values()))
-            all_docs.append(this_doc)
+            # there's only one doc per result, so just take the first one
+            this_doc_details = cast(DocDetails, next(iter(r.docs.values())))
+            all_doc_details.append(this_doc_details)
             await state.docs.aadd_texts(
                 texts=r.texts,
-                doc=this_doc,
+                doc=this_doc_details,
                 settings=self.settings,
                 embedding_model=self.embedding_model,
             )
@@ -153,7 +154,9 @@ class PaperSearch(NamedTool):
         # mark how far we've searched so that continuation will start at the right place
         self.previous_searches[search_key] += self.settings.agent.search_count
         if self.settings.agent.return_paper_metadata:
-            retrieved_papers = "\n".join([f"{x.title} ({x.year})" for x in all_docs])
+            retrieved_papers = "\n".join(
+                [f"{x.title} ({x.year})" for x in all_doc_details]
+            )
             return f"Retrieved Papers:\n{retrieved_papers}\n\n{status}"
         return status
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-from collections.abc import Generator, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -59,9 +59,7 @@ def tmp_path_cleanup(tmp_path: Path) -> Iterator[Path]:
 
 
 @pytest.fixture
-def agent_home_dir(
-    tmp_path_cleanup: str | os.PathLike,
-) -> Generator[str | os.PathLike, None, None]:
+def agent_home_dir(tmp_path_cleanup: str | os.PathLike) -> Iterator[str | os.PathLike]:
     """Set up a unique temporary folder for the agent module."""
     with patch.dict("os.environ", {"PQA_HOME": str(tmp_path_cleanup)}):
         yield tmp_path_cleanup
@@ -79,11 +77,9 @@ def fixture_stub_data_dir() -> Path:
 
 @pytest.fixture
 def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
-    settings = Settings(
-        paper_directory=stub_data_dir,
-        index_directory=agent_index_dir,
-        embedding="sparse",
-    )
+    # NOTE: originally here we had usage of embedding="sparse", but this was
+    # shown to be too crappy of an embedding to get past the Obama article
+    settings = Settings(paper_directory=stub_data_dir, index_directory=agent_index_dir)
     settings.agent.search_count = 2
     settings.answer.answer_max_sources = 2
     settings.answer.evidence_k = 10
