@@ -431,9 +431,10 @@ class Settings(BaseSettings):
     manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(
-            "Optional manifest CSV, containing columns which are attributes for a"
-            " DocDetails object. Only 'file_location', 'doi', and 'title' will be used"
-            " when indexing."
+            "Optional absolute path to a manifest CSV, or a relative path from the"
+            " paper_directory to a manifest CSV. A manifest CSV contains columns which"
+            " are attributes for a DocDetails object. Only 'file_location', 'doi', and"
+            " 'title' will be used when indexing, others are discarded."
         ),
     )
     paper_directory: str | os.PathLike = Field(
