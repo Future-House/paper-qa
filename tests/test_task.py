@@ -84,7 +84,7 @@ class TestTaskDataset:
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
         evaluator = Evaluator(
-            config=EvaluatorConfig(batch_size=3),
+            config=EvaluatorConfig(batch_size=3, max_rollout_steps=10),
             agent=SimpleAgent(),
             dataset=dataset,
             callbacks=[metrics_callback],
