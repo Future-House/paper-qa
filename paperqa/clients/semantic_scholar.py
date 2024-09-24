@@ -108,7 +108,7 @@ class SematicScholarSearchType(IntEnum):
         raise NotImplementedError
 
 
-def s2_authors_match(authors: list[str], data: dict):
+def s2_authors_match(authors: list[str], data: dict) -> bool:
     """Check if the authors in the data match the authors in the paper."""
     AUTHOR_NAME_MIN_LENGTH = 2
     s2_authors_noinit = [
