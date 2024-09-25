@@ -433,8 +433,8 @@ async def get_directory_index(
     Args:
         index_name: Override on the name of the index. If unspecified, the default
             behavior is to generate the name from the input settings.
-        sync_index_w_directory: Sync the index with the directory (i.e. delete index
-            files if the file isn't in the source directory).
+        sync_index_w_directory: Sync the index (add or delete index files) with the
+            source paper directory.
         settings: Application settings.
     """
     _settings = get_settings(settings)
@@ -460,36 +460,39 @@ async def get_directory_index(
         manifest_file = directory / manifest_file
 
     metadata = await maybe_get_manifest(manifest_file)
-    valid_files = [
+    valid_paper_dir_files = [
         file
         async for file in (
             directory.rglob("*") if _settings.index_recursively else directory.iterdir()
         )
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
-    if len(valid_files) > WARN_IF_INDEXING_MORE_THAN:
+    if len(valid_paper_dir_files) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
-            f"Indexing {len(valid_files)} files. This may take a few minutes."
+            f"Indexing {len(valid_paper_dir_files)} files. This may take a few minutes."
         )
-    index_files = await search_index.index_files
+    # NOTE: if the index was not previously built, this will be empty.
+    # Otherwise, it will not be empty
+    index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
 
-    if missing := (set(index_files.keys()) - {str(f) for f in valid_files}):
+    if extra_index_files := (
+        index_unique_file_paths - {str(f) for f in valid_paper_dir_files}
+    ):
         if sync_index_w_directory:
-            for missing_file in missing:
+            for extra_file in extra_index_files:
                 logger.warning(
-                    f"[bold red]Removing {missing_file} from index.[/bold red]"
+                    f"[bold red]Removing {extra_file} from index.[/bold red]"
                 )
-                await search_index.remove_from_index(missing_file)
+                await search_index.remove_from_index(extra_file)
             logger.warning("[bold red]Files removed![/bold red]")
         else:
             logger.warning(
-                "[bold red]Indexed files are missing from index folder"
-                f" ({directory}).[/bold red]"
+                f"[bold red]Indexed files {extra_index_files} are missing from paper"
+                f" folder ({directory}).[/bold red]"
             )
-            logger.warning(f"[bold red]files: {missing}[/bold red]")
 
     async with anyio.create_task_group() as tg:
-        for file_path in valid_files:
+        for file_path in valid_paper_dir_files:
             if sync_index_w_directory:
                 tg.start_soon(
                     process_file,
@@ -500,7 +503,7 @@ async def get_directory_index(
                     _settings,
                 )
             else:
-                logger.debug(f"New file {file_path.name} found in directory.")
+                logger.debug(f"File {file_path.name} found in paper directory.")
 
     if search_index.changed:
         await search_index.save_index()
