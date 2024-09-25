@@ -19,47 +19,44 @@ from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
 
+LOG_VERBOSITY_MAP = {
+    0: {
+        "paperqa.agents": logging.INFO,
+        "paperqa.agents.helpers": logging.WARNING,
+        "paperqa.agents.main": logging.WARNING,
+        "paperqa.agents.main.agent_callers": logging.INFO,
+        "paperqa.agents.models": logging.WARNING,
+        "paperqa.agents.search": logging.INFO,
+        "anthropic": logging.WARNING,
+        "openai": logging.WARNING,
+        "httpx": logging.WARNING,
+        "LiteLLM": logging.WARNING,
+        "LiteLLM Router": logging.WARNING,
+        "LiteLLM Proxy": logging.WARNING,
+    }
+}
+LOG_VERBOSITY_MAP[1] = LOG_VERBOSITY_MAP[0] | {
+    "paperqa.models": logging.INFO,
+    "paperqa.agents.main": logging.INFO,
+}
+LOG_VERBOSITY_MAP[2] = LOG_VERBOSITY_MAP[1] | {
+    "paperqa.models": logging.DEBUG,
+    "paperqa.agents.helpers": logging.DEBUG,
+    "paperqa.agents.main": logging.DEBUG,
+    "paperqa.agents.main.agent_callers": logging.DEBUG,
+    "paperqa.agents.search": logging.DEBUG,
+    "LiteLLM": logging.INFO,
+    "LiteLLM Router": logging.INFO,
+    "LiteLLM Proxy": logging.INFO,
+}
+LOG_VERBOSITY_MAP[3] = LOG_VERBOSITY_MAP[2] | {
+    "LiteLLM": logging.DEBUG,  # <-- every single LLM call
+}
+
 
 def configure_cli_logging(verbosity: int = 0) -> None:
     """Suppress loquacious loggers according to verbosity level."""
     setup_default_logs()
-
-    verbosity_map = {
-        0: {
-            "paperqa.agents": logging.INFO,
-            "paperqa.agents.helpers": logging.WARNING,
-            "paperqa.agents.main": logging.WARNING,
-            "paperqa.agents.main.agent_callers": logging.INFO,
-            "anthropic": logging.WARNING,
-            "openai": logging.WARNING,
-            "httpx": logging.WARNING,
-            "paperqa.agents.models": logging.WARNING,
-            "paperqa.agents.search": logging.INFO,
-            "litellm": logging.WARNING,
-            "LiteLLM Router": logging.WARNING,
-            "LiteLLM Proxy": logging.WARNING,
-        }
-    }
-
-    verbosity_map[1] = verbosity_map[0] | {
-        "paperqa.agents.main": logging.INFO,
-        "paperqa.models": logging.INFO,
-    }
-
-    verbosity_map[2] = verbosity_map[1] | {
-        "paperqa.agents.helpers": logging.DEBUG,
-        "paperqa.agents.main": logging.DEBUG,
-        "paperqa.agents.main.agent_callers": logging.DEBUG,
-        "paperqa.models": logging.DEBUG,
-        "paperqa.agents.search": logging.DEBUG,
-        "litellm": logging.INFO,
-        "LiteLLM Router": logging.INFO,
-        "LiteLLM Proxy": logging.INFO,
-    }
-
-    verbosity_map[3] = verbosity_map[2] | {
-        "litellm": logging.DEBUG,  # <-- every single LLM call
-    }
 
     rich_handler = RichHandler(
         rich_tracebacks=True,
@@ -68,17 +65,15 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         show_level=False,
         console=Console(force_terminal=True),
     )
-
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
 
     module_logger = logging.getLogger(__name__.split(".", maxsplit=1)[0])
-
     if not any(isinstance(h, RichHandler) for h in module_logger.handlers):
         module_logger.addHandler(rich_handler)
 
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
-            log_level := verbosity_map.get(min(verbosity, 2), {}).get(logger_name)
+            log_level := LOG_VERBOSITY_MAP.get(min(verbosity, 2), {}).get(logger_name)
         ):
             logger_.setLevel(log_level)
 
