@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import csv
 import json
 import logging
@@ -8,7 +9,7 @@ import pathlib
 import pickle
 import warnings
 import zlib
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Collection, Sequence
 from enum import StrEnum, auto
 from io import StringIO
 from typing import TYPE_CHECKING, Any, ClassVar, cast
@@ -16,6 +17,15 @@ from uuid import UUID
 
 import anyio
 from pydantic import BaseModel
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    TaskProgressColumn,
+    TextColumn,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+)
 from tantivy import (  # pylint: disable=no-name-in-module
     Document,
     Index,
@@ -374,6 +384,7 @@ async def process_file(
     manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
+    progress_bar_update: Callable[[], Awaitable] | None = None,
 ) -> None:
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
@@ -413,6 +424,8 @@ async def process_file(
                     f"Error parsing {file_location}, skipping index for this file."
                 )
                 await search_index.mark_failed_document(file_location)
+                if progress_bar_update:
+                    await progress_bar_update()
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
@@ -434,8 +447,49 @@ async def process_file(
             )
             logger.info(f"Complete ({title}).")
 
+        # Update progress bar for either a new or previously indexed file
+        if progress_bar_update:
+            await progress_bar_update()
+
 
 WARN_IF_INDEXING_MORE_THAN = 999
+ENV_VAR_MATCH: Collection[str] = {"1", "true"}
+
+
+def _make_progress_bar_update(
+    sync_index_w_directory: bool, total: int
+) -> tuple[contextlib.AbstractContextManager, Callable[[], Awaitable] | None]:
+    # Disable should override enable
+    env_var_disable = (
+        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+    )
+    env_var_enable = (
+        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+    )
+    try:
+        is_cli = is_running_under_cli()  # pylint: disable=used-before-assignment
+    except NameError:  # Work around circular import
+        from . import is_running_under_cli
+
+        is_cli = is_running_under_cli()
+
+    if sync_index_w_directory and not env_var_disable and (is_cli or env_var_enable):
+        # Progress.get_default_columns with a few more
+        progress = Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TimeElapsedColumn(),
+            MofNCompleteColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+        )
+        task_id = progress.add_task("Indexing...", total=total)
+
+        async def progress_bar_update() -> None:
+            progress.update(task_id, advance=1)
+
+        return progress, progress_bar_update
+    return contextlib.nullcontext(), None
 
 
 async def get_directory_index(  # noqa: PLR0912
@@ -532,21 +586,26 @@ async def get_directory_index(  # noqa: PLR0912
             )
 
     semaphore = anyio.Semaphore(index_settings.concurrency)
-    async with anyio.create_task_group() as tg:
-        for rel_file_path in valid_papers_rel_file_paths:
-            if index_settings.sync_with_paper_directory:
-                tg.start_soon(
-                    process_file,
-                    rel_file_path,
-                    search_index,
-                    manifest,
-                    semaphore,
-                    _settings,
-                )
-            else:
-                logger.debug(
-                    f"File {rel_file_path} found in paper directory {paper_directory}."
-                )
+    progress_bar, progress_bar_update_fn = _make_progress_bar_update(
+        index_settings.sync_with_paper_directory, total=len(valid_papers_rel_file_paths)
+    )
+    with progress_bar:
+        async with anyio.create_task_group() as tg:
+            for rel_file_path in valid_papers_rel_file_paths:
+                if index_settings.sync_with_paper_directory:
+                    tg.start_soon(
+                        process_file,
+                        rel_file_path,
+                        search_index,
+                        manifest,
+                        semaphore,
+                        _settings,
+                        progress_bar_update_fn,
+                    )
+                else:
+                    logger.debug(
+                        f"File {rel_file_path} found in paper directory {paper_directory}."
+                    )
 
     if search_index.changed:
         await search_index.save_index()
