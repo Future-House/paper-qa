@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
+from uuid import uuid4
 
 import ldp.agent
 import pytest
@@ -38,7 +39,11 @@ from paperqa.utils import extract_thought, get_year, md5sum
 
 @pytest.mark.asyncio
 async def test_get_directory_index(agent_test_settings: Settings) -> None:
-    index = await get_directory_index(settings=agent_test_settings)
+    index_name = f"stub{uuid4()}"  # Unique across tests
+    index = await get_directory_index(
+        index_name=index_name, settings=agent_test_settings
+    )
+    assert index.index_name == index_name, "Index name should match its specification"
     assert index.fields == [
         "file_location",
         "body",
