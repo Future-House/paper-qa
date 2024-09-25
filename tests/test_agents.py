@@ -41,7 +41,9 @@ from paperqa.utils import extract_thought, get_year, md5sum
 
 @pytest.mark.asyncio
 async def test_get_directory_index(agent_test_settings: Settings) -> None:
-    # Use a tempdir here so we can delete files without affecting concurrent tests
+    # Since agent_test_settings is used by other tests, and thus uses the same
+    # paper_directory as other tests, we use a tempdir so we can delete files
+    # without affecting concurrent tests
     with tempfile.TemporaryDirectory() as tempdir:
         shutil.copytree(
             agent_test_settings.paper_directory, tempdir, dirs_exist_ok=True
