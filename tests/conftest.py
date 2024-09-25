@@ -17,7 +17,8 @@ from paperqa.settings import Settings
 from paperqa.types import Answer
 from paperqa.utils import setup_default_logs
 
-PAPER_DIRECTORY = Path(__file__).parent
+TESTS_DIR = Path(__file__).parent
+CASSETTES_DIR = TESTS_DIR / "cassettes"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -46,7 +47,7 @@ def fixture_vcr_config() -> dict[str, Any]:
         ],
         "match_on": ["method", "host", "path", "query"],
         "allow_playback_repeats": True,
-        "cassette_library_dir": "tests/cassettes",
+        "cassette_library_dir": str(CASSETTES_DIR),
     }
 
 
