@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import csv
 import json
 import logging
@@ -7,7 +8,7 @@ import os
 import pathlib
 import pickle
 import zlib
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Collection, Sequence
 from enum import StrEnum, auto
 from io import StringIO
 from typing import Any, ClassVar, cast
@@ -15,6 +16,7 @@ from uuid import UUID
 
 import anyio
 from pydantic import BaseModel
+from rich.progress import Progress
 from tantivy import (  # pylint: disable=no-name-in-module
     Document,
     Index,
@@ -367,6 +369,7 @@ async def process_file(
     metadata: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
+    progress_bar_update: Callable[[], Awaitable] | None = None,
 ) -> None:
     async with semaphore:
         file_name = file_path.name
@@ -394,6 +397,8 @@ async def process_file(
                     str(file_path)
                 ] = FAILED_DOCUMENT_ADD_ID
                 await search_index.save_index()
+                if progress_bar_update:
+                    await progress_bar_update()
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
@@ -416,8 +421,41 @@ async def process_file(
             await search_index.save_index()
             logger.info(f"Complete ({title}).")
 
+        # Update progress bar for either a new or previously indexed file
+        if progress_bar_update:
+            await progress_bar_update()
+
 
 WARN_IF_INDEXING_MORE_THAN = 999
+ENV_VAR_MATCH: Collection[str] = {"1", "true"}
+
+
+def _make_progress_bar_update(
+    sync_index_w_directory: bool, total: int
+) -> tuple[contextlib.AbstractContextManager, Callable[[], Awaitable] | None]:
+    # Disable should override enable
+    env_var_disable = (
+        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+    )
+    env_var_enable = (
+        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+    )
+    try:
+        is_cli = is_running_under_cli()  # pylint: disable=used-before-assignment
+    except NameError:  # Work around circular import
+        from . import is_running_under_cli
+
+        is_cli = is_running_under_cli()
+
+    if sync_index_w_directory and not env_var_disable and (is_cli or env_var_enable):
+        progress = Progress()
+        task_id = progress.add_task("Indexing...", total=total)
+
+        async def progress_bar_update() -> None:
+            progress.update(task_id, advance=1)
+
+        return progress, progress_bar_update
+    return contextlib.nullcontext(), None
 
 
 async def get_directory_index(
@@ -491,19 +529,24 @@ async def get_directory_index(
                 f" folder ({directory}).[/bold red]"
             )
 
-    async with anyio.create_task_group() as tg:
-        for file_path in valid_paper_dir_files:
-            if sync_index_w_directory:
-                tg.start_soon(
-                    process_file,
-                    file_path,
-                    search_index,
-                    metadata,
-                    semaphore,
-                    _settings,
-                )
-            else:
-                logger.debug(f"File {file_path.name} found in paper directory.")
+    progress_bar, progress_bar_update_fn = _make_progress_bar_update(
+        sync_index_w_directory, total=len(valid_paper_dir_files)
+    )
+    with progress_bar:
+        async with anyio.create_task_group() as tg:
+            for file_path in valid_paper_dir_files:
+                if sync_index_w_directory:
+                    tg.start_soon(
+                        process_file,
+                        file_path,
+                        search_index,
+                        metadata,
+                        semaphore,
+                        _settings,
+                        progress_bar_update_fn,
+                    )
+                else:
+                    logger.debug(f"File {file_path.name} found in paper directory.")
 
     if search_index.changed:
         await search_index.save_index()
