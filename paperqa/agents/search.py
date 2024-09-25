@@ -343,7 +343,7 @@ async def maybe_get_manifest(
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
             records = [DocDetails(**row) for row in csv.DictReader(StringIO(content))]
-            logger.info(
+            logger.debug(
                 f"Found manifest file at {filename} and read {len(records)} records"
                 " from it."
             )
