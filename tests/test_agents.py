@@ -3,6 +3,8 @@ from __future__ import annotations
 import itertools
 import json
 import re
+import shutil
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, cast
@@ -39,26 +41,54 @@ from paperqa.utils import extract_thought, get_year, md5sum
 
 @pytest.mark.asyncio
 async def test_get_directory_index(agent_test_settings: Settings) -> None:
-    index_name = f"stub{uuid4()}"  # Unique across tests
-    index = await get_directory_index(
-        index_name=index_name, settings=agent_test_settings
-    )
-    assert index.index_name == index_name, "Index name should match its specification"
-    assert index.fields == [
-        "file_location",
-        "body",
-        "title",
-        "year",
-    ], "Incorrect fields in index"
-    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
-    # but empty.txt fails to be added
-    path_to_id = await index.index_files
-    assert (
-        sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
-    ), "Incorrect number of parsed index files"
-    results = await index.query(query="who is Frederick Bates?")
-    paper_dir = cast(Path, agent_test_settings.paper_directory)
-    assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
+    # Use a tempdir here so we can delete files without affecting concurrent tests
+    with tempfile.TemporaryDirectory() as tempdir:
+        shutil.copytree(
+            agent_test_settings.paper_directory, tempdir, dirs_exist_ok=True
+        )
+        paper_dir = agent_test_settings.paper_directory = Path(tempdir)
+
+        index_name = f"stub{uuid4()}"  # Unique across test invocations
+        index = await get_directory_index(
+            index_name=index_name, settings=agent_test_settings
+        )
+        assert (
+            index.index_name == index_name
+        ), "Index name should match its specification"
+        assert index.fields == [
+            "file_location",
+            "body",
+            "title",
+            "year",
+        ], "Incorrect fields in index"
+        # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
+        # but empty.txt fails to be added
+        path_to_id = await index.index_files
+        assert (
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
+        ), "Incorrect number of parsed index files"
+        results = await index.query(query="who is Frederick Bates?")
+        assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
+
+        # Check getting the same index name will not reprocess files
+        with patch.object(Docs, "aadd") as mock_aadd:
+            index = await get_directory_index(
+                index_name=index_name, settings=agent_test_settings
+            )
+        assert len(await index.index_files) == len(path_to_id)
+        mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
+
+        # Now we actually remove (but not add!) a file from the paper directory,
+        # and we still don't reprocess files
+        (paper_dir / "obama.txt").unlink()
+        with patch.object(
+            Docs, "aadd", autospec=True, side_effect=Docs.aadd
+        ) as mock_aadd:
+            index = await get_directory_index(
+                index_name=index_name, settings=agent_test_settings
+            )
+        assert len(await index.index_files) == len(path_to_id) - 1
+        mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
 
 @pytest.mark.asyncio
