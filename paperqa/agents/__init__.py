@@ -53,11 +53,16 @@ LOG_VERBOSITY_MAP[3] = LOG_VERBOSITY_MAP[2] | {
     "LiteLLM": logging.DEBUG,  # <-- every single LLM call
 }
 
+_PAPERQA_ROOT_LOGGER = logging.getLogger(__name__.split(".", maxsplit=1)[0])
 
-def configure_cli_logging(verbosity: int = 0) -> None:
-    """Suppress loquacious loggers according to verbosity level."""
-    setup_default_logs()
 
+def is_running_under_cli() -> bool:
+    """Check if the current Python process comes from the CLI."""
+    return any(isinstance(h, RichHandler) for h in _PAPERQA_ROOT_LOGGER.handlers)
+
+
+def set_up_rich_handler() -> None:
+    """Add a RichHandler to the paper-qa "root" logger."""
     rich_handler = RichHandler(
         rich_tracebacks=True,
         markup=True,
@@ -66,10 +71,14 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         console=Console(force_terminal=True),
     )
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
+    if not is_running_under_cli():
+        _PAPERQA_ROOT_LOGGER.addHandler(rich_handler)
 
-    module_logger = logging.getLogger(__name__.split(".", maxsplit=1)[0])
-    if not any(isinstance(h, RichHandler) for h in module_logger.handlers):
-        module_logger.addHandler(rich_handler)
+
+def configure_cli_logging(verbosity: int = 0) -> None:
+    """Suppress loquacious loggers according to verbosity level."""
+    setup_default_logs()
+    set_up_rich_handler()
 
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
