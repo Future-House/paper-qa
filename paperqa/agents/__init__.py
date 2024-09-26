@@ -6,7 +6,6 @@ import os
 from typing import Any
 
 from pydantic_settings import CliSettingsSource
-from rich.console import Console
 from rich.logging import RichHandler
 
 from paperqa.settings import Settings, get_settings
@@ -64,11 +63,7 @@ def is_running_under_cli() -> bool:
 def set_up_rich_handler() -> None:
     """Add a RichHandler to the paper-qa "root" logger."""
     rich_handler = RichHandler(
-        rich_tracebacks=True,
-        markup=True,
-        show_path=False,
-        show_level=False,
-        console=Console(force_terminal=True),
+        rich_tracebacks=True, markup=True, show_path=False, show_level=False
     )
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
     if not is_running_under_cli():
