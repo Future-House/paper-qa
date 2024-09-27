@@ -15,4 +15,11 @@
   "pre-commit": {
     enabled: true,
   },
+  packageRules: [
+    {
+      // Allow 'widen' range strategy while matching aviary_internal pyproject.toml
+      matchPackageNames: ["openai"],
+      allowedVersions: "<1.47",
+    },
+  ],
 }
