@@ -391,7 +391,7 @@ class LiteLLMModel(LLMModel):
                         ),
                     }
                 ],
-                "router_kwargs": {"num_retries": 3, "retry_after": 5},
+                "router_kwargs": {"num_retries": 3, "retry_after": 5, "timeout": 60},
             }
         # we only support one "model name" for now, here we validate
         model_list = data["config"]["model_list"]
