@@ -1,6 +1,10 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
+  extends: [
+    "config:recommended",
+    "group:allNonMajor", // Rely on config:recommended for major version updates
+    ":automergeMinor",
+  ],
   schedule: ["* 2 * * 1"],
   prHourlyLimit: 4,
   timezone: "America/Los_Angeles",
@@ -13,16 +17,9 @@
   },
   packageRules: [
     {
-      matchUpdateTypes: ["lockFileMaintenance"],
-      automerge: true,
-    },
-    {
-      // group:allNonMajor, with automerge
-      groupName: "all non-major dependencies",
-      groupSlug: "all-minor-patch",
-      matchPackageNames: ["*"],
-      matchUpdateTypes: ["minor", "patch"],
-      automerge: true,
+      // Allow 'widen' range strategy while matching aviary_internal pyproject.toml
+      matchPackageNames: ["openai"],
+      allowedVersions: "<1.47",
     },
   ],
 }
