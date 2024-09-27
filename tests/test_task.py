@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from aviary.env import TASK_DATASET_REGISTRY, TaskDataset
+from aviary.env import TASK_DATASET_REGISTRY, TaskConfig, TaskDataset
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
@@ -78,9 +78,26 @@ class TestTaskDataset:
     @pytest.mark.asyncio
     async def test_evaluation(self, base_query_request: QueryRequest) -> None:
         docs = Docs()
-        dataset = TaskDataset.from_name(
-            STUB_TASK_DATASET_NAME, base_query=base_query_request, base_docs=docs
+        # Why are we constructing a TaskConfig here using a serialized QueryRequest and
+        # Docs? It's to confirm everything works as if hydrating from a YAML config file
+        task_config = TaskConfig(
+            name=STUB_TASK_DATASET_NAME,
+            eval_kwargs={
+                "base_query": base_query_request.model_dump(
+                    exclude={"id", "settings", "docs_name"}
+                ),
+                "base_docs": docs.model_dump(
+                    exclude={
+                        "id",
+                        "docnames",
+                        "texts_index",
+                        "index_path",
+                        "deleted_dockeys",
+                    }
+                ),
+            },
         )
+        dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
         evaluator = Evaluator(
