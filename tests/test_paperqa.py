@@ -814,10 +814,14 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     )
 
 
-# vcr.VCR default: ('method', 'scheme', 'host', 'port', 'path', 'query')
-# this is the default list + body
-# Adding body won't create new cassettes; it just helps vcr correctly match the right request with its response.
-@pytest.mark.vcr(match_on=["method", "scheme", "host", "port", "path", "query", "body"])
+# SEE: https://github.com/kevin1024/vcrpy/blob/v6.0.1/vcr/config.py#L43
+VCR_DEFAULT_MATCH_ON = "method", "scheme", "host", "port", "path", "query"
+
+
+# some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)
+# body will always be different between requests
+# adding body so that vcr correctly match the right request with its response.
+@pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
 def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(
@@ -829,10 +833,7 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
-    assert doc_details.dockey in {
-        "41f786fcc56d27ff0c1507153fae3774",  # From file contents
-        "5300ef1d5fb960d7",  # Or from crossref data
-    }
+    assert doc_details.dockey == "5300ef1d5fb960d7"
     assert isinstance(doc_details, DocDetails)
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
