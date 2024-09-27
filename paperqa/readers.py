@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from math import ceil
 from pathlib import Path
 from typing import Literal, overload
@@ -85,7 +86,10 @@ def chunk_pdf(
 
 
 def parse_text(
-    path: Path, html: bool = False, split_lines: bool = False, use_tiktoken: bool = True
+    path: str | os.PathLike,
+    html: bool = False,
+    split_lines: bool = False,
+    use_tiktoken: bool = True,
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -95,6 +99,7 @@ def parse_text(
         split_lines: flag to split lines into a list.
         use_tiktoken: flag to use tiktoken library to encode text.
     """
+    path = Path(path)
     try:
         with path.open() as f:
             text = list(f) if split_lines else f.read()
