@@ -81,9 +81,12 @@ def configure_cli_logging(verbosity: int = 0) -> None:
     setup_default_logs()
     set_up_rich_handler()
 
+    max_preset_verbosity: int = max(list(LOG_VERBOSITY_MAP.keys()))
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
-            log_level := LOG_VERBOSITY_MAP.get(min(verbosity, 2), {}).get(logger_name)
+            log_level := LOG_VERBOSITY_MAP.get(
+                min(verbosity, max_preset_verbosity), {}
+            ).get(logger_name)
         ):
             logger_.setLevel(log_level)
 
