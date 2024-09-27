@@ -815,8 +815,8 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
 
 # default: ['method', 'scheme', 'host', 'port', 'path', 'query']
 # this is the default list + body
-# this ensures vcr distinguishes requests with a different body, preventing mismatched responses.
-@pytest.mark.vcr(match_on=['method', 'scheme', 'host', 'port', 'path', 'query', 'body'], record_mode="once")
+# this ensures vcr distinguishes requests with a different body
+@pytest.mark.vcr(match_on=['method', 'scheme', 'host', 'port', 'path', 'query', 'body'])
 def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(
