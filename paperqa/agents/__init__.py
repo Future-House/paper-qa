@@ -53,15 +53,16 @@ LOG_VERBOSITY_MAP[3] = LOG_VERBOSITY_MAP[2] | {
     "LiteLLM": logging.DEBUG,  # <-- every single LLM call
 }
 
-_PAPERQA_ROOT_LOGGER = logging.getLogger(__name__.split(".", maxsplit=1)[0])
+_PAPERQA_PKG_ROOT_LOGGER = logging.getLogger(__name__.split(".", maxsplit=1)[0])
+_INITIATED_FROM_CLI = False
 
 
 def is_running_under_cli() -> bool:
     """Check if the current Python process comes from the CLI."""
-    return any(isinstance(h, RichHandler) for h in _PAPERQA_ROOT_LOGGER.handlers)
+    return _INITIATED_FROM_CLI
 
 
-def set_up_rich_handler() -> RichHandler:
+def set_up_rich_handler(install: bool = True) -> RichHandler:
     """Add a RichHandler to the paper-qa "root" logger, and return it."""
     rich_handler = RichHandler(
         rich_tracebacks=True,
@@ -71,8 +72,10 @@ def set_up_rich_handler() -> RichHandler:
         console=Console(force_terminal=True),
     )
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
-    if not is_running_under_cli():
-        _PAPERQA_ROOT_LOGGER.addHandler(rich_handler)
+    if install and not any(
+        isinstance(h, RichHandler) for h in _PAPERQA_PKG_ROOT_LOGGER.handlers
+    ):
+        _PAPERQA_PKG_ROOT_LOGGER.addHandler(rich_handler)
     return rich_handler
 
 
@@ -166,8 +169,8 @@ def save_settings(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="PaperQA CLI")
 
+    parser = argparse.ArgumentParser(description="PaperQA CLI")
     parser.add_argument(
         "--settings",
         "-s",
@@ -177,7 +180,6 @@ def main() -> None:
             " last"
         ),
     )
-
     parser.add_argument(
         "--index", "-i", default="default", help="Index name to search or create"
     )
@@ -187,6 +189,7 @@ def main() -> None:
     )
 
     subparsers.add_parser("view", help="View the chosen settings")
+
     save_parser = subparsers.add_parser("save", help="View the chosen settings")
     save_parser.add_argument(
         "location", help="Location for new settings (name or an absolute path)"
@@ -244,4 +247,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    _INITIATED_FROM_CLI = True
     main()
