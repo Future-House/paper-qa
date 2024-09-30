@@ -46,14 +46,13 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
     # without affecting concurrent tests
     with tempfile.TemporaryDirectory() as tempdir:
         shutil.copytree(
-            agent_test_settings.paper_directory, tempdir, dirs_exist_ok=True
+            agent_test_settings.agent.index.paper_directory, tempdir, dirs_exist_ok=True
         )
-        paper_dir = agent_test_settings.paper_directory = Path(tempdir)
+        paper_dir = agent_test_settings.agent.index.paper_directory = Path(tempdir)
 
         index_name = f"stub{uuid4()}"  # Unique across test invocations
-        index = await get_directory_index(
-            index_name=index_name, settings=agent_test_settings
-        )
+        agent_test_settings.agent.index.name = index_name
+        index = await get_directory_index(settings=agent_test_settings)
         assert (
             index.index_name == index_name
         ), "Index name should match its specification"
@@ -74,9 +73,7 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
 
         # Check getting the same index name will not reprocess files
         with patch.object(Docs, "aadd") as mock_aadd:
-            index = await get_directory_index(
-                index_name=index_name, settings=agent_test_settings
-            )
+            index = await get_directory_index(settings=agent_test_settings)
         assert len(await index.index_files) == len(path_to_id)
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
@@ -86,9 +83,7 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         with patch.object(
             Docs, "aadd", autospec=True, side_effect=Docs.aadd
         ) as mock_aadd:
-            index = await get_directory_index(
-                index_name=index_name, settings=agent_test_settings
-            )
+            index = await get_directory_index(settings=agent_test_settings)
         assert len(await index.index_files) == len(path_to_id) - 1
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
@@ -97,7 +92,7 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
 async def test_get_directory_index_w_manifest(
     agent_test_settings: Settings, reset_log_levels, caplog  # noqa: ARG001
 ) -> None:
-    agent_test_settings.manifest_file = "stub_manifest.csv"
+    agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
     index = await get_directory_index(settings=agent_test_settings)
     assert index.fields == [
         "file_location",
@@ -109,7 +104,7 @@ async def test_get_directory_index_w_manifest(
     assert len(await index.index_files) == 5, "Incorrect number of index files"
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
-    paper_dir = cast(Path, agent_test_settings.paper_directory)
+    paper_dir = cast(Path, agent_test_settings.agent.index.paper_directory)
     assert top_result.dockey == md5sum((paper_dir / "bates.txt").absolute())
     # note: this title comes from the manifest, so we know it worked
     assert top_result.title == "Frederick Bates (Wikipedia article)"

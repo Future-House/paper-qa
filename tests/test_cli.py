@@ -39,8 +39,8 @@ def test_can_modify_settings() -> None:
 
 def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
     settings = Settings.from_name("debug")
-    settings.index_directory = agent_index_dir
-    settings.paper_directory = stub_data_dir
+    settings.agent.index.index_directory = agent_index_dir
+    settings.agent.index.paper_directory = stub_data_dir
     response = ask(
         "How can you use XAI for chemical property prediction?", settings=settings
     )
@@ -60,7 +60,7 @@ def test_cli_can_build_and_search_index(
     agent_index_dir: Path, stub_data_dir: Path
 ) -> None:
     settings = Settings.from_name("debug")
-    settings.index_directory = agent_index_dir
+    settings.agent.index.index_directory = agent_index_dir
     index_name = "test"
     build_index(index_name, stub_data_dir, settings)
     search_result = search_query("XAI", index_name, settings)

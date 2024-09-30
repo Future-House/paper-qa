@@ -6,11 +6,12 @@ import logging
 import os
 import pathlib
 import pickle
+import warnings
 import zlib
 from collections.abc import Sequence
 from enum import StrEnum, auto
 from io import StringIO
-from typing import Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 from uuid import UUID
 
 import anyio
@@ -31,11 +32,14 @@ from tenacity import (
 )
 
 from paperqa.docs import Docs
-from paperqa.settings import MaybeSettings, Settings, get_settings
+from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
+
+if TYPE_CHECKING:
+    from paperqa.settings import MaybeSettings, Settings
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +109,7 @@ class SearchIndex:
                 f"{self.REQUIRED_FIELDS} must be included in search index fields."
             )
         if index_directory is None:
-            index_directory = Settings.model_fields["index_directory"].default
+            index_directory = IndexSettings.model_fields["index_directory"].default
         self.index_name = index_name
         self._index_directory = index_directory
         self._schema = None
@@ -431,39 +435,57 @@ async def get_directory_index(
     This function only reads from the source directory, not edits or writes to it.
 
     Args:
-        index_name: Override on the name of the index. If unspecified, the default
-            behavior is to generate the name from the input settings.
+        index_name: Deprecated override on the name of the index. If unspecified,
+            the default behavior is to generate the name from the input settings.
         sync_index_w_directory: Sync the index (add or delete index files) with the
             source paper directory.
         settings: Application settings.
     """
     _settings = get_settings(settings)
+    index_settings = _settings.agent.index
+    semaphore = anyio.Semaphore(index_settings.concurrency)
+    paper_directory = await index_settings.finalize_paper_directory()
 
-    semaphore = anyio.Semaphore(_settings.agent.index_concurrency)
-    directory = anyio.Path(_settings.paper_directory)
-
-    if _settings.index_absolute_directory:
-        directory = await directory.absolute()
+    if index_name:
+        warnings.warn(
+            (
+                f"The index_name argument has been moved to"
+                f" {type(_settings.agent.index).__name__},"
+                " this deprecation will conclude in version 6."
+            ),
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        index_settings.name = index_name
+    del index_name
+    if not sync_index_w_directory:
+        warnings.warn(
+            (
+                f"The sync_index_w_directory argument has been moved to"
+                f" {type(_settings.agent.index).__name__},"
+                " this deprecation will conclude in version 6."
+            ),
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        index_settings.sync_with_paper_directory = sync_index_w_directory
+    del sync_index_w_directory
 
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
-        index_name=index_name or _settings.get_index_name(),
-        index_directory=_settings.index_directory,
+        index_name=index_settings.name or _settings.get_index_name(),
+        index_directory=index_settings.index_directory,
     )
 
-    manifest_file = (
-        anyio.Path(_settings.manifest_file) if _settings.manifest_file else None
+    metadata = await maybe_get_manifest(
+        filename=await index_settings.finalize_manifest_file(paper_directory)
     )
-    if manifest_file and not await manifest_file.exists():
-        # If the manifest file was specified but doesn't exist,
-        # perhaps it was specified as a relative path from the paper_directory
-        manifest_file = directory / manifest_file
-
-    metadata = await maybe_get_manifest(manifest_file)
     valid_paper_dir_files = [
         file
         async for file in (
-            directory.rglob("*") if _settings.index_recursively else directory.iterdir()
+            paper_directory.rglob("*")
+            if index_settings.recurse_subdirectories
+            else paper_directory.iterdir()
         )
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
@@ -478,7 +500,7 @@ async def get_directory_index(
     if extra_index_files := (
         index_unique_file_paths - {str(f) for f in valid_paper_dir_files}
     ):
-        if sync_index_w_directory:
+        if index_settings.sync_with_paper_directory:
             for extra_file in extra_index_files:
                 logger.warning(
                     f"[bold red]Removing {extra_file} from index.[/bold red]"
@@ -488,12 +510,12 @@ async def get_directory_index(
         else:
             logger.warning(
                 f"[bold red]Indexed files {extra_index_files} are missing from paper"
-                f" folder ({directory}).[/bold red]"
+                f" folder ({paper_directory}).[/bold red]"
             )
 
     async with anyio.create_task_group() as tg:
         for file_path in valid_paper_dir_files:
-            if sync_index_w_directory:
+            if index_settings.sync_with_paper_directory:
                 tg.start_soon(
                     process_file,
                     file_path,
