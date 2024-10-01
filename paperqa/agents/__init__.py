@@ -121,7 +121,7 @@ def search_query(
         index_search(
             query,
             index_name=index_name,
-            index_directory=settings.index_directory,
+            index_directory=settings.agent.index.index_directory,
         )
     )
 
@@ -134,13 +134,13 @@ def build_index(
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
     settings = get_settings(settings)
     if index_name == "default":
-        index_name = None
+        settings.agent.index.name = None
+    elif isinstance(index_name, str):
+        settings.agent.index.name = index_name
     configure_cli_logging(verbosity=settings.verbosity)
     if directory:
-        settings.paper_directory = directory
-    return get_loop().run_until_complete(
-        get_directory_index(index_name=index_name, settings=settings)
-    )
+        settings.agent.index.paper_directory = directory
+    return get_loop().run_until_complete(get_directory_index(settings=settings))
 
 
 def save_settings(
