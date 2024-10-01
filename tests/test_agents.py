@@ -21,7 +21,7 @@ from ldp.llms import EmbeddingModel, MultipleCompletionLLMModel
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
-from paperqa.agents import agent_query
+from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import settings_to_tools
 from paperqa.agents.main import FAKE_AGENT_TYPE
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
@@ -52,7 +52,10 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
 
         index_name = f"stub{uuid4()}"  # Unique across test invocations
         agent_test_settings.agent.index.name = index_name
-        index = await get_directory_index(settings=agent_test_settings)
+        with patch.object(
+            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
+        ) as mock_save_index:
+            index = await get_directory_index(settings=agent_test_settings)
         assert (
             index.index_name == index_name
         ), "Index name should match its specification"
@@ -62,6 +65,8 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
             "title",
             "year",
         ], "Incorrect fields in index"
+        mock_save_index.assert_awaited_once(), "Expected just one save"
+        assert not index.changed, "Expected index to not have changes at this point"
         # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
         # but empty.txt fails to be added
         path_to_id = await index.index_files

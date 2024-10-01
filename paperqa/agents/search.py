@@ -288,6 +288,7 @@ class SearchIndex:
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
+        self.changed = False
 
     async def get_saved_object(
         self, file_location: str, keep_filenames: bool = False
@@ -418,7 +419,6 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
-            await search_index.save_index()
             logger.info(f"Complete ({title}).")
 
 
