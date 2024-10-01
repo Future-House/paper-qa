@@ -27,7 +27,7 @@ from paperqa.types import Answer
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
 from .models import AgentStatus, AnswerResponse, QueryRequest, SimpleProfiler
-from .search import SearchDocumentStorage, SearchIndex
+from .search import SearchDocumentStorage, SearchIndex, get_directory_index
 from .tools import EnvironmentState, GatherEvidence, GenerateAnswer, PaperSearch
 
 if TYPE_CHECKING:
@@ -51,7 +51,7 @@ async def agent_query(
     if docs is None:
         docs = Docs()
 
-    search_index = SearchIndex(
+    answers_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
         index_directory=query.settings.agent.index.index_directory,
@@ -63,7 +63,7 @@ async def agent_query(
 
     agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
 
-    await search_index.add_document(
+    await answers_index.add_document(
         {
             "file_location": str(response.answer.id),
             "body": response.answer.answer,
@@ -71,7 +71,7 @@ async def agent_query(
         },
         document=response,
     )
-    await search_index.save_index()
+    await answers_index.save_index()
     return response
 
 
@@ -106,6 +106,8 @@ async def run_agent(
         f" query {query.model_dump()}."
     )
 
+    # Build the index once here, and then all tools won't need to rebuild it
+    await get_directory_index(settings=query.settings)
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):
@@ -288,7 +290,7 @@ async def index_search(
     fields = [*SearchIndex.REQUIRED_FIELDS]
     if index_name == "answers":
         fields.append("question")
-    search_index = SearchIndex(
+    index_to_query = SearchIndex(
         fields=fields,
         index_name=index_name,
         index_directory=index_directory,
@@ -301,15 +303,14 @@ async def index_search(
 
     results = [
         (AnswerResponse(**a[0]) if index_name == "answers" else a[0], a[1])
-        for a in await search_index.query(query=query, keep_filenames=True)
+        for a in await index_to_query.query(query=query, keep_filenames=True)
     ]
-
     if results:
         console = Console(record=True)
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        count = await search_index.count
-        agent_logger.info(f"No results found. Searched {count} docs")
+        count = await index_to_query.count
+        agent_logger.info(f"No results found. Searched {count} docs.")
 
     return results

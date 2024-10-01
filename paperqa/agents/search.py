@@ -423,10 +423,11 @@ async def process_file(
 WARN_IF_INDEXING_MORE_THAN = 999
 
 
-async def get_directory_index(
+async def get_directory_index(  # noqa: PLR0912
     index_name: str | None = None,
     sync_index_w_directory: bool = True,
     settings: MaybeSettings = None,
+    build: bool = True,
 ) -> SearchIndex:
     """
     Create a Tantivy index by reading from a directory of text files.
@@ -436,15 +437,14 @@ async def get_directory_index(
     Args:
         index_name: Deprecated override on the name of the index. If unspecified,
             the default behavior is to generate the name from the input settings.
-        sync_index_w_directory: Sync the index (add or delete index files) with the
-            source paper directory.
+        sync_index_w_directory: Opt-out flag to sync the index (add or delete index
+            files) with the source paper directory.
         settings: Application settings.
+        build: Opt-out flag (default is True) to read the contents of the source paper
+            directory and if sync_index_w_directory is enabled also update the index.
     """
     _settings = get_settings(settings)
     index_settings = _settings.agent.index
-    semaphore = anyio.Semaphore(index_settings.concurrency)
-    paper_directory = await index_settings.finalize_paper_directory()
-
     if index_name:
         warnings.warn(
             (
@@ -457,6 +457,17 @@ async def get_directory_index(
         )
         index_settings.name = index_name
     del index_name
+
+    search_index = SearchIndex(
+        fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
+        index_name=index_settings.name or _settings.get_index_name(),
+        index_directory=index_settings.index_directory,
+    )
+    # NOTE: if the index was not previously built, its index_files will be empty.
+    # Otherwise, the index_files will not be empty
+    if not build:
+        return search_index
+
     if not sync_index_w_directory:
         warnings.warn(
             (
@@ -470,12 +481,7 @@ async def get_directory_index(
         index_settings.sync_with_paper_directory = sync_index_w_directory
     del sync_index_w_directory
 
-    search_index = SearchIndex(
-        fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
-        index_name=index_settings.name or _settings.get_index_name(),
-        index_directory=index_settings.index_directory,
-    )
-
+    paper_directory = await index_settings.finalize_paper_directory()
     metadata = await maybe_get_manifest(
         filename=await index_settings.finalize_manifest_file(paper_directory)
     )
@@ -492,10 +498,8 @@ async def get_directory_index(
         logger.warning(
             f"Indexing {len(valid_paper_dir_files)} files. This may take a few minutes."
         )
-    # NOTE: if the index was not previously built, this will be empty.
-    # Otherwise, it will not be empty
-    index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
 
+    index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
     if extra_index_files := (
         index_unique_file_paths - {str(f) for f in valid_paper_dir_files}
     ):
@@ -512,6 +516,7 @@ async def get_directory_index(
                 f" folder ({paper_directory}).[/bold red]"
             )
 
+    semaphore = anyio.Semaphore(index_settings.concurrency)
     async with anyio.create_task_group() as tg:
         for file_path in valid_paper_dir_files:
             if index_settings.sync_with_paper_directory:

@@ -50,8 +50,9 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         )
         paper_dir = agent_test_settings.agent.index.paper_directory = Path(tempdir)
 
-        index_name = f"stub{uuid4()}"  # Unique across test invocations
-        agent_test_settings.agent.index.name = index_name
+        index_name = agent_test_settings.agent.index.name = (
+            f"stub{uuid4()}"  # Unique across test invocations
+        )
         with patch.object(
             SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
         ) as mock_save_index:
@@ -313,18 +314,26 @@ async def test_agent_sharing_state(
     embedding_model = agent_test_settings.get_embedding_model()
 
     answer = Answer(question="What is is a self-explanatory model?")
-    docs = Docs()
     query = QueryRequest(query=answer.question, settings=agent_test_settings)
-    env_state = EnvironmentState(docs=docs, answer=answer)
+    env_state = EnvironmentState(docs=Docs(), answer=answer)
+    built_index = await get_directory_index(settings=agent_test_settings)
+    assert await built_index.count, "Index build did not work"
 
     with subtests.test(msg=PaperSearch.__name__):
         search_tool = PaperSearch(
             settings=agent_test_settings, embedding_model=embedding_model
         )
-        await search_tool.paper_search(
-            "XAI self explanatory model", min_year=None, max_year=None, state=env_state
-        )
-        assert env_state.docs.docs, "Search did not save any papers"
+        with patch.object(
+            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
+        ) as mock_save_index:
+            await search_tool.paper_search(
+                "XAI self explanatory model",
+                min_year=None,
+                max_year=None,
+                state=env_state,
+            )
+        assert env_state.docs.docs, "Search did not add any papers"
+        mock_save_index.assert_not_awaited(), "Search shouldn't try to update the index"
         assert all(
             (isinstance(d, Doc) or issubclass(d, Doc))  # type: ignore[unreachable]
             for d in env_state.docs.docs.values()
