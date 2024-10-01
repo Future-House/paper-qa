@@ -203,6 +203,10 @@ class SearchIndex:
             and (filehash is None or index_files[filename] == filehash)
         )
 
+    async def mark_failed_document(self, path: str | os.PathLike) -> None:
+        (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
+        self.changed = True
+
     async def add_document(
         self, index_doc: dict, document: Any | None = None, max_retries: int = 1000
     ) -> None:
@@ -394,10 +398,7 @@ async def process_file(
                 logger.exception(
                     f"Error parsing {file_name}, skipping index for this file."
                 )
-                (await search_index.index_files)[
-                    str(file_path)
-                ] = FAILED_DOCUMENT_ADD_ID
-                await search_index.save_index()
+                await search_index.mark_failed_document(file_path)
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
