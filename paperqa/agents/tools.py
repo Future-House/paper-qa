@@ -124,7 +124,7 @@ class PaperSearch(NamedTool):
             offset = self.previous_searches[search_key] = 0
 
         logger.info(f"Starting paper search for {query!r}.")
-        index = await get_directory_index(settings=self.settings)
+        index = await get_directory_index(settings=self.settings, build=False)
         results: list[Docs] = await index.query(
             query,
             top_n=self.settings.agent.search_count,
