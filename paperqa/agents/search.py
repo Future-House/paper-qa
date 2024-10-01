@@ -122,25 +122,23 @@ class SearchIndex:
     async def init_directory(self) -> None:
         await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
 
-    @staticmethod
-    async def extend_and_make_directory(base: anyio.Path, *dirs: str) -> anyio.Path:
-        directory = base.joinpath(*dirs)
+    @property
+    async def index_directory(self) -> anyio.Path:
+        directory = anyio.Path(self._index_directory).joinpath(self.index_name)
         await directory.mkdir(parents=True, exist_ok=True)
         return directory
 
     @property
-    async def index_directory(self) -> anyio.Path:
-        return await self.extend_and_make_directory(
-            anyio.Path(self._index_directory), self.index_name
-        )
-
-    @property
     async def index_filename(self) -> anyio.Path:
-        return await self.extend_and_make_directory(await self.index_directory, "index")
+        index_dir = (await self.index_directory) / "index"
+        await index_dir.mkdir(exist_ok=True)
+        return index_dir
 
     @property
     async def docs_index_directory(self) -> anyio.Path:
-        return await self.extend_and_make_directory(await self.index_directory, "docs")
+        docs_dir = (await self.index_directory) / "docs"
+        await docs_dir.mkdir(exist_ok=True)
+        return docs_dir
 
     @property
     async def file_index_filename(self) -> anyio.Path:
@@ -202,6 +200,10 @@ class SearchIndex:
             index_files.get(filename)
             and (filehash is None or index_files[filename] == filehash)
         )
+
+    async def mark_failed_document(self, path: str | os.PathLike) -> None:
+        (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
+        self.changed = True
 
     async def add_document(
         self, index_doc: dict, document: Any | None = None, max_retries: int = 1000
@@ -284,6 +286,7 @@ class SearchIndex:
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
+        self.changed = False
 
     async def get_saved_object(
         self, file_location: str, keep_filenames: bool = False
@@ -394,10 +397,7 @@ async def process_file(
                 logger.exception(
                     f"Error parsing {file_name}, skipping index for this file."
                 )
-                (await search_index.index_files)[
-                    str(file_path)
-                ] = FAILED_DOCUMENT_ADD_ID
-                await search_index.save_index()
+                await search_index.mark_failed_document(file_path)
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
@@ -417,7 +417,6 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
-            await search_index.save_index()
             logger.info(f"Complete ({title}).")
 
 
