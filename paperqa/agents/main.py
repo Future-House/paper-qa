@@ -27,7 +27,7 @@ from paperqa.types import Answer
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
 from .models import AgentStatus, AnswerResponse, QueryRequest, SimpleProfiler
-from .search import SearchDocumentStorage, SearchIndex
+from .search import SearchDocumentStorage, SearchIndex, get_directory_index
 from .tools import EnvironmentState, GatherEvidence, GenerateAnswer, PaperSearch
 
 if TYPE_CHECKING:
@@ -106,6 +106,8 @@ async def run_agent(
         f" query {query.model_dump()}."
     )
 
+    # Build the index once here, and then all tools won't need to rebuild it
+    await get_directory_index(settings=query.settings)
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):

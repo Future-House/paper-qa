@@ -129,6 +129,9 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         return self.state, self.tools
 
     async def reset(self) -> tuple[list[Message], list[Tool]]:
+        # NOTE: don't build the index here, as sometimes we asyncio.gather over this
+        # method, and our current design (as of v5.0.10) could hit race conditions
+        # because index building does not use file locks
         self._docs.clear_docs()
         self.state, self.tools = self.make_initial_state_and_tools()
         return (
