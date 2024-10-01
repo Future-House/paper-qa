@@ -122,25 +122,23 @@ class SearchIndex:
     async def init_directory(self) -> None:
         await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
 
-    @staticmethod
-    async def extend_and_make_directory(base: anyio.Path, *dirs: str) -> anyio.Path:
-        directory = base.joinpath(*dirs)
+    @property
+    async def index_directory(self) -> anyio.Path:
+        directory = anyio.Path(self._index_directory).joinpath(self.index_name)
         await directory.mkdir(parents=True, exist_ok=True)
         return directory
 
     @property
-    async def index_directory(self) -> anyio.Path:
-        return await self.extend_and_make_directory(
-            anyio.Path(self._index_directory), self.index_name
-        )
-
-    @property
     async def index_filename(self) -> anyio.Path:
-        return await self.extend_and_make_directory(await self.index_directory, "index")
+        index_dir = (await self.index_directory) / "index"
+        await index_dir.mkdir(exist_ok=True)
+        return index_dir
 
     @property
     async def docs_index_directory(self) -> anyio.Path:
-        return await self.extend_and_make_directory(await self.index_directory, "docs")
+        docs_dir = (await self.index_directory) / "docs"
+        await docs_dir.mkdir(exist_ok=True)
+        return docs_dir
 
     @property
     async def file_index_filename(self) -> anyio.Path:
