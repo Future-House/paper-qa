@@ -290,7 +290,7 @@ async def index_search(
     fields = [*SearchIndex.REQUIRED_FIELDS]
     if index_name == "answers":
         fields.append("question")
-    search_or_answers_index = SearchIndex(
+    index_to_query = SearchIndex(
         fields=fields,
         index_name=index_name,
         index_directory=index_directory,
@@ -303,15 +303,14 @@ async def index_search(
 
     results = [
         (AnswerResponse(**a[0]) if index_name == "answers" else a[0], a[1])
-        for a in await search_or_answers_index.query(query=query, keep_filenames=True)
+        for a in await index_to_query.query(query=query, keep_filenames=True)
     ]
-
     if results:
         console = Console(record=True)
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        count = await search_or_answers_index.count
+        count = await index_to_query.count
         agent_logger.info(f"No results found. Searched {count} docs.")
 
     return results
