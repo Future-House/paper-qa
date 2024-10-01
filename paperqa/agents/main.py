@@ -51,7 +51,7 @@ async def agent_query(
     if docs is None:
         docs = Docs()
 
-    search_index = SearchIndex(
+    answers_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
         index_directory=query.settings.agent.index.index_directory,
@@ -63,7 +63,7 @@ async def agent_query(
 
     agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
 
-    await search_index.add_document(
+    await answers_index.add_document(
         {
             "file_location": str(response.answer.id),
             "body": response.answer.answer,
@@ -71,7 +71,7 @@ async def agent_query(
         },
         document=response,
     )
-    await search_index.save_index()
+    await answers_index.save_index()
     return response
 
 
@@ -290,7 +290,7 @@ async def index_search(
     fields = [*SearchIndex.REQUIRED_FIELDS]
     if index_name == "answers":
         fields.append("question")
-    search_index = SearchIndex(
+    search_or_answers_index = SearchIndex(
         fields=fields,
         index_name=index_name,
         index_directory=index_directory,
@@ -303,7 +303,7 @@ async def index_search(
 
     results = [
         (AnswerResponse(**a[0]) if index_name == "answers" else a[0], a[1])
-        for a in await search_index.query(query=query, keep_filenames=True)
+        for a in await search_or_answers_index.query(query=query, keep_filenames=True)
     ]
 
     if results:
@@ -311,7 +311,7 @@ async def index_search(
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        count = await search_index.count
-        agent_logger.info(f"No results found. Searched {count} docs")
+        count = await search_or_answers_index.count
+        agent_logger.info(f"No results found. Searched {count} docs.")
 
     return results
