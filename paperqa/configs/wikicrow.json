@@ -8,9 +8,7 @@
   "temperature": 0.0,
   "batch_size": 1,
   "texts_index_mmr_lambda": 1.0,
-  "index_absolute_directory": false,
   "verbosity": 0,
-  "manifest_file": null,
   "answer": {
     "evidence_k": 25,
     "evidence_detailed_citations": true,
@@ -51,7 +49,6 @@
     "wipe_context_on_answer_failure": true,
     "timeout": 500.0,
     "should_pre_search": false,
-    "tool_names": null,
-    "index_concurrency": 30
+    "tool_names": null
   }
 }
