@@ -69,8 +69,8 @@ class GlobalRateLimiter:
     ):
         self.rate_config = rate_config
         self.use_in_memory = use_in_memory
-        self._storage = None
-        self._rate_limiter = None
+        self._storage: RedisStorage | MemoryStorage | None = None
+        self._rate_limiter: MovingWindowRateLimiter | None = None
         self._current_ip: str | None = None
 
     @staticmethod
@@ -225,16 +225,16 @@ class GlobalRateLimiter:
         if not (host and port):
             raise ValueError(f'Invalid REDIS_URL: {os.environ.get("REDIS_URL")}.')
 
-        client = Redis(host=host, port=port)
+        client = Redis(host=host, port=int(port))
 
         cursor = b"0"
-        matching_keys = []
+        matching_keys: list[bytes] = []
 
         while cursor:
             cursor, keys = await client.scan(
-                cursor, match=f"{self.storage.PREFIX}*", count=100
+                int(cursor), match=f"{self.storage.PREFIX}*", count=100
             )
-            matching_keys.extend(keys)
+            matching_keys.extend(list(keys))
 
         await client.quit()
 
@@ -259,7 +259,7 @@ class GlobalRateLimiter:
 
         for rate_limit, (namespace, primary_key) in await self.get_limit_keys():
             period_start, n_items_in_period = await self.storage.get_moving_window(
-                rate_limit.key_for(*(namespace, primary_key)),
+                rate_limit.key_for(*(namespace, primary_key or "")),
                 rate_limit.amount,
                 rate_limit.get_expiry(),
             )
