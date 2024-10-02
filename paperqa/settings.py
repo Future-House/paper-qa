@@ -320,22 +320,12 @@ class IndexSettings(BaseModel):
         ),
     )
 
-    async def finalize_paper_directory(self) -> anyio.Path:
-        paper_directory = anyio.Path(self.paper_directory)
-        if self.use_absolute_paper_directory:
-            paper_directory = await paper_directory.absolute()
-        return paper_directory
-
-    async def finalize_manifest_file(
-        self, paper_directory: anyio.Path | None = None
-    ) -> anyio.Path | None:
+    async def finalize_manifest_file(self) -> anyio.Path | None:
         manifest_file = anyio.Path(self.manifest_file) if self.manifest_file else None
         if manifest_file and not await manifest_file.exists():
-            if paper_directory is None:
-                paper_directory = await self.finalize_paper_directory()
             # If the manifest file was specified but doesn't exist,
             # perhaps it was specified as a relative path from the paper_directory
-            manifest_file = paper_directory / manifest_file
+            manifest_file = anyio.Path(self.paper_directory) / manifest_file
         return manifest_file
 
 
@@ -602,6 +592,7 @@ class Settings(BaseSettings):
             first_segment = str(self.agent.index.paper_directory)
         segments = [
             first_segment,
+            str(self.agent.index.use_absolute_paper_directory),
             self.embedding,
             str(self.parsing.chunk_size),
             str(self.parsing.overlap),

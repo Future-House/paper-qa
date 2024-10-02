@@ -94,25 +94,55 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
 
-@pytest.mark.usefixtures("reset_log_levels")
+EXPECTED_STUB_DATA_FILES = {
+    "bates.txt",
+    "empty.txt",
+    "flag_day.html",
+    "obama.txt",
+    "paper.pdf",
+}
+
+
 @pytest.mark.asyncio
 async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> None:
+    # Set the paper_directory to be a relative path as starting point to confirm this
+    # won't trip us up, and set the manifest file too
+    abs_paper_dir = cast(Path, agent_test_settings.agent.index.paper_directory)
+    agent_test_settings.agent.index.paper_directory = abs_paper_dir.relative_to(
+        Path.cwd()
+    )
     agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
-    index = await get_directory_index(settings=agent_test_settings)
-    assert index.fields == [
-        "file_location",
-        "body",
-        "title",
-        "year",
-    ], "Incorrect fields in index"
-    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 5, "Incorrect number of index files"
-    results = await index.query(query="who is Frederick Bates?")
-    top_result = next(iter(results[0].docs.values()))
-    paper_dir = cast(Path, agent_test_settings.agent.index.paper_directory)
-    assert top_result.dockey == md5sum((paper_dir / "bates.txt").absolute())
-    # note: this title comes from the manifest, so we know it worked
-    assert top_result.title == "Frederick Bates (Wikipedia article)"
+
+    # Now set up both relative and absolute test settings
+    relative_test_settings = agent_test_settings.model_copy(deep=True)
+    absolute_test_settings = agent_test_settings.model_copy(deep=True)
+    absolute_test_settings.agent.index.use_absolute_paper_directory = True
+    assert (
+        relative_test_settings != absolute_test_settings
+    ), "We need to be able to differentiate between relative and absolute settings"
+    del agent_test_settings
+
+    relative_index = await get_directory_index(settings=relative_test_settings)
+    assert (
+        set((await relative_index.index_files).keys()) == EXPECTED_STUB_DATA_FILES
+    ), "Incorrect index files, should be relative to share indexes across machines"
+    absolute_index = await get_directory_index(settings=absolute_test_settings)
+    assert set((await absolute_index.index_files).keys()) == {
+        str(abs_paper_dir / f) for f in EXPECTED_STUB_DATA_FILES
+    }, "Incorrect index files, should be absolute to deny sharing indexes across machines"
+    for index in (relative_index, absolute_index):
+        assert index.fields == [
+            "file_location",
+            "body",
+            "title",
+            "year",
+        ], "Incorrect fields in index"
+
+        results = await index.query(query="who is Frederick Bates?")
+        top_result = next(iter(results[0].docs.values()))
+        assert top_result.dockey == md5sum(abs_paper_dir / "bates.txt")
+        # note: this title comes from the manifest, so we know it worked
+        assert top_result.title == "Frederick Bates (Wikipedia article)"
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
