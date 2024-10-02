@@ -21,6 +21,12 @@ from tenacity import (
     stop_after_attempt,
 )
 
+try:
+    from ldp.alg import Callback, RolloutManager
+except ImportError:
+    Callback = None  # type: ignore[assignment,misc]
+    RolloutManager = None  # type: ignore[assignment,misc]
+
 from paperqa.docs import Docs
 from paperqa.types import Answer
 
@@ -263,37 +269,38 @@ async def run_ldp_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
-    if query.settings.agent.max_timesteps is not None:
-        logger.warning(
-            f"Max timesteps (configured {query.settings.agent.max_timesteps}) is not"
-            " yet implemented with the ldp agent, ignoring it."
-        )
     env = PaperQAEnvironment(query, docs, **env_kwargs)
-    done = False
+    # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
+    # has already taken place, which checks that ldp is installed
+
+    class RolloutCallback(Callback):
+        async def after_agent_get_asv(
+            self, traj_id: str, *args  # noqa: ARG002
+        ) -> None:
+            if on_agent_action_callback is not None:
+                await on_agent_action_callback(*args)
+
+        async def after_env_reset(self, traj_id: str, *_) -> None:  # noqa: ARG002
+            if on_env_reset_callback is not None:
+                await on_env_reset_callback(env.state)
+
+        async def after_env_step(self, traj_id: str, *args) -> None:  # noqa: ARG002
+            if on_env_step_callback is not None:
+                await on_env_step_callback(*args)
 
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
-            obs, tools = await env.reset()
-            if on_env_reset_callback:
-                await on_env_reset_callback(env.state)
-
-            agent_state = await agent.init_state(tools=tools)
-
-            while not done:
-                action, agent_state, value = await agent.get_asv(agent_state, obs)
-                if on_agent_action_callback:
-                    await on_agent_action_callback(action, agent_state, value)
-
-                obs, reward, done, truncated = await env.step(action.value)
-                if on_env_step_callback:
-                    await on_env_step_callback(obs, reward, done, truncated)
+            rollout_manager = RolloutManager(agent, callbacks=[RolloutCallback()])
+            await rollout_manager.sample_trajectories(
+                environments=[env], max_steps=query.settings.agent.max_timesteps
+            )
             status = AgentStatus.SUCCESS
     except TimeoutError:
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
         )
         status = AgentStatus.TRUNCATED
-        await tools[-1]._tool_fn(question=query.query, state=env.state)
+        await env.tools[-1]._tool_fn(question=query.query, state=env.state)
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
