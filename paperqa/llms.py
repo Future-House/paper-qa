@@ -16,7 +16,7 @@ from collections.abc import (
 from enum import StrEnum
 from inspect import isasyncgenfunction, signature
 from sys import version_info
-from typing import Any, ClassVar, TypeVar, cast
+from typing import Any, ClassVar, TypeVar
 
 import numpy as np
 import tiktoken
@@ -265,7 +265,7 @@ class LLMModel(ABC, BaseModel):
 
         start_clock = asyncio.get_running_loop().time()
         if callbacks is None:
-            chunk = cast(Chunk, self.achat(messages))
+            chunk = await self.achat(messages)
             output = chunk.text
         else:
             sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
