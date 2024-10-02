@@ -39,8 +39,9 @@ class AgentStatus(StrEnum):
     FAIL = "fail"
     # SUCCESS - answer was generated
     SUCCESS = "success"
-    # TIMEOUT - agent took too long, but an answer was generated
-    TIMEOUT = "timeout"
+    # TRUNCATED - agent didn't finish naturally (e.g. timeout, too many actions),
+    # so we prematurely answered
+    TRUNCATED = "truncated"
     # UNSURE - the agent was unsure, but an answer is present
     UNSURE = "unsure"
 

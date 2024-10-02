@@ -243,7 +243,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
         agent_type=agent_type,
     )
     # ensure that GenerateAnswerTool was called
-    assert response.status == AgentStatus.TIMEOUT, "Agent did not timeout"
+    assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
     assert "I cannot answer" in response.answer.answer
 
 
@@ -306,7 +306,9 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
             ),
             docs=Docs(),
         )
-    assert response.status == AgentStatus.FAIL, "Agent should have registered a failure"
+    assert (
+        response.status == AgentStatus.TRUNCATED
+    ), "Agent should have hit its max timesteps"
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
