@@ -15,18 +15,11 @@ from paperqa.llms import (
 from paperqa.types import LLMResult
 
 LLM_CONFIG_W_RATE_LIMITS = [
+    # following ensures that "short-form" rate limits are also supported
+    # where the user doesn't specify the model_list
     {
         "name": "gpt-4o-mini",
         "config": {
-            "model_list": [
-                {
-                    "model_name": "gpt-4o-mini",
-                    "litellm_params": {
-                        "model": "gpt-4o-mini",
-                        "temperature": 0,
-                    },
-                }
-            ],
             "rate_limit": {"gpt-4o-mini": RateLimitItemPerSecond(20, 3)},
         },
     },
@@ -144,18 +137,18 @@ async def time_n_llm_methods(
     if hasattr(outputs[0], "prompt_tokens"):
         token_count = sum(o.prompt_tokens + o.completion_tokens for o in outputs)
 
-    return max(character_count / CHARACTERS_PER_TOKEN, token_count) / (
-        time.time() - start_time
-    )
+    return (
+        (character_count / CHARACTERS_PER_TOKEN) if token_count == 0 else token_count
+    ) / (time.time() - start_time)
 
 
 @pytest.mark.parametrize("llm_config_w_rate_limits", LLM_CONFIG_W_RATE_LIMITS)
 @pytest.mark.asyncio
 async def test_rate_limit_on_run_prompt(
-    llm_config_w_rate_limits: dict[str, Any], litellm_model: type[LiteLLMModel]
+    llm_config_w_rate_limits: dict[str, Any],
 ) -> None:
 
-    llm = litellm_model(**llm_config_w_rate_limits)
+    llm = LiteLLMModel(**llm_config_w_rate_limits)
 
     outputs = []
 
@@ -218,10 +211,9 @@ async def test_rate_limit_on_run_prompt(
 async def test_rate_limit_on_sequential_completion_litellm_methods(
     llm_config_w_rate_limits: dict[str, Any],
     llm_method_kwargs: dict[str, Any],
-    litellm_model: type[LiteLLMModel],
 ) -> None:
 
-    llm = litellm_model(**llm_config_w_rate_limits)
+    llm = LiteLLMModel(**llm_config_w_rate_limits)
 
     estimated_tokens_per_second = await time_n_llm_methods(
         llm,
@@ -249,10 +241,9 @@ async def test_rate_limit_on_sequential_completion_litellm_methods(
 async def test_rate_limit_on_parallel_completion_litellm_methods(
     llm_config_w_rate_limits: dict[str, Any],
     llm_method_kwargs: dict[str, Any],
-    litellm_model: type[LiteLLMModel],
 ) -> None:
 
-    llm = litellm_model(**llm_config_w_rate_limits)
+    llm = LiteLLMModel(**llm_config_w_rate_limits)
 
     if "iter" not in llm_method_kwargs["method"]:
         estimated_tokens_per_second = await time_n_llm_methods(
@@ -280,10 +271,9 @@ async def test_rate_limit_on_parallel_completion_litellm_methods(
 @pytest.mark.asyncio
 async def test_embedding_rate_limits(
     embedding_config_w_rate_limits: dict[str, Any],
-    litellm_embedding_model: type[LiteLLMEmbeddingModel],
 ) -> None:
 
-    embedding_model = litellm_embedding_model(**embedding_config_w_rate_limits)
+    embedding_model = LiteLLMEmbeddingModel(**embedding_config_w_rate_limits)
     texts_to_embed = ["the duck says"] * 10
     start = time.time()
     await embedding_model.embed_documents(texts=texts_to_embed, batch_size=5)

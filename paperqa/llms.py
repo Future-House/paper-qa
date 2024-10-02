@@ -70,7 +70,7 @@ class EmbeddingModel(ABC, BaseModel):
         description="Optional `rate_limit` key, value must be a RateLimitItem",
     )
 
-    async def check_rate_limit(self, token_count: float, **kwargs):
+    async def check_rate_limit(self, token_count: float, **kwargs) -> None:
         if "rate_limit" in self.config:
             await GLOBAL_LIMITER.try_acquire(
                 ("client", self.name),
@@ -474,7 +474,7 @@ class LiteLLMModel(LLMModel):
     @classmethod
     def maybe_set_config_attribute(cls, data: dict[str, Any]) -> dict[str, Any]:
         """If a user only gives a name, make a sensible config dict for them."""
-        if "name" in data and "config" not in data:
+        if "name" in data and ("model_list" not in data.get("config", {})):
             data["config"] = {
                 "model_list": [
                     {
@@ -488,7 +488,7 @@ class LiteLLMModel(LLMModel):
                     }
                 ],
                 "router_kwargs": {"num_retries": 3, "retry_after": 5, "timeout": 60},
-            }
+            } | data.get("config", {})
         # we only support one "model name" for now, here we validate
         model_list = data["config"]["model_list"]
         if IS_PYTHON_BELOW_312:
@@ -520,8 +520,7 @@ class LiteLLMModel(LLMModel):
             )
         return self._router
 
-    async def check_rate_limit(self, token_count: float, **kwargs):
-        # TODO: validate rate_limit config structure?
+    async def check_rate_limit(self, token_count: float, **kwargs) -> None:
         if "rate_limit" in self.config:
             await GLOBAL_LIMITER.try_acquire(
                 ("client", self.name),
