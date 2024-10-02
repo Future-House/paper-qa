@@ -295,8 +295,11 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
         autospec=True,
     ) as mock_gen_answer:
         mock_gen_answer.__doc__ = original_doc
-        settings = Settings()
-        settings.agent.tool_names = {"gather_evidence", "gen_answer"}
+        settings = Settings(
+            agent=AgentSettings(
+                tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
+            )
+        )
         response = await agent_query(
             query=QueryRequest(
                 query="Are COVID-19 vaccines effective?", settings=settings

@@ -406,6 +406,10 @@ class AgentSettings(BaseModel):
             " supplied."
         ),
     )
+    max_timesteps: int | None = Field(
+        default=None,
+        description="Optional upper limit on the number of environment steps.",
+    )
 
     index_concurrency: int = Field(
         default=30,
