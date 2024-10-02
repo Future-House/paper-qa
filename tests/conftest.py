@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
+from paperqa.llms import LiteLLMEmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
 from paperqa.types import Answer
 from paperqa.utils import setup_default_logs
@@ -120,3 +121,16 @@ def reset_log_levels(caplog):
         logger = logging.getLogger(name)
         logger.setLevel(logging.NOTSET)
         logger.propagate = True
+
+
+# get a new module objects
+# to avoid sharing a rate limiter
+# between calls
+@pytest.fixture
+def litellm_model() -> type[LiteLLMModel]:
+    return LiteLLMModel
+
+
+@pytest.fixture
+def litellm_embedding_model() -> type[LiteLLMEmbeddingModel]:
+    return LiteLLMEmbeddingModel

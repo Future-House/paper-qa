@@ -9,7 +9,6 @@ import aiohttp
 from coredis import Redis
 from limits import (
     RateLimitItem,
-    RateLimitItemPerHour,
     RateLimitItemPerMinute,
     RateLimitItemPerSecond,
 )
@@ -19,17 +18,17 @@ from limits.aio.strategies import MovingWindowRateLimiter
 logger = logging.getLogger(__name__)
 
 GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "30"))
+
 # RATE_CONFIG keys are tuples, corresponding to a namespace and primary key.
 # Anything defined with MATCH_ALL variable, will match all non-matched requests for that namespace.
 # For the "get" namespace, all primary key urls will be parsed down to the domain level.
 # For example, you're trying to do a get request to "https://google.com", "google.com" will get
 # its own limit, and it will use the ("get", MATCH_ALL) for its limits.
 # machine_id is a unique identifier for the machine making the request, it's used to limit the
-# rate of requests per machine. If the machine_id is not in the NO_PROXY_EXTENSIONS list, then
+# rate of requests per machine. If the primary_key is in the NO_MACHINE_ID_EXTENSIONS list, then
 # the dynamic IP of the machine will be used to limit the rate of requests, otherwise the
-# user input proxy_id will be used.
-# NOTICE: When liteLLM is implemented, LLM-client limits can be set via the RouterAPI, for now we only
-# have a custom client limit for openAI based embedding models
+# user input machine_id will be used.
+
 MATCH_ALL = None
 MATCH_ALL_INPUTS = Literal[None]
 MATCH_MACHINE_ID = "<machine_id>"
@@ -57,18 +56,9 @@ class GlobalRateLimiter:
         "http://icanhazip.com",
         "https://ipecho.net/plain",
     }
-    # top sources pulled from prod log proxy failures
-    NO_PROXY_EXTENSIONS: ClassVar[Collection[str]] = {
-        ".gov",
-        ".uk",
-        "doi.org",
-        "cyberleninka.org",
-        ".de",
-        ".jp",
-        ".ro",
-        "microsoft.com",
-        "cambridge.org",
-    }
+    # the following will use IP scope for limiting, rather
+    # than user input machine ID
+    NO_MACHINE_ID_EXTENSIONS: ClassVar[Collection[str]] = {"crossref.org"}
 
     def __init__(
         self,
@@ -87,7 +77,7 @@ class GlobalRateLimiter:
     async def get_outbound_ip(session: aiohttp.ClientSession, url: str) -> str | None:
         try:
             async with session.get(url, timeout=aiohttp.ClientTimeout(5)) as response:
-                if response.status == 200:
+                if response.ok:
                     return await response.text()
         except TimeoutError:
             logger.warning(f"Timeout occurred while connecting to {url}")
@@ -103,10 +93,11 @@ class GlobalRateLimiter:
                     if ip:
                         logger.info(f"Successfully retrieved IP from {service}")
                         self._current_ip = ip.strip()
-                    else:
-                        logger.error("Failed to retrieve IP from all services")
-                        self._current_ip = UNKNOWN_IP
-        return self._current_ip  # type: ignore[return-value]
+                        break
+                if self._current_ip is None:
+                    logger.error("Failed to retrieve IP from all services")
+                    self._current_ip = UNKNOWN_IP
+        return self._current_ip
 
     @property
     def storage(self):
@@ -127,9 +118,15 @@ class GlobalRateLimiter:
         return self._rate_limiter
 
     async def parse_namespace_and_primary_key(
-        self, namespace_and_key: tuple[str, str | MATCH_ALL_INPUTS], proxy_id: int = 0
+        self, namespace_and_key: tuple[str, str | MATCH_ALL_INPUTS], machine_id: int = 0
     ) -> tuple[str, str | MATCH_ALL_INPUTS]:
-        """Turn get key into a namespace and primary-key."""
+        """Turn namespace_and_key tuple into a namespace and primary-key.
+
+        If using a namespace starting with "get", then the primary key will be url parsed.
+        "get" namespaces will also have their machine_ids appended to the namespace here,
+        unless the primary key is in the NO_MACHINE_ID_EXTENSIONS list, in which case
+        the outbound IP will be used.
+        """
         namespace, primary_key = namespace_and_key
 
         if namespace.startswith("get") and primary_key is not None:
@@ -139,10 +136,10 @@ class GlobalRateLimiter:
 
             primary_key = urlparse(primary_key).netloc or urlparse(primary_key).path
 
-            if any(ext in primary_key for ext in self.NO_PROXY_EXTENSIONS):
+            if any(ext in primary_key for ext in self.NO_MACHINE_ID_EXTENSIONS):
                 namespace = f"{namespace}|{await self.outbount_ip()}"
             else:
-                namespace = f"{namespace}|{proxy_id}"
+                namespace = f"{namespace}|{machine_id}"
 
         return namespace, primary_key
 
@@ -151,7 +148,13 @@ class GlobalRateLimiter:
         namespace: str,
         primary_key: str | MATCH_ALL_INPUTS,
     ) -> tuple[RateLimitItem, str]:
-        """Get rate limit and new namespace for a given namespace and primary_key."""
+        """Get rate limit and new namespace for a given namespace and primary_key.
+
+        This parsing logic finds the correct rate limits for a namespace/primary_key.
+        It's a bit complex due to the <MATCH ALL> and <MATCH MACHINE ID> placeholders.
+        These allow users to match
+
+        """
         # the namespace may have a machine_id in it -- we replace if that's the case
         namespace_w_stub_machine_id = namespace
         namespace_w_machine_id_stripped = namespace
@@ -216,7 +219,7 @@ class GlobalRateLimiter:
     async def get_rate_limit_keys(
         self,
     ) -> list[tuple[RateLimitItem, tuple[str, str | MATCH_ALL_INPUTS]]]:
-        """Returns a list of current RateLimitItems with tuples of namespace and primary key"""
+        """Returns a list of current RateLimitItems with tuples of namespace and primary key."""
         host, port = os.environ.get("REDIS_URL", ":").split(":", maxsplit=2)
 
         if not (host and port):
@@ -240,7 +243,7 @@ class GlobalRateLimiter:
     def get_in_memory_limit_keys(
         self,
     ) -> list[tuple[RateLimitItem, tuple[str, str | MATCH_ALL_INPUTS]]]:
-        """Returns a list of current RateLimitItems with tuples of namespace and primary key"""
+        """Returns a list of current RateLimitItems with tuples of namespace and primary key."""
         return [self.parse_key(key) for key in self.storage.events]
 
     async def get_limit_keys(
@@ -273,52 +276,64 @@ class GlobalRateLimiter:
         self,
         namespace_and_key: tuple[str, str | MATCH_ALL_INPUTS],
         rate_limit: RateLimitItem | None = None,
-        proxy_id: int = 0,
-        timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,
+        machine_id: int = 0,
+        timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,  # noqa: ASYNC109
         weight: int = 1,
+        raise_impossible_limits: bool = False,
     ) -> None:
         """Returns when the limit is satisfied for the namespace_and_key.
-        
+
         Args:
-            `namespace_and_key` is composed of a tuple with namespace (e.g. "get") and a primary-key (e.g. "arxiv.org").
-            namespaces can be nested with multiple '|', primary-keys in the "get" namespace will be stripped to the domain.
+            namespace_and_key: is composed of a tuple with namespace (e.g. "get") and
+            a primary-key (e.g. "arxiv.org"). namespaces can be nested with multiple '|',
+            primary-keys in the "get" namespace will be stripped to the domain.
 
-            `proxy_id` will be used to modify the namespace of get requests if
-            the primary key is not in the NO_PROXY_EXTENSIONS list.
-            Otherwise, the outbound IP will be used to modify the namespace.
+            rate_limit: Optional RateLimitItem to be used for the namespace and primary-key.
+            If not provided, RATE_CONFIG will be used to find the rate limit.
 
-            The proxy_id / outbound IP are referred to as the machine_id.
+            machine_id: will be used to modify the namespace of GET requests if
+            the primary key is not in the NO_MACHINE_ID_EXTENSIONS list.
+            In that case, the outbound IP will be used to modify the namespace.
 
-            `rate_limit` is the rate limit to be used for the namespace and primary-key.
-            
-            `timeout` is the maximum time to wait for the rate limit to be satisfied.
+            timeout: is the maximum time to wait for the rate limit to be satisfied.
 
-            `weight` is the cost of the request, default is 1. (could be tokens for example)
+            weight: is the cost of the request, default is 1. (could be tokens for example)
+
+            raise_impossible_limits: flag will raise a ValueError for weights that exceed the rate.
 
         returns if the limit is satisfied or times out via a TimeoutError.
 
         """
         namespace, primary_key = await self.parse_namespace_and_primary_key(
-            namespace_and_key, proxy_id=proxy_id
+            namespace_and_key, machine_id=machine_id
         )
-        
+
         _rate_limit, new_namespace = self.parse_rate_limits_and_namespace(
             namespace, primary_key
         )
 
         rate_limit = rate_limit or _rate_limit
 
+        if rate_limit.amount < weight and raise_impossible_limits:
+            raise ValueError(
+                f"Weight ({weight}) > RateLimit ({rate_limit}), cannot satisfy rate limit."
+            )
+
         while True:
             elapsed = 0.0
             while (
                 not (
-                    await self.rate_limiter.test(rate_limit, new_namespace, primary_key, cost=weight)
+                    await self.rate_limiter.test(
+                        rate_limit,
+                        new_namespace,
+                        primary_key,
+                        cost=min(weight, rate_limit.amount),
+                    )
                 )
                 and elapsed < timeout
             ):
                 await asyncio.sleep(self.WAIT_INCREMENT)
                 elapsed += self.WAIT_INCREMENT
-
             if elapsed >= timeout:
                 raise TimeoutError(
                     f"Timeout ({elapsed} secs): rate limit for key: {namespace_and_key}"
@@ -326,7 +341,17 @@ class GlobalRateLimiter:
 
             # If the rate limit hit is False, then we're violating the limit, so we
             # need to wait again. This can happen in race conditions.
-            if await self.rate_limiter.hit(rate_limit, new_namespace, primary_key, cost=weight):
+            if await self.rate_limiter.hit(
+                rate_limit,
+                new_namespace,
+                primary_key,
+                cost=min(weight, rate_limit.amount),
+            ):
+                # we need to keep trying when we have an "impossible" limit
+                if rate_limit.amount < weight:
+                    weight -= rate_limit.amount
+                    timeout = max(timeout - elapsed, 1.0)
+                    continue
                 break
             timeout = max(timeout - elapsed, 1.0)
 

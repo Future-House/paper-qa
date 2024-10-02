@@ -2,13 +2,21 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import functools
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterable, Awaitable, Callable, Iterable, Sequence
+from collections.abc import (
+    AsyncGenerator,
+    AsyncIterable,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Iterable,
+    Sequence,
+)
 from enum import StrEnum
-from inspect import signature
+from inspect import isasyncgenfunction, signature
 from sys import version_info
-from typing import Any, ClassVar
-from xml.dom.pulldom import CHARACTERS
+from typing import Any, ClassVar, TypeVar, cast
 
 import numpy as np
 import tiktoken
@@ -16,9 +24,9 @@ from litellm import DeploymentTypedDict, Router, aembedding, token_counter
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from paperqa.prompts import default_system_prompt
+from paperqa.rate_limiter import GLOBAL_LIMITER
 from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
-from paperqa.rate_limiter import GLOBAL_LIMITER
 
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
@@ -54,6 +62,20 @@ class EmbeddingModes(StrEnum):
 
 class EmbeddingModel(ABC, BaseModel):
     name: str
+    config: dict = Field(
+        default_factory=dict,
+        description="Optional `rate_limit` key, value must be a RateLimitItem",
+    )
+    CHARACTERS_PER_TOKEN: ClassVar[float] = 4.0
+
+    async def check_rate_limit(self, token_count: float, **kwargs):
+        if "rate_limit" in self.config:
+            await GLOBAL_LIMITER.try_acquire(
+                ("client", self.name),
+                self.config["rate_limit"],
+                weight=max(int(token_count), 1),
+                **kwargs,
+            )
 
     def set_mode(self, mode: EmbeddingModes) -> None:
         """Several embedding models have a 'mode' or prompt which affects output."""
@@ -73,10 +95,19 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
         N = len(texts)
         embeddings = []
         for i in range(0, N, batch_size):
+
+            await self.check_rate_limit(
+                sum(
+                    len(t) / self.CHARACTERS_PER_TOKEN
+                    for t in texts[i : i + batch_size]
+                )
+            )
+
             response = await aembedding(
                 self.name, input=texts[i : i + batch_size], **self.embedding_kwargs
             )
             embeddings.extend([e["embedding"] for e in response.data])
+
         return embeddings
 
 
@@ -134,6 +165,7 @@ class LLMModel(ABC, BaseModel):
         exclude=True,
     )
     config: dict = Field(default_factory=dict)
+    CHARACTERS_PER_TOKEN: ClassVar[float] = 4.0
 
     async def acomplete(self, prompt: str) -> Chunk:
         """Return the completion as string and the number of tokens in the prompt and completion."""
@@ -234,12 +266,12 @@ class LLMModel(ABC, BaseModel):
 
         start_clock = asyncio.get_running_loop().time()
         if callbacks is None:
-            chunk = await self.achat(messages)
+            chunk = cast(Chunk, self.achat(messages))
             output = chunk.text
         else:
             sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
             async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
-            completion = self.achat_iter(messages)
+            completion = await self.achat_iter(messages)  # type: ignore[misc]
             text_result = []
             async for chunk in completion:
                 if chunk.text:
@@ -334,6 +366,69 @@ class LLMModel(ABC, BaseModel):
         return result
 
 
+LLMModelOrChild = TypeVar("LLMModelOrChild", bound=LLMModel)
+
+
+def rate_limited(
+    func: Callable[[LLMModelOrChild, Any], Awaitable[Chunk] | AsyncIterable[Chunk]],
+) -> Callable[
+    [LLMModelOrChild, Any, Any],
+    Coroutine[
+        Any, Any, Chunk | AsyncIterable[Chunk] | AsyncGenerator[LLMModelOrChild, None]
+    ],
+]:
+    """Decorator to rate limit relevant methods of an LLMModel."""
+
+    @functools.wraps(func)
+    async def wrapper(
+        self: LLMModelOrChild, *args: Any, **kwargs: Any
+    ) -> Chunk | AsyncIterable[Chunk] | AsyncGenerator[LLMModelOrChild, None]:
+
+        if not hasattr(self, "check_rate_limit") or not hasattr(
+            self, "CHARACTERS_PER_TOKEN"
+        ):
+            raise NotImplementedError(
+                f"Model {self.name} must have a `check_rate_limit` method "
+                "and a `CHARACTERS_PER_TOKEN` class variable."
+            )
+
+        # Estimate token count based on input
+        if func.__name__ in {"acomplete", "acomplete_iter"}:
+            prompt = args[0] if args else kwargs.get("prompt", "")
+            token_count = len(prompt) / self.CHARACTERS_PER_TOKEN
+        elif func.__name__ in {"achat", "achat_iter"}:
+            messages = args[0] if args else kwargs.get("messages", [])
+            token_count = len(str(messages)) / self.CHARACTERS_PER_TOKEN
+        else:
+            token_count = 0  # Default if method is unknown
+
+        await self.check_rate_limit(token_count)
+
+        # If wrapping a generator, count the tokens for each
+        # portion before yielding
+        if isasyncgenfunction(func):
+
+            async def rate_limited_generator() -> AsyncGenerator[LLMModelOrChild, None]:
+                async for item in func(self, *args, **kwargs):
+                    token_count = 0
+                    if isinstance(item, Chunk):
+                        token_count = int(
+                            len(item.text or "") / self.CHARACTERS_PER_TOKEN
+                        )
+                    await self.check_rate_limit(token_count)
+                    yield item
+
+            return rate_limited_generator()
+
+        result = await func(self, *args, **kwargs)  # type: ignore[misc]
+
+        if func.__name__ in {"acomplete", "achat"} and isinstance(result, Chunk):
+            await self.check_rate_limit(result.completion_tokens)
+        return result
+
+    return wrapper
+
+
 DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
     {
         "category": "HARM_CATEGORY_HARASSMENT",
@@ -368,7 +463,7 @@ class LiteLLMModel(LLMModel):
         `model_list`: stores a list of all model configurations
           (see https://docs.litellm.ai/docs/routing)
         `router_kwargs`: kwargs for the Router class
-        `rate_limits`: (Optional) dictionary keyed by model group name
+        `rate_limit`: (Optional) dictionary keyed by model group name
             with values of type limits.RateLimitItem (in tokens / minute)
 
     This way users can specify routing strategies, retries, etc.
@@ -377,7 +472,6 @@ class LiteLLMModel(LLMModel):
     config: dict = Field(default_factory=dict)
     name: str = "gpt-4o-mini"
     _router: Router | None = None
-    CHARACTERS_PER_TOKEN: ClassVar[float] = 4.0
 
     @model_validator(mode="before")
     @classmethod
@@ -429,23 +523,29 @@ class LiteLLMModel(LLMModel):
             )
         return self._router
 
-    async def check_rate_limit(self, token_count: float):
-        await GLOBAL_LIMITER.try_acquire(('client', self.name), 
-                                    self.config.get("rate_limits", {}).get(self.name, None), 
-                                    weight=token_count)
+    async def check_rate_limit(self, token_count: float, **kwargs):
+        # TODO: validate rate_limit config structure?
+        if "rate_limit" in self.config:
+            await GLOBAL_LIMITER.try_acquire(
+                ("client", self.name),
+                self.config["rate_limit"].get(self.name, None),
+                weight=max(int(token_count), 1),
+                **kwargs,
+            )
 
-    async def acomplete(self, prompt: str) -> Chunk:
-        await self.check_rate_limit(len(prompt) / self.CHARACTERS_PER_TOKEN)
+    @rate_limited
+    async def acomplete(self, prompt: str) -> Chunk:  # type: ignore[override]
         response = await self.router.atext_completion(model=self.name, prompt=prompt)
-        await self.check_rate_limit(response.usage.completion_tokens)
         return Chunk(
             text=response.choices[0].text,
             prompt_tokens=response.usage.prompt_tokens,
             completion_tokens=response.usage.completion_tokens,
         )
 
-    async def acomplete_iter(self, prompt: str) -> AsyncIterable[Chunk]:
-        await self.check_rate_limit(len(prompt) / self.CHARACTERS_PER_TOKEN)
+    @rate_limited
+    async def acomplete_iter(  # type: ignore[override]
+        self, prompt: str
+    ) -> AsyncIterable[Chunk]:
         completion = await self.router.atext_completion(
             model=self.name,
             prompt=prompt,
@@ -453,43 +553,39 @@ class LiteLLMModel(LLMModel):
             stream_options={"include_usage": True},
         )
         async for chunk in completion:
-            await self.check_rate_limit(len(chunk.choices[0].text) / self.CHARACTERS_PER_TOKEN)
             yield Chunk(
                 text=chunk.choices[0].text, prompt_tokens=0, completion_tokens=0
             )
         if hasattr(chunk, "usage") and hasattr(chunk.usage, "prompt_tokens"):
-            #TODO: should this access chunk.usage and chunk.usage.prompt_tokens?
-            await self.check_rate_limit(len(chunk.choices[0].text) / self.CHARACTERS_PER_TOKEN)
             yield Chunk(
                 text=chunk.choices[0].text, prompt_tokens=0, completion_tokens=0
             )
 
-    async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
-        await self.check_rate_limit(len(str(messages)) / self.CHARACTERS_PER_TOKEN)
+    @rate_limited
+    async def achat(  # type: ignore[override]
+        self, messages: Iterable[dict[str, str]]
+    ) -> Chunk:
         response = await self.router.acompletion(self.name, messages)
-        await self.check_rate_limit(response.usage.completion_tokens)
         return Chunk(
             text=response.choices[0].message.content,
             prompt_tokens=response.usage.prompt_tokens,
             completion_tokens=response.usage.completion_tokens,
         )
 
-    async def achat_iter(
+    @rate_limited
+    async def achat_iter(  # type: ignore[override]
         self, messages: Iterable[dict[str, str]]
     ) -> AsyncIterable[Chunk]:
-        await self.check_rate_limit(len(str(messages)) / self.CHARACTERS_PER_TOKEN)
         completion = await self.router.acompletion(
             self.name, messages, stream=True, stream_options={"include_usage": True}
         )
         async for chunk in completion:
-            await self.check_rate_limit(len(chunk.choices[0].delta.content) / self.CHARACTERS_PER_TOKEN)
             yield Chunk(
                 text=chunk.choices[0].delta.content,
                 prompt_tokens=0,
                 completion_tokens=0,
             )
         if hasattr(chunk, "usage") and hasattr(chunk.usage, "prompt_tokens"):
-            await self.check_rate_limit(chunk.usage.completion_tokens)
             yield Chunk(
                 text=None,
                 prompt_tokens=chunk.usage.prompt_tokens,
