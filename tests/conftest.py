@@ -112,8 +112,8 @@ def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[
         shutil.rmtree(tmp_path, ignore_errors=True)
 
 
-@pytest.fixture
-def reset_log_levels(caplog):
+@pytest.fixture(name="reset_log_levels")
+def fixture_reset_log_levels(caplog) -> Iterator[None]:
     logging.getLogger().setLevel(logging.DEBUG)
 
     for name in logging.root.manager.loggerDict:

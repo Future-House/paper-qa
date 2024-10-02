@@ -500,8 +500,9 @@ async def test_bad_init() -> None:
 
 
 @pytest.mark.vcr
+@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
-async def test_ensure_sequential_run(caplog, reset_log_levels) -> None:  # noqa: ARG001
+async def test_ensure_sequential_run(caplog) -> None:
     caplog.set_level(logging.DEBUG)
     # were using a DOI that is NOT in crossref, but running the crossref client first
     # we will ensure that both are run sequentially
@@ -535,10 +536,9 @@ async def test_ensure_sequential_run(caplog, reset_log_levels) -> None:  # noqa:
 
 
 @pytest.mark.vcr
+@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
-async def test_ensure_sequential_run_early_stop(
-    caplog, reset_log_levels  # noqa: ARG001
-) -> None:
+async def test_ensure_sequential_run_early_stop(caplog) -> None:
     caplog.set_level(logging.DEBUG)
     # now we should stop after hitting s2
     async with aiohttp.ClientSession() as session:
