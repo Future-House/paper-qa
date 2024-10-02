@@ -61,11 +61,11 @@ repos:
         additional_dependencies:
           - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.17
+    rev: 0.4.18
     hooks:
       - id: uv-lock
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 38.103.1
+    rev: 38.106.4
     hooks:
       - id: renovate-config-validator
   - repo: https://github.com/adamchainz/blacken-docs
