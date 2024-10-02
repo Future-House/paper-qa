@@ -10,7 +10,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 try:
-    from ldp.alg.algorithms import discounted_returns
+    from ldp.utils import discounted_returns
 except ImportError:
     discounted_returns = None  # type: ignore[assignment]
 
