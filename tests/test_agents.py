@@ -243,7 +243,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
         agent_type=agent_type,
     )
     # ensure that GenerateAnswerTool was called
-    assert response.status == AgentStatus.TIMEOUT, "Agent did not timeout"
+    assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
     assert "I cannot answer" in response.answer.answer
 
 
@@ -287,18 +287,28 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
     # lead to an unsure status, which will break this test's assertions. Since
     # this test is about a GatherEvidenceTool edge case, defeating
     # GenerateAnswerTool is fine
+    original_doc = GenerateAnswer.gen_answer.__doc__
     with patch.object(
-        GenerateAnswer, "gen_answer", return_value="Failed to answer question."
-    ):
-        settings = Settings()
-        settings.agent.tool_names = {"gather_evidence", "gen_answer"}
+        GenerateAnswer,
+        "gen_answer",
+        return_value="Failed to answer question.",
+        autospec=True,
+    ) as mock_gen_answer:
+        mock_gen_answer.__doc__ = original_doc
+        settings = Settings(
+            agent=AgentSettings(
+                tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
+            )
+        )
         response = await agent_query(
             query=QueryRequest(
                 query="Are COVID-19 vaccines effective?", settings=settings
             ),
             docs=Docs(),
         )
-    assert response.status == AgentStatus.FAIL, "Agent should have registered a failure"
+    assert (
+        response.status == AgentStatus.TRUNCATED
+    ), "Agent should have hit its max timesteps"
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
