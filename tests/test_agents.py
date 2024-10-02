@@ -287,9 +287,14 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
     # lead to an unsure status, which will break this test's assertions. Since
     # this test is about a GatherEvidenceTool edge case, defeating
     # GenerateAnswerTool is fine
+    original_doc = GenerateAnswer.gen_answer.__doc__
     with patch.object(
-        GenerateAnswer, "gen_answer", return_value="Failed to answer question."
-    ):
+        GenerateAnswer,
+        "gen_answer",
+        return_value="Failed to answer question.",
+        autospec=True,
+    ) as mock_gen_answer:
+        mock_gen_answer.__doc__ = original_doc
         settings = Settings()
         settings.agent.tool_names = {"gather_evidence", "gen_answer"}
         response = await agent_query(
