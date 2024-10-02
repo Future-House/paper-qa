@@ -94,10 +94,9 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
 
+@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
-async def test_get_directory_index_w_manifest(
-    agent_test_settings: Settings, reset_log_levels, caplog  # noqa: ARG001
-) -> None:
+async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> None:
     agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
     index = await get_directory_index(settings=agent_test_settings)
     assert index.fields == [
