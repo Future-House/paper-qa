@@ -226,7 +226,15 @@ async def run_aviary_agent(
                     logger.warning(
                         f"Agent didn't finish within {max_timesteps} timesteps, just answering."
                     )
-                    await tools[-1]._tool_fn(question=query.query, state=env.state)
+                    generate_answer_tool = next(
+                        filter(
+                            lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME,
+                            env.tools,
+                        )
+                    )
+                    await generate_answer_tool._tool_fn(
+                        question=query.query, state=env.state
+                    )
                     return env.state.answer, AgentStatus.TRUNCATED
                 agent_state.messages += obs
                 for attempt in Retrying(
@@ -251,7 +259,10 @@ async def run_aviary_agent(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
         )
         status = AgentStatus.TRUNCATED
-        await tools[-1]._tool_fn(question=query.query, state=env.state)
+        generate_answer_tool = next(
+            filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
+        )
+        await generate_answer_tool._tool_fn(question=query.query, state=env.state)
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
@@ -300,7 +311,10 @@ async def run_ldp_agent(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
         )
         status = AgentStatus.TRUNCATED
-        await env.tools[-1]._tool_fn(question=query.query, state=env.state)
+        generate_answer_tool = next(
+            filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
+        )
+        await generate_answer_tool._tool_fn(question=query.query, state=env.state)
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
