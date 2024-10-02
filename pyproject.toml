@@ -53,7 +53,7 @@ datasets = [
     "datasets",
 ]
 ldp = [
-    "ldp>=0.6",  # For LiteLLM 1.42.1 pinning's UnsupportedParamsError fix
+    "ldp>=0.9",  # For alg namespace grouping
 ]
 typing = [
     "pandas-stubs",
