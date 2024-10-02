@@ -19,48 +19,51 @@ from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
 
-
-def configure_cli_logging(verbosity: int = 0) -> None:
-    """Suppress loquacious loggers according to verbosity level."""
-    setup_default_logs()
-
-    verbosity_map = {
-        0: {
-            "paperqa.agents": logging.INFO,
-            "paperqa.agents.helpers": logging.WARNING,
-            "paperqa.agents.main": logging.WARNING,
-            "paperqa.agents.main.agent_callers": logging.INFO,
-            "anthropic": logging.WARNING,
-            "openai": logging.WARNING,
-            "httpx": logging.WARNING,
-            "paperqa.agents.models": logging.WARNING,
-            "paperqa.agents.search": logging.INFO,
-            "litellm": logging.WARNING,
-            "LiteLLM Router": logging.WARNING,
-            "LiteLLM Proxy": logging.WARNING,
-        }
+LOG_VERBOSITY_MAP = {
+    0: {
+        "paperqa.agents": logging.INFO,
+        "paperqa.agents.helpers": logging.WARNING,
+        "paperqa.agents.main": logging.WARNING,
+        "paperqa.agents.main.agent_callers": logging.INFO,
+        "paperqa.agents.models": logging.WARNING,
+        "paperqa.agents.search": logging.INFO,
+        "anthropic": logging.WARNING,
+        "openai": logging.WARNING,
+        "httpx": logging.WARNING,
+        "LiteLLM": logging.WARNING,
+        "LiteLLM Router": logging.WARNING,
+        "LiteLLM Proxy": logging.WARNING,
     }
+}
+LOG_VERBOSITY_MAP[1] = LOG_VERBOSITY_MAP[0] | {
+    "paperqa.models": logging.INFO,
+    "paperqa.agents.main": logging.INFO,
+}
+LOG_VERBOSITY_MAP[2] = LOG_VERBOSITY_MAP[1] | {
+    "paperqa.models": logging.DEBUG,
+    "paperqa.agents.helpers": logging.DEBUG,
+    "paperqa.agents.main": logging.DEBUG,
+    "paperqa.agents.main.agent_callers": logging.DEBUG,
+    "paperqa.agents.search": logging.DEBUG,
+    "LiteLLM": logging.INFO,
+    "LiteLLM Router": logging.INFO,
+    "LiteLLM Proxy": logging.INFO,
+}
+LOG_VERBOSITY_MAP[3] = LOG_VERBOSITY_MAP[2] | {
+    "LiteLLM": logging.DEBUG,  # <-- every single LLM call
+}
 
-    verbosity_map[1] = verbosity_map[0] | {
-        "paperqa.agents.main": logging.INFO,
-        "paperqa.models": logging.INFO,
-    }
+_PAPERQA_PKG_ROOT_LOGGER = logging.getLogger(__name__.split(".", maxsplit=1)[0])
+_INITIATED_FROM_CLI = False
 
-    verbosity_map[2] = verbosity_map[1] | {
-        "paperqa.agents.helpers": logging.DEBUG,
-        "paperqa.agents.main": logging.DEBUG,
-        "paperqa.agents.main.agent_callers": logging.DEBUG,
-        "paperqa.models": logging.DEBUG,
-        "paperqa.agents.search": logging.DEBUG,
-        "litellm": logging.INFO,
-        "LiteLLM Router": logging.INFO,
-        "LiteLLM Proxy": logging.INFO,
-    }
 
-    verbosity_map[3] = verbosity_map[2] | {
-        "litellm": logging.DEBUG,  # <-- every single LLM call
-    }
+def is_running_under_cli() -> bool:
+    """Check if the current Python process comes from the CLI."""
+    return _INITIATED_FROM_CLI
 
+
+def set_up_rich_handler(install: bool = True) -> RichHandler:
+    """Add a RichHandler to the paper-qa "root" logger, and return it."""
     rich_handler = RichHandler(
         rich_tracebacks=True,
         markup=True,
@@ -68,17 +71,25 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         show_level=False,
         console=Console(force_terminal=True),
     )
-
     rich_handler.setFormatter(logging.Formatter("%(message)s", datefmt="[%X]"))
+    if install and not any(
+        isinstance(h, RichHandler) for h in _PAPERQA_PKG_ROOT_LOGGER.handlers
+    ):
+        _PAPERQA_PKG_ROOT_LOGGER.addHandler(rich_handler)
+    return rich_handler
 
-    module_logger = logging.getLogger(__name__.split(".", maxsplit=1)[0])
 
-    if not any(isinstance(h, RichHandler) for h in module_logger.handlers):
-        module_logger.addHandler(rich_handler)
+def configure_cli_logging(verbosity: int = 0) -> None:
+    """Suppress loquacious loggers according to verbosity level."""
+    setup_default_logs()
+    set_up_rich_handler()
 
+    max_preset_verbosity: int = max(list(LOG_VERBOSITY_MAP.keys()))
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
-            log_level := verbosity_map.get(min(verbosity, 2), {}).get(logger_name)
+            log_level := LOG_VERBOSITY_MAP.get(
+                min(verbosity, max_preset_verbosity), {}
+            ).get(logger_name)
         ):
             logger_.setLevel(log_level)
 
@@ -110,7 +121,7 @@ def search_query(
         index_search(
             query,
             index_name=index_name,
-            index_directory=settings.index_directory,
+            index_directory=settings.agent.index.index_directory,
         )
     )
 
@@ -123,13 +134,13 @@ def build_index(
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
     settings = get_settings(settings)
     if index_name == "default":
-        index_name = None
+        settings.agent.index.name = None
+    elif isinstance(index_name, str):
+        settings.agent.index.name = index_name
     configure_cli_logging(verbosity=settings.verbosity)
     if directory:
-        settings.paper_directory = directory
-    return get_loop().run_until_complete(
-        get_directory_index(index_name=index_name, settings=settings)
-    )
+        settings.agent.index.paper_directory = directory
+    return get_loop().run_until_complete(get_directory_index(settings=settings))
 
 
 def save_settings(
@@ -158,8 +169,8 @@ def save_settings(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="PaperQA CLI")
 
+    parser = argparse.ArgumentParser(description="PaperQA CLI")
     parser.add_argument(
         "--settings",
         "-s",
@@ -169,7 +180,6 @@ def main() -> None:
             " last"
         ),
     )
-
     parser.add_argument(
         "--index", "-i", default="default", help="Index name to search or create"
     )
@@ -179,6 +189,7 @@ def main() -> None:
     )
 
     subparsers.add_parser("view", help="View the chosen settings")
+
     save_parser = subparsers.add_parser("save", help="View the chosen settings")
     save_parser.add_argument(
         "location", help="Location for new settings (name or an absolute path)"
@@ -236,4 +247,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    _INITIATED_FROM_CLI = True
     main()

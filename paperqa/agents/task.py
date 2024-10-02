@@ -123,14 +123,22 @@ class LitQATaskDataset(
 
     def __init__(
         self,
-        base_query: QueryRequest | None = None,
-        base_docs: Docs | None = None,
+        base_query: QueryRequest | dict | None = None,
+        base_docs: Docs | dict | None = None,
         rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         **env_kwargs,
     ):
-        self._base_query = base_query or QueryRequest()
-        self._base_docs = base_docs or Docs()
+        if base_query is None:
+            base_query = QueryRequest()
+        if isinstance(base_query, dict):
+            base_query = QueryRequest(**base_query)
+        self._base_query = base_query
+        if base_docs is None:
+            base_docs = Docs()
+        if isinstance(base_docs, dict):
+            base_docs = Docs(**base_docs)
+        self._base_docs = base_docs
         self._rewards = rewards
         self._env_kwargs = env_kwargs
         self._eval_model = eval_model
@@ -167,15 +175,20 @@ class LitQATaskDataset(
         evidence_count: list[float] = []
         for t in trajectories:
             split_answers = [
-                re.split(
-                    pattern=GenerateAnswer.ANSWER_SPLIT_REGEX_PATTERN,
-                    string=obs.content,
+                split_answers
+                for split_answers in (
+                    re.split(
+                        pattern=GenerateAnswer.ANSWER_SPLIT_REGEX_PATTERN,
+                        string=obs.content,
+                    )
+                    for obs in t.steps[-1].next_observation
+                    if (
+                        isinstance(obs, ToolResponseMessage)
+                        and obs.name == GenerateAnswer.TOOL_FN_NAME
+                    )
                 )
-                for obs in t.steps[-1].next_observation
-                if (
-                    isinstance(obs, ToolResponseMessage)
-                    and obs.name == GenerateAnswer.TOOL_FN_NAME
-                )
+                # Filter for places where the regex split succeeded
+                if len(split_answers) >= 4  # noqa: PLR2004
             ]
             for i, metric_list in enumerate(
                 (total_paper_count, relevant_paper_count, evidence_count),

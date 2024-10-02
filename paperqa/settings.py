@@ -1,11 +1,13 @@
 import asyncio
 import importlib.resources
 import os
+import pathlib
+import warnings
 from enum import StrEnum
-from pathlib import Path
 from pydoc import locate
-from typing import Any, ClassVar, assert_never, cast
+from typing import Any, ClassVar, Self, assert_never, cast
 
+import anyio
 from aviary.tools import ToolSelector
 from pydantic import (
     BaseModel,
@@ -14,6 +16,7 @@ from pydantic import (
     TypeAdapter,
     computed_field,
     field_validator,
+    model_validator,
 )
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
@@ -110,6 +113,8 @@ class ChunkingOptions(StrEnum):
 
 
 class ParsingSettings(BaseModel):
+    """Settings relevant for parsing and chunking documents."""
+
     chunk_size: int = Field(default=3000, description="Number of characters per chunk")
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
@@ -261,6 +266,69 @@ class PromptSettings(BaseModel):
         return v
 
 
+class IndexSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str | None = Field(
+        default=None,
+        description=(
+            "Optional name of the index. If unspecified, the name should be generated."
+        ),
+    )
+    paper_directory: str | os.PathLike = Field(
+        default=pathlib.Path.cwd(),
+        description=(
+            "Local directory which contains the papers to be indexed and searched."
+        ),
+    )
+    manifest_file: str | os.PathLike | None = Field(
+        default=None,
+        description=(
+            "Optional absolute path to a manifest CSV, or a relative path from the"
+            " paper_directory to a manifest CSV. A manifest CSV contains columns which"
+            " are attributes for a DocDetails object. Only 'file_location', 'doi', and"
+            " 'title' will be used when indexing, others are discarded."
+        ),
+    )
+    index_directory: str | os.PathLike | None = Field(
+        default=pqa_directory("indexes"),
+        description=(
+            "Directory to store the PQA built search index, configuration, and"
+            " answer indexes."
+        ),
+    )
+    use_absolute_paper_directory: bool = Field(
+        default=False,
+        description=(
+            "Opt-in flag to convert the index_directory to an absolute path. Setting"
+            " this to True will make the index user-specific, defeating sharing."
+        ),
+    )
+    recurse_subdirectories: bool = Field(
+        default=True,
+        description="Whether to recurse into subdirectories when indexing sources.",
+    )
+    concurrency: int = Field(
+        default=30,
+        description="Number of concurrent filesystem reads for indexing",
+    )
+    sync_with_paper_directory: bool = Field(
+        default=True,
+        description=(
+            "Whether to sync the index with the paper directory when loading an index."
+            " Setting to True will add or delete index files to match the source paper directory."
+        ),
+    )
+
+    async def finalize_manifest_file(self) -> anyio.Path | None:
+        manifest_file = anyio.Path(self.manifest_file) if self.manifest_file else None
+        if manifest_file and not await manifest_file.exists():
+            # If the manifest file was specified but doesn't exist,
+            # perhaps it was specified as a relative path from the paper_directory
+            manifest_file = anyio.Path(self.paper_directory) / manifest_file
+        return manifest_file
+
+
 class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -328,11 +396,18 @@ class AgentSettings(BaseModel):
             " supplied."
         ),
     )
+    max_timesteps: int | None = Field(
+        default=None,
+        description="Optional upper limit on the number of environment steps.",
+    )
 
     index_concurrency: int = Field(
         default=30,
         description="Number of concurrent filesystem reads for indexing",
+        exclude=True,
+        frozen=True,
     )
+    index: IndexSettings = Field(default_factory=IndexSettings)
 
     @field_validator("tool_names")
     @classmethod
@@ -348,6 +423,23 @@ class AgentSettings(BaseModel):
                 f"If using an override, must contain at least the {answer_tool_name}."
             )
         return v
+
+    @model_validator(mode="after")
+    def _deprecated_field(self) -> Self:
+        for deprecated_field_name, new_name in (("index_concurrency", "concurrency"),):
+            value = getattr(self, deprecated_field_name)
+            if value != type(self).model_fields[deprecated_field_name].default:
+                warnings.warn(
+                    (
+                        f"The {deprecated_field_name!r} field has been moved to"
+                        f" {AgentSettings.__name__},"
+                        " this deprecation will conclude in version 6."
+                    ),
+                    category=DeprecationWarning,
+                    stacklevel=2,
+                )
+                setattr(self.index, new_name, value)  # Propagate to new location
+        return self
 
 
 def make_default_litellm_router_settings(llm: str, temperature: float = 0.0) -> dict:
@@ -409,6 +501,8 @@ class Settings(BaseSettings):
     index_absolute_directory: bool = Field(
         default=False,
         description="Whether to use the absolute directory for the PQA index",
+        exclude=True,
+        frozen=True,
     )
     index_directory: str | os.PathLike | None = Field(
         default=pqa_directory("indexes"),
@@ -416,10 +510,14 @@ class Settings(BaseSettings):
             "Directory to store the PQA generated search index, configuration, and"
             " answer indexes."
         ),
+        exclude=True,
+        frozen=True,
     )
     index_recursively: bool = Field(
         default=True,
         description="Whether to recurse into subdirectories when indexing sources.",
+        exclude=True,
+        frozen=True,
     )
     verbosity: int = Field(
         default=0,
@@ -431,17 +529,45 @@ class Settings(BaseSettings):
     manifest_file: str | os.PathLike | None = Field(
         default=None,
         description=(
-            "Optional manifest CSV, containing columns which are attributes for a"
-            " DocDetails object. Only 'file_location', 'doi', and 'title' will be used"
-            " when indexing."
+            "Optional absolute path to a manifest CSV, or a relative path from the"
+            " paper_directory to a manifest CSV. A manifest CSV contains columns which"
+            " are attributes for a DocDetails object. Only 'file_location', 'doi', and"
+            " 'title' will be used when indexing, others are discarded."
         ),
+        exclude=True,
+        frozen=True,
     )
     paper_directory: str | os.PathLike = Field(
-        default=Path.cwd(),
+        default=pathlib.Path.cwd(),
         description=(
             "Local directory which contains the papers to be indexed and searched."
         ),
+        exclude=True,
+        frozen=True,
     )
+
+    @model_validator(mode="after")
+    def _deprecated_field(self) -> Self:
+        for deprecated_field_name, new_name in (
+            ("index_absolute_directory", "use_absolute_paper_directory"),
+            ("index_directory", "index_directory"),
+            ("index_recursively", "recurse_subdirectories"),
+            ("manifest_file", "manifest_file"),
+            ("paper_directory", "paper_directory"),
+        ):
+            value = getattr(self, deprecated_field_name)
+            if value != type(self).model_fields[deprecated_field_name].default:
+                warnings.warn(
+                    (
+                        f"The {deprecated_field_name!r} field has been moved to"
+                        f" {AgentSettings.__name__},"
+                        " this deprecation will conclude in version 6."
+                    ),
+                    category=DeprecationWarning,
+                    stacklevel=2,
+                )
+                setattr(self.agent.index, new_name, value)  # Propagate to new location
+        return self
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -458,30 +584,27 @@ class Settings(BaseSettings):
 
         This index is where parsings are stored based on parsing/embedding strategy.
         """
-        # index name should use an absolute path
-        # this way two different folders where the
-        # user locally uses '.' will make different indexes
-        paper_directory = self.paper_directory
-        if isinstance(paper_directory, Path):
-            paper_directory = str(paper_directory.absolute())
-
-        index_fields = "|".join(
-            [
-                str(paper_directory),
-                self.embedding,
-                str(self.parsing.chunk_size),
-                str(self.parsing.overlap),
-                self.parsing.chunking_algorithm,
-            ]
-        )
-
-        return f"pqa_index_{hexdigest(index_fields)}"
+        if isinstance(self.agent.index.paper_directory, pathlib.Path):
+            # Here we use an absolute path so that where the user locally
+            # uses '.', two different folders will make different indexes
+            first_segment: str = str(self.agent.index.paper_directory.absolute())
+        else:
+            first_segment = str(self.agent.index.paper_directory)
+        segments = [
+            first_segment,
+            str(self.agent.index.use_absolute_paper_directory),
+            self.embedding,
+            str(self.parsing.chunk_size),
+            str(self.parsing.overlap),
+            self.parsing.chunking_algorithm,
+        ]
+        return f"pqa_index_{hexdigest('|'.join(segments))}"
 
     @classmethod
     def from_name(
         cls, config_name: str = "default", cli_source: CliSettingsSource | None = None
     ) -> "Settings":
-        json_path: Path | None = None
+        json_path: pathlib.Path | None = None
 
         # quick exit for default settings
         if config_name == "default":
@@ -504,7 +627,7 @@ class Settings(BaseSettings):
                 importlib.resources.files("paperqa.configs") / f"{config_name}.json"
             )
             if pkg_config_path.is_file():
-                json_path = cast(Path, pkg_config_path)
+                json_path = cast(pathlib.Path, pkg_config_path)
         except FileNotFoundError as e:
             raise FileNotFoundError(
                 f"No configuration file found for {config_name}"

@@ -1,6 +1,10 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended", ":enablePreCommit", "group:allNonMajor"],
+  extends: [
+    "config:recommended",
+    "group:allNonMajor", // Rely on config:recommended for major version updates
+    ":automergeMinor",
+  ],
   schedule: ["* 2 * * 1"],
   prHourlyLimit: 4,
   timezone: "America/Los_Angeles",
@@ -8,4 +12,14 @@
   lockFileMaintenance: {
     enabled: true,
   },
+  "pre-commit": {
+    enabled: true,
+  },
+  packageRules: [
+    {
+      // Allow 'widen' range strategy while matching aviary_internal pyproject.toml
+      matchPackageNames: ["openai"],
+      allowedVersions: "<1.47",
+    },
+  ],
 }

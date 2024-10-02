@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from aviary.env import TASK_DATASET_REGISTRY, TaskDataset
+from aviary.env import TASK_DATASET_REGISTRY, TaskConfig, TaskDataset
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
@@ -78,13 +78,30 @@ class TestTaskDataset:
     @pytest.mark.asyncio
     async def test_evaluation(self, base_query_request: QueryRequest) -> None:
         docs = Docs()
-        dataset = TaskDataset.from_name(
-            STUB_TASK_DATASET_NAME, base_query=base_query_request, base_docs=docs
+        # Why are we constructing a TaskConfig here using a serialized QueryRequest and
+        # Docs? It's to confirm everything works as if hydrating from a YAML config file
+        task_config = TaskConfig(
+            name=STUB_TASK_DATASET_NAME,
+            eval_kwargs={
+                "base_query": base_query_request.model_dump(
+                    exclude={"id", "settings", "docs_name"}
+                ),
+                "base_docs": docs.model_dump(
+                    exclude={
+                        "id",
+                        "docnames",
+                        "texts_index",
+                        "index_path",
+                        "deleted_dockeys",
+                    }
+                ),
+            },
         )
+        dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
         evaluator = Evaluator(
-            config=EvaluatorConfig(batch_size=3),
+            config=EvaluatorConfig(batch_size=3, max_rollout_steps=10),
             agent=SimpleAgent(),
             dataset=dataset,
             callbacks=[metrics_callback],
@@ -95,9 +112,14 @@ class TestTaskDataset:
             not base_query_request.query
         ), "Should not have mutated query in base request"
         assert not docs.docs, "Should not have mutated docs in base docs"
-        assert isinstance(metrics_callback.eval_means["reward"], float)
-        assert isinstance(metrics_callback.eval_means["total_paper_count"], float)
+        assert (
+            isinstance(metrics_callback.eval_means["total_paper_count"], float) > 0
+        ), "Expected some papers to help us answer questions"
+        assert (
+            isinstance(metrics_callback.eval_means["reward"], float) > 0
+        ), "Expected some wins"
 
+    @pytest.mark.vcr
     @pytest.mark.asyncio
     async def test_tool_failure(self, base_query_request: QueryRequest) -> None:
         docs = Docs()
@@ -120,6 +142,9 @@ class TestTaskDataset:
             side_effect=Exception("Totally unexpected but retryable error."),
         ) as mock_query:
             await evaluator.evaluate()  # Confirm this does not crash
-        mock_query.assert_awaited()
+        assert (
+            metrics_callback.eval_means["truncation_rate"] == 1.0
+        ), "Expected 100% truncations due to max_rollout_steps"
+        mock_query.assert_awaited(), "Expected failures to come from unit test"
         assert metrics_callback.eval_means["correct"] == 0.0
         assert metrics_callback.eval_means["correct_unsure"] == 0.0

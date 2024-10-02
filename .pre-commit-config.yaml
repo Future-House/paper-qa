@@ -23,7 +23,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.5
+    rev: v0.6.8
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -55,21 +55,25 @@ repos:
     hooks:
       - id: check-mailmap
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.19
+    rev: v0.20.2
     hooks:
       - id: validate-pyproject
         additional_dependencies:
           - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.12
+    rev: 0.4.17
     hooks:
       - id: uv-lock
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 38.103.1
+    hooks:
+      - id: renovate-config-validator
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.18.0
     hooks:
       - id: blacken-docs
   - repo: https://github.com/jsh9/markdown-toc-creator
-    rev: 0.0.7
+    rev: 0.0.8
     hooks:
       - id: markdown-toc-creator
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -88,6 +92,7 @@ repos:
           - pandas-stubs
           - pydantic~=2.0 # Match pyproject.toml
           - pydantic-settings
+          - rich
           - tantivy
           - tenacity
           - tiktoken>=0.4.0 # Match pyproject.toml

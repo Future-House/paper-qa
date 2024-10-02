@@ -3,10 +3,13 @@ from __future__ import annotations
 import itertools
 import json
 import re
+import shutil
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
+from uuid import uuid4
 
 import ldp.agent
 import pytest
@@ -18,7 +21,7 @@ from ldp.llms import EmbeddingModel, MultipleCompletionLLMModel
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
-from paperqa.agents import agent_query
+from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import settings_to_tools
 from paperqa.agents.main import FAKE_AGENT_TYPE
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
@@ -38,44 +41,108 @@ from paperqa.utils import extract_thought, get_year, md5sum
 
 @pytest.mark.asyncio
 async def test_get_directory_index(agent_test_settings: Settings) -> None:
-    index = await get_directory_index(settings=agent_test_settings)
-    assert index.fields == [
-        "file_location",
-        "body",
-        "title",
-        "year",
-    ], "Incorrect fields in index"
-    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
-    # but empty.txt fails to be added
-    path_to_id = await index.index_files
-    assert (
-        sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
-    ), "Incorrect number of parsed index files"
-    results = await index.query(query="who is Frederick Bates?")
-    paper_dir = cast(Path, agent_test_settings.paper_directory)
-    assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
+    # Since agent_test_settings is used by other tests, and thus uses the same
+    # paper_directory as other tests, we use a tempdir so we can delete files
+    # without affecting concurrent tests
+    with tempfile.TemporaryDirectory() as tempdir:
+        shutil.copytree(
+            agent_test_settings.agent.index.paper_directory, tempdir, dirs_exist_ok=True
+        )
+        paper_dir = agent_test_settings.agent.index.paper_directory = Path(tempdir)
+
+        index_name = agent_test_settings.agent.index.name = (
+            f"stub{uuid4()}"  # Unique across test invocations
+        )
+        with patch.object(
+            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
+        ) as mock_save_index:
+            index = await get_directory_index(settings=agent_test_settings)
+        assert (
+            index.index_name == index_name
+        ), "Index name should match its specification"
+        assert index.fields == [
+            "file_location",
+            "body",
+            "title",
+            "year",
+        ], "Incorrect fields in index"
+        mock_save_index.assert_awaited_once(), "Expected just one save"
+        assert not index.changed, "Expected index to not have changes at this point"
+        # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
+        # but empty.txt fails to be added
+        path_to_id = await index.index_files
+        assert (
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
+        ), "Incorrect number of parsed index files"
+        results = await index.query(query="who is Frederick Bates?")
+        assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
+
+        # Check getting the same index name will not reprocess files
+        with patch.object(Docs, "aadd") as mock_aadd:
+            index = await get_directory_index(settings=agent_test_settings)
+        assert len(await index.index_files) == len(path_to_id)
+        mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
+
+        # Now we actually remove (but not add!) a file from the paper directory,
+        # and we still don't reprocess files
+        (paper_dir / "obama.txt").unlink()
+        with patch.object(
+            Docs, "aadd", autospec=True, side_effect=Docs.aadd
+        ) as mock_aadd:
+            index = await get_directory_index(settings=agent_test_settings)
+        assert len(await index.index_files) == len(path_to_id) - 1
+        mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
+
+
+EXPECTED_STUB_DATA_FILES = {
+    "bates.txt",
+    "empty.txt",
+    "flag_day.html",
+    "obama.txt",
+    "paper.pdf",
+}
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index_w_manifest(
-    agent_test_settings: Settings, reset_log_levels, caplog  # noqa: ARG001
-) -> None:
-    agent_test_settings.manifest_file = "stub_manifest.csv"
-    index = await get_directory_index(settings=agent_test_settings)
-    assert index.fields == [
-        "file_location",
-        "body",
-        "title",
-        "year",
-    ], "Incorrect fields in index"
-    # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt
-    assert len(await index.index_files) == 5, "Incorrect number of index files"
-    results = await index.query(query="who is Frederick Bates?")
-    top_result = next(iter(results[0].docs.values()))
-    paper_dir = cast(Path, agent_test_settings.paper_directory)
-    assert top_result.dockey == md5sum((paper_dir / "bates.txt").absolute())
-    # note: this title comes from the manifest, so we know it worked
-    assert top_result.title == "Frederick Bates (Wikipedia article)"
+async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> None:
+    # Set the paper_directory to be a relative path as starting point to confirm this
+    # won't trip us up, and set the manifest file too
+    abs_paper_dir = cast(Path, agent_test_settings.agent.index.paper_directory)
+    agent_test_settings.agent.index.paper_directory = abs_paper_dir.relative_to(
+        Path.cwd()
+    )
+    agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
+
+    # Now set up both relative and absolute test settings
+    relative_test_settings = agent_test_settings.model_copy(deep=True)
+    absolute_test_settings = agent_test_settings.model_copy(deep=True)
+    absolute_test_settings.agent.index.use_absolute_paper_directory = True
+    assert (
+        relative_test_settings != absolute_test_settings
+    ), "We need to be able to differentiate between relative and absolute settings"
+    del agent_test_settings
+
+    relative_index = await get_directory_index(settings=relative_test_settings)
+    assert (
+        set((await relative_index.index_files).keys()) == EXPECTED_STUB_DATA_FILES
+    ), "Incorrect index files, should be relative to share indexes across machines"
+    absolute_index = await get_directory_index(settings=absolute_test_settings)
+    assert set((await absolute_index.index_files).keys()) == {
+        str(abs_paper_dir / f) for f in EXPECTED_STUB_DATA_FILES
+    }, "Incorrect index files, should be absolute to deny sharing indexes across machines"
+    for index in (relative_index, absolute_index):
+        assert index.fields == [
+            "file_location",
+            "body",
+            "title",
+            "year",
+        ], "Incorrect fields in index"
+
+        results = await index.query(query="who is Frederick Bates?")
+        top_result = next(iter(results[0].docs.values()))
+        assert top_result.dockey == md5sum(abs_paper_dir / "bates.txt")
+        # note: this title comes from the manifest, so we know it worked
+        assert top_result.title == "Frederick Bates (Wikipedia article)"
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
@@ -205,7 +272,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
         agent_type=agent_type,
     )
     # ensure that GenerateAnswerTool was called
-    assert response.status == AgentStatus.TIMEOUT, "Agent did not timeout"
+    assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
     assert "I cannot answer" in response.answer.answer
 
 
@@ -249,18 +316,28 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
     # lead to an unsure status, which will break this test's assertions. Since
     # this test is about a GatherEvidenceTool edge case, defeating
     # GenerateAnswerTool is fine
+    original_doc = GenerateAnswer.gen_answer.__doc__
     with patch.object(
-        GenerateAnswer, "gen_answer", return_value="Failed to answer question."
-    ):
-        settings = Settings()
-        settings.agent.tool_names = {"gather_evidence", "gen_answer"}
+        GenerateAnswer,
+        "gen_answer",
+        return_value="Failed to answer question.",
+        autospec=True,
+    ) as mock_gen_answer:
+        mock_gen_answer.__doc__ = original_doc
+        settings = Settings(
+            agent=AgentSettings(
+                tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
+            )
+        )
         response = await agent_query(
             query=QueryRequest(
                 query="Are COVID-19 vaccines effective?", settings=settings
             ),
             docs=Docs(),
         )
-    assert response.status == AgentStatus.FAIL, "Agent should have registered a failure"
+    assert (
+        response.status == AgentStatus.TRUNCATED
+    ), "Agent should have hit its max timesteps"
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
@@ -276,18 +353,26 @@ async def test_agent_sharing_state(
     embedding_model = agent_test_settings.get_embedding_model()
 
     answer = Answer(question="What is is a self-explanatory model?")
-    docs = Docs()
     query = QueryRequest(query=answer.question, settings=agent_test_settings)
-    env_state = EnvironmentState(docs=docs, answer=answer)
+    env_state = EnvironmentState(docs=Docs(), answer=answer)
+    built_index = await get_directory_index(settings=agent_test_settings)
+    assert await built_index.count, "Index build did not work"
 
     with subtests.test(msg=PaperSearch.__name__):
         search_tool = PaperSearch(
             settings=agent_test_settings, embedding_model=embedding_model
         )
-        await search_tool.paper_search(
-            "XAI self explanatory model", min_year=None, max_year=None, state=env_state
-        )
-        assert env_state.docs.docs, "Search did not save any papers"
+        with patch.object(
+            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
+        ) as mock_save_index:
+            await search_tool.paper_search(
+                "XAI self explanatory model",
+                min_year=None,
+                max_year=None,
+                state=env_state,
+            )
+        assert env_state.docs.docs, "Search did not add any papers"
+        mock_save_index.assert_not_awaited(), "Search shouldn't try to update the index"
         assert all(
             (isinstance(d, Doc) or issubclass(d, Doc))  # type: ignore[unreachable]
             for d in env_state.docs.docs.values()

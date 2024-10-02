@@ -6,11 +6,12 @@ import logging
 import os
 import pathlib
 import pickle
+import warnings
 import zlib
 from collections.abc import Sequence
 from enum import StrEnum, auto
 from io import StringIO
-from typing import Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 from uuid import UUID
 
 import anyio
@@ -31,11 +32,14 @@ from tenacity import (
 )
 
 from paperqa.docs import Docs
-from paperqa.settings import MaybeSettings, Settings, get_settings
+from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
+
+if TYPE_CHECKING:
+    from paperqa.settings import MaybeSettings, Settings
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +109,7 @@ class SearchIndex:
                 f"{self.REQUIRED_FIELDS} must be included in search index fields."
             )
         if index_directory is None:
-            index_directory = Settings.model_fields["index_directory"].default
+            index_directory = IndexSettings.model_fields["index_directory"].default
         self.index_name = index_name
         self._index_directory = index_directory
         self._schema = None
@@ -118,25 +122,23 @@ class SearchIndex:
     async def init_directory(self) -> None:
         await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
 
-    @staticmethod
-    async def extend_and_make_directory(base: anyio.Path, *dirs: str) -> anyio.Path:
-        directory = base.joinpath(*dirs)
+    @property
+    async def index_directory(self) -> anyio.Path:
+        directory = anyio.Path(self._index_directory).joinpath(self.index_name)
         await directory.mkdir(parents=True, exist_ok=True)
         return directory
 
     @property
-    async def index_directory(self) -> anyio.Path:
-        return await self.extend_and_make_directory(
-            anyio.Path(self._index_directory), self.index_name
-        )
-
-    @property
     async def index_filename(self) -> anyio.Path:
-        return await self.extend_and_make_directory(await self.index_directory, "index")
+        index_dir = (await self.index_directory) / "index"
+        await index_dir.mkdir(exist_ok=True)
+        return index_dir
 
     @property
     async def docs_index_directory(self) -> anyio.Path:
-        return await self.extend_and_make_directory(await self.index_directory, "docs")
+        docs_dir = (await self.index_directory) / "docs"
+        await docs_dir.mkdir(exist_ok=True)
+        return docs_dir
 
     @property
     async def file_index_filename(self) -> anyio.Path:
@@ -198,6 +200,10 @@ class SearchIndex:
             index_files.get(filename)
             and (filehash is None or index_files[filename] == filehash)
         )
+
+    async def mark_failed_document(self, path: str | os.PathLike) -> None:
+        (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
+        self.changed = True
 
     async def add_document(
         self, index_doc: dict, document: Any | None = None, max_retries: int = 1000
@@ -280,6 +286,7 @@ class SearchIndex:
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
+        self.changed = False
 
     async def get_saved_object(
         self, file_location: str, keep_filenames: bool = False
@@ -313,14 +320,14 @@ class SearchIndex:
         query_fields = list(field_subset or self.fields)
         searcher = await self.searcher
         index = await self.index
-        results = [
+        addresses = [
             s[1]
             for s in searcher.search(
                 index.parse_query(self.clean_query(query), query_fields), top_n
             ).hits
             if s[0] > min_score
         ][offset : offset + top_n]
-        search_index_docs = [searcher.doc(result) for result in results]
+        search_index_docs = [searcher.doc(address) for address in addresses]
         return [
             result
             for result in [
@@ -343,6 +350,10 @@ async def maybe_get_manifest(
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
             records = [DocDetails(**row) for row in csv.DictReader(StringIO(content))]
+            logger.debug(
+                f"Found manifest file at {filename} and read {len(records)} records"
+                " from it."
+            )
             return {str(r.file_location): r for r in records if r.file_location}
         except FileNotFoundError:
             logging.warning(f"Manifest file at {filename} could not be found.")
@@ -358,25 +369,40 @@ FAILED_DOCUMENT_ADD_ID = "ERROR"
 
 
 async def process_file(
-    file_path: anyio.Path,
+    rel_file_path: anyio.Path,
     search_index: SearchIndex,
-    metadata: dict[str, Any],
+    manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
 ) -> None:
+    abs_file_path = (
+        pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
+    )
+    fallback_title = rel_file_path.name
+    if settings.agent.index.use_absolute_paper_directory:
+        file_location = str(abs_file_path)
+        manifest_fallback_location = str(rel_file_path)
+    else:
+        file_location = str(rel_file_path)
+        manifest_fallback_location = str(abs_file_path)
+
     async with semaphore:
-        file_name = file_path.name
-        if not await search_index.filecheck(str(file_path)):
-            logger.info(f"New file to index: {file_name}...")
+        if not await search_index.filecheck(filename=file_location):
+            logger.info(f"New file to index: {file_location}...")
 
             doi, title = None, None
-            if file_name in metadata:
-                doi, title = metadata[file_name].doi, metadata[file_name].title
+            if file_location in manifest:
+                manifest_entry = manifest[file_location]
+                doi, title = manifest_entry.doi, manifest_entry.title
+            elif manifest_fallback_location in manifest:
+                # Perhaps manifest used the opposite pathing scheme
+                manifest_entry = manifest[manifest_fallback_location]
+                doi, title = manifest_entry.doi, manifest_entry.title
 
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
-                    path=pathlib.Path(file_path),
+                    path=abs_file_path,
                     title=title,
                     doi=doi,
                     fields=["title", "author", "journal", "year"],
@@ -384,42 +410,39 @@ async def process_file(
                 )
             except (ValueError, ImpossibleParsingError):
                 logger.exception(
-                    f"Error parsing {file_name}, skipping index for this file."
+                    f"Error parsing {file_location}, skipping index for this file."
                 )
-                (await search_index.index_files)[
-                    str(file_path)
-                ] = FAILED_DOCUMENT_ADD_ID
-                await search_index.save_index()
+                await search_index.mark_failed_document(file_location)
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
 
             if isinstance(this_doc, DocDetails):
-                title = this_doc.title or file_name
+                title = this_doc.title or fallback_title
                 year = this_doc.year or "Unknown year"
             else:
-                title, year = file_name, "Unknown year"
+                title, year = fallback_title, "Unknown year"
 
             await search_index.add_document(
                 {
                     "title": title,
                     "year": year,
-                    "file_location": str(file_path),
+                    "file_location": file_location,
                     "body": "".join([t.text for t in tmp_docs.texts]),
                 },
                 document=tmp_docs,
             )
-            await search_index.save_index()
             logger.info(f"Complete ({title}).")
 
 
 WARN_IF_INDEXING_MORE_THAN = 999
 
 
-async def get_directory_index(
+async def get_directory_index(  # noqa: PLR0912
     index_name: str | None = None,
     sync_index_w_directory: bool = True,
     settings: MaybeSettings = None,
+    build: bool = True,
 ) -> SearchIndex:
     """
     Create a Tantivy index by reading from a directory of text files.
@@ -427,75 +450,103 @@ async def get_directory_index(
     This function only reads from the source directory, not edits or writes to it.
 
     Args:
-        index_name: Override on the name of the index. If unspecified, the default
-            behavior is to generate the name from the input settings.
-        sync_index_w_directory: Sync the index with the directory (i.e. delete index
-            files if the file isn't in the source directory).
+        index_name: Deprecated override on the name of the index. If unspecified,
+            the default behavior is to generate the name from the input settings.
+        sync_index_w_directory: Opt-out flag to sync the index (add or delete index
+            files) with the source paper directory.
         settings: Application settings.
+        build: Opt-out flag (default is True) to read the contents of the source paper
+            directory and if sync_index_w_directory is enabled also update the index.
     """
     _settings = get_settings(settings)
-
-    semaphore = anyio.Semaphore(_settings.agent.index_concurrency)
-    directory = anyio.Path(_settings.paper_directory)
-
-    if _settings.index_absolute_directory:
-        directory = await directory.absolute()
+    index_settings = _settings.agent.index
+    if index_name:
+        warnings.warn(
+            (
+                f"The index_name argument has been moved to"
+                f" {type(_settings.agent.index).__name__},"
+                " this deprecation will conclude in version 6."
+            ),
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        index_settings.name = index_name
+    del index_name
 
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
-        index_name=index_name or _settings.get_index_name(),
-        index_directory=_settings.index_directory,
+        index_name=index_settings.name or _settings.get_index_name(),
+        index_directory=index_settings.index_directory,
     )
+    # NOTE: if the index was not previously built, its index_files will be empty.
+    # Otherwise, the index_files will not be empty
+    if not build:
+        return search_index
 
-    manifest_file = (
-        anyio.Path(_settings.manifest_file) if _settings.manifest_file else None
+    if not sync_index_w_directory:
+        warnings.warn(
+            (
+                f"The sync_index_w_directory argument has been moved to"
+                f" {type(_settings.agent.index).__name__},"
+                " this deprecation will conclude in version 6."
+            ),
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        index_settings.sync_with_paper_directory = sync_index_w_directory
+    del sync_index_w_directory
+
+    paper_directory = anyio.Path(index_settings.paper_directory)
+    manifest = await maybe_get_manifest(
+        filename=await index_settings.finalize_manifest_file()
     )
-    # check if it doesn't exist - if so, try to make it relative
-    if manifest_file and not await manifest_file.exists():
-        manifest_file = directory / manifest_file
-
-    metadata = await maybe_get_manifest(manifest_file)
-    valid_files = [
-        file
+    valid_papers_rel_file_paths = [
+        file.relative_to(paper_directory)
         async for file in (
-            directory.rglob("*") if _settings.index_recursively else directory.iterdir()
+            paper_directory.rglob("*")
+            if index_settings.recurse_subdirectories
+            else paper_directory.iterdir()
         )
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
-    if len(valid_files) > WARN_IF_INDEXING_MORE_THAN:
+    if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
-            f"Indexing {len(valid_files)} files. This may take a few minutes."
+            f"Indexing {len(valid_papers_rel_file_paths)} files may take a few minutes."
         )
-    index_files = await search_index.index_files
 
-    if missing := (set(index_files.keys()) - {str(f) for f in valid_files}):
-        if sync_index_w_directory:
-            for missing_file in missing:
+    index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
+    if extra_index_files := (
+        index_unique_file_paths - {str(f) for f in valid_papers_rel_file_paths}
+    ):
+        if index_settings.sync_with_paper_directory:
+            for extra_file in extra_index_files:
                 logger.warning(
-                    f"[bold red]Removing {missing_file} from index.[/bold red]"
+                    f"[bold red]Removing {extra_file} from index.[/bold red]"
                 )
-                await search_index.remove_from_index(missing_file)
+                await search_index.remove_from_index(extra_file)
             logger.warning("[bold red]Files removed![/bold red]")
         else:
             logger.warning(
-                "[bold red]Indexed files are missing from index folder"
-                f" ({directory}).[/bold red]"
+                f"[bold red]Indexed files {extra_index_files} are missing from paper"
+                f" folder ({paper_directory}).[/bold red]"
             )
-            logger.warning(f"[bold red]files: {missing}[/bold red]")
 
+    semaphore = anyio.Semaphore(index_settings.concurrency)
     async with anyio.create_task_group() as tg:
-        for file_path in valid_files:
-            if sync_index_w_directory:
+        for rel_file_path in valid_papers_rel_file_paths:
+            if index_settings.sync_with_paper_directory:
                 tg.start_soon(
                     process_file,
-                    file_path,
+                    rel_file_path,
                     search_index,
-                    metadata,
+                    manifest,
                     semaphore,
                     _settings,
                 )
             else:
-                logger.debug(f"New file {file_path.name} found in directory.")
+                logger.debug(
+                    f"File {rel_file_path} found in paper directory {paper_directory}."
+                )
 
     if search_index.changed:
         await search_index.save_index()

@@ -12,6 +12,7 @@ from uuid import UUID, uuid4
 
 import litellm  # for cost
 import tiktoken
+from aviary.message import Message
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
@@ -198,8 +199,16 @@ class Answer(BaseModel):
             raise ValueError(f"Could not find docname {name} in contexts.") from exc
         return doc.citation
 
-    def add_tokens(self, result: LLMResult) -> None:
-        """Update the token counts for the given result."""
+    def add_tokens(self, result: LLMResult | Message) -> None:
+        """Update the token counts for the given LLM result or message."""
+        if isinstance(result, Message):
+            if not result.info or any(x not in result.info for x in ("model", "usage")):
+                return
+            result = LLMResult(
+                model=result.info["model"],
+                prompt_count=result.info["usage"][0],
+                completion_count=result.info["usage"][1],
+            )
         if result.model not in self.token_counts:
             self.token_counts[result.model] = [
                 result.prompt_count,
@@ -232,6 +241,10 @@ class Answer(BaseModel):
             )
             for c in self.contexts
         ]
+
+    @property
+    def could_not_answer(self) -> bool:
+        return "cannot answer" in self.answer.lower()
 
 
 class ChunkMetadata(BaseModel):

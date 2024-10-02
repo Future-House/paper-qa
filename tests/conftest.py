@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-from collections.abc import Generator, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -18,7 +18,8 @@ from paperqa.settings import Settings
 from paperqa.types import Answer
 from paperqa.utils import setup_default_logs
 
-PAPER_DIRECTORY = Path(__file__).parent
+TESTS_DIR = Path(__file__).parent
+CASSETTES_DIR = TESTS_DIR / "cassettes"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -31,13 +32,23 @@ def _setup_default_logs() -> None:
     setup_default_logs()
 
 
+OPENAI_API_KEY_HEADER = "authorization"
+ANTHROPIC_API_KEY_HEADER = "x-api-key"
+
+
 @pytest.fixture(scope="session", name="vcr_config")
 def fixture_vcr_config() -> dict[str, Any]:
     return {
-        "filter_headers": [CROSSREF_HEADER_KEY, SEMANTIC_SCHOLAR_HEADER_KEY],
+        "filter_headers": [
+            CROSSREF_HEADER_KEY,
+            SEMANTIC_SCHOLAR_HEADER_KEY,
+            OPENAI_API_KEY_HEADER,
+            ANTHROPIC_API_KEY_HEADER,
+            "cookie",
+        ],
         "match_on": ["method", "host", "path", "query"],
         "allow_playback_repeats": True,
-        "cassette_library_dir": "tests/cassettes",
+        "cassette_library_dir": str(CASSETTES_DIR),
     }
 
 
@@ -50,9 +61,7 @@ def tmp_path_cleanup(tmp_path: Path) -> Iterator[Path]:
 
 
 @pytest.fixture
-def agent_home_dir(
-    tmp_path_cleanup: str | os.PathLike,
-) -> Generator[str | os.PathLike, None, None]:
+def agent_home_dir(tmp_path_cleanup: str | os.PathLike) -> Iterator[str | os.PathLike]:
     """Set up a unique temporary folder for the agent module."""
     with patch.dict("os.environ", {"PQA_HOME": str(tmp_path_cleanup)}):
         yield tmp_path_cleanup
@@ -70,11 +79,11 @@ def fixture_stub_data_dir() -> Path:
 
 @pytest.fixture
 def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
-    settings = Settings(
-        paper_directory=stub_data_dir,
-        index_directory=agent_index_dir,
-        embedding="sparse",
-    )
+    # NOTE: originally here we had usage of embedding="sparse", but this was
+    # shown to be too crappy of an embedding to get past the Obama article
+    settings = Settings()
+    settings.agent.index.paper_directory = stub_data_dir
+    settings.agent.index.index_directory = agent_index_dir
     settings.agent.search_count = 2
     settings.answer.answer_max_sources = 2
     settings.answer.evidence_k = 10
@@ -104,8 +113,8 @@ def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[
         shutil.rmtree(tmp_path, ignore_errors=True)
 
 
-@pytest.fixture
-def reset_log_levels(caplog):
+@pytest.fixture(name="reset_log_levels")
+def fixture_reset_log_levels(caplog) -> Iterator[None]:
     logging.getLogger().setLevel(logging.DEBUG)
 
     for name in logging.root.manager.loggerDict:

@@ -27,7 +27,7 @@ from paperqa.types import Answer
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
 from .models import AgentStatus, AnswerResponse, QueryRequest, SimpleProfiler
-from .search import SearchDocumentStorage, SearchIndex
+from .search import SearchDocumentStorage, SearchIndex, get_directory_index
 from .tools import EnvironmentState, GatherEvidence, GenerateAnswer, PaperSearch
 
 if TYPE_CHECKING:
@@ -51,10 +51,10 @@ async def agent_query(
     if docs is None:
         docs = Docs()
 
-    search_index = SearchIndex(
+    answers_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
-        index_directory=query.settings.index_directory,
+        index_directory=query.settings.agent.index.index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 
@@ -63,7 +63,7 @@ async def agent_query(
 
     agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
 
-    await search_index.add_document(
+    await answers_index.add_document(
         {
             "file_location": str(response.answer.id),
             "body": response.answer.answer,
@@ -71,7 +71,7 @@ async def agent_query(
         },
         document=response,
     )
-    await search_index.save_index()
+    await answers_index.save_index()
     return response
 
 
@@ -106,6 +106,8 @@ async def run_agent(
         f" query {query.model_dump()}."
     )
 
+    # Build the index once here, and then all tools won't need to rebuild it
+    await get_directory_index(settings=query.settings)
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):
@@ -119,7 +121,7 @@ async def run_agent(
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    if "cannot answer" in answer.answer.lower() and agent_status != AgentStatus.TIMEOUT:
+    if answer.could_not_answer and agent_status != AgentStatus.TRUNCATED:
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
@@ -138,6 +140,11 @@ async def run_fake_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
+    if query.settings.agent.max_timesteps is not None:
+        logger.warning(
+            f"Max timesteps (configured {query.settings.agent.max_timesteps}) is not"
+            " applicable with the fake agent, ignoring it."
+        )
     env = PaperQAEnvironment(query, docs, **env_kwargs)
     _, tools = await env.reset()
     if on_env_reset_callback:
@@ -207,7 +214,14 @@ async def run_aviary_agent(
                 tools=tools,
             )
 
+            timestep, max_timesteps = 0, query.settings.agent.max_timesteps
             while not done:
+                if max_timesteps is not None and timestep >= max_timesteps:
+                    logger.warning(
+                        f"Agent didn't finish within {max_timesteps} timesteps, just answering."
+                    )
+                    await tools[-1]._tool_fn(question=query.query, state=env.state)
+                    return env.state.answer, AgentStatus.TRUNCATED
                 agent_state.messages += obs
                 for attempt in Retrying(
                     stop=stop_after_attempt(5),
@@ -224,12 +238,13 @@ async def run_aviary_agent(
                 obs, reward, done, truncated = await env.step(action)
                 if on_env_step_callback:
                     await on_env_step_callback(obs, reward, done, truncated)
+                timestep += 1
             status = AgentStatus.SUCCESS
     except TimeoutError:
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
         )
-        status = AgentStatus.TIMEOUT
+        status = AgentStatus.TRUNCATED
         await tools[-1]._tool_fn(question=query.query, state=env.state)
     except Exception:
         logger.exception(f"Agent {agent} failed.")
@@ -248,6 +263,11 @@ async def run_ldp_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
+    if query.settings.agent.max_timesteps is not None:
+        logger.warning(
+            f"Max timesteps (configured {query.settings.agent.max_timesteps}) is not"
+            " yet implemented with the ldp agent, ignoring it."
+        )
     env = PaperQAEnvironment(query, docs, **env_kwargs)
     done = False
 
@@ -272,7 +292,7 @@ async def run_ldp_agent(
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
         )
-        status = AgentStatus.TIMEOUT
+        status = AgentStatus.TRUNCATED
         await tools[-1]._tool_fn(question=query.query, state=env.state)
     except Exception:
         logger.exception(f"Agent {agent} failed.")
@@ -288,7 +308,7 @@ async def index_search(
     fields = [*SearchIndex.REQUIRED_FIELDS]
     if index_name == "answers":
         fields.append("question")
-    search_index = SearchIndex(
+    index_to_query = SearchIndex(
         fields=fields,
         index_name=index_name,
         index_directory=index_directory,
@@ -301,15 +321,14 @@ async def index_search(
 
     results = [
         (AnswerResponse(**a[0]) if index_name == "answers" else a[0], a[1])
-        for a in await search_index.query(query=query, keep_filenames=True)
+        for a in await index_to_query.query(query=query, keep_filenames=True)
     ]
-
     if results:
         console = Console(record=True)
         # Render the table to a string
         console.print(table_formatter(results))
     else:
-        count = await search_index.count
-        agent_logger.info(f"No results found. Searched {count} docs")
+        count = await index_to_query.count
+        agent_logger.info(f"No results found. Searched {count} docs.")
 
     return results

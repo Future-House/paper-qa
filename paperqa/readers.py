@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from math import ceil
 from pathlib import Path
 from typing import Literal, overload
@@ -21,7 +22,14 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
         total_length = 0
 
         for i in range(file.page_count):
-            page = file.load_page(i)
+            try:
+                page = file.load_page(i)
+            except pymupdf.mupdf.FzErrorFormat as exc:
+                raise ImpossibleParsingError(
+                    f"Page loading via {pymupdf.__name__} failed on page {i} of"
+                    f" {file.page_count} for the PDF at path {path}, likely this PDF"
+                    " file is corrupt"
+                ) from exc
             pages[str(i + 1)] = page.get_text("text", sort=True)
             total_length += len(pages[str(i + 1)])
 
@@ -78,7 +86,10 @@ def chunk_pdf(
 
 
 def parse_text(
-    path: Path, html: bool = False, split_lines: bool = False, use_tiktoken: bool = True
+    path: str | os.PathLike,
+    html: bool = False,
+    split_lines: bool = False,
+    use_tiktoken: bool = True,
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -88,6 +99,7 @@ def parse_text(
         split_lines: flag to split lines into a list.
         use_tiktoken: flag to use tiktoken library to encode text.
     """
+    path = Path(path)
     try:
         with path.open() as f:
             text = list(f) if split_lines else f.read()

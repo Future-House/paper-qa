@@ -152,10 +152,11 @@ or using different phrasing for the gather evidence step from the generate answe
 ## Installation
 
 For a non-development setup,
-install PaperQA2 from [PyPI](https://pypi.org/project/paper-qa/):
+install PaperQA2 (aka version 5) from [PyPI](https://pypi.org/project/paper-qa/).
+Note version 5 requires Python 3.11+.
 
 ```bash
-pip install paper-qa
+pip install paper-qa>=5
 ```
 
 For development setup,
@@ -869,8 +870,8 @@ Please read and cite the following papers if you use this software:
     Samuel G. Rodriques and
     Andrew D. White},
   year={2024},
-  journal={preprint},
-  url={https://paper.wikicrow.ai}
+  journal={arXiv preprent arXiv:2409.13740},
+  url={https://doi.org/10.48550/arXiv.2409.13740}
 }
 
 

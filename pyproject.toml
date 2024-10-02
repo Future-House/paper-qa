@@ -27,6 +27,7 @@ dependencies = [
     "limits",
     "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
+    "openai<1.47",  # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0",
@@ -200,6 +201,7 @@ disable = [
     "too-many-instance-attributes",  # Don't care to enforce this
     "too-many-lines",  # Don't care to enforce this
     "too-many-locals",  # Rely on ruff PLR0914 for this
+    "too-many-positional-arguments",  # Don't care to enforce this
     "too-many-return-statements",  # Rely on ruff PLR0911 for this
     "too-many-statements",  # Rely on ruff PLR0915 for this
     "undefined-loop-variable",  # Don't care to enforce this
@@ -235,6 +237,8 @@ min-similarity-lines = 12
 filterwarnings = [
     "ignore:'imghdr' is deprecated and slated for removal in Python 3.13:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/2929#issuecomment-2345224633
     "ignore:Support for class-based `config` is deprecated, use ConfigDict instead",  # SEE: https://github.com/BerriAI/litellm/issues/5648
+    "ignore:The `dict` method is deprecated; use `model_dump` instead",  # SEE: https://github.com/BerriAI/litellm/issues/5987
+    "ignore:Use 'content=<...>' to upload raw bytes/text content:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/5986
     'ignore:open_text is deprecated. Use files\(\) instead:DeprecationWarning',  # SEE: https://github.com/BerriAI/litellm/issues/5647
     'ignore:pkg_resources is deprecated as an API.:DeprecationWarning:pybtex',  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/169/replace-pkg_resources-with
 ]
