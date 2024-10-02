@@ -60,13 +60,15 @@ class EmbeddingModes(StrEnum):
     QUERY = "query"
 
 
+CHARACTERS_PER_TOKEN: float = 4.0
+
+
 class EmbeddingModel(ABC, BaseModel):
     name: str
     config: dict = Field(
         default_factory=dict,
         description="Optional `rate_limit` key, value must be a RateLimitItem",
     )
-    CHARACTERS_PER_TOKEN: ClassVar[float] = 4.0
 
     async def check_rate_limit(self, token_count: float, **kwargs):
         if "rate_limit" in self.config:
@@ -97,10 +99,7 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
         for i in range(0, N, batch_size):
 
             await self.check_rate_limit(
-                sum(
-                    len(t) / self.CHARACTERS_PER_TOKEN
-                    for t in texts[i : i + batch_size]
-                )
+                sum(len(t) / CHARACTERS_PER_TOKEN for t in texts[i : i + batch_size])
             )
 
             response = await aembedding(
@@ -395,10 +394,10 @@ def rate_limited(
         # Estimate token count based on input
         if func.__name__ in {"acomplete", "acomplete_iter"}:
             prompt = args[0] if args else kwargs.get("prompt", "")
-            token_count = len(prompt) / self.CHARACTERS_PER_TOKEN
+            token_count = len(prompt) / CHARACTERS_PER_TOKEN
         elif func.__name__ in {"achat", "achat_iter"}:
             messages = args[0] if args else kwargs.get("messages", [])
-            token_count = len(str(messages)) / self.CHARACTERS_PER_TOKEN
+            token_count = len(str(messages)) / CHARACTERS_PER_TOKEN
         else:
             token_count = 0  # Default if method is unknown
 
@@ -412,9 +411,7 @@ def rate_limited(
                 async for item in func(self, *args, **kwargs):
                     token_count = 0
                     if isinstance(item, Chunk):
-                        token_count = int(
-                            len(item.text or "") / self.CHARACTERS_PER_TOKEN
-                        )
+                        token_count = int(len(item.text or "") / CHARACTERS_PER_TOKEN)
                     await self.check_rate_limit(token_count)
                     yield item
 

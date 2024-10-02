@@ -5,9 +5,13 @@ from typing import Any
 
 import pytest
 from limits import RateLimitItemPerSecond
-from litellm import Type
 
-from paperqa.llms import Chunk, LiteLLMEmbeddingModel, LiteLLMModel
+from paperqa.llms import (
+    CHARACTERS_PER_TOKEN,
+    Chunk,
+    LiteLLMEmbeddingModel,
+    LiteLLMModel,
+)
 from paperqa.types import LLMResult
 
 LLM_CONFIG_W_RATE_LIMITS = [
@@ -140,7 +144,7 @@ async def time_n_llm_methods(
     if hasattr(outputs[0], "prompt_tokens"):
         token_count = sum(o.prompt_tokens + o.completion_tokens for o in outputs)
 
-    return max(character_count / llm.CHARACTERS_PER_TOKEN, token_count) / (
+    return max(character_count / CHARACTERS_PER_TOKEN, token_count) / (
         time.time() - start_time
     )
 
@@ -148,7 +152,7 @@ async def time_n_llm_methods(
 @pytest.mark.parametrize("llm_config_w_rate_limits", LLM_CONFIG_W_RATE_LIMITS)
 @pytest.mark.asyncio
 async def test_rate_limit_on_run_prompt(
-    llm_config_w_rate_limits: dict[str, Any], litellm_model: Type[LiteLLMModel]
+    llm_config_w_rate_limits: dict[str, Any], litellm_model: type[LiteLLMModel]
 ) -> None:
 
     llm = litellm_model(**llm_config_w_rate_limits)
@@ -214,7 +218,7 @@ async def test_rate_limit_on_run_prompt(
 async def test_rate_limit_on_sequential_completion_litellm_methods(
     llm_config_w_rate_limits: dict[str, Any],
     llm_method_kwargs: dict[str, Any],
-    litellm_model: Type[LiteLLMModel],
+    litellm_model: type[LiteLLMModel],
 ) -> None:
 
     llm = litellm_model(**llm_config_w_rate_limits)
@@ -245,7 +249,7 @@ async def test_rate_limit_on_sequential_completion_litellm_methods(
 async def test_rate_limit_on_parallel_completion_litellm_methods(
     llm_config_w_rate_limits: dict[str, Any],
     llm_method_kwargs: dict[str, Any],
-    litellm_model: Type[LiteLLMModel],
+    litellm_model: type[LiteLLMModel],
 ) -> None:
 
     llm = litellm_model(**llm_config_w_rate_limits)
@@ -276,7 +280,7 @@ async def test_rate_limit_on_parallel_completion_litellm_methods(
 @pytest.mark.asyncio
 async def test_embedding_rate_limits(
     embedding_config_w_rate_limits: dict[str, Any],
-    litellm_embedding_model: Type[LiteLLMEmbeddingModel],
+    litellm_embedding_model: type[LiteLLMEmbeddingModel],
 ) -> None:
 
     embedding_model = litellm_embedding_model(**embedding_config_w_rate_limits)
@@ -284,7 +288,7 @@ async def test_embedding_rate_limits(
     start = time.time()
     await embedding_model.embed_documents(texts=texts_to_embed, batch_size=5)
     estimated_tokens_per_second = sum(
-        len(t) / embedding_model.CHARACTERS_PER_TOKEN for t in texts_to_embed
+        len(t) / CHARACTERS_PER_TOKEN for t in texts_to_embed
     ) / (time.time() - start)
 
     if "rate_limit" in embedding_config_w_rate_limits:
