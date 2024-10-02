@@ -242,6 +242,10 @@ class Answer(BaseModel):
             for c in self.contexts
         ]
 
+    @property
+    def could_not_answer(self) -> bool:
+        return "cannot answer" in self.answer.lower()
+
 
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""

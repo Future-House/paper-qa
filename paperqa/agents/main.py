@@ -121,10 +121,7 @@ async def run_agent(
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    if (
-        "cannot answer" in answer.answer.lower()
-        and agent_status != AgentStatus.TRUNCATED
-    ):
+    if answer.could_not_answer and agent_status != AgentStatus.TRUNCATED:
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
