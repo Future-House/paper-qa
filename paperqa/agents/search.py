@@ -369,25 +369,40 @@ FAILED_DOCUMENT_ADD_ID = "ERROR"
 
 
 async def process_file(
-    file_path: anyio.Path,
+    rel_file_path: anyio.Path,
     search_index: SearchIndex,
-    metadata: dict[str, Any],
+    manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
 ) -> None:
+    abs_file_path = (
+        pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
+    )
+    fallback_title = rel_file_path.name
+    if settings.agent.index.use_absolute_paper_directory:
+        file_location = str(abs_file_path)
+        manifest_fallback_location = str(rel_file_path)
+    else:
+        file_location = str(rel_file_path)
+        manifest_fallback_location = str(abs_file_path)
+
     async with semaphore:
-        file_name = file_path.name
-        if not await search_index.filecheck(str(file_path)):
-            logger.info(f"New file to index: {file_name}...")
+        if not await search_index.filecheck(filename=file_location):
+            logger.info(f"New file to index: {file_location}...")
 
             doi, title = None, None
-            if file_name in metadata:
-                doi, title = metadata[file_name].doi, metadata[file_name].title
+            if file_location in manifest:
+                manifest_entry = manifest[file_location]
+                doi, title = manifest_entry.doi, manifest_entry.title
+            elif manifest_fallback_location in manifest:
+                # Perhaps manifest used the opposite pathing scheme
+                manifest_entry = manifest[manifest_fallback_location]
+                doi, title = manifest_entry.doi, manifest_entry.title
 
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
-                    path=pathlib.Path(file_path),
+                    path=abs_file_path,
                     title=title,
                     doi=doi,
                     fields=["title", "author", "journal", "year"],
@@ -395,24 +410,24 @@ async def process_file(
                 )
             except (ValueError, ImpossibleParsingError):
                 logger.exception(
-                    f"Error parsing {file_name}, skipping index for this file."
+                    f"Error parsing {file_location}, skipping index for this file."
                 )
-                await search_index.mark_failed_document(file_path)
+                await search_index.mark_failed_document(file_location)
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
 
             if isinstance(this_doc, DocDetails):
-                title = this_doc.title or file_name
+                title = this_doc.title or fallback_title
                 year = this_doc.year or "Unknown year"
             else:
-                title, year = file_name, "Unknown year"
+                title, year = fallback_title, "Unknown year"
 
             await search_index.add_document(
                 {
                     "title": title,
                     "year": year,
-                    "file_location": str(file_path),
+                    "file_location": file_location,
                     "body": "".join([t.text for t in tmp_docs.texts]),
                 },
                 document=tmp_docs,
@@ -481,12 +496,12 @@ async def get_directory_index(  # noqa: PLR0912
         index_settings.sync_with_paper_directory = sync_index_w_directory
     del sync_index_w_directory
 
-    paper_directory = await index_settings.finalize_paper_directory()
-    metadata = await maybe_get_manifest(
-        filename=await index_settings.finalize_manifest_file(paper_directory)
+    paper_directory = anyio.Path(index_settings.paper_directory)
+    manifest = await maybe_get_manifest(
+        filename=await index_settings.finalize_manifest_file()
     )
-    valid_paper_dir_files = [
-        file
+    valid_papers_rel_file_paths = [
+        file.relative_to(paper_directory)
         async for file in (
             paper_directory.rglob("*")
             if index_settings.recurse_subdirectories
@@ -494,14 +509,14 @@ async def get_directory_index(  # noqa: PLR0912
         )
         if file.suffix in {".txt", ".pdf", ".html"}
     ]
-    if len(valid_paper_dir_files) > WARN_IF_INDEXING_MORE_THAN:
+    if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
-            f"Indexing {len(valid_paper_dir_files)} files. This may take a few minutes."
+            f"Indexing {len(valid_papers_rel_file_paths)} files may take a few minutes."
         )
 
     index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
     if extra_index_files := (
-        index_unique_file_paths - {str(f) for f in valid_paper_dir_files}
+        index_unique_file_paths - {str(f) for f in valid_papers_rel_file_paths}
     ):
         if index_settings.sync_with_paper_directory:
             for extra_file in extra_index_files:
@@ -518,18 +533,20 @@ async def get_directory_index(  # noqa: PLR0912
 
     semaphore = anyio.Semaphore(index_settings.concurrency)
     async with anyio.create_task_group() as tg:
-        for file_path in valid_paper_dir_files:
+        for rel_file_path in valid_papers_rel_file_paths:
             if index_settings.sync_with_paper_directory:
                 tg.start_soon(
                     process_file,
-                    file_path,
+                    rel_file_path,
                     search_index,
-                    metadata,
+                    manifest,
                     semaphore,
                     _settings,
                 )
             else:
-                logger.debug(f"File {file_path.name} found in paper directory.")
+                logger.debug(
+                    f"File {rel_file_path} found in paper directory {paper_directory}."
+                )
 
     if search_index.changed:
         await search_index.save_index()
