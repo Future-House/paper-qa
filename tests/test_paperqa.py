@@ -773,7 +773,7 @@ def test_bad_context(stub_data_dir) -> None:
     answer = docs.query(
         "What do scientist estimate as the planetary composition of Jupyter?"
     )
-    assert "cannot answer" in answer.answer
+    assert answer.could_not_answer
 
 
 def test_repeat_keys(stub_data_dir) -> None:

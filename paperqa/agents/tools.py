@@ -258,7 +258,7 @@ class GenerateAnswer(NamedTool):
             embedding_model=self.embedding_model,
         )
 
-        if "cannot answer" in state.answer.answer.lower():
+        if state.answer.could_not_answer:
             if self.settings.agent.wipe_context_on_answer_failure:
                 state.answer.contexts = []
                 state.answer.context = ""
