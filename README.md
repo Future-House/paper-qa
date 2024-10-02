@@ -870,8 +870,8 @@ Please read and cite the following papers if you use this software:
     Samuel G. Rodriques and
     Andrew D. White},
   year={2024},
-  journal={preprint},
-  url={https://paper.wikicrow.ai}
+  journal={arXiv preprent arXiv:2409.13740},
+  url={https://doi.org/10.48550/arXiv.2409.13740}
 }
 
 
