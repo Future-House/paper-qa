@@ -17,11 +17,11 @@ wheels = [
 
 [[package]]
 name = "aiohappyeyeballs"
-version = "2.4.2"
+version = "2.4.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c7/d9/e710a5c9e51b4d5a977c823ce323a81d344da8c1b6fba16bb270a8be800d/aiohappyeyeballs-2.4.2.tar.gz", hash = "sha256:4ca893e6c5c1f5bf3888b04cb5a3bee24995398efef6e0b9f747b5e89d84fd74", size = 18391 }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/69/2f6d5a019bd02e920a3417689a89887b39ad1e350b562f9955693d900c40/aiohappyeyeballs-2.4.3.tar.gz", hash = "sha256:75cf88a15106a5002a8eb1dab212525c00d1f4c0fa96e551c9fbe6f09a621586", size = 21809 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/64/40165ff77ade5203284e3015cf88e11acb07d451f6bf83fff71192912a0d/aiohappyeyeballs-2.4.2-py3-none-any.whl", hash = "sha256:8522691d9a154ba1145b157d6d5c15e5c692527ce6a53c5e5f9876977f6dab2f", size = 14105 },
+    { url = "https://files.pythonhosted.org/packages/f7/d8/120cd0fe3e8530df0539e71ba9683eade12cae103dd7543e50d15f737917/aiohappyeyeballs-2.4.3-py3-none-any.whl", hash = "sha256:8a7a83727b2756f394ab2895ea0765a0a8c475e3c71e98d43d76f22b4b435572", size = 14742 },
 ]
 
 [[package]]
@@ -160,12 +160,12 @@ wheels = [
 
 [[package]]
 name = "bibtexparser"
-version = "1.4.1"
+version = "1.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyparsing" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/25/06/f710a276e4e018b02fe17b39313629213a43c365401179bc437e0ab24425/bibtexparser-1.4.1.tar.gz", hash = "sha256:e00e29e24676c4808e0b4333b37bb55cca9cbb7871a56f63058509281588d789", size = 55102 }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/61/9cbb09b876d09a3fb61818f88e89a182f81c79d064d599fa92f419c3a11c/bibtexparser-1.4.2.tar.gz", hash = "sha256:dd5d54a1ec6d27b6485ce2f6b9aa514b183fb2b8d4bf5f19333a906eedaf8eaa", size = 55729 }
 
 [[package]]
 name = "certifi"
@@ -594,15 +594,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/1a/43/e1d53588561e53321
 
 [[package]]
 name = "httpcore"
-version = "1.0.5"
+version = "1.0.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
     { name = "h11" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/17/b0/5e8b8674f8d203335a62fdfcfa0d11ebe09e23613c3391033cbba35f7926/httpcore-1.0.5.tar.gz", hash = "sha256:34a38e2f9291467ee3b44e89dd52615370e152954ba21721378a87b2960f7a61", size = 83234 }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/44/ed0fa6a17845fb033bd885c03e842f08c1b9406c86a2e60ac1ae1b9206a6/httpcore-1.0.6.tar.gz", hash = "sha256:73f6dbd6eb8c21bbf7ef8efad555481853f5f6acdeaff1edb0694289269ee17f", size = 85180 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/d4/e5d7e4f2174f8a4d63c8897d79eb8fe2503f7ecc03282fee1fa2719c2704/httpcore-1.0.5-py3-none-any.whl", hash = "sha256:421f18bac248b25d310f3cacd198d55b8e6125c107797b609ff9b7a6ba7991b5", size = 77926 },
+    { url = "https://files.pythonhosted.org/packages/06/89/b161908e2f51be56568184aeb4a880fd287178d176fd1c860d2217f41106/httpcore-1.0.6-py3-none-any.whl", hash = "sha256:27b59625743b85577a8c0e10e55b50b5368a4f2cfe8cc7bcfa9cf00829c2682f", size = 78011 },
 ]
 
 [[package]]
@@ -689,7 +689,7 @@ wheels = [
 
 [[package]]
 name = "ipython"
-version = "8.27.0"
+version = "8.28.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -703,9 +703,9 @@ dependencies = [
     { name = "traitlets" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/57/24/d4fabaca03c8804bf0b8d994c8ae3a20e57e9330d277fb43d83e558dec5e/ipython-8.27.0.tar.gz", hash = "sha256:0b99a2dc9f15fd68692e898e5568725c6d49c527d36a9fb5960ffbdeaa82ff7e", size = 5494984 }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/21/48db7d9dd622b9692575004c7c98f85f5629428f58596c59606d36c51b58/ipython-8.28.0.tar.gz", hash = "sha256:0d0d15ca1e01faeb868ef56bc7ee5a0de5bd66885735682e8a322ae289a13d1a", size = 5495762 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/a2/6c725958e6f135d8e5de081e69841bb2c1d84b3fc259d02eb092b8fc203a/ipython-8.27.0-py3-none-any.whl", hash = "sha256:f68b3cb8bde357a5d7adc9598d57e22a45dfbea19eb6b98286fa3b288c9cd55c", size = 818986 },
+    { url = "https://files.pythonhosted.org/packages/f4/3a/5d8680279ada9571de8469220069d27024ee47624af534e537c9ff49a450/ipython-8.28.0-py3-none-any.whl", hash = "sha256:530ef1e7bb693724d3cdc37287c80b07ad9b25986c007a53aa1857272dac3f35", size = 819456 },
 ]
 
 [[package]]
@@ -867,7 +867,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.8.0"
+version = "0.9.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -885,9 +885,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5a/2f/6eb23fa7e72575cd70e0daf4c7f684edec5076bef2151ee525396d8cb9b3/ldp-0.8.0.tar.gz", hash = "sha256:2b67cfa9a3d9bd2d27aefc1272c1018e56b8a0634bc61872ccd69595604cba51", size = 270067 }
+sdist = { url = "https://files.pythonhosted.org/packages/db/3d/761c4fe2b028d614544ad9147bffabbdce82856cc413e91c66bcd5a035c4/ldp-0.9.1.tar.gz", hash = "sha256:b68912c7453175afe2f4b75f094c37b59963741e250509c3868d497de3b87979", size = 305063 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/93/d2fba704dc890767fec216bb153c331f3defead21d454178c008a75333d7/ldp-0.8.0-py3-none-any.whl", hash = "sha256:be9a4c34ef27d217d54eddcb855ad2fe14ad40bfe9e1a9b59ff782a58ca2c048", size = 87075 },
+    { url = "https://files.pythonhosted.org/packages/2c/97/7530c484fb7387b2d33cccab5eafca692d007036b493faaeedbdef9f01f3/ldp-0.9.1-py3-none-any.whl", hash = "sha256:8e3de0f2c8b491ca77e114b5abdddab0e9669511e0d2d25e7a293465d47a035d", size = 90067 },
 ]
 
 [[package]]
@@ -907,7 +907,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.48.6"
+version = "1.48.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -922,9 +922,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/17/fd/99c3075c1e50a468a9d88cea141e918f9437a31152ad1d44ce67ee44caed/litellm-1.48.6.tar.gz", hash = "sha256:44584867d115ba0c1bb5f39efbc8a6131642e63d078e6a9cf2e7abe969d5edf6", size = 8418239 }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/b8/2a79055477b2c880a38b3211f030a7b88e7ff3f40b81487fd1c2b39c1b02/litellm-1.48.9.tar.gz", hash = "sha256:02dd2f66fab24f388692694401bbabd34de5a62a16d064b3f15726a550a65cd3", size = 6035164 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/90/08ac40e04edc16ec1e91ceadc577465b090f06354f3e46d70d2b2560f3ab/litellm-1.48.6-py3-none-any.whl", hash = "sha256:7f6e0f787790d29c4464123bae92712ceb2dd1e05eef1ea90182663c4e4762a3", size = 8753596 },
+    { url = "https://files.pythonhosted.org/packages/e2/df/786f02161a813c64034aede8caaccfc7f8a1134937156ff7ca0193bb0080/litellm-1.48.9-py3-none-any.whl", hash = "sha256:9608f510e82c27b15bab7bcfab5e1308055f0c457e7881ccfff91c189bf2c055", size = 6236021 },
 ]
 
 [[package]]
@@ -1294,7 +1294,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.0.11.dev2+g3ee6b8d"
+version = "5.0.11.dev20+gcbc4454.d20241002"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1368,7 +1368,7 @@ requires-dist = [
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.6" },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.6" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.9" },
     { name = "limits" },
     { name = "litellm", specifier = ">=1.44" },
     { name = "numpy" },
@@ -2058,15 +2058,15 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "13.8.1"
+version = "13.9.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/92/76/40f084cb7db51c9d1fa29a7120717892aeda9a7711f6225692c957a93535/rich-13.8.1.tar.gz", hash = "sha256:8260cda28e3db6bf04d2d1ef4dbc03ba80a824c88b0e7668a0f23126a424844a", size = 222080 }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/78/87d00a1df7c457ad9aa0139f01b8a11c67209f27f927c503b0109bf2ed6c/rich-13.9.1.tar.gz", hash = "sha256:097cffdf85db1babe30cc7deba5ab3a29e1b9885047dab24c57e9a7f8a9c1466", size = 222907 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/11/dadb85e2bd6b1f1ae56669c3e1f0410797f9605d752d68fb47b77f525b31/rich-13.8.1-py3-none-any.whl", hash = "sha256:1760a3c0848469b97b558fc61c85233e3dafb69c7a071b4d60c38099d3cd4c06", size = 241608 },
+    { url = "https://files.pythonhosted.org/packages/ab/71/cd9549551f1aa11cf7e5f92bae5817979e8b3a19e31e8810c15f3f45c311/rich-13.9.1-py3-none-any.whl", hash = "sha256:b340e739f30aa58921dc477b8adaa9ecdb7cecc217be01d93730ee1bc8aa83be", size = 242147 },
 ]
 
 [[package]]

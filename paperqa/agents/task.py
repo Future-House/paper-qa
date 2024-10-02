@@ -19,7 +19,7 @@ from aviary.message import Message
 from aviary.tools import ToolRequestMessage, ToolResponseMessage
 
 try:
-    from ldp.alg.callbacks import ComputeTrajectoryMetricsMixin
+    from ldp.alg import ComputeTrajectoryMetricsMixin
 except ImportError:
 
     class ComputeTrajectoryMetricsMixin:  # type: ignore[no-redef]
