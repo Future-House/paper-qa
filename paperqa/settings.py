@@ -300,7 +300,7 @@ class IndexSettings(BaseModel):
     use_absolute_paper_directory: bool = Field(
         default=False,
         description=(
-            "Opt-in flag to convert the index_directory to an absolute path. Setting"
+            "Opt-in flag to convert the paper_directory to an absolute path. Setting"
             " this to True will make the index user-specific, defeating sharing."
         ),
     )
@@ -500,7 +500,7 @@ class Settings(BaseSettings):
     )
     index_absolute_directory: bool = Field(
         default=False,
-        description="Whether to use the absolute directory for the PQA index",
+        description="Whether to use the absolute paper directory for the PQA index",
         exclude=True,
         frozen=True,
     )
