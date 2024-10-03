@@ -7,7 +7,7 @@ import pytest
 from limits import RateLimitItemPerSecond
 
 from paperqa.llms import (
-    CHARACTERS_PER_TOKEN,
+    CHARACTERS_PER_TOKEN_ASSUMPTION,
     Chunk,
     LiteLLMEmbeddingModel,
     LiteLLMModel,
@@ -69,22 +69,24 @@ LLM_CONFIG_W_RATE_LIMITS = [
     },
 ]
 
+RATE_LIMITER_PROMPT = "Animals make many noises. The duck says"
+
 LLM_METHOD_AND_INPUTS = [
     {
         "method": "acomplete",
-        "kwargs": {"prompt": "The duck says"},
+        "kwargs": {"prompt": RATE_LIMITER_PROMPT},
     },
     {
         "method": "acomplete_iter",
-        "kwargs": {"prompt": "The duck says"},
+        "kwargs": {"prompt": RATE_LIMITER_PROMPT},
     },
     {
         "method": "achat",
-        "kwargs": {"messages": [{"role": "user", "content": "The duck says"}]},
+        "kwargs": {"messages": [{"role": "user", "content": RATE_LIMITER_PROMPT}]},
     },
     {
         "method": "achat_iter",
-        "kwargs": {"messages": [{"role": "user", "content": "The duck says"}]},
+        "kwargs": {"messages": [{"role": "user", "content": RATE_LIMITER_PROMPT}]},
     },
 ]
 
@@ -138,7 +140,9 @@ async def time_n_llm_methods(
         token_count = sum(o.prompt_tokens + o.completion_tokens for o in outputs)
 
     return (
-        (character_count / CHARACTERS_PER_TOKEN) if token_count == 0 else token_count
+        (character_count / CHARACTERS_PER_TOKEN_ASSUMPTION)
+        if token_count == 0
+        else token_count
     ) / (time.time() - start_time)
 
 
@@ -278,7 +282,7 @@ async def test_embedding_rate_limits(
     start = time.time()
     await embedding_model.embed_documents(texts=texts_to_embed, batch_size=5)
     estimated_tokens_per_second = sum(
-        len(t) / CHARACTERS_PER_TOKEN for t in texts_to_embed
+        len(t) / CHARACTERS_PER_TOKEN_ASSUMPTION for t in texts_to_embed
     ) / (time.time() - start)
 
     if "rate_limit" in embedding_config_w_rate_limits:

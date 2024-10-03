@@ -50,6 +50,8 @@ UNKNOWN_IP: str = "0.0.0.0"  # noqa: S104
 class GlobalRateLimiter:
 
     WAIT_INCREMENT: ClassVar[float] = 0.01  # seconds
+    # list of public free outbount IP services
+    # generated initially w. claude, then filtered
     IP_CHECK_SERVICES: ClassVar[Collection[str]] = {
         "https://api.ipify.org",
         "https://ifconfig.me",
@@ -100,7 +102,7 @@ class GlobalRateLimiter:
         return self._current_ip
 
     @property
-    def storage(self):
+    def storage(self) -> RedisStorage | MemoryStorage:
         if self._storage is None:
             if os.environ.get("REDIS_URL") and not self.use_in_memory:
                 self._storage = RedisStorage(f"async+redis://{os.environ['REDIS_URL']}")
@@ -112,7 +114,7 @@ class GlobalRateLimiter:
         return self._storage
 
     @property
-    def rate_limiter(self):
+    def rate_limiter(self) -> MovingWindowRateLimiter:
         if self._rate_limiter is None:
             self._rate_limiter = MovingWindowRateLimiter(self.storage)
         return self._rate_limiter
@@ -318,7 +320,6 @@ class GlobalRateLimiter:
             raise ValueError(
                 f"Weight ({weight}) > RateLimit ({rate_limit}), cannot satisfy rate limit."
             )
-
         while True:
             elapsed = 0.0
             while (

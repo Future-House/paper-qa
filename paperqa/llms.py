@@ -7,16 +7,16 @@ from abc import ABC, abstractmethod
 from collections.abc import (
     AsyncGenerator,
     AsyncIterable,
+    AsyncIterator,
     Awaitable,
     Callable,
-    Coroutine,
     Iterable,
     Sequence,
 )
 from enum import StrEnum
 from inspect import isasyncgenfunction, signature
 from sys import version_info
-from typing import Any, ClassVar, TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 import tiktoken
@@ -60,7 +60,13 @@ class EmbeddingModes(StrEnum):
     QUERY = "query"
 
 
-CHARACTERS_PER_TOKEN: float = 4.0
+# Estimate from OpenAI's FAQ
+# https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+CHARACTERS_PER_TOKEN_ASSUMPTION: float = 4.0
+# Added tokens from user/role message
+# Need to add while doing rate limits
+# Taken from empirical counts in tests
+EXTRA_TOKENS_FROM_USER_ROLE: int = 7
 
 
 class EmbeddingModel(ABC, BaseModel):
@@ -99,7 +105,10 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
         for i in range(0, N, batch_size):
 
             await self.check_rate_limit(
-                sum(len(t) / CHARACTERS_PER_TOKEN for t in texts[i : i + batch_size])
+                sum(
+                    len(t) / CHARACTERS_PER_TOKEN_ASSUMPTION
+                    for t in texts[i : i + batch_size]
+                )
             )
 
             response = await aembedding(
@@ -164,7 +173,6 @@ class LLMModel(ABC, BaseModel):
         exclude=True,
     )
     config: dict = Field(default_factory=dict)
-    CHARACTERS_PER_TOKEN: ClassVar[float] = 4.0
 
     async def acomplete(self, prompt: str) -> Chunk:
         """Return the completion as string and the number of tokens in the prompt and completion."""
@@ -372,32 +380,30 @@ def rate_limited(
     func: Callable[[LLMModelOrChild, Any], Awaitable[Chunk] | AsyncIterable[Chunk]],
 ) -> Callable[
     [LLMModelOrChild, Any, Any],
-    Coroutine[
-        Any, Any, Chunk | AsyncIterable[Chunk] | AsyncGenerator[LLMModelOrChild, None]
-    ],
+    Awaitable[Chunk | AsyncIterator[Chunk] | AsyncIterator[LLMModelOrChild]],
 ]:
     """Decorator to rate limit relevant methods of an LLMModel."""
 
     @functools.wraps(func)
     async def wrapper(
         self: LLMModelOrChild, *args: Any, **kwargs: Any
-    ) -> Chunk | AsyncIterable[Chunk] | AsyncGenerator[LLMModelOrChild, None]:
+    ) -> Chunk | AsyncIterator[Chunk] | AsyncIterator[LLMModelOrChild]:
 
-        if not hasattr(self, "check_rate_limit") or not hasattr(
-            self, "CHARACTERS_PER_TOKEN"
-        ):
+        if not hasattr(self, "check_rate_limit"):
             raise NotImplementedError(
-                f"Model {self.name} must have a `check_rate_limit` method "
-                "and a `CHARACTERS_PER_TOKEN` class variable."
+                f"Model {self.name} must have a `check_rate_limit` method."
             )
 
         # Estimate token count based on input
         if func.__name__ in {"acomplete", "acomplete_iter"}:
             prompt = args[0] if args else kwargs.get("prompt", "")
-            token_count = len(prompt) / CHARACTERS_PER_TOKEN
+            token_count = (
+                len(prompt) / CHARACTERS_PER_TOKEN_ASSUMPTION
+                + EXTRA_TOKENS_FROM_USER_ROLE
+            )
         elif func.__name__ in {"achat", "achat_iter"}:
             messages = args[0] if args else kwargs.get("messages", [])
-            token_count = len(str(messages)) / CHARACTERS_PER_TOKEN
+            token_count = len(str(messages)) / CHARACTERS_PER_TOKEN_ASSUMPTION
         else:
             token_count = 0  # Default if method is unknown
 
@@ -411,7 +417,9 @@ def rate_limited(
                 async for item in func(self, *args, **kwargs):
                     token_count = 0
                     if isinstance(item, Chunk):
-                        token_count = int(len(item.text or "") / CHARACTERS_PER_TOKEN)
+                        token_count = int(
+                            len(item.text or "") / CHARACTERS_PER_TOKEN_ASSUMPTION
+                        )
                     await self.check_rate_limit(token_count)
                     yield item
 
