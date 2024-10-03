@@ -10,6 +10,7 @@ from itertools import starmap
 from typing import Any
 
 import aiohttp
+from tenacity import before_sleep_log, retry, retry_if_exception, stop_after_attempt
 
 from paperqa.types import DocDetails
 from paperqa.utils import (
@@ -21,7 +22,7 @@ from paperqa.utils import (
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .crossref import doi_to_bibtex
-from .exceptions import DOINotFoundError
+from .exceptions import DOINotFoundError, make_flaky_ssl_error_predicate
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,8 @@ SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT = 10.0
 SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(
     union_collections_to_ordered_list(SEMANTIC_SCHOLAR_API_MAPPING.values())
 )
-SEMANTIC_SCHOLAR_BASE_URL = "https://api.semanticscholar.org"
+SEMANTIC_SCHOLAR_HOST = "api.semanticscholar.org"
+SEMANTIC_SCHOLAR_BASE_URL = f"https://{SEMANTIC_SCHOLAR_HOST}"
 SEMANTIC_SCHOLAR_HEADER_KEY = "x-api-key"
 
 
@@ -249,6 +251,11 @@ async def s2_title_search(
     return await parse_s2_to_doc_details(data, session)
 
 
+@retry(
+    retry=retry_if_exception(make_flaky_ssl_error_predicate(SEMANTIC_SCHOLAR_HOST)),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    stop=stop_after_attempt(3),
+)
 async def get_s2_doc_details_from_doi(
     doi: str | None,
     session: aiohttp.ClientSession,
