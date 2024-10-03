@@ -270,7 +270,7 @@ You can also specify them manually with any rate limit string that matches the s
 pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
-Or by adding into a settings object, if calling imperatively:
+Or by adding into a `Settings` object, if calling imperatively:
 
 ```python
 from paperqa import Settings, ask
