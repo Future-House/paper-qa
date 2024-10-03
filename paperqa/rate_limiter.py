@@ -6,6 +6,8 @@ from typing import ClassVar, Literal
 from urllib.parse import urlparse
 
 import aiohttp
+from clients.crossref import CROSSREF_BASE_URL
+from clients.semantic_scholar import SEMANTIC_SCHOLAR_BASE_URL
 from coredis import Redis
 from limits import (
     RateLimitItem,
@@ -33,15 +35,15 @@ GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "60"))
 # user input machine_id will be used.
 
 MATCH_ALL = None
-MATCH_ALL_INPUTS = Literal[None]
+MatchAllInputs = Literal[None]
 MATCH_MACHINE_ID = "<machine_id>"
 
 FALLBACK_RATE_LIMIT = RateLimitItemPerSecond(3, 1)
 TOKEN_FALLBACK_RATE_LIMIT = RateLimitItemPerMinute(30_000, 1)
 
-RATE_CONFIG: dict[tuple[str, str | MATCH_ALL_INPUTS], RateLimitItem] = {
-    ("get", "api.crossref.org"): RateLimitItemPerSecond(30, 1),
-    ("get", "api.semanticscholar.org"): RateLimitItemPerSecond(15, 1),
+RATE_CONFIG: dict[tuple[str, str | MatchAllInputs], RateLimitItem] = {
+    ("get", CROSSREF_BASE_URL): RateLimitItemPerSecond(30, 1),
+    ("get", SEMANTIC_SCHOLAR_BASE_URL): RateLimitItemPerSecond(15, 1),
     ("client", MATCH_ALL): TOKEN_FALLBACK_RATE_LIMIT,
     # MATCH_MACHINE_ID is a placeholder for the machine_id passed in by the caller
     (f"get|{MATCH_MACHINE_ID}", MATCH_ALL): FALLBACK_RATE_LIMIT,
@@ -51,6 +53,12 @@ UNKNOWN_IP: str = "0.0.0.0"  # noqa: S104
 
 
 class GlobalRateLimiter:
+    """Rate limiter for all requests within or between processes.
+
+    Supports both Redis and in-memory storage.
+    'Global' refers to being able to limit the rate
+    of requests across processes with Redis.
+    """
 
     WAIT_INCREMENT: ClassVar[float] = 0.01  # seconds
     # list of public free outbount IP services
@@ -68,7 +76,7 @@ class GlobalRateLimiter:
     def __init__(
         self,
         rate_config: (
-            None | dict[tuple[str, str | MATCH_ALL_INPUTS], RateLimitItem]
+            None | dict[tuple[str, str | MatchAllInputs], RateLimitItem]
         ) = None,
         use_in_memory: bool = False,
     ):
@@ -123,8 +131,8 @@ class GlobalRateLimiter:
         return self._rate_limiter
 
     async def parse_namespace_and_primary_key(
-        self, namespace_and_key: tuple[str, str | MATCH_ALL_INPUTS], machine_id: int = 0
-    ) -> tuple[str, str | MATCH_ALL_INPUTS]:
+        self, namespace_and_key: tuple[str, str | MatchAllInputs], machine_id: int = 0
+    ) -> tuple[str, str | MatchAllInputs]:
         """Turn namespace_and_key tuple into a namespace and primary-key.
 
         If using a namespace starting with "get", then the primary key will be url parsed.
@@ -151,7 +159,7 @@ class GlobalRateLimiter:
     def parse_rate_limits_and_namespace(
         self,
         namespace: str,
-        primary_key: str | MATCH_ALL_INPUTS,
+        primary_key: str | MatchAllInputs,
     ) -> tuple[RateLimitItem, str]:
         """Get rate limit and new namespace for a given namespace and primary_key.
 
@@ -205,7 +213,7 @@ class GlobalRateLimiter:
 
     def parse_key(
         self, key: str
-    ) -> tuple[RateLimitItem, tuple[str, str | MATCH_ALL_INPUTS]]:
+    ) -> tuple[RateLimitItem, tuple[str, str | MatchAllInputs]]:
         """Parse the rate limit item from a redis/in-memory key.
 
         Note the key is created with RateLimitItem.key_for(*identifiers),
@@ -222,8 +230,8 @@ class GlobalRateLimiter:
         )
 
     async def get_rate_limit_keys(
-        self,
-    ) -> list[tuple[RateLimitItem, tuple[str, str | MATCH_ALL_INPUTS]]]:
+        self, cursor_scan_count: int = 100
+    ) -> list[tuple[RateLimitItem, tuple[str, str | MatchAllInputs]]]:
         """Returns a list of current RateLimitItems with tuples of namespace and primary key."""
         host, port = os.environ.get("REDIS_URL", ":").split(":", maxsplit=2)
 
@@ -237,7 +245,7 @@ class GlobalRateLimiter:
 
         while cursor:
             cursor, keys = await client.scan(
-                int(cursor), match=f"{self.storage.PREFIX}*", count=100
+                int(cursor), match=f"{self.storage.PREFIX}*", count=cursor_scan_count
             )
             matching_keys.extend(list(keys))
 
@@ -247,13 +255,13 @@ class GlobalRateLimiter:
 
     def get_in_memory_limit_keys(
         self,
-    ) -> list[tuple[RateLimitItem, tuple[str, str | MATCH_ALL_INPUTS]]]:
+    ) -> list[tuple[RateLimitItem, tuple[str, str | MatchAllInputs]]]:
         """Returns a list of current RateLimitItems with tuples of namespace and primary key."""
         return [self.parse_key(key) for key in self.storage.events]
 
     async def get_limit_keys(
         self,
-    ) -> list[tuple[RateLimitItem, tuple[str, str | MATCH_ALL_INPUTS]]]:
+    ) -> list[tuple[RateLimitItem, tuple[str, str | MatchAllInputs]]]:
         if os.environ.get("REDIS_URL") and not self.use_in_memory:
             return await self.get_rate_limit_keys()
         return self.get_in_memory_limit_keys()
@@ -279,7 +287,7 @@ class GlobalRateLimiter:
 
     async def try_acquire(
         self,
-        namespace_and_key: tuple[str, str | MATCH_ALL_INPUTS],
+        namespace_and_key: tuple[str, str | MatchAllInputs],
         rate_limit: RateLimitItem | str | None = None,
         machine_id: int = 0,
         timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,  # noqa: ASYNC109
@@ -289,27 +297,32 @@ class GlobalRateLimiter:
         """Returns when the limit is satisfied for the namespace_and_key.
 
         Args:
-            namespace_and_key: is composed of a tuple with namespace (e.g. "get") and
-            a primary-key (e.g. "arxiv.org"). namespaces can be nested with multiple '|',
-            primary-keys in the "get" namespace will be stripped to the domain.
+            namespace_and_key (:obj:`tuple[str, str | MatchAllInputs]`): is
+                composed of a tuple with namespace (e.g. "get") and a primary-key
+                (e.g. "arxiv.org"). namespaces can be nested with multiple '|',
+                primary-keys in the "get" namespace will be stripped to the domain.
+            rate_limit (:obj:`RateLimitItem | str | None`, optional): Optional
+                RateLimitItem to be used for the namespace and primary-key.
+                If not provided, RATE_CONFIG will be used to find the rate limit.
+                Can also use a string of the form:
+                [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
+            machine_id (:obj:`int`, optional): will be used to modify the namespace
+                of GET requests if the primary key is not in the
+                NO_MACHINE_ID_EXTENSIONS list. In that case, the outbound IP will be
+                used to modify the namespace.
+            timeout (:obj:`float`, optional): is the maximum time (in seconds) to
+                wait for the rate limit to be satisfied.
+            weight (:obj:`int`, optional): is the cost of the request,
+                default is 1. (could be tokens for example)
+            raise_impossible_limits (:obj:`bool`, optional): flag will raise a
+                ValueError for weights that exceed the rate.
 
-            rate_limit: Optional RateLimitItem to be used for the namespace and primary-key.
-            If not provided, RATE_CONFIG will be used to find the rate limit. Can also
-            use a string of the form:
-            [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
+        Returns:
+            None if the rate limit is satisfied.
 
-            machine_id: will be used to modify the namespace of GET requests if
-            the primary key is not in the NO_MACHINE_ID_EXTENSIONS list.
-            In that case, the outbound IP will be used to modify the namespace.
-
-            timeout: is the maximum time to wait for the rate limit to be satisfied.
-
-            weight: is the cost of the request, default is 1. (could be tokens for example)
-
-            raise_impossible_limits: flag will raise a ValueError for weights that exceed the rate.
-
-        returns if the limit is satisfied or times out via a TimeoutError.
-
+        Raises:
+            TimeoutError: if the timeout is exceeded.
+            ValueError: if the weight exceeds the rate limit and raise_impossible_limits is True.
         """
         namespace, primary_key = await self.parse_namespace_and_primary_key(
             namespace_and_key, machine_id=machine_id
