@@ -264,7 +264,7 @@ pqa --settings 'tier1_limits' ask 'Are there nm scale features in thermoelectric
 
 This will limit your system to use the tier1_limits, and slow down your queries to accommodate.
 
-You can also specify them manually:
+You can also specify them manually with any rate limit string that matches the specification in the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
 pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'

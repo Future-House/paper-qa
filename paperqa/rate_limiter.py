@@ -46,7 +46,7 @@ RATE_CONFIG: dict[tuple[str, str | MatchAllInputs], RateLimitItem] = {
     ("get", CROSSREF_BASE_URL): RateLimitItemPerSecond(30, 1),
     ("get", SEMANTIC_SCHOLAR_BASE_URL): RateLimitItemPerSecond(15, 1),
     ("client", MATCH_ALL): TOKEN_FALLBACK_RATE_LIMIT,
-    # MATCH_MACHINE_ID is a placeholder for the machine_id passed in by the caller
+    # MATCH_MACHINE_ID is a sentinel for the machine_id passed in by the caller
     (f"get|{MATCH_MACHINE_ID}", MATCH_ALL): FALLBACK_RATE_LIMIT,
 }
 
@@ -217,8 +217,9 @@ class GlobalRateLimiter:
     ) -> tuple[RateLimitItem, tuple[str, str | MatchAllInputs]]:
         """Parse the rate limit item from a redis/in-memory key.
 
-        Note the key is created with RateLimitItem.key_for(*identifiers),
-        the first key is the namespace, then the next two will be our identifiers.
+        Args:
+            key (str): is created with RateLimitItem.key_for(*identifiers),
+            the first key is the namespace, then the next two will be our identifiers.
 
         """
         namespace, primary_key = key.split("/")[1:3]
@@ -241,16 +242,18 @@ class GlobalRateLimiter:
 
         client = Redis(host=host, port=int(port))
 
-        cursor = b"0"
-        matching_keys: list[bytes] = []
-
-        while cursor:
-            cursor, keys = await client.scan(
-                int(cursor), match=f"{self.storage.PREFIX}*", count=cursor_scan_count
-            )
-            matching_keys.extend(list(keys))
-
-        await client.quit()
+        try:
+            cursor = b"0"
+            matching_keys: list[bytes] = []
+            while cursor:
+                cursor, keys = await client.scan(
+                    int(cursor),
+                    match=f"{self.storage.PREFIX}*",
+                    count=cursor_scan_count,
+                )
+                matching_keys.extend(list(keys))
+        finally:
+            await client.quit()
 
         return [self.parse_key(key.decode()) for key in matching_keys]
 
@@ -291,7 +294,7 @@ class GlobalRateLimiter:
         namespace_and_key: tuple[str, str | MatchAllInputs],
         rate_limit: RateLimitItem | str | None = None,
         machine_id: int = 0,
-        timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,  # noqa: ASYNC109
+        acquire_timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,
         weight: int = 1,
         raise_impossible_limits: bool = False,
     ) -> None:
@@ -311,7 +314,7 @@ class GlobalRateLimiter:
                 of GET requests if the primary key is not in the
                 NO_MACHINE_ID_EXTENSIONS list. In that case, the outbound IP will be
                 used to modify the namespace.
-            timeout (:obj:`float`, optional): is the maximum time (in seconds) to
+            acquire_timeout (:obj:`float`, optional): is the maximum time (in seconds) to
                 wait for the rate limit to be satisfied.
             weight (:obj:`int`, optional): is the cost of the request,
                 default is 1. (could be tokens for example)
@@ -322,7 +325,7 @@ class GlobalRateLimiter:
             None if the rate limit is satisfied.
 
         Raises:
-            TimeoutError: if the timeout is exceeded.
+            TimeoutError: if the acquire_timeout is exceeded.
             ValueError: if the weight exceeds the rate limit and raise_impossible_limits is True.
         """
         namespace, primary_key = await self.parse_namespace_and_primary_key(
@@ -353,11 +356,11 @@ class GlobalRateLimiter:
                         cost=min(weight, rate_limit.amount),
                     )
                 )
-                and elapsed < timeout
+                and elapsed < acquire_timeout
             ):
                 await asyncio.sleep(self.WAIT_INCREMENT)
                 elapsed += self.WAIT_INCREMENT
-            if elapsed >= timeout:
+            if elapsed >= acquire_timeout:
                 raise TimeoutError(
                     f"Timeout ({elapsed} secs): rate limit for key: {namespace_and_key}"
                 )
@@ -373,10 +376,10 @@ class GlobalRateLimiter:
                 # we need to keep trying when we have an "impossible" limit
                 if rate_limit.amount < weight:
                     weight -= rate_limit.amount
-                    timeout = max(timeout - elapsed, 1.0)
+                    acquire_timeout = max(acquire_timeout - elapsed, 1.0)
                     continue
                 break
-            timeout = max(timeout - elapsed, 1.0)
+            acquire_timeout = max(acquire_timeout - elapsed, 1.0)
 
 
 GLOBAL_LIMITER = GlobalRateLimiter()

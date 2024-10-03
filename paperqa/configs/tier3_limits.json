@@ -12,9 +12,6 @@
   "prompts": {
     "use_json": true
   },
-  "agent": {
-    "agent_type": "ToolSelector"
-  },
   "llm_config": {
     "rate_limit": {
       "gpt-4o": "800000 per 1 minute",
