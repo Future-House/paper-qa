@@ -262,7 +262,8 @@ For each OpenAI tier, a pre-built setting exists to limit usage.
 pqa --settings 'tier1_limits' ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
-This will limit your system to use the tier1_limits, and slow down your queries to accommodate.
+This will limit your system to use the [tier1_limits](paperqa/config/tier1_limits.json),
+and slow down your queries to accommodate.
 
 You can also specify them manually with any rate limit string that matches the specification in the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
