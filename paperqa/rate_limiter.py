@@ -6,8 +6,6 @@ from typing import ClassVar, Literal
 from urllib.parse import urlparse
 
 import aiohttp
-from clients.crossref import CROSSREF_BASE_URL
-from clients.semantic_scholar import SEMANTIC_SCHOLAR_BASE_URL
 from coredis import Redis
 from limits import (
     RateLimitItem,
@@ -19,6 +17,9 @@ from limits import (
 )
 from limits.aio.storage import MemoryStorage, RedisStorage
 from limits.aio.strategies import MovingWindowRateLimiter
+
+from .clients.crossref import CROSSREF_BASE_URL
+from .clients.semantic_scholar import SEMANTIC_SCHOLAR_BASE_URL
 
 logger = logging.getLogger(__name__)
 
