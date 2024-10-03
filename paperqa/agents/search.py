@@ -565,7 +565,8 @@ async def get_directory_index(  # noqa: PLR0912
     ]
     if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
-            f"Indexing {len(valid_papers_rel_file_paths)} files may take a few minutes."
+            f"Indexing {len(valid_papers_rel_file_paths)} files into the index"
+            f" {search_index.index_name}, may take a few minutes."
         )
 
     index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
