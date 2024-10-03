@@ -440,7 +440,16 @@ def pqa_directory(name: str) -> Path:
 
 def setup_default_logs() -> None:
     """Configure logs to reasonable defaults."""
-    fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    # Work around https://github.com/pymupdf/PyMuPDF/issues/3914
+    pymupdf_logger = logging.getLogger(pymupdf.__name__)
+
+    def message(text="") -> None:
+        # https://github.com/pymupdf/PyMuPDF/blob/1.24.10/src/__init__.py#L102-L107,
+        # but with logging instead of print
+        # Warning was chosen since most `message` usages are errors or warnings
+        pymupdf_logger.warning(text)
+
+    pymupdf.message = message
 
     # Set sane default LiteLLM logging configuration
     # SEE: https://docs.litellm.ai/docs/observability/telemetry
@@ -450,20 +459,6 @@ def setup_default_logs() -> None:
         {
             "version": 1,
             "disable_existing_loggers": False,
-            # Configure a default format and level for all loggers
-            "formatters": {
-                "standard": {
-                    "format": fmt,
-                },
-            },
-            "handlers": {
-                "default": {
-                    "level": "INFO",
-                    "formatter": "standard",
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stdout",
-                },
-            },
             # Lower level for verbose logs
             "loggers": {
                 "httpcore": {"level": "WARNING"},
