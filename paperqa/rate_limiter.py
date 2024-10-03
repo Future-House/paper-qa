@@ -240,7 +240,7 @@ class GlobalRateLimiter:
 
         await client.quit()
 
-        return [self.parse_key(key.decode("utf-8")) for key in matching_keys]
+        return [self.parse_key(key.decode()) for key in matching_keys]
 
     def get_in_memory_limit_keys(
         self,
