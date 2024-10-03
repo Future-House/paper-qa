@@ -9,5 +9,8 @@
   },
   "parsing": {
     "use_doc_details": false
+  },
+  "agent": {
+    "agent_type": "fake"
   }
 }

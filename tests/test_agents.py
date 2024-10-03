@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import itertools
 import json
 import re
@@ -407,6 +408,33 @@ async def test_agent_sharing_state(
         assert (
             len(answer.used_contexts) <= query.settings.answer.answer_max_sources
         ), "Answer has more sources than expected"
+
+
+def test_settings_model_config() -> None:
+
+    settings_name = "tier1_limits"
+    tier1 = Settings.from_name(settings_name)
+
+    with Path(
+        str(importlib.resources.files("paperqa.configs") / f"{settings_name}.json")
+    ).open("r") as f:
+        raw_settings = json.loads(f.read())
+
+    llm_model = tier1.get_llm()
+    summary_llm_model = tier1.get_summary_llm()
+    embedding_model = tier1.get_embedding_model()
+    assert (
+        llm_model.config["rate_limit"]["gpt-4o"]
+        == raw_settings["llm_config"]["rate_limit"]["gpt-4o"]
+    )
+    assert (
+        summary_llm_model.config["rate_limit"]["gpt-4o"]
+        == raw_settings["summary_llm_config"]["rate_limit"]["gpt-4o"]
+    )
+    assert (
+        embedding_model.config["rate_limit"]
+        == raw_settings["embedding_config"]["rate_limit"]
+    )
 
 
 def test_tool_schema(agent_test_settings: Settings) -> None:

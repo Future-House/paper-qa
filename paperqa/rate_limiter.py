@@ -12,12 +12,15 @@ from limits import (
     RateLimitItemPerMinute,
     RateLimitItemPerSecond,
 )
+from limits import (
+    parse as limit_parse,
+)
 from limits.aio.storage import MemoryStorage, RedisStorage
 from limits.aio.strategies import MovingWindowRateLimiter
 
 logger = logging.getLogger(__name__)
 
-GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "30"))
+GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "60"))
 
 # RATE_CONFIG keys are tuples, corresponding to a namespace and primary key.
 # Anything defined with MATCH_ALL variable, will match all non-matched requests for that namespace.
@@ -64,12 +67,12 @@ class GlobalRateLimiter:
 
     def __init__(
         self,
-        rate_config: dict[
-            tuple[str, str | MATCH_ALL_INPUTS], RateLimitItem
-        ] = RATE_CONFIG,
+        rate_config: (
+            None | dict[tuple[str, str | MATCH_ALL_INPUTS], RateLimitItem]
+        ) = None,
         use_in_memory: bool = False,
     ):
-        self.rate_config = rate_config
+        self.rate_config = RATE_CONFIG if rate_config is None else rate_config
         self.use_in_memory = use_in_memory
         self._storage: RedisStorage | MemoryStorage | None = None
         self._rate_limiter: MovingWindowRateLimiter | None = None
@@ -277,7 +280,7 @@ class GlobalRateLimiter:
     async def try_acquire(
         self,
         namespace_and_key: tuple[str, str | MATCH_ALL_INPUTS],
-        rate_limit: RateLimitItem | None = None,
+        rate_limit: RateLimitItem | str | None = None,
         machine_id: int = 0,
         timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,  # noqa: ASYNC109
         weight: int = 1,
@@ -291,7 +294,9 @@ class GlobalRateLimiter:
             primary-keys in the "get" namespace will be stripped to the domain.
 
             rate_limit: Optional RateLimitItem to be used for the namespace and primary-key.
-            If not provided, RATE_CONFIG will be used to find the rate limit.
+            If not provided, RATE_CONFIG will be used to find the rate limit. Can also
+            use a string of the form:
+            [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
 
             machine_id: will be used to modify the namespace of GET requests if
             the primary key is not in the NO_MACHINE_ID_EXTENSIONS list.
@@ -313,6 +318,9 @@ class GlobalRateLimiter:
         _rate_limit, new_namespace = self.parse_rate_limits_and_namespace(
             namespace, primary_key
         )
+
+        if isinstance(rate_limit, str):
+            rate_limit = limit_parse(rate_limit)
 
         rate_limit = rate_limit or _rate_limit
 

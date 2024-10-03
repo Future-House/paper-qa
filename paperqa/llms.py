@@ -73,7 +73,7 @@ class EmbeddingModel(ABC, BaseModel):
     name: str
     config: dict = Field(
         default_factory=dict,
-        description="Optional `rate_limit` key, value must be a RateLimitItem",
+        description="Optional `rate_limit` key, value must be a RateLimitItem or RateLimitItem string for parsing",
     )
 
     async def check_rate_limit(self, token_count: float, **kwargs) -> None:
@@ -95,7 +95,6 @@ class EmbeddingModel(ABC, BaseModel):
 
 class LiteLLMEmbeddingModel(EmbeddingModel):
     name: str = Field(default="text-embedding-3-small")
-    embedding_kwargs: dict = Field(default_factory=dict)
 
     async def embed_documents(
         self, texts: list[str], batch_size: int = 16
@@ -112,7 +111,9 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
             )
 
             response = await aembedding(
-                self.name, input=texts[i : i + batch_size], **self.embedding_kwargs
+                self.name,
+                input=texts[i : i + batch_size],
+                **self.config.get("kwargs", {}),
             )
             embeddings.extend([e["embedding"] for e in response.data])
 
@@ -470,6 +471,7 @@ class LiteLLMModel(LLMModel):
         `router_kwargs`: kwargs for the Router class
         `rate_limit`: (Optional) dictionary keyed by model group name
             with values of type limits.RateLimitItem (in tokens / minute)
+            or valid limits.RateLimitItem string for parsing
 
     This way users can specify routing strategies, retries, etc.
     """
@@ -745,4 +747,4 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
     if embedding == "sparse":
         return SparseEmbeddingModel(**kwargs)
 
-    return LiteLLMEmbeddingModel(name=embedding, embedding_kwargs=kwargs)
+    return LiteLLMEmbeddingModel(name=embedding, config=kwargs)

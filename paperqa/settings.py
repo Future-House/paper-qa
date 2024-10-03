@@ -115,12 +115,12 @@ class ChunkingOptions(StrEnum):
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
-    chunk_size: int = Field(default=3000, description="Number of characters per chunk")
+    chunk_size: int = Field(default=5000, description="Number of characters per chunk")
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
     )
     overlap: int = Field(
-        default=100, description="Number of characters to overlap chunks"
+        default=250, description="Number of characters to overlap chunks"
     )
     citation_prompt: str = Field(
         default=citation_prompt,
@@ -204,7 +204,7 @@ class PromptSettings(BaseModel):
     )
     post: str | None = None
     system: str = default_system_prompt
-    use_json: bool = False
+    use_json: bool = True
     # Not thrilled about this model,
     # but need to split out the system/summary
     # to get JSON
@@ -309,7 +309,7 @@ class IndexSettings(BaseModel):
         description="Whether to recurse into subdirectories when indexing sources.",
     )
     concurrency: int = Field(
-        default=30,
+        default=5,  # low default for folks without S2/Crossref keys
         description="Number of concurrent filesystem reads for indexing",
     )
     sync_with_paper_directory: bool = Field(
@@ -343,7 +343,7 @@ class AgentSettings(BaseModel):
     )
 
     agent_type: str = Field(
-        default="fake",
+        default="ToolSelector",
         description="Type of agent to use",
     )
     agent_config: dict[str, Any] | None = Field(
@@ -402,7 +402,7 @@ class AgentSettings(BaseModel):
     )
 
     index_concurrency: int = Field(
-        default=30,
+        default=5,  # low default for folks without S2/Crossref keys
         description="Number of concurrent filesystem reads for indexing",
         exclude=True,
         frozen=True,
