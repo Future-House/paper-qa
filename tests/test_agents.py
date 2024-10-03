@@ -417,7 +417,7 @@ def test_settings_model_config() -> None:
 
     with Path(
         str(importlib.resources.files("paperqa.configs") / f"{settings_name}.json")
-    ).open("r") as f:
+    ).open() as f:
         raw_settings = json.loads(f.read())
 
     llm_model = tier1.get_llm()

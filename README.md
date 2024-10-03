@@ -20,6 +20,7 @@ question answering, summarization, and contradiction detection.
 - [Installation](#installation)
 - [CLI Usage](#cli-usage)
   - [Bundled Settings](#bundled-settings)
+  - [Rate Limits](#rate-limits)
 - [Library Usage](#library-usage)
   - [`ask` manually](#ask-manually)
   - [Adding Documents Manually](#adding-documents-manually)
@@ -250,6 +251,38 @@ Inside [`paperqa/configs`](paperqa/configs) we bundle known useful settings:
 | wikicrow     | Setting to emulate the Wikipedia article writing used in our WikiCrow publication.                                           |
 | contracrow   | Setting to find contradictions in papers, your query should be a claim that needs to be flagged as a contradiction (or not). |
 | debug        | Setting useful solely for debugging, but not in any actual application beyond debugging.                                     |
+| tier1_limits | Settings that match OpenAI rate limits for each tier, you can use `tier<1-5>_limits` to specify the tier.                    |
+
+### Rate Limits
+
+If you are hitting rate limits, say with the OpenAI Tier 1 plan, you can add them into PaperQA2.
+For each OpenAI tier, a pre-built setting exists to limit usage.
+
+```bash
+pqa --settings 'tier1_limits' ask 'Are there nm scale features in thermoelectric materials?'
+```
+
+This will limit your system to use the tier1_limits, and slow down your queries to accommodate.
+
+You can also specify them manually:
+
+```bash
+pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
+```
+
+Or by adding into a settings object, if calling imperatively:
+
+```python
+from paperqa import Settings, ask
+
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
+        summary_llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
+    ),
+)
+```
 
 ## Library Usage
 
