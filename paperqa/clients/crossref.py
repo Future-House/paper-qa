@@ -30,7 +30,7 @@ from paperqa.utils import (
 )
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
-from .exceptions import DOINotFoundError
+from .exceptions import DOINotFoundError, make_flaky_ssl_error_predicate
 
 logger = logging.getLogger(__name__)
 
@@ -132,16 +132,8 @@ def get_crossref_mailto() -> str:
         return "example@papercrow.ai"
 
 
-def is_flaky_crossref_ssl_error(exc: BaseException) -> bool:
-    """Get if we should retry upon known flaky Crossref failures."""
-    # > aiohttp.client_exceptions.ClientConnectorError:
-    # > Cannot connect to host api.crossref.org:443 ssl:default [nodename nor servname provided, or not known]
-    # SEE: https://github.com/aio-libs/aiohttp/blob/v3.10.5/aiohttp/client_exceptions.py#L193-L196
-    return isinstance(exc, aiohttp.ClientConnectorError) and exc.host == CROSSREF_HOST
-
-
 @retry(
-    retry=retry_if_exception(is_flaky_crossref_ssl_error),
+    retry=retry_if_exception(make_flaky_ssl_error_predicate(CROSSREF_HOST)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
     stop=stop_after_attempt(3),
 )
@@ -273,7 +265,7 @@ async def parse_crossref_to_doc_details(
 
 
 @retry(
-    retry=retry_if_exception(is_flaky_crossref_ssl_error),
+    retry=retry_if_exception(make_flaky_ssl_error_predicate(CROSSREF_HOST)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
     stop=stop_after_attempt(3),
 )
