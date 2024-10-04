@@ -12,5 +12,8 @@
   "parsing": {
     "use_doc_details": false,
     "defer_embedding": true
+  },
+  "prompts": {
+    "use_json": false
   }
 }

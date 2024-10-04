@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import itertools
 import json
 import re
@@ -34,7 +35,7 @@ from paperqa.agents.tools import (
     make_status,
 )
 from paperqa.docs import Docs
-from paperqa.settings import AgentSettings, Settings
+from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Answer, Context, Doc, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 
@@ -310,7 +311,9 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 
 
 @pytest.mark.asyncio
-async def test_gather_evidence_rejects_empty_docs() -> None:
+async def test_gather_evidence_rejects_empty_docs(
+    agent_test_settings: Settings,
+) -> None:
     # Patch GenerateAnswerTool._arun so that if this tool is chosen first, we
     # don't give a 'cannot answer' response. A 'cannot answer' response can
     # lead to an unsure status, which will break this test's assertions. Since
@@ -324,14 +327,18 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
         autospec=True,
     ) as mock_gen_answer:
         mock_gen_answer.__doc__ = original_doc
-        settings = Settings(
-            agent=AgentSettings(
-                tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
-            )
+        agent_test_settings.agent = AgentSettings(
+            tool_names={"gather_evidence", "gen_answer"},
+            max_timesteps=3,
+            search_count=agent_test_settings.agent.search_count,
+            index=IndexSettings(
+                paper_directory=agent_test_settings.agent.index.paper_directory,
+                index_directory=agent_test_settings.agent.index.index_directory,
+            ),
         )
         response = await agent_query(
             query=QueryRequest(
-                query="Are COVID-19 vaccines effective?", settings=settings
+                query="Are COVID-19 vaccines effective?", settings=agent_test_settings
             ),
             docs=Docs(),
         )
@@ -407,6 +414,33 @@ async def test_agent_sharing_state(
         assert (
             len(answer.used_contexts) <= query.settings.answer.answer_max_sources
         ), "Answer has more sources than expected"
+
+
+def test_settings_model_config() -> None:
+
+    settings_name = "tier1_limits"
+    tier1 = Settings.from_name(settings_name)
+
+    with Path(
+        str(importlib.resources.files("paperqa.configs") / f"{settings_name}.json")
+    ).open() as f:
+        raw_settings = json.loads(f.read())
+
+    llm_model = tier1.get_llm()
+    summary_llm_model = tier1.get_summary_llm()
+    embedding_model = tier1.get_embedding_model()
+    assert (
+        llm_model.config["rate_limit"]["gpt-4o"]
+        == raw_settings["llm_config"]["rate_limit"]["gpt-4o"]
+    )
+    assert (
+        summary_llm_model.config["rate_limit"]["gpt-4o"]
+        == raw_settings["summary_llm_config"]["rate_limit"]["gpt-4o"]
+    )
+    assert (
+        embedding_model.config["rate_limit"]
+        == raw_settings["embedding_config"]["rate_limit"]
+    )
 
 
 def test_tool_schema(agent_test_settings: Settings) -> None:

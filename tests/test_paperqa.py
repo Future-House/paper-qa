@@ -542,12 +542,12 @@ def test_make_docs(stub_data_dir: Path) -> None:
 
 
 def test_evidence(docs_fixture) -> None:
-    fast_settings = Settings.from_name("debug")
+    debug_settings = Settings.from_name("debug")
     evidence = docs_fixture.get_evidence(
         Answer(question="What does XAI stand for?"),
-        settings=fast_settings,
+        settings=debug_settings,
     ).contexts
-    assert len(evidence) >= fast_settings.answer.evidence_k
+    assert len(evidence) >= debug_settings.answer.evidence_k
 
 
 def test_json_evidence(docs_fixture) -> None:
@@ -741,11 +741,18 @@ def test_custom_llm(stub_data_dir: Path) -> None:
         dockey="test",
         llm_model=MyLLM(),
     )
-    evidence = docs.get_evidence("Echo", summary_llm_model=MyLLM()).contexts
+    # ensure JSON summaries are not used
+    no_json_settings = Settings(prompts={"use_json": False})
+    evidence = docs.get_evidence(
+        "Echo", summary_llm_model=MyLLM(), settings=no_json_settings
+    ).contexts
     assert "Echo" in evidence[0].context
 
     evidence = docs.get_evidence(
-        "Echo", callbacks=[print_callback], summary_llm_model=MyLLM()
+        "Echo",
+        callbacks=[print_callback],
+        summary_llm_model=MyLLM(),
+        settings=no_json_settings,
     ).contexts
     assert "Echo" in evidence[0].context
 
@@ -856,7 +863,9 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         fields=["author", "journal"],
     )
     doc_details = next(iter(docs.docs.values()))
-    assert doc_details.dockey == "5300ef1d5fb960d7"
+    # Crossref is non-deterministic in its ordering for results
+    # thus we need to capture both possible dockeys
+    assert doc_details.dockey in {"d7763485f06aabde", "5300ef1d5fb960d7"}
     assert isinstance(doc_details, DocDetails)
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
@@ -868,7 +877,10 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         "Aditi Seshadri",
         "Andrew D. White",
     }
-    assert doc_details.doi == "10.26434/chemrxiv-2022-qfv02"
+    assert doc_details.doi in {
+        "10.1021/acs.jctc.2c01235",
+        "10.26434/chemrxiv-2022-qfv02",
+    }
     num_retries = 3
     for _ in range(num_retries):
         answer = docs.query("Are counterfactuals actionable? [yes/no]")
