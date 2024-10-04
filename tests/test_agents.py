@@ -311,7 +311,9 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 
 
 @pytest.mark.asyncio
-async def test_gather_evidence_rejects_empty_docs() -> None:
+async def test_gather_evidence_rejects_empty_docs(
+    agent_test_settings: Settings,
+) -> None:
     # Patch GenerateAnswerTool._arun so that if this tool is chosen first, we
     # don't give a 'cannot answer' response. A 'cannot answer' response can
     # lead to an unsure status, which will break this test's assertions. Since
@@ -325,14 +327,12 @@ async def test_gather_evidence_rejects_empty_docs() -> None:
         autospec=True,
     ) as mock_gen_answer:
         mock_gen_answer.__doc__ = original_doc
-        settings = Settings(
-            agent=AgentSettings(
-                tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
-            )
+        agent_test_settings.agent = AgentSettings(
+            tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
         )
         response = await agent_query(
             query=QueryRequest(
-                query="Are COVID-19 vaccines effective?", settings=settings
+                query="Are COVID-19 vaccines effective?", settings=agent_test_settings
             ),
             docs=Docs(),
         )
