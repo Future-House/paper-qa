@@ -35,7 +35,7 @@ from paperqa.agents.tools import (
     make_status,
 )
 from paperqa.docs import Docs
-from paperqa.settings import AgentSettings, Settings
+from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Answer, Context, Doc, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 
@@ -328,7 +328,13 @@ async def test_gather_evidence_rejects_empty_docs(
     ) as mock_gen_answer:
         mock_gen_answer.__doc__ = original_doc
         agent_test_settings.agent = AgentSettings(
-            tool_names={"gather_evidence", "gen_answer"}, max_timesteps=3
+            tool_names={"gather_evidence", "gen_answer"},
+            max_timesteps=3,
+            search_count=agent_test_settings.agent.search_count,
+            index=IndexSettings(
+                paper_directory=agent_test_settings.agent.index.paper_directory,
+                index_directory=agent_test_settings.agent.index.index_directory,
+            ),
         )
         response = await agent_query(
             query=QueryRequest(
