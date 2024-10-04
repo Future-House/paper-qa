@@ -542,12 +542,12 @@ def test_make_docs(stub_data_dir: Path) -> None:
 
 
 def test_evidence(docs_fixture) -> None:
-    fast_settings = Settings.from_name("debug")
+    debug_settings = Settings.from_name("debug")
     evidence = docs_fixture.get_evidence(
         Answer(question="What does XAI stand for?"),
-        settings=fast_settings,
+        settings=debug_settings,
     ).contexts
-    assert len(evidence) >= fast_settings.answer.evidence_k
+    assert len(evidence) >= debug_settings.answer.evidence_k
 
 
 def test_json_evidence(docs_fixture) -> None:
@@ -741,11 +741,18 @@ def test_custom_llm(stub_data_dir: Path) -> None:
         dockey="test",
         llm_model=MyLLM(),
     )
-    evidence = docs.get_evidence("Echo", summary_llm_model=MyLLM()).contexts
+    # ensure JSON summaries are not used
+    no_json_settings = Settings(prompts={"use_json": False})
+    evidence = docs.get_evidence(
+        "Echo", summary_llm_model=MyLLM(), settings=no_json_settings
+    ).contexts
     assert "Echo" in evidence[0].context
 
     evidence = docs.get_evidence(
-        "Echo", callbacks=[print_callback], summary_llm_model=MyLLM()
+        "Echo",
+        callbacks=[print_callback],
+        summary_llm_model=MyLLM(),
+        settings=no_json_settings,
     ).contexts
     assert "Echo" in evidence[0].context
 

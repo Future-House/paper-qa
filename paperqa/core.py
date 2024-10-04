@@ -28,8 +28,15 @@ def llm_parse_json(text: str) -> dict:
     # https://regex101.com/r/VFcDmB/1
     pattern = r'"(?:[^"\\]|\\.)*"'
     text = re.sub(pattern, replace_newlines, text)
-
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        raise ValueError(
+            "Failed to parse JSON. Your model may not "
+            "be capable of supporting JSON output. Try "
+            "a different model or with "
+            "`Settings(prompts={'use_json': False})`"
+        ) from e
 
 
 async def map_fxn_summary(
