@@ -386,16 +386,23 @@ def create_bibtex_key(author: list[str], year: str, title: str) -> str:
     return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
 
 
+def is_retryable(exc: BaseException) -> bool:
+    """Check if an exception is known to be a retryable HTTP issue."""
+    if isinstance(
+        exc, aiohttp.ServerDisconnectedError | aiohttp.ClientConnectionResetError
+    ):
+        # Seen with Semantic Scholar:
+        # > aiohttp.client_exceptions.ClientConnectionResetError:
+        # > Cannot write to closing transport
+        return True
+    return isinstance(exc, aiohttp.ClientResponseError) and exc.status in {
+        httpx.codes.INTERNAL_SERVER_ERROR.value,
+        httpx.codes.GATEWAY_TIMEOUT.value,
+    }
+
+
 @retry(
-    retry=retry_if_exception(
-        lambda x: isinstance(x, aiohttp.ServerDisconnectedError)
-        or isinstance(x, aiohttp.ClientResponseError)
-        and x.status
-        in {
-            httpx.codes.INTERNAL_SERVER_ERROR.value,
-            httpx.codes.GATEWAY_TIMEOUT.value,
-        }
-    ),
+    retry=retry_if_exception(is_retryable),
     before_sleep=before_sleep_log(logger, logging.WARNING),
     stop=stop_after_attempt(5),
     wait=wait_incrementing(0.1, 0.1),
