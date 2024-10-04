@@ -11,7 +11,13 @@ from typing import Any
 
 import numpy as np
 import tiktoken
-from litellm import DeploymentTypedDict, Router, aembedding, token_counter
+from litellm import (
+    DeploymentTypedDict,
+    Router,
+    aembedding,
+    get_model_cost_map,
+    token_counter,
+)
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from paperqa.prompts import default_system_prompt
@@ -22,6 +28,8 @@ PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
     Awaitable[LLMResult],
 ]
+
+MODEL_COST_MAP = get_model_cost_map("")
 
 
 def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
@@ -67,18 +75,20 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
 
     def _truncate_if_large(self, texts: list[str]) -> list[str]:
         """Truncate texts if they are too large specifically for an openai model."""
-        if self.name not in {
-            "text-embedding-3-small",
-            "text-embedding-3-large",
-            "text-embedding-ada-002",
-        }:
+        if self.name not in MODEL_COST_MAP:
             return texts
-        max_tokens = 8192
-        maybe_too_large = max_tokens * 3
+        max_tokens = MODEL_COST_MAP[self.name]["max_input_tokens"]
+        # heuristic about ratio of tokens to characters
+        conservative_char_token_ratio = 3
+        maybe_too_large = max_tokens * conservative_char_token_ratio
         if any(len(t) > maybe_too_large for t in texts):
-            enct = tiktoken.get_encoding("cl100k_base")
-            enc_batch = enct.encode_ordinary_batch(texts)
-            return [enct.decode(t[:max_tokens]) for t in enc_batch]
+            try:
+                enct = tiktoken.encoding_for_model("cl100k_base")
+                enc_batch = enct.encode_ordinary_batch(texts)
+                return [enct.decode(t[:max_tokens]) for t in enc_batch]
+            except KeyError:
+                return [t[: max_tokens * conservative_char_token_ratio] for t in texts]
+
         return texts
 
     async def embed_documents(
