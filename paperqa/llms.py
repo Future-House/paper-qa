@@ -74,7 +74,7 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
     embedding_kwargs: dict = Field(default_factory=dict)
 
     def _truncate_if_large(self, texts: list[str]) -> list[str]:
-        """Truncate texts if they are too large specifically for an openai model."""
+        """Truncate texts if they are too large by using litellm cost map."""
         if self.name not in MODEL_COST_MAP:
             return texts
         max_tokens = MODEL_COST_MAP[self.name]["max_input_tokens"]
