@@ -2,8 +2,11 @@ from unittest.mock import patch
 
 import pytest
 from pydantic import ValidationError
+from pytest_subtests import SubTests
 
 from paperqa.settings import (
+    AgentSettings,
+    IndexSettings,
     PromptSettings,
     Settings,
     get_formatted_variables,
@@ -50,3 +53,14 @@ def test_settings_default_instantiation() -> None:
     settings = Settings()
     assert "gpt-" in settings.llm
     assert settings.answer.evidence_k == 10
+
+
+def test_index_naming(subtests: SubTests) -> None:
+    with subtests.test(msg="no name"):
+        settings = Settings()
+        with pytest.raises(ValueError, match="specify a name"):
+            settings.agent.index.get_named_index_directory()
+
+    with subtests.test(msg="with name"):
+        settings = Settings(agent=AgentSettings(index=IndexSettings(name="test")))
+        assert settings.agent.index.get_named_index_directory().name == "test"
