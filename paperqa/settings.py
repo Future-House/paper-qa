@@ -300,7 +300,7 @@ class IndexSettings(BaseModel):
             " 'title' will be used when indexing, others are discarded."
         ),
     )
-    index_directory: str | os.PathLike | None = Field(
+    index_directory: str | os.PathLike = Field(
         default=pqa_directory("indexes"),
         description=(
             "Directory to store the PQA built search index, configuration, and"

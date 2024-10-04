@@ -108,7 +108,9 @@ class SearchIndex:
         self,
         fields: Sequence[str] | None = None,
         index_name: str = "pqa_index",
-        index_directory: str | os.PathLike | None = None,
+        index_directory: str | os.PathLike = IndexSettings.model_fields[
+            "index_directory"
+        ].default,
         storage: SearchDocumentStorage = SearchDocumentStorage.PICKLE_COMPRESSED,
     ):
         if fields is None:
@@ -118,8 +120,6 @@ class SearchIndex:
             raise ValueError(
                 f"{self.REQUIRED_FIELDS} must be included in search index fields."
             )
-        if index_directory is None:
-            index_directory = IndexSettings.model_fields["index_directory"].default
         self.index_name = index_name
         self._index_directory = index_directory
         self._schema = None

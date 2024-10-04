@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any
 
@@ -322,9 +321,7 @@ async def run_ldp_agent(
 
 
 async def index_search(
-    query: str,
-    index_name: str = "answers",
-    index_directory: str | os.PathLike | None = None,
+    query: str, index_name: str = "answers", **index_kwargs
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
     fields = [*SearchIndex.REQUIRED_FIELDS]
     if index_name == "answers":
@@ -332,12 +329,12 @@ async def index_search(
     index_to_query = SearchIndex(
         fields=fields,
         index_name=index_name,
-        index_directory=index_directory,
         storage=(
             SearchDocumentStorage.JSON_MODEL_DUMP
             if index_name == "answers"
             else SearchDocumentStorage.PICKLE_COMPRESSED
         ),
+        **index_kwargs,
     )
 
     results = [
