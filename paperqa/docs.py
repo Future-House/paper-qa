@@ -401,7 +401,7 @@ class Docs(BaseModel):
         self,
         texts: list[Text],
         doc: Doc,
-        settings: MaybeSettings = None,  # noqa: ARG002 future proofing
+        settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> bool:
         """
@@ -416,6 +416,12 @@ class Docs(BaseModel):
             return False
         if not texts:
             raise ValueError("No texts to add.")
+
+        all_settings = get_settings(settings)
+        if not all_settings.parsing.defer_embedding and not embedding_model:
+            # want to embed now!
+            embedding_model = all_settings.get_embedding_model()
+
         # 1. Calculate text embeddings if not already present, but don't set them into
         # the texts until we've set up the Doc's embedding, so callers can retry upon
         # OpenAI rate limit errors

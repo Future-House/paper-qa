@@ -818,8 +818,9 @@ def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     docs = Docs()
     settings = Settings.from_name("debug")
     settings.parsing.chunk_size = 0
-    # don't want to shove whole document into llm to get citation
+    # don't want to shove whole document into llm to get citation or embedding
     settings.parsing.use_doc_details = False
+    settings.parsing.defer_embedding = True
     # need larger context window
     settings.summary_llm = "gpt-4o-mini"
     docs.add(
@@ -828,6 +829,10 @@ def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
         settings=settings,
     )
     assert len(docs.texts) == 1
+
+    # make sure we deferred embedding
+    assert docs.texts[0].embedding is None
+
     # now check we can get evidence (namely embed very long document)
     docs.get_evidence("What is XAI?", settings=settings)
 

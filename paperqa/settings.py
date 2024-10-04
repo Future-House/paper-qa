@@ -142,6 +142,13 @@ class ParsingSettings(BaseModel):
             " correctly)"
         ),
     )
+    defer_embedding: bool = Field(
+        default=False,
+        description=(
+            "Whether to embed documents immediately as they are added, or defer until"
+            " summarization."
+        ),
+    )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
     model_config = ConfigDict(extra="forbid")
 
