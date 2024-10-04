@@ -65,9 +65,26 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
     name: str = Field(default="text-embedding-3-small")
     embedding_kwargs: dict = Field(default_factory=dict)
 
+    def _truncate_if_large(self, texts: list[str]) -> list[str]:
+        """Truncate texts if they are too large specifically for an openai model."""
+        if self.name not in {
+            "text-embedding-3-small",
+            "text-embedding-3-large",
+            "text-embedding-ada-002",
+        }:
+            return texts
+        max_tokens = 8192
+        maybe_too_large = max_tokens * 3
+        if any(len(t) > maybe_too_large for t in texts):
+            enct = tiktoken.get_encoding("cl100k_base")
+            enc_batch = enct.encode_ordinary_batch(texts)
+            return [enct.decode(t[:max_tokens]) for t in enc_batch]
+        return texts
+
     async def embed_documents(
         self, texts: list[str], batch_size: int = 16
     ) -> list[list[float]]:
+        texts = self._truncate_if_large(texts)
         N = len(texts)
         embeddings = []
         for i in range(0, N, batch_size):

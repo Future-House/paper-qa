@@ -115,7 +115,10 @@ class ChunkingOptions(StrEnum):
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
-    chunk_size: int = Field(default=3000, description="Number of characters per chunk")
+    chunk_size: int = Field(
+        default=3000,
+        description="Number of characters per chunk. If 0, no chunking will be done.",
+    )
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
     )

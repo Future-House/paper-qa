@@ -814,6 +814,24 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     )
 
 
+def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
+    docs = Docs()
+    settings = Settings.from_name("debug")
+    settings.parsing.chunk_size = 0
+    # don't want to shove whole document into llm to get citation
+    settings.parsing.use_doc_details = False
+    # need larger context window
+    settings.summary_llm = "gpt-4o-mini"
+    docs.add(
+        stub_data_dir / "paper.pdf",
+        "Wellawatte et al, XAI Review, 2023",
+        settings=settings,
+    )
+    assert len(docs.texts) == 1
+    # now check we can get evidence (namely embed very long document)
+    docs.get_evidence("What is XAI?", settings=settings)
+
+
 # SEE: https://github.com/kevin1024/vcrpy/blob/v6.0.1/vcr/config.py#L43
 VCR_DEFAULT_MATCH_ON = "method", "scheme", "host", "port", "path", "query"
 

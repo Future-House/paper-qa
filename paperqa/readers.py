@@ -286,7 +286,6 @@ def read_doc(
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
         parsed_text = parse_pdf_to_pages(path)
-
     elif str_path.endswith(".txt"):
         parsed_text = parse_text(path)
     elif str_path.endswith(".html"):
@@ -298,7 +297,14 @@ def read_doc(
         return parsed_text
 
     # next chunk the parsed text
-    if str_path.endswith(".pdf"):
+
+    # check if chunk is 0 (no chunking)
+    if chunk_chars == 0:
+        chunked_text = [
+            Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
+        ]
+        chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
+    elif str_path.endswith(".pdf"):
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )

@@ -401,7 +401,7 @@ class Docs(BaseModel):
         self,
         texts: list[Text],
         doc: Doc,
-        settings: MaybeSettings = None,
+        settings: MaybeSettings = None,  # noqa: ARG002 future proofing
         embedding_model: EmbeddingModel | None = None,
     ) -> bool:
         """
@@ -412,11 +412,6 @@ class Docs(BaseModel):
         Returns:
             True if the doc was added, otherwise False if already in the collection.
         """
-        all_settings = get_settings(settings)
-
-        if embedding_model is None:
-            embedding_model = all_settings.get_embedding_model()
-
         if doc.dockey in self.docs:
             return False
         if not texts:
@@ -424,11 +419,13 @@ class Docs(BaseModel):
         # 1. Calculate text embeddings if not already present, but don't set them into
         # the texts until we've set up the Doc's embedding, so callers can retry upon
         # OpenAI rate limit errors
-        text_embeddings: list[list[float]] | None = (
-            await embedding_model.embed_documents(texts=[t.text for t in texts])
-            if texts[0].embedding is None
-            else None
-        )
+        text_embeddings: list[list[float]] | None = None
+        if embedding_model:
+            text_embeddings = (
+                await embedding_model.embed_documents(texts=[t.text for t in texts])
+                if texts[0].embedding is None
+                else None
+            )
         # 2. Now we can set the text embeddings
         if text_embeddings is not None:
             for t, t_embedding in zip(texts, text_embeddings, strict=True):
@@ -465,8 +462,13 @@ class Docs(BaseModel):
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
 
-    def _build_texts_index(self) -> None:
+    async def _build_texts_index(self, embedding_model: EmbeddingModel) -> None:
         texts = [t for t in self.texts if t not in self.texts_index]
+        to_embed = [t.text for t in texts if t.embedding is None]
+        if to_embed:
+            embeddings = await embedding_model.embed_documents(texts=to_embed)
+            for t, e in zip(texts, embeddings, strict=True):
+                t.embedding = e
         self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
@@ -484,7 +486,7 @@ class Docs(BaseModel):
         # TODO: should probably happen elsewhere
         self.texts_index.mmr_lambda = settings.texts_index_mmr_lambda
 
-        self._build_texts_index()
+        await self._build_texts_index(embedding_model)
         _k = k + len(self.deleted_dockeys)
         matches: list[Text] = cast(
             list[Text],
