@@ -20,7 +20,13 @@ from typing import Any, TypeVar
 
 import numpy as np
 import tiktoken
-from litellm import DeploymentTypedDict, Router, aembedding, token_counter
+from litellm import (
+    DeploymentTypedDict,
+    Router,
+    aembedding,
+    get_model_cost_map,
+    token_counter,
+)
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from paperqa.prompts import default_system_prompt
@@ -32,6 +38,8 @@ PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
     Awaitable[LLMResult],
 ]
+
+MODEL_COST_MAP = get_model_cost_map("")
 
 
 def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
@@ -96,9 +104,28 @@ class EmbeddingModel(ABC, BaseModel):
 class LiteLLMEmbeddingModel(EmbeddingModel):
     name: str = Field(default="text-embedding-3-small")
 
+    def _truncate_if_large(self, texts: list[str]) -> list[str]:
+        """Truncate texts if they are too large by using litellm cost map."""
+        if self.name not in MODEL_COST_MAP:
+            return texts
+        max_tokens = MODEL_COST_MAP[self.name]["max_input_tokens"]
+        # heuristic about ratio of tokens to characters
+        conservative_char_token_ratio = 3
+        maybe_too_large = max_tokens * conservative_char_token_ratio
+        if any(len(t) > maybe_too_large for t in texts):
+            try:
+                enct = tiktoken.encoding_for_model("cl100k_base")
+                enc_batch = enct.encode_ordinary_batch(texts)
+                return [enct.decode(t[:max_tokens]) for t in enc_batch]
+            except KeyError:
+                return [t[: max_tokens * conservative_char_token_ratio] for t in texts]
+
+        return texts
+
     async def embed_documents(
         self, texts: list[str], batch_size: int = 16
     ) -> list[list[float]]:
+        texts = self._truncate_if_large(texts)
         N = len(texts)
         embeddings = []
         for i in range(0, N, batch_size):

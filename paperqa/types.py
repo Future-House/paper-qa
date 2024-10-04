@@ -284,6 +284,14 @@ class ParsedText(BaseModel):
                 "Encoding only implemented for str and list[str] content."
             )
 
+    def reduce_content(self):
+        """Reduce any content to a single string."""
+        if isinstance(self.content, str):
+            return self.content
+        if isinstance(self.content, list):
+            return "\n\n".join(self.content)
+        return "\n\n".join(self.content.values())
+
 
 # We use these integer values
 # as defined in https://jfp.csc.fi/en/web/haku/kayttoohje
