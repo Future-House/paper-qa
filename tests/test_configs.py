@@ -64,3 +64,9 @@ def test_index_naming(subtests: SubTests) -> None:
     with subtests.test(msg="with name"):
         settings = Settings(agent=AgentSettings(index=IndexSettings(name="test")))
         assert settings.agent.index.get_named_index_directory().name == "test"
+
+
+def test_router_kwargs_present_in_models() -> None:
+    settings = Settings()
+    assert settings.get_llm().config["router_kwargs"] is not None
+    assert settings.get_summary_llm().config["router_kwargs"] is not None
