@@ -10,6 +10,7 @@
     "max_concurrent_requests": 5
   },
   "parsing": {
-    "use_doc_details": false
+    "use_doc_details": false,
+    "defer_embedding": true
   }
 }
