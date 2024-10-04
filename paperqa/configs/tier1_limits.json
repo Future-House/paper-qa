@@ -1,0 +1,53 @@
+{
+  "answer": {
+    "evidence_k": 5,
+    "evidence_detailed_citations": false,
+    "evidence_summary_length": "25 to 50 words",
+    "answer_max_sources": 3,
+    "answer_length": "50 to 100 words",
+    "max_concurrent_requests": 5
+  },
+  "parsing": {
+    "use_doc_details": false
+  },
+  "prompts": {
+    "use_json": true
+  },
+  "llm_config": {
+    "rate_limit": {
+      "gpt-4o": "30000 per 1 minute",
+      "gpt-4o-2024-08-06": "30000 per 1 minute",
+      "gpt-4o-2024-05-13": "30000 per 1 minute",
+      "gpt-4o-mini": "200000 per 1 minute",
+      "gpt-4o-mini-2024-07-18": "200000 per 1 minute",
+      "gpt-4-turbo": "30000 per 1 minute",
+      "gpt-4-turbo-2024-04-09": "30000 per 1 minute",
+      "gpt-4-0613": "10000 per 1 minute",
+      "gpt-4-0314": "10000 per 1 minute",
+      "gpt-4": "10000 per 1 minute",
+      "gpt-3.5-turbo-0125": "200000 per 1 minute",
+      "gpt-3.5-turbo": "200000 per 1 minute",
+      "gpt-3.5-turbo-1106": "200000 per 1 minute"
+    }
+  },
+  "summary_llm_config": {
+    "rate_limit": {
+      "gpt-4o": "30000 per 1 minute",
+      "gpt-4o-2024-08-06": "30000 per 1 minute",
+      "gpt-4o-2024-05-13": "30000 per 1 minute",
+      "gpt-4o-mini": "200000 per 1 minute",
+      "gpt-4o-mini-2024-07-18": "200000 per 1 minute",
+      "gpt-4-turbo": "30000 per 1 minute",
+      "gpt-4-turbo-2024-04-09": "30000 per 1 minute",
+      "gpt-4-0613": "10000 per 1 minute",
+      "gpt-4-0314": "10000 per 1 minute",
+      "gpt-4": "10000 per 1 minute",
+      "gpt-3.5-turbo-0125": "200000 per 1 minute",
+      "gpt-3.5-turbo": "200000 per 1 minute",
+      "gpt-3.5-turbo-1106": "200000 per 1 minute"
+    }
+  },
+  "embedding_config": {
+    "rate_limit": "1000000 per 1 minute"
+  }
+}

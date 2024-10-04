@@ -9,5 +9,11 @@
   },
   "parsing": {
     "use_doc_details": false
+  },
+  "prompts": {
+    "use_json": false
+  },
+  "agent": {
+    "agent_type": "fake"
   }
 }
