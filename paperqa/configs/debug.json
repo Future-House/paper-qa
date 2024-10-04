@@ -10,11 +10,10 @@
     "max_concurrent_requests": 5
   },
   "parsing": {
-    "use_doc_details": false
-  },
-  "prompts": {
-    "use_json": false,
     "use_doc_details": false,
     "defer_embedding": true
+  },
+  "prompts": {
+    "use_json": false
   }
 }
