@@ -115,7 +115,10 @@ class ChunkingOptions(StrEnum):
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
-    chunk_size: int = Field(default=3000, description="Number of characters per chunk")
+    chunk_size: int = Field(
+        default=3000,
+        description="Number of characters per chunk. If 0, no chunking will be done.",
+    )
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
     )
@@ -137,6 +140,13 @@ class ParsingSettings(BaseModel):
         description=(
             "Whether to disable checking if a document looks like text (was parsed"
             " correctly)"
+        ),
+    )
+    defer_embedding: bool = Field(
+        default=False,
+        description=(
+            "Whether to embed documents immediately as they are added, or defer until"
+            " summarization."
         ),
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
