@@ -27,6 +27,7 @@ except ImportError:
     RolloutManager = None  # type: ignore[assignment,misc]
 
 from paperqa.docs import Docs
+from paperqa.settings import AgentSettings
 from paperqa.types import Answer
 
 from .env import PaperQAEnvironment
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 agent_logger = logging.getLogger(__name__ + ".agent_callers")
 
-DEFAULT_AGENT_TYPE = ToolSelector
+DEFAULT_AGENT_TYPE = AgentSettings.model_fields["agent_type"].default
 
 
 async def agent_query(
