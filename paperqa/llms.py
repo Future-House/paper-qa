@@ -79,7 +79,7 @@ EXTRA_TOKENS_FROM_USER_ROLE: int = 7
 
 class EmbeddingModel(ABC, BaseModel):
     name: str
-    config: dict = Field(
+    config: dict[str, Any] = Field(
         default_factory=dict,
         description="Optional `rate_limit` key, value must be a RateLimitItem or RateLimitItem string for parsing",
     )
@@ -772,7 +772,6 @@ class NumpyVectorStore(VectorStore):
 
 
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
-
     if embedding.startswith("hybrid"):
         embedding_model_name = "-".join(embedding.split("-")[1:])
         return HybridEmbeddingModel(
@@ -783,5 +782,6 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
         )
     if embedding == "sparse":
         return SparseEmbeddingModel(**kwargs)
-
-    return LiteLLMEmbeddingModel(name=embedding, config=kwargs)
+    if kwargs:  # Only override the default config if there are actually kwargs
+        kwargs = {"config": kwargs}
+    return LiteLLMEmbeddingModel(name=embedding, **kwargs)
