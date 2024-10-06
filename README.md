@@ -459,6 +459,36 @@ answer = ask(
 )
 ```
 
+Also there is the possibility to use ollama hosted models.
+Tun run example below make sure you have downloaded llama3.2 and mxbai-embed-large via ollama.
+
+```python
+from paperqa import Settings, ask
+
+local_llm_config = {
+    "model_list": [
+        {
+            "model_name": "ollama/llama3.2",
+            "litellm_params": {
+                "model": "ollama/llama3.2",
+                "api_base": "http://localhost:11434"
+            }
+        }
+    ]
+}
+
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="ollama/llama3.2",
+        llm_config=local_llm_config,
+        summary_llm="ollama/llama3.2",
+        summary_llm_config=local_llm_config,
+        embedding="ollama/mxbai-embed-large",
+    ),
+)
+```
+
 ### Changing Embedding Model
 
 PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
