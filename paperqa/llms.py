@@ -27,7 +27,14 @@ from litellm import (
     get_model_cost_map,
     token_counter,
 )
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    TypeAdapter,
+    field_validator,
+    model_validator,
+)
 
 from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
@@ -102,7 +109,21 @@ class EmbeddingModel(ABC, BaseModel):
 
 
 class LiteLLMEmbeddingModel(EmbeddingModel):
+
     name: str = Field(default="text-embedding-3-small")
+    config: dict[str, Any] = Field(
+        default_factory=dict,  # See below field_validator for injection of kwargs
+        description="Optional `rate_limit` key, value must be a RateLimitItem or RateLimitItem string for parsing",
+    )
+
+    @field_validator("config")
+    @classmethod
+    def set_up_default_config(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if "kwargs" not in value:
+            value["kwargs"] = get_litellm_retrying_config(
+                timeout=120,  # 2-min timeout seemed reasonable
+            )
+        return value
 
     def _truncate_if_large(self, texts: list[str]) -> list[str]:
         """Truncate texts if they are too large by using litellm cost map."""
