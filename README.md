@@ -460,7 +460,7 @@ answer = ask(
 ```
 
 Models hosted with `ollama` are also supported.
-Tun run example below make sure you have downloaded llama3.2 and mxbai-embed-large via ollama.
+To run the example below make sure you have downloaded llama3.2 and mxbai-embed-large via ollama.
 
 ```python
 from paperqa import Settings, ask
