@@ -489,6 +489,11 @@ if not IS_PYTHON_BELOW_312:
     )
 
 
+def get_litellm_retrying_config(timeout: float = 60.0) -> dict[str, Any]:
+    """Get retrying configuration for litellm.acompletion and litellm.aembedding."""
+    return {"num_retries": 3, "timeout": timeout}
+
+
 class LiteLLMModel(LLMModel):
     """A wrapper around the litellm library.
 
@@ -527,10 +532,8 @@ class LiteLLMModel(LLMModel):
             } | data.get("config", {})
 
         if "router_kwargs" not in data.get("config", {}):
-            data["config"]["router_kwargs"] = {
-                "num_retries": 3,
-                "retry_after": 5,
-                "timeout": 60,
+            data["config"]["router_kwargs"] = get_litellm_retrying_config() | {
+                "retry_after": 5
             }
 
         # we only support one "model name" for now, here we validate
