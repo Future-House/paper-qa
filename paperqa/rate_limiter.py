@@ -25,6 +25,13 @@ logger = logging.getLogger(__name__)
 
 GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "60"))
 
+MATCH_ALL = None
+MatchAllInputs = Literal[None]
+MATCH_MACHINE_ID = "<machine_id>"
+
+FALLBACK_RATE_LIMIT = RateLimitItemPerSecond(3, 1)
+TOKEN_FALLBACK_RATE_LIMIT = RateLimitItemPerMinute(30_000, 1)
+
 # RATE_CONFIG keys are tuples, corresponding to a namespace and primary key.
 # Anything defined with MATCH_ALL variable, will match all non-matched requests for that namespace.
 # For the "get" namespace, all primary key urls will be parsed down to the domain level.
@@ -34,13 +41,6 @@ GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "60"))
 # rate of requests per machine. If the primary_key is in the NO_MACHINE_ID_EXTENSIONS list, then
 # the dynamic IP of the machine will be used to limit the rate of requests, otherwise the
 # user input machine_id will be used.
-
-MATCH_ALL = None
-MatchAllInputs = Literal[None]
-MATCH_MACHINE_ID = "<machine_id>"
-
-FALLBACK_RATE_LIMIT = RateLimitItemPerSecond(3, 1)
-TOKEN_FALLBACK_RATE_LIMIT = RateLimitItemPerMinute(30_000, 1)
 
 RATE_CONFIG: dict[tuple[str, str | MatchAllInputs], RateLimitItem] = {
     ("get", CROSSREF_BASE_URL): RateLimitItemPerSecond(30, 1),
@@ -132,8 +132,8 @@ class GlobalRateLimiter:
         return self._rate_limiter
 
     async def parse_namespace_and_primary_key(
-        self, namespace_and_key: tuple[str, str | MatchAllInputs], machine_id: int = 0
-    ) -> tuple[str, str | MatchAllInputs]:
+        self, namespace_and_key: tuple[str, str], machine_id: int = 0
+    ) -> tuple[str, str]:
         """Turn namespace_and_key tuple into a namespace and primary-key.
 
         If using a namespace starting with "get", then the primary key will be url parsed.
@@ -240,10 +240,15 @@ class GlobalRateLimiter:
         if not (host and port):
             raise ValueError(f'Invalid REDIS_URL: {os.environ.get("REDIS_URL")}.')
 
+        if not isinstance(self.storage, RedisStorage):
+            raise NotImplementedError(
+                "get_rate_limit_keys only works with RedisStorage."
+            )
+
         client = Redis(host=host, port=int(port))
 
         try:
-            cursor = b"0"
+            cursor: int | bytes = b"0"
             matching_keys: list[bytes] = []
             while cursor:
                 cursor, keys = await client.scan(
@@ -261,6 +266,10 @@ class GlobalRateLimiter:
         self,
     ) -> list[tuple[RateLimitItem, tuple[str, str | MatchAllInputs]]]:
         """Returns a list of current RateLimitItems with tuples of namespace and primary key."""
+        if not isinstance(self.storage, MemoryStorage):
+            raise NotImplementedError(
+                "get_in_memory_limit_keys only works with MemoryStorage."
+            )
         return [self.parse_key(key) for key in self.storage.events]
 
     async def get_limit_keys(
@@ -291,7 +300,7 @@ class GlobalRateLimiter:
 
     async def try_acquire(
         self,
-        namespace_and_key: tuple[str, str | MatchAllInputs],
+        namespace_and_key: tuple[str, str],
         rate_limit: RateLimitItem | str | None = None,
         machine_id: int = 0,
         acquire_timeout: float = GLOBAL_RATE_LIMITER_TIMEOUT,
@@ -301,7 +310,7 @@ class GlobalRateLimiter:
         """Returns when the limit is satisfied for the namespace_and_key.
 
         Args:
-            namespace_and_key (:obj:`tuple[str, str | MatchAllInputs]`): is
+            namespace_and_key (:obj:`tuple[str, str]`): is
                 composed of a tuple with namespace (e.g. "get") and a primary-key
                 (e.g. "arxiv.org"). namespaces can be nested with multiple '|',
                 primary-keys in the "get" namespace will be stripped to the domain.
