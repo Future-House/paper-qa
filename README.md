@@ -459,7 +459,7 @@ answer = ask(
 )
 ```
 
-Also there is the possibility to use ollama hosted models.
+Models hosted with `ollama` are also supported.
 Tun run example below make sure you have downloaded llama3.2 and mxbai-embed-large via ollama.
 
 ```python
