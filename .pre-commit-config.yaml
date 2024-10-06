@@ -83,10 +83,12 @@ repos:
         args: [--pretty, --ignore-missing-imports]
         additional_dependencies:
           - aiohttp
+          - coredis
           - fhaviary[llm]>=0.6 # Match pyproject.toml
           - ldp>=0.9 # Match pyproject.toml
           - html2text
           - httpx
+          - limits
           - numpy
           - openai>=1 # Match pyproject.toml
           - pandas-stubs
