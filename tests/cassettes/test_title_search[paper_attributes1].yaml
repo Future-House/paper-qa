@@ -6,7 +6,7 @@ interactions:
       uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=example@papercrow.ai
     response:
       body:
-        string: '{"elapsed_seconds":0.021,"results":[]}
+        string: '{"elapsed_seconds":0.028,"results":[]}
 
           '
       headers:
@@ -23,13 +23,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 16 Sep 2024 14:27:24 GMT
+          - Mon, 07 Oct 2024 01:01:13 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1726496844&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=8R%2FkS7ZX7kIO47oqQL9k7%2F0TOIAIV7TNhokT4OBh6HQ%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728262873&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=y8IiG%2BfeUGHqR3ijDH8PArcehcA5RSDSavhj%2FOTeA6M%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1726496844&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=8R%2FkS7ZX7kIO47oqQL9k7%2F0TOIAIV7TNhokT4OBh6HQ%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728262873&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=y8IiG%2BfeUGHqR3ijDH8PArcehcA5RSDSavhj%2FOTeA6M%3D
         Server:
           - gunicorn
         Via:
@@ -49,7 +49,7 @@ interactions:
           {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
           "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
           "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 25, "influentialCitationCount":
+          "venue": "arXiv.org", "year": 2023, "citationCount": 28, "influentialCitationCount":
           1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
           "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
           "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
@@ -61,7 +61,7 @@ interactions:
           "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
           Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
           "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}], "matchScore": 245.30392}]}
+          "Andrew D. White"}], "matchScore": 245.16095}]}
 
           '
       headers:
@@ -74,27 +74,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 16 Sep 2024 14:27:24 GMT
+          - Mon, 07 Oct 2024 01:01:13 GMT
         Via:
-          - 1.1 cc58556a6e846289f4d3105969536e4c.cloudfront.net (CloudFront)
+          - 1.1 a0fdc0fd69b93d134cd1b726f68c77b4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - vYVSmPNOxrNMlkPspTDYwQvTEjEt_FnRdoOcXM_xqzHzattndSdWnA==
+          - VSTP_sPi0L-8YjK5SO1ZKKbt2hBT11iwtJBRfZ8VrdJVOaFMDuxGvw==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - eM78AGtAPHcElCw=
+          - fQTh-FhSPHcEG2g=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1386"
         x-amzn-Remapped-Date:
-          - Mon, 16 Sep 2024 14:27:24 GMT
+          - Mon, 07 Oct 2024 01:01:13 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 20898718-6cb6-472f-95a9-0dce2bb43279
+          - 91b70e96-3ab0-4413-9969-193f8cb3061e
       status:
         code: 200
         message: OK
@@ -106,7 +106,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2022077,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2034471,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
           University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
           Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
           Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
@@ -193,7 +193,7 @@ interactions:
           gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
           Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
           Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
-          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.98084,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.993042,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -211,7 +211,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 16 Sep 2024 14:27:24 GMT
+          - Mon, 07 Oct 2024 01:01:13 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:

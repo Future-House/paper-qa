@@ -20,7 +20,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:18 GMT
+          - Mon, 07 Oct 2024 01:01:07 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -60,27 +60,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:18 GMT
+          - Mon, 07 Oct 2024 01:01:07 GMT
         Via:
           - 1.1 d12f243c0eac340525d6f4e735c01b64.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 3DWgEuMADlSeiLMhufObr-vygiJPeAWhCoFVgOUvmVrEwbLPbilLAQ==
+          - ojCEmDB7BRUeUGRO-SSW-Y9v5W5fTS2ZgHwuLo3R_09LxTw3g_x0ag==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Error from cloudfront
         x-amz-apigw-id:
-          - dmipYEcqvHcEfEw=
+          - fQTg9FIevHcEF1w=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "34"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:18 GMT
+          - Mon, 07 Oct 2024 01:01:07 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 41badda1-f747-4d97-bf9a-198de87c5eca
+          - 5d0e46b7-6187-4841-8bb8-ac418fe4c26b
       status:
         code: 404
         message: Not Found
@@ -106,7 +106,7 @@ interactions:
           tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
           year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
           Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          208.01811}]}
+          208.05576}]}
 
           '
       headers:
@@ -119,27 +119,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:19 GMT
+          - Mon, 07 Oct 2024 01:01:07 GMT
         Via:
           - 1.1 d12f243c0eac340525d6f4e735c01b64.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 7POquAziX-3ilWrhAo6vJ7PubfSasYLaHfgIUsEfVoP5qSdVsBj6SQ==
+          - Apvsk7kKOybrJYKD8wI3cm6FzwBEa16xalw5HXfJMVdzreYoPm--LQ==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmipeH_lvHcETFA=
+          - fQThDGxLvHcEcWg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1109"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:52:19 GMT
+          - Mon, 07 Oct 2024 01:01:07 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 992527e5-3812-4041-81c2-aeb61d4d6980
+          - 804cf18a-d225-4b46-af8c-1ca68ceaa250
       status:
         code: 200
         message: OK
@@ -151,7 +151,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10323850,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":10397615,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
           Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
           of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
           layers are likely to be present on metallic nano-structures due to either
@@ -245,7 +245,7 @@ interactions:
           Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
           Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
           Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.360317,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":49.242294,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -259,11 +259,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3946"
+          - "3945"
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:52:19 GMT
+          - Mon, 07 Oct 2024 01:01:09 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -310,7 +310,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 04 Sep 2024 22:52:19 GMT
+          - Mon, 07 Oct 2024 01:01:09 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
