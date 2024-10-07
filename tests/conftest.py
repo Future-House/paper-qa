@@ -33,6 +33,8 @@ def _setup_default_logs() -> None:
 
 OPENAI_API_KEY_HEADER = "authorization"
 ANTHROPIC_API_KEY_HEADER = "x-api-key"
+# SEE: https://github.com/kevin1024/vcrpy/blob/v6.0.1/vcr/config.py#L43
+VCR_DEFAULT_MATCH_ON = "method", "scheme", "host", "port", "path", "query"
 
 
 @pytest.fixture(scope="session", name="vcr_config")
