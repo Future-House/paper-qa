@@ -409,20 +409,13 @@ def is_retryable(exc: BaseException) -> bool:
 )
 async def _get_with_retrying(
     url: str,
-    params: dict[str, Any],
     session: aiohttp.ClientSession,
-    headers: dict[str, str] | None = None,
-    timeout: float = 10.0,  # noqa: ASYNC109
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
+    **get_kwargs,
 ) -> dict[str, Any]:
     """Get from a URL with retrying protection."""
     try:
-        async with session.get(
-            url,
-            params=params,
-            headers=headers,
-            timeout=aiohttp.ClientTimeout(timeout),
-        ) as response:
+        async with session.get(url, **get_kwargs) as response:
             response.raise_for_status()
             return await response.json()
     except aiohttp.ClientResponseError as e:
