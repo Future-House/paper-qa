@@ -29,76 +29,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:28 GMT
+          - Mon, 07 Oct 2024 01:01:06 GMT
         Via:
-          - 1.1 01dbe7e23991a177a7cdfba5803db41c.cloudfront.net (CloudFront)
+          - 1.1 2509c74f5f6cfb0d8a2f556b68170b28.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - uRmNn23CJGWRi9ZYCvXKxbn6Gh9RBXv1V2O6VFwf_fJ8AEyurMVRzw==
+          - 7a7MbQlbnoFNCzkgk3UwBDaPP90rtrqLyUTagKAF4V7m1vI6kc4Saw==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - dmi9xEkCPHcEa4w=
+          - fQTg9H8dvHcEpPA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "837"
         x-amzn-Remapped-Date:
-          - Wed, 04 Sep 2024 22:54:28 GMT
+          - Mon, 07 Oct 2024 01:01:06 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - be736639-2cc3-46ef-bb7f-ce9d4abc9180
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.unpaywall.org/v2/10.1007/s40278-023-41815-2?email=example@papercrow.ai
-    response:
-      body:
-        string:
-          '{"doi": "10.1007/s40278-023-41815-2", "doi_url": "https://doi.org/10.1007/s40278-023-41815-2",
-          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "genre": "journal-article",
-          "is_paratext": false, "published_date": "2023-06-24", "year": 2023, "journal_name":
-          "Reactions Weekly", "journal_issns": "1179-2051", "journal_issn_l": "0114-9954",
-          "journal_is_oa": false, "journal_is_in_doaj": false, "publisher": "Springer
-          Science and Business Media LLC", "is_oa": false, "oa_status": "closed", "has_repository_copy":
-          false, "best_oa_location": null, "first_oa_location": null, "oa_locations":
-          [], "oa_locations_embargoed": [], "updated": "2023-06-24T05:46:22.445497",
-          "data_standard": 2, "z_authors": null}'
-      headers:
-        Access-Control-Allow-Headers:
-          - origin, content-type, accept, x-requested-with
-        Access-Control-Allow-Methods:
-          - POST, GET, OPTIONS, PUT, DELETE, PATCH
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "396"
-        Content-Type:
-          - application/json
-        Date:
-          - Wed, 04 Sep 2024 22:54:28 GMT
-        Nel:
-          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
-        Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1725490468&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=7atICqhTs9Cjq2B7Szr5e8RJKh5vHUfuNCpH8ChJWyw%3D"}]}'
-        Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1725490468&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=7atICqhTs9Cjq2B7Szr5e8RJKh5vHUfuNCpH8ChJWyw%3D
-        Server:
-          - gunicorn
-        Vary:
-          - Accept-Encoding
-        Via:
-          - 1.1 vegur
+          - 98c343c0-ad0b-46bd-a7e0-72ebaf507273
       status:
         code: 200
         message: OK
@@ -137,7 +88,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 04 Sep 2024 22:54:28 GMT
+          - Mon, 07 Oct 2024 01:01:06 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -154,6 +105,55 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1007/s40278-023-41815-2?email=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"doi": "10.1007/s40278-023-41815-2", "doi_url": "https://doi.org/10.1007/s40278-023-41815-2",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "genre": "journal-article",
+          "is_paratext": false, "published_date": "2023-06-24", "year": 2023, "journal_name":
+          "Reactions Weekly", "journal_issns": "1179-2051", "journal_issn_l": "0114-9954",
+          "journal_is_oa": false, "journal_is_in_doaj": false, "publisher": "Springer
+          Science and Business Media LLC", "is_oa": false, "oa_status": "closed", "has_repository_copy":
+          false, "best_oa_location": null, "first_oa_location": null, "oa_locations":
+          [], "oa_locations_embargoed": [], "updated": "2023-06-24T05:46:22.445497",
+          "data_standard": 2, "z_authors": null}'
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "396"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 07 Oct 2024 01:01:06 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728262866&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=EejZnfVWmkOMbLkdh5D23Ic8pUWk7blnC4%2Fk5Py8sdY%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728262866&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=EejZnfVWmkOMbLkdh5D23Ic8pUWk7blnC4%2Fk5Py8sdY%3D
+        Server:
+          - gunicorn
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
       status:
         code: 200
         message: OK
@@ -180,7 +180,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 04 Sep 2024 22:54:29 GMT
+          - Mon, 07 Oct 2024 01:01:07 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
