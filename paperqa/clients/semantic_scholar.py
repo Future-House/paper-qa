@@ -110,6 +110,23 @@ class SematicScholarSearchType(IntEnum):
         raise NotImplementedError
 
 
+@retry(
+    retry=retry_if_exception(make_flaky_ssl_error_predicate(SEMANTIC_SCHOLAR_HOST)),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    stop=stop_after_attempt(3),
+)
+async def _s2_get_with_retrying(url: str, **get_kwargs) -> dict[str, Any]:
+    return await _get_with_retrying(
+        url=url,
+        headers=get_kwargs.get("headers") or semantic_scholar_headers(),
+        timeout=(
+            get_kwargs.get("timeout")
+            or aiohttp.ClientTimeout(SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT)
+        ),
+        **get_kwargs,
+    )
+
+
 def s2_authors_match(authors: list[str], data: dict) -> bool:
     """Check if the authors in the data match the authors in the paper."""
     AUTHOR_NAME_MIN_LENGTH = 2
@@ -131,7 +148,7 @@ def s2_authors_match(authors: list[str], data: dict) -> bool:
 
 
 async def parse_s2_to_doc_details(
-    paper_data: dict, session: aiohttp.ClientSession
+    paper_data: dict[str, Any], session: aiohttp.ClientSession
 ) -> DocDetails:
 
     bibtex_source = "self_generated"
@@ -217,12 +234,10 @@ async def s2_title_search(
         params={"query": title, "fields": fields}
     )
 
-    data = await _get_with_retrying(
+    data = await _s2_get_with_retrying(
         url=endpoint,
         params=params,
         session=session,
-        headers=semantic_scholar_headers(),
-        timeout=SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT,
         http_exception_mappings={
             HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {title}.")
         },
@@ -277,18 +292,17 @@ async def get_s2_doc_details_from_doi(
     else:
         s2_fields = SEMANTIC_SCHOLAR_API_FIELDS
 
-    details = await _get_with_retrying(
-        url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/DOI:{doi}",
-        params={"fields": s2_fields},
+    return await parse_s2_to_doc_details(
+        paper_data=await _s2_get_with_retrying(
+            url=f"{SEMANTIC_SCHOLAR_BASE_URL}/graph/v1/paper/DOI:{doi}",
+            params={"fields": s2_fields},
+            session=session,
+            http_exception_mappings={
+                HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {doi}.")
+            },
+        ),
         session=session,
-        headers=semantic_scholar_headers(),
-        timeout=SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT,
-        http_exception_mappings={
-            HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {doi}.")
-        },
     )
-
-    return await parse_s2_to_doc_details(details, session)
 
 
 async def get_s2_doc_details_from_title(
