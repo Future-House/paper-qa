@@ -8,6 +8,7 @@ from pathlib import Path
 
 import httpx
 import numpy as np
+import pymupdf
 import pytest
 
 from paperqa import (
@@ -38,6 +39,7 @@ from paperqa.utils import (
     name_in_text,
     strip_citations,
 )
+from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
 @pytest.fixture
@@ -844,14 +846,15 @@ def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     docs.get_evidence("What is XAI?", settings=settings)
 
 
-# SEE: https://github.com/kevin1024/vcrpy/blob/v6.0.1/vcr/config.py#L43
-VCR_DEFAULT_MATCH_ON = "method", "scheme", "host", "port", "path", "query"
-
-
 # some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)
 # body will always be different between requests
 # adding body so that vcr correctly match the right request with its response.
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
+# pymupdf v1.24.10 to v1.24.11 broke the made cassettes, so we specify it in the
+# cassette name so newer versions are automatically incompatible
+@pytest.mark.default_cassette(
+    f"test_pdf_reader_match_doc_details_pymupdf_v{pymupdf.__version__}.yaml"
+)
 def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(
