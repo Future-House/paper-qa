@@ -471,8 +471,8 @@ local_llm_config = {
             "model_name": "ollama/llama3.2",
             "litellm_params": {
                 "model": "ollama/llama3.2",
-                "api_base": "http://localhost:11434"
-            }
+                "api_base": "http://localhost:11434",
+            },
         }
     ]
 }
