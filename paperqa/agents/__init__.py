@@ -28,6 +28,7 @@ LOG_VERBOSITY_MAP: dict[int, dict[str, int]] = {
         "paperqa.agents.search": logging.INFO,
         "anthropic": logging.WARNING,
         "openai": logging.WARNING,
+        "httpcore": logging.WARNING,
         "httpx": logging.WARNING,
         "LiteLLM": logging.WARNING,
         "LiteLLM Router": logging.WARNING,
