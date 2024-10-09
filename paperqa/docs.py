@@ -314,9 +314,14 @@ class Docs(BaseModel):
                 data={"citation": citation},
                 skip_system=True,
             )
-            clean_text = result.text.strip("`")
-            if clean_text.startswith("json"):
-                clean_text = clean_text.replace("json", "", 1)
+            # This code below tries to isolate the JSON
+            # based on observed messages from LLMs
+            # it does so by isolating the content between
+            # the first { and last } in the response.
+            # Since the anticipated structure should  not be nested,
+            # we don't have to worry about nested curlies.
+            clean_text = result.text.split("{", 1)[-1].split("}", 1)[0]
+            clean_text = "{" + clean_text + "}"
             try:
                 citation_json = json.loads(clean_text)
                 if citation_title := citation_json.get("title"):
@@ -328,9 +333,7 @@ class Docs(BaseModel):
             except (json.JSONDecodeError, AttributeError):
                 # json.JSONDecodeError: clean_text was not actually JSON
                 # AttributeError: citation_json was not a dict (e.g. a list)
-                # NOTE: we only want to warning log when we fail on title and
-                # authors we may not care if we fail on DOI here
-                logger.exception(
+                logger.warning(
                     "Failed to parse all of title, DOI, and authors from the"
                     " ParsingSettings.structured_citation_prompt's response"
                     f" {clean_text}, consider using a manifest file or specifying a"
