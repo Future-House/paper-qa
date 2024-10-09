@@ -18,7 +18,7 @@ from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
 
-LOG_VERBOSITY_MAP = {
+LOG_VERBOSITY_MAP: dict[int, dict[str, int]] = {
     0: {
         "paperqa.agents": logging.INFO,
         "paperqa.agents.helpers": logging.WARNING,
@@ -28,6 +28,7 @@ LOG_VERBOSITY_MAP = {
         "paperqa.agents.search": logging.INFO,
         "anthropic": logging.WARNING,
         "openai": logging.WARNING,
+        "httpcore": logging.WARNING,
         "httpx": logging.WARNING,
         "LiteLLM": logging.WARNING,
         "LiteLLM Router": logging.WARNING,
@@ -51,6 +52,7 @@ LOG_VERBOSITY_MAP[2] = LOG_VERBOSITY_MAP[1] | {
 LOG_VERBOSITY_MAP[3] = LOG_VERBOSITY_MAP[2] | {
     "LiteLLM": logging.DEBUG,  # <-- every single LLM call
 }
+_MAX_PRESET_VERBOSITY: int = max(k for k in LOG_VERBOSITY_MAP)
 
 _PAPERQA_PKG_ROOT_LOGGER = logging.getLogger(__name__.split(".", maxsplit=1)[0])
 _INITIATED_FROM_CLI = False
@@ -75,12 +77,10 @@ def set_up_rich_handler(install: bool = True) -> RichHandler:
 
 
 def configure_log_verbosity(verbosity: int = 0) -> None:
-    max_preset_verbosity: int = max(list(LOG_VERBOSITY_MAP.keys()))
+    key = min(verbosity, _MAX_PRESET_VERBOSITY)
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
-            log_level := LOG_VERBOSITY_MAP.get(
-                min(verbosity, max_preset_verbosity), {}
-            ).get(logger_name)
+            log_level := LOG_VERBOSITY_MAP.get(key, {}).get(logger_name)
         ):
             logger_.setLevel(log_level)
 
