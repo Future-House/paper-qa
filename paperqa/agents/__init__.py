@@ -74,11 +74,7 @@ def set_up_rich_handler(install: bool = True) -> RichHandler:
     return rich_handler
 
 
-def configure_cli_logging(verbosity: int = 0) -> None:
-    """Suppress loquacious loggers according to verbosity level."""
-    setup_default_logs()
-    set_up_rich_handler()
-
+def configure_log_verbosity(verbosity: int = 0) -> None:
     max_preset_verbosity: int = max(list(LOG_VERBOSITY_MAP.keys()))
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
@@ -88,13 +84,21 @@ def configure_cli_logging(verbosity: int = 0) -> None:
         ):
             logger_.setLevel(log_level)
 
+
+def configure_cli_logging(verbosity: int | Settings = 0) -> None:
+    """Suppress loquacious loggers according to the settings' verbosity level."""
+    setup_default_logs()
+    set_up_rich_handler()
+    if isinstance(verbosity, Settings):
+        verbosity = verbosity.verbosity
+    configure_log_verbosity(verbosity)
     if verbosity > 0:
         print(f"PaperQA version: {__version__}")
 
 
 def ask(query: str, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
-    configure_cli_logging(verbosity=settings.verbosity)
+    configure_cli_logging(settings)
     return get_loop().run_until_complete(
         agent_query(
             QueryRequest(query=query, settings=settings),
@@ -109,7 +113,7 @@ def search_query(
     settings: Settings,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
     """Search using a pre-built PaperQA index."""
-    configure_cli_logging(verbosity=settings.verbosity)
+    configure_cli_logging(settings)
     if index_name == "default":
         index_name = settings.get_index_name()
     return get_loop().run_until_complete(
@@ -132,7 +136,7 @@ def build_index(
         settings.agent.index.name = None
     elif isinstance(index_name, str):
         settings.agent.index.name = index_name
-    configure_cli_logging(verbosity=settings.verbosity)
+    configure_cli_logging(settings)
     if directory:
         settings.agent.index.paper_directory = directory
     return get_loop().run_until_complete(get_directory_index(settings=settings))
@@ -143,7 +147,7 @@ def save_settings(
     settings_path: str | os.PathLike,
 ) -> None:
     """Save the settings to a file."""
-    configure_cli_logging(verbosity=settings.verbosity)
+    configure_cli_logging(settings)
     # check if this could be interpreted at an absolute path
     if os.path.isabs(settings_path):
         full_settings_path = os.path.expanduser(settings_path)
@@ -225,7 +229,7 @@ def main() -> None:
         case "ask":
             ask(args.query, settings)
         case "view":
-            configure_cli_logging(settings.verbosity)
+            configure_cli_logging(settings)
             logger.info(f"Viewing: {args.settings}")
             logger.info(settings.model_dump_json(indent=2))
         case "save":
