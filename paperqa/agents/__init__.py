@@ -18,21 +18,25 @@ from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
 
-LOG_VERBOSITY_MAP = {
-    0: {
-        "paperqa.agents": logging.INFO,
-        "paperqa.agents.helpers": logging.WARNING,
-        "paperqa.agents.main": logging.WARNING,
-        "paperqa.agents.main.agent_callers": logging.INFO,
-        "paperqa.agents.models": logging.WARNING,
-        "paperqa.agents.search": logging.INFO,
+
+LOG_VERBOSITY_MAP: dict[int | None, dict[str, int]] = {
+    None: {
         "anthropic": logging.WARNING,
         "openai": logging.WARNING,
+        "httpcore": logging.WARNING,
         "httpx": logging.WARNING,
         "LiteLLM": logging.WARNING,
         "LiteLLM Router": logging.WARNING,
         "LiteLLM Proxy": logging.WARNING,
     }
+}
+LOG_VERBOSITY_MAP[0] = LOG_VERBOSITY_MAP[None] | {
+    "paperqa.agents": logging.INFO,
+    "paperqa.agents.helpers": logging.WARNING,
+    "paperqa.agents.main": logging.WARNING,
+    "paperqa.agents.main.agent_callers": logging.INFO,
+    "paperqa.agents.models": logging.WARNING,
+    "paperqa.agents.search": logging.INFO,
 }
 LOG_VERBOSITY_MAP[1] = LOG_VERBOSITY_MAP[0] | {
     "paperqa.models": logging.INFO,
@@ -51,6 +55,7 @@ LOG_VERBOSITY_MAP[2] = LOG_VERBOSITY_MAP[1] | {
 LOG_VERBOSITY_MAP[3] = LOG_VERBOSITY_MAP[2] | {
     "LiteLLM": logging.DEBUG,  # <-- every single LLM call
 }
+_MAX_PRESET_VERBOSITY: int = max(k for k in LOG_VERBOSITY_MAP if k)
 
 _PAPERQA_PKG_ROOT_LOGGER = logging.getLogger(__name__.split(".", maxsplit=1)[0])
 _INITIATED_FROM_CLI = False
@@ -74,25 +79,23 @@ def set_up_rich_handler(install: bool = True) -> RichHandler:
     return rich_handler
 
 
-def configure_log_verbosity(verbosity: int = 0) -> None:
-    max_preset_verbosity: int = max(list(LOG_VERBOSITY_MAP.keys()))
+def configure_log_verbosity(verbosity: int | None = 0) -> None:
+    key = min(verbosity, _MAX_PRESET_VERBOSITY) if isinstance(verbosity, int) else None
     for logger_name, logger_ in logging.Logger.manager.loggerDict.items():
         if isinstance(logger_, logging.Logger) and (
-            log_level := LOG_VERBOSITY_MAP.get(
-                min(verbosity, max_preset_verbosity), {}
-            ).get(logger_name)
+            log_level := LOG_VERBOSITY_MAP.get(key, {}).get(logger_name)
         ):
             logger_.setLevel(log_level)
 
 
-def configure_cli_logging(verbosity: int | Settings = 0) -> None:
+def configure_cli_logging(verbosity: int | None | Settings = 0) -> None:
     """Suppress loquacious loggers according to the settings' verbosity level."""
     setup_default_logs()
     set_up_rich_handler()
     if isinstance(verbosity, Settings):
         verbosity = verbosity.verbosity
     configure_log_verbosity(verbosity)
-    if verbosity > 0:
+    if verbosity and verbosity > 0:
         print(f"PaperQA version: {__version__}")
 
 
