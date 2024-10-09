@@ -94,6 +94,11 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         assert len(await index.index_files) == len(path_to_id) - 1
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
+        # Note let's delete files.zip, and confirm we can't load the index
+        await (await index.file_index_filename).unlink()
+        with pytest.raises(RuntimeError, match="please rebuild"):
+            await get_directory_index(settings=agent_test_settings, build=False)
+
 
 EXPECTED_STUB_DATA_FILES = {
     "bates.txt",
