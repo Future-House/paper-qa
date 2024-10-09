@@ -318,10 +318,12 @@ class Docs(BaseModel):
             if clean_text.startswith("json"):
                 clean_text = clean_text.replace("json", "", 1)
             # there should be no nesting here, so we can just split on curlies
+            # Note - this is why we cannot extract it to a general method
+            # because JSON in general has nested curlies
             clean_text = clean_text.split("{", 1)[-1].split("}", 1)[0]
             clean_text = "{" + clean_text + "}"
             try:
-                citation_json = json.loads(clean_text.split("}", 1)[0] + "}")
+                citation_json = json.loads(clean_text)
                 if citation_title := citation_json.get("title"):
                     title = citation_title
                 if citation_doi := citation_json.get("doi"):
