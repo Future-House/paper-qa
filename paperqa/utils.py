@@ -9,6 +9,7 @@ import math
 import os
 import re
 import string
+import unicodedata
 from collections.abc import Collection, Coroutine, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
@@ -345,6 +346,24 @@ def remove_substrings(target: str, substr_removal_list: Collection[str]) -> str:
     return target
 
 
+def convert_acutes(text: str) -> str:
+    """Replaces acute accent with apostrophe."""
+
+    # Used for any client that returns names with acutes
+    def replace_acute(match):
+        return f"'{match.group(1)}"
+
+    nfd = unicodedata.normalize("NFD", text)
+    converted = re.sub(r"([aeiouAEIOU])\u0301", replace_acute, nfd)
+    return unicodedata.normalize("NFC", converted)
+
+
+def remove_acutes(text: str) -> str:
+    return "".join(
+        c for c in unicodedata.normalize("NFD", text) if unicodedata.category(c) != "Mn"
+    )
+
+
 def bibtex_field_extract(
     bibtex: str, field: str, missing_replacements: dict[str, str] | None = None
 ) -> str:
@@ -372,7 +391,8 @@ def create_bibtex_key(author: list[str], year: str, title: str) -> str:
     FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
     try:
         author_rep = (
-            author[0].split()[-1].casefold()
+            # casefold will not remove accutes
+            remove_acutes(author[0].split()[-1].casefold())
             if "Unknown" not in author[0]
             else UNKNOWN_AUTHOR_KEY
         )

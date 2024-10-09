@@ -34,27 +34,149 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:08 GMT
+          - Wed, 09 Oct 2024 21:24:10 GMT
         Via:
-          - 1.1 ac3f0425be668a2439884bb8cbd3ccd8.cloudfront.net (CloudFront)
+          - 1.1 ad82d8a3c91257adecf18541576c7e72.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 1XnDVdKthKDrztD0RvveziYu7uaP6kn9MXgrtbrTfvgG7KkaCobiEg==
+          - znUXHDOFYU32kWbh2bebFHel_Kz2AR4dWgFNzAQCLPfWjI9PdlPH0Q==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQThQHmRvHcEDRw=
+          - fZsjHF6MPHcEkfg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1325"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:08 GMT
+          - Wed, 09 Oct 2024 21:24:10 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 51a9a3bb-d328-4522-998a-d7285dcaccf6
+          - 8774a852-2060-4817-8ea6-4ba2b9c5c60b
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.openalex.org/works/https://doi.org/10.1101%2F2024.04.01.587366
+    response:
+      body:
+        string:
+          '{"id":"https://openalex.org/W4393448183","doi":"https://doi.org/10.1101/2024.04.01.587366","title":"High-throughput
+          screening of human genetic variants by pooled prime editing","display_name":"High-throughput
+          screening of human genetic variants by pooled prime editing","publication_year":2024,"publication_date":"2024-04-01","ids":{"openalex":"https://openalex.org/W4393448183","doi":"https://doi.org/10.1101/2024.04.01.587366"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1101/2024.04.01.587366","pdf_url":"https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf","source":{"id":"https://openalex.org/S4306402567","display_name":"bioRxiv
+          (Cold Spring Harbor Laboratory)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I2750212522","host_organization_name":"Cold
+          Spring Harbor Laboratory","host_organization_lineage":["https://openalex.org/I2750212522"],"host_organization_lineage_names":["Cold
+          Spring Harbor Laboratory"],"type":"repository"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"submittedVersion","is_accepted":false,"is_published":false},"type":"preprint","type_crossref":"posted-content","indexed_in":["crossref"],"open_access":{"is_oa":true,"oa_status":"green","oa_url":"https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5067011895","display_name":"Michael
+          Herger","orcid":"https://orcid.org/0000-0002-5390-2695"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
+          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"facility","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Michael
+          Herger","raw_affiliation_strings":["The Francis Crick Institute"],"affiliations":[{"raw_affiliation_string":"The
+          Francis Crick Institute","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5003387836","display_name":"Christina
+          M. Kajba","orcid":"https://orcid.org/0000-0002-7896-0744"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
+          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"facility","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Christina
+          M. Kajba","raw_affiliation_strings":["The Francis Crick Institute"],"affiliations":[{"raw_affiliation_string":"The
+          Francis Crick Institute","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5054087528","display_name":"Megan
+          Buckley","orcid":"https://orcid.org/0000-0003-4450-8474"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
+          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"facility","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Megan
+          Buckley","raw_affiliation_strings":["The Francis Crick Institute"],"affiliations":[{"raw_affiliation_string":"The
+          Francis Crick Institute","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5061084011","display_name":"Ana
+          Cunha","orcid":"https://orcid.org/0000-0002-7651-5858"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
+          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"facility","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Ana
+          Cunha","raw_affiliation_strings":["The Francis Crick Institute"],"affiliations":[{"raw_affiliation_string":"The
+          Francis Crick Institute","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5083414853","display_name":"Molly
+          Strom","orcid":null},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
+          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"facility","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Molly
+          Strom","raw_affiliation_strings":["The Francis Crick Institute"],"affiliations":[{"raw_affiliation_string":"The
+          Francis Crick Institute","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5084597634","display_name":"Gregory
+          M. Findlay","orcid":"https://orcid.org/0000-0002-7767-8608"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
+          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"facility","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Gregory
+          M. Findlay","raw_affiliation_strings":["The Francis Crick Institute"],"affiliations":[{"raw_affiliation_string":"The
+          Francis Crick Institute","institution_ids":["https://openalex.org/I2801081054"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":null,"has_fulltext":true,"fulltext_origin":"pdf","cited_by_count":1,"citation_normalized_percentile":{"value":0.999883,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":87,"max":95},"biblio":{"volume":null,"issue":null,"first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T10878","display_name":"Clustered
+          Regularly Interspaced Short Palindromic Repeats and CRISPR-associated proteins","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}},"topics":[{"id":"https://openalex.org/T10878","display_name":"Clustered
+          Regularly Interspaced Short Palindromic Repeats and CRISPR-associated proteins","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}},{"id":"https://openalex.org/T10207","display_name":"DNA Nanotechnology
+          and Bioanalytical Applications","score":0.9972,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}},{"id":"https://openalex.org/T10521","display_name":"Ribosome Structure
+          and Translation Mechanisms","score":0.9943,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/multiplex-genome-editing","display_name":"Multiplex
+          Genome Editing","score":0.568746},{"id":"https://openalex.org/keywords/gene-editing","display_name":"Gene
+          Editing","score":0.531232},{"id":"https://openalex.org/keywords/negative-selection","display_name":"Negative
+          selection","score":0.48653165}],"concepts":[{"id":"https://openalex.org/C70721500","wikidata":"https://www.wikidata.org/wiki/Q177005","display_name":"Computational
+          biology","level":1,"score":0.6271358},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.5850787},{"id":"https://openalex.org/C81917197","wikidata":"https://www.wikidata.org/wiki/Q628760","display_name":"Selection
+          (genetic algorithm)","level":2,"score":0.52266854},{"id":"https://openalex.org/C2779343474","wikidata":"https://www.wikidata.org/wiki/Q3109175","display_name":"Context
+          (archaeology)","level":2,"score":0.5084159},{"id":"https://openalex.org/C7386963","wikidata":"https://www.wikidata.org/wiki/Q3954859","display_name":"Negative
+          selection","level":4,"score":0.48653165},{"id":"https://openalex.org/C54355233","wikidata":"https://www.wikidata.org/wiki/Q7162","display_name":"Genetics","level":1,"score":0.44161588},{"id":"https://openalex.org/C144501496","wikidata":"https://www.wikidata.org/wiki/Q5533489","display_name":"Genome
+          editing","level":4,"score":0.41460347},{"id":"https://openalex.org/C141231307","wikidata":"https://www.wikidata.org/wiki/Q7020","display_name":"Genome","level":3,"score":0.39861494},{"id":"https://openalex.org/C104317684","wikidata":"https://www.wikidata.org/wiki/Q7187","display_name":"Gene","level":2,"score":0.3876987},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
+          science","level":0,"score":0.33935452},{"id":"https://openalex.org/C119857082","wikidata":"https://www.wikidata.org/wiki/Q2539","display_name":"Machine
+          learning","level":1,"score":0.101546764},{"id":"https://openalex.org/C151730666","wikidata":"https://www.wikidata.org/wiki/Q7205","display_name":"Paleontology","level":1,"score":0.0}],"mesh":[],"locations_count":1,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1101/2024.04.01.587366","pdf_url":"https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf","source":{"id":"https://openalex.org/S4306402567","display_name":"bioRxiv
+          (Cold Spring Harbor Laboratory)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I2750212522","host_organization_name":"Cold
+          Spring Harbor Laboratory","host_organization_lineage":["https://openalex.org/I2750212522"],"host_organization_lineage_names":["Cold
+          Spring Harbor Laboratory"],"type":"repository"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"submittedVersion","is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1101/2024.04.01.587366","pdf_url":"https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf","source":{"id":"https://openalex.org/S4306402567","display_name":"bioRxiv
+          (Cold Spring Harbor Laboratory)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I2750212522","host_organization_name":"Cold
+          Spring Harbor Laboratory","host_organization_lineage":["https://openalex.org/I2750212522"],"host_organization_lineage_names":["Cold
+          Spring Harbor Laboratory"],"type":"repository"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"submittedVersion","is_accepted":false,"is_published":false},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":50,"referenced_works":["https://openalex.org/W1973260880","https://openalex.org/W2014747507","https://openalex.org/W2031211461","https://openalex.org/W2045435533","https://openalex.org/W2051978340","https://openalex.org/W2068427957","https://openalex.org/W2101868032","https://openalex.org/W2110951885","https://openalex.org/W2174602966","https://openalex.org/W2174686320","https://openalex.org/W2252568502","https://openalex.org/W2512645103","https://openalex.org/W2774216375","https://openalex.org/W2788593837","https://openalex.org/W2791921618","https://openalex.org/W2887461405","https://openalex.org/W2889874867","https://openalex.org/W2909194804","https://openalex.org/W2915459742","https://openalex.org/W2954501063","https://openalex.org/W2967059818","https://openalex.org/W2981137429","https://openalex.org/W3062028978","https://openalex.org/W3087701445","https://openalex.org/W3098409330","https://openalex.org/W3115988811","https://openalex.org/W3121904305","https://openalex.org/W3129351841","https://openalex.org/W3131839988","https://openalex.org/W3132864675","https://openalex.org/W3161833585","https://openalex.org/W3192108213","https://openalex.org/W3199622685","https://openalex.org/W3202931255","https://openalex.org/W3206354438","https://openalex.org/W3213536168","https://openalex.org/W4213232054","https://openalex.org/W4220887281","https://openalex.org/W4226280654","https://openalex.org/W4288060326","https://openalex.org/W4303199315","https://openalex.org/W4307446592","https://openalex.org/W4312190539","https://openalex.org/W4316507374","https://openalex.org/W4317689970","https://openalex.org/W4367311810","https://openalex.org/W4378976943","https://openalex.org/W4386861232","https://openalex.org/W4389398607","https://openalex.org/W4390063959"],"related_works":["https://openalex.org/W4388142354","https://openalex.org/W4377564400","https://openalex.org/W4366822718","https://openalex.org/W4365811064","https://openalex.org/W4320032841","https://openalex.org/W4280502984","https://openalex.org/W2998674376","https://openalex.org/W2770215042","https://openalex.org/W2607137613","https://openalex.org/W2580221256"],"abstract_inverted_index":{"ABSTRACT":[0],"Understanding":[1],"the":[2,92],"effects":[3],"of":[4,19,28,38,42,70,94,110,128,199],"rare":[5],"genetic":[6],"variants":[7,39,61,71,120,142,152,164],"remains":[8],"challenging,":[9],"both":[10,183],"in":[11,54,62,91,121,132,158],"coding":[12],"and":[13,79,107,139,185],"non-coding":[14,150],"regions.":[15],"While":[16],"multiplexed":[17],"assays":[18],"variant":[20],"effect":[21],"(MAVEs)":[22],"have":[23],"enabled":[24],"scalable":[25,196],"functional":[26,197],"assessment":[27,198],"variants,":[29],"established":[30],"MAVEs":[31],"are":[32],"limited":[33],"by":[34,97],"either":[35],"exogenous":[36],"expression":[37],"or":[40],"constraints":[41],"genome":[43],"editing.":[44],"Here,":[45],"we":[46,147],"introduce":[47],"a":[48,81,133,154,159],"pooled":[49],"prime":[50],"editing":[51,105],"(PE)":[52],"platform":[53,90,191],"haploid":[55],"human":[56,200],"cells":[57],"to":[58,72,193],"scalably":[59],"assay":[60,148],"their":[63],"endogenous":[64],"context.":[65],"We":[66,87,117],"first":[67],"optimized":[68],"delivery":[69],"HAP1":[73],"cells,":[74],"defining":[75],"optimal":[76],"pegRNA":[77],"designs":[78],"establishing":[80],"co-selection":[82],"strategy":[83],"for":[84,104,177],"improved":[85],"efficiency.":[86],"characterize":[88],"our":[89,190],"context":[93],"negative":[95,186],"selection":[96,187],"testing":[98],"over":[99],"7,500":[100],"pegRNAs":[101,113,180],"targeting":[102],"SMARCB1":[103],"activity":[106],"observing":[108],"depletion":[109],"highly":[111,178,195],"active":[112,179],"installing":[114],"loss-of-function":[115],"variants.":[116,201],"next":[118],"assess":[119],"MLH1":[122,151],"via":[123,166],"6-thioguanine":[124],"selection,":[125],"assaying":[126],"65.3%":[127],"all":[129],"possible":[130],"SNVs":[131],"200-bp":[134],"region":[135,157],"spanning":[136],"exon":[137],"10":[138],"distinguishing":[140],"LoF":[141],"with":[143,169],"high":[144,170],"accuracy.":[145],"Lastly,":[146],"362":[149],"across":[153],"60":[155],"kb":[156],"single":[160],"experiment,":[161],"identifying":[162],"pathogenic":[163],"acting":[165],"multiple":[167],"mechanisms":[168],"specificity.":[171],"Our":[172],"analyses":[173],"detail":[174],"how":[175],"filtering":[176],"can":[181],"facilitate":[182],"positive":[184],"screens.":[188],"Accordingly,":[189],"promises":[192],"enable":[194]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4393448183","counts_by_year":[{"year":2024,"cited_by_count":1}],"updated_date":"2024-09-30T10:15:54.502093","created_date":"2024-04-03"}
+
+          '
+      headers:
+        Access-Control-Allow-Credentials:
+          - "true"
+        Access-Control-Allow-Headers:
+          - Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Authorization, Cache-Control
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "3762"
+        Content-Security-Policy:
+          - default-src 'self'; object-src 'none'
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 09 Oct 2024 21:24:10 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728509050&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ngaDCRkntEWJfV5LnVD0Jm%2BwKeqjFrDlPXpP9DIyjDE%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728509050&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ngaDCRkntEWJfV5LnVD0Jm%2BwKeqjFrDlPXpP9DIyjDE%3D
+        Server:
+          - gunicorn
+        Strict-Transport-Security:
+          - max-age=31556926; includeSubDomains
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+        X-Api-Pool:
+          - common
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - SAMEORIGIN
+        X-Xss-Protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
@@ -130,7 +252,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:08 GMT
+          - Wed, 09 Oct 2024 21:24:10 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -207,13 +329,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:08 GMT
+          - Wed, 09 Oct 2024 21:24:10 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728262868&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=jrUZ54LywAaS9wy2Hle6RuZ6ACslJJKZhNE7cm6WDjk%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728509050&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=JmpP9k%2BWngClOYB6UnvUm2Okgsof5a%2FInyK9neoZnOY%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1728262868&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=jrUZ54LywAaS9wy2Hle6RuZ6ACslJJKZhNE7cm6WDjk%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728509050&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=JmpP9k%2BWngClOYB6UnvUm2Okgsof5a%2FInyK9neoZnOY%3D
         Server:
           - gunicorn
         Vary:
@@ -249,7 +371,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Mon, 07 Oct 2024 01:01:09 GMT
+          - Wed, 09 Oct 2024 21:24:10 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
