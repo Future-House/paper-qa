@@ -314,13 +314,13 @@ class Docs(BaseModel):
                 data={"citation": citation},
                 skip_system=True,
             )
-            clean_text = result.text.strip("`")
-            if clean_text.startswith("json"):
-                clean_text = clean_text.replace("json", "", 1)
-            # there should be no nesting here, so we can just split on curlies
-            # Note - this is why we cannot extract it to a general method
-            # because JSON in general has nested curlies
-            clean_text = clean_text.split("{", 1)[-1].split("}", 1)[0]
+            # This code below tries to isolate the JSON
+            # based on observed messages from LLMs
+            # it does so by isolating the content between
+            # the first { and last } in the response.
+            # Since the anticipated structure should  not be nested,
+            # we don't have to worry about nested curlies.
+            clean_text = result.text.split("{", 1)[-1].split("}", 1)[0]
             clean_text = "{" + clean_text + "}"
             try:
                 citation_json = json.loads(clean_text)
