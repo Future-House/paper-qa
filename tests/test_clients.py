@@ -18,6 +18,7 @@ from paperqa.clients import (
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
+from paperqa.clients.openalex import reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
 
 
@@ -601,3 +602,25 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
             in crossref_details.formatted_citation
         )
         assert crossref_details.is_retracted is True, "Should be retracted"
+
+
+def test_reformat_name():
+    test_cases = [
+        ("Doe, John", "John Doe"),
+        ("Doe, Jane Mary", "Jane Mary Doe"),
+        ("O'Doe, John", "John O'Doe"),
+        ("Doe, Jane", "Jane Doe"),
+        ("Family, Jane Mary Elizabeth", "Jane Mary Elizabeth Family"),
+        ("O'Doe, Jane", "Jane O'Doe"),
+        ("Family, John Jr.", "John Jr. Family"),
+        ("Family", "Family"),
+        ("Jane Doe", "Jane Doe"),
+        ("Doe, Jöhn", "Jöhn Doe"),
+        ("Doe, Jòhn", "Jòhn Doe"),
+    ]
+
+    for name, expected in test_cases:
+        result = reformat_name(name)
+        assert (
+            result == expected
+        ), f"Expected '{expected}', but got '{result}' for '{name}'"
