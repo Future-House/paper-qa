@@ -107,7 +107,12 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
     name: str = Field(default="text-embedding-3-small")
     config: dict[str, Any] = Field(
         default_factory=dict,  # See below field_validator for injection of kwargs
-        description="Optional `rate_limit` key, value must be a RateLimitItem or RateLimitItem string for parsing",
+        description=(
+            "The optional `rate_limit` key's value must be a RateLimitItem or"
+            " RateLimitItem string for parsing. The optional `kwargs` key is keyword"
+            " arguments to pass to the litellm.aembedding function. Note that LiteLLM's"
+            " Router is not used here."
+        ),
     )
 
     @field_validator("config")
