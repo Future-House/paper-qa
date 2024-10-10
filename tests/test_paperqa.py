@@ -667,7 +667,7 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
 def test_custom_llm(stub_data_dir: Path) -> None:
     from paperqa.llms import Chunk
 
-    class MyLLM(LLMModel):
+    class StubLLMModel(LLMModel):
         name: str = "myllm"
 
         async def acomplete(self, prompt: str) -> Chunk:  # noqa: ARG002
@@ -683,19 +683,19 @@ def test_custom_llm(stub_data_dir: Path) -> None:
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
-        llm_model=MyLLM(),
+        llm_model=StubLLMModel(),
     )
     # ensure JSON summaries are not used
     no_json_settings = Settings(prompts={"use_json": False})
     evidence = docs.get_evidence(
-        "Echo", summary_llm_model=MyLLM(), settings=no_json_settings
+        "Echo", summary_llm_model=StubLLMModel(), settings=no_json_settings
     ).contexts
     assert "Echo" in evidence[0].context
 
     evidence = docs.get_evidence(
         "Echo",
         callbacks=[print_callback],
-        summary_llm_model=MyLLM(),
+        summary_llm_model=StubLLMModel(),
         settings=no_json_settings,
     ).contexts
     assert "Echo" in evidence[0].context
