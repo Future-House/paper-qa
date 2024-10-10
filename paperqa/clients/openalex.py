@@ -148,37 +148,56 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
         for author in raw_author_names
     ]
 
-    publisher = (
-        message.get("primary_location", {})
-        .get("source", {})
-        .get("host_organization_name")
-    )
-    journal = message.get("primary_location", {}).get("source", {}).get("display_name")
+    primary_location = message.get("primary_location") or {}
+    source = primary_location.get("source") or {}
 
-    best_oa_location = message.get("best_oa_location")
-    pdf_url = best_oa_location.get("pdf_url") if best_oa_location else None
-    oa_license = best_oa_location.get("license") if best_oa_location else None
+    publisher = source.get("host_organization_name", None)
+    journal = source.get("display_name", None)
+    issn = source.get("issn_l", None)
+    volume = message.get("biblio", {}).get("volume", None)
+    issue = message.get("biblio", {}).get("issue", None)
+    pages = message.get("biblio", {}).get("last_page", None)
+    doi = message.get("doi")
+    title = message.get("title")
+    citation_count = message.get("cited_by_count")
+    publication_year = message.get("publication_year")
+
+    best_oa_location = message.get("best_oa_location") or {}
+    pdf_url = best_oa_location.get("pdf_url", None)
+    oa_license = best_oa_location.get("license", None)
+
+    publication_date_str = message.get("publication_date", "")
+    try:
+        publication_date = (
+            datetime.fromisoformat(publication_date_str)
+            if publication_date_str
+            else None
+        )
+    except ValueError:
+        publication_date = None
+
+    bibtex_type = BIBTEX_MAPPING.get(message.get("type") or "other", "misc")
 
     return DocDetails(  # type: ignore[call-arg]
         key=None,
-        bibtex_type=BIBTEX_MAPPING.get(message.get("type", "other"), "misc"),
+        bibtex_type=bibtex_type,
         bibtex=None,
         authors=sanitized_authors,
-        publication_date=datetime.fromisoformat(message.get("publication_date", "")),
-        year=message.get("publication_year"),
-        volume=message.get("biblio", {}).get("volume"),
-        issue=message.get("biblio", {}).get("issue"),
+        publication_date=publication_date,
+        year=publication_year,
+        volume=volume,
+        issue=issue,
         publisher=publisher,
-        issn=message.get("primary_location", {}).get("source", {}).get("issn_l"),
-        pages=message.get("biblio", {}).get("last_page"),
+        issn=issn,
+        pages=pages,
         journal=journal,
-        url=message.get("doi"),
-        title=message.get("title"),
-        citation_count=message.get("cited_by_count"),
-        doi=message.get("doi"),
+        url=doi,
+        title=title,
+        citation_count=citation_count,
+        doi=doi,
         license=oa_license,
         pdf_url=pdf_url,
-        other=message,
+        other=message or {},
     )
 
 
