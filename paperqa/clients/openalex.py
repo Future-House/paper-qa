@@ -11,7 +11,7 @@ from urllib.parse import quote
 import aiohttp
 
 from paperqa.types import DocDetails
-from paperqa.utils import convert_acutes, strings_similarity
+from paperqa.utils import replace_acute_accents, strings_similarity
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
@@ -29,8 +29,7 @@ logger = logging.getLogger(__name__)
 def reformat_name(name: str) -> str:
     if "," not in name:
         return name
-    family, given_names = x.strip() for x in name.split(",", maxsplit=1)
-
+    family, given_names = (x.strip() for x in name.split(",", maxsplit=1))
     # Return the reformatted name
     return f"{given_names} {family}"
 
@@ -142,7 +141,7 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
         for authorship in message.get("authorships", [])
     ]
     authors = [reformat_name(author) for author in authors]
-    sanitized_authors = [convert_acutes(author) for author in authors]
+    sanitized_authors = [replace_acute_accents(author) for author in authors]
 
     publisher = (
         message.get("primary_location", {})

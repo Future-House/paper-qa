@@ -604,8 +604,9 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
         assert crossref_details.is_retracted is True, "Should be retracted"
 
 
-def test_reformat_name():
-    test_cases = [
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
         ("Doe, John", "John Doe"),
         ("Doe, Jane Mary", "Jane Mary Doe"),
         ("O'Doe, John", "John O'Doe"),
@@ -617,10 +618,8 @@ def test_reformat_name():
         ("Jane Doe", "Jane Doe"),
         ("Doe, Jöhn", "Jöhn Doe"),
         ("Doe, Jòhn", "Jòhn Doe"),
-    ]
-
-    for name, expected in test_cases:
-        result = reformat_name(name)
-        assert (
-            result == expected
-        ), f"Expected '{expected}', but got '{result}' for '{name}'"
+    ],
+)
+def test_reformat_name(name, expected):
+    result = reformat_name(name)
+    assert result == expected, f"Expected '{expected}', but got '{result}' for '{name}'"

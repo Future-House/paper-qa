@@ -346,7 +346,7 @@ def remove_substrings(target: str, substr_removal_list: Collection[str]) -> str:
     return target
 
 
-def convert_acutes(text: str) -> str:
+def replace_acute_accents(text: str) -> str:
     """Replaces acute accent with apostrophe."""
 
     # Used for any client that returns names with acutes
