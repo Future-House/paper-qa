@@ -153,9 +153,9 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
     )
     journal = message.get("primary_location", {}).get("source", {}).get("display_name")
 
-    best_oa_location = message.get("best_oa_location", {})
-    pdf_url = best_oa_location.get("pdf_url")
-    oa_license = best_oa_location.get("license")
+    best_oa_location = message.get("best_oa_location")
+    pdf_url = best_oa_location.get("pdf_url") if best_oa_location else None
+    oa_license = best_oa_location.get("license") if best_oa_location else None
 
     return DocDetails(  # type: ignore[call-arg]
         key=None,
