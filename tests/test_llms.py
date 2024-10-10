@@ -13,23 +13,36 @@ from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 class TestLiteLLMModel:
     @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
+    @pytest.mark.parametrize(
+        "config",
+        [
+            pytest.param(
+                {
+                    "model_list": [
+                        {
+                            "model_name": "gpt-4o-mini",
+                            "litellm_params": {
+                                "model": "gpt-4o-mini",
+                                "temperature": 0,
+                                "max_tokens": 56,
+                            },
+                        }
+                    ]
+                },
+                id="with-router",
+            ),
+            pytest.param(
+                {
+                    "pass_through_router": True,
+                    "router_kwargs": {"temperature": 0, "max_tokens": 56},
+                },
+                id="without-router",
+            ),
+        ],
+    )
     @pytest.mark.asyncio
-    async def test_run_prompt(self) -> None:
-        llm = LiteLLMModel(
-            name="gpt-4o-mini",
-            config={
-                "model_list": [
-                    {
-                        "model_name": "gpt-4o-mini",
-                        "litellm_params": {
-                            "model": "gpt-4o-mini",
-                            "temperature": 0,
-                            "max_tokens": 56,
-                        },
-                    }
-                ]
-            },
-        )
+    async def test_run_prompt(self, config: dict[str, Any]) -> None:
+        llm = LiteLLMModel(name="gpt-4o-mini", config=config)
 
         outputs = []
 
