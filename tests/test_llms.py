@@ -1,9 +1,11 @@
 import pytest
 
 from paperqa import LiteLLMModel
+from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
 class TestLiteLLMModel:
+    @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
     @pytest.mark.asyncio
     async def test_run_prompt(self) -> None:
         llm = LiteLLMModel(
