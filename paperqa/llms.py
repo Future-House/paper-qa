@@ -18,15 +18,9 @@ from inspect import isasyncgenfunction, signature
 from sys import version_info
 from typing import Any, TypeVar
 
+import litellm
 import numpy as np
 import tiktoken
-from litellm import (
-    DeploymentTypedDict,
-    Router,
-    aembedding,
-    get_model_cost_map,
-    token_counter,
-)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -46,7 +40,7 @@ PromptRunner = Callable[
     Awaitable[LLMResult],
 ]
 
-MODEL_COST_MAP = get_model_cost_map("")
+MODEL_COST_MAP = litellm.get_model_cost_map("")
 
 
 def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
@@ -158,7 +152,7 @@ class LiteLLMEmbeddingModel(EmbeddingModel):
                 )
             )
 
-            response = await aembedding(
+            response = await litellm.aembedding(
                 self.name,
                 input=texts[i : i + batch_size],
                 **self.config.get("kwargs", {}),
@@ -506,7 +500,8 @@ DEFAULT_VERTEX_SAFETY_SETTINGS: list[dict[str, str]] = [
 IS_PYTHON_BELOW_312 = version_info < (3, 12)
 if not IS_PYTHON_BELOW_312:
     _DeploymentTypedDictValidator = TypeAdapter(
-        list[DeploymentTypedDict], config=ConfigDict(arbitrary_types_allowed=True)
+        list[litellm.DeploymentTypedDict],
+        config=ConfigDict(arbitrary_types_allowed=True),
     )
 
 
@@ -531,7 +526,7 @@ class LiteLLMModel(LLMModel):
 
     config: dict = Field(default_factory=dict)
     name: str = "gpt-4o-mini"
-    _router: Router | None = None
+    _router: litellm.Router | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -580,7 +575,7 @@ class LiteLLMModel(LLMModel):
     @property
     def router(self):
         if self._router is None:
-            self._router = Router(
+            self._router = litellm.Router(
                 model_list=self.config["model_list"],
                 **self.config.get("router_kwargs", {}),
             )
@@ -663,7 +658,7 @@ class LiteLLMModel(LLMModel):
         return "chat"
 
     def count_tokens(self, text: str) -> int:
-        return token_counter(model=self.name, text=text)
+        return litellm.token_counter(model=self.name, text=text)
 
 
 def cosine_similarity(a, b):
