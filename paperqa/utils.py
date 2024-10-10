@@ -350,15 +350,16 @@ def mutate_acute_accents(text: str, replace: bool = False) -> str:
     """
     Replaces or removes acute accents in a string based on the boolean flag.
 
-    If 'replace' is True, acute accents on vowels are replaced with an apostrophe (e.g., "á" becomes "'a").
-    If 'replace' is False, all acute accents are removed from the string.
-
     Args:
         text: The input string.
         replace: A flag to determine whether to replace (True) or remove (False) acute accents.
 
+            If 'replace' is True, acute accents on vowels are replaced with an apostrophe (e.g., "á" becomes "'a").
+
+            If 'replace' is False, all acute accents are removed from the string.
+
     Returns:
-        str: The modified string with acute accents either replaced or removed.
+        The modified string with acute accents either replaced or removed.
     """
     if replace:
 

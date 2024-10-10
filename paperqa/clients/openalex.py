@@ -124,7 +124,7 @@ async def get_doc_details_from_openalex(
                 f"OpenAlex results did not match for title {title!r}."
             )
         if doi and results_data.get("doi") != doi:
-            raise DOINotFoundError("DOI not found in OpenAlex")
+            raise DOINotFoundError(f"DOI {doi!r} not found in OpenAlex.")
 
         return await parse_openalex_to_doc_details(results_data)
 
@@ -138,9 +138,11 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
     Returns:
         Parsed document details.
     """
+    authorships = message.get("authorships") or []
     authors = [
-        authorship.get("raw_author_name")
-        for authorship in message.get("authorships", [])
+        authorship.get("raw_author_name", "")
+        for authorship in authorships
+        if authorship
     ]
     authors = [reformat_name(author) for author in authors]
     sanitized_authors = [
