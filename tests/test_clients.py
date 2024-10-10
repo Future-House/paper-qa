@@ -620,6 +620,6 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
         ("Doe, Jòhn", "Jòhn Doe"),
     ],
 )
-def test_reformat_name(name, expected):
+def test_reformat_name(name: str, expected: str) -> None:
     result = reformat_name(name)
     assert result == expected, f"Expected '{expected}', but got '{result}' for '{name}'"

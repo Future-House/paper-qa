@@ -140,11 +140,12 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
     """
     raw_author_names = [
         authorship.get("raw_author_name", "")
-        for authorship in (message.get("authorships") or []))  # Handle None authorships
+        for authorship in (message.get("authorships") or [])  # Handle None authorships
         if authorship
     ]
     sanitized_authors = [
-        mutate_acute_accents(text=reformat_name(author), replace=True) for author in raw_author_names
+        mutate_acute_accents(text=reformat_name(author), replace=True)
+        for author in raw_author_names
     ]
 
     publisher = (
@@ -182,6 +183,12 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
 
 
 class OpenAlexProvider(DOIOrTitleBasedProvider):
+    """An open source provider of scholarly documents.
+
+    Includes information on work, researchers, institutions, journals,
+    and research topics.
+    """
+
     async def get_doc_details(
         self, doi: str, session: aiohttp.ClientSession
     ) -> DocDetails | None:
