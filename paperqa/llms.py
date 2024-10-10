@@ -802,5 +802,5 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
     if embedding == "sparse":
         return SparseEmbeddingModel(**kwargs)
     if kwargs:  # Only override the default config if there are actually kwargs
-        kwargs = {"config": kwargs}
+        return LiteLLMEmbeddingModel(name=embedding, config=kwargs)
     return LiteLLMEmbeddingModel(name=embedding, **kwargs)
