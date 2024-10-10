@@ -4,6 +4,7 @@ import pickle
 import pytest
 
 from paperqa import LiteLLMModel
+from paperqa.llms import Chunk
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
@@ -38,6 +39,7 @@ class TestLiteLLMModel:
             skip_system=True,
             callbacks=[accum],
         )
+        assert completion.model == "gpt-4o-mini"
         assert completion.seconds_to_first_token > 0
         assert completion.prompt_count > 0
         assert completion.completion_count > 0
@@ -64,6 +66,26 @@ class TestLiteLLMModel:
             callbacks=[accum, ac],
         )
         assert completion.cost > 0
+
+    @pytest.mark.vcr
+    @pytest.mark.asyncio
+    async def test_max_token_truncation(self) -> None:
+        llm = LiteLLMModel(
+            name="gpt-4o-mini",
+            config={
+                "model_list": [
+                    {
+                        "model_name": "gpt-4o-mini",
+                        "litellm_params": {"model": "gpt-4o-mini", "max_tokens": 3},
+                    }
+                ]
+            },
+        )
+        chunk = await llm.acomplete("Please tell me a story")  # type: ignore[call-arg]
+        assert isinstance(chunk, Chunk)
+        assert chunk.completion_tokens == 3
+        assert chunk.text
+        assert len(chunk.text) < 20
 
     def test_pickling(self, tmp_path: pathlib.Path) -> None:
         pickle_path = tmp_path / "llm_model.pickle"
