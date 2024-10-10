@@ -14,6 +14,7 @@ from paperqa.utils import gather_with_concurrency
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
 from .journal_quality import JournalQualityPostProcessor
+from .openalex import OpenAlexProvider
 from .retractions import RetractionDataPostProcessor
 from .semantic_scholar import SemanticScholarProvider
 from .unpaywall import UnpaywallProvider
@@ -28,6 +29,7 @@ DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
 
 ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
     *DEFAULT_CLIENTS,
+    OpenAlexProvider,
     UnpaywallProvider,
     RetractionDataPostProcessor,
 }

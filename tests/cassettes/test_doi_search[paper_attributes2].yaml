@@ -29,27 +29,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:06 GMT
+          - Wed, 09 Oct 2024 21:24:22 GMT
         Via:
-          - 1.1 2509c74f5f6cfb0d8a2f556b68170b28.cloudfront.net (CloudFront)
+          - 1.1 83a6f42adff040301dd9cde8ff611a9c.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 7a7MbQlbnoFNCzkgk3UwBDaPP90rtrqLyUTagKAF4V7m1vI6kc4Saw==
+          - c99D07In-uK4iDJzHpljZVb6-72VrT4xn4qNZQt1BJZzaaexMlRB-g==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTg9H8dvHcEpPA=
+          - fZslEEw2PHcES_Q=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "837"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:06 GMT
+          - Wed, 09 Oct 2024 21:24:22 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 98c343c0-ad0b-46bd-a7e0-72ebaf507273
+          - a9bba169-9afa-4efa-a7b4-216d8f5aefcb
       status:
         code: 200
         message: OK
@@ -88,7 +88,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:06 GMT
+          - Wed, 09 Oct 2024 21:24:22 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -141,19 +141,101 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:06 GMT
+          - Wed, 09 Oct 2024 21:24:22 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728262866&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=EejZnfVWmkOMbLkdh5D23Ic8pUWk7blnC4%2Fk5Py8sdY%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728509062&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2FEHy8Jzz8YKp7DFqUUdWwcJ4ckWu%2BTADdLCCXTWtf2s%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1728262866&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=EejZnfVWmkOMbLkdh5D23Ic8pUWk7blnC4%2Fk5Py8sdY%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728509062&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2FEHy8Jzz8YKp7DFqUUdWwcJ4ckWu%2BTADdLCCXTWtf2s%3D
         Server:
           - gunicorn
         Vary:
           - Accept-Encoding
         Via:
           - 1.1 vegur
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.openalex.org/works/https://doi.org/10.1007%2Fs40278-023-41815-2
+    response:
+      body:
+        string:
+          '{"id":"https://openalex.org/W4381738344","doi":"https://doi.org/10.1007/s40278-023-41815-2","title":"Convalescent-anti-sars-cov-2-plasma/immune-globulin","display_name":"Convalescent-anti-sars-cov-2-plasma/immune-globulin","publication_year":2023,"publication_date":"2023-06-23","ids":{"openalex":"https://openalex.org/W4381738344","doi":"https://doi.org/10.1007/s40278-023-41815-2"},"language":"en","primary_location":{"is_oa":false,"landing_page_url":"https://doi.org/10.1007/s40278-023-41815-2","pdf_url":null,"source":{"id":"https://openalex.org/S14436165","display_name":"Reactions
+          Weekly","issn_l":"0114-9954","issn":["0114-9954","1179-2051"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310320330","host_organization_name":"Adis,
+          Springer Healthcare","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310320330"],"host_organization_lineage_names":["Springer
+          Nature","Adis, Springer Healthcare"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},"type":"article","type_crossref":"journal-article","indexed_in":["crossref"],"open_access":{"is_oa":false,"oa_status":"closed","oa_url":null,"any_repository_has_fulltext":false},"authorships":[],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":0.0,"has_fulltext":false,"cited_by_count":0,"citation_normalized_percentile":{"value":0.0,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":0,"max":71},"biblio":{"volume":"1962","issue":"1","first_page":"145","last_page":"145"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T12796","display_name":"Cutaneous
+          Manifestations of COVID-19: A Comprehensive Review","score":0.9358,"subfield":{"id":"https://openalex.org/subfields/2708","display_name":"Dermatology"},"field":{"id":"https://openalex.org/fields/27","display_name":"Medicine"},"domain":{"id":"https://openalex.org/domains/4","display_name":"Health
+          Sciences"}},"topics":[{"id":"https://openalex.org/T12796","display_name":"Cutaneous
+          Manifestations of COVID-19: A Comprehensive Review","score":0.9358,"subfield":{"id":"https://openalex.org/subfields/2708","display_name":"Dermatology"},"field":{"id":"https://openalex.org/fields/27","display_name":"Medicine"},"domain":{"id":"https://openalex.org/domains/4","display_name":"Health
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/convalescent-plasma","display_name":"Convalescent
+          plasma","score":0.9101845},{"id":"https://openalex.org/keywords/2019-20-coronavirus-outbreak","display_name":"2019-20
+          coronavirus outbreak","score":0.52068794},{"id":"https://openalex.org/keywords/cutaneous-signs","display_name":"Cutaneous
+          Signs","score":0.434629}],"concepts":[{"id":"https://openalex.org/C3018027319","wikidata":"https://www.wikidata.org/wiki/Q420496","display_name":"Convalescent
+          plasma","level":5,"score":0.9101845},{"id":"https://openalex.org/C3007834351","wikidata":"https://www.wikidata.org/wiki/Q82069695","display_name":"Severe
+          acute respiratory syndrome coronavirus 2 (SARS-CoV-2)","level":5,"score":0.6916741},{"id":"https://openalex.org/C3008058167","wikidata":"https://www.wikidata.org/wiki/Q84263196","display_name":"Coronavirus
+          disease 2019 (COVID-19)","level":4,"score":0.660023},{"id":"https://openalex.org/C159047783","wikidata":"https://www.wikidata.org/wiki/Q7215","display_name":"Virology","level":1,"score":0.65177965},{"id":"https://openalex.org/C203014093","wikidata":"https://www.wikidata.org/wiki/Q101929","display_name":"Immunology","level":1,"score":0.52446485},{"id":"https://openalex.org/C3006700255","wikidata":"https://www.wikidata.org/wiki/Q81068910","display_name":"2019-20
+          coronavirus outbreak","level":3,"score":0.52068794},{"id":"https://openalex.org/C71924100","wikidata":"https://www.wikidata.org/wiki/Q11190","display_name":"Medicine","level":0,"score":0.464142},{"id":"https://openalex.org/C159654299","wikidata":"https://www.wikidata.org/wiki/Q79460","display_name":"Antibody","level":2,"score":0.44701022},{"id":"https://openalex.org/C8891405","wikidata":"https://www.wikidata.org/wiki/Q1059","display_name":"Immune
+          system","level":2,"score":0.43136406},{"id":"https://openalex.org/C126322002","wikidata":"https://www.wikidata.org/wiki/Q11180","display_name":"Internal
+          medicine","level":1,"score":0.082360655},{"id":"https://openalex.org/C524204448","wikidata":"https://www.wikidata.org/wiki/Q788926","display_name":"Infectious
+          disease (medical specialty)","level":3,"score":0.07111758},{"id":"https://openalex.org/C116675565","wikidata":"https://www.wikidata.org/wiki/Q3241045","display_name":"Outbreak","level":2,"score":0.059273064},{"id":"https://openalex.org/C2779134260","wikidata":"https://www.wikidata.org/wiki/Q12136","display_name":"Disease","level":2,"score":0.041250974}],"mesh":[],"locations_count":1,"locations":[{"is_oa":false,"landing_page_url":"https://doi.org/10.1007/s40278-023-41815-2","pdf_url":null,"source":{"id":"https://openalex.org/S14436165","display_name":"Reactions
+          Weekly","issn_l":"0114-9954","issn":["0114-9954","1179-2051"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310320330","host_organization_name":"Adis,
+          Springer Healthcare","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310320330"],"host_organization_lineage_names":["Springer
+          Nature","Adis, Springer Healthcare"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/3","score":0.4,"display_name":"Good
+          health and well-being"}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":1,"referenced_works":["https://openalex.org/W4308075214"],"related_works":["https://openalex.org/W4206669628","https://openalex.org/W4205317059","https://openalex.org/W4200329650","https://openalex.org/W3127156785","https://openalex.org/W3113664224","https://openalex.org/W3084498529","https://openalex.org/W3018906908","https://openalex.org/W3009669391","https://openalex.org/W3007868867","https://openalex.org/W3005417802"],"abstract_inverted_index":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4381738344","counts_by_year":[],"updated_date":"2024-09-25T01:00:19.579676","created_date":"2023-06-24"}
+
+          '
+      headers:
+        Access-Control-Allow-Credentials:
+          - "true"
+        Access-Control-Allow-Headers:
+          - Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Authorization, Cache-Control
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1771"
+        Content-Security-Policy:
+          - default-src 'self'; object-src 'none'
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 09 Oct 2024 21:24:22 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728509062&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=a87rx%2BA8OSjrLUc1Hbp0vkdvBl1I%2FdVarTZ2NHBSeZ4%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728509062&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=a87rx%2BA8OSjrLUc1Hbp0vkdvBl1I%2FdVarTZ2NHBSeZ4%3D
+        Server:
+          - gunicorn
+        Strict-Transport-Security:
+          - max-age=31556926; includeSubDomains
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+        X-Api-Pool:
+          - common
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - SAMEORIGIN
+        X-Xss-Protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
@@ -180,7 +262,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Mon, 07 Oct 2024 01:01:07 GMT
+          - Wed, 09 Oct 2024 21:24:23 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

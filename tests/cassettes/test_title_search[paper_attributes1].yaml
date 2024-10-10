@@ -6,7 +6,7 @@ interactions:
       uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=example@papercrow.ai
     response:
       body:
-        string: '{"elapsed_seconds":0.028,"results":[]}
+        string: '{"elapsed_seconds":0.008,"results":[]}
 
           '
       headers:
@@ -23,13 +23,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:13 GMT
+          - Wed, 09 Oct 2024 21:23:17 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728262873&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=y8IiG%2BfeUGHqR3ijDH8PArcehcA5RSDSavhj%2FOTeA6M%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728508997&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=kFl22lTuB5EVgUEHBXLyVxNQzsg1fEWmyouibtS%2Fj28%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1728262873&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=y8IiG%2BfeUGHqR3ijDH8PArcehcA5RSDSavhj%2FOTeA6M%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728508997&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=kFl22lTuB5EVgUEHBXLyVxNQzsg1fEWmyouibtS%2Fj28%3D
         Server:
           - gunicorn
         Via:
@@ -41,60 +41,121 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.openalex.org/works?filter=title.search:PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research
     response:
       body:
         string:
-          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
-          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
-          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
-          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 28, "influentialCitationCount":
-          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
-          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
-          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
-          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
-          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
-          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
-          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
-          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
-          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
-          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}], "matchScore": 245.16095}]}
+          '{"meta":{"count":1,"db_response_time_ms":54,"page":1,"per_page":25,"groups_count":null},"results":[{"id":"https://openalex.org/W4389761608","doi":"https://doi.org/10.48550/arxiv.2312.07559","title":"PaperQA:
+          Retrieval-Augmented Generative Agent for Scientific Research","display_name":"PaperQA:
+          Retrieval-Augmented Generative Agent for Scientific Research","relevance_score":700.6772,"publication_year":2023,"publication_date":"2023-01-01","ids":{"openalex":"https://openalex.org/W4389761608","doi":"https://doi.org/10.48550/arxiv.2312.07559"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"type":"preprint","type_crossref":"posted-content","indexed_in":["arxiv","datacite"],"open_access":{"is_oa":true,"oa_status":"green","oa_url":"https://arxiv.org/abs/2312.07559","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5092171854","display_name":"Jakub
+          L\u00e1la","orcid":"https://orcid.org/0000-0002-5424-5260"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"L\u00e1la,
+          Jakub","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5050347345","display_name":"Odhran
+          O''Donoghue","orcid":"https://orcid.org/0000-0001-6507-8990"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"O''Donoghue,
+          Odhran","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5025880600","display_name":"Aleksandar
+          Shtedritski","orcid":null},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Shtedritski,
+          Aleksandar","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
+          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Cox,
+          Sam","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5061828831","display_name":"Samuel
+          G. Rodriques","orcid":"https://orcid.org/0000-0002-2509-0861"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Rodriques,
+          Samuel G.","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"last","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
+          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"White,
+          Andrew D.","raw_affiliation_strings":[],"affiliations":[]}],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":null,"has_fulltext":false,"cited_by_count":9,"citation_normalized_percentile":{"value":0.836334,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":96,"max":97},"biblio":{"volume":null,"issue":null,"first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T10028","display_name":"Natural
+          Language Processing","score":0.9996,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
+          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},"topics":[{"id":"https://openalex.org/T10028","display_name":"Natural
+          Language Processing","score":0.9996,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
+          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},{"id":"https://openalex.org/T10181","display_name":"Statistical
+          Machine Translation and Natural Language Processing","score":0.9921,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
+          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},{"id":"https://openalex.org/T11710","display_name":"Biomedical
+          Ontologies and Text Mining","score":0.9722,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/relevance","display_name":"Relevance
+          (law)","score":0.723972},{"id":"https://openalex.org/keywords/benchmark","display_name":"Benchmark
+          (surveying)","score":0.70765376},{"id":"https://openalex.org/keywords/information-retrieval","display_name":"Information
+          Retrieval","score":0.548857},{"id":"https://openalex.org/keywords/language-modeling","display_name":"Language
+          Modeling","score":0.522255},{"id":"https://openalex.org/keywords/word-representation","display_name":"Word
+          Representation","score":0.517701},{"id":"https://openalex.org/keywords/natural-language-processing","display_name":"Natural
+          Language Processing","score":0.501901},{"id":"https://openalex.org/keywords/topic-modeling","display_name":"Topic
+          Modeling","score":0.500368},{"id":"https://openalex.org/keywords/scientific-literature","display_name":"Scientific
+          literature","score":0.42651427}],"concepts":[{"id":"https://openalex.org/C158154518","wikidata":"https://www.wikidata.org/wiki/Q7310970","display_name":"Relevance
+          (law)","level":2,"score":0.723972},{"id":"https://openalex.org/C185798385","wikidata":"https://www.wikidata.org/wiki/Q1161707","display_name":"Benchmark
+          (surveying)","level":2,"score":0.70765376},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
+          science","level":0,"score":0.7006018},{"id":"https://openalex.org/C44291984","wikidata":"https://www.wikidata.org/wiki/Q1074173","display_name":"Question
+          answering","level":2,"score":0.60793006},{"id":"https://openalex.org/C9652623","wikidata":"https://www.wikidata.org/wiki/Q190109","display_name":"Field
+          (mathematics)","level":2,"score":0.51713365},{"id":"https://openalex.org/C23123220","wikidata":"https://www.wikidata.org/wiki/Q816826","display_name":"Information
+          retrieval","level":1,"score":0.51568186},{"id":"https://openalex.org/C39890363","wikidata":"https://www.wikidata.org/wiki/Q36108","display_name":"Generative
+          grammar","level":2,"score":0.4766829},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
+          science","level":1,"score":0.4566322},{"id":"https://openalex.org/C2781083858","wikidata":"https://www.wikidata.org/wiki/Q17327049","display_name":"Scientific
+          literature","level":2,"score":0.42651427},{"id":"https://openalex.org/C154945302","wikidata":"https://www.wikidata.org/wiki/Q11660","display_name":"Artificial
+          intelligence","level":1,"score":0.26270974},{"id":"https://openalex.org/C17744445","wikidata":"https://www.wikidata.org/wiki/Q36442","display_name":"Political
+          science","level":0,"score":0.0},{"id":"https://openalex.org/C151730666","wikidata":"https://www.wikidata.org/wiki/Q7205","display_name":"Paleontology","level":1,"score":0.0},{"id":"https://openalex.org/C33923547","wikidata":"https://www.wikidata.org/wiki/Q395","display_name":"Mathematics","level":0,"score":0.0},{"id":"https://openalex.org/C13280743","wikidata":"https://www.wikidata.org/wiki/Q131089","display_name":"Geodesy","level":1,"score":0.0},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.0},{"id":"https://openalex.org/C202444582","wikidata":"https://www.wikidata.org/wiki/Q837863","display_name":"Pure
+          mathematics","level":1,"score":0.0},{"id":"https://openalex.org/C199539241","wikidata":"https://www.wikidata.org/wiki/Q7748","display_name":"Law","level":1,"score":0.0},{"id":"https://openalex.org/C205649164","wikidata":"https://www.wikidata.org/wiki/Q1071","display_name":"Geography","level":0,"score":0.0}],"mesh":[],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://api.datacite.org/dois/10.48550/arxiv.2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4393179698","display_name":"DataCite
+          API","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I4210145204","host_organization_name":"DataCite","host_organization_lineage":["https://openalex.org/I4210145204"],"host_organization_lineage_names":["DataCite"],"type":"metadata"},"license":null,"license_id":null,"version":null}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/4","display_name":"Quality
+          education","score":0.86}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":0,"referenced_works":[],"related_works":["https://openalex.org/W972276598","https://openalex.org/W4321353415","https://openalex.org/W2745001401","https://openalex.org/W2387743295","https://openalex.org/W2384605597","https://openalex.org/W2378211422","https://openalex.org/W2130974462","https://openalex.org/W2087343574","https://openalex.org/W2086519370","https://openalex.org/W2028665553"],"abstract_inverted_index":{"Large":[0],"Language":[1],"Models":[2],"(LLMs)":[3],"generalize":[4],"well":[5],"across":[6,79,152],"language":[7],"tasks,":[8],"but":[9],"suffer":[10],"from":[11,148],"hallucinations":[12,33],"and":[13,34,88,90,112,144],"uninterpretability,":[14],"making":[15],"it":[16,106],"difficult":[17],"to":[18,31,46,93,125],"assess":[19],"their":[20],"accuracy":[21],"without":[22],"ground-truth.":[23],"Retrieval-Augmented":[24],"Generation":[25],"(RAG)":[26],"models":[27,45],"have":[28],"been":[29],"proposed":[30],"reduce":[32],"provide":[35,94],"provenance":[36],"for":[37,64],"how":[38,126],"an":[39,73],"answer":[40],"was":[41],"generated.":[42],"Applying":[43],"such":[44],"the":[47,68,84,122,153],"scientific":[48,56,69,81,131,150],"literature":[49],"may":[50],"enable":[51],"large-scale,":[52],"systematic":[53],"processing":[54],"of":[55,86,109,146],"knowledge.":[57],"We":[58],"present":[59],"PaperQA,":[60],"a":[61,100,137],"RAG":[62,92],"agent":[63,74,98],"answering":[65,102],"questions":[66],"over":[67],"literature.":[70,154],"PaperQA":[71],"is":[72],"that":[75,141],"performs":[76],"information":[77,147],"retrieval":[78,143],"full-text":[80,149],"articles,":[82],"assesses":[83],"relevance":[85],"sources":[87],"passages,":[89],"uses":[91],"answers.":[95],"Viewing":[96],"this":[97],"as":[99],"question":[101],"model,":[103],"we":[104,133,156],"find":[105],"exceeds":[107],"performance":[108],"existing":[110],"LLMs":[111],"LLM":[113],"agents":[114],"on":[115,130,163],"current":[116],"science":[117],"QA":[118],"benchmarks.":[119],"To":[120],"push":[121],"field":[123],"closer":[124],"humans":[127],"perform":[128],"research":[129],"literature,":[132],"also":[134],"introduce":[135],"LitQA,":[136],"more":[138],"complex":[139],"benchmark":[140],"requires":[142],"synthesis":[145],"papers":[151],"Finally,":[155],"demonstrate":[157],"PaperQA''s":[158],"matches":[159],"expert":[160],"human":[161],"researchers":[162],"LitQA.":[164]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4389761608","counts_by_year":[{"year":2024,"cited_by_count":8},{"year":2023,"cited_by_count":1}],"updated_date":"2024-09-15T08:19:45.276523","created_date":"2023-12-15"}],"group_by":[]}
 
           '
       headers:
+        Access-Control-Allow-Credentials:
+          - "true"
+        Access-Control-Allow-Headers:
+          - Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
         Access-Control-Allow-Origin:
           - "*"
+        Access-Control-Expose-Headers:
+          - Authorization, Cache-Control
         Connection:
           - keep-alive
+        Content-Encoding:
+          - gzip
         Content-Length:
-          - "1386"
+          - "3487"
+        Content-Security-Policy:
+          - default-src 'self'; object-src 'none'
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:13 GMT
-        Via:
-          - 1.1 a0fdc0fd69b93d134cd1b726f68c77b4.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - VSTP_sPi0L-8YjK5SO1ZKKbt2hBT11iwtJBRfZ8VrdJVOaFMDuxGvw==
-        X-Amz-Cf-Pop:
-          - SFO53-C1
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - fQTh-FhSPHcEG2g=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1386"
-        x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:13 GMT
-        x-amzn-Remapped-Server:
+          - Wed, 09 Oct 2024 21:23:17 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728508997&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=MGhHLA3PYS9ZDsSmxwMhgFToHyAsrvzd9UfUAKRuh%2F4%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728508997&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=MGhHLA3PYS9ZDsSmxwMhgFToHyAsrvzd9UfUAKRuh%2F4%3D
+        Server:
           - gunicorn
-        x-amzn-RequestId:
-          - 91b70e96-3ab0-4413-9969-193f8cb3061e
+        Strict-Transport-Security:
+          - max-age=31556926; includeSubDomains
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+        X-Api-Pool:
+          - common
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - SAMEORIGIN
+        X-Xss-Protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
@@ -106,7 +167,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2034471,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2036134,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
           University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
           Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
           Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
@@ -193,7 +254,7 @@ interactions:
           gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
           Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
           Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
-          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.993042,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.998283,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -207,11 +268,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "4502"
+          - "4503"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:13 GMT
+          - Wed, 09 Oct 2024 21:23:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -228,6 +289,67 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
+          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
+          "venue": "arXiv.org", "year": 2023, "citationCount": 30, "influentialCitationCount":
+          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
+          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
+          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
+          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
+          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
+          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
+          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
+          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
+          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
+          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
+          "Andrew D. White"}], "matchScore": 248.06189}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1386"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 09 Oct 2024 21:23:17 GMT
+        Via:
+          - 1.1 bdb686e41bd85ffb1c6e5b48947e5566.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - kb2XoMwvTFOdlyQynY5NHlyZHCbFFSqL2d91AjXj8uV1k3O9ajkXxg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - fZsa3Hj2PHcEeBA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1386"
+        x-amzn-Remapped-Date:
+          - Wed, 09 Oct 2024 21:23:17 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 2c71e913-470d-468d-8ca3-a9c7b55d9eef
       status:
         code: 200
         message: OK
