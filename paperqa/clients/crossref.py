@@ -21,6 +21,7 @@ from tenacity import (
 )
 
 from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
+from paperqa.utils import BIBTEX_MAPPING as CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING
 from paperqa.utils import (
     bibtex_field_extract,
     create_bibtex_key,
@@ -31,7 +32,6 @@ from paperqa.utils import (
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError, make_flaky_ssl_error_predicate
-from .shared_dicts import BIBTEX_MAPPING as CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING
 
 logger = logging.getLogger(__name__)
 

@@ -11,11 +11,10 @@ from urllib.parse import quote
 import aiohttp
 
 from paperqa.types import DocDetails
-from paperqa.utils import replace_acute_accents, strings_similarity
+from paperqa.utils import BIBTEX_MAPPING, mutate_acute_accents, strings_similarity
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
-from .shared_dicts import BIBTEX_MAPPING
 
 OPENALEX_BASE_URL = "https://api.openalex.org"
 OPENALEX_API_REQUEST_TIMEOUT = 5.0
@@ -80,6 +79,9 @@ async def get_doc_details_from_openalex(
 
     url = f"{OPENALEX_BASE_URL}/works"
     if doi:
+        # this looks wrong but it's now
+        # will compile to a relative url similar to:
+        # https://api.openalex.org/works/https://doi.org/10.7717/peerj.4375
         url += f"/https://doi.org/{quote(doi, safe='')}"
     elif title:
         params["filter"] = f"title.search:{title}"
@@ -141,7 +143,9 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
         for authorship in message.get("authorships", [])
     ]
     authors = [reformat_name(author) for author in authors]
-    sanitized_authors = [replace_acute_accents(author) for author in authors]
+    sanitized_authors = [
+        mutate_acute_accents(text=author, replace=True) for author in authors
+    ]
 
     publisher = (
         message.get("primary_location", {})
