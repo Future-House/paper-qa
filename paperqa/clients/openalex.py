@@ -29,9 +29,7 @@ logger = logging.getLogger(__name__)
 def reformat_name(name: str) -> str:
     if "," not in name:
         return name
-    family, given = name.split(",", 1)
-    family = family.strip()
-    given_names = given.strip()
+    family, given_names = x.strip() for x in name.split(",", maxsplit=1)
 
     # Return the reformatted name
     return f"{given_names} {family}"
