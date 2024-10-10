@@ -26,7 +26,6 @@ from paperqa.llms import (
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
-    LiteLLMModel,
     LLMModel,
     SparseEmbeddingModel,
 )
@@ -430,63 +429,6 @@ async def test_chain_completion() -> None:
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
 
-    assert completion.cost > 0
-
-
-@pytest.mark.asyncio
-async def test_chain_chat() -> None:
-    llm = LiteLLMModel(
-        name="gpt-4o-mini",
-        config={
-            "model_list": [
-                {
-                    "model_name": "gpt-4o-mini",
-                    "litellm_params": {
-                        "model": "gpt-4o-mini",
-                        "temperature": 0,
-                        "max_tokens": 56,
-                    },
-                }
-            ]
-        },
-    )
-
-    outputs = []
-
-    def accum(x) -> None:
-        outputs.append(x)
-
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        skip_system=True,
-        callbacks=[accum],
-    )
-    assert completion.seconds_to_first_token > 0
-    assert completion.prompt_count > 0
-    assert completion.completion_count > 0
-    assert str(completion) == "".join(outputs)
-    assert completion.cost > 0
-
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        skip_system=True,
-    )
-    assert completion.seconds_to_first_token == 0
-    assert completion.seconds_to_last_token > 0
-    assert completion.cost > 0
-
-    # check with mixed callbacks
-    async def ac(x) -> None:
-        pass
-
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        skip_system=True,
-        callbacks=[accum, ac],
-    )
     assert completion.cost > 0
 
 

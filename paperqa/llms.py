@@ -571,13 +571,11 @@ class LiteLLMModel(LLMModel):
         return data
 
     def __getstate__(self):
-        state = self.__dict__.copy()
-        # Remove the _router attribute as it's not picklable
-        state["_router"] = None
+        # Prevent _router from being pickled, SEE: https://stackoverflow.com/a/2345953
+        state = super().__getstate__()
+        state["__dict__"] = state["__dict__"].copy()
+        state["__dict__"].pop("_router", None)
         return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
 
     @property
     def router(self):
