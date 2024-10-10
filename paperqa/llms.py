@@ -543,10 +543,11 @@ class LiteLLMModel(LLMModel):
             " `router_kwargs` key is keyword arguments to pass to the Router class."
             " Inclusion of a key `pass_through_router` with a truthy value will lead"
             " to using not using LiteLLM's Router, instead just LiteLLM's free"
-            f" functions (see {PassThroughRouter.__name__}). The optional `rate_limit`"
-            " key is a dictionary keyed by model group name with values of type"
-            " limits.RateLimitItem (in tokens / minute) or valid limits.RateLimitItem"
-            " string for parsing."
+            f" functions (see {PassThroughRouter.__name__}). Rate limiting applies"
+            " regardless of `pass_through_router` being present. The optional"
+            " `rate_limit` key is a dictionary keyed by model group name with values"
+            " of type limits.RateLimitItem (in tokens / minute) or valid"
+            " limits.RateLimitItem string for parsing."
         ),
     )
     name: str = "gpt-4o-mini"
