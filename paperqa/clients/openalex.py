@@ -138,15 +138,13 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
     Returns:
         Parsed document details.
     """
-    authorships = message.get("authorships") or []
-    authors = [
+    raw_author_names = [
         authorship.get("raw_author_name", "")
-        for authorship in authorships
+        for authorship in (message.get("authorships") or []))  # Handle None authorships
         if authorship
     ]
-    authors = [reformat_name(author) for author in authors]
     sanitized_authors = [
-        mutate_acute_accents(text=author, replace=True) for author in authors
+        mutate_acute_accents(text=reformat_name(author), replace=True) for author in raw_author_names
     ]
 
     publisher = (
