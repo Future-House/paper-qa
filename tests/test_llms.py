@@ -1,3 +1,6 @@
+import pathlib
+import pickle
+
 import pytest
 
 from paperqa import LiteLLMModel
@@ -61,3 +64,28 @@ class TestLiteLLMModel:
             callbacks=[accum, ac],
         )
         assert completion.cost > 0
+
+    def test_pickling(self, tmp_path: pathlib.Path) -> None:
+        pickle_path = tmp_path / "llm_model.pickle"
+        llm = LiteLLMModel(
+            name="gpt-4o-mini",
+            config={
+                "model_list": [
+                    {
+                        "model_name": "gpt-4o-mini",
+                        "litellm_params": {
+                            "model": "gpt-4o-mini",
+                            "temperature": 0,
+                            "max_tokens": 56,
+                        },
+                    }
+                ]
+            },
+        )
+        with pickle_path.open("wb") as f:
+            pickle.dump(llm, f)
+        with pickle_path.open("rb") as f:
+            rehydrated_llm = pickle.load(f)
+        assert llm.name == rehydrated_llm.name
+        assert llm.config == rehydrated_llm.config
+        assert llm.router.deployment_names == rehydrated_llm.router.deployment_names
