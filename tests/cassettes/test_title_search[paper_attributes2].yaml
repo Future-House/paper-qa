@@ -3,11 +3,541 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.openalex.org/works?filter=title.search:Augmenting+large+language+models+with+chemistry+tools
+    response:
+      body:
+        string:
+          '{"meta":{"count":2,"db_response_time_ms":114,"page":1,"per_page":25,"groups_count":null},"results":[{"id":"https://openalex.org/W4365597205","doi":"https://doi.org/10.48550/arxiv.2304.05376","title":"ChemCrow:
+          Augmenting large-language models with chemistry tools","display_name":"ChemCrow:
+          Augmenting large-language models with chemistry tools","relevance_score":1082.0984,"publication_year":2023,"publication_date":"2023-01-01","ids":{"openalex":"https://openalex.org/W4365597205","doi":"https://doi.org/10.48550/arxiv.2304.05376"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"type":"preprint","type_crossref":"posted-content","indexed_in":["arxiv","datacite"],"open_access":{"is_oa":true,"oa_status":"green","oa_url":"https://arxiv.org/abs/2304.05376","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5055903035","display_name":"Andres
+          M Bran","orcid":"https://orcid.org/0000-0002-4432-3667"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Bran,
+          Andres M","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
+          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Cox,
+          Sam","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
+          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"White,
+          Andrew D","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"last","author":{"id":"https://openalex.org/A5028051805","display_name":"Philippe
+          Schwaller","orcid":"https://orcid.org/0000-0003-3046-6576"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Schwaller,
+          Philippe","raw_affiliation_strings":[],"affiliations":[]}],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":null,"has_fulltext":false,"cited_by_count":76,"citation_normalized_percentile":{"value":0.999852,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":null,"issue":null,"first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},"topics":[{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/limiting","display_name":"Limiting","score":0.706134},{"id":"https://openalex.org/keywords/computational-chemistry","display_name":"Computational
+          Chemistry","score":0.518176}],"concepts":[{"id":"https://openalex.org/C188198153","wikidata":"https://www.wikidata.org/wiki/Q1613840","display_name":"Limiting","level":2,"score":0.706134},{"id":"https://openalex.org/C174348530","wikidata":"https://www.wikidata.org/wiki/Q188635","display_name":"Bridging
+          (networking)","level":2,"score":0.67967176},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
+          science","level":0,"score":0.6176928},{"id":"https://openalex.org/C177264268","wikidata":"https://www.wikidata.org/wiki/Q1514741","display_name":"Set
+          (abstract data type)","level":2,"score":0.47735333},{"id":"https://openalex.org/C74187038","wikidata":"https://www.wikidata.org/wiki/Q1418791","display_name":"Drug
+          discovery","level":2,"score":0.4398606},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.3678416},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
+          science","level":1,"score":0.34021586},{"id":"https://openalex.org/C171250308","wikidata":"https://www.wikidata.org/wiki/Q11468","display_name":"Nanotechnology","level":1,"score":0.3370079},{"id":"https://openalex.org/C154945302","wikidata":"https://www.wikidata.org/wiki/Q11660","display_name":"Artificial
+          intelligence","level":1,"score":0.33441877},{"id":"https://openalex.org/C127413603","wikidata":"https://www.wikidata.org/wiki/Q11023","display_name":"Engineering","level":0,"score":0.19605169},{"id":"https://openalex.org/C199360897","wikidata":"https://www.wikidata.org/wiki/Q9143","display_name":"Programming
+          language","level":1,"score":0.13234842},{"id":"https://openalex.org/C78519656","wikidata":"https://www.wikidata.org/wiki/Q101333","display_name":"Mechanical
+          engineering","level":1,"score":0.0},{"id":"https://openalex.org/C31258907","wikidata":"https://www.wikidata.org/wiki/Q1301371","display_name":"Computer
+          network","level":1,"score":0.0},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.0},{"id":"https://openalex.org/C192562407","wikidata":"https://www.wikidata.org/wiki/Q228736","display_name":"Materials
+          science","level":0,"score":0.0}],"mesh":[],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://api.datacite.org/dois/10.48550/arxiv.2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4393179698","display_name":"DataCite
+          API","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I4210145204","host_organization_name":"DataCite","host_organization_lineage":["https://openalex.org/I4210145204"],"host_organization_lineage_names":["DataCite"],"type":"metadata"},"license":null,"license_id":null,"version":null}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":0,"referenced_works":[],"related_works":["https://openalex.org/W4388870064","https://openalex.org/W4248308508","https://openalex.org/W4235186151","https://openalex.org/W2667588871","https://openalex.org/W2272354214","https://openalex.org/W2210139803","https://openalex.org/W2084768720","https://openalex.org/W2056057048","https://openalex.org/W2054685365","https://openalex.org/W2043010663"],"abstract_inverted_index":{"Over":[0],"the":[1,92,107,117,179],"last":[2],"decades,":[3],"excellent":[4],"computational":[5,184],"chemistry":[6,71],"tools":[7],"have":[8,35],"been":[9],"developed.":[10],"Integrating":[11],"them":[12],"into":[13],"a":[14,120,136],"single":[15],"platform":[16],"with":[17,45],"enhanced":[18],"accessibility":[19],"could":[20],"help":[21],"reaching":[22],"their":[23,58],"full":[24],"potential":[25],"by":[26,177],"overcoming":[27],"steep":[28],"learning":[29],"curves.":[30],"Recently,":[31],"large-language":[32],"models":[33,50],"(LLMs)":[34],"shown":[36],"strong":[37],"performance":[38,94],"in":[39,60,95,134],"tasks":[40,76],"across":[41,77],"domains,":[42],"but":[43,172],"struggle":[44],"chemistry-related":[46],"problems.":[47],"Moreover,":[48],"these":[49],"lack":[51],"access":[52],"to":[53,74],"external":[54],"knowledge":[55],"sources,":[56],"limiting":[57],"usefulness":[59],"scientific":[61,175],"applications.":[62],"In":[63],"this":[64],"study,":[65],"we":[66,143],"introduce":[67],"ChemCrow,":[68],"an":[69,110,148],"LLM":[70,93,127],"agent":[72,102],"designed":[73],"accomplish":[75],"organic":[78],"synthesis,":[79],"drug":[80],"discovery,":[81],"and":[82,97,105,115,128,157,167,183],"materials":[83],"design.":[84],"By":[85],"integrating":[86],"18":[87],"expert-designed":[88],"tools,":[89],"ChemCrow":[90],"augments":[91],"chemistry,":[96],"new":[98],"capabilities":[99],"emerge.":[100],"Our":[101,123,160],"autonomously":[103],"planned":[104],"executed":[106],"syntheses":[108],"of":[109,119,139],"insect":[111],"repellent,":[112],"three":[113],"organocatalysts,":[114],"guided":[116],"discovery":[118],"novel":[121],"chromophore.":[122],"evaluation,":[124],"including":[125],"both":[126],"expert":[129,165],"assessments,":[130],"demonstrates":[131],"ChemCrow''s":[132],"effectiveness":[133],"automating":[135],"diverse":[137],"set":[138],"chemical":[140],"tasks.":[141],"Surprisingly,":[142],"find":[144],"that":[145],"GPT-4":[146,155],"as":[147],"evaluator":[149],"cannot":[150],"distinguish":[151],"between":[152,181],"clearly":[153],"wrong":[154],"completions":[156],"Chemcrow''s":[158],"performance.":[159],"work":[161],"not":[162],"only":[163],"aids":[164],"chemists":[166],"lowers":[168],"barriers":[169],"for":[170],"non-experts,":[171],"also":[173],"fosters":[174],"advancement":[176],"bridging":[178],"gap":[180],"experimental":[182],"chemistry.":[185]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4365597205","counts_by_year":[{"year":2024,"cited_by_count":44},{"year":2023,"cited_by_count":31}],"updated_date":"2024-10-09T14:02:10.165497","created_date":"2023-04-15"},{"id":"https://openalex.org/W4396723768","doi":"https://doi.org/10.1038/s42256-024-00832-8","title":"Augmenting
+          large language models with chemistry tools","display_name":"Augmenting large
+          language models with chemistry tools","relevance_score":881.374,"publication_year":2024,"publication_date":"2024-05-08","ids":{"openalex":"https://openalex.org/W4396723768","doi":"https://doi.org/10.1038/s42256-024-00832-8","pmid":"https://pubmed.ncbi.nlm.nih.gov/38799228"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
+          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
+          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
+          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"type":"article","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"hybrid","oa_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5031480183","display_name":"Andres
+          M. Bran","orcid":null},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
+          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Andres
+          M. Bran","raw_affiliation_strings":["Laboratory of Artificial Chemical Intelligence
+          (LIAC), ISIC, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"Laboratory
+          of Artificial Chemical Intelligence (LIAC), ISIC, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
+          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
+          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Sam
+          Cox","raw_affiliation_strings":["Department of Chemical Engineering, University
+          of Rochester, Rochester, NY, USA"],"affiliations":[{"raw_affiliation_string":"Department
+          of Chemical Engineering, University of Rochester, Rochester, NY, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5075449407","display_name":"Oliver
+          Schilter","orcid":"https://orcid.org/0000-0003-0310-0851"},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
+          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Oliver
+          Schilter","raw_affiliation_strings":["Laboratory of Artificial Chemical Intelligence
+          (LIAC), ISIC, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"Laboratory
+          of Artificial Chemical Intelligence (LIAC), ISIC, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5092630105","display_name":"Carlo
+          Baldassari","orcid":"https://orcid.org/0009-0008-1199-7113"},"institutions":[{"id":"https://openalex.org/I4210126328","display_name":"IBM
+          Research - Zurich","ror":"https://ror.org/02js37d36","country_code":"CH","type":"facility","lineage":["https://openalex.org/I1341412227","https://openalex.org/I4210114115","https://openalex.org/I4210126328"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Carlo
+          Baldassari","raw_affiliation_strings":["Accelerated Discovery, IBM Research
+          \u2013 Europe, R\u00fcschlikon, Switzerland"],"affiliations":[{"raw_affiliation_string":"Accelerated
+          Discovery, IBM Research \u2013 Europe, R\u00fcschlikon, Switzerland","institution_ids":["https://openalex.org/I4210126328"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
+          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
+          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Andrew
+          D. White","raw_affiliation_strings":["Department of Chemical Engineering,
+          University of Rochester, Rochester, NY, USA"],"affiliations":[{"raw_affiliation_string":"Department
+          of Chemical Engineering, University of Rochester, Rochester, NY, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5028051805","display_name":"Philippe
+          Schwaller","orcid":"https://orcid.org/0000-0003-3046-6576"},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
+          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Philippe
+          Schwaller","raw_affiliation_strings":["National Centre of Competence in Research
+          (NCCR) Catalysis, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"National
+          Centre of Competence in Research (NCCR) Catalysis, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]}],"institution_assertions":[],"countries_distinct_count":2,"institutions_distinct_count":3,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":9750,"currency":"EUR","value_usd":11690,"provenance":"doaj"},"apc_paid":{"value":9750,"currency":"EUR","value_usd":11690,"provenance":"doaj"},"fwci":12.752,"has_fulltext":true,"fulltext_origin":"pdf","cited_by_count":44,"citation_normalized_percentile":{"value":0.999956,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":"6","issue":"5","first_page":"525","last_page":"535"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9988,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},"topics":[{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9988,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},{"id":"https://openalex.org/T10211","display_name":"Computational
+          Methods in Drug Discovery","score":0.9965,"subfield":{"id":"https://openalex.org/subfields/1703","display_name":"Computational
+          Theory and Mathematics"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},{"id":"https://openalex.org/T10028","display_name":"Natural Language
+          Processing","score":0.9808,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
+          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/computational-chemistry","display_name":"Computational
+          Chemistry","score":0.630781},{"id":"https://openalex.org/keywords/topic-modeling","display_name":"Topic
+          Modeling","score":0.623188},{"id":"https://openalex.org/keywords/machine-translation","display_name":"Machine
+          Translation","score":0.602642},{"id":"https://openalex.org/keywords/materials-discovery","display_name":"Materials
+          Discovery","score":0.590893},{"id":"https://openalex.org/keywords/named-entity-recognition","display_name":"Named
+          Entity Recognition","score":0.560989}],"concepts":[{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.45771447},{"id":"https://openalex.org/C87355193","wikidata":"https://www.wikidata.org/wiki/Q411","display_name":"Astrobiology","level":1,"score":0.36399078},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
+          science","level":0,"score":0.3528102},{"id":"https://openalex.org/C121332964","wikidata":"https://www.wikidata.org/wiki/Q413","display_name":"Physics","level":0,"score":0.14846519}],"mesh":[],"locations_count":3,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
+          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
+          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
+          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":true,"landing_page_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","pdf_url":null,"source":{"id":"https://openalex.org/S2764455111","display_name":"PubMed
+          Central","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
+          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/38799228","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
+          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
+          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
+          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
+          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[{"display_name":"Quality
+          education","score":0.49,"id":"https://metadata.un.org/sdg/4"}],"grants":[{"funder":"https://openalex.org/F4320306076","funder_display_name":"National
+          Science Foundation","award_id":"1751471"},{"funder":"https://openalex.org/F4320320924","funder_display_name":"Schweizerischer
+          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","award_id":"180544"}],"datasets":[],"versions":[],"referenced_works_count":57,"referenced_works":["https://openalex.org/W1964666522","https://openalex.org/W1972905466","https://openalex.org/W1988037271","https://openalex.org/W1995396482","https://openalex.org/W2034354062","https://openalex.org/W2037825667","https://openalex.org/W2119396661","https://openalex.org/W2126363023","https://openalex.org/W2189911347","https://openalex.org/W2324964582","https://openalex.org/W2478294658","https://openalex.org/W2529996553","https://openalex.org/W2594183968","https://openalex.org/W2606363443","https://openalex.org/W2747592475","https://openalex.org/W2903262661","https://openalex.org/W2966357564","https://openalex.org/W2968071222","https://openalex.org/W2970764640","https://openalex.org/W2987091515","https://openalex.org/W2998702515","https://openalex.org/W3010145447","https://openalex.org/W3014089210","https://openalex.org/W3023658436","https://openalex.org/W3088999551","https://openalex.org/W3094640617","https://openalex.org/W3094686696","https://openalex.org/W3097758405","https://openalex.org/W3098269892","https://openalex.org/W3101155908","https://openalex.org/W3103092523","https://openalex.org/W3121024033","https://openalex.org/W3123901912","https://openalex.org/W3128474010","https://openalex.org/W3129039627","https://openalex.org/W3157679602","https://openalex.org/W3179394107","https://openalex.org/W3198449425","https://openalex.org/W4220681836","https://openalex.org/W4220715560","https://openalex.org/W4220747243","https://openalex.org/W4225876201","https://openalex.org/W4226159083","https://openalex.org/W4281669078","https://openalex.org/W4283034548","https://openalex.org/W4285093994","https://openalex.org/W4306845856","https://openalex.org/W4310603653","https://openalex.org/W4319996831","https://openalex.org/W4327564965","https://openalex.org/W4365794116","https://openalex.org/W4385571219","https://openalex.org/W4387567938","https://openalex.org/W4389519254","https://openalex.org/W4389520103","https://openalex.org/W4389991792","https://openalex.org/W4391561379"],"related_works":["https://openalex.org/W4391375266","https://openalex.org/W4387497383","https://openalex.org/W2948807893","https://openalex.org/W2778153218","https://openalex.org/W2748952813","https://openalex.org/W2527526854","https://openalex.org/W2078814861","https://openalex.org/W1986764834","https://openalex.org/W1976181487","https://openalex.org/W1531601525"],"abstract_inverted_index":{"Abstract":[0],"Large":[1],"language":[2],"models":[3,19],"(LLMs)":[4],"have":[5],"shown":[6],"strong":[7],"performance":[8,67],"in":[9,30,68,108],"tasks":[10,43],"across":[11,44],"domains":[12],"but":[13,128],"struggle":[14],"with":[15],"chemistry-related":[16],"problems.":[17],"These":[18],"also":[20,129],"lack":[21],"access":[22],"to":[23,41],"external":[24],"knowledge":[25],"sources,":[26],"limiting":[27],"their":[28],"usefulness":[29],"scientific":[31,131],"applications.":[32],"We":[33],"introduce":[34],"ChemCrow,":[35],"an":[36,83],"LLM":[37,66,101],"chemistry":[38],"agent":[39,75],"designed":[40],"accomplish":[42],"organic":[45],"synthesis,":[46],"drug":[47],"discovery":[48,92],"and":[49,57,70,78,86,89,102,123,139],"materials":[50],"design.":[51],"By":[52],"integrating":[53],"18":[54],"expert-designed":[55],"tools":[56],"using":[58],"GPT-4":[59],"as":[60],"the":[61,65,80,91,135],"LLM,":[62],"ChemCrow":[63],"augments":[64],"chemistry,":[69],"new":[71],"capabilities":[72],"emerge.":[73],"Our":[74,97,116],"autonomously":[76],"planned":[77],"executed":[79],"syntheses":[81],"of":[82,93,113],"insect":[84],"repellent":[85],"three":[87],"organocatalysts":[88],"guided":[90],"a":[94,110],"novel":[95],"chromophore.":[96],"evaluation,":[98],"including":[99],"both":[100],"expert":[103,121],"assessments,":[104],"demonstrates":[105],"ChemCrow\u2019s":[106],"effectiveness":[107],"automating":[109],"diverse":[111],"set":[112],"chemical":[114],"tasks.":[115],"work":[117],"not":[118],"only":[119],"aids":[120],"chemists":[122],"lowers":[124],"barriers":[125],"for":[126],"non-experts":[127],"fosters":[130],"advancement":[132],"by":[133],"bridging":[134],"gap":[136],"between":[137],"experimental":[138],"computational":[140],"chemistry.":[141]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4396723768","counts_by_year":[{"year":2024,"cited_by_count":40},{"year":2023,"cited_by_count":3}],"updated_date":"2024-10-08T05:03:44.286409","created_date":"2024-05-09"}],"group_by":[]}
+
+          '
+      headers:
+        Access-Control-Allow-Credentials:
+          - "true"
+        Access-Control-Allow-Headers:
+          - Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Authorization, Cache-Control
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "6141"
+        Content-Security-Policy:
+          - default-src 'self'; object-src 'none'
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 09 Oct 2024 21:23:18 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728508998&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=3GaemXSfYtRw6ZfJh4tLMCARBb8uTetHYuPqrpO3me0%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728508998&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=3GaemXSfYtRw6ZfJh4tLMCARBb8uTetHYuPqrpO3me0%3D
+        Server:
+          - gunicorn
+        Strict-Transport-Security:
+          - max-age=31556926; includeSubDomains
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+        X-Api-Pool:
+          - common
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - SAMEORIGIN
+        X-Xss-Protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2317298,"items":[{"indexed":{"date-parts":[[2024,9,20]],"date-time":"2024-09-20T17:08:43Z","timestamp":1726852123984},"reference-count":103,"publisher":"Springer
+          Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
+          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
+          Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
+          Mach Intell"],"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Large
+          language models (LLMs) have shown strong performance in tasks across domains
+          but struggle with chemistry-related problems. These models also lack access
+          to external knowledge sources, limiting their usefulness in scientific applications.
+          We introduce ChemCrow, an LLM chemistry agent designed to accomplish tasks
+          across organic synthesis, drug discovery and materials design. By integrating
+          18 expert-designed tools and using GPT-4 as the LLM, ChemCrow augments the
+          LLM performance in chemistry, and new capabilities emerge. Our agent autonomously
+          planned and executed the syntheses of an insect repellent and three organocatalysts
+          and guided the discovery of a novel chromophore. Our evaluation, including
+          both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
+          in automating a diverse set of chemical tasks. Our work not only aids expert
+          chemists and lowers barriers for non-experts but also fosters scientific advancement
+          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":21,"title":["Augmenting
+          large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
+          Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
+          D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
+          J., Chang, M.-W., Lee, K. & Toutanova, K. Bert: pre-training of deep bidirectional
+          transformers for language understanding. In Proc. Conference of the North
+          American Chapter of the Association for Computational Linguistics: Human Language
+          Technologies (eds Burstein, J. et al.) 4171\u20134186 (Association for Computational
+          Linguistics, 2019)."},{"key":"832_CR2","first-page":"1877","volume":"33","author":"T
+          Brown","year":"2020","unstructured":"Brown, T. et al. Language models are
+          few-shot learners. Adv. Neural Inf. Process. Syst. 33, 1877\u20131901 (2020).","journal-title":"Adv.
+          Neural Inf. Process. Syst."},{"key":"832_CR3","unstructured":"Bommasani, R.
+          et al. On the opportunities and risks of foundation models. Preprint at https:\/\/arxiv.org\/abs\/2108.07258
+          (2021)."},{"key":"832_CR4","first-page":"1","volume":"24","author":"A Chowdhery","year":"2023","unstructured":"Chowdhery,
+          A. et al. Palm: scaling language modeling with pathways. J. Mach. Learn. Res.
+          24, 1\u2013113 (2023).","journal-title":"J. Mach. Learn. Res."},{"key":"832_CR5","unstructured":"Bubeck,
+          S. et al. Sparks of artificial general intelligence: early experiments with
+          gpt-4. Preprint at https:\/\/arxiv.org\/abs\/2303.12712 (2023)."},{"key":"832_CR6","unstructured":"Github
+          Copilot. GitHub https:\/\/copilot.github.com (2023)."},{"key":"832_CR7","unstructured":"Li,
+          R. et al. Starcoder: may the source be with you! Trans. Mach. Learn. Res.
+          https:\/\/openreview.net\/pdf?id=KoFOg41haE (2023)."},{"key":"832_CR8","doi-asserted-by":"crossref","unstructured":"Ziegler,
+          A. et al. Productivity assessment of neural code completion. In Proc. 6th
+          ACM SIGPLAN International Symposium on Machine Programming (eds Chaudhuri,
+          S. and Sutton, C.) 21\u201329 (ACM, 2022).","DOI":"10.1145\/3520312.3534864"},{"key":"832_CR9","unstructured":"Vaswani,
+          A. et al. Attention is all you need. In Proc. Advances in Neural Information
+          Processing Systems 30 (eds. Guyon, I. et al.) 5999\u20136009 (Curran Associates,
+          2017)."},{"key":"832_CR10","unstructured":"Schick, T. et al. Toolformer: language
+          models can teach themselves to use tools. In Proc. Advances in Neural Information
+          Processing Systems 36 (eds. Oh, A. et al.) 68539\u201368551 (Curran Associates,
+          2023)."},{"key":"832_CR11","doi-asserted-by":"publisher","first-page":"1649","DOI":"10.1021\/acs.jcim.3c00285","volume":"63","author":"CM
+          Castro Nascimento","year":"2023","unstructured":"Castro Nascimento, C. M.
+          & Pimentel, A. S. Do large language models understand chemistry? A conversation
+          with ChatGPT. J. Chem. Inf. Model. 63, 1649\u20131655 (2023).","journal-title":"J.
+          Chem. Inf. Model."},{"key":"832_CR12","unstructured":"OpenAI. GPT-4 technical
+          report. Preprint at https:\/\/arxiv.org\/abs\/2303.08774 (2023)."},{"key":"832_CR13","first-page":"27730","volume":"35","author":"L
+          Ouyang","year":"2022","unstructured":"Ouyang, L. et al. Training language
+          models to follow instructions with human feedback. Adv. Neural Inf. Process.
+          Syst. 35, 27730\u201327744 (2022).","journal-title":"Adv. Neural Inf. Process.
+          Syst."},{"key":"832_CR14","doi-asserted-by":"publisher","first-page":"368","DOI":"10.1039\/D2DD00087C","volume":"2","author":"AD
+          White","year":"2023","unstructured":"White, A. D. et al. Assessment of chemistry
+          knowledge in large language models that generate code. Digit. Discov. 2, 368\u2013376
+          (2023).","journal-title":"Digit. Discov."},{"key":"832_CR15","doi-asserted-by":"publisher","first-page":"739","DOI":"10.1021\/ci100384d","volume":"51","author":"DM
+          Lowe","year":"2011","unstructured":"Lowe, D. M., Corbett, P. T., Murray-Rust,
+          P. & Glen, R. C. Chemical name to structure: Opsin, an open source solution.
+          J. Chem. Inf. Model. 51, 739\u2013753 (2011).","journal-title":"J. Chem. Inf.
+          Model."},{"key":"832_CR16","doi-asserted-by":"publisher","first-page":"434","DOI":"10.1021\/acscentsci.7b00064","volume":"3","author":"CW
+          Coley","year":"2017","unstructured":"Coley, C. W., Barzilay, R., Jaakkola,
+          T. S., Green, W. H. & Jensen, K. F. Prediction of organic reaction outcomes
+          using machine learning. ACS Cent. Sci. 3, 434\u2013443 (2017).","journal-title":"ACS
+          Cent. Sci."},{"key":"832_CR17","doi-asserted-by":"publisher","first-page":"370","DOI":"10.1039\/C8SC04228D","volume":"10","author":"CW
+          Coley","year":"2019","unstructured":"Coley, C. W. et al. A graph-convolutional
+          neural network model for the prediction of chemical reactivity. Chem. Sci.
+          10, 370\u2013377 (2019).","journal-title":"Chem. Sci."},{"key":"832_CR18","doi-asserted-by":"publisher","first-page":"1572","DOI":"10.1021\/acscentsci.9b00576","volume":"5","author":"P
+          Schwaller","year":"2019","unstructured":"Schwaller, P. et al. Molecular transformer:
+          a model for uncertainty-calibrated chemical reaction prediction. ACS Cent.
+          Sci. 5, 1572\u20131583 (2019).","journal-title":"ACS Cent. Sci."},{"key":"832_CR19","doi-asserted-by":"publisher","first-page":"4874","DOI":"10.1038\/s41467-020-18671-7","volume":"11","author":"G
+          Pesciullesi","year":"2020","unstructured":"Pesciullesi, G., Schwaller, P.,
+          Laino, T. & Reymond, J.-L. Transfer learning enables the molecular transformer
+          to predict regio-and stereoselective reactions on carbohydrates. Nat. Commun.
+          11, 4874 (2020).","journal-title":"Nat. Commun."},{"key":"832_CR20","doi-asserted-by":"publisher","first-page":"015022","DOI":"10.1088\/2632-2153\/ac3ffb","volume":"3","author":"R
+          Irwin","year":"2022","unstructured":"Irwin, R., Dimitriadis, S., He, J. &
+          Bjerrum, E. J. Chemformer: a pre-trained transformer for computational chemistry.
+          Mach. Learn. Sci.Technol. 3, 015022 (2022).","journal-title":"Mach. Learn.
+          Sci.Technol."},{"key":"832_CR21","doi-asserted-by":"publisher","first-page":"5904","DOI":"10.1002\/anie.201506101","volume":"55","author":"S
+          Szymkuc","year":"2016","unstructured":"Szymkuc, S. et al. Computer-assisted
+          synthetic planning: the end of the beginning. Angew. Chem. Int. Ed. Engl.
+          55, 5904\u20135937 (2016).","journal-title":"Angew. Chem. Int. Ed. Engl."},{"key":"832_CR22","doi-asserted-by":"publisher","first-page":"604","DOI":"10.1038\/nature25978","volume":"555","author":"MH
+          Segler","year":"2018","unstructured":"Segler, M. H., Preuss, M. & Waller,
+          M. P. Planning chemical syntheses with deep neural networks and symbolic AI.
+          Nature 555, 604\u2013610 (2018).","journal-title":"Nature"},{"key":"832_CR23","doi-asserted-by":"crossref","unstructured":"Coley,
+          C. W. et al. A robotic platform for flow synthesis of organic compounds informed
+          by AI planning. Science 365 (2019).","DOI":"10.1126\/science.aax1566"},{"key":"832_CR24","doi-asserted-by":"publisher","first-page":"3316","DOI":"10.1039\/C9SC05704H","volume":"11","author":"P
+          Schwaller","year":"2020","unstructured":"Schwaller, P. et al. Predicting retrosynthetic
+          pathways using transformer-based models and a hyper-graph exploration strategy.
+          Chem. Sci. 11, 3316\u20133325 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR25","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1186\/s13321-020-00472-1","volume":"12","author":"S
+          Genheden","year":"2020","unstructured":"Genheden, S. et al. AiZynthFinder:
+          a fast, robust and flexible open-source software for retrosynthetic planning.
+          J. Cheminf. 12, 1\u20139 (2020).","journal-title":"J. Cheminf."},{"key":"832_CR26","doi-asserted-by":"publisher","first-page":"1094","DOI":"10.1021\/acs.accounts.0c00714","volume":"54","author":"K
+          Molga","year":"2021","unstructured":"Molga, K., Szymkuc, S. & Grzybowski,
+          B. A. Chemist ex machina: advanced synthesis planning by computers. Acc. Chem.
+          Res. 54, 1094\u20131106 (2021).","journal-title":"Acc. Chem. Res."},{"key":"832_CR27","doi-asserted-by":"publisher","first-page":"e1604","DOI":"10.1002\/wcms.1604","volume":"12","author":"P
+          Schwaller","year":"2022","unstructured":"Schwaller, P. et al. Machine intelligence
+          for chemical reaction space. Wiley Interdiscip. Rev. Comput. Mol. Sci. 12,
+          e1604 (2022).","journal-title":"Wiley Interdiscip. Rev. Comput. Mol. Sci."},{"key":"832_CR28","doi-asserted-by":"publisher","first-page":"80","DOI":"10.3389\/fenvs.2015.00080","volume":"3","author":"A
+          Mayr","year":"2016","unstructured":"Mayr, A., Klambauer, G., Unterthiner,
+          T. & Hochreiter, S. Deeptox: toxicity prediction using deep learning. Front.
+          Environ. Sci. 3, 80 (2016).","journal-title":"Front. Environ. Sci."},{"key":"832_CR29","doi-asserted-by":"publisher","first-page":"3370","DOI":"10.1021\/acs.jcim.9b00237","volume":"59","author":"K
+          Yang","year":"2019","unstructured":"Yang, K. et al. Analyzing learned molecular
+          representations for property prediction. J. Chem. Inf. Model. 59, 3370\u20133388
+          (2019).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR30","unstructured":"Chithrananda,
+          S., Grand, G. & Ramsundar, B. Chemberta: large-scale self-supervised pretraining
+          for molecular property prediction. Preprint at https:\/\/arxiv.org\/abs\/2010.09885
+          (2020)."},{"key":"832_CR31","doi-asserted-by":"publisher","first-page":"5938","DOI":"10.1021\/acs.jcim.2c01073","volume":"62","author":"D
+          van Tilborg","year":"2022","unstructured":"van Tilborg, D., Alenicheva, A.
+          & Grisoni, F. Exposing the limitations of molecular machine learning with
+          activity cliffs. J. Chem. Inf. Model. 62, 5938\u20135951 (2022).","journal-title":"J.
+          Chem. Inf. Model."},{"key":"832_CR32","doi-asserted-by":"publisher","first-page":"161","DOI":"10.1038\/s42256-023-00788-1","volume":"6","author":"KM
+          Jablonka","year":"2024","unstructured":"Jablonka, K. M., Schwaller, P., Ortega-Guerrero,
+          A. & Smit, B. Leveraging large language models for predictive chemistry. Nat.
+          Mach. Intell. 6, 161\u2013169 (2024).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR33","doi-asserted-by":"publisher","first-page":"268","DOI":"10.1021\/acscentsci.7b00572","volume":"4","author":"R
+          G\u00f3mez-Bombarelli","year":"2018","unstructured":"G\u00f3mez-Bombarelli,
+          R. et al. Automatic chemical design using a data-driven continuous representation
+          of molecules. ACS Cent. Sci. 4, 268\u2013276 (2018).","journal-title":"ACS
+          Cent. Sci."},{"key":"832_CR34","doi-asserted-by":"publisher","first-page":"5918","DOI":"10.1021\/acs.jcim.0c00915","volume":"60","author":"T
+          Blaschke","year":"2020","unstructured":"Blaschke, T. et al. Reinvent 2.0:
+          an AI tool for de novo drug design. J. Chem. Inf. Model. 60, 5918\u20135922
+          (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR35","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1038\/s41524-021-00495-8","volume":"7","author":"Q
+          Tao","year":"2021","unstructured":"Tao, Q., Xu, P., Li, M. & Lu, W. Machine
+          learning for perovskite materials design and discovery. NPJ Comput. Mater.
+          7, 1\u201318 (2021).","journal-title":"NPJ Comput. Mater."},{"key":"832_CR36","doi-asserted-by":"publisher","first-page":"1120","DOI":"10.1038\/nmat4717","volume":"15","author":"R
+          G\u00f3mez-Bombarelli","year":"2016","unstructured":"G\u00f3mez-Bombarelli,
+          R. et al. Design of efficient molecular organic light-emitting diodes by a
+          high-throughput virtual screening and experimental approach. Nat. Mater. 15,
+          1120\u20131127 (2016).","journal-title":"Nat. Mater."},{"key":"832_CR37","doi-asserted-by":"publisher","first-page":"89","DOI":"10.1038\/s41586-021-03213-y","volume":"590","author":"BJ
+          Shields","year":"2021","unstructured":"Shields, B. J. et al. Bayesian reaction
+          optimization as a tool for chemical synthesis. Nature 590, 89\u201396 (2021).","journal-title":"Nature"},{"key":"832_CR38","doi-asserted-by":"publisher","first-page":"19999","DOI":"10.1021\/jacs.2c08592","volume":"144","author":"JAG
+          Torres","year":"2022","unstructured":"Torres, J. A. G. et al. A multi-objective
+          active learning platform and web app for reaction optimization. J. Am. Chem.
+          Soc. 144, 19999\u201320007 (2022).","journal-title":"J. Am. Chem. Soc."},{"key":"832_CR39","unstructured":"Ramos,
+          M. C., Michtavy, S. S., Porosoff, M. D. & White, A. D. Bayesian optimization
+          of catalysts with in-context learning. Preprint at https:\/\/arxiv.org\/abs\/2304.05341
+          (2023)."},{"key":"832_CR40","doi-asserted-by":"crossref","unstructured":"Marra,
+          G., Giannini, F., Diligenti, M. & Gori, M. Integrating learning and reasoning
+          with deep logic models. In Proc. Machine Learning and Knowledge Discovery
+          in Databases, Part II (eds. Hutter, F. et al.) 517\u2013532 (Springer, 2020).","DOI":"10.1007\/978-3-030-46147-8_31"},{"key":"832_CR41","first-page":"24824","volume":"35","author":"J
+          Wei","year":"2022","unstructured":"Wei, J. et al. Chain-of-thought prompting
+          elicits reasoning in large language models. Adv. Neural Inf. Process. Syst.
+          35, 24824\u201324837 (2022).","journal-title":"Adv. Neural Inf. Process. Syst."},{"key":"832_CR42","doi-asserted-by":"crossref","unstructured":"Ho,
+          N., Schmid, L. & Yun, S.-Y. Large language models are reasoning teachers.
+          In Proc. 61st Annual Meeting of the Association for Computational Linguistics
+          (Volume 1: Long Papers) (eds. Rogers, A. et al.) 14852\u201314882 (ACL, 2023).","DOI":"10.18653\/v1\/2023.acl-long.830"},{"key":"832_CR43","unstructured":"Yao,
+          S. et al. ReAct: synergizing reasoning and acting in language models. In Proc.
+          11th International Conference on Learning Representations (OpenReview, 2023)."},{"key":"832_CR44","first-page":"15476","volume":"35","author":"E
+          Zelikman","year":"2022","unstructured":"Zelikman, E., Wu, Y., Mu, J. & Goodman,
+          N. Star: bootstrapping reasoning with reasoning. Adv. Neural Inf. Process.
+          Syst. 35, 15476\u201315488 (2022).","journal-title":"Adv. Neural Inf. Process.
+          Syst."},{"key":"832_CR45","doi-asserted-by":"publisher","first-page":"266","DOI":"10.1039\/D2DD00004K","volume":"1","author":"Z-W
+          Zhao","year":"2022","unstructured":"Zhao, Z.-W., del Cueto, M. & Troisi, A.
+          Limitations of machine learning models when predicting compounds with completely
+          new chemistries: possible improvements applied to the discovery of new non-fullerene
+          acceptors. Digit. Discov. 1, 266\u2013276 (2022).","journal-title":"Digit.
+          Discov."},{"key":"832_CR46","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-22951-1","volume":"12","author":"AC
+          Vaucher","year":"2021","unstructured":"Vaucher, A. C. et al. Inferring experimental
+          procedures from text-based representations of chemical reactions. Nat. Commun.
+          12, 2573 (2021).","journal-title":"Nat. Commun."},{"key":"832_CR47","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/s42256-020-00284-w","volume":"3","author":"P
+          Schwaller","year":"2021","unstructured":"Schwaller, P. et al. Mapping the
+          space of chemical reactions using attention-based neural networks. Nat. Mach.
+          Intell. 3, 144\u2013152 (2021).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR48","unstructured":"RXN
+          for Chemistry. rxn4Chemistry. GitHub https:\/\/github.com\/rxn4chemistry\/rxn4chemistry
+          (2020)."},{"key":"832_CR49","doi-asserted-by":"publisher","first-page":"154","DOI":"10.1039\/C9SC04944D","volume":"11","author":"A
+          Thakkar","year":"2020","unstructured":"Thakkar, A., Kogej, T., Reymond, J.-L.,
+          Engkvist, O. & Bjerrum, E. J. Datasets and their influence on the development
+          of computer assisted synthesis planning tools in the pharmaceutical domain.
+          Chem. Sci. 11, 154\u2013168 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR50","doi-asserted-by":"publisher","first-page":"8791","DOI":"10.1021\/acs.jmedchem.9b01919","volume":"63","author":"A
+          Thakkar","year":"2020","unstructured":"Thakkar, A., Selmi, N., Reymond, J.-L.,
+          Engkvist, O. & Bjerrum, E. J. \u2018Ring breaker\u2019: neural network driven
+          synthesis prediction of the ring system chemical space. J. Med. Chem. 63,
+          8791\u20138808 (2020).","journal-title":"J. Med. Chem."},{"key":"832_CR51","unstructured":"Yang,
+          Z. et al. Mm-react: prompting ChatGPT for multimodal reasoning and action.
+          Preprint at https:\/\/arxiv.org\/abs\/2303.11381 (2023)."},{"key":"832_CR52","unstructured":"Shen,
+          Y. et al. Hugginggpt: solving AI tasks with chatgpt and its friends in huggingface.
+          Poster at Advances in Neural Information Processing Systems 36 (2023)."},{"key":"832_CR53","unstructured":"Karpas,
+          E. et al. Mrkl systems: a modular, neuro-symbolic architecture that combines
+          large language models, external knowledge sources and discrete reasoning.
+          Preprint at https:\/\/arxiv.org\/abs\/2205.00445 (2022)."},{"key":"832_CR54","doi-asserted-by":"publisher","first-page":"570","DOI":"10.1038\/s41586-023-06792-0","volume":"624","author":"DA
+          Boiko","year":"2023","unstructured":"Boiko, D. A., MacKnight, R., Kline, B.
+          & Gomes, G. Autonomous chemical research with large language models. Nature
+          624, 570\u2013578 (2023).","journal-title":"Nature"},{"key":"832_CR55","unstructured":"RoboRXN.
+          IBM https:\/\/research.ibm.com\/science\/ibm-roborxn\/ (2021)."},{"key":"832_CR56","doi-asserted-by":"publisher","first-page":"407","DOI":"10.1002\/chem.200390042","volume":"9","author":"A
+          Wittkopp","year":"2003","unstructured":"Wittkopp, A. & Schreiner, P. R. Metal-free,
+          noncovalent catalysis of Diels-Alder reactions by neutral hydrogen bond donors
+          in organic solvents and in water. Chem. Eur. J. 9, 407\u2013414 (2003).","journal-title":"Chem.
+          Eur. J."},{"key":"832_CR57","doi-asserted-by":"publisher","first-page":"217","DOI":"10.1021\/ol017117s","volume":"4","author":"PR
+          Schreiner","year":"2002","unstructured":"Schreiner, P. R. & Wittkopp, A. H-bonding
+          additives act like Lewis acid catalysts. Org. Lett. 4, 217\u2013220 (2002).","journal-title":"Org.
+          Lett."},{"key":"832_CR58","doi-asserted-by":"publisher","first-page":"6576","DOI":"10.1002\/anie.200500227","volume":"44","author":"RP
+          Herrera","year":"2005","unstructured":"Herrera, R. P., Sgarzani, V., Bernardi,
+          L. & Ricci, A. Catalytic enantioselective friedel-crafts alkylation of indoles
+          with nitroalkenes by using a simple thiourea organocatalyst. Angew. Chem.
+          Int. Ed. Engl. 44, 6576\u20136579 (2005).","journal-title":"Angew. Chem. Int.
+          Ed. Engl."},{"key":"832_CR59","doi-asserted-by":"publisher","first-page":"12672","DOI":"10.1021\/ja036972z","volume":"125","author":"T
+          Okino","year":"2003","unstructured":"Okino, T., Hoashi, Y. & Takemoto, Y.
+          Enantioselective Michael reaction of malonates to nitroolefins catalyzed by
+          bifunctional organocatalysts. J. Am. Chem. Soc. 125, 12672\u201312673 (2003).","journal-title":"J.
+          Am. Chem. Soc."},{"key":"832_CR60","unstructured":"Joung, J. F., Han, M.,
+          Jeong, M. & Park, S. DB for chromophore. figshare https:\/\/figshare.com\/articles\/dataset\/DB_for_chromophore\/12045567
+          (2020)."},{"key":"832_CR61","unstructured":"Lowe, D. M. Extraction of Chemical
+          Structures and Reactions from the Literature. PhD thesis, Univ. of Cambridge
+          (2012)."},{"key":"832_CR62","doi-asserted-by":"publisher","first-page":"513","DOI":"10.1039\/C7SC02664A","volume":"9","author":"Z
+          Wu","year":"2018","unstructured":"Wu, Z. et al. Moleculenet: a benchmark for
+          molecular machine learning. Chem. Sci. 9, 513\u2013530 (2018).","journal-title":"Chem.
+          Sci."},{"key":"832_CR63","doi-asserted-by":"crossref","unstructured":"Liu,
+          Y. et al. G-Eval: NLG evaluation using GPT-4 with better human alignment.
+          In Proc. Conference on Empirical Methods in Natural Language Processing (eds.
+          Bouamor, H. et al.) 2511\u20132522 (ACL, 2023).","DOI":"10.18653\/v1\/2023.emnlp-main.153"},{"key":"832_CR64","unstructured":"Eloundou,
+          T., Manning, S., Mishkin, P. & Rock, D. GPTs are GPTs: an early look at the
+          labor market impact potential of large language models. Preprint at https:\/\/arxiv.org\/abs\/2303.10130
+          (2023)."},{"key":"832_CR65","doi-asserted-by":"publisher","first-page":"e1630","DOI":"10.1002\/wcms.1630","volume":"13","author":"BA
+          Grzybowski","year":"2023","unstructured":"Grzybowski, B. A., Badowski, T.,
+          Molga, K. & Szymkuc, S. Network search algorithms and scoring functions for
+          advanced-level computerized synthesis planning. Wiley Interdiscip. Rev. Comput.
+          Mol. Sci. 13, e1630 (2023).","journal-title":"Wiley Interdiscip. Rev. Comput.
+          Mol. Sci."},{"key":"832_CR66","doi-asserted-by":"publisher","first-page":"27","DOI":"10.1039\/D0RE00340A","volume":"6","author":"A
+          Thakkar","year":"2021","unstructured":"Thakkar, A. et al. Artificial intelligence
+          and automation in computer aided synthesis planning. React. Chem. Eng. 6,
+          27\u201351 (2021).","journal-title":"React. Chem. Eng."},{"key":"832_CR67","doi-asserted-by":"publisher","first-page":"189","DOI":"10.1038\/s42256-022-00465-9","volume":"4","author":"F
+          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
+          C. & Ekins, S. Dual use of artificial-intelligence-powered drug discovery.
+          Nat. Mach. Intell. 4, 189\u2013191 (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR68","doi-asserted-by":"publisher","first-page":"607","DOI":"10.1038\/s42256-022-00511-6","volume":"4","author":"F
+          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
+          C. & Ekins, S. A teachable moment for dual-use. Nat. Mach. Intell. 4, 607\u2013607
+          (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR69","unstructured":"Campbell,
+          Q. L., Herington, J. & White, A. D. Censoring chemical data to mitigate dual
+          use risk. Preprint at https:\/\/arxiv.org\/abs\/2304.10510 (2023)."},{"key":"832_CR70","unstructured":"Gao,
+          L., Schulman, J. & Hilton, J. Scaling laws for reward model overoptimization.
+          In Proc. International Conference on Machine Learning (eds Krause, A. et al.)
+          10835\u201310866 (PMLR, 2023)."},{"key":"832_CR71","unstructured":"Radford,
+          A. et al. Improving language understanding by generative pre-training. OpenAI
+          blog https:\/\/cdn.openai.com\/research-covers\/language-unsupervised\/language_understanding_paper.pdf
+          (2018)."},{"key":"832_CR72","first-page":"1\u201346","volume":"55","author":"B
+          Li","year":"2021","unstructured":"Li, B. et al. Trustworthy AI: from principles
+          to practices. ACM Comput. Surv. 55, 1\u201346 (2021).","journal-title":"ACM
+          Comput. Surv."},{"key":"832_CR73","doi-asserted-by":"publisher","first-page":"79","DOI":"10.1039\/D1DD00009H","volume":"1","author":"GM
+          Hocky","year":"2022","unstructured":"Hocky, G. M. & White, A. D. Natural language
+          processing models that automate programming will transform chemistry research
+          and teaching. Dig. Discov. 1, 79\u201383 (2022).","journal-title":"Dig. Discov."},{"key":"832_CR74","doi-asserted-by":"crossref","unstructured":"Henderson,
+          P. et al. Foundation models and fair use. Preprint at https:\/\/arxiv.org\/abs\/2303.15715
+          (2023).","DOI":"10.2139\/ssrn.4404340"},{"key":"832_CR75","unstructured":"Askell,
+          A., Brundage, M. & Hadfield, G. The role of cooperation in responsible AI
+          development. Preprint at https:\/\/arxiv.org\/abs\/1907.04534 (2019)."},{"key":"832_CR76","doi-asserted-by":"publisher","first-page":"101649","DOI":"10.1016\/j.techsoc.2021.101649","volume":"66","author":"RD
+          Neufville","year":"2021","unstructured":"Neufville, R. D. & Baum, S. D. Collective
+          action on artificial intelligence: a primer and review. Technol. Soc. 66,
+          101649 (2021).","journal-title":"Technol. Soc."},{"key":"832_CR77","unstructured":"Touvron,
+          H. et al. Llama: open and efficient foundation language models. Preprint at
+          https:\/\/arxiv.org\/abs\/2302.13971 (2023)."},{"key":"832_CR78","unstructured":"Chiang,
+          W.-L. et al. Vicuna: an open-source chatbot impressing GPT-4 with 90%* ChatGPT
+          quality. LMSYS Org. https:\/\/lmsys.org\/blog\/2023-03-30-vicuna\/ (2023)."},{"key":"832_CR79","unstructured":"Mukherjee,
+          S. et al. Orca: progressive learning from complex explanation traces of GPT-4.
+          Preprint at https:\/\/arxiv.org\/abs\/2306.02707 (2023)."},{"key":"832_CR80","unstructured":"Chase,
+          H. LangChain. GitHub https:\/\/github.com\/hwchase17\/langchain (2022)."},{"key":"832_CR81","doi-asserted-by":"crossref","unstructured":"Press,
+          O. et al. Measuring and narrowing the compositionality gap in language models.
+          In Proc. Association for Computational Linguistics: EMNLP (eds. Bouamor, H.
+          et al.) 5687\u20135711 (ACL, 2023).","DOI":"10.18653\/v1\/2023.findings-emnlp.378"},{"key":"832_CR82","unstructured":"Google
+          search API. SerpApi https:\/\/serpapi.com\/ (2023)."},{"key":"832_CR83","unstructured":"Neelakantan,
+          A. et al. Text and code embeddings by contrastive pre-training. Preprint at
+          https:\/\/arxiv.org\/abs\/2201.10005 (2022)."},{"key":"832_CR84","doi-asserted-by":"publisher","first-page":"535","DOI":"10.1109\/TBDATA.2019.2921572","volume":"7","author":"J
+          Johnson","year":"2019","unstructured":"Johnson, J., Douze, M. & J\u00e9gou,
+          H. Billion-scale similarity search with GPUs. IEEE Trans. Big Data 7, 535\u2013547
+          (2019).","journal-title":"IEEE Trans. Big Data"},{"key":"832_CR85","unstructured":"ChemSpace
+          https:\/\/chem-space.com\/ (2023)."},{"key":"832_CR86","unstructured":"National
+          Center for Biotechnology Information. PubChem. NIH https:\/\/pubchem.ncbi.nlm.nih.gov\/
+          (2023)."},{"key":"832_CR87","doi-asserted-by":"publisher","first-page":"95","DOI":"10.1186\/s13321-023-00765-1","volume":"15","author":"J
+          Medina","year":"2023","unstructured":"Medina, J. & White, A. D. Bloom filters
+          for molecules. J. Cheminf. 15, 95 (2023).","journal-title":"J. Cheminf."},{"key":"832_CR88","doi-asserted-by":"publisher","first-page":"6065","DOI":"10.1021\/acs.jcim.0c00675","volume":"60","author":"JJ
+          Irwin","year":"2020","unstructured":"Irwin, J. J. et al. Zinc20\u2014a free
+          ultralarge-scale chemical database for ligand discovery. J. Chem. Inf. Model.
+          60, 6065\u20136073 (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR89","unstructured":"Chemical
+          Abstracts Service. CAS registry number. CAS www.cas.org\/content\/cas-registry
+          (2023)."},{"key":"832_CR90","unstructured":"Tanimoto, T. T. An Elementary
+          Mathematical Theory of Classification and Prediction (IBM, 1958)."},{"key":"832_CR91","doi-asserted-by":"publisher","first-page":"742","DOI":"10.1021\/ci100050t","volume":"50","author":"D
+          Rogers","year":"2010","unstructured":"Rogers, D. & Hahn, M. Extended-connectivity
+          fingerprints. J. Chem. Inf. Model. 50, 742\u2013754 (2010).","journal-title":"J.
+          Chem. Inf. Model."},{"key":"832_CR92","unstructured":"White, A. D. Synspace.
+          GitHub https:\/\/github.com\/whitead\/synspace (2023)."},{"key":"832_CR93","doi-asserted-by":"publisher","first-page":"3697","DOI":"10.1039\/D1SC05259D","volume":"13","author":"GP
+          Wellawatte","year":"2022","unstructured":"Wellawatte, G. P., Seshadri, A.
+          & White, A. D. Model agnostic generation of counterfactual explanations for
+          molecules. Chem. Sci. 13, 3697\u20133705 (2022).","journal-title":"Chem. Sci."},{"key":"832_CR94","doi-asserted-by":"publisher","first-page":"3093","DOI":"10.1021\/ci200379p","volume":"51","author":"M
+          Hartenfeller","year":"2011","unstructured":"Hartenfeller, M. et al. A collection
+          of robust organic synthesis reactions for in silico molecule design. J. Chem.
+          Inf. Model. 51, 3093\u20133098 (2011).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR95","doi-asserted-by":"publisher","first-page":"12152","DOI":"10.1039\/C9CC05122H","volume":"55","author":"Q
+          Yang","year":"2019","unstructured":"Yang, Q. et al. Molecular transformer
+          unifies reaction prediction and retrosynthesis across pharma chemical space.
+          Chem. Commun. 55, 12152\u201312155 (2019).","journal-title":"Chem. Commun."},{"key":"832_CR96","unstructured":"Purchasable
+          Mcule. Mcule https:\/\/purchasable.mcule.com\/ (2023)."},{"key":"832_CR97","unstructured":"RDKit:
+          open-source cheminformatics (RDKit, 2023); www.rdkit.org"},{"key":"832_CR98","unstructured":"Chemical
+          weapons convention, annex on chemicals, b. schedules of chemicals. OPCW www.opcw.org\/chemical-weapons-convention\/annexes\/annex-chemicals\/annex-chemicals
+          (2024)."},{"key":"832_CR99","unstructured":"The Australia Group. Australia
+          Group common control lists: chemical weapons precursors. Department of Foreign
+          Affairs and Trade www.dfat.gov.au\/publications\/minisite\/theaustraliagroupnet\/site\/en\/controllists.html
+          (2023)."},{"key":"832_CR100","unstructured":"Namerxn (NextMove Software, 2023);
+          www.nextmovesoftware.com\/namerxn.html"},{"key":"832_CR101","doi-asserted-by":"publisher","first-page":"2337","DOI":"10.1039\/b602413k","volume":"4","author":"JS
+          Carey","year":"2006","unstructured":"Carey, J. S., Laffan, D., Thomson, C.
+          & Williams, M. T. Analysis of the reactions used for the preparation of drug
+          candidate molecules. Org. Biomol. Chem. 4, 2337\u20132347 (2006).","journal-title":"Org.
+          Biomol. Chem."},{"key":"832_CR102","doi-asserted-by":"publisher","unstructured":"Bran,
+          A. & Cox, S. ur-whitelab\/chemcrow-runs: Zendo release. Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884645
+          (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
+          A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
+          Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.453835,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
+          History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
+          History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
+          Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"A.D.W.
+          has served as a paid consultant for evaluating AI model safety at OpenAI.
+          The other authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
+          interests"}}]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "10575"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 09 Oct 2024 21:23:18 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.unpaywall.org/v2/search?query=Augmenting%20large%20language%20models%20with%20chemistry%20tools&email=example@papercrow.ai
     response:
       body:
         string:
-          '{"elapsed_seconds":0.347,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
+          '{"elapsed_seconds":0.249,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
           (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"data_standard":2,"doi":"10.1038/s42256-024-00832-8","doi_url":"https://doi.org/10.1038/s42256-024-00832-8","first_oa_location":{"endpoint_id":null,"evidence":"open
           (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-07-28T13:13:26.235272","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"genre":"journal-article","has_repository_copy":true,"is_oa":true,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"2522-5839","journal_issns":"2522-5839","journal_name":"Nature
           Machine Intelligence","oa_locations":[{"endpoint_id":null,"evidence":"open
@@ -1577,17 +2107,17 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "39585"
+          - "39584"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:07 GMT
+          - Wed, 09 Oct 2024 21:23:18 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728262866&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=EejZnfVWmkOMbLkdh5D23Ic8pUWk7blnC4%2Fk5Py8sdY%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728508998&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=HHLl2RikZMdOgUBEg%2F4KQSMiKXPrP5ksf%2B%2BDY6ZlPeA%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1728262866&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=EejZnfVWmkOMbLkdh5D23Ic8pUWk7blnC4%2Fk5Py8sdY%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1728508998&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=HHLl2RikZMdOgUBEg%2F4KQSMiKXPrP5ksf%2B%2BDY6ZlPeA%3D
         Server:
           - gunicorn
         Vary:
@@ -1610,7 +2140,7 @@ interactions:
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
           "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 201, "influentialCitationCount":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 205, "influentialCitationCount":
           11, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
           "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
           "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
@@ -1623,7 +2153,7 @@ interactions:
           M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
           "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
           {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 178.801}]}
+          "name": "P. Schwaller"}], "matchScore": 178.31793}]}
 
           '
       headers:
@@ -1632,390 +2162,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1549"
+          - "1551"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:07 GMT
+          - Wed, 09 Oct 2024 21:23:18 GMT
         Via:
-          - 1.1 acc85cd7bb80090b1fc6f29cede93766.cloudfront.net (CloudFront)
+          - 1.1 61770d955dae13eda6e8f1b3baae4d1e.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - NnLuLimazYpgfW5NtqVV75bSU98bCng_BcwDkgZ-7CGNk30jOS5M-g==
+          - 0hwP5VPcGuNyVtSNBvXZrzJiUoHNvdfApIWeWP-3XO3m0bAk_dB6AQ==
         X-Amz-Cf-Pop:
           - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTg9EULPHcEoMg=
+          - fZsbAGJBPHcElLQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1549"
+          - "1551"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:07 GMT
+          - Wed, 09 Oct 2024 21:23:18 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - f0be0a09-b7d8-4dc2-86b2-5a21fd2b472c
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2315786,"items":[{"indexed":{"date-parts":[[2024,9,20]],"date-time":"2024-09-20T17:08:43Z","timestamp":1726852123984},"reference-count":103,"publisher":"Springer
-          Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
-          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
-          Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
-          Mach Intell"],"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Large
-          language models (LLMs) have shown strong performance in tasks across domains
-          but struggle with chemistry-related problems. These models also lack access
-          to external knowledge sources, limiting their usefulness in scientific applications.
-          We introduce ChemCrow, an LLM chemistry agent designed to accomplish tasks
-          across organic synthesis, drug discovery and materials design. By integrating
-          18 expert-designed tools and using GPT-4 as the LLM, ChemCrow augments the
-          LLM performance in chemistry, and new capabilities emerge. Our agent autonomously
-          planned and executed the syntheses of an insect repellent and three organocatalysts
-          and guided the discovery of a novel chromophore. Our evaluation, including
-          both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
-          in automating a diverse set of chemical tasks. Our work not only aids expert
-          chemists and lowers barriers for non-experts but also fosters scientific advancement
-          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":21,"title":["Augmenting
-          large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
-          Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
-          D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
-          J., Chang, M.-W., Lee, K. & Toutanova, K. Bert: pre-training of deep bidirectional
-          transformers for language understanding. In Proc. Conference of the North
-          American Chapter of the Association for Computational Linguistics: Human Language
-          Technologies (eds Burstein, J. et al.) 4171\u20134186 (Association for Computational
-          Linguistics, 2019)."},{"key":"832_CR2","first-page":"1877","volume":"33","author":"T
-          Brown","year":"2020","unstructured":"Brown, T. et al. Language models are
-          few-shot learners. Adv. Neural Inf. Process. Syst. 33, 1877\u20131901 (2020).","journal-title":"Adv.
-          Neural Inf. Process. Syst."},{"key":"832_CR3","unstructured":"Bommasani, R.
-          et al. On the opportunities and risks of foundation models. Preprint at https:\/\/arxiv.org\/abs\/2108.07258
-          (2021)."},{"key":"832_CR4","first-page":"1","volume":"24","author":"A Chowdhery","year":"2023","unstructured":"Chowdhery,
-          A. et al. Palm: scaling language modeling with pathways. J. Mach. Learn. Res.
-          24, 1\u2013113 (2023).","journal-title":"J. Mach. Learn. Res."},{"key":"832_CR5","unstructured":"Bubeck,
-          S. et al. Sparks of artificial general intelligence: early experiments with
-          gpt-4. Preprint at https:\/\/arxiv.org\/abs\/2303.12712 (2023)."},{"key":"832_CR6","unstructured":"Github
-          Copilot. GitHub https:\/\/copilot.github.com (2023)."},{"key":"832_CR7","unstructured":"Li,
-          R. et al. Starcoder: may the source be with you! Trans. Mach. Learn. Res.
-          https:\/\/openreview.net\/pdf?id=KoFOg41haE (2023)."},{"key":"832_CR8","doi-asserted-by":"crossref","unstructured":"Ziegler,
-          A. et al. Productivity assessment of neural code completion. In Proc. 6th
-          ACM SIGPLAN International Symposium on Machine Programming (eds Chaudhuri,
-          S. and Sutton, C.) 21\u201329 (ACM, 2022).","DOI":"10.1145\/3520312.3534864"},{"key":"832_CR9","unstructured":"Vaswani,
-          A. et al. Attention is all you need. In Proc. Advances in Neural Information
-          Processing Systems 30 (eds. Guyon, I. et al.) 5999\u20136009 (Curran Associates,
-          2017)."},{"key":"832_CR10","unstructured":"Schick, T. et al. Toolformer: language
-          models can teach themselves to use tools. In Proc. Advances in Neural Information
-          Processing Systems 36 (eds. Oh, A. et al.) 68539\u201368551 (Curran Associates,
-          2023)."},{"key":"832_CR11","doi-asserted-by":"publisher","first-page":"1649","DOI":"10.1021\/acs.jcim.3c00285","volume":"63","author":"CM
-          Castro Nascimento","year":"2023","unstructured":"Castro Nascimento, C. M.
-          & Pimentel, A. S. Do large language models understand chemistry? A conversation
-          with ChatGPT. J. Chem. Inf. Model. 63, 1649\u20131655 (2023).","journal-title":"J.
-          Chem. Inf. Model."},{"key":"832_CR12","unstructured":"OpenAI. GPT-4 technical
-          report. Preprint at https:\/\/arxiv.org\/abs\/2303.08774 (2023)."},{"key":"832_CR13","first-page":"27730","volume":"35","author":"L
-          Ouyang","year":"2022","unstructured":"Ouyang, L. et al. Training language
-          models to follow instructions with human feedback. Adv. Neural Inf. Process.
-          Syst. 35, 27730\u201327744 (2022).","journal-title":"Adv. Neural Inf. Process.
-          Syst."},{"key":"832_CR14","doi-asserted-by":"publisher","first-page":"368","DOI":"10.1039\/D2DD00087C","volume":"2","author":"AD
-          White","year":"2023","unstructured":"White, A. D. et al. Assessment of chemistry
-          knowledge in large language models that generate code. Digit. Discov. 2, 368\u2013376
-          (2023).","journal-title":"Digit. Discov."},{"key":"832_CR15","doi-asserted-by":"publisher","first-page":"739","DOI":"10.1021\/ci100384d","volume":"51","author":"DM
-          Lowe","year":"2011","unstructured":"Lowe, D. M., Corbett, P. T., Murray-Rust,
-          P. & Glen, R. C. Chemical name to structure: Opsin, an open source solution.
-          J. Chem. Inf. Model. 51, 739\u2013753 (2011).","journal-title":"J. Chem. Inf.
-          Model."},{"key":"832_CR16","doi-asserted-by":"publisher","first-page":"434","DOI":"10.1021\/acscentsci.7b00064","volume":"3","author":"CW
-          Coley","year":"2017","unstructured":"Coley, C. W., Barzilay, R., Jaakkola,
-          T. S., Green, W. H. & Jensen, K. F. Prediction of organic reaction outcomes
-          using machine learning. ACS Cent. Sci. 3, 434\u2013443 (2017).","journal-title":"ACS
-          Cent. Sci."},{"key":"832_CR17","doi-asserted-by":"publisher","first-page":"370","DOI":"10.1039\/C8SC04228D","volume":"10","author":"CW
-          Coley","year":"2019","unstructured":"Coley, C. W. et al. A graph-convolutional
-          neural network model for the prediction of chemical reactivity. Chem. Sci.
-          10, 370\u2013377 (2019).","journal-title":"Chem. Sci."},{"key":"832_CR18","doi-asserted-by":"publisher","first-page":"1572","DOI":"10.1021\/acscentsci.9b00576","volume":"5","author":"P
-          Schwaller","year":"2019","unstructured":"Schwaller, P. et al. Molecular transformer:
-          a model for uncertainty-calibrated chemical reaction prediction. ACS Cent.
-          Sci. 5, 1572\u20131583 (2019).","journal-title":"ACS Cent. Sci."},{"key":"832_CR19","doi-asserted-by":"publisher","first-page":"4874","DOI":"10.1038\/s41467-020-18671-7","volume":"11","author":"G
-          Pesciullesi","year":"2020","unstructured":"Pesciullesi, G., Schwaller, P.,
-          Laino, T. & Reymond, J.-L. Transfer learning enables the molecular transformer
-          to predict regio-and stereoselective reactions on carbohydrates. Nat. Commun.
-          11, 4874 (2020).","journal-title":"Nat. Commun."},{"key":"832_CR20","doi-asserted-by":"publisher","first-page":"015022","DOI":"10.1088\/2632-2153\/ac3ffb","volume":"3","author":"R
-          Irwin","year":"2022","unstructured":"Irwin, R., Dimitriadis, S., He, J. &
-          Bjerrum, E. J. Chemformer: a pre-trained transformer for computational chemistry.
-          Mach. Learn. Sci.Technol. 3, 015022 (2022).","journal-title":"Mach. Learn.
-          Sci.Technol."},{"key":"832_CR21","doi-asserted-by":"publisher","first-page":"5904","DOI":"10.1002\/anie.201506101","volume":"55","author":"S
-          Szymkuc","year":"2016","unstructured":"Szymkuc, S. et al. Computer-assisted
-          synthetic planning: the end of the beginning. Angew. Chem. Int. Ed. Engl.
-          55, 5904\u20135937 (2016).","journal-title":"Angew. Chem. Int. Ed. Engl."},{"key":"832_CR22","doi-asserted-by":"publisher","first-page":"604","DOI":"10.1038\/nature25978","volume":"555","author":"MH
-          Segler","year":"2018","unstructured":"Segler, M. H., Preuss, M. & Waller,
-          M. P. Planning chemical syntheses with deep neural networks and symbolic AI.
-          Nature 555, 604\u2013610 (2018).","journal-title":"Nature"},{"key":"832_CR23","doi-asserted-by":"crossref","unstructured":"Coley,
-          C. W. et al. A robotic platform for flow synthesis of organic compounds informed
-          by AI planning. Science 365 (2019).","DOI":"10.1126\/science.aax1566"},{"key":"832_CR24","doi-asserted-by":"publisher","first-page":"3316","DOI":"10.1039\/C9SC05704H","volume":"11","author":"P
-          Schwaller","year":"2020","unstructured":"Schwaller, P. et al. Predicting retrosynthetic
-          pathways using transformer-based models and a hyper-graph exploration strategy.
-          Chem. Sci. 11, 3316\u20133325 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR25","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1186\/s13321-020-00472-1","volume":"12","author":"S
-          Genheden","year":"2020","unstructured":"Genheden, S. et al. AiZynthFinder:
-          a fast, robust and flexible open-source software for retrosynthetic planning.
-          J. Cheminf. 12, 1\u20139 (2020).","journal-title":"J. Cheminf."},{"key":"832_CR26","doi-asserted-by":"publisher","first-page":"1094","DOI":"10.1021\/acs.accounts.0c00714","volume":"54","author":"K
-          Molga","year":"2021","unstructured":"Molga, K., Szymkuc, S. & Grzybowski,
-          B. A. Chemist ex machina: advanced synthesis planning by computers. Acc. Chem.
-          Res. 54, 1094\u20131106 (2021).","journal-title":"Acc. Chem. Res."},{"key":"832_CR27","doi-asserted-by":"publisher","first-page":"e1604","DOI":"10.1002\/wcms.1604","volume":"12","author":"P
-          Schwaller","year":"2022","unstructured":"Schwaller, P. et al. Machine intelligence
-          for chemical reaction space. Wiley Interdiscip. Rev. Comput. Mol. Sci. 12,
-          e1604 (2022).","journal-title":"Wiley Interdiscip. Rev. Comput. Mol. Sci."},{"key":"832_CR28","doi-asserted-by":"publisher","first-page":"80","DOI":"10.3389\/fenvs.2015.00080","volume":"3","author":"A
-          Mayr","year":"2016","unstructured":"Mayr, A., Klambauer, G., Unterthiner,
-          T. & Hochreiter, S. Deeptox: toxicity prediction using deep learning. Front.
-          Environ. Sci. 3, 80 (2016).","journal-title":"Front. Environ. Sci."},{"key":"832_CR29","doi-asserted-by":"publisher","first-page":"3370","DOI":"10.1021\/acs.jcim.9b00237","volume":"59","author":"K
-          Yang","year":"2019","unstructured":"Yang, K. et al. Analyzing learned molecular
-          representations for property prediction. J. Chem. Inf. Model. 59, 3370\u20133388
-          (2019).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR30","unstructured":"Chithrananda,
-          S., Grand, G. & Ramsundar, B. Chemberta: large-scale self-supervised pretraining
-          for molecular property prediction. Preprint at https:\/\/arxiv.org\/abs\/2010.09885
-          (2020)."},{"key":"832_CR31","doi-asserted-by":"publisher","first-page":"5938","DOI":"10.1021\/acs.jcim.2c01073","volume":"62","author":"D
-          van Tilborg","year":"2022","unstructured":"van Tilborg, D., Alenicheva, A.
-          & Grisoni, F. Exposing the limitations of molecular machine learning with
-          activity cliffs. J. Chem. Inf. Model. 62, 5938\u20135951 (2022).","journal-title":"J.
-          Chem. Inf. Model."},{"key":"832_CR32","doi-asserted-by":"publisher","first-page":"161","DOI":"10.1038\/s42256-023-00788-1","volume":"6","author":"KM
-          Jablonka","year":"2024","unstructured":"Jablonka, K. M., Schwaller, P., Ortega-Guerrero,
-          A. & Smit, B. Leveraging large language models for predictive chemistry. Nat.
-          Mach. Intell. 6, 161\u2013169 (2024).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR33","doi-asserted-by":"publisher","first-page":"268","DOI":"10.1021\/acscentsci.7b00572","volume":"4","author":"R
-          G\u00f3mez-Bombarelli","year":"2018","unstructured":"G\u00f3mez-Bombarelli,
-          R. et al. Automatic chemical design using a data-driven continuous representation
-          of molecules. ACS Cent. Sci. 4, 268\u2013276 (2018).","journal-title":"ACS
-          Cent. Sci."},{"key":"832_CR34","doi-asserted-by":"publisher","first-page":"5918","DOI":"10.1021\/acs.jcim.0c00915","volume":"60","author":"T
-          Blaschke","year":"2020","unstructured":"Blaschke, T. et al. Reinvent 2.0:
-          an AI tool for de novo drug design. J. Chem. Inf. Model. 60, 5918\u20135922
-          (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR35","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1038\/s41524-021-00495-8","volume":"7","author":"Q
-          Tao","year":"2021","unstructured":"Tao, Q., Xu, P., Li, M. & Lu, W. Machine
-          learning for perovskite materials design and discovery. NPJ Comput. Mater.
-          7, 1\u201318 (2021).","journal-title":"NPJ Comput. Mater."},{"key":"832_CR36","doi-asserted-by":"publisher","first-page":"1120","DOI":"10.1038\/nmat4717","volume":"15","author":"R
-          G\u00f3mez-Bombarelli","year":"2016","unstructured":"G\u00f3mez-Bombarelli,
-          R. et al. Design of efficient molecular organic light-emitting diodes by a
-          high-throughput virtual screening and experimental approach. Nat. Mater. 15,
-          1120\u20131127 (2016).","journal-title":"Nat. Mater."},{"key":"832_CR37","doi-asserted-by":"publisher","first-page":"89","DOI":"10.1038\/s41586-021-03213-y","volume":"590","author":"BJ
-          Shields","year":"2021","unstructured":"Shields, B. J. et al. Bayesian reaction
-          optimization as a tool for chemical synthesis. Nature 590, 89\u201396 (2021).","journal-title":"Nature"},{"key":"832_CR38","doi-asserted-by":"publisher","first-page":"19999","DOI":"10.1021\/jacs.2c08592","volume":"144","author":"JAG
-          Torres","year":"2022","unstructured":"Torres, J. A. G. et al. A multi-objective
-          active learning platform and web app for reaction optimization. J. Am. Chem.
-          Soc. 144, 19999\u201320007 (2022).","journal-title":"J. Am. Chem. Soc."},{"key":"832_CR39","unstructured":"Ramos,
-          M. C., Michtavy, S. S., Porosoff, M. D. & White, A. D. Bayesian optimization
-          of catalysts with in-context learning. Preprint at https:\/\/arxiv.org\/abs\/2304.05341
-          (2023)."},{"key":"832_CR40","doi-asserted-by":"crossref","unstructured":"Marra,
-          G., Giannini, F., Diligenti, M. & Gori, M. Integrating learning and reasoning
-          with deep logic models. In Proc. Machine Learning and Knowledge Discovery
-          in Databases, Part II (eds. Hutter, F. et al.) 517\u2013532 (Springer, 2020).","DOI":"10.1007\/978-3-030-46147-8_31"},{"key":"832_CR41","first-page":"24824","volume":"35","author":"J
-          Wei","year":"2022","unstructured":"Wei, J. et al. Chain-of-thought prompting
-          elicits reasoning in large language models. Adv. Neural Inf. Process. Syst.
-          35, 24824\u201324837 (2022).","journal-title":"Adv. Neural Inf. Process. Syst."},{"key":"832_CR42","doi-asserted-by":"crossref","unstructured":"Ho,
-          N., Schmid, L. & Yun, S.-Y. Large language models are reasoning teachers.
-          In Proc. 61st Annual Meeting of the Association for Computational Linguistics
-          (Volume 1: Long Papers) (eds. Rogers, A. et al.) 14852\u201314882 (ACL, 2023).","DOI":"10.18653\/v1\/2023.acl-long.830"},{"key":"832_CR43","unstructured":"Yao,
-          S. et al. ReAct: synergizing reasoning and acting in language models. In Proc.
-          11th International Conference on Learning Representations (OpenReview, 2023)."},{"key":"832_CR44","first-page":"15476","volume":"35","author":"E
-          Zelikman","year":"2022","unstructured":"Zelikman, E., Wu, Y., Mu, J. & Goodman,
-          N. Star: bootstrapping reasoning with reasoning. Adv. Neural Inf. Process.
-          Syst. 35, 15476\u201315488 (2022).","journal-title":"Adv. Neural Inf. Process.
-          Syst."},{"key":"832_CR45","doi-asserted-by":"publisher","first-page":"266","DOI":"10.1039\/D2DD00004K","volume":"1","author":"Z-W
-          Zhao","year":"2022","unstructured":"Zhao, Z.-W., del Cueto, M. & Troisi, A.
-          Limitations of machine learning models when predicting compounds with completely
-          new chemistries: possible improvements applied to the discovery of new non-fullerene
-          acceptors. Digit. Discov. 1, 266\u2013276 (2022).","journal-title":"Digit.
-          Discov."},{"key":"832_CR46","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-22951-1","volume":"12","author":"AC
-          Vaucher","year":"2021","unstructured":"Vaucher, A. C. et al. Inferring experimental
-          procedures from text-based representations of chemical reactions. Nat. Commun.
-          12, 2573 (2021).","journal-title":"Nat. Commun."},{"key":"832_CR47","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/s42256-020-00284-w","volume":"3","author":"P
-          Schwaller","year":"2021","unstructured":"Schwaller, P. et al. Mapping the
-          space of chemical reactions using attention-based neural networks. Nat. Mach.
-          Intell. 3, 144\u2013152 (2021).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR48","unstructured":"RXN
-          for Chemistry. rxn4Chemistry. GitHub https:\/\/github.com\/rxn4chemistry\/rxn4chemistry
-          (2020)."},{"key":"832_CR49","doi-asserted-by":"publisher","first-page":"154","DOI":"10.1039\/C9SC04944D","volume":"11","author":"A
-          Thakkar","year":"2020","unstructured":"Thakkar, A., Kogej, T., Reymond, J.-L.,
-          Engkvist, O. & Bjerrum, E. J. Datasets and their influence on the development
-          of computer assisted synthesis planning tools in the pharmaceutical domain.
-          Chem. Sci. 11, 154\u2013168 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR50","doi-asserted-by":"publisher","first-page":"8791","DOI":"10.1021\/acs.jmedchem.9b01919","volume":"63","author":"A
-          Thakkar","year":"2020","unstructured":"Thakkar, A., Selmi, N., Reymond, J.-L.,
-          Engkvist, O. & Bjerrum, E. J. \u2018Ring breaker\u2019: neural network driven
-          synthesis prediction of the ring system chemical space. J. Med. Chem. 63,
-          8791\u20138808 (2020).","journal-title":"J. Med. Chem."},{"key":"832_CR51","unstructured":"Yang,
-          Z. et al. Mm-react: prompting ChatGPT for multimodal reasoning and action.
-          Preprint at https:\/\/arxiv.org\/abs\/2303.11381 (2023)."},{"key":"832_CR52","unstructured":"Shen,
-          Y. et al. Hugginggpt: solving AI tasks with chatgpt and its friends in huggingface.
-          Poster at Advances in Neural Information Processing Systems 36 (2023)."},{"key":"832_CR53","unstructured":"Karpas,
-          E. et al. Mrkl systems: a modular, neuro-symbolic architecture that combines
-          large language models, external knowledge sources and discrete reasoning.
-          Preprint at https:\/\/arxiv.org\/abs\/2205.00445 (2022)."},{"key":"832_CR54","doi-asserted-by":"publisher","first-page":"570","DOI":"10.1038\/s41586-023-06792-0","volume":"624","author":"DA
-          Boiko","year":"2023","unstructured":"Boiko, D. A., MacKnight, R., Kline, B.
-          & Gomes, G. Autonomous chemical research with large language models. Nature
-          624, 570\u2013578 (2023).","journal-title":"Nature"},{"key":"832_CR55","unstructured":"RoboRXN.
-          IBM https:\/\/research.ibm.com\/science\/ibm-roborxn\/ (2021)."},{"key":"832_CR56","doi-asserted-by":"publisher","first-page":"407","DOI":"10.1002\/chem.200390042","volume":"9","author":"A
-          Wittkopp","year":"2003","unstructured":"Wittkopp, A. & Schreiner, P. R. Metal-free,
-          noncovalent catalysis of Diels-Alder reactions by neutral hydrogen bond donors
-          in organic solvents and in water. Chem. Eur. J. 9, 407\u2013414 (2003).","journal-title":"Chem.
-          Eur. J."},{"key":"832_CR57","doi-asserted-by":"publisher","first-page":"217","DOI":"10.1021\/ol017117s","volume":"4","author":"PR
-          Schreiner","year":"2002","unstructured":"Schreiner, P. R. & Wittkopp, A. H-bonding
-          additives act like Lewis acid catalysts. Org. Lett. 4, 217\u2013220 (2002).","journal-title":"Org.
-          Lett."},{"key":"832_CR58","doi-asserted-by":"publisher","first-page":"6576","DOI":"10.1002\/anie.200500227","volume":"44","author":"RP
-          Herrera","year":"2005","unstructured":"Herrera, R. P., Sgarzani, V., Bernardi,
-          L. & Ricci, A. Catalytic enantioselective friedel-crafts alkylation of indoles
-          with nitroalkenes by using a simple thiourea organocatalyst. Angew. Chem.
-          Int. Ed. Engl. 44, 6576\u20136579 (2005).","journal-title":"Angew. Chem. Int.
-          Ed. Engl."},{"key":"832_CR59","doi-asserted-by":"publisher","first-page":"12672","DOI":"10.1021\/ja036972z","volume":"125","author":"T
-          Okino","year":"2003","unstructured":"Okino, T., Hoashi, Y. & Takemoto, Y.
-          Enantioselective Michael reaction of malonates to nitroolefins catalyzed by
-          bifunctional organocatalysts. J. Am. Chem. Soc. 125, 12672\u201312673 (2003).","journal-title":"J.
-          Am. Chem. Soc."},{"key":"832_CR60","unstructured":"Joung, J. F., Han, M.,
-          Jeong, M. & Park, S. DB for chromophore. figshare https:\/\/figshare.com\/articles\/dataset\/DB_for_chromophore\/12045567
-          (2020)."},{"key":"832_CR61","unstructured":"Lowe, D. M. Extraction of Chemical
-          Structures and Reactions from the Literature. PhD thesis, Univ. of Cambridge
-          (2012)."},{"key":"832_CR62","doi-asserted-by":"publisher","first-page":"513","DOI":"10.1039\/C7SC02664A","volume":"9","author":"Z
-          Wu","year":"2018","unstructured":"Wu, Z. et al. Moleculenet: a benchmark for
-          molecular machine learning. Chem. Sci. 9, 513\u2013530 (2018).","journal-title":"Chem.
-          Sci."},{"key":"832_CR63","doi-asserted-by":"crossref","unstructured":"Liu,
-          Y. et al. G-Eval: NLG evaluation using GPT-4 with better human alignment.
-          In Proc. Conference on Empirical Methods in Natural Language Processing (eds.
-          Bouamor, H. et al.) 2511\u20132522 (ACL, 2023).","DOI":"10.18653\/v1\/2023.emnlp-main.153"},{"key":"832_CR64","unstructured":"Eloundou,
-          T., Manning, S., Mishkin, P. & Rock, D. GPTs are GPTs: an early look at the
-          labor market impact potential of large language models. Preprint at https:\/\/arxiv.org\/abs\/2303.10130
-          (2023)."},{"key":"832_CR65","doi-asserted-by":"publisher","first-page":"e1630","DOI":"10.1002\/wcms.1630","volume":"13","author":"BA
-          Grzybowski","year":"2023","unstructured":"Grzybowski, B. A., Badowski, T.,
-          Molga, K. & Szymkuc, S. Network search algorithms and scoring functions for
-          advanced-level computerized synthesis planning. Wiley Interdiscip. Rev. Comput.
-          Mol. Sci. 13, e1630 (2023).","journal-title":"Wiley Interdiscip. Rev. Comput.
-          Mol. Sci."},{"key":"832_CR66","doi-asserted-by":"publisher","first-page":"27","DOI":"10.1039\/D0RE00340A","volume":"6","author":"A
-          Thakkar","year":"2021","unstructured":"Thakkar, A. et al. Artificial intelligence
-          and automation in computer aided synthesis planning. React. Chem. Eng. 6,
-          27\u201351 (2021).","journal-title":"React. Chem. Eng."},{"key":"832_CR67","doi-asserted-by":"publisher","first-page":"189","DOI":"10.1038\/s42256-022-00465-9","volume":"4","author":"F
-          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
-          C. & Ekins, S. Dual use of artificial-intelligence-powered drug discovery.
-          Nat. Mach. Intell. 4, 189\u2013191 (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR68","doi-asserted-by":"publisher","first-page":"607","DOI":"10.1038\/s42256-022-00511-6","volume":"4","author":"F
-          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
-          C. & Ekins, S. A teachable moment for dual-use. Nat. Mach. Intell. 4, 607\u2013607
-          (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR69","unstructured":"Campbell,
-          Q. L., Herington, J. & White, A. D. Censoring chemical data to mitigate dual
-          use risk. Preprint at https:\/\/arxiv.org\/abs\/2304.10510 (2023)."},{"key":"832_CR70","unstructured":"Gao,
-          L., Schulman, J. & Hilton, J. Scaling laws for reward model overoptimization.
-          In Proc. International Conference on Machine Learning (eds Krause, A. et al.)
-          10835\u201310866 (PMLR, 2023)."},{"key":"832_CR71","unstructured":"Radford,
-          A. et al. Improving language understanding by generative pre-training. OpenAI
-          blog https:\/\/cdn.openai.com\/research-covers\/language-unsupervised\/language_understanding_paper.pdf
-          (2018)."},{"key":"832_CR72","first-page":"1\u201346","volume":"55","author":"B
-          Li","year":"2021","unstructured":"Li, B. et al. Trustworthy AI: from principles
-          to practices. ACM Comput. Surv. 55, 1\u201346 (2021).","journal-title":"ACM
-          Comput. Surv."},{"key":"832_CR73","doi-asserted-by":"publisher","first-page":"79","DOI":"10.1039\/D1DD00009H","volume":"1","author":"GM
-          Hocky","year":"2022","unstructured":"Hocky, G. M. & White, A. D. Natural language
-          processing models that automate programming will transform chemistry research
-          and teaching. Dig. Discov. 1, 79\u201383 (2022).","journal-title":"Dig. Discov."},{"key":"832_CR74","doi-asserted-by":"crossref","unstructured":"Henderson,
-          P. et al. Foundation models and fair use. Preprint at https:\/\/arxiv.org\/abs\/2303.15715
-          (2023).","DOI":"10.2139\/ssrn.4404340"},{"key":"832_CR75","unstructured":"Askell,
-          A., Brundage, M. & Hadfield, G. The role of cooperation in responsible AI
-          development. Preprint at https:\/\/arxiv.org\/abs\/1907.04534 (2019)."},{"key":"832_CR76","doi-asserted-by":"publisher","first-page":"101649","DOI":"10.1016\/j.techsoc.2021.101649","volume":"66","author":"RD
-          Neufville","year":"2021","unstructured":"Neufville, R. D. & Baum, S. D. Collective
-          action on artificial intelligence: a primer and review. Technol. Soc. 66,
-          101649 (2021).","journal-title":"Technol. Soc."},{"key":"832_CR77","unstructured":"Touvron,
-          H. et al. Llama: open and efficient foundation language models. Preprint at
-          https:\/\/arxiv.org\/abs\/2302.13971 (2023)."},{"key":"832_CR78","unstructured":"Chiang,
-          W.-L. et al. Vicuna: an open-source chatbot impressing GPT-4 with 90%* ChatGPT
-          quality. LMSYS Org. https:\/\/lmsys.org\/blog\/2023-03-30-vicuna\/ (2023)."},{"key":"832_CR79","unstructured":"Mukherjee,
-          S. et al. Orca: progressive learning from complex explanation traces of GPT-4.
-          Preprint at https:\/\/arxiv.org\/abs\/2306.02707 (2023)."},{"key":"832_CR80","unstructured":"Chase,
-          H. LangChain. GitHub https:\/\/github.com\/hwchase17\/langchain (2022)."},{"key":"832_CR81","doi-asserted-by":"crossref","unstructured":"Press,
-          O. et al. Measuring and narrowing the compositionality gap in language models.
-          In Proc. Association for Computational Linguistics: EMNLP (eds. Bouamor, H.
-          et al.) 5687\u20135711 (ACL, 2023).","DOI":"10.18653\/v1\/2023.findings-emnlp.378"},{"key":"832_CR82","unstructured":"Google
-          search API. SerpApi https:\/\/serpapi.com\/ (2023)."},{"key":"832_CR83","unstructured":"Neelakantan,
-          A. et al. Text and code embeddings by contrastive pre-training. Preprint at
-          https:\/\/arxiv.org\/abs\/2201.10005 (2022)."},{"key":"832_CR84","doi-asserted-by":"publisher","first-page":"535","DOI":"10.1109\/TBDATA.2019.2921572","volume":"7","author":"J
-          Johnson","year":"2019","unstructured":"Johnson, J., Douze, M. & J\u00e9gou,
-          H. Billion-scale similarity search with GPUs. IEEE Trans. Big Data 7, 535\u2013547
-          (2019).","journal-title":"IEEE Trans. Big Data"},{"key":"832_CR85","unstructured":"ChemSpace
-          https:\/\/chem-space.com\/ (2023)."},{"key":"832_CR86","unstructured":"National
-          Center for Biotechnology Information. PubChem. NIH https:\/\/pubchem.ncbi.nlm.nih.gov\/
-          (2023)."},{"key":"832_CR87","doi-asserted-by":"publisher","first-page":"95","DOI":"10.1186\/s13321-023-00765-1","volume":"15","author":"J
-          Medina","year":"2023","unstructured":"Medina, J. & White, A. D. Bloom filters
-          for molecules. J. Cheminf. 15, 95 (2023).","journal-title":"J. Cheminf."},{"key":"832_CR88","doi-asserted-by":"publisher","first-page":"6065","DOI":"10.1021\/acs.jcim.0c00675","volume":"60","author":"JJ
-          Irwin","year":"2020","unstructured":"Irwin, J. J. et al. Zinc20\u2014a free
-          ultralarge-scale chemical database for ligand discovery. J. Chem. Inf. Model.
-          60, 6065\u20136073 (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR89","unstructured":"Chemical
-          Abstracts Service. CAS registry number. CAS www.cas.org\/content\/cas-registry
-          (2023)."},{"key":"832_CR90","unstructured":"Tanimoto, T. T. An Elementary
-          Mathematical Theory of Classification and Prediction (IBM, 1958)."},{"key":"832_CR91","doi-asserted-by":"publisher","first-page":"742","DOI":"10.1021\/ci100050t","volume":"50","author":"D
-          Rogers","year":"2010","unstructured":"Rogers, D. & Hahn, M. Extended-connectivity
-          fingerprints. J. Chem. Inf. Model. 50, 742\u2013754 (2010).","journal-title":"J.
-          Chem. Inf. Model."},{"key":"832_CR92","unstructured":"White, A. D. Synspace.
-          GitHub https:\/\/github.com\/whitead\/synspace (2023)."},{"key":"832_CR93","doi-asserted-by":"publisher","first-page":"3697","DOI":"10.1039\/D1SC05259D","volume":"13","author":"GP
-          Wellawatte","year":"2022","unstructured":"Wellawatte, G. P., Seshadri, A.
-          & White, A. D. Model agnostic generation of counterfactual explanations for
-          molecules. Chem. Sci. 13, 3697\u20133705 (2022).","journal-title":"Chem. Sci."},{"key":"832_CR94","doi-asserted-by":"publisher","first-page":"3093","DOI":"10.1021\/ci200379p","volume":"51","author":"M
-          Hartenfeller","year":"2011","unstructured":"Hartenfeller, M. et al. A collection
-          of robust organic synthesis reactions for in silico molecule design. J. Chem.
-          Inf. Model. 51, 3093\u20133098 (2011).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR95","doi-asserted-by":"publisher","first-page":"12152","DOI":"10.1039\/C9CC05122H","volume":"55","author":"Q
-          Yang","year":"2019","unstructured":"Yang, Q. et al. Molecular transformer
-          unifies reaction prediction and retrosynthesis across pharma chemical space.
-          Chem. Commun. 55, 12152\u201312155 (2019).","journal-title":"Chem. Commun."},{"key":"832_CR96","unstructured":"Purchasable
-          Mcule. Mcule https:\/\/purchasable.mcule.com\/ (2023)."},{"key":"832_CR97","unstructured":"RDKit:
-          open-source cheminformatics (RDKit, 2023); www.rdkit.org"},{"key":"832_CR98","unstructured":"Chemical
-          weapons convention, annex on chemicals, b. schedules of chemicals. OPCW www.opcw.org\/chemical-weapons-convention\/annexes\/annex-chemicals\/annex-chemicals
-          (2024)."},{"key":"832_CR99","unstructured":"The Australia Group. Australia
-          Group common control lists: chemical weapons precursors. Department of Foreign
-          Affairs and Trade www.dfat.gov.au\/publications\/minisite\/theaustraliagroupnet\/site\/en\/controllists.html
-          (2023)."},{"key":"832_CR100","unstructured":"Namerxn (NextMove Software, 2023);
-          www.nextmovesoftware.com\/namerxn.html"},{"key":"832_CR101","doi-asserted-by":"publisher","first-page":"2337","DOI":"10.1039\/b602413k","volume":"4","author":"JS
-          Carey","year":"2006","unstructured":"Carey, J. S., Laffan, D., Thomson, C.
-          & Williams, M. T. Analysis of the reactions used for the preparation of drug
-          candidate molecules. Org. Biomol. Chem. 4, 2337\u20132347 (2006).","journal-title":"Org.
-          Biomol. Chem."},{"key":"832_CR102","doi-asserted-by":"publisher","unstructured":"Bran,
-          A. & Cox, S. ur-whitelab\/chemcrow-runs: Zendo release. Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884645
-          (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
-          A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
-          Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.4457,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
-          September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
-          History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
-          History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
-          Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"A.D.W.
-          has served as a paid consultant for evaluating AI model safety at OpenAI.
-          The other authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
-          interests"}}]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "10574"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 07 Oct 2024 01:01:07 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
+          - 7dd9b697-4c0f-4813-b9ac-f26805dc37f1
       status:
         code: 200
         message: OK
@@ -2045,7 +2216,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Mon, 07 Oct 2024 01:01:08 GMT
+          - Wed, 09 Oct 2024 21:23:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

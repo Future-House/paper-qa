@@ -18,6 +18,7 @@ from paperqa.clients import (
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
+from paperqa.clients.openalex import reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
 
 
@@ -67,7 +68,7 @@ from paperqa.clients.retractions import RetractionDataPostProcessor
                 " Samuel G. Rodriques, and Andrew D. White. Paperqa:"
                 " retrieval-augmented generative agent for scientific research. ArXiv,"
                 " Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559,"
-                " doi:10.48550/arxiv.2312.07559. This article has 28 citations."
+                " doi:10.48550/arxiv.2312.07559. This article has 30 citations."
             ),
             "is_oa": None,
         },
@@ -91,7 +92,7 @@ from paperqa.clients.retractions import RetractionDataPostProcessor
                 " White, and Philippe Schwaller. Augmenting large language models with"
                 " chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
-                " doi:10.1038/s42256-024-00832-8. This article has 201 citations and is"
+                " doi:10.1038/s42256-024-00832-8. This article has 205 citations and is"
                 " from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
@@ -601,3 +602,24 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
             in crossref_details.formatted_citation
         )
         assert crossref_details.is_retracted is True, "Should be retracted"
+
+
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
+        ("Doe, John", "John Doe"),
+        ("Doe, Jane Mary", "Jane Mary Doe"),
+        ("O'Doe, John", "John O'Doe"),
+        ("Doe, Jane", "Jane Doe"),
+        ("Family, Jane Mary Elizabeth", "Jane Mary Elizabeth Family"),
+        ("O'Doe, Jane", "Jane O'Doe"),
+        ("Family, John Jr.", "John Jr. Family"),
+        ("Family", "Family"),
+        ("Jane Doe", "Jane Doe"),
+        ("Doe, Jöhn", "Jöhn Doe"),
+        ("Doe, Jòhn", "Jòhn Doe"),
+    ],
+)
+def test_reformat_name(name: str, expected: str) -> None:
+    result = reformat_name(name)
+    assert result == expected, f"Expected '{expected}', but got '{result}' for '{name}'"

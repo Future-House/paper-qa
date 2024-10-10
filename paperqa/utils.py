@@ -9,6 +9,7 @@ import math
 import os
 import re
 import string
+import unicodedata
 from collections.abc import Collection, Coroutine, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
@@ -345,6 +346,34 @@ def remove_substrings(target: str, substr_removal_list: Collection[str]) -> str:
     return target
 
 
+def mutate_acute_accents(text: str, replace: bool = False) -> str:
+    """
+    Replaces or removes acute accents in a string based on the boolean flag.
+
+    Args:
+        text: The input string.
+        replace: A flag to determine whether to replace (True) or remove (False) acute accents.
+
+            If 'replace' is True, acute accents on vowels are replaced with an apostrophe (e.g., "á" becomes "'a").
+
+            If 'replace' is False, all acute accents are removed from the string.
+
+    Returns:
+        The modified string with acute accents either replaced or removed.
+    """
+    if replace:
+
+        def replace_acute(match):
+            return f"'{match.group(1)}"
+
+        nfd = unicodedata.normalize("NFD", text)
+        converted = re.sub(r"([aeiouAEIOU])\u0301", replace_acute, nfd)
+        return unicodedata.normalize("NFC", converted)
+    return "".join(
+        c for c in unicodedata.normalize("NFD", text) if unicodedata.category(c) != "Mn"
+    )
+
+
 def bibtex_field_extract(
     bibtex: str, field: str, missing_replacements: dict[str, str] | None = None
 ) -> str:
@@ -372,7 +401,8 @@ def create_bibtex_key(author: list[str], year: str, title: str) -> str:
     FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/", "'", "`", ":", ",", "\n"}
     try:
         author_rep = (
-            author[0].split()[-1].casefold()
+            # casefold will not remove accutes
+            mutate_acute_accents(text=author[0].split()[-1].casefold())
             if "Unknown" not in author[0]
             else UNKNOWN_AUTHOR_KEY
         )
@@ -476,3 +506,34 @@ def extract_thought(content: str | None) -> str:
     """Extract an Anthropic thought from a message's content."""
     # SEE: https://regex101.com/r/bpJt05/1
     return re.sub(r"<\/?thinking>", "", content or "")
+
+
+BIBTEX_MAPPING: dict[str, str] = {
+    """Maps client bibtex types to pybtex types""" "journal-article": "article",
+    "journal-issue": "misc",  # No direct equivalent, so 'misc' is used
+    "journal-volume": "misc",  # No direct equivalent, so 'misc' is used
+    "journal": "misc",  # No direct equivalent, so 'misc' is used
+    "proceedings-article": "inproceedings",
+    "proceedings": "proceedings",
+    "dataset": "misc",  # No direct equivalent, so 'misc' is used
+    "component": "misc",  # No direct equivalent, so 'misc' is used
+    "report": "techreport",
+    "report-series": "techreport",  # 'series' implies multiple tech reports, but each is still a 'techreport'
+    "standard": "misc",  # No direct equivalent, so 'misc' is used
+    "standard-series": "misc",  # No direct equivalent, so 'misc' is used
+    "edited-book": "book",  # Edited books are considered books in BibTeX
+    "monograph": "book",  # Monographs are considered books in BibTeX
+    "reference-book": "book",  # Reference books are considered books in BibTeX
+    "book": "book",
+    "book-series": "book",  # Series of books can be considered as 'book' in BibTeX
+    "book-set": "book",  # Set of books can be considered as 'book' in BibTeX
+    "book-chapter": "inbook",
+    "book-section": "inbook",  # Sections in books can be considered as 'inbook'
+    "book-part": "inbook",  # Parts of books can be considered as 'inbook'
+    "book-track": "inbook",  # Tracks in books can be considered as 'inbook'
+    "reference-entry": "inbook",  # Entries in reference books can be considered as 'inbook'
+    "dissertation": "phdthesis",  # Dissertations are usually PhD thesis
+    "posted-content": "misc",  # No direct equivalent, so 'misc' is used
+    "peer-review": "misc",  # No direct equivalent, so 'misc' is used
+    "other": "article",  # Assume an article if we don't know the type
+}
