@@ -16,7 +16,7 @@ from collections.abc import (
 from enum import StrEnum
 from inspect import isasyncgenfunction, signature
 from sys import version_info
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 import litellm
 import numpy as np
@@ -578,7 +578,7 @@ class LiteLLMModel(LLMModel):
         return state
 
     @property
-    def router(self):
+    def router(self) -> litellm.Router:
         if self._router is None:
             self._router = litellm.Router(
                 model_list=self.config["model_list"],
@@ -627,11 +627,11 @@ class LiteLLMModel(LLMModel):
     async def achat(  # type: ignore[override]
         self, messages: Iterable[dict[str, str]]
     ) -> Chunk:
-        response = await self.router.acompletion(self.name, messages)
+        response = await self.router.acompletion(self.name, list(messages))
         return Chunk(
-            text=response.choices[0].message.content,
-            prompt_tokens=response.usage.prompt_tokens,
-            completion_tokens=response.usage.completion_tokens,
+            text=cast(litellm.Choices, response.choices[0]).message.content,
+            prompt_tokens=response.usage.prompt_tokens,  # type: ignore[attr-defined]
+            completion_tokens=response.usage.completion_tokens,  # type: ignore[attr-defined]
         )
 
     @rate_limited
@@ -639,7 +639,10 @@ class LiteLLMModel(LLMModel):
         self, messages: Iterable[dict[str, str]]
     ) -> AsyncIterable[Chunk]:
         completion = await self.router.acompletion(
-            self.name, messages, stream=True, stream_options={"include_usage": True}
+            self.name,
+            list(messages),
+            stream=True,
+            stream_options={"include_usage": True},
         )
         async for chunk in completion:
             yield Chunk(
