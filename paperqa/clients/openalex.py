@@ -197,7 +197,7 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
         doi=doi,
         license=oa_license,
         pdf_url=pdf_url,
-        other=message or {},
+        other=message,
     )
 
 
