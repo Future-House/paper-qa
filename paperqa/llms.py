@@ -82,7 +82,10 @@ class EmbeddingModel(ABC, BaseModel):
     name: str
     config: dict[str, Any] = Field(
         default_factory=dict,
-        description="Optional `rate_limit` key, value must be a RateLimitItem or RateLimitItem string for parsing",
+        description=(
+            "Optional `rate_limit` key, value must be a RateLimitItem or RateLimitItem"
+            " string for parsing"
+        ),
     )
 
     async def check_rate_limit(self, token_count: float, **kwargs) -> None:
@@ -515,21 +518,37 @@ def get_litellm_retrying_config(timeout: float = 60.0) -> dict[str, Any]:
     return {"num_retries": 3, "timeout": timeout}
 
 
+class PassThroughRouter(litellm.Router):
+    """Router that is just a wrapper on LiteLLM's normal free functions."""
+
+    def __init__(self, **kwargs):
+        self._default_kwargs = kwargs
+
+    async def atext_completion(self, *args, **kwargs):
+        return await litellm.atext_completion(*args, **(self._default_kwargs | kwargs))
+
+    async def acompletion(self, *args, **kwargs):
+        return await litellm.acompletion(*args, **(self._default_kwargs | kwargs))
+
+
 class LiteLLMModel(LLMModel):
-    """A wrapper around the litellm library.
+    """A wrapper around the litellm library."""
 
-    `config` should have two high level keys:
-        `model_list`: stores a list of all model configurations
-          (see https://docs.litellm.ai/docs/routing)
-        `router_kwargs`: kwargs for the Router class
-        `rate_limit`: (Optional) dictionary keyed by model group name
-            with values of type limits.RateLimitItem (in tokens / minute)
-            or valid limits.RateLimitItem string for parsing
-
-    This way users can specify routing strategies, retries, etc.
-    """
-
-    config: dict = Field(default_factory=dict)
+    config: dict = Field(
+        default_factory=dict,
+        description=(
+            "Configuration of this model containing several important keys. The"
+            " optional `model_list` key stores a list of all model configurations"
+            " (SEE: https://docs.litellm.ai/docs/routing). The optional"
+            " `router_kwargs` key is keyword arguments to pass to the Router class."
+            " Inclusion of a key `pass_through_router` with a truthy value will lead"
+            " to using not using LiteLLM's Router, instead just LiteLLM's free"
+            f" functions (see {PassThroughRouter.__name__}). The optional `rate_limit`"
+            " key is a dictionary keyed by model group name with values of type"
+            " limits.RateLimitItem (in tokens / minute) or valid limits.RateLimitItem"
+            " string for parsing."
+        ),
+    )
     name: str = "gpt-4o-mini"
     _router: litellm.Router | None = None
 
@@ -553,9 +572,12 @@ class LiteLLMModel(LLMModel):
             } | data.get("config", {})
 
         if "router_kwargs" not in data.get("config", {}):
-            data["config"]["router_kwargs"] = get_litellm_retrying_config() | {
-                "retry_after": 5
-            }
+            if data.get("config", {}).get("pass_through_router"):
+                data["config"]["router_kwargs"] = get_litellm_retrying_config()
+            else:
+                data["config"]["router_kwargs"] = get_litellm_retrying_config() | {
+                    "retry_after": 5
+                }
 
         # we only support one "model name" for now, here we validate
         model_list = data["config"]["model_list"]
@@ -580,10 +602,13 @@ class LiteLLMModel(LLMModel):
     @property
     def router(self) -> litellm.Router:
         if self._router is None:
-            self._router = litellm.Router(
-                model_list=self.config["model_list"],
-                **self.config.get("router_kwargs", {}),
-            )
+            router_kwargs: dict = self.config.get("router_kwargs", {})
+            if self.config.get("pass_through_router"):
+                self._router = PassThroughRouter(**router_kwargs)
+            else:
+                self._router = litellm.Router(
+                    model_list=self.config["model_list"], **router_kwargs
+                )
         return self._router
 
     async def check_rate_limit(self, token_count: float, **kwargs) -> None:

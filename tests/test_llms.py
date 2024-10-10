@@ -1,6 +1,9 @@
 import pathlib
 import pickle
+from typing import Any
+from unittest.mock import patch
 
+import litellm
 import pytest
 
 from paperqa import LiteLLMModel
@@ -68,20 +71,43 @@ class TestLiteLLMModel:
         assert completion.cost > 0
 
     @pytest.mark.vcr
+    @pytest.mark.parametrize(
+        ("config", "bypassed_router"),
+        [
+            pytest.param(
+                {
+                    "model_list": [
+                        {
+                            "model_name": "gpt-4o-mini",
+                            "litellm_params": {"model": "gpt-4o-mini", "max_tokens": 3},
+                        }
+                    ]
+                },
+                False,
+                id="with-router",
+            ),
+            pytest.param(
+                {"pass_through_router": True, "router_kwargs": {"max_tokens": 3}},
+                True,
+                id="without-router",
+            ),
+        ],
+    )
     @pytest.mark.asyncio
-    async def test_max_token_truncation(self) -> None:
-        llm = LiteLLMModel(
-            name="gpt-4o-mini",
-            config={
-                "model_list": [
-                    {
-                        "model_name": "gpt-4o-mini",
-                        "litellm_params": {"model": "gpt-4o-mini", "max_tokens": 3},
-                    }
-                ]
-            },
-        )
-        chunk = await llm.acomplete("Please tell me a story")  # type: ignore[call-arg]
+    async def test_max_token_truncation(
+        self, config: dict[str, Any], bypassed_router: bool
+    ) -> None:
+        llm = LiteLLMModel(name="gpt-4o-mini", config=config)
+        with patch(
+            "litellm.Router.atext_completion",
+            side_effect=litellm.Router.atext_completion,
+            autospec=True,
+        ) as mock_atext_completion:
+            chunk = await llm.acomplete("Please tell me a story")  # type: ignore[call-arg]
+        if bypassed_router:
+            mock_atext_completion.assert_not_awaited()
+        else:
+            mock_atext_completion.assert_awaited_once()
         assert isinstance(chunk, Chunk)
         assert chunk.completion_tokens == 3
         assert chunk.text
