@@ -562,7 +562,7 @@ class LiteLLMModel(LLMModel):
             # pylint: disable-next=possibly-used-before-assignment
             _DeploymentTypedDictValidator.validate_python(model_list)
         if "config" in data and len({m["model_name"] for m in model_list}) > 1:
-            raise ValueError("Only one model name per router is supported for now.")
+            raise ValueError("Only one model name per model list is supported for now.")
         return data
 
     def __getstate__(self):
