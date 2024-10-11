@@ -12,7 +12,11 @@ jobs:
       - uses: actions/checkout@v4
       - id: build
         uses: hynek/build-and-inspect-python-package@v2
+      - name: Download built artifact to dist/
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.build.outputs.artifact-name }}
+          path: dist
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: ${{ steps.build.outputs.dist }}
           password: ${{ secrets.PYPI_API_TOKEN }}
