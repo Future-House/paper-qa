@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hynek/build-and-inspect-python-package@v2
+      - id: build
+        uses: hynek/build-and-inspect-python-package@v2
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          packages-dir: ${{ steps.build.outputs.dist }}
           password: ${{ secrets.PYPI_API_TOKEN }}
