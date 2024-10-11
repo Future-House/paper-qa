@@ -23,7 +23,7 @@ from .clients.semantic_scholar import SEMANTIC_SCHOLAR_BASE_URL
 
 logger = logging.getLogger(__name__)
 
-GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMOUT", "60"))
+GLOBAL_RATE_LIMITER_TIMEOUT = float(os.environ.get("RATE_LIMITER_TIMEOUT", "60"))
 
 MATCH_ALL = None
 MatchAllInputs = Literal[None]
