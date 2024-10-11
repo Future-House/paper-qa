@@ -28,10 +28,11 @@ jobs:
         python-version: [3.11] # Our min supported Python version
     steps:
       - uses: actions/checkout@v4
-      - name: Set up uv
-        run: |-
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv python pin ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python pin ${{ matrix.python-version }}
+      - uses: hynek/build-and-inspect-python-package@v2
       - run: uv sync --python-preference=only-managed
       - run: uv run refurb paperqa tests
       - run: uv run pylint paperqa
@@ -42,10 +43,10 @@ jobs:
         python-version: [3.11, 3.12] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
-      - name: Set up uv
-        run: |-
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv python pin ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
       - name: Cache datasets
         uses: actions/cache@v4
