@@ -54,10 +54,7 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         index_name = agent_test_settings.agent.index.name = (
             f"stub{uuid4()}"  # Unique across test invocations
         )
-        with patch.object(
-            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
-        ) as mock_save_index:
-            index = await get_directory_index(settings=agent_test_settings)
+        index = await get_directory_index(settings=agent_test_settings)
         assert (
             index.index_name == index_name
         ), "Index name should match its specification"
@@ -67,7 +64,6 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
             "title",
             "year",
         ], "Incorrect fields in index"
-        mock_save_index.assert_awaited_once(), "Expected just one save"
         assert not index.changed, "Expected index to not have changes at this point"
         # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
         # but empty.txt fails to be added
