@@ -54,10 +54,7 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         index_name = agent_test_settings.agent.index.name = (
             f"stub{uuid4()}"  # Unique across test invocations
         )
-        with patch.object(
-            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
-        ) as mock_save_index:
-            index = await get_directory_index(settings=agent_test_settings)
+        index = await get_directory_index(settings=agent_test_settings)
         assert (
             index.index_name == index_name
         ), "Index name should match its specification"
@@ -67,7 +64,6 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
             "title",
             "year",
         ], "Incorrect fields in index"
-        mock_save_index.assert_awaited_once(), "Expected just one save"
         assert not index.changed, "Expected index to not have changes at this point"
         # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
         # but empty.txt fails to be added
@@ -98,6 +94,49 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         await (await index.file_index_filename).unlink()
         with pytest.raises(RuntimeError, match="please rebuild"):
             await get_directory_index(settings=agent_test_settings, build=False)
+
+
+@pytest.mark.asyncio
+async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> None:
+    index_settings = agent_test_settings.agent.index
+    crash_threshold, index_settings.concurrency = 3, 2
+    num_source_files = len(
+        [
+            x
+            for x in cast(Path, index_settings.paper_directory).iterdir()
+            if x.suffix != ".csv"
+        ]
+    )
+    assert (
+        num_source_files >= 5
+    ), "Less source files than this test was designed to work with"
+    call_count = 0
+    original_docs_aadd = Docs.aadd
+
+    async def crashing_aadd(*args, **kwargs) -> str | None:
+        nonlocal call_count
+        if call_count == crash_threshold:
+            raise RuntimeError("Unexpected crash.")
+        call_count += 1
+        return await original_docs_aadd(*args, **kwargs)
+
+    # 1. Try to build an index, and crash halfway through
+    with (
+        pytest.raises(ExceptionGroup, match="unhandled"),
+        patch.object(
+            Docs, "aadd", side_effect=crashing_aadd, autospec=True
+        ) as mock_aadd,
+    ):
+        await get_directory_index(settings=agent_test_settings)
+    mock_aadd.assert_awaited()
+
+    # 2. Resume and complete building the index
+    with patch.object(Docs, "aadd", autospec=True, side_effect=Docs.aadd) as mock_aadd:
+        index = await get_directory_index(settings=agent_test_settings)
+    assert (
+        mock_aadd.await_count <= crash_threshold
+    ), "Should have been able to resume build"
+    assert len(await index.index_files) > crash_threshold
 
 
 EXPECTED_STUB_DATA_FILES = {

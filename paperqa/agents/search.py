@@ -424,6 +424,9 @@ async def process_file(
                     f"Error parsing {file_location}, skipping index for this file."
                 )
                 await search_index.mark_failed_document(file_location)
+                # Save so we can resume the build without rebuilding this file if a
+                # separate process_file invocation leads to a segfault or crash
+                await search_index.save_index()
                 if progress_bar_update:
                     await progress_bar_update()
                 return
@@ -445,6 +448,9 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
+            # Save so we can resume the build without rebuilding this file if a
+            # separate process_file invocation leads to a segfault or crash
+            await search_index.save_index()
             logger.info(f"Complete ({title}).")
 
         # Update progress bar for either a new or previously indexed file
