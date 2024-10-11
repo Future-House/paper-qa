@@ -8,7 +8,7 @@ from typing import cast
 from rich.table import Table
 
 from paperqa.docs import Docs
-from paperqa.llms import LiteLLMModel
+from paperqa.llms import LiteLLMModel, LLMModel
 
 from .models import AnswerResponse
 
@@ -26,7 +26,7 @@ async def litellm_get_search_query(
     question: str,
     count: int,
     template: str | None = None,
-    llm: str = "gpt-4o-mini",
+    llm: LLMModel | str = "gpt-4o-mini",
     temperature: float = 1.0,
 ) -> list[str]:
     search_prompt = ""
@@ -51,8 +51,13 @@ async def litellm_get_search_query(
             f" is optional. The current year is {get_year()}."
         )
 
-    model = LiteLLMModel(name=llm)
-    model.config["model_list"][0]["litellm_params"].update({"temperature": temperature})
+    if isinstance(llm, str):
+        model: LLMModel = LiteLLMModel(name=llm)
+        model.config["model_list"][0]["litellm_params"].update(
+            {"temperature": temperature}
+        )
+    else:
+        model = llm
     result = await model.run_prompt(
         prompt=search_prompt,
         data={"question": question, "count": count},

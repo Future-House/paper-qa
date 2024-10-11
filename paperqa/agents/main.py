@@ -176,7 +176,7 @@ async def run_fake_agent(
 
     # Seed docs with a few keyword searches
     for search in await litellm_get_search_query(
-        question, llm=query.settings.llm, count=3
+        question, llm=query.settings.get_llm(), count=3
     ):
         await step(search_tool, query=search, min_year=None, max_year=None)
     await step(gather_evidence_tool, question=question)
