@@ -16,7 +16,7 @@ except ImportError:
 
 from paperqa.llms import LiteLLMModel, LLMModel
 from paperqa.prompts import EVAL_PROMPT_TEMPLATE, QA_PROMPT_TEMPLATE
-from paperqa.settings import make_default_litellm_router_settings
+from paperqa.settings import make_default_litellm_model_list_settings
 from paperqa.types import Answer
 
 if TYPE_CHECKING:
@@ -139,7 +139,8 @@ class LitQAEvaluation(IntEnum):
 
         if isinstance(eval_model, str):
             eval_model = LiteLLMModel(
-                name=eval_model, config=make_default_litellm_router_settings(eval_model)
+                name=eval_model,
+                config=make_default_litellm_model_list_settings(eval_model),
             )
 
         async def llm_from_answer(answer: Answer | str) -> LitQAEvaluation:

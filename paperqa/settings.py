@@ -466,7 +466,9 @@ class AgentSettings(BaseModel):
         return self
 
 
-def make_default_litellm_router_settings(llm: str, temperature: float = 0.0) -> dict:
+def make_default_litellm_model_list_settings(
+    llm: str, temperature: float = 0.0
+) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
     return {
         "model_list": [
@@ -674,21 +676,23 @@ class Settings(BaseSettings):
         return LiteLLMModel(
             name=self.llm,
             config=self.llm_config
-            or make_default_litellm_router_settings(self.llm, self.temperature),
+            or make_default_litellm_model_list_settings(self.llm, self.temperature),
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.summary_llm,
             config=self.summary_llm_config
-            or make_default_litellm_router_settings(self.summary_llm, self.temperature),
+            or make_default_litellm_model_list_settings(
+                self.summary_llm, self.temperature
+            ),
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.agent.agent_llm,
             config=self.agent.agent_llm_config
-            or make_default_litellm_router_settings(
+            or make_default_litellm_model_list_settings(
                 self.agent.agent_llm, self.temperature
             ),
         )
