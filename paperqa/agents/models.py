@@ -18,7 +18,7 @@ from pydantic import (
     field_validator,
 )
 
-from paperqa.llms import LiteLLMModel
+from paperqa.llms import LiteLLMModel, LLMModel
 from paperqa.settings import Settings
 from paperqa.types import Answer
 from paperqa.version import __version__
@@ -104,12 +104,14 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model: str = "gpt-4o") -> str:
+    async def get_summary(self, llm_model: LLMModel | str = "gpt-4o") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
-        model = LiteLLMModel(name=llm_model)
+        model = (
+            LiteLLMModel(name=llm_model) if isinstance(llm_model, str) else llm_model
+        )
         result = await model.run_prompt(
             prompt="{question}\n\n{answer}",
             data={"question": self.answer.question, "answer": self.answer.answer},

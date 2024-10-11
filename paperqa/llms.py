@@ -557,7 +557,9 @@ class LiteLLMModel(LLMModel):
     @classmethod
     def maybe_set_config_attribute(cls, data: dict[str, Any]) -> dict[str, Any]:
         """If a user only gives a name, make a sensible config dict for them."""
-        if "name" in data and ("model_list" not in data.get("config", {})):
+        if "config" not in data:
+            data["config"] = {}
+        if "name" in data and "model_list" not in data["config"]:
             data["config"] = {
                 "model_list": [
                     {
@@ -570,15 +572,17 @@ class LiteLLMModel(LLMModel):
                         ),
                     }
                 ],
-            } | data.get("config", {})
+            } | data["config"]
 
-        if "router_kwargs" not in data.get("config", {}):
-            if data.get("config", {}).get("pass_through_router"):
-                data["config"]["router_kwargs"] = get_litellm_retrying_config()
-            else:
-                data["config"]["router_kwargs"] = get_litellm_retrying_config() | {
-                    "retry_after": 5
-                }
+        if "router_kwargs" not in data["config"]:
+            data["config"]["router_kwargs"] = {}
+        data["config"]["router_kwargs"] = (
+            get_litellm_retrying_config() | data["config"]["router_kwargs"]
+        )
+        if not data["config"].get("pass_through_router"):
+            data["config"]["router_kwargs"] = {"retry_after": 5} | data["config"][
+                "router_kwargs"
+            ]
 
         # we only support one "model name" for now, here we validate
         model_list = data["config"]["model_list"]
@@ -589,7 +593,7 @@ class LiteLLMModel(LLMModel):
         else:
             # pylint: disable-next=possibly-used-before-assignment
             _DeploymentTypedDictValidator.validate_python(model_list)
-        if "config" in data and len({m["model_name"] for m in model_list}) > 1:
+        if len({m["model_name"] for m in model_list}) > 1:
             raise ValueError("Only one model name per model list is supported for now.")
         return data
 
