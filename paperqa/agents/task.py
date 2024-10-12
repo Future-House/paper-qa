@@ -60,6 +60,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         evaluation_from_answer: (
             Callable[[Answer | str], Awaitable[LitQAEvaluation]] | None
         ) = None,
+        sources: str | list[str] | None = None,
         rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
         evaluation_callback: Callable[[LitQAEvaluation], Awaitable] | None = None,
         **env_kwargs,
@@ -68,6 +69,10 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             query, docs, llm_model, summary_llm_model, embedding_model, **env_kwargs
         )
         self._evaluation_from_answer = evaluation_from_answer
+        # Enables checking an Index has the right DOI(s)
+        self.sources: list[str] | None = (
+            [sources] if isinstance(sources, str) else sources
+        )
         self._evaluation_callback = evaluation_callback
         self._rewards = rewards
 
@@ -149,6 +154,7 @@ class LitQATaskDataset(
         distractors: str | list[str],
         question: str,
         use_unsure: bool = True,
+        sources: str | list[str] | None = None,
     ) -> GradablePaperQAEnvironment:
         qa_prompt, evaluation_from_answer = LitQAEvaluation.from_question(
             ideal=ideal,
@@ -163,6 +169,7 @@ class LitQATaskDataset(
             query=query,
             docs=self._base_docs.model_copy(),
             evaluation_from_answer=evaluation_from_answer,
+            sources=sources,
             rewards=self._rewards,
             **self._env_kwargs,
         )
@@ -243,6 +250,7 @@ class LitQAv2TaskDataset(LitQATaskDataset):
             ideal=self.data.iloc[idx].ideal,
             distractors=self.data.iloc[idx].distractors,
             question=self.data.iloc[idx].question,
+            sources=list(self.data.iloc[idx].sources),
         )
 
     def __len__(self) -> int:

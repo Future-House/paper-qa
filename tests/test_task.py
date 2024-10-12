@@ -26,8 +26,13 @@ class StubLitQADataset(LitQATaskDataset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data: list[tuple[str, str | list[str], str]] = [
-            ("Politician", ["Technologist", "Plumber"], "Who is Frederick Bates?"),
+        self.data: list[tuple[str, str | list[str], str, str]] = [
+            (
+                "Politician",
+                ["Technologist", "Plumber"],
+                "Who is Frederick Bates?",
+                "bates.txt",
+            ),
             (
                 "Make molecular counterfactuals",
                 [
@@ -35,11 +40,13 @@ class StubLitQADataset(LitQATaskDataset):
                     "Simple explanations of internet searches",
                 ],
                 "How can you use XAI for chemical property prediction?",
+                "paper.pdf",
             ),
             (
                 "Maple Leaf",
                 ["The Stars and Stripes", "The Blue and Yellow", "The Southern Cross"],
                 "What is the national flag of Canada?",
+                "flag_day.html",
             ),
         ]
 
@@ -48,6 +55,7 @@ class StubLitQADataset(LitQATaskDataset):
             ideal=self.data[idx][0],
             distractors=self.data[idx][1],
             question=self.data[idx][2],
+            sources=self.data[idx][3],
         )
 
     def __len__(self) -> int:
