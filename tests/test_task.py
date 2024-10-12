@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from unittest.mock import patch
 
 import pytest
@@ -18,6 +19,7 @@ from paperqa.agents.task import (
 
 @pytest.fixture(name="base_query_request")
 def fixture_base_query_request(agent_test_settings: Settings) -> QueryRequest:
+    agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
     return QueryRequest(settings=agent_test_settings)
 
 
@@ -70,11 +72,13 @@ TASK_DATASET_REGISTRY[STUB_TASK_DATASET_NAME] = (
 
 
 class TestTaskDataset:
+
     @pytest.mark.parametrize(
         ("split", "expected_length"),
         [(LitQAv2TaskSplit.TRAIN, 159), (LitQAv2TaskSplit.EVAL, 40)],
     )
-    def test___len__(
+    @pytest.mark.asyncio
+    async def test___len__(
         self,
         split: str | LitQAv2TaskSplit,
         expected_length: int,
@@ -82,6 +86,23 @@ class TestTaskDataset:
     ) -> None:
         task_dataset = LitQAv2TaskDataset(base_query=base_query_request, split=split)
         assert len(task_dataset) == expected_length
+
+        # Now let's check we could use the sources in a validation
+        for i in range(len(task_dataset)):
+            env = task_dataset.get_new_env_by_idx(i)
+            assert env.sources, "Sources need to be accessible"
+            assert isinstance(
+                env.sources, Iterable
+            ), "Sources need to be at least iterable"
+
+    @pytest.mark.asyncio
+    async def test_can_validate_stub_dataset_sources(
+        self, base_query_request: QueryRequest
+    ) -> None:
+        dataset = StubLitQADataset(base_query=base_query_request)
+        for i in range(len(dataset)):
+            env = dataset.get_new_env_by_idx(i)
+            await env.validate_sources()
 
     @pytest.mark.asyncio
     async def test_evaluation(self, base_query_request: QueryRequest) -> None:

@@ -18,6 +18,10 @@ from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame, TaskDataset
 from aviary.message import Message
 from aviary.tools import ToolRequestMessage, ToolResponseMessage
 
+from paperqa.types import DocDetails
+
+from .search import maybe_get_manifest
+
 try:
     from ldp.alg import ComputeTrajectoryMetricsMixin
 except ImportError:
@@ -75,6 +79,25 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         )
         self._evaluation_callback = evaluation_callback
         self._rewards = rewards
+
+    async def validate_sources(
+        self, manifest: dict[str, DocDetails] | None = None
+    ) -> None:
+        """Validate the sources can be found in the input manifest."""
+        if not self.sources:
+            return
+        if manifest is None:
+            manifest = await maybe_get_manifest(
+                filename=await self._query.settings.agent.index.finalize_manifest_file()
+            )
+        if not manifest:  # No manifest file or incorrectly specified manifest file
+            logger.warning(f"Can't validate sources {self.sources} without a manifest.")
+            return
+        file_names = {k for k in manifest if k}
+        dois = {v["doi"] for v in manifest.values() if v["doi"]}
+        for source in self.sources:
+            if source not in file_names and source not in dois:
+                raise ValueError(f"Source {source!r} not found in the manifest.")
 
     async def step(
         self, action: ToolRequestMessage
