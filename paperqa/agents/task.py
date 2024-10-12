@@ -20,7 +20,7 @@ from aviary.tools import ToolRequestMessage, ToolResponseMessage
 
 from paperqa.types import DocDetails
 
-from .search import maybe_get_manifest
+from .search import SearchIndex, maybe_get_manifest
 
 try:
     from ldp.alg import ComputeTrajectoryMetricsMixin
@@ -81,23 +81,32 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         self._rewards = rewards
 
     async def validate_sources(
-        self, manifest: dict[str, DocDetails] | None = None
+        self, manifest_or_index: dict[str, DocDetails] | SearchIndex | None = None
     ) -> None:
-        """Validate the sources can be found in the input manifest."""
+        """Validate the sources can be found in the input manifest or index."""
         if not self.sources:
             return
-        if manifest is None:
-            manifest = await maybe_get_manifest(
+        if manifest_or_index is None:  # Let's try to load in the manifest
+            manifest_or_index = await maybe_get_manifest(
                 filename=await self._query.settings.agent.index.finalize_manifest_file()
             )
-        if not manifest:  # No manifest file or incorrectly specified manifest file
-            logger.warning(f"Can't validate sources {self.sources} without a manifest.")
+        if isinstance(manifest_or_index, SearchIndex):
+            entity: str = "index"
+            file_names: set[str] = {k for k in await manifest_or_index.index_files if k}
+            dois: set[str] = set()
+        else:
+            entity = "manifest"
+            file_names = {k for k in manifest_or_index if k}
+            dois = {v["doi"] for v in manifest_or_index.values() if v["doi"]}
+        if not file_names:  # File names being empty means something's wrong
+            logger.warning(
+                f"Can't validate sources {self.sources} without a correctly specified"
+                f" {entity}."
+            )
             return
-        file_names = {k for k in manifest if k}
-        dois = {v["doi"] for v in manifest.values() if v["doi"]}
         for source in self.sources:
             if source not in file_names and source not in dois:
-                raise ValueError(f"Source {source!r} not found in the manifest.")
+                raise ValueError(f"Source {source!r} not found in the {entity}.")
 
     async def step(
         self, action: ToolRequestMessage
