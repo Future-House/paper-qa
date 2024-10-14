@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import itertools
 import json
+import logging
 import re
 import shutil
 import tempfile
@@ -26,7 +27,11 @@ from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import settings_to_tools
 from paperqa.agents.main import FAKE_AGENT_TYPE
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
-from paperqa.agents.search import FAILED_DOCUMENT_ADD_ID, get_directory_index
+from paperqa.agents.search import (
+    FAILED_DOCUMENT_ADD_ID,
+    get_directory_index,
+    maybe_get_manifest,
+)
 from paperqa.agents.tools import (
     EnvironmentState,
     GatherEvidence,
@@ -42,9 +47,8 @@ from paperqa.utils import extract_thought, get_year, md5sum
 
 @pytest.mark.asyncio
 async def test_get_directory_index(agent_test_settings: Settings) -> None:
-    # Since agent_test_settings is used by other tests, and thus uses the same
-    # paper_directory as other tests, we use a tempdir so we can delete files
-    # without affecting concurrent tests
+    # Since agent_test_settings is used by other tests, we use a tempdir so we
+    # can delete files without affecting concurrent tests
     with tempfile.TemporaryDirectory() as tempdir:
         shutil.copytree(
             agent_test_settings.agent.index.paper_directory, tempdir, dirs_exist_ok=True
@@ -137,6 +141,32 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
         mock_aadd.await_count <= crash_threshold
     ), "Should have been able to resume build"
     assert len(await index.index_files) > crash_threshold
+
+
+@pytest.mark.asyncio
+async def test_getting_manifest(
+    agent_test_settings: Settings, stub_data_dir: Path, caplog
+) -> None:
+    agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
+
+    # Since stub_manifest.csv is used by other tests, we use a tempdir so we
+    # can modify it without affecting concurrent tests
+    with tempfile.TemporaryDirectory() as tempdir, caplog.at_level(logging.WARNING):
+        shutil.copytree(stub_data_dir, tempdir, dirs_exist_ok=True)
+        agent_test_settings.agent.index.paper_directory = tempdir
+        manifest_filepath = (
+            await agent_test_settings.agent.index.finalize_manifest_file()
+        )
+        assert manifest_filepath
+        assert await maybe_get_manifest(manifest_filepath)
+        assert not caplog.records
+
+        # If a header line isn't present, our manifest extraction should fail
+        original_manifest_lines = (await manifest_filepath.read_text()).splitlines()
+        await manifest_filepath.write_text(data="\n".join(original_manifest_lines[1:]))
+        await maybe_get_manifest(manifest_filepath)
+        assert len(caplog.records) == 1
+        assert caplog.records[0].levelno == logging.ERROR
 
 
 EXPECTED_STUB_DATA_FILES = {
