@@ -11,7 +11,6 @@ import warnings
 import zlib
 from collections.abc import Awaitable, Callable, Collection, Sequence
 from enum import StrEnum, auto
-from io import StringIO
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 from uuid import UUID
 
@@ -359,18 +358,27 @@ async def maybe_get_manifest(
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
-            records = [DocDetails(**row) for row in csv.DictReader(StringIO(content))]
+            records = [DocDetails(**r) for r in csv.DictReader(content.splitlines())]
+            file_loc_to_records = {
+                str(r.file_location): r for r in records if r.file_location
+            }
+            if not file_loc_to_records:
+                raise ValueError(  # noqa: TRY301
+                    f"No mapping of file location to details extracted from manifest"
+                    f" file {filename}."
+                )
             logger.debug(
-                f"Found manifest file at {filename} and read {len(records)} records"
-                " from it."
+                f"Found manifest file at {filename}, read {len(records)} records"
+                f" from it, which maps to {len(file_loc_to_records)} locations."
             )
-            return {str(r.file_location): r for r in records if r.file_location}
         except FileNotFoundError:
-            logging.warning(f"Manifest file at {filename} could not be found.")
+            logger.warning(f"Manifest file at {filename} could not be found.")
         except Exception:
-            logging.exception(f"Error reading manifest file {filename}")
+            logger.exception(f"Error reading manifest file {filename}.")
+        else:
+            return file_loc_to_records
     else:
-        logging.error(f"Invalid manifest file type: {filename.suffix}")
+        logger.error(f"Invalid manifest file type: {filename.suffix}")
 
     return {}
 
