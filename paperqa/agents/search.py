@@ -48,6 +48,8 @@ from paperqa.utils import ImpossibleParsingError, hexdigest
 from .models import SupportsPickle
 
 if TYPE_CHECKING:
+    from tantivy import IndexWriter
+
     from paperqa.settings import MaybeSettings, Settings
 
 logger = logging.getLogger(__name__)
@@ -243,7 +245,7 @@ class SearchIndex:
         async def _add_document() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
-                    writer = (await self.index).writer()
+                    writer: IndexWriter = (await self.index).writer()
                     writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
                     writer.commit()
 
@@ -282,7 +284,7 @@ class SearchIndex:
     )
     def delete_document(index: Index, file_location: str) -> None:
         try:
-            writer = index.writer()
+            writer: IndexWriter = index.writer()
             writer.delete_documents("file_location", file_location)
             writer.commit()
         except ValueError as e:
