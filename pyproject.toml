@@ -231,6 +231,9 @@ score = false
 min-similarity-lines = 12
 
 [tool.pytest.ini_options]
+# Add the specified OPTS to the set of command line arguments as if they had been
+# specified by the user.
+addopts = "--typeguard-packages=paperqa"
 # Sets a list of filters and actions that should be taken for matched warnings.
 # By default all warnings emitted during the test session will be displayed in
 # a summary at the end of the test session.
@@ -418,4 +421,5 @@ dev-dependencies = [
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "refurb>=2",  # Pin to keep recent
+    "typeguard",
 ]
