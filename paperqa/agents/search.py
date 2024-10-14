@@ -366,11 +366,11 @@ async def maybe_get_manifest(
             )
             return {str(r.file_location): r for r in records if r.file_location}
         except FileNotFoundError:
-            logging.warning(f"Manifest file at {filename} could not be found.")
+            logger.warning(f"Manifest file at {filename} could not be found.")
         except Exception:
-            logging.exception(f"Error reading manifest file {filename}")
+            logger.exception(f"Error reading manifest file {filename}.")
     else:
-        logging.error(f"Invalid manifest file type: {filename.suffix}")
+        logger.error(f"Invalid manifest file type: {filename.suffix}")
 
     return {}
 
