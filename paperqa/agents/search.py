@@ -128,9 +128,6 @@ class SearchIndex:
         self.changed = False
         self.storage = storage
 
-    async def init_directory(self) -> None:
-        await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
-
     @property
     async def index_directory(self) -> anyio.Path:
         directory = anyio.Path(self._index_directory).joinpath(self.index_name)
