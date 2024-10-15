@@ -406,7 +406,7 @@ dev-dependencies = [
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[datasets,ldp,typing,zotero]",
-    "pre-commit~=3.4",  # Pin to keep recent
+    "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",
     "pytest-asyncio",
