@@ -48,6 +48,8 @@ from paperqa.utils import ImpossibleParsingError, hexdigest
 from .models import SupportsPickle
 
 if TYPE_CHECKING:
+    from tantivy import IndexWriter
+
     from paperqa.settings import MaybeSettings, Settings
 
 logger = logging.getLogger(__name__)
@@ -72,9 +74,11 @@ class RobustEncoder(json.JSONEncoder):
 
 
 class SearchDocumentStorage(StrEnum):
-    JSON_MODEL_DUMP = auto()
-    PICKLE_COMPRESSED = auto()
-    PICKLE_UNCOMPRESSED = auto()
+    """Method to serialize a document."""
+
+    JSON_MODEL_DUMP = auto()  # utf-8 JSON dump
+    PICKLE_COMPRESSED = auto()  # pickle + zlib compression
+    PICKLE_UNCOMPRESSED = auto()  # pickle
 
     def extension(self) -> str:
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
@@ -101,6 +105,8 @@ class SearchDocumentStorage(StrEnum):
 
 
 class SearchIndex:
+    """Wrapper around a tantivy.Index exposing higher-level behaviors for documents."""
+
     REQUIRED_FIELDS: ClassVar[list[str]] = ["file_location", "body"]
 
     def __init__(
@@ -128,9 +134,6 @@ class SearchIndex:
         self.changed = False
         self.storage = storage
 
-    async def init_directory(self) -> None:
-        await anyio.Path(await self.index_directory).mkdir(parents=True, exist_ok=True)
-
     @property
     async def index_directory(self) -> anyio.Path:
         directory = anyio.Path(self._index_directory).joinpath(self.index_name)
@@ -138,19 +141,22 @@ class SearchIndex:
         return directory
 
     @property
-    async def index_filename(self) -> anyio.Path:
+    async def index_filename(self) -> anyio.Path:  # TODO: rename to index_directory
+        """Directory to store files used to house index internals."""
         index_dir = (await self.index_directory) / "index"
         await index_dir.mkdir(exist_ok=True)
         return index_dir
 
     @property
     async def docs_index_directory(self) -> anyio.Path:
+        """Directory to store documents (e.g. chunked PDFs) given the storage type."""
         docs_dir = (await self.index_directory) / "docs"
         await docs_dir.mkdir(exist_ok=True)
         return docs_dir
 
     @property
     async def file_index_filename(self) -> anyio.Path:
+        """File containing a zlib-compressed pickle of the index_files."""
         return (await self.index_directory) / "files.zip"
 
     @property
@@ -167,9 +173,10 @@ class SearchIndex:
         if not self._index:
             index_path = await self.index_filename
             if await (index_path / "meta.json").exists():
-                self._index = Index.open(str(index_path))  # type: ignore[assignment]
+                self._index = Index.open(path=str(index_path))  # type: ignore[assignment]
             else:
-                self._index = Index(self.schema, str(index_path))  # type: ignore[assignment]
+                # NOTE: this creates the above meta.json file
+                self._index = Index(self.schema, path=str(index_path))  # type: ignore[assignment]
         return cast(Index, self._index)
 
     @property
@@ -200,10 +207,9 @@ class SearchIndex:
     def filehash(body: str) -> str:
         return hexdigest(body)
 
-    async def filecheck(self, filename: str, body: str | None = None):
-        filehash = None
-        if body:
-            filehash = self.filehash(body)
+    async def filecheck(self, filename: str, body: str | None = None) -> bool:
+        """Check if this index contains the filename and if the body's filehash matches."""
+        filehash: str | None = self.filehash(body) if body else None
         index_files = await self.index_files
         return bool(
             index_files.get(filename)
@@ -215,19 +221,31 @@ class SearchIndex:
         self.changed = True
 
     async def add_document(
-        self, index_doc: dict, document: Any | None = None, max_retries: int = 1000
+        self,
+        index_doc: dict[str, Any],  # TODO: rename to something more intuitive
+        document: Any | None = None,
+        lock_acquisition_max_retries: int = 1000,
     ) -> None:
+        """
+        Add the input document to this index.
+
+        Args:
+            index_doc: "Document" (thinking types.Doc) of metadata such as 'title' to
+                use in the index.
+            document: Document to store according to the specified storage method.
+            lock_acquisition_max_retries: Amount of retries to acquire a file lock. A
+                large default of 1000 is used because lock acquisition can take a while.
+        """
+
         @retry(
-            stop=stop_after_attempt(max_retries),
+            stop=stop_after_attempt(lock_acquisition_max_retries),
             wait=wait_random_exponential(multiplier=0.25, max=60),
             retry=retry_if_exception_type(AsyncRetryError),
-            reraise=True,
         )
-        async def _add_document_with_retry() -> None:
+        async def _add_document() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
-                    index = await self.index
-                    writer = index.writer()
+                    writer: IndexWriter = (await self.index).writer()
                     writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
                     writer.commit()
 
@@ -245,19 +263,17 @@ class SearchIndex:
                     self.changed = True
                 except ValueError as e:
                     if "Failed to acquire Lockfile: LockBusy." in str(e):
-                        raise AsyncRetryError("Failed to acquire lock") from e
+                        raise AsyncRetryError("Failed to acquire lock.") from e
                     raise
 
         try:
-            await _add_document_with_retry()
+            await _add_document()  # If this runs, we succeeded
         except RetryError:
             logger.exception(
-                f"Failed to add document after {max_retries} attempts:"
-                f" {index_doc['file_location']}"
+                f"Failed to add document to {index_doc['file_location']}"
+                f" within {lock_acquisition_max_retries} attempts."
             )
             raise
-
-        # Success
 
     @staticmethod
     @retry(
@@ -268,7 +284,7 @@ class SearchIndex:
     )
     def delete_document(index: Index, file_location: str) -> None:
         try:
-            writer = index.writer()
+            writer: IndexWriter = index.writer()
             writer.delete_documents("file_location", file_location)
             writer.commit()
         except ValueError as e:
@@ -279,8 +295,7 @@ class SearchIndex:
     async def remove_from_index(self, file_location: str) -> None:
         index_files = await self.index_files
         if index_files.get(file_location):
-            index = await self.index
-            self.delete_document(index, file_location)
+            self.delete_document(await self.index, file_location)
             filehash = index_files.pop(file_location)
             docs_index_dir = await self.docs_index_directory
             # TODO: since the directory is part of the filehash these
@@ -452,7 +467,7 @@ async def process_file(
                     "title": title,
                     "year": year,
                     "file_location": file_location,
-                    "body": "".join([t.text for t in tmp_docs.texts]),
+                    "body": "".join(t.text for t in tmp_docs.texts),
                 },
                 document=tmp_docs,
             )
