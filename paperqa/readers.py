@@ -15,7 +15,9 @@ from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
 
-def parse_pdf_to_pages(path: str | os.PathLike) -> ParsedText:
+def parse_pdf_to_pages(
+    path: str | os.PathLike, page_limit: int | None = None
+) -> ParsedText:
 
     with pymupdf.open(path) as file:
         pages: dict[str, str] = {}
@@ -28,10 +30,17 @@ def parse_pdf_to_pages(path: str | os.PathLike) -> ParsedText:
                 raise ImpossibleParsingError(
                     f"Page loading via {pymupdf.__name__} failed on page {i} of"
                     f" {file.page_count} for the PDF at path {path}, likely this PDF"
-                    " file is corrupt"
+                    " file is corrupt."
                 ) from exc
-            pages[str(i + 1)] = page.get_text("text", sort=True)
-            total_length += len(pages[str(i + 1)])
+            text = page.get_text("text", sort=True)
+            if page_limit and len(text) > page_limit:
+                raise ImpossibleParsingError(
+                    f"The text in page {i} of {file.page_count} was {len(text)} chars"
+                    f" long, which exceeds the {page_limit} char limit for the PDF at"
+                    f" path {path}."
+                )
+            pages[str(i + 1)] = text
+            total_length += len(text)
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
@@ -56,8 +65,8 @@ def chunk_pdf(
 
     if not parsed_text.content:
         raise ImpossibleParsingError(
-            f"No text was parsed from the document named {doc.docname!r}, either empty"
-            " or corrupted."
+            f"No text was parsed from the document named {doc.docname!r} with ID"
+            f" {doc.dockey}, either empty or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():
@@ -90,6 +99,7 @@ def parse_text(
     html: bool = False,
     split_lines: bool = False,
     use_tiktoken: bool = True,
+    page_limit: int | None = None,
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -98,6 +108,7 @@ def parse_text(
         html: flag to use html2text library for parsing.
         split_lines: flag to split lines into a list.
         use_tiktoken: flag to use tiktoken library to encode text.
+        page_limit: optional limit on the number of characters per page.
     """
     path = Path(path)
     try:
@@ -113,18 +124,27 @@ def parse_text(
             raise NotImplementedError(
                 "HTML parsing is not yet set up to work with split_lines."
             )
+        parse_type: str = "html"
         text = html2text(text)
         parsing_libraries.append(f"html2text ({html2text_version})")
+    else:
+        parse_type = "txt"
 
+    texts = [text] if isinstance(text, str) else text
+    total_length = sum(len(t) for t in texts)
+    for i, t in enumerate(texts):
+        if page_limit and len(text) > page_limit:
+            raise ImpossibleParsingError(
+                f"The {parse_type} on page {i} of {len(texts)} was {len(t)} chars long,"
+                f" which exceeds the {page_limit} char limit at path {path}."
+            )
     return ParsedText(
         content=text,
         metadata=ParsedMetadata(
             parsing_libraries=parsing_libraries,
             paperqa_version=pqa_version,
-            total_parsed_text_length=(
-                len(text) if isinstance(text, str) else sum(len(t) for t in text)
-            ),
-            parse_type="txt" if not html else "html",
+            total_parsed_text_length=total_length,
+            parse_type=parse_type,
         ),
     )
 
@@ -152,8 +172,8 @@ def chunk_text(
     content = parsed_text.content if not use_tiktoken else parsed_text.encode_content()
     if not content:  # Avoid div0 in token calculations
         raise ImpossibleParsingError(
-            f"No text was parsed from the document named {doc.docname!r}, either empty"
-            " or corrupted."
+            f"No text was parsed from the document named {doc.docname!r} with ID"
+            f" {doc.dockey}, either empty or corrupted."
         )
 
     # convert from characters to chunks
