@@ -18,6 +18,10 @@ from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame, TaskDataset
 from aviary.message import Message
 from aviary.tools import ToolRequestMessage, ToolResponseMessage
 
+from paperqa.types import DocDetails
+
+from .search import SearchIndex, maybe_get_manifest
+
 try:
     from ldp.alg import ComputeTrajectoryMetricsMixin
 except ImportError:
@@ -60,6 +64,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         evaluation_from_answer: (
             Callable[[Answer | str], Awaitable[LitQAEvaluation]] | None
         ) = None,
+        sources: str | list[str] | None = None,
         rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
         evaluation_callback: Callable[[LitQAEvaluation], Awaitable] | None = None,
         **env_kwargs,
@@ -68,8 +73,40 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             query, docs, llm_model, summary_llm_model, embedding_model, **env_kwargs
         )
         self._evaluation_from_answer = evaluation_from_answer
+        # Enables checking an Index has the right DOI(s)
+        self.sources: list[str] | None = (
+            [sources] if isinstance(sources, str) else sources
+        )
         self._evaluation_callback = evaluation_callback
         self._rewards = rewards
+
+    async def validate_sources(
+        self, manifest_or_index: dict[str, DocDetails] | SearchIndex | None = None
+    ) -> None:
+        """Validate the sources can be found in the input manifest or index."""
+        if not self.sources:
+            return
+        if manifest_or_index is None:  # Let's try to load in the manifest
+            manifest_or_index = await maybe_get_manifest(
+                filename=await self._query.settings.agent.index.finalize_manifest_file()
+            )
+        if isinstance(manifest_or_index, SearchIndex):
+            entity: str = "index"
+            file_names: set[str] = {k for k in await manifest_or_index.index_files if k}
+            dois: set[str] = set()
+        else:
+            entity = "manifest"
+            file_names = {k for k in manifest_or_index if k}
+            dois = {v["doi"] for v in manifest_or_index.values() if v["doi"]}
+        if not file_names:  # File names being empty means something's wrong
+            logger.warning(
+                f"Can't validate sources {self.sources} without a correctly specified"
+                f" {entity}."
+            )
+            return
+        for source in self.sources:
+            if source not in file_names and source not in dois:
+                raise ValueError(f"Source {source!r} not found in the {entity}.")
 
     async def step(
         self, action: ToolRequestMessage
@@ -149,6 +186,7 @@ class LitQATaskDataset(
         distractors: str | list[str],
         question: str,
         use_unsure: bool = True,
+        sources: str | list[str] | None = None,
     ) -> GradablePaperQAEnvironment:
         qa_prompt, evaluation_from_answer = LitQAEvaluation.from_question(
             ideal=ideal,
@@ -163,6 +201,7 @@ class LitQATaskDataset(
             query=query,
             docs=self._base_docs.model_copy(),
             evaluation_from_answer=evaluation_from_answer,
+            sources=sources,
             rewards=self._rewards,
             **self._env_kwargs,
         )
@@ -243,6 +282,7 @@ class LitQAv2TaskDataset(LitQATaskDataset):
             ideal=self.data.iloc[idx].ideal,
             distractors=self.data.iloc[idx].distractors,
             question=self.data.iloc[idx].question,
+            sources=list(self.data.iloc[idx].sources),
         )
 
     def __len__(self) -> int:
