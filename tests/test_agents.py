@@ -421,7 +421,7 @@ async def test_gather_evidence_rejects_empty_docs(
     ), "Agent should have hit its max timesteps"
 
 
-@pytest.mark.parametrize("callback_type", ["none", "async"])
+@pytest.mark.parametrize("callback_type", [None, "async"])
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
@@ -436,14 +436,19 @@ async def test_agent_sharing_state(
 
     callbacks = {}
     if callback_type == "async":
-        agenerate_answer_callback = AsyncMock()
-        agather_evidence_callback = AsyncMock()
+        gen_answer_initialized_callback = AsyncMock()
+        gen_answer_completed_callback = AsyncMock()
+        gather_evidence_initialized_callback = AsyncMock()
+        gather_evidence_completed_callback = AsyncMock()
+
         callbacks = {
-            "generate_answer_completed": agenerate_answer_callback,
-            "gather_evidence_completed": agather_evidence_callback,
+            "gen_answer_initialized": [gen_answer_initialized_callback],
+            "gen_answer_completed": [gen_answer_completed_callback],
+            "gather_evidence_initialized": [gather_evidence_initialized_callback],
+            "gather_evidence_completed": [gather_evidence_completed_callback],
         }
 
-    agent_test_settings.callbacks = callbacks
+    agent_test_settings.callbacks = callbacks  # type: ignore[assignment]
 
     answer = Answer(question="What is is a self-explanatory model?")
     query = QueryRequest(query=answer.question, settings=agent_test_settings)
@@ -479,10 +484,12 @@ async def test_agent_sharing_state(
             embedding_model=embedding_model,
         )
         await gather_evidence_tool.gather_evidence(answer.question, state=env_state)
-        assert answer.contexts, "Evidence did not return any results"
 
         if callback_type == "async":
-            agather_evidence_callback.assert_awaited_once_with(env_state)
+            gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
+            gather_evidence_completed_callback.assert_awaited_once_with(env_state)
+
+        assert answer.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswer.__name__} working"):
         generate_answer_tool = GenerateAnswer(
@@ -494,7 +501,8 @@ async def test_agent_sharing_state(
         result = await generate_answer_tool.gen_answer(answer.question, state=env_state)
 
         if callback_type == "async":
-            agenerate_answer_callback.assert_awaited_once_with(env_state)
+            gen_answer_initialized_callback.assert_awaited_once_with(env_state)
+            gen_answer_completed_callback.assert_awaited_once_with(env_state)
 
         assert re.search(
             pattern=EnvironmentState.STATUS_SEARCH_REGEX_PATTERN, string=result

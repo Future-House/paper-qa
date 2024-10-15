@@ -584,21 +584,33 @@ class Settings(BaseSettings):
         frozen=True,
     )
 
-    callbacks: Mapping[str, Callable[["EnvironmentState"], Any]] = Field(
+    callbacks: Mapping[str, list[Callable[["EnvironmentState"], Any]]] = Field(
         default_factory=dict,
         description="""
-            A mapping that associates callback names with their corresponding callable functions.
-            Each callback will be called with an instance of `EnvironmentState`, representing
-            the current state context.
-
-            The callback functions can be synchronous or asynchronous, and are used to trigger specific
-            actions after key operations in the agent lifecycle.
+            A mapping that associates callback names with lists of corresponding callable functions.
+            Each callback list contains functions that will be called with an instance of `EnvironmentState`,
+            representing the current state context.
 
             Accepted callback names:
-            - 'generate_answer_completed': Triggered after `GenerateAnswer.gen_answer` generates an answer.
-            - 'gather_evidence_completed': Triggered after `GatherEvidence.gather_evidence` gathers evidence.
+            - 'gen_answer_initialized': Triggered when `GenerateAnswer.gen_answer`
+                is initialized.
 
+            - 'gen_answer_aget_query': LLM callbacks to execute in the prompt runner
+                as part of `GenerateAnswer.gen_answer`.
+
+            - 'gen_answer_completed': Triggered after `GenerateAnswer.gen_answer`
+                successfully generates an answer.
+
+            - 'gather_evidence_initialized': Triggered when `GatherEvidence.gather_evidence`
+                is initialized.
+
+            - 'gather_evidence_aget_evidence: LLM callbacks to execute in the prompt runner
+                as part of `GatherEvidence.gather_evidence`.
+
+            - 'gather_evidence_completed': Triggered after `GatherEvidence.gather_evidence`
+                completes evidence gathering.
         """,
+        exclude=True,
     )
 
     @model_validator(mode="after")

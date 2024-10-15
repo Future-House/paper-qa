@@ -190,6 +190,11 @@ class GatherEvidence(NamedTool):
         if not state.docs.docs:
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
+        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
+            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]
+            for callback in callback_list:
+                await callback(state)
+
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.answer.question
         try:
@@ -197,12 +202,17 @@ class GatherEvidence(NamedTool):
             # TODO: remove this swap, as it prevents us from supporting parallel calls
             state.answer.question = question
             l0 = len(state.answer.contexts)
+
+            aget_evidence_callbacks = self.settings.callbacks.get(
+                f"{self.TOOL_FN_NAME}_aget_evidence", None
+            )
             # TODO: refactor answer out of this...
             state.answer = await state.docs.aget_evidence(
                 query=state.answer,
                 settings=self.settings,
                 embedding_model=self.embedding_model,
                 summary_llm_model=self.summary_llm_model,
+                callbacks=aget_evidence_callbacks,
             )
             l1 = len(state.answer.contexts)
         finally:
@@ -219,10 +229,10 @@ class GatherEvidence(NamedTool):
             else ""
         )
 
-        # named this way to support lifecycle callbacks in the future
-        # gather_evidence_init, generate_evidence_progress, etc.
-        if "gather_evidence_completed" in self.settings.callbacks:
-            await self.settings.callbacks["gather_evidence_completed"](state)
+        if f"{self.TOOL_FN_NAME}_completed" in self.settings.callbacks:
+            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_completed"]
+            for callback in callback_list:
+                await callback(state)
 
         return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
 
@@ -254,6 +264,15 @@ class GenerateAnswer(NamedTool):
             state: Current state.
         """
         logger.info(f"Generating answer for '{question}'.")
+
+        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
+            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]
+            for callback in callback_list:
+                await callback(state)
+
+        aget_query_callbacks = self.settings.callbacks.get(
+            f"{self.TOOL_FN_NAME}_aget_query", None
+        )
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
         state.answer = await state.docs.aquery(
@@ -262,6 +281,7 @@ class GenerateAnswer(NamedTool):
             llm_model=self.llm_model,
             summary_llm_model=self.summary_llm_model,
             embedding_model=self.embedding_model,
+            callbacks=aget_query_callbacks,
         )
 
         if state.answer.could_not_answer:
@@ -274,10 +294,10 @@ class GenerateAnswer(NamedTool):
         status = state.status
         logger.info(status)
 
-        # named this way to support lifecycle callbacks in the future
-        # generate_answer_init, generate_answer_progress, etc.
-        if "generate_answer_completed" in self.settings.callbacks:
-            await self.settings.callbacks["generate_answer_completed"](state)
+        if f"{self.TOOL_FN_NAME}_completed" in self.settings.callbacks:
+            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_completed"]
+            for callback in callback_list:
+                await callback(state)
 
         return f"{answer} | {status}"
 
