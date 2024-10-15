@@ -15,7 +15,7 @@ from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
 
-def parse_pdf_to_pages(path: Path) -> ParsedText:
+def parse_pdf_to_pages(path: str | os.PathLike) -> ParsedText:
 
     with pymupdf.open(path) as file:
         pages: dict[str, str] = {}
@@ -218,7 +218,7 @@ def chunk_code_text(
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
     include_metadata: Literal[False],
@@ -229,7 +229,7 @@ def read_doc(
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False] = ...,
     include_metadata: Literal[False] = ...,
@@ -240,7 +240,7 @@ def read_doc(
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[True],
     include_metadata: bool = ...,
@@ -251,7 +251,7 @@ def read_doc(
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
     include_metadata: Literal[True],
@@ -261,7 +261,7 @@ def read_doc(
 
 
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: bool = False,
     include_metadata: bool = False,
