@@ -15,7 +15,9 @@ from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
 
-def parse_pdf_to_pages(path: Path) -> ParsedText:
+def parse_pdf_to_pages(
+    path: str | os.PathLike, page_size_limit: int | None = None
+) -> ParsedText:
 
     with pymupdf.open(path) as file:
         pages: dict[str, str] = {}
@@ -28,10 +30,17 @@ def parse_pdf_to_pages(path: Path) -> ParsedText:
                 raise ImpossibleParsingError(
                     f"Page loading via {pymupdf.__name__} failed on page {i} of"
                     f" {file.page_count} for the PDF at path {path}, likely this PDF"
-                    " file is corrupt"
+                    " file is corrupt."
                 ) from exc
-            pages[str(i + 1)] = page.get_text("text", sort=True)
-            total_length += len(pages[str(i + 1)])
+            text = page.get_text("text", sort=True)
+            if page_size_limit and len(text) > page_size_limit:
+                raise ImpossibleParsingError(
+                    f"The text in page {i} of {file.page_count} was {len(text)} chars"
+                    f" long, which exceeds the {page_size_limit} char limit for the PDF"
+                    f" at path {path}."
+                )
+            pages[str(i + 1)] = text
+            total_length += len(text)
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
@@ -56,8 +65,8 @@ def chunk_pdf(
 
     if not parsed_text.content:
         raise ImpossibleParsingError(
-            f"No text was parsed from the document named {doc.docname!r}, either empty"
-            " or corrupted."
+            f"No text was parsed from the document named {doc.docname!r} with ID"
+            f" {doc.dockey}, either empty or corrupted."
         )
 
     for page_num, page_text in parsed_text.content.items():
@@ -90,6 +99,7 @@ def parse_text(
     html: bool = False,
     split_lines: bool = False,
     use_tiktoken: bool = True,
+    page_size_limit: int | None = None,
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -98,6 +108,8 @@ def parse_text(
         html: flag to use html2text library for parsing.
         split_lines: flag to split lines into a list.
         use_tiktoken: flag to use tiktoken library to encode text.
+        page_size_limit: optional limit on the number of characters per page. Only
+            relevant when split_lines is True.
     """
     path = Path(path)
     try:
@@ -113,18 +125,29 @@ def parse_text(
             raise NotImplementedError(
                 "HTML parsing is not yet set up to work with split_lines."
             )
+        parse_type: str = "html"
         text = html2text(text)
         parsing_libraries.append(f"html2text ({html2text_version})")
-
+    else:
+        parse_type = "txt"
+    if isinstance(text, str):
+        total_length: int = len(text)
+    else:
+        total_length = sum(len(t) for t in text)
+        for i, t in enumerate(text):
+            if page_size_limit and len(text) > page_size_limit:
+                raise ImpossibleParsingError(
+                    f"The {parse_type} on page {i} of {len(text)} was {len(t)} chars"
+                    f" long, which exceeds the {page_size_limit} char limit at path"
+                    f" {path}."
+                )
     return ParsedText(
         content=text,
         metadata=ParsedMetadata(
             parsing_libraries=parsing_libraries,
             paperqa_version=pqa_version,
-            total_parsed_text_length=(
-                len(text) if isinstance(text, str) else sum(len(t) for t in text)
-            ),
-            parse_type="txt" if not html else "html",
+            total_parsed_text_length=total_length,
+            parse_type=parse_type,
         ),
     )
 
@@ -152,8 +175,8 @@ def chunk_text(
     content = parsed_text.content if not use_tiktoken else parsed_text.encode_content()
     if not content:  # Avoid div0 in token calculations
         raise ImpossibleParsingError(
-            f"No text was parsed from the document named {doc.docname!r}, either empty"
-            " or corrupted."
+            f"No text was parsed from the document named {doc.docname!r} with ID"
+            f" {doc.dockey}, either empty or corrupted."
         )
 
     # convert from characters to chunks
@@ -218,55 +241,60 @@ def chunk_code_text(
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
     include_metadata: Literal[False],
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_size_limit: int | None = ...,
 ) -> list[Text]: ...
 
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False] = ...,
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_size_limit: int | None = ...,
 ) -> list[Text]: ...
 
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[True],
     include_metadata: bool = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_size_limit: int | None = ...,
 ) -> ParsedText: ...
 
 
 @overload
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_size_limit: int | None = ...,
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
 def read_doc(
-    path: Path,
+    path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: bool = False,
     include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
+    page_size_limit: int | None = None,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
@@ -275,23 +303,26 @@ def read_doc(
     Args:
         path: local document path
         doc: object with document metadata
-        chunk_chars: size of chunks
-        overlap: size of overlap between chunks
         parsed_text_only: return parsed text without chunking
         include_metadata: return a tuple
+        chunk_chars: size of chunks
+        overlap: size of overlap between chunks
+        page_size_limit: optional limit on the number of characters per page
     """
     str_path = str(path)
     parsed_text = None
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        parsed_text = parse_pdf_to_pages(path)
+        parsed_text = parse_pdf_to_pages(path, page_size_limit=page_size_limit)
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path)
+        parsed_text = parse_text(path, page_size_limit=page_size_limit)
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True)
+        parsed_text = parse_text(path, html=True, page_size_limit=page_size_limit)
     else:
-        parsed_text = parse_text(path, split_lines=True, use_tiktoken=False)
+        parsed_text = parse_text(
+            path, split_lines=True, use_tiktoken=False, page_size_limit=page_size_limit
+        )
 
     if parsed_text_only:
         return parsed_text

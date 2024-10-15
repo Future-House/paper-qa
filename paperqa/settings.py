@@ -119,6 +119,14 @@ class ParsingSettings(BaseModel):
         default=5000,
         description="Number of characters per chunk. If 0, no chunking will be done.",
     )
+    page_size_limit: int | None = Field(
+        default=1_280_000,
+        description=(
+            "Optional limit on the number of characters to parse in one 'page', default"
+            " is 1.28 million chars, 10X larger than a 128k tokens context limit"
+            " (ignoring chars vs tokens difference)."
+        ),
+    )
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc"
     )

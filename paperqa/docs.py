@@ -269,6 +269,7 @@ class Docs(BaseModel):
                 Doc(docname="", citation="", dockey=dockey),  # Fake doc
                 chunk_chars=parse_config.chunk_size,
                 overlap=parse_config.overlap,
+                page_size_limit=parse_config.page_size_limit,
             )
             if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
@@ -369,6 +370,7 @@ class Docs(BaseModel):
             doc,
             chunk_chars=parse_config.chunk_size,
             overlap=parse_config.overlap,
+            page_size_limit=parse_config.page_size_limit,
         )
         # loose check to see if document was loaded
         if (
