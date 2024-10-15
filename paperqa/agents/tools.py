@@ -218,6 +218,16 @@ class GatherEvidence(NamedTool):
             if sorted_contexts
             else ""
         )
+
+        # named this way to support lifecycle callbacks in the future
+        # gather_evidence_init, generate_evidence_progress, etc.
+        if "gather_evidence_completed" in self.settings.callbacks:
+            callback = self.settings.callbacks["gather_evidence_completed"]
+            if inspect.iscoroutinefunction(callback):
+                await callback(state)
+            else:
+                callback(state)
+
         return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
 
 
@@ -267,6 +277,16 @@ class GenerateAnswer(NamedTool):
             answer = state.answer.answer
         status = state.status
         logger.info(status)
+
+        # named this way to support lifecycle callbacks in the future
+        # generate_answer_init, generate_answer_progress, etc.
+        if "generate_answer_completed" in self.settings.callbacks:
+            callback = self.settings.callbacks["generate_answer_completed"]
+            if inspect.iscoroutinefunction(callback):
+                await callback(state)
+            else:
+                callback(state)
+
         return f"{answer} | {status}"
 
     # NOTE: can match failure to answer or an actual answer

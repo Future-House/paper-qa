@@ -3,9 +3,10 @@ import importlib.resources
 import os
 import pathlib
 import warnings
+from collections.abc import Callable, Mapping
 from enum import StrEnum
 from pydoc import locate
-from typing import Any, ClassVar, Self, assert_never, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Self, assert_never, cast
 
 import anyio
 from aviary.tools import ToolSelector
@@ -570,6 +571,26 @@ class Settings(BaseSettings):
         ),
         exclude=True,
         frozen=True,
+    )
+
+    # imported here to avoid circular ref
+    if TYPE_CHECKING:
+        from .agents.env import EnvironmentState
+    callbacks: Mapping[str, Callable[["EnvironmentState"], Any]] = Field(
+        default_factory=dict,
+        description="""
+            A mapping that associates callback names with their corresponding callable functions.
+            Each callback will be called with an instance of `EnvironmentState`, representing
+            the current state context.
+
+            The callback functions can be synchronous or asynchronous, and are used to trigger specific
+            actions after key operations in the agent lifecycle.
+
+            Accepted callback names:
+            - 'generate_answer_completed': Triggered after `GenerateAnswer.gen_answer` generates an answer.
+            - 'gather_evidence_completed': Triggered after `GatherEvidence.gather_evidence` gathers evidence.
+
+        """,
     )
 
     @model_validator(mode="after")
