@@ -54,6 +54,9 @@ from paperqa.prompts import (
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
 
+if TYPE_CHECKING:
+    from .agents.env import EnvironmentState
+
 
 class AnswerSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -573,9 +576,6 @@ class Settings(BaseSettings):
         frozen=True,
     )
 
-    # imported here to avoid circular ref
-    if TYPE_CHECKING:
-        from .agents.env import EnvironmentState
     callbacks: Mapping[str, Callable[["EnvironmentState"], Any]] = Field(
         default_factory=dict,
         description="""
