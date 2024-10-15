@@ -5,7 +5,7 @@
     "group:allNonMajor", // Rely on config:recommended for major version updates
     ":automergeMinor",
   ],
-  schedule: ["* 2 * * 1"],
+  schedule: ["* 2 1-7 * 1"],
   prHourlyLimit: 4,
   timezone: "America/Los_Angeles",
   rangeStrategy: "widen",
