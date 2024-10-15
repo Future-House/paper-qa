@@ -946,7 +946,9 @@ def test_zotero() -> None:
         ZoteroDB()  # "group" if group library
 
 
-def test_too_much_evidence(stub_data_dir: Path, stub_data_dir_w_near_dupes) -> None:
+def test_too_much_evidence(
+    stub_data_dir: Path, stub_data_dir_w_near_dupes: Path
+) -> None:
     doc_path = stub_data_dir / "obama.txt"
     mini_settings = Settings(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
     docs = Docs()
