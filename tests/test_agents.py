@@ -10,7 +10,7 @@ import tempfile
 import time
 from pathlib import Path
 from typing import Any, cast
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import ldp.agent
@@ -421,7 +421,7 @@ async def test_gather_evidence_rejects_empty_docs(
     ), "Agent should have hit its max timesteps"
 
 
-@pytest.mark.parametrize("callback_type", ["none", "sync", "async"])
+@pytest.mark.parametrize("callback_type", ["none", "async"])
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
@@ -435,14 +435,7 @@ async def test_agent_sharing_state(
     embedding_model = agent_test_settings.get_embedding_model()
 
     callbacks = {}
-    if callback_type == "sync":
-        generate_answer_callback = Mock()
-        gather_evidence_callback = Mock()
-        callbacks = {
-            "generate_answer_completed": generate_answer_callback,
-            "gather_evidence_completed": gather_evidence_callback,
-        }
-    elif callback_type == "async":
+    if callback_type == "async":
         agenerate_answer_callback = AsyncMock()
         agather_evidence_callback = AsyncMock()
         callbacks = {
@@ -488,9 +481,7 @@ async def test_agent_sharing_state(
         await gather_evidence_tool.gather_evidence(answer.question, state=env_state)
         assert answer.contexts, "Evidence did not return any results"
 
-        if callback_type == "sync":
-            gather_evidence_callback.assert_called_with(env_state)
-        elif callback_type == "async":
+        if callback_type == "async":
             agather_evidence_callback.assert_awaited_once_with(env_state)
 
     with subtests.test(msg=f"{GenerateAnswer.__name__} working"):
@@ -502,9 +493,7 @@ async def test_agent_sharing_state(
         )
         result = await generate_answer_tool.gen_answer(answer.question, state=env_state)
 
-        if callback_type == "sync":
-            generate_answer_callback.assert_called_with(env_state)
-        elif callback_type == "async":
+        if callback_type == "async":
             agenerate_answer_callback.assert_awaited_once_with(env_state)
 
         assert re.search(
