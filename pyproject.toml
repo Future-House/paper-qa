@@ -238,7 +238,6 @@ addopts = "--typeguard-packages=paperqa"
 # By default all warnings emitted during the test session will be displayed in
 # a summary at the end of the test session.
 filterwarnings = [
-    "ignore:'imghdr' is deprecated and slated for removal in Python 3.13:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/2929#issuecomment-2345224633
     "ignore:Support for class-based `config` is deprecated, use ConfigDict instead",  # SEE: https://github.com/BerriAI/litellm/issues/5648
     "ignore:The `dict` method is deprecated; use `model_dump` instead",  # SEE: https://github.com/BerriAI/litellm/issues/5987
     "ignore:Use 'content=<...>' to upload raw bytes/text content:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/5986
