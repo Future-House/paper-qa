@@ -16,7 +16,7 @@ from paperqa.version import __version__ as pqa_version
 
 
 def parse_pdf_to_pages(
-    path: str | os.PathLike, page_limit: int | None = None
+    path: str | os.PathLike, page_size_limit: int | None = None
 ) -> ParsedText:
 
     with pymupdf.open(path) as file:
@@ -33,11 +33,11 @@ def parse_pdf_to_pages(
                     " file is corrupt."
                 ) from exc
             text = page.get_text("text", sort=True)
-            if page_limit and len(text) > page_limit:
+            if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The text in page {i} of {file.page_count} was {len(text)} chars"
-                    f" long, which exceeds the {page_limit} char limit for the PDF at"
-                    f" path {path}."
+                    f" long, which exceeds the {page_size_limit} char limit for the PDF"
+                    f" at path {path}."
                 )
             pages[str(i + 1)] = text
             total_length += len(text)
@@ -99,7 +99,7 @@ def parse_text(
     html: bool = False,
     split_lines: bool = False,
     use_tiktoken: bool = True,
-    page_limit: int | None = None,
+    page_size_limit: int | None = None,
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -108,7 +108,7 @@ def parse_text(
         html: flag to use html2text library for parsing.
         split_lines: flag to split lines into a list.
         use_tiktoken: flag to use tiktoken library to encode text.
-        page_limit: optional limit on the number of characters per page.
+        page_size_limit: optional limit on the number of characters per page.
     """
     path = Path(path)
     try:
@@ -133,10 +133,10 @@ def parse_text(
     texts = [text] if isinstance(text, str) else text
     total_length = sum(len(t) for t in texts)
     for i, t in enumerate(texts):
-        if page_limit and len(text) > page_limit:
+        if page_size_limit and len(text) > page_size_limit:
             raise ImpossibleParsingError(
                 f"The {parse_type} on page {i} of {len(texts)} was {len(t)} chars long,"
-                f" which exceeds the {page_limit} char limit at path {path}."
+                f" which exceeds the {page_size_limit} char limit at path {path}."
             )
     return ParsedText(
         content=text,
@@ -244,7 +244,7 @@ def read_doc(
     include_metadata: Literal[False],
     chunk_chars: int = ...,
     overlap: int = ...,
-    page_limit: int | None = ...,
+    page_size_limit: int | None = ...,
 ) -> list[Text]: ...
 
 
@@ -256,7 +256,7 @@ def read_doc(
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
-    page_limit: int | None = ...,
+    page_size_limit: int | None = ...,
 ) -> list[Text]: ...
 
 
@@ -268,7 +268,7 @@ def read_doc(
     include_metadata: bool = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
-    page_limit: int | None = ...,
+    page_size_limit: int | None = ...,
 ) -> ParsedText: ...
 
 
@@ -280,7 +280,7 @@ def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
-    page_limit: int | None = ...,
+    page_size_limit: int | None = ...,
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
@@ -291,7 +291,7 @@ def read_doc(
     include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
-    page_limit: int | None = None,
+    page_size_limit: int | None = None,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
@@ -304,21 +304,21 @@ def read_doc(
         include_metadata: return a tuple
         chunk_chars: size of chunks
         overlap: size of overlap between chunks
-        page_limit: optional limit on the number of characters per page
+        page_size_limit: optional limit on the number of characters per page
     """
     str_path = str(path)
     parsed_text = None
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        parsed_text = parse_pdf_to_pages(path, page_limit=page_limit)
+        parsed_text = parse_pdf_to_pages(path, page_size_limit=page_size_limit)
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path, page_limit=page_limit)
+        parsed_text = parse_text(path, page_size_limit=page_size_limit)
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True, page_limit=page_limit)
+        parsed_text = parse_text(path, html=True, page_size_limit=page_size_limit)
     else:
         parsed_text = parse_text(
-            path, split_lines=True, use_tiktoken=False, page_limit=page_limit
+            path, split_lines=True, use_tiktoken=False, page_size_limit=page_size_limit
         )
 
     if parsed_text_only:

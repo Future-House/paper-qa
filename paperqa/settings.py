@@ -119,7 +119,7 @@ class ParsingSettings(BaseModel):
         default=5000,
         description="Number of characters per chunk. If 0, no chunking will be done.",
     )
-    page_limit: int | None = Field(
+    page_size_limit: int | None = Field(
         default=1_280_000,
         description=(
             "Optional limit on the number of characters to parse in one 'page', default"
