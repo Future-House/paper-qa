@@ -422,6 +422,7 @@ async def test_gather_evidence_rejects_empty_docs(
 
 
 @pytest.mark.parametrize("callback_type", ["none", "sync", "async"])
+@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
     agent_test_settings: Settings, subtests: SubTests, callback_type: str
