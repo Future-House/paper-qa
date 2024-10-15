@@ -244,6 +244,7 @@ def read_doc(
     include_metadata: Literal[False],
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_limit: int | None = ...,
 ) -> list[Text]: ...
 
 
@@ -255,6 +256,7 @@ def read_doc(
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_limit: int | None = ...,
 ) -> list[Text]: ...
 
 
@@ -266,6 +268,7 @@ def read_doc(
     include_metadata: bool = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_limit: int | None = ...,
 ) -> ParsedText: ...
 
 
@@ -277,6 +280,7 @@ def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
+    page_limit: int | None = ...,
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
@@ -287,6 +291,7 @@ def read_doc(
     include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
+    page_limit: int | None = None,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
@@ -295,23 +300,26 @@ def read_doc(
     Args:
         path: local document path
         doc: object with document metadata
-        chunk_chars: size of chunks
-        overlap: size of overlap between chunks
         parsed_text_only: return parsed text without chunking
         include_metadata: return a tuple
+        chunk_chars: size of chunks
+        overlap: size of overlap between chunks
+        page_limit: optional limit on the number of characters per page
     """
     str_path = str(path)
     parsed_text = None
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        parsed_text = parse_pdf_to_pages(path)
+        parsed_text = parse_pdf_to_pages(path, page_limit=page_limit)
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path)
+        parsed_text = parse_text(path, page_limit=page_limit)
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True)
+        parsed_text = parse_text(path, html=True, page_limit=page_limit)
     else:
-        parsed_text = parse_text(path, split_lines=True, use_tiktoken=False)
+        parsed_text = parse_text(
+            path, split_lines=True, use_tiktoken=False, page_limit=page_limit
+        )
 
     if parsed_text_only:
         return parsed_text
