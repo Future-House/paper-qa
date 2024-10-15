@@ -108,7 +108,8 @@ def parse_text(
         html: flag to use html2text library for parsing.
         split_lines: flag to split lines into a list.
         use_tiktoken: flag to use tiktoken library to encode text.
-        page_size_limit: optional limit on the number of characters per page.
+        page_size_limit: optional limit on the number of characters per page. Only
+            relevant when split_lines is True.
     """
     path = Path(path)
     try:
@@ -129,15 +130,17 @@ def parse_text(
         parsing_libraries.append(f"html2text ({html2text_version})")
     else:
         parse_type = "txt"
-
-    texts = [text] if isinstance(text, str) else text
-    total_length = sum(len(t) for t in texts)
-    for i, t in enumerate(texts):
-        if page_size_limit and len(text) > page_size_limit:
-            raise ImpossibleParsingError(
-                f"The {parse_type} on page {i} of {len(texts)} was {len(t)} chars long,"
-                f" which exceeds the {page_size_limit} char limit at path {path}."
-            )
+    if isinstance(text, str):
+        total_length: int = len(text)
+    else:
+        total_length = sum(len(t) for t in text)
+        for i, t in enumerate(text):
+            if page_size_limit and len(text) > page_size_limit:
+                raise ImpossibleParsingError(
+                    f"The {parse_type} on page {i} of {len(text)} was {len(t)} chars"
+                    f" long, which exceeds the {page_size_limit} char limit at path"
+                    f" {path}."
+                )
     return ParsedText(
         content=text,
         metadata=ParsedMetadata(
