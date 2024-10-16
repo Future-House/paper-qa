@@ -368,6 +368,7 @@ class DocDetails(Doc):
         description="Other metadata besides the above standardized fields.",
     )
     UNDEFINED_JOURNAL_QUALITY: ClassVar[int] = -1
+    # NOTE: can use a regex starting from the pattern in https://regex101.com/r/lpF1up/1
     DOI_URL_FORMATS: ClassVar[Collection[str]] = {
         "https://doi.org/",
         "http://dx.doi.org/",
