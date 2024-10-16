@@ -191,9 +191,7 @@ class GatherEvidence(NamedTool):
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
-            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]
-            for callback in callback_list:
-                await callback(state)
+            await asyncio.gather(*(c(state) for c in self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]))
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.answer.question
