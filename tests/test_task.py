@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Iterable
 from unittest.mock import patch
 
@@ -99,10 +100,10 @@ class TestTaskDataset:
     async def test_can_validate_stub_dataset_sources(
         self, base_query_request: QueryRequest
     ) -> None:
-        dataset = StubLitQADataset(base_query=base_query_request)
-        for i in range(len(dataset)):
-            env = dataset.get_new_env_by_idx(i)
-            await env.validate_sources()
+        ds = StubLitQADataset(base_query=base_query_request)
+        await asyncio.gather(
+            *(ds.get_new_env_by_idx(i).validate_sources() for i in range(len(ds)))
+        )
 
     @pytest.mark.asyncio
     async def test_evaluation(self, base_query_request: QueryRequest) -> None:
