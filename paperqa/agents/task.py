@@ -278,11 +278,24 @@ class LitQAv2TaskDataset(LitQATaskDataset):
             assert_never(split)
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
+        sources = []
+        for s in self.data.iloc[idx].sources:
+            try:
+                (doi,) = (
+                    s.split(substr, maxsplit=1)[1]
+                    for substr in DocDetails.DOI_URL_FORMATS
+                    if substr in s
+                )
+            except ValueError as exc:
+                raise NotImplementedError(
+                    f"Didn't handle DOI extraction from source {s!r}."
+                ) from exc
+            sources.append(doi)
         return self._make_gradable_environment(
             ideal=self.data.iloc[idx].ideal,
             distractors=self.data.iloc[idx].distractors,
             question=self.data.iloc[idx].question,
-            sources=list(self.data.iloc[idx].sources),
+            sources=sources,
         )
 
     def __len__(self) -> int:

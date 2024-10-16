@@ -20,6 +20,7 @@ from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvide
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.clients.openalex import reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
+from paperqa.types import DocDetails
 
 
 @pytest.mark.vcr
@@ -534,6 +535,14 @@ async def test_ensure_sequential_run(caplog) -> None:
         assert (
             record_indices["crossref"] < record_indices["semantic_scholar"]
         ), "Crossref should run first"
+
+        non_clobbered_details = await client.query(
+            doi="10.1063/1.4938384",
+        )
+        assert set(cast(DocDetails, non_clobbered_details).other["client_source"]) == {
+            "crossref",
+            "semantic_scholar",
+        }, "Sources should stack, even if sequentially called"
 
 
 @pytest.mark.vcr
