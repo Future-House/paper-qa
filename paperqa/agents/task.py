@@ -107,7 +107,8 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         not_found = [s for s in self.sources if s not in file_names and s not in dois]
         if not_found:
             raise ValueError(
-                f"Sources {not_found} of {self.sources} not found in the {entity}."
+                f"Sources {not_found} of {self.sources} not found in the {entity},"
+                f" the corresponding query was {self._query.query!r}."
             )
 
     async def step(
