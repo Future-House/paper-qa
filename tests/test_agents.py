@@ -10,7 +10,7 @@ import tempfile
 import time
 from pathlib import Path
 from typing import Any, cast
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import ldp.agent
@@ -421,10 +421,11 @@ async def test_gather_evidence_rejects_empty_docs(
     ), "Agent should have hit its max timesteps"
 
 
+@pytest.mark.parametrize("callback_type", [None, "async"])
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
-    agent_test_settings: Settings, subtests: SubTests
+    agent_test_settings: Settings, subtests: SubTests, callback_type: str
 ) -> None:
     agent_test_settings.agent.search_count = 3  # Keep low for speed
     agent_test_settings.answer.evidence_k = 2
@@ -432,6 +433,22 @@ async def test_agent_sharing_state(
     llm_model = agent_test_settings.get_llm()
     summary_llm_model = agent_test_settings.get_summary_llm()
     embedding_model = agent_test_settings.get_embedding_model()
+
+    callbacks = {}
+    if callback_type == "async":
+        gen_answer_initialized_callback = AsyncMock()
+        gen_answer_completed_callback = AsyncMock()
+        gather_evidence_initialized_callback = AsyncMock()
+        gather_evidence_completed_callback = AsyncMock()
+
+        callbacks = {
+            "gen_answer_initialized": [gen_answer_initialized_callback],
+            "gen_answer_completed": [gen_answer_completed_callback],
+            "gather_evidence_initialized": [gather_evidence_initialized_callback],
+            "gather_evidence_completed": [gather_evidence_completed_callback],
+        }
+
+    agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
     answer = Answer(question="What is is a self-explanatory model?")
     query = QueryRequest(query=answer.question, settings=agent_test_settings)
@@ -455,8 +472,7 @@ async def test_agent_sharing_state(
         assert env_state.docs.docs, "Search did not add any papers"
         mock_save_index.assert_not_awaited(), "Search shouldn't try to update the index"
         assert all(
-            (isinstance(d, Doc) or issubclass(d, Doc))  # type: ignore[unreachable]
-            for d in env_state.docs.docs.values()
+            isinstance(d, Doc) for d in env_state.docs.docs.values()
         ), "Document type or DOI propagation failure"
 
     with subtests.test(msg=GatherEvidence.__name__):
@@ -468,6 +484,11 @@ async def test_agent_sharing_state(
             embedding_model=embedding_model,
         )
         await gather_evidence_tool.gather_evidence(answer.question, state=env_state)
+
+        if callback_type == "async":
+            gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
+            gather_evidence_completed_callback.assert_awaited_once_with(env_state)
+
         assert answer.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswer.__name__} working"):
@@ -478,6 +499,11 @@ async def test_agent_sharing_state(
             embedding_model=embedding_model,
         )
         result = await generate_answer_tool.gen_answer(answer.question, state=env_state)
+
+        if callback_type == "async":
+            gen_answer_initialized_callback.assert_awaited_once_with(env_state)
+            gen_answer_completed_callback.assert_awaited_once_with(env_state)
+
         assert re.search(
             pattern=EnvironmentState.STATUS_SEARCH_REGEX_PATTERN, string=result
         )

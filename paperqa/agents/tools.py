@@ -1,5 +1,6 @@
 """Base classes for tools, implemented in a functional manner."""
 
+import asyncio
 import inspect
 import logging
 import re
@@ -190,6 +191,16 @@ class GatherEvidence(NamedTool):
         if not state.docs.docs:
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
+        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
+            await asyncio.gather(
+                *(
+                    c(state)
+                    for c in self.settings.agent.callbacks[
+                        f"{self.TOOL_FN_NAME}_initialized"
+                    ]
+                )
+            )
+
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.answer.question
         try:
@@ -197,12 +208,16 @@ class GatherEvidence(NamedTool):
             # TODO: remove this swap, as it prevents us from supporting parallel calls
             state.answer.question = question
             l0 = len(state.answer.contexts)
+
             # TODO: refactor answer out of this...
             state.answer = await state.docs.aget_evidence(
                 query=state.answer,
                 settings=self.settings,
                 embedding_model=self.embedding_model,
                 summary_llm_model=self.summary_llm_model,
+                callbacks=self.settings.agent.callbacks.get(
+                    f"{self.TOOL_FN_NAME}_aget_evidence"
+                ),
             )
             l1 = len(state.answer.contexts)
         finally:
@@ -218,6 +233,17 @@ class GatherEvidence(NamedTool):
             if sorted_contexts
             else ""
         )
+
+        if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
+            await asyncio.gather(
+                *(
+                    callback(state)
+                    for callback in self.settings.agent.callbacks[
+                        f"{self.TOOL_FN_NAME}_completed"
+                    ]
+                )
+            )
+
         return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
 
 
@@ -248,6 +274,17 @@ class GenerateAnswer(NamedTool):
             state: Current state.
         """
         logger.info(f"Generating answer for '{question}'.")
+
+        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
+            await asyncio.gather(
+                *(
+                    callback(state)
+                    for callback in self.settings.agent.callbacks[
+                        f"{self.TOOL_FN_NAME}_initialized"
+                    ]
+                )
+            )
+
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
         state.answer = await state.docs.aquery(
@@ -256,6 +293,9 @@ class GenerateAnswer(NamedTool):
             llm_model=self.llm_model,
             summary_llm_model=self.summary_llm_model,
             embedding_model=self.embedding_model,
+            callbacks=self.settings.agent.callbacks.get(
+                f"{self.TOOL_FN_NAME}_aget_query"
+            ),
         )
 
         if state.answer.could_not_answer:
@@ -267,6 +307,17 @@ class GenerateAnswer(NamedTool):
             answer = state.answer.answer
         status = state.status
         logger.info(status)
+
+        if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
+            await asyncio.gather(
+                *(
+                    callback(state)
+                    for callback in self.settings.agent.callbacks[
+                        f"{self.TOOL_FN_NAME}_completed"
+                    ]
+                )
+            )
+
         return f"{answer} | {status}"
 
     # NOTE: can match failure to answer or an actual answer
