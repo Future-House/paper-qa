@@ -1,5 +1,6 @@
 """Base classes for tools, implemented in a functional manner."""
 
+import asyncio
 import inspect
 import logging
 import re
@@ -191,7 +192,12 @@ class GatherEvidence(NamedTool):
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
-            await asyncio.gather(*(c(state) for c in self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]))
+            await asyncio.gather(
+                *(
+                    c(state)
+                    for c in self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]
+                )
+            )
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.answer.question
@@ -227,9 +233,14 @@ class GatherEvidence(NamedTool):
         )
 
         if f"{self.TOOL_FN_NAME}_completed" in self.settings.callbacks:
-            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_completed"]
-            for callback in callback_list:
-                await callback(state)
+            await asyncio.gather(
+                *(
+                    callback(state)
+                    for callback in self.settings.callbacks[
+                        f"{self.TOOL_FN_NAME}_completed"
+                    ]
+                )
+            )
 
         return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
 
@@ -263,9 +274,14 @@ class GenerateAnswer(NamedTool):
         logger.info(f"Generating answer for '{question}'.")
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
-            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]
-            for callback in callback_list:
-                await callback(state)
+            await asyncio.gather(
+                *(
+                    callback(state)
+                    for callback in self.settings.callbacks[
+                        f"{self.TOOL_FN_NAME}_initialized"
+                    ]
+                )
+            )
 
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
@@ -289,9 +305,14 @@ class GenerateAnswer(NamedTool):
         logger.info(status)
 
         if f"{self.TOOL_FN_NAME}_completed" in self.settings.callbacks:
-            callback_list = self.settings.callbacks[f"{self.TOOL_FN_NAME}_completed"]
-            for callback in callback_list:
-                await callback(state)
+            await asyncio.gather(
+                *(
+                    callback(state)
+                    for callback in self.settings.callbacks[
+                        f"{self.TOOL_FN_NAME}_completed"
+                    ]
+                )
+            )
 
         return f"{answer} | {status}"
 
