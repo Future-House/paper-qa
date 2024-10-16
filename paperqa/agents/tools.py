@@ -203,16 +203,15 @@ class GatherEvidence(NamedTool):
             state.answer.question = question
             l0 = len(state.answer.contexts)
 
-            aget_evidence_callbacks = self.settings.callbacks.get(
-                f"{self.TOOL_FN_NAME}_aget_evidence", None
-            )
             # TODO: refactor answer out of this...
             state.answer = await state.docs.aget_evidence(
                 query=state.answer,
                 settings=self.settings,
                 embedding_model=self.embedding_model,
                 summary_llm_model=self.summary_llm_model,
-                callbacks=aget_evidence_callbacks,
+                callbacks=self.settings.callbacks.get(
+                    f"{self.TOOL_FN_NAME}_aget_evidence"
+                ),
             )
             l1 = len(state.answer.contexts)
         finally:
@@ -270,9 +269,6 @@ class GenerateAnswer(NamedTool):
             for callback in callback_list:
                 await callback(state)
 
-        aget_query_callbacks = self.settings.callbacks.get(
-            f"{self.TOOL_FN_NAME}_aget_query", None
-        )
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
         state.answer = await state.docs.aquery(
@@ -281,7 +277,7 @@ class GenerateAnswer(NamedTool):
             llm_model=self.llm_model,
             summary_llm_model=self.summary_llm_model,
             embedding_model=self.embedding_model,
-            callbacks=aget_query_callbacks,
+            callbacks=self.settings.callbacks.get(f"{self.TOOL_FN_NAME}_aget_query"),
         )
 
         if state.answer.could_not_answer:
