@@ -104,9 +104,11 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
                 f" {entity}."
             )
             return
-        for source in self.sources:
-            if source not in file_names and source not in dois:
-                raise ValueError(f"Source {source!r} not found in the {entity}.")
+        not_found = [s for s in self.sources if s not in file_names and s not in dois]
+        if not_found:
+            raise ValueError(
+                f"Sources {not_found} of {self.sources} not found in the {entity}."
+            )
 
     async def step(
         self, action: ToolRequestMessage
