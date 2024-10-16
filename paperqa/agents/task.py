@@ -12,7 +12,7 @@ import re
 from abc import ABC
 from collections.abc import Awaitable, Callable, Sequence
 from enum import StrEnum
-from typing import TYPE_CHECKING, ClassVar, assert_never
+from typing import TYPE_CHECKING, assert_never
 
 from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame, TaskDataset
 from aviary.message import Message
@@ -277,18 +277,20 @@ class LitQAv2TaskDataset(LitQATaskDataset):
         else:
             assert_never(split)
 
-    # SEE: https://regex101.com/r/lpF1up/1
-    DOI_URL_REGEX_PATTERN: ClassVar[str] = r"https?:\/\/(?:dx\.)?doi\.org\/"
-
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         sources = []
         for s in self.data.iloc[idx].sources:
-            match = re.split(self.DOI_URL_REGEX_PATTERN, string=s, maxsplit=1)
-            if len(match) != 2 or match[0]:  # noqa: PLR2004
+            try:
+                (doi,) = (
+                    s.split(substr, maxsplit=1)[1]
+                    for substr in DocDetails.DOI_URL_FORMATS
+                    if substr in s
+                )
+            except ValueError as exc:
                 raise NotImplementedError(
                     f"Didn't handle DOI extraction from source {s!r}."
-                )
-            sources.append(match[1])
+                ) from exc
+            sources.append(doi)
         return self._make_gradable_environment(
             ideal=self.data.iloc[idx].ideal,
             distractors=self.data.iloc[idx].distractors,
