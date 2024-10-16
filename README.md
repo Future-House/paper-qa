@@ -922,27 +922,34 @@ Please read and cite the following papers if you use this software:
 
 ```bibtex
 @article{skarlinski2024language,
-  title={Language agents achieve superhuman synthesis of scientific knowledge},
-  author={
+    title = {Language agents achieve superhuman synthesis of scientific knowledge},
+    author = {
     Michael D. Skarlinski and
-    Sam Cox and
-    Jon M. Laurent and
-    James D. Braza and
-    Michaela Hinks and
-    Michael J. Hammerling and
-    Manvitha Ponnapati and
-    Samuel G. Rodriques and
-    Andrew D. White},
-  year={2024},
-  journal={arXiv preprent arXiv:2409.13740},
-  url={https://doi.org/10.48550/arXiv.2409.13740}
+ Sam Cox and
+ Jon M. Laurent and
+ James D. Braza and
+ Michaela Hinks and
+ Michael J. Hammerling and
+ Manvitha Ponnapati and
+ Samuel G. Rodriques and
+ Andrew D. White},
+    year = {2024},
+    journal = {arXiv preprent arXiv:2409.13740},
+    url = {https://doi.org/10.48550/arXiv.2409.13740}
 }
+```
 
-
+```bibtex
 @article{lala2023paperqa,
-  title={PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
-  author={L{\'a}la, Jakub and O'Donoghue, Odhran and Shtedritski, Aleksandar and Cox, Sam and Rodriques, Samuel G and White, Andrew D},
-  journal={arXiv preprint arXiv:2312.07559},
-  year={2023}
+    title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},
+    author = {
+    Jakub Lála and
+ Odhran O'Donoghue and
+ Aleksandar Shtedritski and
+ Sam Cox and
+ Samuel G. Rodriques and
+ Andrew D. White},
+    journal = {arXiv preprint arXiv:2312.07559},
+    year = {2023}
 }
 ```
