@@ -427,27 +427,23 @@ class Docs(BaseModel):
             # want to embed now!
             embedding_model = all_settings.get_embedding_model()
 
-        # 1. Calculate text embeddings if not already present, but don't set them into
-        # the texts until we've set up the Doc's embedding, so callers can retry upon
-        # OpenAI rate limit errors
-        text_embeddings: list[list[float]] | None = None
-        if embedding_model:
-            text_embeddings = (
-                await embedding_model.embed_documents(texts=[t.text for t in texts])
-                if texts[0].embedding is None
-                else None
-            )
-        # 2. Now we can set the text embeddings
-        if text_embeddings is not None:
-            for t, t_embedding in zip(texts, text_embeddings, strict=True):
+        # 1. Calculate text embeddings if not already present
+        if embedding_model and texts[0].embedding is None:
+            for t, t_embedding in zip(
+                texts,
+                await embedding_model.embed_documents(texts=[t.text for t in texts]),
+                strict=True,
+            ):
                 t.embedding = t_embedding
-        # 4. Update texts and the Doc's name
+        # 2. Update texts' and Doc's name
         if doc.docname in self.docnames:
             new_docname = self._get_unique_name(doc.docname)
             for t in texts:
                 t.name = t.name.replace(doc.docname, new_docname)
             doc.docname = new_docname
-        # 5. We do not embed here, because we do it lazily
+        # 3. Update self
+        # NOTE: we defer adding texts to the texts index to retrieval time
+        # (e.g. `self.texts_index.add_texts_and_embeddings(texts)`)
         self.docs[doc.dockey] = doc
         self.texts += texts
         self.docnames.add(doc.docname)
@@ -475,11 +471,15 @@ class Docs(BaseModel):
 
     async def _build_texts_index(self, embedding_model: EmbeddingModel) -> None:
         texts = [t for t in self.texts if t not in self.texts_index]
+        # For any embeddings we are supposed to lazily embed, embed them now
         to_embed = [t.text for t in texts if t.embedding is None]
         if to_embed:
-            embeddings = await embedding_model.embed_documents(texts=to_embed)
-            for t, e in zip(texts, embeddings, strict=True):
-                t.embedding = e
+            for t, t_embedding in zip(
+                texts,
+                await embedding_model.embed_documents(texts=to_embed),
+                strict=True,
+            ):
+                t.embedding = t_embedding
         self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
