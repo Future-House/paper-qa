@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import logging
 from collections.abc import Collection, Coroutine, Sequence
-from typing import Any
+from typing import Any, cast
 
 import aiohttp
 from pydantic import BaseModel, ConfigDict
@@ -137,9 +137,10 @@ class DocMetadataClient:
 
         query_args = kwargs if "session" in kwargs else kwargs | {"session": session}
 
-        doc_details: DocDetails | None = None
+        all_doc_details: DocDetails | None = None
 
         for ti, task in enumerate(self.tasks):
+
             logger.debug(
                 f"Attempting to populate metadata query: {query_args} via {task}"
             )
@@ -167,19 +168,24 @@ class DocMetadataClient:
                     )
                 )
 
-            if doc_details and not doc_details.is_hydration_needed(
-                inclusion=kwargs.get("fields", [])
-            ):
-                logger.debug(
-                    "All requested fields are present in the DocDetails "
-                    f"object{', stopping early.' if ti != len(self.tasks) - 1 else '.'}"
-                )
-                break
+            if doc_details:
+
+                # abuse int handling in __add__ for empty all_doc_details, None types won't work
+                all_doc_details = doc_details + (all_doc_details or 0)
+
+                if not cast(DocDetails, all_doc_details).is_hydration_needed(
+                    inclusion=kwargs.get("fields", [])
+                ):
+                    logger.debug(
+                        "All requested fields are present in the DocDetails "
+                        f"object{', stopping early.' if ti != len(self.tasks) - 1 else '.'}"
+                    )
+                    break
 
         if self._session is None:
             await session.close()
 
-        return doc_details
+        return all_doc_details
 
     async def bulk_query(
         self, queries: Collection[dict[str, Any]], concurrency: int = 10
