@@ -448,7 +448,7 @@ async def test_agent_sharing_state(
             "gather_evidence_completed": [gather_evidence_completed_callback],
         }
 
-    agent_test_settings.callbacks = callbacks  # type: ignore[assignment]
+    agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
     answer = Answer(question="What is is a self-explanatory model?")
     query = QueryRequest(query=answer.question, settings=agent_test_settings)

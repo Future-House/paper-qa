@@ -191,11 +191,13 @@ class GatherEvidence(NamedTool):
         if not state.docs.docs:
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
-        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
+        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
             await asyncio.gather(
                 *(
                     c(state)
-                    for c in self.settings.callbacks[f"{self.TOOL_FN_NAME}_initialized"]
+                    for c in self.settings.agent.callbacks[
+                        f"{self.TOOL_FN_NAME}_initialized"
+                    ]
                 )
             )
 
@@ -213,7 +215,7 @@ class GatherEvidence(NamedTool):
                 settings=self.settings,
                 embedding_model=self.embedding_model,
                 summary_llm_model=self.summary_llm_model,
-                callbacks=self.settings.callbacks.get(
+                callbacks=self.settings.agent.callbacks.get(
                     f"{self.TOOL_FN_NAME}_aget_evidence"
                 ),
             )
@@ -232,11 +234,11 @@ class GatherEvidence(NamedTool):
             else ""
         )
 
-        if f"{self.TOOL_FN_NAME}_completed" in self.settings.callbacks:
+        if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
             await asyncio.gather(
                 *(
                     callback(state)
-                    for callback in self.settings.callbacks[
+                    for callback in self.settings.agent.callbacks[
                         f"{self.TOOL_FN_NAME}_completed"
                     ]
                 )
@@ -273,11 +275,11 @@ class GenerateAnswer(NamedTool):
         """
         logger.info(f"Generating answer for '{question}'.")
 
-        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.callbacks:
+        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
             await asyncio.gather(
                 *(
                     callback(state)
-                    for callback in self.settings.callbacks[
+                    for callback in self.settings.agent.callbacks[
                         f"{self.TOOL_FN_NAME}_initialized"
                     ]
                 )
@@ -291,7 +293,9 @@ class GenerateAnswer(NamedTool):
             llm_model=self.llm_model,
             summary_llm_model=self.summary_llm_model,
             embedding_model=self.embedding_model,
-            callbacks=self.settings.callbacks.get(f"{self.TOOL_FN_NAME}_aget_query"),
+            callbacks=self.settings.agent.callbacks.get(
+                f"{self.TOOL_FN_NAME}_aget_query"
+            ),
         )
 
         if state.answer.could_not_answer:
@@ -304,11 +308,11 @@ class GenerateAnswer(NamedTool):
         status = state.status
         logger.info(status)
 
-        if f"{self.TOOL_FN_NAME}_completed" in self.settings.callbacks:
+        if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
             await asyncio.gather(
                 *(
                     callback(state)
-                    for callback in self.settings.callbacks[
+                    for callback in self.settings.agent.callbacks[
                         f"{self.TOOL_FN_NAME}_completed"
                     ]
                 )
