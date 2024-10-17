@@ -5,7 +5,7 @@ import inspect
 import logging
 import re
 import sys
-from typing import ClassVar, cast
+from typing import ClassVar, Self, cast
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
@@ -64,6 +64,9 @@ class EnvironmentState(BaseModel):
             ),
             cost=self.answer.cost,
         )
+
+    def __deepcopy__(self, memo=None) -> Self:
+        return type(self)(**self.model_dump(exclude={"status"}))
 
 
 class NamedTool(BaseModel):
