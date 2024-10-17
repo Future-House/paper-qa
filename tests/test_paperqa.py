@@ -18,6 +18,7 @@ from paperqa import (
     Docs,
     NumpyVectorStore,
     Settings,
+    Text,
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
@@ -781,6 +782,27 @@ def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     )
     assert len(docs.texts) == 1, "Should have been one chunk"
     assert docs.texts[0].embedding is None, "Should have deferred the embedding"
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_partly_embedded_texts() -> None:
+    settings = Settings.from_name("fast")
+
+    stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    pre_embedded_text = Text(text="I like turtles.", name="sentence1", doc=stub_doc)
+    pre_embedded_text.embedding = (
+        await settings.get_embedding_model().embed_documents([pre_embedded_text.text])
+    )[0]
+    docs = Docs()
+    await docs.aadd_texts(
+        texts=[
+            pre_embedded_text,
+            Text(text="I like cats.", name="sentence2", doc=stub_doc),
+        ],
+        doc=stub_doc,
+    )
+    await docs.aget_evidence("What do I like?")
 
 
 # some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)
