@@ -543,10 +543,10 @@ The sparse embedding (keyword) models default to having 256 dimensions, but this
 
 #### Local Embedding Models (Sentence Transformers)
 
-You can use a `SentenceTransformerEmbeddingModel` model if you install `sentence-transformers`, which is [a local embedding library](https://sbert.net/) with support for HuggingFace models and more:
+You can use a `SentenceTransformerEmbeddingModel` model if you install `sentence-transformers`, which is [a local embedding library](https://sbert.net/) with support for HuggingFace models and more. You can install it by adding the `local` extras.
 
 ```sh
-pip install sentence-transformers
+pip install paper-qa[local]
 ```
 
 and then prefix embedding model names with `st-`:
