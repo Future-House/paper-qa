@@ -28,6 +28,7 @@ question answering, summarization, and contradiction detection.
   - [Choosing Model](#choosing-model)
     - [Locally Hosted](#locally-hosted)
   - [Changing Embedding Model](#changing-embedding-model)
+    - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
   - [Adjusting number of sources](#adjusting-number-of-sources)
   - [Using Code or HTML](#using-code-or-html)
   - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
@@ -539,6 +540,36 @@ for doc in ("myfile.pdf", "myotherfile.pdf"):
 ```
 
 The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
+
+#### Local Embedding Models (Sentence Transformers)
+
+You can use a `SentenceTransformerEmbeddingModel` model if you install `sentence-transformers`, which is [a local embedding library](https://sbert.net/) with support for HuggingFace models and more. You can install it by adding the `local` extras.
+
+```sh
+pip install paper-qa[local]
+```
+
+and then prefix embedding model names with `st-`:
+
+```python
+from paperqa import Settings, ask
+
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(embedding="st-multi-qa-MiniLM-L6-cos-v1"),
+)
+```
+
+or with a hybrid model
+
+```python
+from paperqa import Settings, ask
+
+answer = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1"),
+)
+```
 
 ### Adjusting number of sources
 

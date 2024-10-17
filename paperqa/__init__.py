@@ -18,6 +18,7 @@ from paperqa.llms import (  # noqa: E402
     LLMModel,
     LLMResult,
     NumpyVectorStore,
+    SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
     embedding_model_factory,
 )
@@ -39,6 +40,7 @@ __all__ = [
     "LiteLLMModel",
     "NumpyVectorStore",
     "QueryRequest",
+    "SentenceTransformerEmbeddingModel",
     "Settings",
     "SparseEmbeddingModel",
     "Text",

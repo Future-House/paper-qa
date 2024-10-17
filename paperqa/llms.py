@@ -197,6 +197,67 @@ class HybridEmbeddingModel(EmbeddingModel):
         )
         return np.concatenate(all_embeds, axis=1)
 
+    def set_mode(self, mode: EmbeddingModes) -> None:
+        # Set mode for all component models
+        for model in self.models:
+            model.set_mode(mode)
+
+
+class SentenceTransformerEmbeddingModel(EmbeddingModel):
+    """An embedding model using SentenceTransformers."""
+
+    name: str = Field(default="multi-qa-MiniLM-L6-cos-v1")
+    config: dict[str, Any] = Field(default_factory=dict)
+    _model: Any = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError as exc:
+            raise ImportError(
+                "Please install paper-qa[local] to use SentenceTransformerEmbeddingModel."
+            ) from exc
+
+        self._model = SentenceTransformer(self.name)
+
+    def set_mode(self, mode: EmbeddingModes) -> None:
+        # SentenceTransformer does not support different modes.
+        pass
+
+    async def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        """
+        Asynchronously embed a list of documents using SentenceTransformer.
+
+        Args:
+            texts: A list of text documents to embed.
+
+        Returns:
+            A list of embedding vectors.
+        """
+        # Extract additional configurations if needed
+        batch_size = self.config.get("batch_size", 32)
+        device = self.config.get("device", "cpu")
+
+        # Update the model's device if necessary
+        if device:
+            self._model.to(device)
+
+        # Run the synchronous encode method in a thread pool to avoid blocking the event loop.
+        embeddings = await asyncio.to_thread(
+            lambda: self._model.encode(
+                texts,
+                convert_to_numpy=True,
+                show_progress_bar=False,  # Disabled progress bar
+                batch_size=batch_size,
+                device=device,
+            ),
+        )
+        # If embeddings are returned as numpy arrays, convert them to lists.
+        if isinstance(embeddings, np.ndarray):
+            embeddings = embeddings.tolist()
+        return embeddings
+
 
 class Chunk(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -824,16 +885,62 @@ class NumpyVectorStore(VectorStore):
 
 
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
-    if embedding.startswith("hybrid"):
-        embedding_model_name = "-".join(embedding.split("-")[1:])
-        return HybridEmbeddingModel(
-            models=[
-                LiteLLMEmbeddingModel(name=embedding_model_name),
-                SparseEmbeddingModel(**kwargs),
-            ]
+    """
+    Factory function to create an appropriate EmbeddingModel based on the embedding string.
+
+    Supports:
+    - SentenceTransformer models prefixed with "st-" (e.g., "st-multi-qa-MiniLM-L6-cos-v1")
+    - LiteLLM models (default if no prefix is provided)
+    - Hybrid embeddings prefixed with "hybrid-", contains a sparse and a dense model
+
+    Args:
+        embedding: The embedding model identifier. Supports prefixes like "st-" for SentenceTransformer
+                   and "hybrid-" for combining multiple embedding models.
+        **kwargs: Additional keyword arguments for the embedding model.
+    """
+    embedding = embedding.strip()  # Remove any leading/trailing whitespace
+
+    if embedding.startswith("hybrid-"):
+        # Extract the component embedding identifiers after "hybrid-"
+        dense_name = embedding[len("hybrid-") :]
+
+        if not dense_name:
+            raise ValueError(
+                "Hybrid embedding must contain at least one component embedding."
+            )
+
+        # Recursively create each component embedding model
+        dense_model = embedding_model_factory(dense_name, **kwargs)
+        sparse_model = SparseEmbeddingModel(**kwargs)
+
+        return HybridEmbeddingModel(models=[dense_model, sparse_model])
+
+    if embedding.startswith("st-"):
+        # Extract the SentenceTransformer model name after "st-"
+        model_name = embedding[len("st-") :].strip()
+        if not model_name:
+            raise ValueError(
+                "SentenceTransformer model name must be specified after 'st-'."
+            )
+
+        return SentenceTransformerEmbeddingModel(
+            name=model_name,
+            config=kwargs,
         )
+
+    if embedding.startswith("litellm-"):
+        # Extract the LiteLLM model name after "litellm-"
+        model_name = embedding[len("litellm-") :].strip()
+        if not model_name:
+            raise ValueError("model name must be specified after 'litellm-'.")
+
+        return LiteLLMEmbeddingModel(
+            name=model_name,
+            config=kwargs,
+        )
+
     if embedding == "sparse":
         return SparseEmbeddingModel(**kwargs)
-    if kwargs:  # Only override the default config if there are actually kwargs
-        return LiteLLMEmbeddingModel(name=embedding, config=kwargs)
-    return LiteLLMEmbeddingModel(name=embedding, **kwargs)
+
+    # Default to LiteLLMEmbeddingModel if no special prefix is found
+    return LiteLLMEmbeddingModel(name=embedding, config=kwargs)

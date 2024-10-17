@@ -6,7 +6,14 @@ from unittest.mock import patch
 import litellm
 import pytest
 
-from paperqa import LiteLLMModel
+from paperqa import (
+    HybridEmbeddingModel,
+    LiteLLMEmbeddingModel,
+    LiteLLMModel,
+    SentenceTransformerEmbeddingModel,
+    SparseEmbeddingModel,
+    embedding_model_factory,
+)
 from paperqa.llms import Chunk
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
@@ -150,3 +157,106 @@ class TestLiteLLMModel:
         assert llm.name == rehydrated_llm.name
         assert llm.config == rehydrated_llm.config
         assert llm.router.deployment_names == rehydrated_llm.router.deployment_names
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_sentence_transformer() -> None:
+    """Test that the factory creates a SentenceTransformerEmbeddingModel when given an 'st-' prefix."""
+    embedding = "st-multi-qa-MiniLM-L6-cos-v1"
+    model = embedding_model_factory(embedding)
+    assert isinstance(
+        model, SentenceTransformerEmbeddingModel
+    ), "Factory did not create SentenceTransformerEmbeddingModel"
+    assert model.name == "multi-qa-MiniLM-L6-cos-v1", "Incorrect model name assigned"
+
+    # Test embedding functionality
+    texts = ["Hello world", "Test sentence"]
+    embeddings = await model.embed_documents(texts)
+    assert len(embeddings) == 2, "Incorrect number of embeddings returned"
+    assert all(
+        isinstance(embed, list) for embed in embeddings
+    ), "Embeddings are not in list format"
+    assert all(len(embed) > 0 for embed in embeddings), "Embeddings should not be empty"
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_hybrid_with_sentence_transformer() -> None:
+    """Test that the factory creates a HybridEmbeddingModel containing a SentenceTransformerEmbeddingModel."""
+    embedding = "hybrid-st-multi-qa-MiniLM-L6-cos-v1"
+    model = embedding_model_factory(embedding)
+    assert isinstance(
+        model, HybridEmbeddingModel
+    ), "Factory did not create HybridEmbeddingModel"
+    assert len(model.models) == 2, "Hybrid model should contain two component models"
+    assert isinstance(
+        model.models[0], SentenceTransformerEmbeddingModel
+    ), "First component should be SentenceTransformerEmbeddingModel"
+    assert isinstance(
+        model.models[1], SparseEmbeddingModel
+    ), "Second component should be SparseEmbeddingModel"
+
+    # Test embedding functionality
+    texts = ["Hello world", "Test sentence"]
+    embeddings = await model.embed_documents(texts)
+    assert len(embeddings) == 2, "Incorrect number of embeddings returned"
+    expected_length = len((await model.models[0].embed_documents(texts))[0]) + len(
+        (await model.models[1].embed_documents(texts))[0]
+    )
+    assert all(
+        len(embed) == expected_length for embed in embeddings
+    ), "Embeddings do not match expected combined length"
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_invalid_st_prefix() -> None:
+    """Test that the factory raises a ValueError when 'st-' prefix is provided without a model name."""
+    embedding = "st-"
+    with pytest.raises(
+        ValueError,
+        match="SentenceTransformer model name must be specified after 'st-'.",
+    ):
+        embedding_model_factory(embedding)
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_unknown_prefix() -> None:
+    """Test that the factory defaults to LiteLLMEmbeddingModel when an unknown prefix is provided."""
+    embedding = "unknown-prefix-model"
+    model = embedding_model_factory(embedding)
+    assert isinstance(
+        model, LiteLLMEmbeddingModel
+    ), "Factory did not default to LiteLLMEmbeddingModel for unknown prefix"
+    assert model.name == "unknown-prefix-model", "Incorrect model name assigned"
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_sparse() -> None:
+    """Test that the factory creates a SparseEmbeddingModel when 'sparse' is provided."""
+    embedding = "sparse"
+    model = embedding_model_factory(embedding)
+    assert isinstance(
+        model, SparseEmbeddingModel
+    ), "Factory did not create SparseEmbeddingModel"
+    assert model.name == "sparse", "Incorrect model name assigned"
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_litellm() -> None:
+    """Test that the factory creates a LiteLLMEmbeddingModel when 'litellm-' prefix is provided."""
+    embedding = "litellm-text-embedding-3-small"
+    model = embedding_model_factory(embedding)
+    assert isinstance(
+        model, LiteLLMEmbeddingModel
+    ), "Factory did not create LiteLLMEmbeddingModel"
+    assert model.name == "text-embedding-3-small", "Incorrect model name assigned"
+
+
+@pytest.mark.asyncio
+async def test_embedding_model_factory_default() -> None:
+    """Test that the factory defaults to LiteLLMEmbeddingModel when no known prefix is provided."""
+    embedding = "default-model"
+    model = embedding_model_factory(embedding)
+    assert isinstance(
+        model, LiteLLMEmbeddingModel
+    ), "Factory did not default to LiteLLMEmbeddingModel"
+    assert model.name == "default-model", "Incorrect model name assigned"
