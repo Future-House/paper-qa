@@ -16,7 +16,7 @@ from collections.abc import (
 from enum import StrEnum
 from inspect import isasyncgenfunction, signature
 from sys import version_info
-from typing import Any, TypeVar, cast
+from typing import Any, Self, TypeVar, cast
 
 import litellm
 import numpy as np
@@ -782,7 +782,7 @@ class VectorStore(BaseModel, ABC):
         return len(self.texts_hashes)
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         for t in texts:
             self.texts_hashes.add(hash(t))
 
@@ -847,18 +847,37 @@ class NumpyVectorStore(VectorStore):
     texts: list[Embeddable] = []
     _embeddings_matrix: np.ndarray | None = None
 
+    @model_validator(mode="after")
+    def populate_embeddings(self) -> Self:
+        """Populate the embeddings matrix from the texts on instantiation."""
+        if self.texts:
+            for t in self.texts:
+                self.texts_hashes.add(hash(t))
+            self._add_embeddings(self.texts)
+        return self
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, type(self)):
+            raise NotImplementedError
+        return (
+            self.texts == other.texts
+            and self.texts_hashes == other.texts_hashes
+            and self.mmr_lambda == other.mmr_lambda
+            and self._embeddings_matrix == other._embeddings_matrix
+        )
+
     def clear(self) -> None:
         super().clear()
         self.texts = []
         self._embeddings_matrix = None
 
-    def add_texts_and_embeddings(
-        self,
-        texts: Sequence[Embeddable],
-    ) -> None:
+    def _add_embeddings(self, values: Iterable[Embeddable]) -> None:
+        self._embeddings_matrix = np.array([t.embedding for t in values])
+
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
-        self._embeddings_matrix = np.array([t.embedding for t in self.texts])
+        self._add_embeddings(self.texts)
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
