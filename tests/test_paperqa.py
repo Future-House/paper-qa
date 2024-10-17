@@ -18,6 +18,7 @@ from paperqa import (
     Docs,
     NumpyVectorStore,
     Settings,
+    Text,
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
@@ -766,26 +767,42 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
 
 
 def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
-    docs = Docs()
     settings = Settings.from_name("debug")
-    settings.parsing.chunk_size = 0
+    assert settings.parsing.defer_embedding, "Test relies on deferred embedding"
+    settings.parsing.chunk_size = 0  # Leads to one chunk = entire text
     # don't want to shove whole document into llm to get citation or embedding
     settings.parsing.use_doc_details = False
-    settings.parsing.defer_embedding = True
-    # need larger context window
-    settings.summary_llm = "gpt-4o-mini"
+    settings.summary_llm = "gpt-4o-mini"  # context window needs to fit our one chunk
+
+    docs = Docs()
     docs.add(
         stub_data_dir / "paper.pdf",
         "Wellawatte et al, XAI Review, 2023",
         settings=settings,
     )
-    assert len(docs.texts) == 1
+    assert len(docs.texts) == 1, "Should have been one chunk"
+    assert docs.texts[0].embedding is None, "Should have deferred the embedding"
 
-    # make sure we deferred embedding
-    assert docs.texts[0].embedding is None
 
-    # now check we can get evidence (namely embed very long document)
-    docs.get_evidence("What is XAI?", settings=settings)
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_partly_embedded_texts() -> None:
+    settings = Settings.from_name("fast")
+
+    stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    pre_embedded_text = Text(text="I like turtles.", name="sentence1", doc=stub_doc)
+    pre_embedded_text.embedding = (
+        await settings.get_embedding_model().embed_documents([pre_embedded_text.text])
+    )[0]
+    docs = Docs()
+    await docs.aadd_texts(
+        texts=[
+            pre_embedded_text,
+            Text(text="I like cats.", name="sentence2", doc=stub_doc),
+        ],
+        doc=stub_doc,
+    )
+    await docs.aget_evidence("What do I like?")
 
 
 # some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)

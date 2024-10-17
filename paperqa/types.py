@@ -284,8 +284,8 @@ class ParsedText(BaseModel):
                 "Encoding only implemented for str and list[str] content."
             )
 
-    def reduce_content(self):
-        """Reduce any content to a single string."""
+    def reduce_content(self) -> str:
+        """Reduce any content to a string."""
         if isinstance(self.content, str):
             return self.content
         if isinstance(self.content, list):
