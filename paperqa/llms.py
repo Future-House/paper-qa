@@ -783,7 +783,8 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
-        [self.texts_hashes.add(hash(t)) for t in texts]  # type: ignore[func-returns-value]
+        for t in texts:
+            self.texts_hashes.add(hash(t))
 
     @abstractmethod
     async def similarity_search(
