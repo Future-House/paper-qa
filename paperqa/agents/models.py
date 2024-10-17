@@ -53,6 +53,8 @@ class MismatchedModelsError(Exception):
 
 
 class QueryRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     query: str = ""
     id: UUID = Field(
         default_factory=uuid4,
@@ -63,8 +65,6 @@ class QueryRequest(BaseModel):
     # provides post-hoc linkage of request to a docs object
     # NOTE: this isn't a unique field, on the user to keep straight
     _docs_name: str | None = PrivateAttr(default=None)
-
-    model_config = ConfigDict(extra="forbid")
 
     @field_validator("settings")
     @classmethod

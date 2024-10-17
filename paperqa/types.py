@@ -152,6 +152,8 @@ class Context(BaseModel):
 class Answer(BaseModel):
     """A class to hold the answer to a question."""
 
+    model_config = ConfigDict(extra="ignore")
+
     id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
@@ -170,7 +172,6 @@ class Answer(BaseModel):
             "MD5 hash of the settings used to generate the answer. Cannot change"
         ),
     )
-    model_config = ConfigDict(extra="ignore")
 
     def __str__(self) -> str:
         """Return the answer as a string."""

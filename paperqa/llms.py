@@ -261,6 +261,7 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
 
 class Chunk(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
+
     text: str | None
     prompt_tokens: int
     completion_tokens: int
@@ -768,9 +769,10 @@ def cosine_similarity(a, b):
 class VectorStore(BaseModel, ABC):
     """Interface for vector store - very similar to LangChain's VectorStore to be compatible."""
 
+    model_config = ConfigDict(extra="forbid")
+
     # can be tuned for different tasks
     mmr_lambda: float = Field(default=0.9)
-    model_config = ConfigDict(extra="forbid")
     texts_hashes: set[int] = Field(default_factory=set)
 
     def __contains__(self, item) -> bool:

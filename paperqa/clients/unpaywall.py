@@ -19,14 +19,17 @@ UNPAYWALL_TIMEOUT = float(os.environ.get("UNPAYWALL_TIMEOUT", "10.0"))  # second
 
 
 class Author(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     family: str | None = None
     given: str | None = None
     sequence: str | None = None
     affiliation: list[dict[str, str]] | None = None
-    model_config = ConfigDict(extra="allow")
 
 
 class BestOaLocation(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     updated: datetime | None = None
     url: str | None = None
     url_for_pdf: str | None = None
@@ -40,7 +43,6 @@ class BestOaLocation(BaseModel):
     endpoint_id: str | None = None
     repository_institution: str | None = None
     oa_date: str | None = None
-    model_config = ConfigDict(extra="allow")
 
 
 class UnpaywallResponse(BaseModel):
