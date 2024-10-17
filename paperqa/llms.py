@@ -235,7 +235,6 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
         Returns:
             A list of embedding vectors.
         """
-        loop = asyncio.get_running_loop()
         # Extract additional configurations if needed
         batch_size = self.config.get("batch_size", 32)
         device = self.config.get("device", "cpu")
@@ -245,8 +244,7 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
             self._model.to(device)
 
         # Run the synchronous encode method in a thread pool to avoid blocking the event loop.
-        embeddings = await loop.run_in_executor(
-            None,
+        embeddings = await asyncio.to_thread(
             lambda: self._model.encode(
                 texts,
                 convert_to_numpy=True,
