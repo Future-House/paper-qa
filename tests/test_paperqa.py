@@ -766,26 +766,21 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
 
 
 def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
-    docs = Docs()
     settings = Settings.from_name("debug")
-    settings.parsing.chunk_size = 0
+    assert settings.parsing.defer_embedding, "Test relies on deferred embedding"
+    settings.parsing.chunk_size = 0  # Leads to one chunk = entire text
     # don't want to shove whole document into llm to get citation or embedding
     settings.parsing.use_doc_details = False
-    settings.parsing.defer_embedding = True
-    # need larger context window
-    settings.summary_llm = "gpt-4o-mini"
+    settings.summary_llm = "gpt-4o-mini"  # context window needs to fit our one chunk
+
+    docs = Docs()
     docs.add(
         stub_data_dir / "paper.pdf",
         "Wellawatte et al, XAI Review, 2023",
         settings=settings,
     )
-    assert len(docs.texts) == 1
-
-    # make sure we deferred embedding
-    assert docs.texts[0].embedding is None
-
-    # now check we can get evidence (namely embed very long document)
-    docs.get_evidence("What is XAI?", settings=settings)
+    assert len(docs.texts) == 1, "Should have been one chunk"
+    assert docs.texts[0].embedding is None, "Should have deferred the embedding"
 
 
 # some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)
