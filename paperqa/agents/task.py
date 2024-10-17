@@ -93,18 +93,24 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         if isinstance(manifest_or_index, SearchIndex):
             entity: str = "index"
             file_names: set[str] = {k for k in await manifest_or_index.index_files if k}
-            dois: set[str] = set()
+            lowercased_dois: set[str] = set()
         else:
             entity = "manifest"
             file_names = {k for k in manifest_or_index if k}
-            dois = {v["doi"] for v in manifest_or_index.values() if v["doi"]}
+            lowercased_dois = {
+                v["doi"].lower() for v in manifest_or_index.values() if v["doi"]
+            }
         if not file_names:  # File names being empty means something's wrong
             logger.warning(
                 f"Can't validate sources {self.sources} without a correctly specified"
                 f" {entity}."
             )
             return
-        not_found = [s for s in self.sources if s not in file_names and s not in dois]
+        not_found = [
+            s
+            for s in self.sources
+            if s not in file_names and s.lower() not in lowercased_dois
+        ]
         if not_found:
             raise ValueError(
                 f"Sources {not_found} of {self.sources} not found in the {entity},"
