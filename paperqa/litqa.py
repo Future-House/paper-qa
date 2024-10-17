@@ -128,7 +128,22 @@ class LitQAEvaluation(IntEnum):
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         seed: int | None = None,
     ) -> tuple[str, Callable[[Answer | str], Awaitable[LitQAEvaluation]]]:
-        """Create a LitQA question and an evaluation callback."""
+        """
+        Create a LitQA question and an answer-to-evaluation function.
+
+        Args:
+            ideal: Ideal answer term's text (not a multiple choice letter).
+            distractors: Distractor terms' text (not multiple choice letters).
+            question: Question text.
+            use_unsure: Flag (default is enabled) to add an 'insufficient answer' term.
+            eval_model: Evaluation model to use for multiple choice letter extraction
+                from a text answer.
+            seed: Optional seed to use in randomization of multiple choice letters.
+
+        Returns:
+            Two-tuple of created LitQA question, function (that can be thought of as
+                stateless) to use to extract an evaluation result from an answer.
+        """
         text, ideal_answer, unsure_answer = make_mc_options(
             ideal=ideal,
             distractors=distractors,
