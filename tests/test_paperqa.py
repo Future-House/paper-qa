@@ -603,9 +603,7 @@ def test_custom_embedding(stub_data_dir: Path) -> None:
         async def embed_documents(self, texts):
             return [[1, 2, 3] for _ in texts]
 
-    docs = Docs(
-        texts_index=NumpyVectorStore(),
-    )
+    docs = Docs(texts_index=NumpyVectorStore())
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -615,9 +613,7 @@ def test_custom_embedding(stub_data_dir: Path) -> None:
 
 
 def test_sparse_embedding(stub_data_dir: Path) -> None:
-    docs = Docs(
-        texts_index=NumpyVectorStore(),
-    )
+    docs = Docs(texts_index=NumpyVectorStore())
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -638,9 +634,7 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
     emb_model = HybridEmbeddingModel(
         models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()]
     )
-    docs = Docs(
-        texts_index=NumpyVectorStore(),
-    )
+    docs = Docs(texts_index=NumpyVectorStore())
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
