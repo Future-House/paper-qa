@@ -1490,7 +1490,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.1.2.dev23+g3d0b0c6.d20241017"
+version = "5.1.2.dev25+g9faf790.d20241017"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1520,6 +1520,9 @@ datasets = [
 ]
 ldp = [
     { name = "ldp" },
+]
+sentence-transformers = [
+    { name = "sentence-transformers" },
 ]
 typing = [
     { name = "pandas-stubs" },
@@ -1578,6 +1581,7 @@ requires-dist = [
     { name = "pymupdf", specifier = ">=1.24.3" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
     { name = "rich" },
+    { name = "sentence-transformers", marker = "extra == 'sentence-transformers'" },
     { name = "setuptools" },
     { name = "tantivy" },
     { name = "tenacity" },
@@ -1590,7 +1594,7 @@ requires-dist = [
 dev = [
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
-    { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero"] },
+    { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero", "sentence-transformers"] },
     { name = "pre-commit", specifier = ">=3.4" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pylint-pydantic" },
@@ -1604,7 +1608,6 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "refurb", specifier = ">=2" },
-    { name = "sentence-transformers" },
     { name = "typeguard" },
 ]
 

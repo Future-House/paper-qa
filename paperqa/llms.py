@@ -222,8 +222,8 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
         self._model = SentenceTransformer(self.name)
 
     def set_mode(self, mode: EmbeddingModes) -> None:
-        """Set the embedding mode. SentenceTransformer does not support modes, so this is a no-op."""
         # SentenceTransformer does not support different modes.
+        pass
 
     async def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """
@@ -897,11 +897,8 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
 
     Args:
         embedding: The embedding model identifier. Supports prefixes like "st-" for SentenceTransformer
-                         and "hybrid-" for combining multiple embedding models.
+                   and "hybrid-" for combining multiple embedding models.
         **kwargs: Additional keyword arguments for the embedding model.
-
-    Returns:
-        EmbeddingModel: An instance of a subclass of EmbeddingModel.
     """
     embedding = embedding.strip()  # Remove any leading/trailing whitespace
 
@@ -930,18 +927,18 @@ def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
 
         return SentenceTransformerEmbeddingModel(
             name=model_name,
-            config=kwargs,  # Pass any additional configurations via config
+            config=kwargs,
         )
 
     if embedding.startswith("litellm-"):
         # Extract the LiteLLM model name after "litellm-"
         model_name = embedding[len("litellm-") :].strip()
         if not model_name:
-            raise ValueError("LiteLLM model name must be specified after 'litellm-'.")
+            raise ValueError("model name must be specified after 'litellm-'.")
 
         return LiteLLMEmbeddingModel(
             name=model_name,
-            config=kwargs,  # Pass any additional configurations via config
+            config=kwargs,
         )
 
     if embedding == "sparse":
