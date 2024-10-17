@@ -793,7 +793,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     def clear(self) -> None:
-        pass
+        self.texts_hashes = set()
 
     async def max_marginal_relevance_search(
         self, query: str, k: int, fetch_k: int, embedding_model: EmbeddingModel
@@ -847,6 +847,7 @@ class NumpyVectorStore(VectorStore):
     _embeddings_matrix: np.ndarray | None = None
 
     def clear(self) -> None:
+        super().clear()
         self.texts = []
         self._embeddings_matrix = None
 
