@@ -472,11 +472,11 @@ class Docs(BaseModel):
     async def _build_texts_index(self, embedding_model: EmbeddingModel) -> None:
         texts = [t for t in self.texts if t not in self.texts_index]
         # For any embeddings we are supposed to lazily embed, embed them now
-        to_embed = [t.text for t in texts if t.embedding is None]
+        to_embed = [t for t in texts if t.embedding is None]
         if to_embed:
             for t, t_embedding in zip(
-                texts,
-                await embedding_model.embed_documents(texts=to_embed),
+                to_embed,
+                await embedding_model.embed_documents(texts=[t.text for t in to_embed]),
                 strict=True,
             ):
                 t.embedding = t_embedding
