@@ -111,8 +111,16 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self._summary_llm_model = summary_llm_model
         self._embedding_model = embedding_model
 
-    def make_initial_state_and_tools(self) -> tuple[EnvironmentState, list[Tool]]:
-        self.state = EnvironmentState(
+    def make_tools(self) -> list[Tool]:
+        return settings_to_tools(
+            settings=self._query.settings,
+            llm_model=self._llm_model,
+            summary_llm_model=self._summary_llm_model,
+            embedding_model=self._embedding_model,
+        )
+
+    def make_initial_state(self) -> EnvironmentState:
+        return EnvironmentState(
             docs=self._docs,
             answer=Answer(
                 question=self._query.query,
@@ -120,20 +128,13 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 id=self._query.id,
             ),
         )
-        self.tools = settings_to_tools(
-            settings=self._query.settings,
-            llm_model=self._llm_model,
-            summary_llm_model=self._summary_llm_model,
-            embedding_model=self._embedding_model,
-        )
-        return self.state, self.tools
 
     async def reset(self) -> tuple[list[Message], list[Tool]]:
         # NOTE: don't build the index here, as sometimes we asyncio.gather over this
         # method, and our current design (as of v5.0.10) could hit race conditions
         # because index building does not use file locks
         self._docs.clear_docs()
-        self.state, self.tools = self.make_initial_state_and_tools()
+        self.state, self.tools = self.make_initial_state(), self.make_tools()
         return (
             [
                 Message(
