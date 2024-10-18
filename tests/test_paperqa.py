@@ -799,24 +799,41 @@ def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
 
 
 @pytest.mark.vcr
+@pytest.mark.parametrize("defer_embeddings", [True, False])
 @pytest.mark.asyncio
-async def test_partly_embedded_texts() -> None:
+async def test_partly_embedded_texts(defer_embeddings: bool) -> None:
     settings = Settings.from_name("fast")
+    settings.parsing.defer_embedding = defer_embeddings
+    docs = Docs()
+    assert isinstance(
+        docs.texts_index, NumpyVectorStore
+    ), "We want this test to cover NumpyVectorStore"
 
     stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
     pre_embedded_text = Text(text="I like turtles.", name="sentence1", doc=stub_doc)
     pre_embedded_text.embedding = (
         await settings.get_embedding_model().embed_documents([pre_embedded_text.text])
     )[0]
-    docs = Docs()
-    await docs.aadd_texts(
-        texts=[
-            pre_embedded_text,
-            Text(text="I like cats.", name="sentence2", doc=stub_doc),
-        ],
-        doc=stub_doc,
-    )
+    texts_to_add = [
+        pre_embedded_text,
+        Text(text="I like cats.", name="sentence2", doc=stub_doc),
+    ]
+
+    # 1. Add texts (and some are partly embedded)
+    await docs.aadd_texts(texts=texts_to_add, doc=stub_doc)
+    assert docs.texts == texts_to_add
+    assert not docs.texts_index.texts
+    assert not docs.texts_index.texts_hashes
+
+    # 2. Gather evidence should work
     await docs.aget_evidence("What do I like?")
+    assert docs.texts_index.texts == docs.texts == texts_to_add
+    assert len(docs.texts_index.texts_hashes) == len(texts_to_add)
+
+    # 3. Gathering evidence again should not change shapes
+    await docs.aget_evidence("What was it that I liked?")
+    assert docs.texts_index.texts == docs.texts == texts_to_add
+    assert len(docs.texts_index.texts_hashes) == len(texts_to_add)
 
 
 # some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)
