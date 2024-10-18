@@ -119,6 +119,8 @@ class ChunkingOptions(StrEnum):
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
+    model_config = ConfigDict(extra="forbid")
+
     chunk_size: int = Field(
         default=5000,
         description="Number of characters per chunk. If 0, no chunking will be done.",
@@ -162,7 +164,6 @@ class ParsingSettings(BaseModel):
         ),
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
-    model_config = ConfigDict(extra="forbid")
 
     def chunk_type(self, chunking_selection: ChunkingOptions | None = None) -> str:
         """Future chunking implementations (i.e. by section) will get an elif clause here."""

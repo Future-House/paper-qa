@@ -38,10 +38,10 @@ ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
 class DocMetadataTask(BaseModel):
     """Holder for provider and processor tasks."""
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     providers: Collection[MetadataProvider]
     processors: Collection[MetadataPostProcessor]
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def provider_queries(
         self, query: dict
