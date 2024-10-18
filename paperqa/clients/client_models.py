@@ -24,8 +24,9 @@ logger = logging.getLogger(__name__)
 
 # ClientQuery is a base class for all queries to the client_models
 class ClientQuery(BaseModel):
-    session: aiohttp.ClientSession
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    session: aiohttp.ClientSession
 
 
 class TitleAuthorQuery(ClientQuery):
