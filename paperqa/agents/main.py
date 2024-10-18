@@ -145,6 +145,9 @@ async def run_fake_agent(
     query: QueryRequest,
     docs: Docs,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
+    on_agent_action_callback: (
+        Callable[[ToolRequestMessage, BaseModel], Awaitable] | None
+    ) = None,
     on_env_step_callback: (
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
@@ -170,11 +173,12 @@ async def run_fake_agent(
     )
 
     async def step(tool: Tool, **call_kwargs) -> None:
-        obs, reward, done, truncated = await env.step(
-            action=ToolRequestMessage(
-                tool_calls=[ToolCall.from_tool(tool, **call_kwargs)]
-            )
+        action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_tool(tool, **call_kwargs)]
         )
+        if on_agent_action_callback:
+            await on_agent_action_callback(action, env.state)
+        obs, reward, done, truncated = await env.step(action)
         if on_env_step_callback:
             await on_env_step_callback(obs, reward, done, truncated)
 
