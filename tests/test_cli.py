@@ -1,4 +1,3 @@
-import io
 import os
 import sys
 from pathlib import Path
@@ -15,25 +14,37 @@ except ImportError:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
-def test_can_modify_settings() -> None:
+def test_can_modify_settings(capsys, stub_data_dir: Path) -> None:
+    rel_path_home_to_stub_data = Path("~") / stub_data_dir.relative_to(Path.home())
+
+    # This test depends on the unit_test config not previously existing
+    with pytest.raises(FileNotFoundError, match="unit_test"):
+        Settings.from_name("unit_test")
+
     old_argv = sys.argv
-    old_stdout = sys.stdout
-    captured_output = io.StringIO()
     try:
-        sys.argv = "paperqa -s debug --llm=my-model-foo save unit_test".split()
+        sys.argv = (
+            "paperqa -s debug --llm=my-model-foo"
+            f" --agent.index.paper_directory={rel_path_home_to_stub_data!s} save"
+            " unit_test"
+        ).split()
         main()
 
-        sys.stdout = captured_output
-        assert Settings.from_name("unit_test").llm == "my-model-foo"
+        captured = capsys.readouterr()
+        assert not captured.err
+        assert "Settings saved" in captured.out
+        settings = Settings.from_name("unit_test")
+        assert settings.llm == "my-model-foo"
+        assert settings.agent.index.paper_directory == str(rel_path_home_to_stub_data)
 
         sys.argv = "paperqa -s unit_test view".split()
         main()
 
-        output = captured_output.getvalue().strip()
-        assert "my-model-foo" in output
+        captured = capsys.readouterr()
+        assert not captured.err
+        assert "my-model-foo" in captured.out
     finally:
         sys.argv = old_argv
-        sys.stdout = old_stdout
         os.unlink(pqa_directory("settings") / "unit_test.json")
 
 
