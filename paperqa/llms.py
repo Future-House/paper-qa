@@ -780,8 +780,8 @@ class VectorStore(BaseModel, ABC):
         return len(self.texts_hashes)
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
-        [self.texts_hashes.add(hash(t)) for t in texts]  # type: ignore[func-returns-value]
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        self.texts_hashes.update(hash(t) for t in texts)
 
     @abstractmethod
     async def similarity_search(
@@ -791,7 +791,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     def clear(self) -> None:
-        pass
+        self.texts_hashes = set()
 
     async def max_marginal_relevance_search(
         self, query: str, k: int, fetch_k: int, embedding_model: EmbeddingModel
@@ -844,14 +844,22 @@ class NumpyVectorStore(VectorStore):
     texts: list[Embeddable] = []
     _embeddings_matrix: np.ndarray | None = None
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, type(self)):
+            raise NotImplementedError
+        return (
+            self.texts == other.texts
+            and self.texts_hashes == other.texts_hashes
+            and self.mmr_lambda == other.mmr_lambda
+            and self._embeddings_matrix == other._embeddings_matrix
+        )
+
     def clear(self) -> None:
+        super().clear()
         self.texts = []
         self._embeddings_matrix = None
 
-    def add_texts_and_embeddings(
-        self,
-        texts: Sequence[Embeddable],
-    ) -> None:
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
