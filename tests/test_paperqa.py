@@ -10,6 +10,7 @@ import httpx
 import numpy as np
 import pymupdf
 import pytest
+from pytest_subtests import SubTests
 
 from paperqa import (
     Answer,
@@ -476,14 +477,27 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert result.cost > 0
 
 
-def test_make_docs(stub_data_dir: Path) -> None:
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "flag_day.html",
         "WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
     )
-    assert docs.docs["test"].docname == "Wiki2023"
+    with subtests.test(msg="citation-creation"):
+        assert docs.docs["test"].docname == "Wiki2023"
+
+    with subtests.test(msg="text-contains"):
+        await docs.aget_evidence("What is the national flag of Canada?")
+        assert docs.texts_index.texts_hashes
+        assert docs.texts
+        assert all(t in docs.texts_index for t in docs.texts)
+
+        docs.texts_index.clear()
+        assert docs.texts
+        assert all(t not in docs.texts_index for t in docs.texts)
 
 
 def test_evidence(docs_fixture) -> None:
