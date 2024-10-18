@@ -23,7 +23,10 @@ from tenacity import (
 try:
     from ldp.alg import Callback, RolloutManager
 except ImportError:
-    Callback = None  # type: ignore[assignment,misc]
+
+    class Callback:  # type: ignore[no-redef]
+        """Placeholder parent class for when ldp isn't installed."""
+
     RolloutManager = None  # type: ignore[assignment,misc]
 
 from paperqa.docs import Docs
@@ -37,6 +40,7 @@ from .search import SearchDocumentStorage, SearchIndex, get_directory_index
 from .tools import EnvironmentState, GatherEvidence, GenerateAnswer, PaperSearch
 
 if TYPE_CHECKING:
+    from aviary.env import Environment
     from ldp.agent import Agent, SimpleAgentState
     from ldp.graph.ops import OpResult
 
@@ -142,6 +146,9 @@ async def run_fake_agent(
     docs: Docs,
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
+    on_agent_action_callback: (
+        Callable[[ToolRequestMessage, BaseModel], Awaitable] | None
+    ) = None,
     on_env_step_callback: (
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
@@ -167,11 +174,12 @@ async def run_fake_agent(
     )
 
     async def step(tool: Tool, **call_kwargs) -> None:
-        obs, reward, done, truncated = await env.step(
-            action=ToolRequestMessage(
-                tool_calls=[ToolCall.from_tool(tool, **call_kwargs)]
-            )
+        action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_tool(tool, **call_kwargs)]
         )
+        if on_agent_action_callback:
+            await on_agent_action_callback(action, env.state)
+        obs, reward, done, truncated = await env.step(action)
         if on_env_step_callback:
             await on_env_step_callback(obs, reward, done, truncated)
 
@@ -271,6 +279,36 @@ async def run_aviary_agent(
     return env.state.answer, status
 
 
+class LDPRolloutCallback(Callback):
+    """Shim connecting ldp RolloutManager Callbacks with paperqa runner callbacks."""
+
+    def __init__(
+        self,
+        env: "Environment",
+        on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
+        on_agent_action_callback: "Callable[[OpResult[ToolRequestMessage], SimpleAgentState, float], Awaitable] | None" = None,  # noqa: E501
+        on_env_step_callback: (
+            Callable[[list[Message], float, bool, bool], Awaitable] | None
+        ) = None,
+    ):
+        self.env = env
+        self.on_env_reset_callback = on_env_reset_callback
+        self.on_agent_action_callback = on_agent_action_callback
+        self.on_env_step_callback = on_env_step_callback
+
+    async def after_agent_get_asv(self, traj_id: str, *args) -> None:  # noqa: ARG002
+        if self.on_agent_action_callback is not None:
+            await self.on_agent_action_callback(*args)
+
+    async def after_env_reset(self, traj_id: str, *_) -> None:  # noqa: ARG002
+        if self.on_env_reset_callback is not None:
+            await self.on_env_reset_callback(self.env.state)
+
+    async def after_env_step(self, traj_id: str, *args) -> None:  # noqa: ARG002
+        if self.on_env_step_callback is not None:
+            await self.on_env_step_callback(*args)
+
+
 async def run_ldp_agent(
     query: QueryRequest,
     docs: Docs,
@@ -281,30 +319,26 @@ async def run_ldp_agent(
     on_env_step_callback: (
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
+    ldp_callback_type: type[LDPRolloutCallback] = LDPRolloutCallback,
     **env_kwargs,
 ) -> tuple[Answer, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
     # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
     # has already taken place, which checks that ldp is installed
 
-    class RolloutCallback(Callback):
-        async def after_agent_get_asv(
-            self, traj_id: str, *args  # noqa: ARG002
-        ) -> None:
-            if on_agent_action_callback is not None:
-                await on_agent_action_callback(*args)
-
-        async def after_env_reset(self, traj_id: str, *_) -> None:  # noqa: ARG002
-            if on_env_reset_callback is not None:
-                await on_env_reset_callback(env.state)
-
-        async def after_env_step(self, traj_id: str, *args) -> None:  # noqa: ARG002
-            if on_env_step_callback is not None:
-                await on_env_step_callback(*args)
-
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
-            rollout_manager = RolloutManager(agent, callbacks=[RolloutCallback()])
+            rollout_manager = RolloutManager(
+                agent,
+                callbacks=[
+                    ldp_callback_type(
+                        env,
+                        on_env_reset_callback,
+                        on_agent_action_callback,
+                        on_env_step_callback,
+                    )
+                ],
+            )
             await rollout_manager.sample_trajectories(
                 environments=[env], max_steps=query.settings.agent.max_timesteps
             )
