@@ -780,7 +780,7 @@ class VectorStore(BaseModel, ABC):
         return len(self.texts_hashes)
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: Sequence[Embeddable]) -> None:
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         self.texts_hashes.update(hash(t) for t in texts)
 
     @abstractmethod
@@ -791,7 +791,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     def clear(self) -> None:
-        pass
+        self.texts_hashes = set()
 
     async def max_marginal_relevance_search(
         self, query: str, k: int, fetch_k: int, embedding_model: EmbeddingModel
@@ -845,13 +845,11 @@ class NumpyVectorStore(VectorStore):
     _embeddings_matrix: np.ndarray | None = None
 
     def clear(self) -> None:
+        super().clear()
         self.texts = []
         self._embeddings_matrix = None
 
-    def add_texts_and_embeddings(
-        self,
-        texts: Sequence[Embeddable],
-    ) -> None:
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
