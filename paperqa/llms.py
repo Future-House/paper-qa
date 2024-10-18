@@ -844,6 +844,16 @@ class NumpyVectorStore(VectorStore):
     texts: list[Embeddable] = []
     _embeddings_matrix: np.ndarray | None = None
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, type(self)):
+            raise NotImplementedError
+        return (
+            self.texts == other.texts
+            and self.texts_hashes == other.texts_hashes
+            and self.mmr_lambda == other.mmr_lambda
+            and self._embeddings_matrix == other._embeddings_matrix
+        )
+
     def clear(self) -> None:
         super().clear()
         self.texts = []
