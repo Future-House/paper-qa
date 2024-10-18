@@ -1,10 +1,10 @@
-import io
 import os
 import sys
 from pathlib import Path
 
 import pytest
 
+from paperqa import Docs
 from paperqa.settings import Settings
 from paperqa.utils import pqa_directory
 
@@ -15,25 +15,37 @@ except ImportError:
     pytest.skip("agents module is not installed", allow_module_level=True)
 
 
-def test_can_modify_settings() -> None:
+def test_can_modify_settings(capsys, stub_data_dir: Path) -> None:
+    rel_path_home_to_stub_data = Path("~") / stub_data_dir.relative_to(Path.home())
+
+    # This test depends on the unit_test config not previously existing
+    with pytest.raises(FileNotFoundError, match="unit_test"):
+        Settings.from_name("unit_test")
+
     old_argv = sys.argv
-    old_stdout = sys.stdout
-    captured_output = io.StringIO()
     try:
-        sys.argv = "paperqa -s debug --llm=my-model-foo save unit_test".split()
+        sys.argv = (
+            "paperqa -s debug --llm=my-model-foo"
+            f" --agent.index.paper_directory={rel_path_home_to_stub_data!s} save"
+            " unit_test"
+        ).split()
         main()
 
-        sys.stdout = captured_output
-        assert Settings.from_name("unit_test").llm == "my-model-foo"
+        captured = capsys.readouterr()
+        assert not captured.err
+        assert "Settings saved" in captured.out
+        settings = Settings.from_name("unit_test")
+        assert settings.llm == "my-model-foo"
+        assert settings.agent.index.paper_directory == str(rel_path_home_to_stub_data)
 
         sys.argv = "paperqa -s unit_test view".split()
         main()
 
-        output = captured_output.getvalue().strip()
-        assert "my-model-foo" in output
+        captured = capsys.readouterr()
+        assert not captured.err
+        assert "my-model-foo" in captured.out
     finally:
         sys.argv = old_argv
-        sys.stdout = old_stdout
         os.unlink(pqa_directory("settings") / "unit_test.json")
 
 
@@ -59,9 +71,14 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
 def test_cli_can_build_and_search_index(
     agent_index_dir: Path, stub_data_dir: Path
 ) -> None:
+    rel_path_home_to_stub_data = Path("~") / stub_data_dir.relative_to(Path.home())
     settings = Settings.from_name("debug")
+    settings.agent.index.paper_directory = rel_path_home_to_stub_data
     settings.agent.index.index_directory = agent_index_dir
     index_name = "test"
     build_index(index_name, stub_data_dir, settings)
-    search_result = search_query("XAI", index_name, settings)
-    assert search_result
+    result = search_query("XAI", index_name, settings)
+    assert len(result) == 1
+    assert isinstance(result[0][0], Docs)
+    assert result[0][0].docnames == {"Wellawatte"}
+    assert result[0][1] == "paper.pdf"
