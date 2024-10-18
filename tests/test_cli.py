@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from paperqa import Docs
 from paperqa.settings import Settings
 from paperqa.utils import pqa_directory
 
@@ -70,9 +71,14 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
 def test_cli_can_build_and_search_index(
     agent_index_dir: Path, stub_data_dir: Path
 ) -> None:
+    rel_path_home_to_stub_data = Path("~") / stub_data_dir.relative_to(Path.home())
     settings = Settings.from_name("debug")
+    settings.agent.index.paper_directory = rel_path_home_to_stub_data
     settings.agent.index.index_directory = agent_index_dir
     index_name = "test"
     build_index(index_name, stub_data_dir, settings)
-    search_result = search_query("XAI", index_name, settings)
-    assert search_result
+    result = search_query("XAI", index_name, settings)
+    assert len(result) == 1
+    assert isinstance(result[0][0], Docs)
+    assert result[0][0].docnames == {"Wellawatte"}
+    assert result[0][1] == "paper.pdf"
