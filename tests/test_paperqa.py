@@ -3,6 +3,7 @@ import os
 import pickle
 import textwrap
 from collections.abc import AsyncIterable
+from copy import deepcopy
 from io import BytesIO
 from pathlib import Path
 
@@ -610,7 +611,7 @@ def test_duplicate(stub_data_dir: Path) -> None:
     ), "Unique documents should be hashed as unique"
 
 
-def test_custom_embedding(stub_data_dir: Path) -> None:
+def test_docs_with_custom_embedding(subtests: SubTests, stub_data_dir: Path) -> None:
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
@@ -625,7 +626,35 @@ def test_custom_embedding(stub_data_dir: Path) -> None:
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=MyEmbeds(),
     )
-    assert docs.texts[0].embedding == [1, 2, 3]
+    with subtests.test(msg="confirm-embedding"):
+        assert docs.texts[0].embedding == [1, 2, 3]
+
+    with subtests.test(msg="copying-before-get-evidence"):
+        # Before getting evidence, shallow and deep copies are the same
+        docs_shallow_copy = Docs(
+            texts_index=type(docs.texts_index)(**docs.texts_index.model_dump()),
+            **docs.model_dump(exclude={"texts_index"}),
+        )
+        docs_deep_copy = deepcopy(docs)
+        assert (
+            docs.texts_index
+            == docs_shallow_copy.texts_index
+            == docs_deep_copy.texts_index
+        )
+
+    with subtests.test(msg="copying-after-get-evidence"):
+        # After getting evidence, a shallow copy of Docs is not the same because its
+        # texts index gets lazily populated, while a deep copy should preserve it
+        docs.get_evidence(
+            "What country is Frederick Bates from?", embedding_model=MyEmbeds()
+        )
+        docs_shallow_copy = Docs(
+            texts_index=type(docs.texts_index)(**docs.texts_index.model_dump()),
+            **docs.model_dump(exclude={"texts_index"}),
+        )
+        docs_deep_copy = deepcopy(docs)
+        assert docs.texts_index != docs_shallow_copy.texts_index
+        assert docs.texts_index == docs_deep_copy.texts_index
 
 
 def test_sparse_embedding(stub_data_dir: Path) -> None:
