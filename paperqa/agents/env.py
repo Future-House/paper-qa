@@ -1,5 +1,6 @@
 import logging
-from typing import cast
+from copy import deepcopy
+from typing import Any, Self, cast
 
 from aviary.env import Environment, Frame
 from aviary.message import Message
@@ -111,8 +112,16 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self._summary_llm_model = summary_llm_model
         self._embedding_model = embedding_model
 
-    def make_initial_state_and_tools(self) -> tuple[EnvironmentState, list[Tool]]:
-        self.state = EnvironmentState(
+    def make_tools(self) -> list[Tool]:
+        return settings_to_tools(
+            settings=self._query.settings,
+            llm_model=self._llm_model,
+            summary_llm_model=self._summary_llm_model,
+            embedding_model=self._embedding_model,
+        )
+
+    def make_initial_state(self) -> EnvironmentState:
+        return EnvironmentState(
             docs=self._docs,
             answer=Answer(
                 question=self._query.query,
@@ -120,20 +129,13 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 id=self._query.id,
             ),
         )
-        self.tools = settings_to_tools(
-            settings=self._query.settings,
-            llm_model=self._llm_model,
-            summary_llm_model=self._summary_llm_model,
-            embedding_model=self._embedding_model,
-        )
-        return self.state, self.tools
 
     async def reset(self) -> tuple[list[Message], list[Tool]]:
         # NOTE: don't build the index here, as sometimes we asyncio.gather over this
         # method, and our current design (as of v5.0.10) could hit race conditions
         # because index building does not use file locks
         self._docs.clear_docs()
-        self.state, self.tools = self.make_initial_state_and_tools()
+        self.state, self.tools = self.make_initial_state(), self.make_tools()
         return (
             [
                 Message(
@@ -171,3 +173,26 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             ),
             False,
         )
+
+    def __deepcopy__(self, memo) -> Self:
+        copy_state = deepcopy(self.state, memo)
+        # We don't know the side effects of deep copying a litellm.Router,
+        # so we force a shallow copy of these LiteLLMModels
+        env_model_kwargs: dict[str, Any] = {
+            name: model if model is None else type(model)(**model.model_dump())
+            for name, model in (
+                ("llm_model", self._llm_model),
+                ("summary_llm_model", self._summary_llm_model),
+                ("embedding_model", self._embedding_model),
+            )
+        }
+        copy_self = type(self)(
+            query=deepcopy(self._query, memo),  # deepcopy for _docs_name
+            docs=copy_state.docs,
+            **env_model_kwargs,
+        )
+        copy_self.state = copy_state
+        # Because we shallow copied the LiteLLMModels, we need to re-make the
+        # tool functions within the tools
+        copy_self.tools = copy_self.make_tools()
+        return copy_self

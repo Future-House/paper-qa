@@ -11,8 +11,9 @@ import logging
 import re
 from abc import ABC
 from collections.abc import Awaitable, Callable, Sequence
+from copy import deepcopy
 from enum import StrEnum
-from typing import TYPE_CHECKING, assert_never
+from typing import TYPE_CHECKING, Any, Self, assert_never
 
 from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame, TaskDataset
 from aviary.message import Message
@@ -148,6 +149,33 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
 
     def export_frame(self) -> Frame:
         raise NotImplementedError("Didn't yet need to export a frame.")
+
+    def __deepcopy__(self, memo) -> Self:
+        copy_state = deepcopy(self.state, memo)
+        # We don't know the side effects of deep copying a litellm.Router,
+        # so we force a shallow copy of these LiteLLMModels
+        env_model_kwargs: dict[str, Any] = {
+            name: model if model is None else type(model)(**model.model_dump())
+            for name, model in (
+                ("llm_model", self._llm_model),
+                ("summary_llm_model", self._summary_llm_model),
+                ("embedding_model", self._embedding_model),
+            )
+        }
+        copy_self = type(self)(
+            query=deepcopy(self._query, memo),  # deepcopy for _docs_name
+            docs=copy_state.docs,
+            evaluation_from_answer=self._evaluation_from_answer,
+            sources=self.sources,
+            rewards=self._rewards,
+            evaluation_callback=self._evaluation_callback,
+            **env_model_kwargs,
+        )
+        copy_self.state = copy_state
+        # Because we shallow copied the LiteLLMModels, we need to re-make the
+        # tool functions within the tools
+        copy_self.tools = copy_self.make_tools()
+        return copy_self
 
 
 ENV_NAME = "paperqa-local"
