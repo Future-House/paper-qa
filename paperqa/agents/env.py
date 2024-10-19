@@ -1,5 +1,6 @@
 import logging
-from typing import cast
+from copy import deepcopy
+from typing import Any, Self, cast
 
 from aviary.env import Environment, Frame
 from aviary.message import Message
@@ -172,3 +173,26 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             ),
             False,
         )
+
+    def __deepcopy__(self, memo) -> Self:
+        copy_state = deepcopy(self.state, memo)
+        # We don't know the side effects of deep copying a litellm.Router,
+        # so we force a shallow copy of these LiteLLMModels
+        env_model_kwargs: dict[str, Any] = {
+            name: model if model is None else type(model)(**model.model_dump())
+            for name, model in (
+                ("llm_model", self._llm_model),
+                ("summary_llm_model", self._summary_llm_model),
+                ("embedding_model", self._embedding_model),
+            )
+        }
+        copy_self = type(self)(
+            query=deepcopy(self._query, memo),  # deepcopy for _docs_name
+            docs=copy_state.docs,
+            **env_model_kwargs,
+        )
+        copy_self.state = copy_state
+        # Because we shallow copied the LiteLLMModels, we need to re-make the
+        # tool functions within the tools
+        copy_self.tools = copy_self.make_tools()
+        return copy_self
