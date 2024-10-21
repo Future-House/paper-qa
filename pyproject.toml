@@ -29,7 +29,7 @@ dependencies = [
     "numpy",
     "openai<1.47",  # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
     "pybtex",
-    "pydantic-settings",
+    "pydantic-settings<2.6",  # SEE: https://github.com/pydantic/pydantic-settings/issues/453
     "pydantic~=2.0",
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
