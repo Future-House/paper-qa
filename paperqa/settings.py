@@ -20,7 +20,6 @@ from pydantic import (
     model_validator,
 )
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
-from typing_extensions import deprecated
 
 try:
     from ldp.agent import (
@@ -70,9 +69,6 @@ class AnswerSettings(BaseModel):
     evidence_detailed_citations: bool = Field(
         default=True,
         description="Whether to include detailed citations in summaries",
-        deprecated=deprecated(
-            "Set the context_inner prompt directly to have a citation key. This flag will be removed in v6"
-        ),
     )
     evidence_retrieval: bool = Field(
         default=True,
@@ -97,6 +93,21 @@ class AnswerSettings(BaseModel):
         default=False,
         description="Whether to cite background information provided by model.",
     )
+
+    @model_validator(mode="after")
+    def _deprecated_field(self) -> Self:
+        # default is True, so we only warn if it's False
+        if not self.evidence_detailed_citations:
+            warnings.warn(
+                (
+                    "The 'evidence_detailed_citations' field is deprecated and will be"
+                    " removed in version 6. Adjust 'PromptSettings.context_inner' to remove"
+                    " detailed citations."
+                ),
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+        return self
 
 
 class ParsingOptions(StrEnum):
@@ -284,13 +295,6 @@ class PromptSettings(BaseModel):
                 "Select prompt can only have variables:"
                 f" {get_formatted_variables(select_paper_prompt)}"
             )
-        return v
-
-    @field_validator("pre")
-    @classmethod
-    def check_pre(cls, v: str | None) -> str | None:
-        if v is not None and get_formatted_variables(v) != {"question"}:
-            raise ValueError("Pre prompt must have input variables: question")
         return v
 
     @field_validator("post")
