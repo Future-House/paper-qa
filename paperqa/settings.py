@@ -20,6 +20,7 @@ from pydantic import (
     model_validator,
 )
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
+from typing_extensions import deprecated
 
 try:
     from ldp.agent import (
@@ -42,6 +43,8 @@ except ImportError:
 
 from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from paperqa.prompts import (
+    CONTEXT_INNER_PROMPT,
+    CONTEXT_OUTER_PROMPT,
     citation_prompt,
     default_system_prompt,
     qa_prompt,
@@ -65,7 +68,11 @@ class AnswerSettings(BaseModel):
         default=10, description="Number of evidence pieces to retrieve"
     )
     evidence_detailed_citations: bool = Field(
-        default=True, description="Whether to include detailed citations in summaries"
+        default=True,
+        description="Whether to include detailed citations in summaries",
+        deprecated=deprecated(
+            "Set the context_inner prompt directly to have a citation key. This flag will be removed in v6"
+        ),
     )
     evidence_retrieval: bool = Field(
         default=True,
@@ -89,16 +96,6 @@ class AnswerSettings(BaseModel):
     answer_filter_extra_background: bool = Field(
         default=False,
         description="Whether to cite background information provided by model.",
-    )
-    list_valid_keys: bool = Field(
-        default=True,
-        description="Whether to remind LLM of the list of valid keys. "
-        "Many frontier models do not need this hint.",
-    )
-    short_context_headers: bool = Field(
-        default=True,
-        description="Whether to use compact formatting for name and context, or multiline. "
-        "If using very long contexts (like whole documents), you should probably set this to False.",
     )
 
 
@@ -220,7 +217,9 @@ def get_formatted_variables(s: str) -> set[str]:
 
 
 class PromptSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", validate_assignment=True)
+
+    EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
 
     summary: str = summary_prompt
     qa: str = qa_prompt
@@ -243,7 +242,15 @@ class PromptSettings(BaseModel):
     # to get JSON
     summary_json: str = summary_json_prompt
     summary_json_system: str = summary_json_system_prompt
-    EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
+    context_outer: str = Field(
+        default=CONTEXT_OUTER_PROMPT,
+        description="Prompt for how to format all contexts in generate answer.",
+    )
+    context_inner: str = Field(
+        default=CONTEXT_INNER_PROMPT,
+        description="Prompt for how to format a single context in generate answer. "
+        "This should at least contain key and name.",
+    )
 
     @field_validator("summary")
     @classmethod
@@ -296,6 +303,26 @@ class PromptSettings(BaseModel):
             attrs = set(Answer.model_fields.keys())
             if not get_formatted_variables(v).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
+        return v
+
+    @field_validator("context_outer")
+    @classmethod
+    def check_context_outer(cls, v: str) -> str:
+        if not get_formatted_variables(v).issubset(
+            get_formatted_variables(CONTEXT_OUTER_PROMPT)
+        ):
+            raise ValueError(
+                "Context outer prompt can only have variables:"
+                f" {get_formatted_variables(CONTEXT_OUTER_PROMPT)}"
+            )
+        return v
+
+    @field_validator("context_inner")
+    @classmethod
+    def check_context_inner(cls, v: str) -> str:
+        fvars = get_formatted_variables(v)
+        if "name" not in fvars or "text" not in fvars:
+            raise ValueError("Context inner prompt must have name and text")
         return v
 
 

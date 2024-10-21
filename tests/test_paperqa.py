@@ -1089,3 +1089,49 @@ def test_external_doc_index(stub_data_dir: Path) -> None:
     docs2 = Docs(texts_index=docs.texts_index)
     assert not docs2.docs
     assert docs2.get_evidence("What is the date of flag day?").contexts
+
+
+def test_context_inner_prompt(stub_data_dir: Path) -> None:
+
+    prompt_settings = Settings()
+
+    # try bogus prompt
+    with pytest.raises(ValueError, match="Context inner prompt can only"):
+        prompt_settings.prompts.context_inner = "A:"
+
+    # make sure prompt gets used
+    settings = Settings.from_name("fast")
+    settings.prompts.context_inner = "{name} @@@@@ {text}\nFrom: {citation}"
+    docs = Docs()
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    response = docs.query("What country is Bates from?", settings=settings)
+    assert "@@@@@" in response.context
+    assert "WikiMedia Foundation, 2023" in response.context
+
+
+def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
+
+    # TODO: delete in v6
+    settings = Settings.from_name("fast")
+    settings.answer.evidence_detailed_citations = False
+    docs = Docs()
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    response = docs.query("What country is Bates from?", settings=settings)
+    assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
+
+
+def test_context_outer_prompt(stub_data_dir: Path) -> None:
+
+    prompt_settings = Settings()
+
+    # try bogus prompt
+    with pytest.raises(ValueError, match="Context outer prompt can only"):
+        prompt_settings.prompts.context_outer = "{foo}"
+
+    # make sure can delete keys
+    settings = Settings.from_name("fast")
+    settings.prompts.context_outer = "{context_str}"
+    docs = Docs()
+    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    response = docs.query("What country is Bates from?", settings=settings)
+    assert "Valid Keys" not in response.context

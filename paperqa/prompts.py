@@ -85,3 +85,6 @@ EVAL_PROMPT_TEMPLATE = (
     "\n\n{qa_answer}"
     "\n\nSingle Letter Answer:"
 )
+
+CONTEXT_OUTER_PROMPT = "{context_str}\n\nValid Keys: {valid_keys}"
+CONTEXT_INNER_PROMPT = "{name}: {text}\nFrom {citation}"
