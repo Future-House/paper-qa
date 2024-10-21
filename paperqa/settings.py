@@ -554,7 +554,7 @@ class Settings(BaseSettings):
         ),
     )
     embedding: str = Field(
-        "text-embedding-3-small",
+        default="text-embedding-3-small",
         description="Default embedding model for texts",
     )
     embedding_config: dict | None = Field(
