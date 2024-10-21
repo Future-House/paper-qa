@@ -17,7 +17,7 @@ classifiers = [
     "Programming Language :: Python",
 ]
 dependencies = [
-    "PyMuPDF>=1.24.3",  # python -c "import pymupdf" won't run before version 1.24.3
+    "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
@@ -29,7 +29,7 @@ dependencies = [
     "numpy",
     "openai<1.47",  # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
     "pybtex",
-    "pydantic-settings",
+    "pydantic-settings<2.6",  # SEE: https://github.com/pydantic/pydantic-settings/issues/453
     "pydantic~=2.0",
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
@@ -144,7 +144,7 @@ ignore_missing_imports = true
 module = [
     "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
-    "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3361
+    "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
 ]
 
