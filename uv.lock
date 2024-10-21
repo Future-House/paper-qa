@@ -1490,7 +1490,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.3.1.dev6+g9ca332f"
+version = "5.3.1.dev5+g6ddd81c.d20241021"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1578,7 +1578,7 @@ requires-dist = [
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pydantic-settings", specifier = "<2.6" },
-    { name = "pymupdf", specifier = ">=1.24.3" },
+    { name = "pymupdf", specifier = ">=1.24.12" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
     { name = "rich" },
     { name = "sentence-transformers", marker = "extra == 'local'" },
