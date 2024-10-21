@@ -1093,6 +1093,7 @@ def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
     with pytest.raises(ValueError, match="Context inner prompt must"):
         prompt_settings.prompts.context_inner = "A:"
 
+    prompt_settings = Settings()
     with pytest.raises(ValueError, match="Context outer prompt can only"):
         prompt_settings.prompts.context_outer = "{foo}"
 
