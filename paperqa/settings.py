@@ -90,6 +90,16 @@ class AnswerSettings(BaseModel):
         default=False,
         description="Whether to cite background information provided by model.",
     )
+    list_valid_keys: bool = Field(
+        default=True,
+        description="Whether to remind LLM of the list of valid keys. "
+        "Many frontier models do not need this hint.",
+    )
+    short_context_headers: bool = Field(
+        default=True,
+        description="Whether to use compact formatting for name and context, or multiline. "
+        "If using very long contexts (like whole documents), you should probably set this to False.",
+    )
 
 
 class ParsingOptions(StrEnum):

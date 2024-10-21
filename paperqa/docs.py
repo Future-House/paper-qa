@@ -705,7 +705,11 @@ class Docs(BaseModel):
 
         context_str = "\n\n".join(
             [
-                f"{c.text.name}: {c.context}"
+                (
+                    f"{c.text.name}: {c.context}"
+                    if answer_config.short_context_headers
+                    else f"{c.text.name}:\n----\n{c.context}\n----"
+                )
                 + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
                 + (
                     f"\nFrom {c.text.doc.citation}"
@@ -718,7 +722,8 @@ class Docs(BaseModel):
         )
 
         valid_names = [c.text.name for c in filtered_contexts]
-        context_str += "\n\nValid keys: " + ", ".join(valid_names)
+        if answer_config.list_valid_keys:
+            context_str += "\n\nValid keys: " + ", ".join(valid_names)
 
         bib = {}
         if len(context_str) < 10:  # noqa: PLR2004
