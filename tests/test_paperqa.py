@@ -9,7 +9,6 @@ from pathlib import Path
 
 import httpx
 import numpy as np
-import pymupdf
 import pytest
 from pytest_subtests import SubTests
 
@@ -863,11 +862,6 @@ async def test_partly_embedded_texts(defer_embeddings: bool) -> None:
 # body will always be different between requests
 # adding body so that vcr correctly match the right request with its response.
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
-# pymupdf v1.24.10 to v1.24.11 broke the made cassettes, so we specify it in the
-# cassette name so newer versions are automatically incompatible
-@pytest.mark.default_cassette(
-    f"test_pdf_reader_match_doc_details_pymupdf_v{pymupdf.__version__}.yaml"
-)
 def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     docs.add(

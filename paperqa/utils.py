@@ -470,16 +470,9 @@ def pqa_directory(name: str) -> Path:
 
 def setup_default_logs() -> None:
     """Configure logs to reasonable defaults."""
-    # Work around https://github.com/pymupdf/PyMuPDF/issues/3914
-    pymupdf_logger = logging.getLogger(pymupdf.__name__)
-
-    def message(text="") -> None:
-        # https://github.com/pymupdf/PyMuPDF/blob/1.24.10/src/__init__.py#L102-L107,
-        # but with logging instead of print
-        # Warning was chosen since most `message` usages are errors or warnings
-        pymupdf_logger.warning(text)
-
-    pymupdf.message = message
+    # Trigger PyMuPDF to use Python logging
+    # SEE: https://pymupdf.readthedocs.io/en/latest/app3.html#diagnostics
+    pymupdf.set_messages(pylogging=True)
 
     # Set sane default LiteLLM logging configuration
     # SEE: https://docs.litellm.ai/docs/observability/telemetry
