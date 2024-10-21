@@ -384,11 +384,20 @@ class DocDetails(Doc):
 
     @classmethod
     def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
-        if doi := data.get("doi"):
-            remove_urls = cls.DOI_URL_FORMATS
-            for url in remove_urls:
-                if doi.startswith(url):
-                    doi = doi.replace(url, "")
+        doi: str | list[str] | None = data.get("doi")
+        if isinstance(doi, list):
+            if len(doi) != 1:
+                logger.warning(
+                    f"Discarding list of DOIs {doi} due to it not having one value,"
+                    f" full data was {data}."
+                )
+                doi = None
+            else:
+                doi = doi[0]
+        if doi:
+            for url_prefix_to_remove in cls.DOI_URL_FORMATS:
+                if doi.startswith(url_prefix_to_remove):
+                    doi = doi.replace(url_prefix_to_remove, "")
             data["doi"] = doi.lower()
             data["doc_id"] = encode_id(doi.lower())
         else:
