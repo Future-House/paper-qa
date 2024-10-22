@@ -248,6 +248,7 @@ class SearchIndex:
                     writer: IndexWriter = (await self.index).writer()
                     writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
                     writer.commit()
+                    writer.wait_merging_threads()
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
@@ -287,6 +288,7 @@ class SearchIndex:
             writer: IndexWriter = index.writer()
             writer.delete_documents("file_location", file_location)
             writer.commit()
+            writer.wait_merging_threads()
         except ValueError as e:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
                 raise AsyncRetryError("Failed to acquire lock") from e
