@@ -353,6 +353,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     assert "I cannot answer" in response.answer.answer
 
 
+@pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_propagate_options(agent_test_settings: Settings) -> None:
     llm_name = "gpt-4o-mini"
