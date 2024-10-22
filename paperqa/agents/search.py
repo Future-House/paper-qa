@@ -135,13 +135,17 @@ class SearchIndex:
         self.storage = storage
 
     @property
-    async def index_directory(self) -> anyio.Path:
+    async def index_directory(  # TODO: rename to index_root_directory
+        self,
+    ) -> anyio.Path:
         directory = anyio.Path(self._index_directory).joinpath(self.index_name)
         await directory.mkdir(parents=True, exist_ok=True)
         return directory
 
     @property
-    async def index_filename(self) -> anyio.Path:  # TODO: rename to index_directory
+    async def index_filename(  # TODO: rename to index_meta_directory
+        self,
+    ) -> anyio.Path:
         """Directory to store files used to house index internals."""
         index_dir = (await self.index_directory) / "index"
         await index_dir.mkdir(exist_ok=True)
