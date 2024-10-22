@@ -200,6 +200,12 @@ class SearchIndex:
                     self._index = Index.open(path=str(index_meta_directory))
                 else:
                     key = self.index_name, str(await index_meta_directory.absolute())
+                    # NOTE: now we know we're using the cache and have created the cache
+                    # key. And we know we're in asyncio.gather race condition risk land.
+                    # All of the following operations are *synchronous* so we are not
+                    # giving the opportunity for an await to switch to another parallel
+                    # version of this code. Otherwise, we risk counts being incorrect
+                    # due to race conditions
                     if key not in _OPENED_INDEX_CACHE:  # open a new Index
                         self._index = Index.open(path=str(index_meta_directory))
                         prev_count: int = 0
