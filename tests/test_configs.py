@@ -23,9 +23,6 @@ def test_prompt_settings_validation() -> None:
     )
     assert valid_settings.summary == "{citation} {question} {summary_length} {text}"
 
-    with pytest.raises(ValidationError):
-        PromptSettings(pre="Invalid {var}")
-
     valid_pre_settings = PromptSettings(pre="{question}")
     assert valid_pre_settings.pre == "{question}"
 

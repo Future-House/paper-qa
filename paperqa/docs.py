@@ -695,30 +695,41 @@ class Docs(BaseModel):
             answer.add_tokens(pre)
             pre_str = pre.text
 
+        # sort by first score, then name
         filtered_contexts = sorted(
             contexts,
-            key=lambda x: x.score,
-            reverse=True,
+            key=lambda x: (-x.score, x.text.name),
         )[: answer_config.answer_max_sources]
         # remove any contexts with a score of 0
         filtered_contexts = [c for c in filtered_contexts if c.score > 0]
 
-        context_str = "\n\n".join(
-            [
-                f"{c.text.name}: {c.context}"
-                + "".join([f"\n{k}: {v}" for k, v in (c.model_extra or {}).items()])
-                + (
-                    f"\nFrom {c.text.doc.citation}"
-                    if answer_config.evidence_detailed_citations
-                    else ""
-                )
-                for c in filtered_contexts
-            ]
-            + ([f"Extra background information: {pre_str}"] if pre_str else [])
-        )
+        # shim deprecated flag
+        # TODO: remove in v6
+        context_inner_prompt = prompt_config.context_inner
+        if (
+            not answer_config.evidence_detailed_citations
+            and "\nFrom {citation}" in context_inner_prompt
+        ):
+            context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
 
-        valid_names = [c.text.name for c in filtered_contexts]
-        context_str += "\n\nValid keys: " + ", ".join(valid_names)
+        inner_context_strs = [
+            context_inner_prompt.format(
+                name=c.text.name,
+                text=c.context,
+                citation=c.text.doc.citation,
+                **(c.model_extra or {}),
+            )
+            for c in filtered_contexts
+        ]
+        if pre_str:
+            inner_context_strs += (
+                [f"Extra background information: {pre_str}"] if pre_str else []
+            )
+
+        context_str = prompt_config.context_outer.format(
+            context_str="\n\n".join(inner_context_strs),
+            valid_keys=", ".join([c.text.name for c in filtered_contexts]),
+        )
 
         bib = {}
         if len(context_str) < 10:  # noqa: PLR2004
