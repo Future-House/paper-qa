@@ -11,7 +11,7 @@ import warnings
 import zlib
 from collections.abc import Awaitable, Callable, Collection, Sequence
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID
 
 import anyio
@@ -127,9 +127,9 @@ class SearchIndex:
             )
         self.index_name = index_name
         self._index_directory = index_directory
-        self._schema = None
-        self._index = None
-        self._searcher = None
+        self._schema: Schema | None = None
+        self._index: Index | None = None
+        self._searcher: Searcher | None = None
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
@@ -169,27 +169,27 @@ class SearchIndex:
             schema_builder = SchemaBuilder()
             for field in self.fields:
                 schema_builder.add_text_field(field, stored=True)
-            self._schema = schema_builder.build()  # type: ignore[assignment]
-        return cast(Schema, self._schema)
+            self._schema = schema_builder.build()
+        return self._schema
 
     @property
     async def index(self) -> Index:
         if not self._index:
-            index_path = await self.index_filename
-            if await (index_path / "meta.json").exists():
-                self._index = Index.open(path=str(index_path))  # type: ignore[assignment]
+            index_meta_directory = await self.index_filename
+            if await (index_meta_directory / "meta.json").exists():
+                self._index = Index.open(path=str(index_meta_directory))
             else:
                 # NOTE: this creates the above meta.json file
-                self._index = Index(self.schema, path=str(index_path))  # type: ignore[assignment]
-        return cast(Index, self._index)
+                self._index = Index(self.schema, path=str(index_meta_directory))
+        return self._index
 
     @property
     async def searcher(self) -> Searcher:
         if not self._searcher:
             index = await self.index
             index.reload()
-            self._searcher = index.searcher()  # type: ignore[assignment]
-        return cast(Searcher, self._searcher)
+            self._searcher = index.searcher()
+        return self._searcher
 
     @property
     async def count(self) -> int:
