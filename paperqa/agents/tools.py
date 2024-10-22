@@ -7,14 +7,14 @@ import re
 import sys
 from typing import ClassVar, cast
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, computed_field
 
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
 from paperqa.types import Answer, DocDetails
 
-from .search import get_directory_index
+from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +82,7 @@ class PaperSearch(NamedTool):
     settings: Settings
     embedding_model: EmbeddingModel
     previous_searches: dict[tuple[str, str | None], int] = Field(default_factory=dict)
+    _search_index: SearchIndex | None = PrivateAttr(default=None)
 
     async def paper_search(
         self,
@@ -125,12 +126,15 @@ class PaperSearch(NamedTool):
             offset = self.previous_searches[search_key] = 0
 
         logger.info(f"Starting paper search for {query!r}.")
-        index = await get_directory_index(settings=self.settings, build=False)
-        results: list[Docs] = await index.query(
+        if self._search_index is None:
+            self._search_index = await get_directory_index(
+                settings=self.settings, build=False
+            )
+        results: list[Docs] = await self._search_index.query(
             query,
             top_n=self.settings.agent.search_count,
             offset=offset,
-            field_subset=[f for f in index.fields if f != "year"],
+            field_subset=[f for f in self._search_index.fields if f != "year"],
         )
         logger.info(
             f"{self.TOOL_FN_NAME} for query {query!r} and offset {offset} returned"
