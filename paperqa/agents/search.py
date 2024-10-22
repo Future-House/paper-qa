@@ -104,10 +104,12 @@ class SearchDocumentStorage(StrEnum):
         return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
 
 
-# Cache of index name to a two-tuple of an opened Index instance and the count
-# of SearchIndex instances currently referencing that Index
-_OPENED_INDEX_CACHE: dict[str, tuple[Index, int]] = {}
 ENV_VAR_MATCH: Collection[str] = {"1", "true"}
+
+# Cache keys are a two-tuple of index name and absolute index directory
+# Cache values are a two-tuple of an opened Index instance and the count
+# of SearchIndex instances currently referencing that Index
+_OPENED_INDEX_CACHE: dict[tuple[str, str], tuple[Index, int]] = {}
 DONT_USE_OPENED_INDEX_CACHE = (
     os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in ENV_VAR_MATCH
 )
@@ -197,21 +199,26 @@ class SearchIndex:
                 if DONT_USE_OPENED_INDEX_CACHE:
                     self._index = Index.open(path=str(index_meta_directory))
                 else:
-                    if self.index_name not in _OPENED_INDEX_CACHE:  # open a new Index
+                    key = self.index_name, str(await index_meta_directory.absolute())
+                    if key not in _OPENED_INDEX_CACHE:  # open a new Index
                         self._index = Index.open(path=str(index_meta_directory))
                         prev_count: int = 0
                     else:  # reuse Index
-                        self._index, prev_count = _OPENED_INDEX_CACHE[self.index_name]
-                    _OPENED_INDEX_CACHE[self.index_name] = self._index, prev_count + 1
+                        self._index, prev_count = _OPENED_INDEX_CACHE[key]
+                    _OPENED_INDEX_CACHE[key] = self._index, prev_count + 1
             else:
                 # NOTE: this creates the above meta.json file
                 self._index = Index(self.schema, path=str(index_meta_directory))
         return self._index
 
     def __del__(self) -> None:
-        if self.index_name in _OPENED_INDEX_CACHE:
-            index, count = _OPENED_INDEX_CACHE[self.index_name]
-            _OPENED_INDEX_CACHE[self.index_name] = index, count - 1
+        index_meta_directory = (
+            pathlib.Path(self._index_directory) / self.index_name / "index"
+        )
+        key = self.index_name, str(index_meta_directory.absolute())
+        if key in _OPENED_INDEX_CACHE:
+            index, count = _OPENED_INDEX_CACHE[key]
+            _OPENED_INDEX_CACHE[key] = index, count - 1
 
     @property
     async def searcher(self) -> Searcher:
