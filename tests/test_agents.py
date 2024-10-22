@@ -520,18 +520,20 @@ async def test_agent_sharing_state(
 
 
 def test_settings_model_config() -> None:
-
     settings_name = "tier1_limits"
-    tier1 = Settings.from_name(settings_name)
+    settings = Settings.from_name(settings_name)
+    assert (
+        settings.embedding_config
+    ), "Test assertions are only effective if there's something to configure"
 
     with Path(
         str(importlib.resources.files("paperqa.configs") / f"{settings_name}.json")
     ).open() as f:
         raw_settings = json.loads(f.read())
 
-    llm_model = tier1.get_llm()
-    summary_llm_model = tier1.get_summary_llm()
-    embedding_model = tier1.get_embedding_model()
+    llm_model = settings.get_llm()
+    summary_llm_model = settings.get_summary_llm()
+    embedding_model = settings.get_embedding_model()
     assert (
         llm_model.config["rate_limit"]["gpt-4o"]
         == raw_settings["llm_config"]["rate_limit"]["gpt-4o"]
