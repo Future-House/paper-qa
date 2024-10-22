@@ -104,6 +104,23 @@ class SearchDocumentStorage(StrEnum):
         return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
 
 
+# Cache of index name to a two-tuple of an opened Index instance and the count
+# of SearchIndex instances currently referencing that Index
+_OPENED_INDEX_CACHE: dict[str, tuple[Index, int]] = {}
+ENV_VAR_MATCH: Collection[str] = {"1", "true"}
+DONT_USE_OPENED_INDEX_CACHE = (
+    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in ENV_VAR_MATCH
+)
+
+
+def reap_opened_index_cache() -> None:
+    """Delete any unreferenced Index instances from the Index cache."""
+    for index_name, (index, count) in _OPENED_INDEX_CACHE.items():
+        if count == 0:
+            _OPENED_INDEX_CACHE.pop(index_name)
+            del index
+
+
 class SearchIndex:
     """Wrapper around a tantivy.Index exposing higher-level behaviors for documents."""
 
@@ -177,11 +194,24 @@ class SearchIndex:
         if not self._index:
             index_meta_directory = await self.index_filename
             if await (index_meta_directory / "meta.json").exists():
-                self._index = Index.open(path=str(index_meta_directory))
+                if DONT_USE_OPENED_INDEX_CACHE:
+                    self._index = Index.open(path=str(index_meta_directory))
+                else:
+                    if self.index_name not in _OPENED_INDEX_CACHE:  # open a new Index
+                        self._index = Index.open(path=str(index_meta_directory))
+                        prev_count: int = 0
+                    else:  # reuse Index
+                        self._index, prev_count = _OPENED_INDEX_CACHE[self.index_name]
+                    _OPENED_INDEX_CACHE[self.index_name] = self._index, prev_count + 1
             else:
                 # NOTE: this creates the above meta.json file
                 self._index = Index(self.schema, path=str(index_meta_directory))
         return self._index
+
+    def __del__(self) -> None:
+        if self.index_name in _OPENED_INDEX_CACHE:
+            index, count = _OPENED_INDEX_CACHE[self.index_name]
+            _OPENED_INDEX_CACHE[self.index_name] = index, count - 1
 
     @property
     async def searcher(self) -> Searcher:
@@ -488,7 +518,6 @@ async def process_file(
 
 
 WARN_IF_INDEXING_MORE_THAN = 999
-ENV_VAR_MATCH: Collection[str] = {"1", "true"}
 
 
 def _make_progress_bar_update(

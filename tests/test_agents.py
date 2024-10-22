@@ -245,7 +245,9 @@ async def test_agent_types(
         Index, "open", side_effect=Index.open, autospec=True
     ) as mock_open:
         response = await agent_query(request, agent_type=agent_type)
-    mock_open.assert_called_once()
+    assert (
+        mock_open.call_count <= 1
+    ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
     assert response.answer.answer, "Answer not generated"
     assert response.answer.answer != "I cannot answer", "Answer not generated"
     assert response.answer.context, "No contexts were found"
@@ -483,7 +485,9 @@ async def test_agent_sharing_state(
                 state=env_state,
             )
             assert env_state.docs.docs, "Search did not add any papers"
-            mock_open.assert_called_once()
+            assert (
+                mock_open.call_count <= 1
+            ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
             assert all(
                 isinstance(d, Doc) for d in env_state.docs.docs.values()
             ), "Document type or DOI propagation failure"
@@ -494,7 +498,9 @@ async def test_agent_sharing_state(
                 max_year=2024,
                 state=env_state,
             )
-            mock_open.assert_called_once()
+            assert (
+                mock_open.call_count <= 1
+            ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
             mock_save_index.assert_not_awaited()
 
     with subtests.test(msg=GatherEvidence.__name__):
