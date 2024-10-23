@@ -344,8 +344,8 @@ async def test_s2_only_fields_filtering() -> None:
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
             " tools. Unknown journal, Unknown year. URL:"
-            " https://doi.org/10.1038/s42256-024-00832-8,"
-            " doi:10.1038/s42256-024-00832-8."
+            " https://doi.org/10.48550/arxiv.2304.05376,"
+            " doi:10.48550/arxiv.2304.05376."
         ), "Citation should be populated"
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 
@@ -632,3 +632,19 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
 def test_reformat_name(name: str, expected: str) -> None:
     result = reformat_name(name)
     assert result == expected, f"Expected '{expected}', but got '{result}' for '{name}'"
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_arxiv_doi_is_used_when_available() -> None:
+    client = DocMetadataClient(clients={CrossrefProvider, SemanticScholarProvider})
+    result = await client.query(
+        title="Attention is All you Need",
+        authors=(
+            "Ashish Vaswani, Noam Shazeer, Niki Parmar, "
+            "Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, "
+            "Lukasz Kaiser, Illia Polosukhin"
+        ).split(","),
+    )
+    assert result, "paper should be found"
+    assert result.doi == "10.48550/arxiv.1706.03762"

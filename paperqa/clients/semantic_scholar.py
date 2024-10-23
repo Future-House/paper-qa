@@ -156,6 +156,7 @@ async def parse_s2_to_doc_details(
     if "data" in paper_data:
         paper_data = paper_data["data"][0]
 
+    # ArXiV check goes 1st to override another DOI
     if "ArXiv" in paper_data["externalIds"]:
         doi = "10.48550/arXiv." + paper_data["externalIds"]["ArXiv"]
     elif "DOI" in paper_data["externalIds"]:
@@ -194,7 +195,7 @@ async def parse_s2_to_doc_details(
         url=(paper_data.get("openAccessPdf") or {}).get("url"),
         title=paper_data.get("title"),
         citation_count=paper_data.get("citationCount"),
-        doi=(paper_data.get("externalIds") or {}).get("DOI"),
+        doi=doi,
         other={},  # Initialize empty dict for other fields
     )
 
