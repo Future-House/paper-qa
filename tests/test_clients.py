@@ -632,3 +632,19 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
 def test_reformat_name(name: str, expected: str) -> None:
     result = reformat_name(name)
     assert result == expected, f"Expected '{expected}', but got '{result}' for '{name}'"
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_arxiv_dois() -> None:
+    client = DocMetadataClient(clients={CrossrefProvider, SemanticScholarProvider})
+    result = await client.query(
+        title="Attention is All you Need",
+        authors=(
+            "Ashish Vaswani, Noam Shazeer, Niki Parmar, "
+            "Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, "
+            "Lukasz Kaiser, Illia Polosukhin"
+        ).split(","),
+    )
+    assert result, "paper should be found"
+    assert result.doi == "10.48550/arxiv.1706.03762"

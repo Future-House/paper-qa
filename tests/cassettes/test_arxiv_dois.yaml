@@ -1,0 +1,118 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Attention+is+All+you+Need&rows=1&query.author=Ashish+Vaswani+Noam+Shazeer+Niki+Parmar+Jakob+Uszkoreit+Llion+Jones+Aidan+N.+Gomez+Lukasz+Kaiser+Illia+Polosukhin
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5100,"items":[{"indexed":{"date-parts":[[2024,10,6]],"date-time":"2024-10-06T00:54:43Z","timestamp":1728176083535},"publisher-location":"Stroudsburg,
+          PA, USA","reference-count":0,"publisher":"Association for Computational Linguistics","content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2018]]},"DOI":"10.18653\/v1\/n18-2074","type":"proceedings-article","created":{"date-parts":[[2018,5,30]],"date-time":"2018-05-30T00:40:41Z","timestamp":1527640841000},"source":"Crossref","is-referenced-by-count":932,"title":["Self-Attention
+          with Relative Position Representations"],"prefix":"10.18653","author":[{"given":"Peter","family":"Shaw","sequence":"first","affiliation":[]},{"given":"Jakob","family":"Uszkoreit","sequence":"additional","affiliation":[]},{"given":"Ashish","family":"Vaswani","sequence":"additional","affiliation":[]}],"member":"1643","event":{"name":"Proceedings
+          of the 2018 Conference of the North American Chapter of\n          the Association
+          for Computational Linguistics: Human Language\n          Technologies, Volume
+          2 (Short Papers)","location":"New Orleans, Louisiana","start":{"date-parts":[[2018,6]]},"end":{"date-parts":[[2018,6]]}},"container-title":["Proceedings
+          of the 2018 Conference of the North American Chapter of\n          the Association
+          for Computational Linguistics: Human Language\n          Technologies, Volume
+          2 (Short Papers)"],"deposited":{"date-parts":[[2018,5,30]],"date-time":"2018-05-30T00:41:11Z","timestamp":1527640871000},"score":53.7107,"resource":{"primary":{"URL":"http:\/\/aclweb.org\/anthology\/N18-2074"}},"issued":{"date-parts":[[2018]]},"references-count":0,"URL":"http:\/\/dx.doi.org\/10.18653\/v1\/n18-2074","published":{"date-parts":[[2018]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "846"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 23 Oct 2024 17:47:53 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Attention+is+All+you+Need&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "204e3073870fae3d05bcbc2f6a8e263d9b72e776", "externalIds":
+          {"ArXiv": "1706.03762", "MAG": "2963403868", "DBLP": "conf/nips/VaswaniSPUJGKP17",
+          "CorpusId": 13756489}, "url": "https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776",
+          "title": "Attention is All you Need", "venue": "Neural Information Processing
+          Systems", "year": 2017, "citationCount": 107745, "influentialCitationCount":
+          15613, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle",
+          "Conference"], "publicationDate": "2017-06-12", "journal": {"pages": "5998-6008"},
+          "citationStyles": {"bibtex": "@Article{Vaswani2017AttentionIA,\n author =
+          {Ashish Vaswani and Noam M. Shazeer and Niki Parmar and Jakob Uszkoreit and
+          Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},\n
+          booktitle = {Neural Information Processing Systems},\n pages = {5998-6008},\n
+          title = {Attention is All you Need},\n year = {2017}\n}\n"}, "authors": [{"authorId":
+          "40348417", "name": "Ashish Vaswani"}, {"authorId": "1846258", "name": "Noam
+          M. Shazeer"}, {"authorId": "3877127", "name": "Niki Parmar"}, {"authorId":
+          "39328010", "name": "Jakob Uszkoreit"}, {"authorId": "145024664", "name":
+          "Llion Jones"}, {"authorId": "19177000", "name": "Aidan N. Gomez"}, {"authorId":
+          "40527594", "name": "Lukasz Kaiser"}, {"authorId": "3443442", "name": "Illia
+          Polosukhin"}], "matchScore": 133.17268}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1420"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 23 Oct 2024 17:47:53 GMT
+        Via:
+          - 1.1 83a6f42adff040301dd9cde8ff611a9c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - VqRoBE595CVaLFsiWHS9_prp-URbpLRqkXa8WGWamTRCIMLagyWeEA==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - AHV_bGR3vHcElGA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1420"
+        x-amzn-Remapped-Date:
+          - Wed, 23 Oct 2024 17:47:53 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - e0119380-384c-4d07-81a2-deb51f4a0c44
+      status:
+        code: 200
+        message: OK
+version: 1

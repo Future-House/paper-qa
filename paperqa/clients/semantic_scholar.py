@@ -194,7 +194,7 @@ async def parse_s2_to_doc_details(
         url=(paper_data.get("openAccessPdf") or {}).get("url"),
         title=paper_data.get("title"),
         citation_count=paper_data.get("citationCount"),
-        doi=(paper_data.get("externalIds") or {}).get("DOI"),
+        doi=doi,
         other={},  # Initialize empty dict for other fields
     )
 
