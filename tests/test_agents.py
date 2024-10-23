@@ -23,6 +23,7 @@ from ldp.graph.ops import OpResult
 from ldp.llms import EmbeddingModel, MultipleCompletionLLMModel
 from pydantic import ValidationError
 from pytest_subtests import SubTests
+from tantivy import Index
 
 from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import settings_to_tools
@@ -240,7 +241,13 @@ async def test_agent_types(
         " accept the answer for now, as we're in debug mode."
     )
     request = QueryRequest(query=question, settings=agent_test_settings)
-    response = await agent_query(request, agent_type=agent_type)
+    with patch.object(
+        Index, "open", side_effect=Index.open, autospec=True
+    ) as mock_open:
+        response = await agent_query(request, agent_type=agent_type)
+    assert (
+        mock_open.call_count <= 1
+    ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
     assert response.answer.answer, "Answer not generated"
     assert response.answer.answer != "I cannot answer", "Answer not generated"
     assert response.answer.context, "No contexts were found"
@@ -463,20 +470,38 @@ async def test_agent_sharing_state(
         search_tool = PaperSearch(
             settings=agent_test_settings, embedding_model=embedding_model
         )
-        with patch.object(
-            SearchIndex, "save_index", autospec=True, wraps=SearchIndex.save_index
-        ) as mock_save_index:
+        with (
+            patch.object(
+                SearchIndex, "save_index", wraps=SearchIndex.save_index, autospec=True
+            ) as mock_save_index,
+            patch.object(
+                Index, "open", side_effect=Index.open, autospec=True
+            ) as mock_open,
+        ):
             await search_tool.paper_search(
                 "XAI self explanatory model",
                 min_year=None,
                 max_year=None,
                 state=env_state,
             )
-        assert env_state.docs.docs, "Search did not add any papers"
-        mock_save_index.assert_not_awaited(), "Search shouldn't try to update the index"
-        assert all(
-            isinstance(d, Doc) for d in env_state.docs.docs.values()
-        ), "Document type or DOI propagation failure"
+            assert env_state.docs.docs, "Search did not add any papers"
+            assert (
+                mock_open.call_count <= 1
+            ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
+            assert all(
+                isinstance(d, Doc) for d in env_state.docs.docs.values()
+            ), "Document type or DOI propagation failure"
+
+            await search_tool.paper_search(
+                "XAI for chemical property prediction",
+                min_year=2018,
+                max_year=2024,
+                state=env_state,
+            )
+            assert (
+                mock_open.call_count <= 1
+            ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
+            mock_save_index.assert_not_awaited()
 
     with subtests.test(msg=GatherEvidence.__name__):
         assert not answer.contexts, "No contexts is required for a later assertion"

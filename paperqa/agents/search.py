@@ -11,7 +11,7 @@ import warnings
 import zlib
 from collections.abc import Awaitable, Callable, Collection, Sequence
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID
 
 import anyio
@@ -104,6 +104,25 @@ class SearchDocumentStorage(StrEnum):
         return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
 
 
+ENV_VAR_MATCH: Collection[str] = {"1", "true"}
+
+# Cache keys are a two-tuple of index name and absolute index directory
+# Cache values are a two-tuple of an opened Index instance and the count
+# of SearchIndex instances currently referencing that Index
+_OPENED_INDEX_CACHE: dict[tuple[str, str], tuple[Index, int]] = {}
+DONT_USE_OPENED_INDEX_CACHE = (
+    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in ENV_VAR_MATCH
+)
+
+
+def reap_opened_index_cache() -> None:
+    """Delete any unreferenced Index instances from the Index cache."""
+    for index_name, (index, count) in _OPENED_INDEX_CACHE.items():
+        if count == 0:
+            _OPENED_INDEX_CACHE.pop(index_name)
+            del index
+
+
 class SearchIndex:
     """Wrapper around a tantivy.Index exposing higher-level behaviors for documents."""
 
@@ -127,21 +146,25 @@ class SearchIndex:
             )
         self.index_name = index_name
         self._index_directory = index_directory
-        self._schema = None
-        self._index = None
-        self._searcher = None
+        self._schema: Schema | None = None
+        self._index: Index | None = None
+        self._searcher: Searcher | None = None
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
 
     @property
-    async def index_directory(self) -> anyio.Path:
+    async def index_directory(  # TODO: rename to index_root_directory
+        self,
+    ) -> anyio.Path:
         directory = anyio.Path(self._index_directory).joinpath(self.index_name)
         await directory.mkdir(parents=True, exist_ok=True)
         return directory
 
     @property
-    async def index_filename(self) -> anyio.Path:  # TODO: rename to index_directory
+    async def index_filename(  # TODO: rename to index_meta_directory
+        self,
+    ) -> anyio.Path:
         """Directory to store files used to house index internals."""
         index_dir = (await self.index_directory) / "index"
         await index_dir.mkdir(exist_ok=True)
@@ -165,27 +188,51 @@ class SearchIndex:
             schema_builder = SchemaBuilder()
             for field in self.fields:
                 schema_builder.add_text_field(field, stored=True)
-            self._schema = schema_builder.build()  # type: ignore[assignment]
-        return cast(Schema, self._schema)
+            self._schema = schema_builder.build()
+        return self._schema
 
     @property
     async def index(self) -> Index:
         if not self._index:
-            index_path = await self.index_filename
-            if await (index_path / "meta.json").exists():
-                self._index = Index.open(path=str(index_path))  # type: ignore[assignment]
+            index_meta_directory = await self.index_filename
+            if await (index_meta_directory / "meta.json").exists():
+                if DONT_USE_OPENED_INDEX_CACHE:
+                    self._index = Index.open(path=str(index_meta_directory))
+                else:
+                    key = self.index_name, str(await index_meta_directory.absolute())
+                    # NOTE: now we know we're using the cache and have created the cache
+                    # key. And we know we're in asyncio.gather race condition risk land.
+                    # All of the following operations are *synchronous* so we are not
+                    # giving the opportunity for an await to switch to another parallel
+                    # version of this code. Otherwise, we risk counts being incorrect
+                    # due to race conditions
+                    if key not in _OPENED_INDEX_CACHE:  # open a new Index
+                        self._index = Index.open(path=str(index_meta_directory))
+                        prev_count: int = 0
+                    else:  # reuse Index
+                        self._index, prev_count = _OPENED_INDEX_CACHE[key]
+                    _OPENED_INDEX_CACHE[key] = self._index, prev_count + 1
             else:
                 # NOTE: this creates the above meta.json file
-                self._index = Index(self.schema, path=str(index_path))  # type: ignore[assignment]
-        return cast(Index, self._index)
+                self._index = Index(self.schema, path=str(index_meta_directory))
+        return self._index
+
+    def __del__(self) -> None:
+        index_meta_directory = (
+            pathlib.Path(self._index_directory) / self.index_name / "index"
+        )
+        key = self.index_name, str(index_meta_directory.absolute())
+        if key in _OPENED_INDEX_CACHE:
+            index, count = _OPENED_INDEX_CACHE[key]
+            _OPENED_INDEX_CACHE[key] = index, count - 1
 
     @property
     async def searcher(self) -> Searcher:
         if not self._searcher:
             index = await self.index
             index.reload()
-            self._searcher = index.searcher()  # type: ignore[assignment]
-        return cast(Searcher, self._searcher)
+            self._searcher = index.searcher()
+        return self._searcher
 
     @property
     async def count(self) -> int:
@@ -484,7 +531,6 @@ async def process_file(
 
 
 WARN_IF_INDEXING_MORE_THAN = 999
-ENV_VAR_MATCH: Collection[str] = {"1", "true"}
 
 
 def _make_progress_bar_update(
