@@ -344,8 +344,8 @@ async def test_s2_only_fields_filtering() -> None:
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
             " tools. Unknown journal, Unknown year. URL:"
-            " https://doi.org/10.1038/s42256-024-00832-8,"
-            " doi:10.1038/s42256-024-00832-8."
+            " https://doi.org/10.48550/arxiv.2304.05376,"
+            " doi:10.48550/arxiv.2304.05376."
         ), "Citation should be populated"
         assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
 

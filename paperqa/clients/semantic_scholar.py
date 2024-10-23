@@ -156,11 +156,11 @@ async def parse_s2_to_doc_details(
     if "data" in paper_data:
         paper_data = paper_data["data"][0]
 
-    # DOI check goes 1st to override an ArXiV DOI
-    if "DOI" in paper_data["externalIds"]:
-        doi = paper_data["externalIds"]["DOI"]
-    elif "ArXiv" in paper_data["externalIds"]:
+    # ArXiV check goes 1st to override another DOI
+    if "ArXiv" in paper_data["externalIds"]:
         doi = "10.48550/arXiv." + paper_data["externalIds"]["ArXiv"]
+    elif "DOI" in paper_data["externalIds"]:
+        doi = paper_data["externalIds"]["DOI"]
     else:
         raise DOINotFoundError(f"Could not find DOI for {paper_data}.")
 
