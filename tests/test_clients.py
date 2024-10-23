@@ -636,7 +636,7 @@ def test_reformat_name(name: str, expected: str) -> None:
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
-async def test_arxiv_dois() -> None:
+async def test_arxiv_doi_is_used_when_available() -> None:
     client = DocMetadataClient(clients={CrossrefProvider, SemanticScholarProvider})
     result = await client.query(
         title="Attention is All you Need",
