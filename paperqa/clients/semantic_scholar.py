@@ -113,7 +113,7 @@ class SematicScholarSearchType(IntEnum):
 @retry(
     retry=retry_if_exception(make_flaky_ssl_error_predicate(SEMANTIC_SCHOLAR_HOST)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(5),
 )
 async def _s2_get_with_retrying(url: str, **get_kwargs) -> dict[str, Any]:
     return await _get_with_retrying(
@@ -270,7 +270,7 @@ async def s2_title_search(
 @retry(
     retry=retry_if_exception(make_flaky_ssl_error_predicate(SEMANTIC_SCHOLAR_HOST)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(5),
 )
 async def get_s2_doc_details_from_doi(
     doi: str | None,
