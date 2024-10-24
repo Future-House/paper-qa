@@ -107,7 +107,7 @@ def get_crossref_mailto() -> str:
 @retry(
     retry=retry_if_exception(make_flaky_ssl_error_predicate(CROSSREF_HOST)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(5),
 )
 async def doi_to_bibtex(
     doi: str,
@@ -239,7 +239,7 @@ async def parse_crossref_to_doc_details(
 @retry(
     retry=retry_if_exception(make_flaky_ssl_error_predicate(CROSSREF_HOST)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(5),
 )
 async def get_doc_details_from_crossref(  # noqa: PLR0912
     session: aiohttp.ClientSession,
