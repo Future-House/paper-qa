@@ -15,9 +15,15 @@ from copy import deepcopy
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never
 
-from aviary.env import ENV_REGISTRY, TASK_DATASET_REGISTRY, Frame, TaskDataset
-from aviary.message import Message
-from aviary.tools import ToolRequestMessage, ToolResponseMessage
+from aviary.core import (
+    TASK_DATASET_REGISTRY,
+    Frame,
+    Message,
+    TaskDataset,
+    ToolRequestMessage,
+    ToolResponseMessage,
+)
+from aviary.env import ENV_REGISTRY
 
 from paperqa.types import DocDetails
 

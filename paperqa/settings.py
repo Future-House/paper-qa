@@ -9,7 +9,7 @@ from pydoc import locate
 from typing import TYPE_CHECKING, Any, ClassVar, Self, assert_never, cast
 
 import anyio
-from aviary.tools import ToolSelector
+from aviary.core import ToolSelector
 from pydantic import (
     BaseModel,
     ConfigDict,
