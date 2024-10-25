@@ -349,7 +349,8 @@ class GlobalRateLimiter:
 
         if rate_limit.amount < weight and raise_impossible_limits:
             raise ValueError(
-                f"Weight ({weight}) > RateLimit ({rate_limit}), cannot satisfy rate limit."
+                f"Weight ({weight}) > RateLimit ({rate_limit}), cannot satisfy rate"
+                " limit."
             )
         while True:
             elapsed = 0.0

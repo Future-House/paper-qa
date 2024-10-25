@@ -99,11 +99,9 @@ class AnswerSettings(BaseModel):
         # default is True, so we only warn if it's False
         if not self.evidence_detailed_citations:
             warnings.warn(
-                (
-                    "The 'evidence_detailed_citations' field is deprecated and will be"
-                    " removed in version 6. Adjust 'PromptSettings.context_inner' to remove"
-                    " detailed citations."
-                ),
+                "The 'evidence_detailed_citations' field is deprecated and will be"
+                " removed in version 6. Adjust 'PromptSettings.context_inner' to remove"
+                " detailed citations.",
                 category=DeprecationWarning,
                 stacklevel=2,
             )
@@ -259,8 +257,10 @@ class PromptSettings(BaseModel):
     )
     context_inner: str = Field(
         default=CONTEXT_INNER_PROMPT,
-        description="Prompt for how to format a single context in generate answer. "
-        "This should at least contain key and name.",
+        description=(
+            "Prompt for how to format a single context in generate answer. "
+            "This should at least contain key and name."
+        ),
     )
 
     @field_validator("summary")
@@ -380,7 +380,8 @@ class IndexSettings(BaseModel):
         default=True,
         description=(
             "Whether to sync the index with the paper directory when loading an index."
-            " Setting to True will add or delete index files to match the source paper directory."
+            " Setting to True will add or delete index files to match the source paper"
+            " directory."
         ),
     )
 
@@ -537,11 +538,9 @@ class AgentSettings(BaseModel):
             value = getattr(self, deprecated_field_name)
             if value != type(self).model_fields[deprecated_field_name].default:
                 warnings.warn(
-                    (
-                        f"The {deprecated_field_name!r} field has been moved to"
-                        f" {AgentSettings.__name__},"
-                        " this deprecation will conclude in version 6."
-                    ),
+                    f"The {deprecated_field_name!r} field has been moved to"
+                    f" {AgentSettings.__name__},"
+                    " this deprecation will conclude in version 6.",
                     category=DeprecationWarning,
                     stacklevel=2,
                 )
@@ -667,11 +666,9 @@ class Settings(BaseSettings):
             value = getattr(self, deprecated_field_name)
             if value != type(self).model_fields[deprecated_field_name].default:
                 warnings.warn(
-                    (
-                        f"The {deprecated_field_name!r} field has been moved to"
-                        f" {AgentSettings.__name__},"
-                        " this deprecation will conclude in version 6."
-                    ),
+                    f"The {deprecated_field_name!r} field has been moved to"
+                    f" {AgentSettings.__name__},"
+                    " this deprecation will conclude in version 6.",
                     category=DeprecationWarning,
                     stacklevel=2,
                 )

@@ -235,7 +235,8 @@ async def run_aviary_agent(
             while not done:
                 if max_timesteps is not None and timestep >= max_timesteps:
                     logger.warning(
-                        f"Agent didn't finish within {max_timesteps} timesteps, just answering."
+                        f"Agent didn't finish within {max_timesteps} timesteps, just"
+                        " answering."
                     )
                     generate_answer_tool = next(
                         filter(
