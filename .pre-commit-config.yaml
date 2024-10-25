@@ -68,6 +68,7 @@ repos:
     rev: 38.122.0
     hooks:
       - id: renovate-config-validator
+        args: [--strict]
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.19.0
     hooks:
