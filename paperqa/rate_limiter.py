@@ -330,9 +330,6 @@ class GlobalRateLimiter:
             raise_impossible_limits (:obj:`bool`, optional): flag will raise a
                 ValueError for weights that exceed the rate.
 
-        Returns:
-            None if the rate limit is satisfied.
-
         Raises:
             TimeoutError: if the acquire_timeout is exceeded.
             ValueError: if the weight exceeds the rate limit and raise_impossible_limits is True.
