@@ -75,12 +75,14 @@ def maybe_is_html(file: BinaryIO) -> bool:
     return magic_number in {b"<htm", b"<!DO", b"<xsl", b"<!X"}
 
 
-def strings_similarity(s1: str, s2: str) -> float:
+def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float:
     if not s1 or not s2:
         return 0
+
     # break the strings into words
-    ss1 = set(s1.split())
-    ss2 = set(s2.split())
+    ss1 = set(s1.lower().split()) if case_insensitive else set(s1.split())
+    ss2 = set(s2.lower().split()) if case_insensitive else set(s2.split())
+
     # return the similarity ratio
     return len(ss1.intersection(ss2)) / len(ss1.union(ss2))
 

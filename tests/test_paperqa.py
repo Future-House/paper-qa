@@ -38,6 +38,7 @@ from paperqa.utils import (
     maybe_is_html,
     maybe_is_text,
     name_in_text,
+    strings_similarity,
     strip_citations,
 )
 from tests.conftest import VCR_DEFAULT_MATCH_ON
@@ -1118,3 +1119,9 @@ def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
     docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     response = docs.query("What country is Bates from?", settings=settings)
     assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
+
+
+def test_case_insensitive_matching():
+    assert strings_similarity("my test sentence", "My test sentence") == 1.0
+    assert strings_similarity("a b c d e", "a b c f") == 0.5
+    assert strings_similarity("A B c d e", "a b c f") == 0.5
