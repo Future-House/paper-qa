@@ -21,7 +21,7 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.6",  # For info on Message
+    "fhaviary[llm]>=0.8.2",  # For namespace reorg
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
