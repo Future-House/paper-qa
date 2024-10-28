@@ -687,7 +687,7 @@ class Settings(BaseSettings):
         """
         if self.llm in {"o1-preview", "o1-mini"} and self.temperature != 1:
             raise ValueError(
-                "When using 'o1-preview' LLM, the temperature must be set to 1."
+                f"the temperature must be set to 1, {self.temperature} was specified."
             )
         return self
 
