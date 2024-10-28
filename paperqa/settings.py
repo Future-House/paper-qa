@@ -687,7 +687,8 @@ class Settings(BaseSettings):
         """
         if self.llm.startswith("o1-") and self.temperature != 1:
             raise ValueError(
-                f"the temperature must be set to 1, {self.temperature} was specified."
+                "When dealing with OpenAI o1 models, the temperature"
+                f" must be set to 1, {self.temperature} was specified."
             )
         return self
 
