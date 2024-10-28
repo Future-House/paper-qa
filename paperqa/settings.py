@@ -685,7 +685,7 @@ class Settings(BaseSettings):
         o1 reasoning models only support temperature = 1.  See
         https://platform.openai.com/docs/guides/reasoning/quickstart
         """
-        if self.llm in {"o1-preview", "o1-mini"} and self.temperature != 1:
+        if self.llm.startswith("o1-") and self.temperature != 1:
             raise ValueError(
                 f"the temperature must be set to 1, {self.temperature} was specified."
             )
