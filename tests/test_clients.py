@@ -312,20 +312,21 @@ async def test_minimal_fields_filtering() -> None:
             title="Augmenting large language models with chemistry tools",
             fields=["title", "doi"],
         )
-        assert not details.journal, "Journal should not be populated"  # type: ignore[union-attr]
-        assert not details.year, "Year should not be populated"  # type: ignore[union-attr]
-        assert not details.authors, "Authors should not be populated"  # type: ignore[union-attr]
-        assert details.citation == (  # type: ignore[union-attr]
+        assert details
+        assert not details.journal, "Journal should not be populated"
+        assert not details.year, "Year should not be populated"
+        assert not details.authors, "Authors should not be populated"
+        assert set(details.other["client_source"]) == {
+            "semantic_scholar",
+            "crossref",
+        }, "Should be from two sources"
+        assert details.citation == (
             "Unknown author(s). Augmenting large language models with chemistry tools."
             " Unknown journal, Unknown year. URL:"
             " https://doi.org/10.1038/s42256-024-00832-8,"
             " doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
-        assert set(details.other["client_source"]) == {  # type: ignore[union-attr]
-            "semantic_scholar",
-            "crossref",
-        }, "Should be from two sources"
-        assert not details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
+        assert not details.source_quality, "No source quality data should exist"
 
 
 @pytest.mark.vcr
@@ -338,16 +339,17 @@ async def test_s2_only_fields_filtering() -> None:
             title="Augmenting large language models with chemistry tools",
             fields=["title", "doi", "authors"],
         )
-        assert s2_details.authors, "Authors should be populated"  # type: ignore[union-attr]
-        assert set(s2_details.other["client_source"]) == {"semantic_scholar"}  # type: ignore[union-attr]
-        assert s2_details.citation == (  # type: ignore[union-attr]
+        assert s2_details
+        assert s2_details.authors, "Authors should be populated"
+        assert set(s2_details.other["client_source"]) == {"semantic_scholar"}
+        assert s2_details.citation == (
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
             " tools. Unknown journal, Unknown year. URL:"
             " https://doi.org/10.48550/arxiv.2304.05376,"
             " doi:10.48550/arxiv.2304.05376."
         ), "Citation should be populated"
-        assert not s2_details.source_quality, "No source quality data should exist"  # type: ignore[union-attr]
+        assert not s2_details.source_quality, "No source quality data should exist"
 
 
 @pytest.mark.vcr
