@@ -7,7 +7,7 @@ import re
 from collections.abc import Collection
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
 
 import litellm  # for cost
@@ -456,8 +456,11 @@ class DocDetails(Doc):
     def remove_invalid_authors(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Capture and cull strange author names."""
         if authors := data.get("authors"):
+            # On 10/29/2024 while indexing 19k PDFs, a provider (unclear which one)
+            # returned an author of None. The vast majority of the time authors are str
+            authors = cast(list[str | None], authors)
             data["authors"] = [
-                a for a in authors if a.lower() not in cls.AUTHOR_NAMES_TO_REMOVE
+                a for a in authors if a and a.lower() not in cls.AUTHOR_NAMES_TO_REMOVE
             ]
 
         return data
