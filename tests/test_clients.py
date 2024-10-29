@@ -316,16 +316,16 @@ async def test_minimal_fields_filtering() -> None:
         assert not details.journal, "Journal should not be populated"
         assert not details.year, "Year should not be populated"
         assert not details.authors, "Authors should not be populated"
+        assert set(details.other["client_source"]) == {
+            "semantic_scholar",
+            "crossref",
+        }, "Should be from two sources"
         assert details.citation == (
             "Unknown author(s). Augmenting large language models with chemistry tools."
             " Unknown journal, Unknown year. URL:"
             " https://doi.org/10.1038/s42256-024-00832-8,"
             " doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
-        assert set(details.other["client_source"]) == {
-            "semantic_scholar",
-            "crossref",
-        }, "Should be from two sources"
         assert not details.source_quality, "No source quality data should exist"
 
 
