@@ -68,7 +68,8 @@ def test_router_kwargs_present_in_models() -> None:
     assert settings.get_llm().config["router_kwargs"] is not None
     assert settings.get_summary_llm().config["router_kwargs"] is not None
 
+
 def test_o1_requires_temp_equals_1() -> None:
     with pytest.raises(ValidationError):
-        settings = Settings(llm="o1-thismodeldoesnotexist", temperature=0)
-    settings = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
+        _ = Settings(llm="o1-thismodeldoesnotexist", temperature=0)
+    _ = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
