@@ -320,12 +320,20 @@ async def test_minimal_fields_filtering() -> None:
             "semantic_scholar",
             "crossref",
         }, "Should be from two sources"
-        assert details.citation == (
+        citation_boilerplate = (
             "Unknown author(s). Augmenting large language models with chemistry tools."
             " Unknown journal, Unknown year. URL:"
-            " https://doi.org/10.1038/s42256-024-00832-8,"
-            " doi:10.1038/s42256-024-00832-8."
-        ), "Citation should be populated"
+        )
+        assert details.citation in {
+            (  # Match in Nature Machine Intelligence
+                f"{citation_boilerplate} https://doi.org/10.1038/s42256-024-00832-8,"
+                " doi:10.1038/s42256-024-00832-8."
+            ),
+            (  # Match in arXiv
+                f"{citation_boilerplate} https://doi.org/10.48550/arxiv.2304.05376,"
+                " doi:10.48550/arxiv.2304.05376."
+            ),
+        }, "Citation should be populated"
         assert not details.source_quality, "No source quality data should exist"
 
 
