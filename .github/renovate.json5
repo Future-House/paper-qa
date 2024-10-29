@@ -9,17 +9,18 @@
   prHourlyLimit: 4,
   timezone: "America/Los_Angeles",
   rangeStrategy: "widen",
-  lockFileMaintenance: {
-    enabled: true,
-  },
-  "pre-commit": {
-    enabled: true,
-  },
+  lockFileMaintenance: { enabled: true },
+  "pre-commit": { enabled: true },
   packageRules: [
     {
       // Allow 'widen' range strategy while matching aviary_internal pyproject.toml
       matchPackageNames: ["openai"],
       allowedVersions: "<1.47",
+    },
+    {
+      // TODO: remove after fhaviary supports Python 3.13
+      matchPackageNames: ["python"],
+      allowedVersions: "<=3.12",
     },
   ],
 }

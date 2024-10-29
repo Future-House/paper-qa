@@ -21,7 +21,7 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.6",  # For info on Message
+    "fhaviary[llm]>=0.8.2",  # For namespace reorg
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
@@ -281,6 +281,8 @@ preview = true
 explicit-preview-rules = true
 extend-select = [
     "C420",
+    "DOC202",
+    "DOC403",
     "FURB110",
     "FURB113",
     "FURB116",
@@ -293,13 +295,14 @@ extend-select = [
     "FURB148",
     "FURB152",
     "FURB154",
+    "FURB156",
     "FURB157",
     "FURB164",
     "FURB166",
     "FURB171",
     "FURB180",
+    "FURB188",
     "FURB192",
-    "PLR6104",
     "PLR6201",
     "PLW0108",
     "RUF022",

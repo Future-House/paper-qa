@@ -256,7 +256,7 @@ async def s2_title_search(
     # need to check if nested under a 'data' key or not (depends on filtering)
     if (
         strings_similarity(
-            data.get("title") if "data" not in data else data["data"][0]["title"],
+            data.get("title", "") if "data" not in data else data["data"][0]["title"],
             title,
         )
         < title_similarity_threshold
