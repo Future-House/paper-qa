@@ -47,6 +47,7 @@ def fixture_vcr_config() -> dict[str, Any]:
             ANTHROPIC_API_KEY_HEADER,
             "cookie",
         ],
+        "record_mode": "once",
         "allow_playback_repeats": True,
         "cassette_library_dir": str(CASSETTES_DIR),
     }
