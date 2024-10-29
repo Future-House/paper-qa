@@ -675,6 +675,20 @@ class Settings(BaseSettings):
                 setattr(self.agent.index, new_name, value)  # Propagate to new location
         return self
 
+    @model_validator(mode="after")
+    def _validate_temperature_for_o1_preview(self) -> Self:
+        """Ensures temperature is 1 if the LLM is 'o1-preview' or 'o1-mini'.
+
+        o1 reasoning models only support temperature = 1.  See
+        https://platform.openai.com/docs/guides/reasoning/quickstart
+        """
+        if self.llm.startswith("o1-") and self.temperature != 1:
+            raise ValueError(
+                "When dealing with OpenAI o1 models, the temperature"
+                f" must be set to 1, {self.temperature} was specified."
+            )
+        return self
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def md5(self) -> str:
