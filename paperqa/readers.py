@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from math import ceil
 from pathlib import Path
-from typing import Literal, overload
+from typing import Literal, cast, overload
 
 import pymupdf
 import tiktoken
@@ -172,7 +172,9 @@ def chunk_text(
             f"ParsedText.content must be a `str`, not {type(parsed_text.content)}."
         )
 
-    content = parsed_text.content if not use_tiktoken else parsed_text.encode_content()
+    content: str | list[int] = (
+        parsed_text.content if not use_tiktoken else parsed_text.encode_content()
+    )
     if not content:  # Avoid div0 in token calculations
         raise ImpossibleParsingError(
             f"No text was parsed from the document named {doc.docname!r} with ID"
@@ -195,7 +197,11 @@ def chunk_text(
         ]
         texts.append(
             Text(
-                text=enc.decode(split) if use_tiktoken else split,
+                text=(
+                    enc.decode(cast(list[int], split))
+                    if use_tiktoken
+                    else cast(str, split)
+                ),
                 name=f"{doc.docname} chunk {i + 1}",
                 doc=doc,
             )

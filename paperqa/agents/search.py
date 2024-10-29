@@ -428,7 +428,7 @@ async def maybe_get_manifest(
             }
             if not file_loc_to_records:
                 raise ValueError(  # noqa: TRY301
-                    f"No mapping of file location to details extracted from manifest"
+                    "No mapping of file location to details extracted from manifest"
                     f" file {filename}."
                 )
             logger.debug(
@@ -593,11 +593,9 @@ async def get_directory_index(  # noqa: PLR0912
     index_settings = _settings.agent.index
     if index_name:
         warnings.warn(
-            (
-                f"The index_name argument has been moved to"
-                f" {type(_settings.agent.index).__name__},"
-                " this deprecation will conclude in version 6."
-            ),
+            "The index_name argument has been moved to"
+            f" {type(_settings.agent.index).__name__},"
+            " this deprecation will conclude in version 6.",
             category=DeprecationWarning,
             stacklevel=2,
         )
@@ -620,11 +618,9 @@ async def get_directory_index(  # noqa: PLR0912
 
     if not sync_index_w_directory:
         warnings.warn(
-            (
-                f"The sync_index_w_directory argument has been moved to"
-                f" {type(_settings.agent.index).__name__},"
-                " this deprecation will conclude in version 6."
-            ),
+            "The sync_index_w_directory argument has been moved to"
+            f" {type(_settings.agent.index).__name__},"
+            " this deprecation will conclude in version 6.",
             category=DeprecationWarning,
             stacklevel=2,
         )
@@ -686,7 +682,8 @@ async def get_directory_index(  # noqa: PLR0912
                     )
                 else:
                     logger.debug(
-                        f"File {rel_file_path} found in paper directory {paper_directory}."
+                        f"File {rel_file_path} found in paper directory"
+                        f" {paper_directory}."
                     )
 
     if search_index.changed:

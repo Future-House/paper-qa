@@ -602,7 +602,10 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
             ),
         )
         crossref_details = await crossref_client.query(
-            title="The Dilemma and Countermeasures of Music Education under the Background of Big Data",
+            title=(
+                "The Dilemma and Countermeasures of Music Education under the"
+                " Background of Big Data"
+            ),
             fields=["title", "doi", "authors", "journal"],
         )
         assert crossref_details
