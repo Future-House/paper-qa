@@ -216,7 +216,8 @@ class SentenceTransformerEmbeddingModel(EmbeddingModel):
             from sentence_transformers import SentenceTransformer
         except ImportError as exc:
             raise ImportError(
-                "Please install paper-qa[local] to use SentenceTransformerEmbeddingModel."
+                "Please install paper-qa[local] to use"
+                " SentenceTransformerEmbeddingModel."
             ) from exc
 
         self._model = SentenceTransformer(self.name)

@@ -2,9 +2,14 @@ import logging
 from copy import deepcopy
 from typing import Any, Self, cast
 
-from aviary.env import Environment, Frame
-from aviary.message import Message
-from aviary.tools import Tool, ToolRequestMessage, ToolResponseMessage
+from aviary.core import (
+    Environment,
+    Frame,
+    Message,
+    Tool,
+    ToolRequestMessage,
+    ToolResponseMessage,
+)
 
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel

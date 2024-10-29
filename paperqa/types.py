@@ -12,7 +12,7 @@ from uuid import UUID, uuid4
 
 import litellm  # for cost
 import tiktoken
-from aviary.message import Message
+from aviary.core import Message
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
@@ -360,8 +360,10 @@ class DocDetails(Doc):
     file_location: str | os.PathLike | None = None
     license: str | None = Field(
         default=None,
-        description="string indicating license."
-        " Should refer specifically to pdf_url (since that could be preprint). None means unknown/unset.",
+        description=(
+            "string indicating license. Should refer specifically to pdf_url (since"
+            " that could be preprint). None means unknown/unset."
+        ),
     )
     pdf_url: str | None = None
     other: dict[str, Any] = Field(
@@ -612,8 +614,8 @@ class DocDetails(Doc):
 
         if self.source_quality_message:
             return (
-                f"{self.citation} This article has {self.citation_count} citations and is"
-                f" from a {self.source_quality_message}."
+                f"{self.citation} This article has {self.citation_count} citations and"
+                f" is from a {self.source_quality_message}."
             )
         return f"{self.citation} This article has {self.citation_count} citations."
 
