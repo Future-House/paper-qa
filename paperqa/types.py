@@ -69,6 +69,8 @@ class LLMResult(BaseModel):
     This can be combined with LLMModels `llm_result_callback` to store all LLMResults.
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     id: UUID = Field(default_factory=uuid4)
     session_id: UUID | None = Field(
         default_factory=cvar_session_id.get,
@@ -154,7 +156,7 @@ class Context(BaseModel):
 class PQASession(BaseModel):
     """A class to hold session about researching/answering."""
 
-    model_config = ConfigDict(extra="ignore")
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     id: UUID = Field(default_factory=uuid4)
     question: str

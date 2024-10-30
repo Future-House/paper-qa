@@ -695,7 +695,7 @@ def test_query_request_docs_name_serialized() -> None:
 
 def test_answers_are_striped() -> None:
     """Test that answers are striped."""
-    answer = PQASession(
+    session = PQASession(
         question="What is the meaning of life?",
         contexts=[
             Context(
@@ -715,7 +715,7 @@ def test_answers_are_striped() -> None:
             )
         ],
     )
-    response = AnswerResponse(answer=answer, bibtex={}, status="success")
+    response = AnswerResponse(session=session, bibtex={}, status="success")
 
     assert response.session.contexts[0].text.embedding is None
     assert response.session.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]

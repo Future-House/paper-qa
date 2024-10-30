@@ -120,26 +120,26 @@ async def run_agent(
     # Build the index once here, and then all tools won't need to rebuild it
     await get_directory_index(settings=query.settings)
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
-        answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
+        session, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):
-        answer, agent_status = await run_aviary_agent(
+        session, agent_status = await run_aviary_agent(
             query, docs, tool_selector_or_none, **runner_kwargs
         )
     elif ldp_agent_or_none := await query.settings.make_ldp_agent(agent_type):
-        answer, agent_status = await run_ldp_agent(
+        session, agent_status = await run_ldp_agent(
             query, docs, ldp_agent_or_none, **runner_kwargs
         )
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    if answer.could_not_answer and agent_status != AgentStatus.TRUNCATED:
+    if session.could_not_answer and agent_status != AgentStatus.TRUNCATED:
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
         f"Finished agent {agent_type!r} run with question {query.query!r} and status"
         f" {agent_status}."
     )
-    return AnswerResponse(answer=answer, status=agent_status)
+    return AnswerResponse(session=session, status=agent_status)
 
 
 async def run_fake_agent(

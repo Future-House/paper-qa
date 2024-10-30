@@ -85,6 +85,8 @@ class QueryRequest(BaseModel):
 
 
 class AnswerResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     session: PQASession = Field(alias="answer")
     bibtex: dict[str, str] | None = None
     status: AgentStatus
