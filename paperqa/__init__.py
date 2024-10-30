@@ -9,7 +9,7 @@ warnings.filterwarnings(
 from paperqa.agents import ask  # noqa: E402
 from paperqa.agents.main import agent_query  # noqa: E402
 from paperqa.agents.models import QueryRequest  # noqa: E402
-from paperqa.docs import Answer, Docs, print_callback  # noqa: E402
+from paperqa.docs import Docs, PQASession, print_callback  # noqa: E402
 from paperqa.llms import (  # noqa: E402
     EmbeddingModel,
     HybridEmbeddingModel,
@@ -23,7 +23,7 @@ from paperqa.llms import (  # noqa: E402
     embedding_model_factory,
 )
 from paperqa.settings import Settings, get_settings  # noqa: E402
-from paperqa.types import Context, Doc, DocDetails, Text  # noqa: E402
+from paperqa.types import Answer, Context, Doc, DocDetails, Text  # noqa: E402
 from paperqa.version import __version__  # noqa: E402
 
 __all__ = [
@@ -39,6 +39,7 @@ __all__ = [
     "LiteLLMEmbeddingModel",
     "LiteLLMModel",
     "NumpyVectorStore",
+    "PQASession",
     "QueryRequest",
     "SentenceTransformerEmbeddingModel",
     "Settings",

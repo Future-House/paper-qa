@@ -44,7 +44,7 @@ from paperqa.agents.tools import (
 )
 from paperqa.docs import Docs
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Answer, Context, Doc, Text
+from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -251,20 +251,20 @@ async def test_agent_types(
     assert (
         mock_open.call_count <= 1
     ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
-    assert response.answer.answer, "Answer not generated"
-    assert response.answer.answer != "I cannot answer", "Answer not generated"
-    assert response.answer.context, "No contexts were found"
-    assert response.answer.question == question
+    assert response.session.answer, "Answer not generated"
+    assert response.session.answer != "I cannot answer", "Answer not generated"
+    assert response.session.context, "No contexts were found"
+    assert response.session.question == question
     agent_llm = request.settings.agent.agent_llm
     # TODO: once LDP can track tokens, we can remove this check
     if agent_type not in {FAKE_AGENT_TYPE, SimpleAgent}:
         assert (
-            response.answer.token_counts[agent_llm][0] > 1000
+            response.session.token_counts[agent_llm][0] > 1000
         ), "Expected many prompt tokens"
         assert (
-            response.answer.token_counts[agent_llm][1] > 50
+            response.session.token_counts[agent_llm][1] > 50
         ), "Expected many completion tokens"
-        assert response.answer.cost > 0, "Expected nonzero cost"
+        assert response.session.cost > 0, "Expected nonzero cost"
 
 
 @pytest.mark.asyncio
@@ -360,7 +360,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     )
     # ensure that GenerateAnswerTool was called
     assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
-    assert "I cannot answer" in response.answer.answer
+    assert "I cannot answer" in response.session.answer
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
@@ -389,7 +389,7 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     )
     response = await agent_query(query, agent_type=FAKE_AGENT_TYPE)
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
-    result = response.answer
+    result = response.session
     assert len(result.answer) > 200, "Answer did not return any results"
     assert "###" in result.answer, "Answer did not propagate system prompt"
     assert (
@@ -463,7 +463,7 @@ async def test_agent_sharing_state(
 
     agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
-    answer = Answer(question="What is is a self-explanatory model?")
+    answer = PQASession(question="What is is a self-explanatory model?")
     query = QueryRequest(query=answer.question, settings=agent_test_settings)
     env_state = EnvironmentState(docs=Docs(), answer=answer)
     built_index = await get_directory_index(settings=agent_test_settings)
@@ -695,7 +695,7 @@ def test_query_request_docs_name_serialized() -> None:
 
 def test_answers_are_striped() -> None:
     """Test that answers are striped."""
-    answer = Answer(
+    session = PQASession(
         question="What is the meaning of life?",
         contexts=[
             Context(
@@ -715,12 +715,12 @@ def test_answers_are_striped() -> None:
             )
         ],
     )
-    response = AnswerResponse(answer=answer, bibtex={}, status="success")
+    response = AnswerResponse(session=session, bibtex={}, status="success")
 
-    assert response.answer.contexts[0].text.embedding is None
-    assert response.answer.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]
-    assert response.answer.contexts[0].text.doc is not None
-    assert response.answer.contexts[0].text.doc.embedding is None
+    assert response.session.contexts[0].text.embedding is None
+    assert response.session.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]
+    assert response.session.contexts[0].text.doc is not None
+    assert response.session.contexts[0].text.doc.embedding is None
     # make sure it serializes
     response.model_dump_json()
 
@@ -778,12 +778,12 @@ async def test_deepcopy_env(agent_test_settings: Settings) -> None:
     )
     _, _, done, _ = await env.step(gen_answer_action)
     assert done
-    assert not env.state.answer.could_not_answer
-    assert env.state.answer.used_contexts
+    assert not env.state.session.could_not_answer
+    assert env.state.session.used_contexts
     _, _, done, _ = await env_copy.step(gen_answer_action)
     assert done
-    assert not env_copy.state.answer.could_not_answer
-    assert env_copy.state.answer.used_contexts
-    assert sorted(env.state.answer.used_contexts) == sorted(
-        env_copy.state.answer.used_contexts
+    assert not env_copy.state.session.could_not_answer
+    assert env_copy.state.session.used_contexts
+    assert sorted(env.state.session.used_contexts) == sorted(
+        env_copy.state.session.used_contexts
     )
