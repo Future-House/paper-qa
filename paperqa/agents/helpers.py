@@ -81,8 +81,8 @@ def table_formatter(
         table.add_column("Answer", style="magenta")
         for obj, _ in objects:
             table.add_row(
-                cast(AnswerResponse, obj).answer.question[:max_chars_per_column],
-                cast(AnswerResponse, obj).answer.answer[:max_chars_per_column],
+                cast(AnswerResponse, obj).session.question[:max_chars_per_column],
+                cast(AnswerResponse, obj).session.answer[:max_chars_per_column],
             )
         return table
     if isinstance(example_object, Docs):

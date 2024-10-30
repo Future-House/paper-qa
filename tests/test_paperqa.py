@@ -1134,4 +1134,4 @@ def test_case_insensitive_matching():
 
 def test_answer_rename():
     answer = Answer(question="")
-    assert type(answer) is PQASession
+    assert isinstance(answer, PQASession)

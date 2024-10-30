@@ -92,7 +92,7 @@ def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
 
 
 @pytest.fixture
-def agent_stub_answer() -> PQASession:
+def agent_stub_session() -> PQASession:
     return PQASession(question="What is is a self-explanatory model?")
 
 

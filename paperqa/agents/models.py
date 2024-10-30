@@ -85,7 +85,7 @@ class QueryRequest(BaseModel):
 
 
 class AnswerResponse(BaseModel):
-    answer: PQASession
+    session: PQASession = Field(alias="answer")
     bibtex: dict[str, str] | None = None
     status: AgentStatus
     timing_info: dict[str, dict[str, float]] | None = None
@@ -94,7 +94,7 @@ class AnswerResponse(BaseModel):
     # about the answer, such as the number of sources used, etc.
     stats: dict[str, str] | None = None
 
-    @field_validator("answer")
+    @field_validator("session")
     def strip_answer(
         cls, v: PQASession, info: ValidationInfo  # noqa: ARG002, N805
     ) -> PQASession:
@@ -114,7 +114,7 @@ class AnswerResponse(BaseModel):
         )
         result = await model.run_prompt(
             prompt="{question}\n\n{answer}",
-            data={"question": self.answer.question, "answer": self.answer.answer},
+            data={"question": self.session.question, "answer": self.session.answer},
             system_prompt=sys_prompt,
         )
         return result.text.strip()

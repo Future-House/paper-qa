@@ -4,6 +4,7 @@ import contextvars
 import logging
 import os
 import re
+import warnings
 from collections.abc import Collection
 from contextlib import contextmanager
 from datetime import datetime
@@ -40,38 +41,39 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 # A context var that will be unique to threads/processes
-cvar_answer_id = contextvars.ContextVar[UUID | None]("answer_id", default=None)
+cvar_session_id = contextvars.ContextVar[UUID | None]("session_id", default=None)
 
 
 @contextmanager
-def set_llm_answer_ids(answer_id: UUID):
-    token = cvar_answer_id.set(answer_id)
+def set_llm_session_ids(session_id: UUID):
+    token = cvar_session_id.set(session_id)
     try:
         yield
     finally:
-        cvar_answer_id.reset(token)
+        cvar_session_id.reset(token)
 
 
 class LLMResult(BaseModel):
     """A class to hold the result of a LLM completion.
 
-    To associate a group of LLMResults, you can use the `set_llm_answer_ids` context manager:
+    To associate a group of LLMResults, you can use the `set_llm_session_ids` context manager:
 
     ```python
-    my_answer_id = uuid4()
-    with set_llm_answer_ids(my_answer_id):
+    my_session_id = uuid4()
+    with set_llm_session_ids(my_session_id):
         # code that generates LLMResults
         pass
     ```
 
-    and all the LLMResults generated within the context will have the same `answer_id`.
+    and all the LLMResults generated within the context will have the same `session_id`.
     This can be combined with LLMModels `llm_result_callback` to store all LLMResults.
     """
 
     id: UUID = Field(default_factory=uuid4)
-    answer_id: UUID | None = Field(
-        default_factory=cvar_answer_id.get,
+    session_id: UUID | None = Field(
+        default_factory=cvar_session_id.get,
         description="A persistent ID to associate a group of LLMResults",
+        alias="answer_id",
     )
     name: str | None = None
     prompt: str | list[dict] | None = Field(
@@ -249,7 +251,14 @@ class PQASession(BaseModel):
 
 
 # for backwards compatibility
-Answer = PQASession
+class Answer(PQASession):
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "The 'Answer' class is deprecated and will be removed in future versions. Use 'PQASession' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
 class ChunkMetadata(BaseModel):

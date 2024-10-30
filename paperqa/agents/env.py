@@ -145,7 +145,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             [
                 Message(
                     content=self._query.settings.agent.agent_prompt.format(
-                        question=self.state.answer.question,
+                        question=self.state.session.question,
                         status=self.state.status,
                         gen_answer_tool_name=GenerateAnswer.TOOL_FN_NAME,
                     ),
@@ -160,7 +160,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[list[Message], float, bool, bool]:
-        self.state.answer.add_tokens(action)  # Add usage for action if present
+        self.state.session.add_tokens(action)  # Add usage for action if present
 
         # If the action has empty tool_calls, the agent can later take that into account
         msgs = cast(

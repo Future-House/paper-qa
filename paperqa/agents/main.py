@@ -72,13 +72,13 @@ async def agent_query(
     response = await run_agent(docs, query, agent_type, **runner_kwargs)
     agent_logger.debug(f"agent_response: {response}")
 
-    agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
+    agent_logger.info(f"[bold blue]Answer: {response.session.answer}[/bold blue]")
 
     await answers_index.add_document(
         {
-            "file_location": str(response.answer.id),
-            "body": response.answer.answer,
-            "question": response.answer.question,
+            "file_location": str(response.session.id),
+            "body": response.session.answer,
+            "question": response.session.question,
         },
         document=response,
     )
@@ -165,7 +165,7 @@ async def run_fake_agent(
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
 
-    question = env.state.answer.question
+    question = env.state.session.question
     search_tool = next(filter(lambda x: x.info.name == PaperSearch.TOOL_FN_NAME, tools))
     gather_evidence_tool = next(
         filter(lambda x: x.info.name == GatherEvidence.TOOL_FN_NAME, tools)
@@ -191,7 +191,7 @@ async def run_fake_agent(
         await step(search_tool, query=search, min_year=None, max_year=None)
     await step(gather_evidence_tool, question=question)
     await step(generate_answer_tool, question=question)
-    return env.state.answer, AgentStatus.SUCCESS
+    return env.state.session, AgentStatus.SUCCESS
 
 
 async def run_aviary_agent(
@@ -247,7 +247,7 @@ async def run_aviary_agent(
                     await generate_answer_tool._tool_fn(
                         question=query.query, state=env.state
                     )
-                    return env.state.answer, AgentStatus.TRUNCATED
+                    return env.state.session, AgentStatus.TRUNCATED
                 agent_state.messages += obs
                 for attempt in Retrying(
                     stop=stop_after_attempt(5),
@@ -278,7 +278,7 @@ async def run_aviary_agent(
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
-    return env.state.answer, status
+    return env.state.session, status
 
 
 class LDPRolloutCallback(Callback):
@@ -357,7 +357,7 @@ async def run_ldp_agent(
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
-    return env.state.answer, status
+    return env.state.session, status
 
 
 async def index_search(
