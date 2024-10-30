@@ -149,8 +149,8 @@ class Context(BaseModel):
         return self.context
 
 
-class Answer(BaseModel):
-    """A class to hold the answer to a question."""
+class PQASession(BaseModel):
+    """A class to hold session about researching/answering."""
 
     model_config = ConfigDict(extra="ignore")
 
@@ -246,6 +246,10 @@ class Answer(BaseModel):
     @property
     def could_not_answer(self) -> bool:
         return "cannot answer" in self.answer.lower()
+
+
+# for backwards compatibility
+Answer = PQASession
 
 
 class ChunkMetadata(BaseModel):

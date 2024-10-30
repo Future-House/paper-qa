@@ -32,7 +32,7 @@ except ImportError:
 
 from paperqa.docs import Docs
 from paperqa.settings import AgentSettings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
@@ -154,7 +154,7 @@ async def run_fake_agent(
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
     **env_kwargs,
-) -> tuple[Answer, AgentStatus]:
+) -> tuple[PQASession, AgentStatus]:
     if query.settings.agent.max_timesteps is not None:
         logger.warning(
             f"Max timesteps (configured {query.settings.agent.max_timesteps}) is not"
@@ -207,7 +207,7 @@ async def run_aviary_agent(
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
     **env_kwargs,
-) -> tuple[Answer, AgentStatus]:
+) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
     done = False
 
@@ -323,7 +323,7 @@ async def run_ldp_agent(
     ) = None,
     ldp_callback_type: type[LDPRolloutCallback] = LDPRolloutCallback,
     **env_kwargs,
-) -> tuple[Answer, AgentStatus]:
+) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
     # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
     # has already taken place, which checks that ldp is installed

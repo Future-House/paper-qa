@@ -44,7 +44,7 @@ from paperqa.agents.tools import (
 )
 from paperqa.docs import Docs
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Answer, Context, Doc, Text
+from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -463,7 +463,7 @@ async def test_agent_sharing_state(
 
     agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
-    answer = Answer(question="What is is a self-explanatory model?")
+    answer = PQASession(question="What is is a self-explanatory model?")
     query = QueryRequest(query=answer.question, settings=agent_test_settings)
     env_state = EnvironmentState(docs=Docs(), answer=answer)
     built_index = await get_directory_index(settings=agent_test_settings)
@@ -695,7 +695,7 @@ def test_query_request_docs_name_serialized() -> None:
 
 def test_answers_are_striped() -> None:
     """Test that answers are striped."""
-    answer = Answer(
+    answer = PQASession(
         question="What is the meaning of life?",
         contexts=[
             Context(

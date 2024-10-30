@@ -20,7 +20,7 @@ from pydantic import (
 
 from paperqa.llms import LiteLLMModel, LLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class QueryRequest(BaseModel):
 
 
 class AnswerResponse(BaseModel):
-    answer: Answer
+    answer: PQASession
     bibtex: dict[str, str] | None = None
     status: AgentStatus
     timing_info: dict[str, dict[str, float]] | None = None
@@ -96,8 +96,8 @@ class AnswerResponse(BaseModel):
 
     @field_validator("answer")
     def strip_answer(
-        cls, v: Answer, info: ValidationInfo  # noqa: ARG002, N805
-    ) -> Answer:
+        cls, v: PQASession, info: ValidationInfo  # noqa: ARG002, N805
+    ) -> PQASession:
         # This modifies in place, this is fine
         # because when a response is being constructed,
         # we should be done with the Answer object

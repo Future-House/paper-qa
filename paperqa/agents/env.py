@@ -14,7 +14,7 @@ from aviary.core import (
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 from paperqa.utils import get_year
 
 from .models import QueryRequest
@@ -128,7 +128,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     def make_initial_state(self) -> EnvironmentState:
         return EnvironmentState(
             docs=self._docs,
-            answer=Answer(
+            answer=PQASession(
                 question=self._query.query,
                 config_md5=self._query.settings.md5,
                 id=self._query.id,

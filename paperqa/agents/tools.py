@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer, DocDetails
+from paperqa.types import DocDetails, PQASession
 
 from .search import get_directory_index
 
@@ -35,7 +35,7 @@ class EnvironmentState(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     docs: Docs
-    answer: Answer
+    answer: PQASession
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (

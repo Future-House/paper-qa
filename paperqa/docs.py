@@ -34,11 +34,11 @@ from paperqa.paths import PAPERQA_DIR
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import (
-    Answer,
     Doc,
     DocDetails,
     DocKey,
     LLMResult,
+    PQASession,
     Text,
     set_llm_answer_ids,
 )
@@ -512,13 +512,13 @@ class Docs(BaseModel):
 
     def get_evidence(
         self,
-        query: Answer | str,
+        query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
         return get_loop().run_until_complete(
             self.aget_evidence(
                 query=query,
@@ -532,20 +532,20 @@ class Docs(BaseModel):
 
     async def aget_evidence(
         self,
-        query: Answer | str,
+        query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
 
         evidence_settings = get_settings(settings)
         answer_config = evidence_settings.answer
         prompt_config = evidence_settings.prompts
 
         answer = (
-            Answer(question=query, config_md5=evidence_settings.md5)
+            PQASession(question=query, config_md5=evidence_settings.md5)
             if isinstance(query, str)
             else query
         )
@@ -626,13 +626,13 @@ class Docs(BaseModel):
 
     def query(
         self,
-        query: Answer | str,
+        query: PQASession | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
         return get_loop().run_until_complete(
             self.aquery(
                 query,
@@ -646,13 +646,13 @@ class Docs(BaseModel):
 
     async def aquery(  # noqa: PLR0912
         self,
-        query: Answer | str,
+        query: PQASession | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
 
         query_settings = get_settings(settings)
         answer_config = query_settings.answer
@@ -666,7 +666,7 @@ class Docs(BaseModel):
             embedding_model = query_settings.get_embedding_model()
 
         answer = (
-            Answer(question=query, config_md5=query_settings.md5)
+            PQASession(question=query, config_md5=query_settings.md5)
             if isinstance(query, str)
             else query
         )
