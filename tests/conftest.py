@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from paperqa.clients.crossref import CROSSREF_HEADER_KEY
 from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 from paperqa.utils import setup_default_logs
 
 TESTS_DIR = Path(__file__).parent
@@ -92,8 +92,8 @@ def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
 
 
 @pytest.fixture
-def agent_stub_answer() -> Answer:
-    return Answer(question="What is is a self-explanatory model?")
+def agent_stub_session() -> PQASession:
+    return PQASession(question="What is is a self-explanatory model?")
 
 
 @pytest.fixture

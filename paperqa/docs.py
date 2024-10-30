@@ -34,13 +34,13 @@ from paperqa.paths import PAPERQA_DIR
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import (
-    Answer,
     Doc,
     DocDetails,
     DocKey,
     LLMResult,
+    PQASession,
     Text,
-    set_llm_answer_ids,
+    set_llm_session_ids,
 )
 from paperqa.utils import (
     gather_with_concurrency,
@@ -512,13 +512,13 @@ class Docs(BaseModel):
 
     def get_evidence(
         self,
-        query: Answer | str,
+        query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
         return get_loop().run_until_complete(
             self.aget_evidence(
                 query=query,
@@ -532,26 +532,26 @@ class Docs(BaseModel):
 
     async def aget_evidence(
         self,
-        query: Answer | str,
+        query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
 
         evidence_settings = get_settings(settings)
         answer_config = evidence_settings.answer
         prompt_config = evidence_settings.prompts
 
-        answer = (
-            Answer(question=query, config_md5=evidence_settings.md5)
+        session = (
+            PQASession(question=query, config_md5=evidence_settings.md5)
             if isinstance(query, str)
             else query
         )
 
         if not self.docs and len(self.texts_index) == 0:
-            return answer
+            return session
 
         if embedding_model is None:
             embedding_model = evidence_settings.get_embedding_model()
@@ -560,7 +560,7 @@ class Docs(BaseModel):
             summary_llm_model = evidence_settings.get_summary_llm()
 
         exclude_text_filter = exclude_text_filter or set()
-        exclude_text_filter |= {c.text.name for c in answer.contexts}
+        exclude_text_filter |= {c.text.name for c in session.contexts}
 
         _k = answer_config.evidence_k
         if exclude_text_filter:
@@ -570,7 +570,7 @@ class Docs(BaseModel):
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
-                answer.question, _k, evidence_settings, embedding_model
+                session.question, _k, evidence_settings, embedding_model
             )
         else:
             matches = self.texts
@@ -599,13 +599,13 @@ class Docs(BaseModel):
                     system_prompt=prompt_config.system,
                 )
 
-        with set_llm_answer_ids(answer.id):
+        with set_llm_session_ids(session.id):
             results = await gather_with_concurrency(
                 answer_config.max_concurrent_requests,
                 [
                     map_fxn_summary(
                         text=m,
-                        question=answer.question,
+                        question=session.question,
                         prompt_runner=prompt_runner,
                         extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
@@ -619,20 +619,20 @@ class Docs(BaseModel):
             )
 
         for _, llm_result in results:
-            answer.add_tokens(llm_result)
+            session.add_tokens(llm_result)
 
-        answer.contexts += [r for r, _ in results if r is not None]
-        return answer
+        session.contexts += [r for r, _ in results if r is not None]
+        return session
 
     def query(
         self,
-        query: Answer | str,
+        query: PQASession | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
         return get_loop().run_until_complete(
             self.aquery(
                 query,
@@ -646,13 +646,13 @@ class Docs(BaseModel):
 
     async def aquery(  # noqa: PLR0912
         self,
-        query: Answer | str,
+        query: PQASession | str,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
-    ) -> Answer:
+    ) -> PQASession:
 
         query_settings = get_settings(settings)
         answer_config = query_settings.answer
@@ -665,34 +665,34 @@ class Docs(BaseModel):
         if embedding_model is None:
             embedding_model = query_settings.get_embedding_model()
 
-        answer = (
-            Answer(question=query, config_md5=query_settings.md5)
+        session = (
+            PQASession(question=query, config_md5=query_settings.md5)
             if isinstance(query, str)
             else query
         )
 
-        contexts = answer.contexts
+        contexts = session.contexts
 
         if not contexts:
-            answer = await self.aget_evidence(
-                answer,
+            session = await self.aget_evidence(
+                session,
                 callbacks=callbacks,
                 settings=settings,
                 embedding_model=embedding_model,
                 summary_llm_model=summary_llm_model,
             )
-            contexts = answer.contexts
+            contexts = session.contexts
         pre_str = None
         if prompt_config.pre is not None:
-            with set_llm_answer_ids(answer.id):
+            with set_llm_session_ids(session.id):
                 pre = await llm_model.run_prompt(
                     prompt=prompt_config.pre,
-                    data={"question": answer.question},
+                    data={"question": session.question},
                     callbacks=callbacks,
                     name="pre",
                     system_prompt=prompt_config.system,
                 )
-            answer.add_tokens(pre)
+            session.add_tokens(pre)
             pre_str = pre.text
 
         # sort by first score, then name
@@ -737,13 +737,13 @@ class Docs(BaseModel):
                 "I cannot answer this question due to insufficient information."
             )
         else:
-            with set_llm_answer_ids(answer.id):
+            with set_llm_session_ids(session.id):
                 answer_result = await llm_model.run_prompt(
                     prompt=prompt_config.qa,
                     data={
                         "context": context_str,
                         "answer_length": answer_config.answer_length,
-                        "question": answer.question,
+                        "question": session.question,
                         "example_citation": prompt_config.EXAMPLE_CITATION,
                     },
                     callbacks=callbacks,
@@ -751,7 +751,7 @@ class Docs(BaseModel):
                     system_prompt=prompt_config.system,
                 )
             answer_text = answer_result.text
-            answer.add_tokens(answer_result)
+            session.add_tokens(answer_result)
         # it still happens
         if prompt_config.EXAMPLE_CITATION in answer_text:
             answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
@@ -772,30 +772,30 @@ class Docs(BaseModel):
                 answer_text,
             )
 
-        formatted_answer = f"Question: {answer.question}\n\n{answer_text}\n"
+        formatted_answer = f"Question: {session.question}\n\n{answer_text}\n"
         if bib:
             formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         if prompt_config.post is not None:
-            with set_llm_answer_ids(answer.id):
+            with set_llm_session_ids(session.id):
                 post = await llm_model.run_prompt(
                     prompt=prompt_config.post,
-                    data=answer.model_dump(),
+                    data=session.model_dump(),
                     callbacks=callbacks,
                     name="post",
                     system_prompt=prompt_config.system,
                 )
             answer_text = post.text
-            answer.add_tokens(post)
-            formatted_answer = f"Question: {answer.question}\n\n{post}\n"
+            session.add_tokens(post)
+            formatted_answer = f"Question: {session.question}\n\n{post}\n"
             if bib:
                 formatted_answer += f"\nReferences\n\n{bib_str}\n"
 
         # now at end we modify, so we could have retried earlier
-        answer.answer = answer_text
-        answer.formatted_answer = formatted_answer
-        answer.references = bib_str
-        answer.contexts = contexts
-        answer.context = context_str
+        session.answer = answer_text
+        session.formatted_answer = formatted_answer
+        session.references = bib_str
+        session.contexts = contexts
+        session.context = context_str
 
-        return answer
+        return session

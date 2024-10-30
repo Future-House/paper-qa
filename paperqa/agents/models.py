@@ -20,7 +20,7 @@ from pydantic import (
 
 from paperqa.llms import LiteLLMModel, LLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,9 @@ class QueryRequest(BaseModel):
 
 
 class AnswerResponse(BaseModel):
-    answer: Answer
+    model_config = ConfigDict(populate_by_name=True)
+
+    session: PQASession = Field(alias="answer")
     bibtex: dict[str, str] | None = None
     status: AgentStatus
     timing_info: dict[str, dict[str, float]] | None = None
@@ -94,10 +96,10 @@ class AnswerResponse(BaseModel):
     # about the answer, such as the number of sources used, etc.
     stats: dict[str, str] | None = None
 
-    @field_validator("answer")
+    @field_validator("session")
     def strip_answer(
-        cls, v: Answer, info: ValidationInfo  # noqa: ARG002, N805
-    ) -> Answer:
+        cls, v: PQASession, info: ValidationInfo  # noqa: ARG002, N805
+    ) -> PQASession:
         # This modifies in place, this is fine
         # because when a response is being constructed,
         # we should be done with the Answer object
@@ -114,7 +116,7 @@ class AnswerResponse(BaseModel):
         )
         result = await model.run_prompt(
             prompt="{question}\n\n{answer}",
-            data={"question": self.answer.question, "answer": self.answer.answer},
+            data={"question": self.session.question, "answer": self.session.answer},
             system_prompt=sys_prompt,
         )
         return result.text.strip()

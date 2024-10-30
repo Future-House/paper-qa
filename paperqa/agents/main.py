@@ -32,7 +32,7 @@ except ImportError:
 
 from paperqa.docs import Docs
 from paperqa.settings import AgentSettings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
@@ -72,13 +72,13 @@ async def agent_query(
     response = await run_agent(docs, query, agent_type, **runner_kwargs)
     agent_logger.debug(f"agent_response: {response}")
 
-    agent_logger.info(f"[bold blue]Answer: {response.answer.answer}[/bold blue]")
+    agent_logger.info(f"[bold blue]Answer: {response.session.answer}[/bold blue]")
 
     await answers_index.add_document(
         {
-            "file_location": str(response.answer.id),
-            "body": response.answer.answer,
-            "question": response.answer.question,
+            "file_location": str(response.session.id),
+            "body": response.session.answer,
+            "question": response.session.question,
         },
         document=response,
     )
@@ -120,26 +120,26 @@ async def run_agent(
     # Build the index once here, and then all tools won't need to rebuild it
     await get_directory_index(settings=query.settings)
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
-        answer, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
+        session, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
     elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):
-        answer, agent_status = await run_aviary_agent(
+        session, agent_status = await run_aviary_agent(
             query, docs, tool_selector_or_none, **runner_kwargs
         )
     elif ldp_agent_or_none := await query.settings.make_ldp_agent(agent_type):
-        answer, agent_status = await run_ldp_agent(
+        session, agent_status = await run_ldp_agent(
             query, docs, ldp_agent_or_none, **runner_kwargs
         )
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    if answer.could_not_answer and agent_status != AgentStatus.TRUNCATED:
+    if session.could_not_answer and agent_status != AgentStatus.TRUNCATED:
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
         f"Finished agent {agent_type!r} run with question {query.query!r} and status"
         f" {agent_status}."
     )
-    return AnswerResponse(answer=answer, status=agent_status)
+    return AnswerResponse(session=session, status=agent_status)
 
 
 async def run_fake_agent(
@@ -154,7 +154,7 @@ async def run_fake_agent(
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
     **env_kwargs,
-) -> tuple[Answer, AgentStatus]:
+) -> tuple[PQASession, AgentStatus]:
     if query.settings.agent.max_timesteps is not None:
         logger.warning(
             f"Max timesteps (configured {query.settings.agent.max_timesteps}) is not"
@@ -165,7 +165,7 @@ async def run_fake_agent(
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
 
-    question = env.state.answer.question
+    question = env.state.session.question
     search_tool = next(filter(lambda x: x.info.name == PaperSearch.TOOL_FN_NAME, tools))
     gather_evidence_tool = next(
         filter(lambda x: x.info.name == GatherEvidence.TOOL_FN_NAME, tools)
@@ -191,7 +191,7 @@ async def run_fake_agent(
         await step(search_tool, query=search, min_year=None, max_year=None)
     await step(gather_evidence_tool, question=question)
     await step(generate_answer_tool, question=question)
-    return env.state.answer, AgentStatus.SUCCESS
+    return env.state.session, AgentStatus.SUCCESS
 
 
 async def run_aviary_agent(
@@ -207,7 +207,7 @@ async def run_aviary_agent(
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
     **env_kwargs,
-) -> tuple[Answer, AgentStatus]:
+) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
     done = False
 
@@ -247,7 +247,7 @@ async def run_aviary_agent(
                     await generate_answer_tool._tool_fn(
                         question=query.query, state=env.state
                     )
-                    return env.state.answer, AgentStatus.TRUNCATED
+                    return env.state.session, AgentStatus.TRUNCATED
                 agent_state.messages += obs
                 for attempt in Retrying(
                     stop=stop_after_attempt(5),
@@ -278,7 +278,7 @@ async def run_aviary_agent(
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
-    return env.state.answer, status
+    return env.state.session, status
 
 
 class LDPRolloutCallback(Callback):
@@ -323,7 +323,7 @@ async def run_ldp_agent(
     ) = None,
     ldp_callback_type: type[LDPRolloutCallback] = LDPRolloutCallback,
     **env_kwargs,
-) -> tuple[Answer, AgentStatus]:
+) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
     # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
     # has already taken place, which checks that ldp is installed
@@ -357,7 +357,7 @@ async def run_ldp_agent(
     except Exception:
         logger.exception(f"Agent {agent} failed.")
         status = AgentStatus.FAIL
-    return env.state.answer, status
+    return env.state.session, status
 
 
 async def index_search(

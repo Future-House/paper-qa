@@ -302,9 +302,9 @@ class PromptSettings(BaseModel):
     def check_post(cls, v: str | None) -> str | None:
         if v is not None:
             # kind of a hack to get list of attributes in answer
-            from paperqa.types import Answer
+            from paperqa.types import PQASession
 
-            attrs = set(Answer.model_fields.keys())
+            attrs = set(PQASession.model_fields.keys())
             if not get_formatted_variables(v).issubset(attrs):
                 raise ValueError(f"Post prompt must have input variables: {attrs}")
         return v

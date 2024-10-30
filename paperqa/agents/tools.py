@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import Answer, DocDetails
+from paperqa.types import DocDetails, PQASession
 
 from .search import get_directory_index
 
@@ -35,7 +35,7 @@ class EnvironmentState(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     docs: Docs
-    answer: Answer
+    session: PQASession = Field(..., alias="answer")
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
@@ -51,18 +51,18 @@ class EnvironmentState(BaseModel):
             relevant_paper_count=len(
                 {
                     c.text.doc.dockey
-                    for c in self.answer.contexts
+                    for c in self.session.contexts
                     if c.score > self.RELEVANT_SCORE_CUTOFF
                 }
             ),
             evidence_count=len(
                 [
                     c
-                    for c in self.answer.contexts
+                    for c in self.session.contexts
                     if c.score > self.RELEVANT_SCORE_CUTOFF
                 ]
             ),
-            cost=self.answer.cost,
+            cost=self.session.cost,
         )
 
 
@@ -202,16 +202,16 @@ class GatherEvidence(NamedTool):
             )
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
-        original_question = state.answer.question
+        original_question = state.session.question
         try:
             # Swap out the question with the more specific question
             # TODO: remove this swap, as it prevents us from supporting parallel calls
-            state.answer.question = question
-            l0 = len(state.answer.contexts)
+            state.session.question = question
+            l0 = len(state.session.contexts)
 
             # TODO: refactor answer out of this...
-            state.answer = await state.docs.aget_evidence(
-                query=state.answer,
+            state.session = await state.docs.aget_evidence(
+                query=state.session,
                 settings=self.settings,
                 embedding_model=self.embedding_model,
                 summary_llm_model=self.summary_llm_model,
@@ -219,14 +219,14 @@ class GatherEvidence(NamedTool):
                     f"{self.TOOL_FN_NAME}_aget_evidence"
                 ),
             )
-            l1 = len(state.answer.contexts)
+            l1 = len(state.session.contexts)
         finally:
-            state.answer.question = original_question
+            state.session.question = original_question
 
         status = state.status
         logger.info(status)
         sorted_contexts = sorted(
-            state.answer.contexts, key=lambda x: x.score, reverse=True
+            state.session.contexts, key=lambda x: x.score, reverse=True
         )
         best_evidence = (
             f" Best evidence:\n\n{sorted_contexts[0].context}"
@@ -287,8 +287,8 @@ class GenerateAnswer(NamedTool):
 
         # TODO: Should we allow the agent to change the question?
         # self.answer.question = query
-        state.answer = await state.docs.aquery(
-            query=state.answer,
+        state.session = await state.docs.aquery(
+            query=state.session,
             settings=self.settings,
             llm_model=self.llm_model,
             summary_llm_model=self.summary_llm_model,
@@ -298,13 +298,13 @@ class GenerateAnswer(NamedTool):
             ),
         )
 
-        if state.answer.could_not_answer:
+        if state.session.could_not_answer:
             if self.settings.agent.wipe_context_on_answer_failure:
-                state.answer.contexts = []
-                state.answer.context = ""
+                state.session.contexts = []
+                state.session.context = ""
             answer = self.FAILED_TO_ANSWER
         else:
-            answer = state.answer.answer
+            answer = state.session.answer
         status = state.status
         logger.info(status)
 

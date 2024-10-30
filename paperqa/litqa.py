@@ -17,7 +17,7 @@ except ImportError:
 from paperqa.llms import LiteLLMModel, LLMModel
 from paperqa.prompts import EVAL_PROMPT_TEMPLATE, QA_PROMPT_TEMPLATE
 from paperqa.settings import make_default_litellm_model_list_settings
-from paperqa.types import Answer
+from paperqa.types import PQASession
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -127,7 +127,7 @@ class LitQAEvaluation(IntEnum):
         use_unsure: bool = True,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         seed: int | None = None,
-    ) -> tuple[str, Callable[[Answer | str], Awaitable[LitQAEvaluation]]]:
+    ) -> tuple[str, Callable[[PQASession | str], Awaitable[LitQAEvaluation]]]:
         """
         Create a LitQA question and an answer-to-evaluation function.
 
@@ -158,8 +158,8 @@ class LitQAEvaluation(IntEnum):
                 config=make_default_litellm_model_list_settings(eval_model),
             )
 
-        async def llm_from_answer(answer: Answer | str) -> LitQAEvaluation:
-            if isinstance(answer, Answer):
+        async def llm_from_answer(answer: PQASession | str) -> LitQAEvaluation:
+            if isinstance(answer, PQASession):
                 answer = answer.answer
             eval_chunk = await eval_model.achat(
                 messages=[

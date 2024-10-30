@@ -19,6 +19,7 @@ from paperqa import (
     DocDetails,
     Docs,
     NumpyVectorStore,
+    PQASession,
     Settings,
     Text,
     print_callback,
@@ -507,7 +508,7 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
 def test_evidence(docs_fixture) -> None:
     debug_settings = Settings.from_name("debug")
     evidence = docs_fixture.get_evidence(
-        Answer(question="What does XAI stand for?"),
+        PQASession(question="What does XAI stand for?"),
         settings=debug_settings,
     ).contexts
     assert len(evidence) >= debug_settings.answer.evidence_k
@@ -527,7 +528,7 @@ def test_json_evidence(docs_fixture) -> None:
         " question (integer out of 10)."
     )
     evidence = docs_fixture.get_evidence(
-        Answer(question="Who wrote this article?"),
+        PQASession(question="Who wrote this article?"),
         settings=settings,
     ).contexts
     assert evidence[0].author_name
@@ -1129,3 +1130,8 @@ def test_case_insensitive_matching():
     assert strings_similarity("my test sentence", "My test sentence") == 1.0
     assert strings_similarity("a b c d e", "a b c f") == 0.5
     assert strings_similarity("A B c d e", "a b c f") == 0.5
+
+
+def test_answer_rename():
+    answer = Answer(question="")
+    assert isinstance(answer, PQASession)
