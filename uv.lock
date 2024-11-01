@@ -1505,7 +1505,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.3.3.dev1+gdcb4fd4"
+version = "5.3.3.dev5+gc849dd1"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1584,7 +1584,7 @@ requires-dist = [
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.8.2" },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.9" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.12" },
     { name = "limits" },
     { name = "litellm", specifier = ">=1.44" },
     { name = "numpy" },
