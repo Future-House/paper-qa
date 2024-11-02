@@ -55,7 +55,7 @@ datasets = [
     "datasets",
 ]
 ldp = [
-    "ldp>=0.9",  # For alg namespace grouping
+    "ldp>=0.12",  # For StoreTrajectoriesCallback
 ]
 local = [
     "sentence-transformers",
