@@ -93,6 +93,13 @@ class AnswerSettings(BaseModel):
         default=False,
         description="Whether to cite background information provided by model.",
     )
+    get_evidence_if_no_contexts: bool = Field(
+        default=True,
+        description=(
+            "Opt-out flag for allowing answer generation to lazily gather evidence if"
+            " called before evidence was gathered."
+        ),
+    )
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
