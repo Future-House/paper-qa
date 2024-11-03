@@ -1115,17 +1115,6 @@ def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
     assert "Valid Keys" not in response.context
 
 
-def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
-
-    # TODO: delete this test in v6
-    settings = Settings.from_name("fast")
-    settings.answer.evidence_detailed_citations = False
-    docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
-    response = docs.query("What country is Bates from?", settings=settings)
-    assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
-
-
 def test_case_insensitive_matching():
     assert strings_similarity("my test sentence", "My test sentence") == 1.0
     assert strings_similarity("a b c d e", "a b c f") == 0.5

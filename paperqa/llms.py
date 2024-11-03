@@ -301,12 +301,12 @@ class LLMModel(ABC, BaseModel):
         if False:  # type: ignore[unreachable]  # pylint: disable=using-constant-test
             yield  # Trick mypy: https://github.com/python/mypy/issues/5070#issuecomment-1050834495
 
-    async def achat(self, messages: Iterable[dict[str, str]]) -> Chunk:
+    async def achat(self, messages: Iterable[dict[str, str | Sequence[dict]]]) -> Chunk:
         """Return the completion as string and the number of tokens in the prompt and completion."""
         raise NotImplementedError
 
     async def achat_iter(
-        self, messages: Iterable[dict[str, str]]  # noqa: ARG002
+        self, messages: Iterable[dict[str, str | Sequence[dict]]]  # noqa: ARG002
     ) -> AsyncIterable[Chunk]:
         """Return an async generator that yields chunks of the completion.
 
@@ -319,7 +319,9 @@ class LLMModel(ABC, BaseModel):
     def infer_llm_type(self) -> str:
         return "completion"
 
-    def count_tokens(self, text: str) -> int:
+    def count_tokens(self, text: str | Sequence[dict]) -> int:
+        if isinstance(text, list):
+            return sum(self.count_tokens(m["text"]) for m in text)
         return len(text) // 4  # gross approximation
 
     async def run_prompt(
@@ -330,20 +332,24 @@ class LLMModel(ABC, BaseModel):
         name: str | None = None,
         skip_system: bool = False,
         system_prompt: str = default_system_prompt,
+        msg_parts: list[dict] | None = None,
     ) -> LLMResult:
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type()
         if self.llm_type == "chat":
             return await self._run_chat(
-                prompt, data, callbacks, name, skip_system, system_prompt
+                prompt, data, callbacks, name, skip_system, system_prompt, msg_parts
             )
         if self.llm_type == "completion":
+            if msg_parts:
+                # compress them into a single message
+                prompt = "".join([m["text"] for m in msg_parts] + [prompt])
             return await self._run_completion(
                 prompt, data, callbacks, name, skip_system, system_prompt
             )
         raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
 
-    async def _run_chat(
+    async def _run_chat(  # noqa: PLR0912
         self,
         prompt: str,
         data: dict,
@@ -351,6 +357,7 @@ class LLMModel(ABC, BaseModel):
         name: str | None = None,
         skip_system: bool = False,
         system_prompt: str = default_system_prompt,
+        msg_parts: list[dict] | None = None,
     ) -> LLMResult:
         """Run a chat prompt.
 
@@ -361,20 +368,40 @@ class LLMModel(ABC, BaseModel):
             name: Optional name for the result.
             skip_system: Set True to skip the system prompt.
             system_prompt: System prompt to use.
+            msg_parts: Additional message parts to be inserted prior to the user message.
 
         Returns:
             Result of the chat.
         """
-        system_message_prompt = {"role": "system", "content": system_prompt}
-        human_message_prompt = {"role": "user", "content": prompt}
-        messages = [
-            {"role": m["role"], "content": m["content"].format(**data)}
-            for m in (
-                [human_message_prompt]
-                if skip_system
-                else [system_message_prompt, human_message_prompt]
+        # build up a multipart message and insert the system prompt
+        msg_parts = msg_parts or []
+        formatted_prompt = prompt.format(**data)
+        # if we're skipping the system prompt, we need to insert msg parts before the user message
+        system_content: str | list[dict] = system_prompt
+        human_content: list[dict] = []
+        if skip_system:
+            system_content = system_prompt
+            human_content = [*msg_parts, {"type": "text", "text": formatted_prompt}]
+        else:
+            # we are using system prompt and so will pack the  msg_parts in with the system prompt
+            # (because that is how anthropic/gemini examples show it)
+            # find first text content to insert prompt
+            insert_point = next(
+                (i for i, m in enumerate(msg_parts) if m["type"] == "text"), None
             )
-        ]
+            if insert_point is None:
+                system_content = [{"type": "text", "text": system_prompt}, *msg_parts]
+            else:
+                # will modify to insert the system prompt before the first text
+                # we do this to preserve any cache control headers
+                system_content = msg_parts
+                msg_parts[insert_point]["text"] = (
+                    system_prompt + "\n\n" + msg_parts[insert_point]["text"]
+                )
+            human_content = [{"type": "text", "text": formatted_prompt}]
+        system_message = {"role": "system", "content": system_content}
+        human_message = {"role": "user", "content": human_content}
+        messages = [human_message] if skip_system else [system_message, human_message]
         result = LLMResult(
             model=self.name,
             name=name,
@@ -718,7 +745,7 @@ class LiteLLMModel(LLMModel):
 
     @rate_limited
     async def achat(  # type: ignore[override]
-        self, messages: Iterable[dict[str, str]]
+        self, messages: Iterable[dict[str, str | Sequence[dict]]]
     ) -> Chunk:
         response = await self.router.acompletion(self.name, list(messages))
         return Chunk(
@@ -729,7 +756,7 @@ class LiteLLMModel(LLMModel):
 
     @rate_limited
     async def achat_iter(  # type: ignore[override]
-        self, messages: Iterable[dict[str, str]]
+        self, messages: Iterable[dict[str, str | Sequence[dict]]]
     ) -> AsyncIterable[Chunk]:
         completion = await self.router.acompletion(
             self.name,
@@ -758,7 +785,9 @@ class LiteLLMModel(LLMModel):
             return "completion"
         return "chat"
 
-    def count_tokens(self, text: str) -> int:
+    def count_tokens(self, text: str | Sequence[dict]) -> int:
+        if isinstance(text, list):
+            return sum(self.count_tokens(m["text"]) for m in text)
         return litellm.token_counter(model=self.name, text=text)
 
 

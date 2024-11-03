@@ -34,6 +34,7 @@ from paperqa.paths import PAPERQA_DIR
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import (
+    Context,
     Doc,
     DocDetails,
     DocKey,
@@ -683,7 +684,11 @@ class Docs(BaseModel):
             )
             contexts = session.contexts
         pre_str = None
-        if prompt_config.pre is not None:
+        # we check if we have a pre-context
+        # to avoid recreating it
+        if prompt_config.pre is not None and not any(
+            c.text.name == "Extra background information" for c in contexts
+        ):
             with set_llm_session_ids(session.id):
                 pre = await llm_model.run_prompt(
                     prompt=prompt_config.pre,
@@ -694,45 +699,28 @@ class Docs(BaseModel):
                 )
             session.add_tokens(pre)
             pre_str = pre.text
-
-        # sort by first score, then name
-        filtered_contexts = sorted(
-            contexts,
-            key=lambda x: (-x.score, x.text.name),
-        )[: answer_config.answer_max_sources]
-        # remove any contexts with a score of 0
-        filtered_contexts = [c for c in filtered_contexts if c.score > 0]
-
-        # shim deprecated flag
-        # TODO: remove in v6
-        context_inner_prompt = prompt_config.context_inner
-        if (
-            not answer_config.evidence_detailed_citations
-            and "\nFrom {citation}" in context_inner_prompt
-        ):
-            context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
-
-        inner_context_strs = [
-            context_inner_prompt.format(
-                name=c.text.name,
-                text=c.context,
-                citation=c.text.doc.citation,
-                **(c.model_extra or {}),
+            # make a context to include this
+            pre_context = Context(
+                text=Text(
+                    name="Extra background information",
+                    text=pre_str,
+                    doc=Doc.empty("Extra background information"),
+                ),
+                context=pre_str,
+                score=10,
             )
-            for c in filtered_contexts
-        ]
-        if pre_str:
-            inner_context_strs += (
-                [f"Extra background information: {pre_str}"] if pre_str else []
-            )
+            contexts.append(pre_context)
 
-        context_str = prompt_config.context_outer.format(
-            context_str="\n\n".join(inner_context_strs),
-            valid_keys=", ".join([c.text.name for c in filtered_contexts]),
+        context_parts = session.get_context_parts(
+            answer_config.answer_max_sources,
+            answer_config.evidence_cache,
+            prompt_config.context_inner,
+            prompt_config.context_outer,
         )
 
         bib = {}
-        if len(context_str) < 10:  # noqa: PLR2004
+        # check if no contexts made it pass filter
+        if len(context_parts) == 0:
             answer_text = (
                 "I cannot answer this question due to insufficient information."
             )
@@ -741,7 +729,6 @@ class Docs(BaseModel):
                 answer_result = await llm_model.run_prompt(
                     prompt=prompt_config.qa,
                     data={
-                        "context": context_str,
                         "answer_length": answer_config.answer_length,
                         "question": session.question,
                         "example_citation": prompt_config.EXAMPLE_CITATION,
@@ -749,13 +736,14 @@ class Docs(BaseModel):
                     callbacks=callbacks,
                     name="answer",
                     system_prompt=prompt_config.system,
+                    msg_parts=context_parts,
                 )
             answer_text = answer_result.text
             session.add_tokens(answer_result)
         # it still happens
         if prompt_config.EXAMPLE_CITATION in answer_text:
             answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
-        for c in filtered_contexts:
+        for c in session.contexts:
             name = c.text.name
             citation = c.text.doc.citation
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
@@ -796,6 +784,6 @@ class Docs(BaseModel):
         session.formatted_answer = formatted_answer
         session.references = bib_str
         session.contexts = contexts
-        session.context = context_str
+        session.context = json.dumps(context_parts, indent=2)
 
         return session

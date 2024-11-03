@@ -80,6 +80,10 @@ class AnswerSettings(BaseModel):
     evidence_skip_summary: bool = Field(
         default=False, description="Whether to summarization"
     )
+    evidence_cache: bool = Field(
+        default=False,
+        description="Whether to cache evidence for reuse in future questions.",
+    )
     answer_max_sources: int = Field(
         default=5, description="Max number of sources to use for an answer"
     )
@@ -98,12 +102,10 @@ class AnswerSettings(BaseModel):
     def _deprecated_field(self) -> Self:
         # default is True, so we only warn if it's False
         if not self.evidence_detailed_citations:
-            warnings.warn(
-                "The 'evidence_detailed_citations' field is deprecated and will be"
-                " removed in version 6. Adjust 'PromptSettings.context_inner' to remove"
+            raise DeprecationWarning(
+                "The 'evidence_detailed_citations' field is deprecated."
+                " Adjust 'PromptSettings.context_inner' to remove"
                 " detailed citations.",
-                category=DeprecationWarning,
-                stacklevel=2,
             )
         return self
 

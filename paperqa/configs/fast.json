@@ -1,7 +1,6 @@
 {
   "answer": {
     "evidence_k": 5,
-    "evidence_detailed_citations": false,
     "evidence_summary_length": "25 to 50 words",
     "answer_max_sources": 3,
     "answer_length": "50 to 100 words",

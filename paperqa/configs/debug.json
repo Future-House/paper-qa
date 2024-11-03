@@ -3,7 +3,6 @@
   "summary_llm": "text-completion-openai/babbage-002",
   "answer": {
     "evidence_k": 2,
-    "evidence_detailed_citations": false,
     "evidence_summary_length": "25 to 50 words",
     "answer_max_sources": 2,
     "answer_length": "50 to 100 words",

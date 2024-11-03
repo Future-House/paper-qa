@@ -129,6 +129,10 @@ class Doc(Embeddable):
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
 
+    @classmethod
+    def empty(cls, docname: str) -> Doc:
+        return cls(docname=docname, citation="", dockey=encode_id(docname))
+
 
 class Text(Embeddable):
     text: str
@@ -147,6 +151,18 @@ class Context(BaseModel):
     context: str = Field(description="Summary of the text with respect to a question.")
     text: Text
     score: int = 5
+
+    def get_part(self, prompt: str | None = None) -> dict:
+        """Return the context formatted as a message part."""
+        formatted_text = self.context
+        if prompt:
+            formatted_text = prompt.format(
+                name=self.text.name,
+                text=self.context,
+                citation=self.text.doc.citation,
+                **(self.model_extra or {}),
+            )
+        return {"type": "text", "text": formatted_text}
 
     def __str__(self) -> str:
         """Return the context as a string."""
@@ -193,6 +209,50 @@ class PQASession(BaseModel):
     def used_contexts(self) -> set[str]:
         """Return the used contexts."""
         return get_citenames(self.formatted_answer)
+
+    def get_context_parts(
+        self,
+        count: int,
+        cache: bool = False,
+        inner_prompt: str | None = None,
+        outer_prompt: str | None = None,
+    ) -> list[dict]:
+        """Return the context formatted as a message."""
+        # sort by first score, then name
+        filtered_contexts = sorted(
+            self.contexts,
+            key=lambda x: (-x.score, x.text.name),
+        )[:count]
+        # remove any contexts with a score of 0
+        filtered_contexts = [c for c in filtered_contexts if c.score > 0]
+        names = [c.text.name for c in filtered_contexts]
+        parts = [c.get_part(inner_prompt) for c in filtered_contexts]
+        if outer_prompt:
+            parts.append(
+                {
+                    "type": "text",
+                    "text": outer_prompt.format(valid_keys=", ".join(names)),
+                }
+            )
+
+        # now merge parts to make caching easier
+        collapsed_parts: list[dict] = []
+        for part in parts:
+            if part["type"] == "text":
+                if collapsed_parts and collapsed_parts[-1]["type"] == "text":
+                    collapsed_parts[-1]["text"] += "\n\n" + part["text"]
+                else:
+                    collapsed_parts.append(part)
+            else:
+                collapsed_parts.append(part)
+
+        # add caching
+        if cache:
+            collapsed_parts = [
+                {**p, "cache-control": "ephemeral"} for p in collapsed_parts
+            ]
+
+        return collapsed_parts
 
     def get_citation(self, name: str) -> str:
         """Return the formatted citation for the given docname."""
