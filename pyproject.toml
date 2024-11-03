@@ -2,6 +2,27 @@
 build-backend = "setuptools.build_meta"
 requires = ["setuptools>=64", "setuptools_scm>=8"]
 
+[dependency-groups]
+dev = [
+    "ipython>=8",  # Pin to keep recent
+    "mypy>=1.8",  # Pin for mutable-override
+    "paper-qa[datasets,ldp,typing,zotero,local]",
+    "pre-commit>=3.4",  # Pin to keep recent
+    "pydantic~=2.0",
+    "pylint-pydantic",
+    "pytest-asyncio",
+    "pytest-recording",
+    "pytest-rerunfailures",
+    "pytest-subtests",
+    "pytest-sugar",
+    "pytest-timer[colorama]",
+    "pytest-xdist",
+    "pytest>=8",  # Pin to keep recent
+    "python-dotenv",
+    "refurb>=2",  # Pin to keep recent
+    "typeguard",
+]
+
 [project]
 authors = [
     {email = "hello@futurehouse.org", name = "FutureHouse technical staff"},
@@ -406,24 +427,3 @@ in_place = true
 spaces_before_inline_comment = 2  # Match Python PEP 8
 spaces_indent_inline_array = 4  # Match Python PEP 8
 trailing_comma_inline_array = true
-
-[tool.uv]
-dev-dependencies = [
-    "ipython>=8",  # Pin to keep recent
-    "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[datasets,ldp,typing,zotero,local]",
-    "pre-commit>=3.4",  # Pin to keep recent
-    "pydantic~=2.0",
-    "pylint-pydantic",
-    "pytest-asyncio",
-    "pytest-recording",
-    "pytest-rerunfailures",
-    "pytest-subtests",
-    "pytest-sugar",
-    "pytest-timer[colorama]",
-    "pytest-xdist",
-    "pytest>=8",  # Pin to keep recent
-    "python-dotenv",
-    "refurb>=2",  # Pin to keep recent
-    "typeguard",
-]
