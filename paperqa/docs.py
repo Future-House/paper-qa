@@ -673,8 +673,7 @@ class Docs(BaseModel):
         )
 
         contexts = session.contexts
-
-        if not contexts:
+        if answer_config.get_evidence_if_no_contexts and not contexts:
             session = await self.aget_evidence(
                 session,
                 callbacks=callbacks,
