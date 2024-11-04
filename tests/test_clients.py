@@ -661,3 +661,36 @@ async def test_arxiv_doi_is_used_when_available() -> None:
     )
     assert result, "paper should be found"
     assert result.doi == "10.48550/arxiv.1706.03762"
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_hard_reconciles() -> None:
+    test_parameters: list[dict] = [
+        {
+            "title": (
+                "High-throughput screening of human genetic variants by pooled"
+                " prime editing."
+            ),
+            "doi": "10.1101/2024.04.01.587366",
+        },
+        {
+            "title": (
+                "High-throughput screening of human genetic variants by pooled"
+                " prime editing."
+            ),
+            "authors": ["garbage", "authors", "that"],
+            "doi": None,
+        },
+    ]
+    for test in test_parameters:
+        client = DocMetadataClient(clients={CrossrefProvider})
+        result = await client.query(
+            title=test["title"], authors=test.get("authors", [])
+        )
+        if test["doi"] is None:
+            assert result is None
+        elif result:
+            assert result.doi == test["doi"]
+        else:
+            raise AssertionError("Expected a result via title search, got None")
