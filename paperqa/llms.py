@@ -32,8 +32,10 @@ from pydantic import (
 
 from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
-from paperqa.types import Embeddable, LLMResult
+from paperqa.types import Embeddable
 from paperqa.utils import is_coroutine_callable
+
+from llmclient.result import LLMResult
 
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
@@ -269,7 +271,6 @@ class Chunk(BaseModel):
 
     def __str__(self):
         return self.text
-
 
 class LLMModel(ABC, BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)

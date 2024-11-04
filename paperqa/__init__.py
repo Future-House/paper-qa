@@ -16,7 +16,6 @@ from paperqa.llms import (  # noqa: E402
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     LLMModel,
-    LLMResult,
     NumpyVectorStore,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
@@ -25,6 +24,8 @@ from paperqa.llms import (  # noqa: E402
 from paperqa.settings import Settings, get_settings  # noqa: E402
 from paperqa.types import Answer, Context, Doc, DocDetails, Text  # noqa: E402
 from paperqa.version import __version__  # noqa: E402
+
+from llmclient.result import LLMResult
 
 __all__ = [
     "Answer",

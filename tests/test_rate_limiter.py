@@ -12,7 +12,7 @@ from paperqa.llms import (
     LiteLLMEmbeddingModel,
     LiteLLMModel,
 )
-from paperqa.types import LLMResult
+from llmclient.result import LLMResult
 
 LLM_CONFIG_W_RATE_LIMITS = [
     # following ensures that "short-form" rate limits are also supported

@@ -37,7 +37,6 @@ from paperqa.types import (
     Doc,
     DocDetails,
     DocKey,
-    LLMResult,
     PQASession,
     Text,
     set_llm_session_ids,
@@ -51,6 +50,8 @@ from paperqa.utils import (
     md5sum,
     name_in_text,
 )
+
+from llmclient.result import LLMResult
 
 logger = logging.getLogger(__name__)
 

@@ -6,8 +6,10 @@ from collections.abc import Callable
 from typing import Any
 
 from paperqa.llms import PromptRunner
-from paperqa.types import Context, LLMResult, Text
+from paperqa.types import Context, Text
 from paperqa.utils import extract_score, strip_citations
+
+from llmclient.result import LLMResult
 
 
 def llm_parse_json(text: str) -> dict:
