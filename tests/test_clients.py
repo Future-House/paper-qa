@@ -328,15 +328,15 @@ async def test_minimal_fields_filtering() -> None:
         }, "Should be from two sources"
         citation_boilerplate = (
             "Unknown author(s). Augmenting large language models with chemistry tools."
+            " ArXiv, Unknown year. URL:"
         )
-        journal_unknown = " Unknown journal, Unknown year. URL:"
         assert details.citation in {
             (  # Match in Nature Machine Intelligence
-                f"{citation_boilerplate}{journal_unknown} https://doi.org/10.1038/s42256-024-00832-8,"
+                f"{citation_boilerplate} https://doi.org/10.1038/s42256-024-00832-8,"
                 " doi:10.1038/s42256-024-00832-8."
             ),
             (  # Match in arXiv
-                f"{citation_boilerplate} ArXiv, Unknown year. URL: "
+                f"{citation_boilerplate} "
                 "https://doi.org/10.48550/arxiv.2304.05376,"
                 " doi:10.48550/arxiv.2304.05376."
             ),
