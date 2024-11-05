@@ -153,7 +153,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "formatted_citation": (
                 "Michael Herger, Christina M. Kajba, Megan Buckley, Ana Cunha, Molly"
                 " Strom, and Gregory M. Findlay. High-throughput screening of human"
-                " genetic variants by pooled prime editing. bioRxiv, Apr 2024. URL:"
+                " genetic variants by pooled prime editing. BioRxiv, Apr 2024. URL:"
                 " https://doi.org/10.1101/2024.04.01.587366,"
                 " doi:10.1101/2024.04.01.587366. This article has 1 citations."
             ),
@@ -321,19 +321,20 @@ async def test_minimal_fields_filtering() -> None:
         }, "Should be from two sources"
         citation_boilerplate = (
             "Unknown author(s). Augmenting large language models with chemistry tools."
-            " Unknown journal, Unknown year. URL:"
         )
+        journal_unknown = " Unknown journal, Unknown year. URL:"
         assert details.citation in {
             (  # Match in Nature Machine Intelligence
-                f"{citation_boilerplate} https://doi.org/10.1038/s42256-024-00832-8,"
+                f"{citation_boilerplate}{journal_unknown} https://doi.org/10.1038/s42256-024-00832-8,"
                 " doi:10.1038/s42256-024-00832-8."
             ),
             (  # Match in arXiv
-                f"{citation_boilerplate} https://doi.org/10.48550/arxiv.2304.05376,"
+                f"{citation_boilerplate} ArXiv, Unknown year. URL: "
+                "https://doi.org/10.48550/arxiv.2304.05376,"
                 " doi:10.48550/arxiv.2304.05376."
             ),
         }, "Citation should be populated"
-        assert not details.source_quality, "No source quality data should exist"
+        assert details.source_quality == -1, "Should be undefined source quality"
 
 
 @pytest.mark.vcr
