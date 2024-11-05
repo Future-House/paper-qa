@@ -25,8 +25,6 @@ from paperqa.settings import Settings, get_settings  # noqa: E402
 from paperqa.types import Answer, Context, Doc, DocDetails, Text  # noqa: E402
 from paperqa.version import __version__  # noqa: E402
 
-from llmclient.result import LLMResult
-
 __all__ = [
     "Answer",
     "Context",
@@ -36,7 +34,6 @@ __all__ = [
     "EmbeddingModel",
     "HybridEmbeddingModel",
     "LLMModel",
-    "LLMResult",
     "LiteLLMEmbeddingModel",
     "LiteLLMModel",
     "NumpyVectorStore",

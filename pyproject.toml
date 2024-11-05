@@ -38,22 +38,23 @@ classifiers = [
     "Programming Language :: Python",
 ]
 dependencies = [
-    "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
-    "aiohttp",  # TODO: remove in favor of httpx
+    "PyMuPDF>=1.24.12", # For pymupdf.set_messages addition
+    "aiohttp", # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.8.2",  # For namespace reorg
-    "html2text",  # TODO: evaluate moving to an opt-in dependency
+    "fhaviary[llm]>=0.8.2", # For namespace reorg
+    "html2text", # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
-    "litellm>=1.44",  # to prevent sys.stdout on router creation
+    "litellm>=1.44",
+    "llm-client @ git+ssh://git@github.com/Future-House/llm-client.git@main",
     "numpy",
-    "openai<1.47",  # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
+    "openai<1.47", # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
     "pybtex",
-    "pydantic-settings<2.6",  # SEE: https://github.com/pydantic/pydantic-settings/issues/453
+    "pydantic-settings<2.6", # SEE: https://github.com/pydantic/pydantic-settings/issues/453
     "pydantic~=2.0",
     "rich",
-    "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
+    "setuptools", # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",
@@ -78,6 +79,7 @@ datasets = [
 ldp = [
     "ldp>=0.12",  # For StoreTrajectoriesCallback
 ]
+
 local = [
     "sentence-transformers",
 ]
