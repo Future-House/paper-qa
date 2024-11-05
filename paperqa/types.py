@@ -129,6 +129,11 @@ class Doc(Embeddable):
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
 
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def formatted_citation(self) -> str:
+        return self.citation
+
 
 class Text(Embeddable):
     text: str
@@ -607,8 +612,9 @@ class DocDetails(Doc):
         except AttributeError:
             return self.other[item]
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
-    def formatted_citation(self) -> str:
+    def formatted_citation(self) -> str | None:  # type: ignore[override]
 
         if self.is_retracted:
             base_message = "**RETRACTED ARTICLE**"
@@ -620,15 +626,9 @@ class DocDetails(Doc):
             )
             return f"{base_message} {citation_message} {retract_info}"
 
-        if (
-            self.citation is None  # type: ignore[redundant-expr]
-            or self.citation_count is None
-            or self.source_quality is None
-        ):
-            raise ValueError(
-                "Citation, citationCount, and sourceQuality are not set -- do you need"
-                " to call `hydrate`?"
-            )
+        if self.citation_count is None or self.source_quality is None:
+            logger.warning("citation_count and source_quality are not set.")
+            return self.citation
 
         if self.source_quality_message:
             return (
