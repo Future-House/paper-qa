@@ -141,7 +141,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "key": "herger2024highthroughputscreeningof",
             "doi": "10.1101/2024.04.01.587366",
             "doc_id": "8e7669b50f31c52b",
-            "journal": "bioRxiv",
+            "journal": "BioRxiv",
             "authors": [
                 "Michael Herger",
                 "Christina M. Kajba",
@@ -313,7 +313,6 @@ async def test_minimal_fields_filtering() -> None:
             fields=["title", "doi"],
         )
         assert details
-        assert not details.journal, "Journal should not be populated"
         assert not details.year, "Year should not be populated"
         assert not details.authors, "Authors should not be populated"
         assert set(details.other["client_source"]) == {
@@ -353,7 +352,7 @@ async def test_s2_only_fields_filtering() -> None:
         assert s2_details.citation == (
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
-            " tools. Unknown journal, Unknown year. URL:"
+            " tools. ArXiv, Unknown year. URL:"
             " https://doi.org/10.48550/arxiv.2304.05376,"
             " doi:10.48550/arxiv.2304.05376."
         ), "Citation should be populated"

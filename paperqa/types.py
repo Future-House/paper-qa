@@ -482,23 +482,24 @@ class DocDetails(Doc):
         data: dict[str, Any],
     ) -> dict[str, Any]:
         if not data.get("journal"):
-            if "10.48550/" in data.get("doi", "") or "ArXiv" in (
-                data.get("other", {}) or {}
-            ).get("externalIds", ""):
+            doi = data.get("doi", "") or ""
+            if "10.48550/" in doi or "ArXiv" in (data.get("other", {}) or {}).get(
+                "externalIds", ""
+            ):
                 data["journal"] = "ArXiv"
-            elif "10.26434/" in data.get("doi", ""):
+            elif "10.26434/" in doi:
                 data["journal"] = "ChemRxiv"
             elif (
-                "10.1101/" in data.get("doi", "")
+                "10.1101/" in doi
                 and len(data.get("doi", "")) == JOURNAL_EXPECTED_DOI_LENGTHS["BioRxiv"]
             ):
                 data["journal"] = "BioRxiv"
             elif (
-                "10.1101/" in data.get("doi", "")
+                "10.1101/" in doi
                 and len(data.get("doi", "")) == JOURNAL_EXPECTED_DOI_LENGTHS["MedRxiv"]
             ):
                 data["journal"] = "MedRxiv"
-            elif "10.31224/" in data.get("doi", ""):
+            elif "10.31224/" in doi:
                 data["journal"] = "EngRxiv"
         return data
 
