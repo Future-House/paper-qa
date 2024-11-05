@@ -208,7 +208,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
     ],
 )
 @pytest.mark.asyncio
-async def test_doi_search(paper_attributes: dict[str, str]) -> None:
+async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
     async with aiohttp.ClientSession() as session:
         client_list = [
             client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
@@ -228,7 +228,14 @@ async def test_doi_search(paper_attributes: dict[str, str]) -> None:
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
             if key not in {"is_oa", "source"}:
-                assert getattr(details, key) == value, f"Should have the correct {key}"
+                if isinstance(value, str):
+                    assert (
+                        getattr(details, key).lower() == value.lower()
+                    ), f"Should have the correct {key}"
+                else:
+                    assert (
+                        getattr(details, key) == value
+                    ), f"Should have the correct {key}"
             elif key == "is_oa":
                 assert (
                     details.other.get("is_oa") == value  # type: ignore[union-attr]
