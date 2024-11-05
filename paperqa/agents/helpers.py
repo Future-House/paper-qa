@@ -93,7 +93,7 @@ def table_formatter(
             try:
                 display_name = cast(Docs, obj).texts[0].doc.title  # type: ignore[attr-defined]
             except AttributeError:
-                display_name = cast(Docs, obj).texts[0].doc.citation
+                display_name = cast(Docs, obj).texts[0].doc.formatted_citation
             table.add_row(display_name[:max_chars_per_column], filename)
         return table
     raise NotImplementedError(

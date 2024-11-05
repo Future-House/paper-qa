@@ -609,7 +609,7 @@ class Docs(BaseModel):
                         prompt_runner=prompt_runner,
                         extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
-                            "citation": f"{m.name}: {m.doc.citation}",
+                            "citation": f"{m.name}: {m.doc.formatted_citation}",
                         },
                         parser=llm_parse_json if prompt_config.use_json else None,
                         callbacks=callbacks,
@@ -715,7 +715,7 @@ class Docs(BaseModel):
             context_inner_prompt.format(
                 name=c.text.name,
                 text=c.context,
-                citation=c.text.doc.citation,
+                citation=c.text.doc.formatted_citation,
                 **(c.model_extra or {}),
             )
             for c in filtered_contexts
@@ -756,7 +756,7 @@ class Docs(BaseModel):
             answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
         for c in filtered_contexts:
             name = c.text.name
-            citation = c.text.doc.citation
+            citation = c.text.doc.formatted_citation
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             if name_in_text(name, answer_text):
                 bib[name] = citation
