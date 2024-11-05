@@ -332,6 +332,11 @@ CITATION_FALLBACK_DATA = {
     "journal": "Unknown journal",
 }
 
+JOURNAL_EXPECTED_DOI_LENGTHS = {
+    "BioRxiv": 25,
+    "MedRxiv": 27,
+}
+
 
 class DocDetails(Doc):
     model_config = ConfigDict(validate_assignment=True)
@@ -472,6 +477,31 @@ class DocDetails(Doc):
 
         return data
 
+    @staticmethod
+    def add_preprint_journal_from_doi_if_missing(
+        data: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not data.get("journal"):
+            if "10.48550/" in data.get("doi", "") or "ArXiv" in (
+                data.get("other", {}) or {}
+            ).get("externalIds", ""):
+                data["journal"] = "ArXiv"
+            elif "10.26434/" in data.get("doi", ""):
+                data["journal"] = "ChemRxiv"
+            elif (
+                "10.1101/" in data.get("doi", "")
+                and len(data.get("doi", "")) == JOURNAL_EXPECTED_DOI_LENGTHS["BioRxiv"]
+            ):
+                data["journal"] = "BioRxiv"
+            elif (
+                "10.1101/" in data.get("doi", "")
+                and len(data.get("doi", "")) == JOURNAL_EXPECTED_DOI_LENGTHS["MedRxiv"]
+            ):
+                data["journal"] = "MedRxiv"
+            elif "10.31224/" in data.get("doi", ""):
+                data["journal"] = "EngRxiv"
+        return data
+
     @classmethod
     def remove_invalid_authors(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Capture and cull strange author names."""
@@ -602,6 +632,7 @@ class DocDetails(Doc):
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
         data = cls.inject_clean_doi_url_into_data(data)
+        data = cls.add_preprint_journal_from_doi_if_missing(data)
         data = cls.populate_bibtex_key_citation(data)
         return cls.overwrite_docname_dockey_for_compatibility_w_doc(data)
 
