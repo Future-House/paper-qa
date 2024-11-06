@@ -483,8 +483,8 @@ class DocDetails(Doc):
     ) -> dict[str, Any]:
         if not data.get("journal"):
             doi = data.get("doi", "") or ""
-            if "10.48550/" in doi or "ArXiv" in (data.get("other", {}) or {}).get(
-                "externalIds", ""
+            if "10.48550/" in doi or "ArXiv" in (
+                (data.get("other", {}) or {}).get("externalIds", {}) or {}
             ):
                 data["journal"] = "ArXiv"
             elif "10.26434/" in doi:
