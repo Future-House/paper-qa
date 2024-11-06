@@ -1156,7 +1156,12 @@ def test_answer_rename():
         {"doi": "10.26434/chemrxiv-2021-hz0qp", "journal": "ChemRxiv"},
         {"doi": "https://doi.org/10.1101/2024.11.04.621790", "journal": "BioRxiv"},
         {"doi": "10.1101/2024.11.02.24316629", "journal": "MedRxiv"},
-        {"doi": "https://doi.org/10.48550/arXiv.2407.10362", "journal": "ArXiv"},
+        # ensure we don't crash when externalIds key is included, but it's None
+        {
+            "doi": "https://doi.org/10.48550/arXiv.2407.10362",
+            "journal": "ArXiv",
+            "other": {"externalIds": None},
+        },
     ],
 )
 def test_dois_resolve_to_correct_journals(doi_journals):
