@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING, Any, Self, assert_never
 from aviary.core import (
     TASK_DATASET_REGISTRY,
     Frame,
-    Message,
     TaskDataset,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -28,6 +27,9 @@ from aviary.env import ENV_REGISTRY
 from paperqa.types import DocDetails
 
 from .search import SearchIndex, maybe_get_manifest
+
+from aviary.core import Message
+# from llmclient.message import LLMMessage as Message
 
 try:
     from ldp.alg import ComputeTrajectoryMetricsMixin
