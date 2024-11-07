@@ -48,6 +48,7 @@ question answering, summarization, and contradiction detection.
   - [How come I get different results than your papers?](#how-come-i-get-different-results-than-your-papers)
   - [How is this different from LlamaIndex or LangChain?](#how-is-this-different-from-llamaindex-or-langchain)
   - [Can I save or load?](#can-i-save-or-load)
+- [Reproduction](#reproduction)
 - [Citation](#citation)
 
 <!--TOC-->
@@ -946,6 +947,15 @@ with open("my_docs.pkl", "wb") as f:
 with open("my_docs.pkl", "rb") as f:
     docs = pickle.load(f)
 ```
+
+## Reproduction
+
+Contained in [docs/2024-10-16_litqa2-splits.json5](docs/2024-10-16_litqa2-splits.json5)
+are the question IDs
+(correspond with [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl))
+used in the train and evaluation splits,
+as well as paper DOIs used to build the train and evaluation splits' indexes.
+The test split remains held out.
 
 ## Citation
 
