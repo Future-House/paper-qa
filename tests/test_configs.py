@@ -81,4 +81,4 @@ def test_o1_requires_temp_equals_1() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         _ = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
-        assert len(w) == 0
+        assert not w
