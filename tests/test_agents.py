@@ -744,46 +744,47 @@ def test_agent_prompt_collection_validations(
             AgentSettings(**kwargs)
 
 
-@pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
-@pytest.mark.asyncio
-async def test_deepcopy_env(agent_test_settings: Settings) -> None:
-    await get_directory_index(settings=agent_test_settings)  # Trigger build
+class TestGradablePaperQAEnvironment:
+    @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
+    @pytest.mark.asyncio
+    async def test_deepcopy_env(self, agent_test_settings: Settings) -> None:
+        await get_directory_index(settings=agent_test_settings)  # Trigger build
 
-    question = "How can you use XAI for chemical property prediction?"
-    env = GradablePaperQAEnvironment(
-        query=QueryRequest(query=question, settings=agent_test_settings),
-        docs=Docs(),
-    )
+        question = "How can you use XAI for chemical property prediction?"
+        env = GradablePaperQAEnvironment(
+            query=QueryRequest(query=question, settings=agent_test_settings),
+            docs=Docs(),
+        )
 
-    # 1. Rollout until after gather evidence
-    await env.reset()
-    for tool_call in (
-        ToolCall.from_name(
-            "paper_search",
-            query="XAI for chemical property prediction",
-            min_year=2018,
-            max_year=2024,
-        ),
-        ToolCall.from_name("gather_evidence", question=question),
-    ):
-        await env.step(ToolRequestMessage(tool_calls=[tool_call]))
+        # 1. Rollout until after gather evidence
+        await env.reset()
+        for tool_call in (
+            ToolCall.from_name(
+                "paper_search",
+                query="XAI for chemical property prediction",
+                min_year=2018,
+                max_year=2024,
+            ),
+            ToolCall.from_name("gather_evidence", question=question),
+        ):
+            await env.step(ToolRequestMessage(tool_calls=[tool_call]))
 
-    # 2. Now we deepcopy the environment
-    env_copy = deepcopy(env)
-    assert env.state == env_copy.state
+        # 2. Now we deepcopy the environment
+        env_copy = deepcopy(env)
+        assert env.state == env_copy.state
 
-    # 3. Generate an answer for both, and confirm they are identical
-    gen_answer_action = ToolRequestMessage(
-        tool_calls=[ToolCall.from_name("gen_answer", question=question)]
-    )
-    _, _, done, _ = await env.step(gen_answer_action)
-    assert done
-    assert not env.state.session.could_not_answer
-    assert env.state.session.used_contexts
-    _, _, done, _ = await env_copy.step(gen_answer_action)
-    assert done
-    assert not env_copy.state.session.could_not_answer
-    assert env_copy.state.session.used_contexts
-    assert sorted(env.state.session.used_contexts) == sorted(
-        env_copy.state.session.used_contexts
-    )
+        # 3. Generate an answer for both, and confirm they are identical
+        gen_answer_action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_name("gen_answer", question=question)]
+        )
+        _, _, done, _ = await env.step(gen_answer_action)
+        assert done
+        assert not env.state.session.could_not_answer
+        assert env.state.session.used_contexts
+        _, _, done, _ = await env_copy.step(gen_answer_action)
+        assert done
+        assert not env_copy.state.session.could_not_answer
+        assert env_copy.state.session.used_contexts
+        assert sorted(env.state.session.used_contexts) == sorted(
+            env_copy.state.session.used_contexts
+        )
