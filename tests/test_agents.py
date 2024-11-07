@@ -788,3 +788,22 @@ class TestGradablePaperQAEnvironment:
         assert sorted(env.state.session.used_contexts) == sorted(
             env_copy.state.session.used_contexts
         )
+
+    @pytest.mark.asyncio
+    async def test_empty_tool_calls(self, agent_test_settings: Settings) -> None:
+        env = GradablePaperQAEnvironment(
+            query=QueryRequest(
+                query="How can you use XAI for chemical property prediction?",
+                settings=agent_test_settings,
+            ),
+            docs=Docs(),
+        )
+
+        await env.reset()
+        obs, _, done, truncated = await env.step(ToolRequestMessage())
+        assert len(obs) == 1
+        assert obs[0].content
+        assert GenerateAnswer.did_not_fail_to_answer(obs[0].content)
+        assert "0 tool calls" in obs[0].content
+        assert done
+        assert not truncated
