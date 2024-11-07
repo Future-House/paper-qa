@@ -690,10 +690,13 @@ class Settings(BaseSettings):
         https://platform.openai.com/docs/guides/reasoning/quickstart
         """
         if self.llm.startswith("o1-") and self.temperature != 1:
-            raise ValueError(
-                "When dealing with OpenAI o1 models, the temperature"
-                f" must be set to 1, {self.temperature} was specified."
+            warnings.warn(
+                "When dealing with OpenAI o1 models, the temperature must be set to 1."
+                f" The specified temperature {self.temperature} has been overridden to 1.",
+                category=UserWarning,
+                stacklevel=2,
             )
+            self.temperature = 1
         return self
 
     @computed_field  # type: ignore[prop-decorator]
