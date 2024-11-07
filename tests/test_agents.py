@@ -744,6 +744,25 @@ def test_agent_prompt_collection_validations(
             AgentSettings(**kwargs)
 
 
+@pytest.mark.asyncio
+async def test_invalid_tool_call(agent_test_settings: Settings) -> None:
+    await get_directory_index(settings=agent_test_settings)  # Trigger build
+
+    question = "How can you use XAI for chemical property prediction?"
+    env = GradablePaperQAEnvironment(
+        query=QueryRequest(query=question, settings=agent_test_settings),
+        docs=Docs(),
+    )
+
+    await env.reset()
+    obs, *_ = await env.step(
+        ToolRequestMessage(tool_calls=[ToolCall.from_name("invalid_tool")])
+    )
+    assert obs
+    assert obs[0].content
+    assert "Invalid tool call" in obs[0].content
+
+
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_deepcopy_env(agent_test_settings: Settings) -> None:
