@@ -1,3 +1,4 @@
+import warnings
 from unittest.mock import patch
 
 import pytest
@@ -70,6 +71,14 @@ def test_router_kwargs_present_in_models() -> None:
 
 
 def test_o1_requires_temp_equals_1() -> None:
-    with pytest.raises(ValidationError):
-        _ = Settings(llm="o1-thismodeldoesnotexist", temperature=0)
-    _ = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        s = Settings(llm="o1-thismodeldoesnotexist", temperature=0)
+        assert "temperature must be set to 1" in str(w[-1].message)
+        assert s.temperature == 1
+
+    # Test that temperature=1 produces no warning
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        _ = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
+        assert len(w) == 0
