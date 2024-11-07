@@ -745,12 +745,11 @@ def test_agent_prompt_collection_validations(
 
 
 @pytest.mark.asyncio
-async def test_invalid_tool_call(agent_test_settings: Settings) -> None:
-    await get_directory_index(settings=agent_test_settings)  # Trigger build
+async def test_invalid_tool_call() -> None:
 
     question = "How can you use XAI for chemical property prediction?"
     env = GradablePaperQAEnvironment(
-        query=QueryRequest(query=question, settings=agent_test_settings),
+        query=QueryRequest(query=question),
         docs=Docs(),
     )
 

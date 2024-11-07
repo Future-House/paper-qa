@@ -173,7 +173,9 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 valid_action, state=self.state, handle_tool_exc=True
             )
             + [
-                ToolResponseMessage.from_call(tool_call, content="Invalid tool call.")
+                ToolResponseMessage.from_call(
+                    tool_call, content=f"Invalid tool call: {tool_call.function.name}"
+                )
                 for tool_call in invalid_action.tool_calls
             ],
         )
