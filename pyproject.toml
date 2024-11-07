@@ -104,6 +104,7 @@ preview = true
 check-filenames = true
 check-hidden = true
 ignore-words-list = "aadd,astroid,ser"
+skip = "docs/2024-10-16_litqa2-splits.json5"
 
 [tool.mypy]
 # Type-checks the interior of functions without type annotations.
