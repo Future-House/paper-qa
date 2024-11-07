@@ -5,6 +5,7 @@ from typing import Any, Self, cast
 from aviary.core import (
     Environment,
     Frame,
+    Message,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -24,9 +25,6 @@ from .tools import (
     GenerateAnswer,
     PaperSearch,
 )
-
-from aviary.core import Message
-# from llmclient.message import LLMMessage as Message
 
 logger = logging.getLogger(__name__)
 

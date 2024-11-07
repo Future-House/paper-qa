@@ -14,10 +14,11 @@ try:
 except ImportError:
     discounted_returns = None  # type: ignore[assignment]
 
-from paperqa.llms import LiteLLMModel, LLMModel
+from paperqa.llms import LiteLLMModel
 from paperqa.prompts import EVAL_PROMPT_TEMPLATE, QA_PROMPT_TEMPLATE
 from paperqa.settings import make_default_litellm_model_list_settings
 from paperqa.types import PQASession
+from llmclient.model import LLMModel
 
 if TYPE_CHECKING:
     import pandas as pd

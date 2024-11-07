@@ -8,9 +8,10 @@ from typing import cast
 from rich.table import Table
 
 from paperqa.docs import Docs
-from paperqa.llms import LiteLLMModel, LLMModel
+from paperqa.llms import LiteLLMModel
 
 from .models import AnswerResponse
+from llmclient.model import LLMModel
 
 logger = logging.getLogger(__name__)
 

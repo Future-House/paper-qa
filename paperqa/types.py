@@ -12,7 +12,6 @@ from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
 
 import tiktoken
-from aviary.core import Message
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
@@ -33,6 +32,7 @@ from paperqa.utils import (
 )
 from paperqa.version import __version__ as pqa_version
 
+from aviary.core import Message
 from llmclient.result import LLMResult
 
 # Just for clarity

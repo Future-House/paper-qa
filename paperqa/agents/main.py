@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from aviary.core import (
     MalformedMessageError,
+    Message,
     Tool,
     ToolCall,
     ToolRequestMessage,
@@ -19,9 +20,6 @@ from tenacity import (
     retry_if_exception_type,
     stop_after_attempt,
 )
-
-from aviary.core import Message
-# from llmclient.message import LLMMessage as Message
 
 try:
     from ldp.alg import Callback, RolloutManager

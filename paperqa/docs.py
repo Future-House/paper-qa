@@ -25,7 +25,6 @@ from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
 from paperqa.llms import (
     EmbeddingModel,
-    LLMModel,
     NumpyVectorStore,
     PromptRunner,
     VectorStore,
@@ -51,6 +50,7 @@ from paperqa.utils import (
     name_in_text,
 )
 
+from llmclient.model import LLMModel
 from llmclient.result import LLMResult
 
 logger = logging.getLogger(__name__)

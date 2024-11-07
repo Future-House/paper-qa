@@ -18,10 +18,11 @@ from pydantic import (
     field_validator,
 )
 
-from paperqa.llms import LiteLLMModel, LLMModel
+from paperqa.llms import LiteLLMModel
 from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.version import __version__
+from llmclient.model import LLMModel
 
 logger = logging.getLogger(__name__)
 

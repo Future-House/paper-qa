@@ -31,9 +31,7 @@ from pydantic import (
 )
 
 from paperqa.rate_limiter import GLOBAL_LIMITER
-from paperqa.types import Embeddable
-
-from llmclient.result import LLMResult
+from paperqa.types import Embeddable, LLMResult
 from llmclient.model import LLMModel
 
 PromptRunner = Callable[

@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Any, Self, assert_never
 from aviary.core import (
     TASK_DATASET_REGISTRY,
     Frame,
+    Message,
     TaskDataset,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -27,9 +28,6 @@ from aviary.env import ENV_REGISTRY
 from paperqa.types import DocDetails
 
 from .search import SearchIndex, maybe_get_manifest
-
-from aviary.core import Message
-# from llmclient.message import LLMMessage as Message
 
 try:
     from ldp.alg import ComputeTrajectoryMetricsMixin
@@ -47,12 +45,13 @@ from paperqa.litqa import (
     LitQAEvaluation,
     read_litqa_v2_from_hub,
 )
-from paperqa.llms import EmbeddingModel, LiteLLMModel, LLMModel
+from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.types import PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .models import QueryRequest
 from .tools import GenerateAnswer
+from llmclient.model import LLMModel
 
 if TYPE_CHECKING:
     from ldp.data_structures import Trajectory

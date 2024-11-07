@@ -983,8 +983,8 @@ wheels = [
 
 [[package]]
 name = "llm-client"
-version = "0.0.2.dev15+gdabc677"
-source = { git = "ssh://git@github.com/Future-House/llm-client.git?rev=main#dabc677b3c1f97a2da582c8e68674d1299317f1e" }
+version = "0.0.2.dev19+g3ad6183"
+source = { git = "ssh://git@github.com/Future-House/llm-client.git?rev=main#3ad6183ca6d56469a7f804b8464bdb7e89f0bf7e" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
@@ -1528,7 +1528,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.3.3.dev10+g54c1659.d20241107"
+version = "5.3.3.dev11+g71439ba.d20241107"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },

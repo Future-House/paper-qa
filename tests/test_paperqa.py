@@ -30,7 +30,6 @@ from paperqa.llms import (
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
-    LLMModel,
     SparseEmbeddingModel,
 )
 from paperqa.readers import read_doc
@@ -44,6 +43,7 @@ from paperqa.utils import (
     strip_citations,
 )
 from tests.conftest import VCR_DEFAULT_MATCH_ON
+from llmclient.model import LLMModel
 
 THIS_MODULE = pathlib.Path(__file__)
 

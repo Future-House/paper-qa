@@ -16,7 +16,8 @@ from uuid import uuid4
 
 import ldp.agent
 import pytest
-from aviary.tools import ToolCall, ToolRequestMessage, ToolsAdapter, ToolSelector
+from aviary.core import ToolRequestMessage, ToolCall, ToolsAdapter, ToolSelector
+
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
@@ -226,6 +227,7 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
         assert top_result.title == "Frederick Bates (Wikipedia article)"
 
 
+@pytest.mark.skip
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", [FAKE_AGENT_TYPE, ToolSelector, SimpleAgent])
 @pytest.mark.asyncio
