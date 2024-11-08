@@ -83,6 +83,13 @@ class AnswerSettings(BaseModel):
     answer_max_sources: int = Field(
         default=5, description="Max number of sources to use for an answer"
     )
+    max_answer_attempts: int | None = Field(
+        default=None,
+        description=(
+            "Optional (exclusive) max number (default is no max) of attempts to"
+            " generate an answer before declaring a failure."
+        ),
+    )
     answer_length: str = Field(
         "about 200 words, but can be longer", description="Length of final answer"
     )

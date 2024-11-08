@@ -159,18 +159,21 @@ class TestTaskDataset:
             base_query_request.settings.agent.tool_names = {
                 GenerateAnswer.gen_answer.__name__
             }
+            base_query_request.settings.answer.max_answer_attempts = 2
             base_query_request.settings.answer.get_evidence_if_no_contexts = False
             dataset = LitQAv2TaskDataset(base_query=base_query_request)
             dataset.data = dataset.data[:2]  # Save the world: just use two questions
             storage_callback = StoreTrajectoriesCallback()
             evaluator = Evaluator(
-                config=EvaluatorConfig(batch_size=len(dataset), max_rollout_steps=2),
+                config=EvaluatorConfig(batch_size=len(dataset), max_rollout_steps=4),
                 agent=SimpleAgent(),
                 dataset=dataset,
                 callbacks=[storage_callback],
             )
             await evaluator.evaluate()
             for traj in storage_callback.eval_trajectories:
+                assert not traj.failed
+                assert traj.done
                 for step in traj.steps:
                     assert all(
                         tc.function.name == GenerateAnswer.gen_answer.__name__
