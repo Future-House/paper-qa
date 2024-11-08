@@ -6,6 +6,7 @@ from aviary.core import (
     Environment,
     Frame,
     Message,
+    Messages,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -173,7 +174,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
 
     async def step(
         self, action: ToolRequestMessage
-    ) -> tuple[list[Message], float, bool, bool]:
+    ) -> tuple[Messages, float, bool, bool]:
         self.state.record_action(action)
         if not action.tool_calls:
             return (
@@ -190,11 +191,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
 
         response_messages = cast(
             list[Message],
-            await self.exec_tool_calls(
-                action,
-                state=self.state,
-                handle_tool_exc=True,
-            ),
+            await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
         )
         return (
             response_messages,
