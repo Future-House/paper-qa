@@ -84,17 +84,20 @@ repos:
         args: [--pretty, --ignore-missing-imports]
         additional_dependencies:
           - aiohttp
+          - PyMuPDF>=1.24.12
+          - anyio
           - coredis
           - fhaviary[llm]>=0.10.0 # Match pyproject.toml
           - ldp>=0.12 # Match pyproject.toml
           - html2text
+          - litellm>=1.44 # Match pyproject.toml
           - httpx
           - limits
+          - pybtex
           - numpy
-          - openai>=1 # Match pyproject.toml
           - pandas-stubs
           - pydantic~=2.0 # Match pyproject.toml
-          - pydantic-settings
+          - pydantic-settings<2.6 # Match pyproject.toml
           - rich
           - tantivy
           - tenacity
