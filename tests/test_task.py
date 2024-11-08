@@ -177,7 +177,7 @@ class TestTaskDataset:
                         for tc in step.action.value.tool_calls
                     )
 
-    @pytest.mark.skip
+
     @pytest.mark.vcr
     @pytest.mark.asyncio
     async def test_tool_failure(self, base_query_request: QueryRequest) -> None:
