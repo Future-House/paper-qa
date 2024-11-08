@@ -53,7 +53,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.46.1
+          - AsyncOpenAI/Python 1.54.3
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -63,32 +63,34 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.46.1
+          - 1.54.3
         x-stainless-raw-response:
           - "true"
+        x-stainless-retry-count:
+          - "1"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.5
+          - 3.12.7
       method: POST
       uri: https://api.openai.com/v1/chat/completions
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//bFLLbtswELzrK4g9W4Ws2E6sm3MwWvTSoi1soAoEilpJTPgySRU2DP97
-          oUcsxbEOBDGjmdld7jkgBHgBCQFWU8+kEeFmu/u5q7b1/Nf+a77k/KjtfsN5flD2N4dZq9D5KzL/
-          rvrCtDQCPdeqp5lF6rF1nT/GT/EqXj/EHSF1gaKVVcaHCx3GUbwIo6cwWg3CWnOGDhLyNyCEkHN3
-          tiWqAo+QkGj2jkh0jlYIyfUnQsBq0SJAnePOU+VhNpJMK4+qrVo1QkwIr7XIGBViDO6/8+Q+zokK
-          kf3RBf/3vKm2314Px6Uoih+7k9x/30/yeuuT6QoqG8Wu85nwVzy5CSMEFJWd1lCDNnNILatv9IQA
-          tVUjUfm2djincGjQnlJIUthaLNBy9kaeqUeXwiwFyVV2QmpTSLohpCDpcYpc4EPAJbh3f5kMz2LZ
-          OCqGqQ745fpMQlfG6tzdTB1KrrirM4vUdd2D89r02W1OlwDNhxcGY7U0PvP6DVVruFg/9n4wLuDI
-          xsuB9NpTMeLLOJ7d8csK9JR3K3DdOkZZjcUojYJJc59D71n0DXJVfXIJBidwJ+dRZiVXFVpjebei
-          UJosLhfRKl/P5w8QXIL/AAAA//8DAMhCLBerAwAA
+          H4sIAAAAAAAAA4xTwY7TMBC95yusObcoLWnL5rYILeyuRNXlgiAomjqTxKxjG9uRtlT9dxS3m6Sl
+          SOQQWfP83sy8Ge8jxkAUkDLgNXreGDm9ffrydflJ293mfrPG3/b2Q1WoVfX529bFNUw6ht7+JO5f
+          WW+4bowkL7Q6wtwSeupUZ6u3s1m8uonjADS6INnRKuOniZ7O43kyjd9N4+WJWGvByUHKvkeMMbYP
+          /65EVdALpCzIhEhDzmFFkPaXGAOrZRcBdE44j8rDZAC5Vp5UV7VqpRwBXmuZc5RySHz89qPz4BNK
+          ma+fluU6aTfJnXhYPD591LVe3z8+tKN8R+mdCQWVreK9PyO8j6cXyRgDhU3gGjRkc0doeX3BZwzQ
+          Vm1Dyne1wz6DXy3ZXQZpBneWCrKCP7P36MllMMmgESrfEdoM0mBCBg2+jCMHOEtwiK6df4zMs1S2
+          DuXJ1VP80I9J6spYvXUXrkMplHB1bgld6H48hOg1W8gD7dmcwVjdGJ97/Uyqk01uFkdVGNZwQOer
+          E+i1RznEF/P55IpeXpBHERah3z2OvKZioA47iG0h9AiIRr3/Xc017WP/QlX/Iz8AnJPxVOTGUiH4
+          ecfDNUvdK/3Xtd7lUDC4nfPU5KVQFVljRXgoUJo8WfBykRSEBNEh+gMAAP//AwDdqluHMQQAAA==
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8ce9f6db5b73fa5a-SJC
+          - 8df9481679ed24d6-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -96,15 +98,9 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:02:12 GMT
+          - Fri, 08 Nov 2024 23:18:20 GMT
         Server:
           - cloudflare
-        Set-Cookie:
-          - __cf_bm=cpgBpO7zUb7RYLDVo_TRx5kBAzjxM7Oj2aZZftJZGuE-1728262932-1.0.1.1-3Nom.dOk2aDcl5yWx1rOl7AcGlRg2S1eMjtm6GmgqUUQPY2dQmMLN3f.Nchfc2hJw3AmwAMgJnW_3XBYGlVMfg;
-            path=/; expires=Mon, 07-Oct-24 01:32:12 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=eGqqo8nH6HPwjljNQe0Fzr7tTJgpTcRrQrvQzSboHtc-1728262932319-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -116,7 +112,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "349"
+          - "439"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -134,7 +130,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_40c14a6e57225b6c5417c9bc2f6a8a43
+          - req_2da9a3f52e4d006e18958767f55d95cc
       status:
         code: 200
         message: OK
@@ -147,11 +143,11 @@ interactions:
         and can simply terminate if the answer looks sufficient. The current status
         of evidence/papers/cost is Status: Paper Count=0 | Relevant Papers=0 | Current
         Evidence=0 | Current Cost=$0.0000"}, {"role": "assistant", "content": null,
-        "function_call": null, "tool_calls": [{"id": "call_UodivBAgFIjqx5lddPWymXKX",
+        "function_call": null, "tool_calls": [{"id": "call_OR6fO4uQ4FiJ5KRGohoOIKJu",
         "type": "function", "function": {"arguments": "{\"query\": \"Frederick Bates\",
         \"min_year\": null, \"max_year\": null}", "name": "paper_search"}}]}, {"role":
-        "tool", "content": "Failed to execute tool call for tool paper_search:\nTotally
-        unexpected but retryable error.", "name": "paper_search", "tool_call_id": "call_UodivBAgFIjqx5lddPWymXKX"}],
+        "tool", "content": "Encountered exception during tool call: Totally unexpected
+        but retryable error.", "name": "paper_search", "tool_call_id": "call_OR6fO4uQ4FiJ5KRGohoOIKJu"}],
         "model": "gpt-4o-2024-08-06", "temperature": 0.1, "tool_choice": "required",
         "tools": [{"type": "function", "function": {"name": "gather_evidence", "description":
         "Gather evidence from previous papers given a specific question to increase
@@ -191,13 +187,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "3432"
+          - "3420"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.46.1
+          - AsyncOpenAI/Python 1.54.3
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -207,32 +203,34 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.46.1
+          - 1.54.3
         x-stainless-raw-response:
           - "true"
+        x-stainless-retry-count:
+          - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.5
+          - 3.12.7
       method: POST
       uri: https://api.openai.com/v1/chat/completions
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA2xSy27bMBC86yuIPduFrFhOoludxEWKpkALxDlUhUBTK5kJRdIklVow/O+FHpZk
-          JzoQxI5mZne4B48Q4ClEBNiWOlZoMf26evn18vjNf+C/q6c76YeL71btQv3+7+c9wqRmqM0rMndi
-          fWGq0AIdV7KFmUHqsFadXQc3wSK4vQoaoFApipqWazedq2ngB/OpfzP1Fx1xqzhDCxH54xFCyKE5
-          6xZlinuIiD85VQq0luYIUf8TIWCUqCtAreXWUelgMoBMSYey7lqWQowAp5RIGBViMG6/w+g+5ESF
-          SJ53a/m4+bF+0qEIlq/7/fP6ffmwkiO/VrrSTUNZKVmfzwjv69GFGSEgadFwNdVoEovUsO0FnxCg
-          Ji8LlK7uHQ4x7Eo0VQxRDCuDKRrO3siSOrQxTGIouEwqpCaGqAkhhoLux5UjnBkcvc/uf0fhGcxK
-          S0WXalc/9s8kVK6N2tiL1CHjktttYpDaZnqwTunWu/ZpHKA8e2HQRhXaJU69oawFw7BbBxgWcECD
-          sAOdclSMWNcn4EwvSdFR3qxAv3WMsi2mA9X3RsN9NP1Moh2Qy/yDitcpga2swyLJuMzRaMObFYVM
-          J0E29xeb29nsCryj9x8AAP//AwCgA6kGqwMAAA==
+          H4sIAAAAAAAAA4xTUWvbMBB+968Q95wMO3GSxW/boHSFErYVVpiHUaSzo0aWNEnemob892IltZ0s
+          g/nBiPv0fXf33WkfEQKCQ0aAbahntZHjD1+/Pc7vPzcv23k8+b5Kp8kfyf3jdLmqHm5h1DL0+gmZ
+          f2O9Y7o2Er3Q6ggzi9Rjq5ospkkSL5ZxHIBac5QtrTJ+nOrxJJ6k4/j9OJ6fiBstGDrIyI+IEEL2
+          4d+WqDg+Q0aCTIjU6BytELLuEiFgtWwjQJ0TzlPlYdSDTCuPqq1aNVIOAK+1LBiVsk98/PaDc+8T
+          lbJ4uGUvN8ly/SW5v/vEV7+rafkkJ3dukO8ovTOhoLJRrPNngHfx7CIZIaBoHbiGGrSFQ2rZ5oJP
+          CFBbNTUq39YO+xx+NWh3OWQ53FjkaAXbko/Uo8thlEMtVLFDanPIggk51PR5GDnAWYJDdO38c2Ce
+          xbJxVJ5cPcUP3ZikrozVa3fhOpRCCbcpLFIXuh8OIXrLFvJAczZnMFbXxhdeb1G1srM0PapCv4Y9
+          OlmcQK89lQPWIhld0Ss4eirCInS7xyjbIO+p/Q7Shgs9AKJB739Xc0372L9Q1f/I9wBjaDzywljk
+          gp133F+z2L7Sf13rXA4Fg9s5j3VRClWhNVaEhwKlKdIZK2cpR4oQHaJXAAAA//8DACRvIBExBAAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8ce9f6df1eddfa5a-SJC
+          - 8df9481a6bbc24d6-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -240,7 +238,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:02:12 GMT
+          - Fri, 08 Nov 2024 23:18:21 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -254,7 +252,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "350"
+          - "534"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -266,13 +264,13 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999845"
+          - "29999848"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_19ada94945e161097f04e6f4e4743f35
+          - req_815accf66129e471f490f3cef52970e2
       status:
         code: 200
         message: OK
