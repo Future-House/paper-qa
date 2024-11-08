@@ -97,7 +97,7 @@ repos:
           - numpy
           - pandas-stubs
           - pydantic~=2.0 # Match pyproject.toml
-          - pydantic-settings<2.6 # Match pyproject.toml
+          - pydantic-settings
           - rich
           - tantivy
           - tenacity
