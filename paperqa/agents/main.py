@@ -184,7 +184,7 @@ async def run_fake_agent(
         if on_env_step_callback:
             await on_env_step_callback(obs, reward, done, truncated)
 
-    async def rollout() -> None:
+    async def rollout() -> AgentStatus:
         # Seed docs with a few keyword searches
         for search in await litellm_get_search_query(
             question, llm=query.settings.get_llm(), count=3
@@ -192,6 +192,7 @@ async def run_fake_agent(
             await step(search_tool, query=search, min_year=None, max_year=None)
         await step(gather_evidence_tool, question=question)
         await step(generate_answer_tool, question=question)
+        return AgentStatus.SUCCESS
 
     await rollout()
     return env.state.session, AgentStatus.SUCCESS
@@ -212,9 +213,8 @@ async def run_aviary_agent(
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
-    status = AgentStatus.SUCCESS
 
-    async def rollout() -> None:
+    async def rollout() -> AgentStatus:
         obs, tools = await env.reset()
         if on_env_reset_callback:
             await on_env_reset_callback(env.state)
@@ -250,9 +250,7 @@ async def run_aviary_agent(
                 await generate_answer_tool._tool_fn(
                     question=query.query, state=env.state
                 )
-                nonlocal status
-                status = AgentStatus.TRUNCATED
-                return
+                return AgentStatus.TRUNCATED
             agent_state.messages += obs
             for attempt in Retrying(
                 stop=stop_after_attempt(5),
@@ -270,6 +268,7 @@ async def run_aviary_agent(
             if on_env_step_callback:
                 await on_env_step_callback(obs, reward, done, truncated)
             timestep += 1
+        return AgentStatus.SUCCESS
 
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
@@ -333,11 +332,10 @@ async def run_ldp_agent(
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
-    status = AgentStatus.SUCCESS
     # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
     # has already taken place, which checks that ldp is installed
 
-    async def rollout() -> None:
+    async def rollout() -> AgentStatus:
         rollout_manager = RolloutManager(
             agent,
             callbacks=[
@@ -354,8 +352,8 @@ async def run_ldp_agent(
         )
         traj = trajs[0]
         if traj.steps[-1].truncated:
-            nonlocal status
-            status = AgentStatus.TRUNCATED
+            return AgentStatus.TRUNCATED
+        return AgentStatus.SUCCESS
 
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
