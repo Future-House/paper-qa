@@ -157,10 +157,22 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     def export_frame(self) -> Frame:
         return Frame(state=self.state, info={"query": self._query})
 
+    def _has_excess_answer_failures(self) -> bool:
+        if self._query.settings.answer.max_answer_attempts is None:
+            return False
+        return (
+            sum(
+                tn == GenerateAnswer.gen_answer.__name__
+                for s in self.state.tool_history
+                for tn in s
+            )
+            > self._query.settings.answer.max_answer_attempts
+        )
+
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[list[Message], float, bool, bool]:
-        self.state.session.add_tokens(action)  # Add usage for action if present
+        self.state.record_action(action)
 
         # If the action has empty tool_calls, the agent can later take that into account
         msgs = cast(
@@ -175,7 +187,8 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 and msg.name == GenerateAnswer.gen_answer.__name__
                 and GenerateAnswer.did_not_fail_to_answer(msg.content)
                 for msg in msgs
-            ),
+            )
+            or self._has_excess_answer_failures(),
             False,
         )
 
