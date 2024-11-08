@@ -142,6 +142,29 @@ async def run_agent(
     return AnswerResponse(session=session, status=agent_status)
 
 
+async def _run_with_timeout_failure(
+    rollout: Callable[[], Awaitable[AgentStatus]],
+    query: QueryRequest,
+    env: PaperQAEnvironment,
+) -> tuple[PQASession, AgentStatus]:
+    try:
+        async with asyncio.timeout(query.settings.agent.timeout):
+            status = await rollout()
+    except TimeoutError:
+        logger.warning(
+            f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
+        )
+        status = AgentStatus.TRUNCATED
+        generate_answer_tool = next(
+            filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
+        )
+        await generate_answer_tool._tool_fn(question=query.query, state=env.state)
+    except Exception:
+        logger.exception("Trajectory failed.")
+        status = AgentStatus.FAIL
+    return env.state.session, status
+
+
 async def run_fake_agent(
     query: QueryRequest,
     docs: Docs,
@@ -194,8 +217,7 @@ async def run_fake_agent(
         await step(generate_answer_tool, question=question)
         return AgentStatus.SUCCESS
 
-    await rollout()
-    return env.state.session, AgentStatus.SUCCESS
+    return await _run_with_timeout_failure(rollout, query, env)
 
 
 async def run_aviary_agent(
@@ -270,22 +292,7 @@ async def run_aviary_agent(
             timestep += 1
         return AgentStatus.SUCCESS
 
-    try:
-        async with asyncio.timeout(query.settings.agent.timeout):
-            await rollout()
-    except TimeoutError:
-        logger.warning(
-            f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
-        )
-        status = AgentStatus.TRUNCATED
-        generate_answer_tool = next(
-            filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
-        )
-        await generate_answer_tool._tool_fn(question=query.query, state=env.state)
-    except Exception:
-        logger.exception(f"Agent {agent} failed.")
-        status = AgentStatus.FAIL
-    return env.state.session, status
+    return await _run_with_timeout_failure(rollout, query, env)
 
 
 class LDPRolloutCallback(Callback):
@@ -355,22 +362,7 @@ async def run_ldp_agent(
             return AgentStatus.TRUNCATED
         return AgentStatus.SUCCESS
 
-    try:
-        async with asyncio.timeout(query.settings.agent.timeout):
-            await rollout()
-    except TimeoutError:
-        logger.warning(
-            f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
-        )
-        status = AgentStatus.TRUNCATED
-        generate_answer_tool = next(
-            filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
-        )
-        await generate_answer_tool._tool_fn(question=query.query, state=env.state)
-    except Exception:
-        logger.exception(f"Agent {agent} failed.")
-        status = AgentStatus.FAIL
-    return env.state.session, status
+    return await _run_with_timeout_failure(rollout, query, env)
 
 
 async def index_search(
