@@ -174,19 +174,22 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     ) -> tuple[list[Message], float, bool, bool]:
         self.state.record_action(action)
 
-        # If the action has empty tool_calls, the agent can later take that into account
-        msgs = cast(
+        response_messages = cast(
             list[Message],
-            await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
+            await self.exec_tool_calls(
+                action,
+                state=self.state,
+                handle_tool_exc=True,
+            ),
         )
         return (
-            msgs,
+            response_messages,
             0,  # Reward is computed in post-processing, use 0 as a placeholder
             any(
                 isinstance(msg, ToolResponseMessage)
                 and msg.name == GenerateAnswer.gen_answer.__name__
                 and GenerateAnswer.did_not_fail_to_answer(msg.content)
-                for msg in msgs
+                for msg in response_messages
             )
             or self._has_excess_answer_failures(),
             False,

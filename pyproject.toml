@@ -42,13 +42,12 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.8.2",  # For namespace reorg
+    "fhaviary[llm]>=0.10.0",  # For invalid tool fixes
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
     "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
-    "openai<1.47",  # TODO: remove after https://github.com/BerriAI/litellm/issues/5854 resolution
     "pybtex",
     "pydantic-settings<2.6",  # SEE: https://github.com/pydantic/pydantic-settings/issues/453
     "pydantic~=2.0",
@@ -258,6 +257,8 @@ min-similarity-lines = 12
 # Add the specified OPTS to the set of command line arguments as if they had been
 # specified by the user.
 addopts = "--typeguard-packages=paperqa"
+# set how loops are scoped to avoid https://github.com/BerriAI/litellm/issues/5854
+asyncio_default_fixture_loop_scope = "session"
 # Sets a list of filters and actions that should be taken for matched warnings.
 # By default all warnings emitted during the test session will be displayed in
 # a summary at the end of the test session.
