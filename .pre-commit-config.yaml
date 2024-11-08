@@ -105,3 +105,4 @@ repos:
           - types-setuptools
           - types-PyYAML
           - sentence-transformers
+          - pyzotero
