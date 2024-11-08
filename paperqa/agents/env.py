@@ -180,7 +180,6 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 action,
                 state=self.state,
                 handle_tool_exc=True,
-                ordered=True,  # prevent concurrent gather evidence steps or anything
             ),
         )
         return (
