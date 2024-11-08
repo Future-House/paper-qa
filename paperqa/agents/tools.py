@@ -7,6 +7,7 @@ import re
 import sys
 from typing import ClassVar, cast
 
+from aviary.core import ToolRequestMessage
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from paperqa.docs import Docs
@@ -36,6 +37,14 @@ class EnvironmentState(BaseModel):
 
     docs: Docs
     session: PQASession = Field(..., alias="answer")
+    tool_history: list[list[str]] = Field(
+        default_factory=list,
+        description=(
+            "History of tool names input to each Environment.step (regardless of being"
+            " a typo or not), where the outer list is steps, and the inner list matches"
+            " the order of tool calls at each step."
+        ),
+    )
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
@@ -64,6 +73,10 @@ class EnvironmentState(BaseModel):
             ),
             cost=self.session.cost,
         )
+
+    def record_action(self, action: ToolRequestMessage) -> None:
+        self.session.add_tokens(action)
+        self.tool_history.append([tc.function.name for tc in action.tool_calls])
 
 
 class NamedTool(BaseModel):
