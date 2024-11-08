@@ -160,7 +160,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[list[Message], float, bool, bool]:
-        self.state.session.add_tokens(action)  # Add usage for action if present
+        self.state.record_action(action)
 
         # If the action has empty tool_calls, the agent can later take that into account
         msgs = cast(
