@@ -162,22 +162,14 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     ) -> tuple[list[Message], float, bool, bool]:
         self.state.session.add_tokens(action)  # Add usage for action if present
 
-        valid_action, invalid_action = self.filter_invalid_tool_calls(action)
-        # NOTE: valid_action or invalid_action may have an empty list of tool calls
         response_messages = cast(
             list[Message],
-            # Ordered since things like search -> lookup need to be run in order.
-            # NOTE: Handling tool exceptions here keeps the trajectory going, but I don't
-            # think the returned message is useful to the agent/learning. Disabling for now.
             await self.exec_tool_calls(
-                valid_action, state=self.state, handle_tool_exc=True
-            )
-            + [
-                ToolResponseMessage.from_call(
-                    tool_call, content=f"Invalid tool call: {tool_call.function.name}"
-                )
-                for tool_call in invalid_action.tool_calls
-            ],
+                action,
+                state=self.state,
+                handle_tool_exc=True,
+                ordered=True,  # prevent concurrent gather evidence steps or anything
+            ),
         )
         return (
             response_messages,
