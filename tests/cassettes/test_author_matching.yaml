@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4007,"items":[{"DOI":"10.4337\/cilj.2023.02.08","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2467-681X","authenticated-orcid":true,"given":"Jack
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4038,"items":[{"DOI":"10.4337\/cilj.2023.02.08","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2467-681X","authenticated-orcid":true,"given":"Jack
           Wright","family":"Nelson","sequence":"first","affiliation":[{"name":"Doctoral
           Candidate, McGill University Faculty of Law, Montreal, QC, Canada"},{"name":"Adjunct
           Research Fellow, National University of Singapore Faculty of Law, Singapore"}]}],"title":["Large
@@ -25,7 +25,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:12 GMT
+          - Fri, 08 Nov 2024 23:17:18 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -61,7 +61,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 178.801}]}
+          "P. Schwaller"}], "matchScore": 176.78436}]}
 
           '
       headers:
@@ -70,31 +70,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "682"
+          - "684"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:13 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         Via:
-          - 1.1 f2ad9d6c3218f50a68fdbc2b2af517aa.cloudfront.net (CloudFront)
+          - 1.1 0113a71a4be95c1ea6c4a193aad565aa.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - yppXGP1uN2ExPYlcqYkxcfDuXBLDufNe5PimvuAES0DOFgZwVm__qA==
+          - _-OZO0fRyGEzT2D_Nr2fyfQjYnjK-7ulNWryozB_SajlRFgLQsAy0A==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTh4F7QPHcERbQ=
+          - A81P5GD3PHcEfSg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "682"
+          - "684"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:13 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 7612ec94-bf23-45ce-bbaa-84d13b52800b
+          - 32af7b91-efaf-4905-b650-0a8c559fae51
       status:
         code: 200
         message: OK
@@ -114,7 +114,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 175.6079}]}
+          "P. Schwaller"}], "matchScore": 176.78436}]}
 
           '
       headers:
@@ -123,31 +123,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "683"
+          - "684"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:14 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Via:
-          - 1.1 f2ad9d6c3218f50a68fdbc2b2af517aa.cloudfront.net (CloudFront)
+          - 1.1 0113a71a4be95c1ea6c4a193aad565aa.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - DV9xQ741VKAbe4SKjo53wtwm8S9_7gJ2TAv5Z9cJ-V21xjZG49jR6A==
+          - UVqCCLXLgrUygXOnemudQET7cDjPC_U2FNqS9HJErbo00mX4RVxRuw==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTiAF8DPHcEpNA=
+          - A81P-GfMvHcEQrA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "683"
+          - "684"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:14 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 31c5900e-fba9-4f30-bbca-80dc671b5feb
+          - 4d65b1f2-c33b-449c-aafb-97a39f59e3fd
       status:
         code: 200
         message: OK
@@ -172,7 +172,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 07 Oct 2024 01:01:14 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

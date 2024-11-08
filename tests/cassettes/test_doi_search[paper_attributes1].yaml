@@ -3,48 +3,62 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=example@papercrow.ai
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,1,21]],"date-time":"2024-01-21T17:53:48Z","timestamp":1705859628791},"reference-count":0,"publisher":"Springer
-          Science and Business Media LLC","issue":"1\/2","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2001]]},"DOI":"10.1023\/a:1007154515475","type":"journal-article","created":{"date-parts":[[2002,12,22]],"date-time":"2002-12-22T09:07:15Z","timestamp":1040548035000},"page":"1-11","source":"Crossref","is-referenced-by-count":6,"title":[],"prefix":"10.1007","volume":"218","author":[{"given":"Subrata","family":"Adak","sequence":"first","affiliation":[]},{"given":"Debashis","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Uday","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Ranajit
-          K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"297","container-title":["Molecular
-          and Cellular Biochemistry"],"original-title":[],"deposited":{"date-parts":[[2012,12,27]],"date-time":"2012-12-27T23:10:34Z","timestamp":1356649834000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1023\/A:1007154515475"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2001]]},"references-count":0,"journal-issue":{"issue":"1\/2"},"alternative-id":["271450"],"URL":"http:\/\/dx.doi.org\/10.1023\/a:1007154515475","relation":{},"ISSN":["0300-8177"],"issn-type":[{"value":"0300-8177","type":"print"}],"subject":[],"published":{"date-parts":[[2001]]}}}'
+          '{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
+          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
+          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
+          "title": "An essential role of active site arginine residue in iodide binding
+          and histidine residue in electron transfer for iodide oxidation by horseradish
+          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
+          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
+          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
+          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
+          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
+          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
+          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
+          of active site arginine residue in iodide binding and histidine residue in
+          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
+          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
+          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
+          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
+          Banerjee"}]}
+
+          '
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
         Access-Control-Allow-Origin:
           - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "762"
+          - "1446"
         Content-Type:
           - application/json
         Date:
-          - Wed, 09 Oct 2024 21:24:15 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
+          - Fri, 08 Nov 2024 23:17:17 GMT
+        Via:
+          - 1.1 6cbbecc3198d4b8fe84dc82e5f121ae6.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - x74xzo1Vgtf0sHjNYMASzYWHeeaxPOZbFamNxgd55X3Wlg5uBEGjZQ==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - A81PnEJPPHcEkMA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1446"
+        x-amzn-Remapped-Date:
+          - Fri, 08 Nov 2024 23:17:17 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 84d31e03-de14-4703-8f90-16f811730d2a
       status:
         code: 200
         message: OK
@@ -78,7 +92,7 @@ interactions:
           Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"facility","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Uday
           Bandyopadhyay","raw_affiliation_strings":["Department of Physiology, Indian
           Institute of Chemical Biology, Calcutta, India"],"affiliations":[{"raw_affiliation_string":"Department
-          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5051397482","display_name":"Ranajit
+          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5110419549","display_name":"Ranajit
           K. Banerjee","orcid":null},"institutions":[{"id":"https://openalex.org/I160344538","display_name":"Indian
           Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"facility","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Ranajit
           K. Banerjee","raw_affiliation_strings":["Department of Physiology, Indian
@@ -125,15 +139,16 @@ interactions:
           Science+Business Media","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310319900"],"host_organization_lineage_names":["Springer
           Nature","Springer Science+Business Media"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/11330823","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
           Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"display_name":"Clean
-          water and sanitation","score":0.74,"id":"https://metadata.un.org/sdg/6"}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":36,"referenced_works":["https://openalex.org/W105515906","https://openalex.org/W1515075543","https://openalex.org/W1565240752","https://openalex.org/W1565691495","https://openalex.org/W1571455001","https://openalex.org/W1578742674","https://openalex.org/W1581359855","https://openalex.org/W1587806072","https://openalex.org/W1589479912","https://openalex.org/W1590103084","https://openalex.org/W1799674254","https://openalex.org/W1849424407","https://openalex.org/W1967044424","https://openalex.org/W1971827843","https://openalex.org/W1986659402","https://openalex.org/W1989790643","https://openalex.org/W1990052170","https://openalex.org/W1998706402","https://openalex.org/W1999881926","https://openalex.org/W2002978594","https://openalex.org/W2003479580","https://openalex.org/W2005601978","https://openalex.org/W2006822851","https://openalex.org/W2017379977","https://openalex.org/W2023180351","https://openalex.org/W2024117678","https://openalex.org/W2055799504","https://openalex.org/W2095100183","https://openalex.org/W2095873332","https://openalex.org/W2154061135","https://openalex.org/W2165898505","https://openalex.org/W2179092050","https://openalex.org/W2411439573","https://openalex.org/W2418888804","https://openalex.org/W91326892","https://openalex.org/W955725593"],"related_works":["https://openalex.org/W2327133413","https://openalex.org/W2122752058","https://openalex.org/W2072464466","https://openalex.org/W2062221185","https://openalex.org/W2044979688","https://openalex.org/W1996602571","https://openalex.org/W1991900549","https://openalex.org/W1978474786","https://openalex.org/W1975984439","https://openalex.org/W1530487393"],"abstract_inverted_index":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W1554322594","counts_by_year":[{"year":2023,"cited_by_count":1}],"updated_date":"2024-10-08T07:49:50.509425","created_date":"2016-06-24"}
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/6","display_name":"Clean
+          water and sanitation","score":0.74}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":36,"referenced_works":["https://openalex.org/W105515906","https://openalex.org/W1515075543","https://openalex.org/W1565240752","https://openalex.org/W1565691495","https://openalex.org/W1571455001","https://openalex.org/W1578742674","https://openalex.org/W1581359855","https://openalex.org/W1587806072","https://openalex.org/W1589479912","https://openalex.org/W1590103084","https://openalex.org/W1799674254","https://openalex.org/W1849424407","https://openalex.org/W1967044424","https://openalex.org/W1971827843","https://openalex.org/W1986659402","https://openalex.org/W1989790643","https://openalex.org/W1990052170","https://openalex.org/W1998706402","https://openalex.org/W1999881926","https://openalex.org/W2002978594","https://openalex.org/W2003479580","https://openalex.org/W2005601978","https://openalex.org/W2006822851","https://openalex.org/W2017379977","https://openalex.org/W2023180351","https://openalex.org/W2024117678","https://openalex.org/W2055799504","https://openalex.org/W2095100183","https://openalex.org/W2095873332","https://openalex.org/W2154061135","https://openalex.org/W2165898505","https://openalex.org/W2179092050","https://openalex.org/W2411439573","https://openalex.org/W2418888804","https://openalex.org/W91326892","https://openalex.org/W955725593"],"related_works":["https://openalex.org/W2327133413","https://openalex.org/W2122752058","https://openalex.org/W2072464466","https://openalex.org/W2062221185","https://openalex.org/W2044979688","https://openalex.org/W1996602571","https://openalex.org/W1991900549","https://openalex.org/W1978474786","https://openalex.org/W1975984439","https://openalex.org/W1530487393"],"abstract_inverted_index":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W1554322594","counts_by_year":[{"year":2023,"cited_by_count":1}],"updated_date":"2024-10-18T04:09:30.104891","created_date":"2016-06-24"}
 
           '
       headers:
         Access-Control-Allow-Credentials:
           - "true"
         Access-Control-Allow-Headers:
-          - Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+          - Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Authorization,
+            Cache-Control
         Access-Control-Allow-Methods:
           - POST, GET, OPTIONS, PUT, DELETE, PATCH
         Access-Control-Allow-Origin:
@@ -145,21 +160,21 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3191"
+          - "3185"
         Content-Security-Policy:
           - default-src 'self'; object-src 'none'
         Content-Type:
           - application/json
         Date:
-          - Wed, 09 Oct 2024 21:24:15 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728509055&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=gQEk%2BVESM8x9RqL0xLIkjRwdZT9gpCBNJD3fZ8kUccE%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1731107837&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ZIRBb24HewjZVtKGsZ7ujli7BbeExRdtzRmMlnaDchg%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1728509055&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=gQEk%2BVESM8x9RqL0xLIkjRwdZT9gpCBNJD3fZ8kUccE%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1731107837&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ZIRBb24HewjZVtKGsZ7ujli7BbeExRdtzRmMlnaDchg%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -183,62 +198,48 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=example@papercrow.ai
     response:
       body:
         string:
-          '{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
-          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
-          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
-          "title": "An essential role of active site arginine residue in iodide binding
-          and histidine residue in electron transfer for iodide oxidation by horseradish
-          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
-          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
-          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
-          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
-          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
-          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
-          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
-          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
-          of active site arginine residue in iodide binding and histidine residue in
-          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
-          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
-          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
-          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
-          Banerjee"}]}
-
-          '
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,1,21]],"date-time":"2024-01-21T17:53:48Z","timestamp":1705859628791},"reference-count":0,"publisher":"Springer
+          Science and Business Media LLC","issue":"1\/2","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2001]]},"DOI":"10.1023\/a:1007154515475","type":"journal-article","created":{"date-parts":[[2002,12,22]],"date-time":"2002-12-22T09:07:15Z","timestamp":1040548035000},"page":"1-11","source":"Crossref","is-referenced-by-count":6,"title":[],"prefix":"10.1007","volume":"218","author":[{"given":"Subrata","family":"Adak","sequence":"first","affiliation":[]},{"given":"Debashis","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Uday","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Ranajit
+          K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"297","container-title":["Molecular
+          and Cellular Biochemistry"],"original-title":[],"deposited":{"date-parts":[[2012,12,27]],"date-time":"2012-12-27T23:10:34Z","timestamp":1356649834000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1023\/A:1007154515475"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2001]]},"references-count":0,"journal-issue":{"issue":"1\/2"},"alternative-id":["271450"],"URL":"http:\/\/dx.doi.org\/10.1023\/a:1007154515475","relation":{},"ISSN":["0300-8177"],"issn-type":[{"value":"0300-8177","type":"print"}],"subject":[],"published":{"date-parts":[[2001]]}}}'
       headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
         Access-Control-Allow-Origin:
           - "*"
+        Access-Control-Expose-Headers:
+          - Link
         Connection:
-          - keep-alive
+          - close
+        Content-Encoding:
+          - gzip
         Content-Length:
-          - "1446"
+          - "762"
         Content-Type:
           - application/json
         Date:
-          - Wed, 09 Oct 2024 21:24:16 GMT
-        Via:
-          - 1.1 771001bf23680c4bf66e77caba3ceaba.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - ttXgpHW2Lzw-WxELh-gNsxmSC9EVRfvm6MrMKK--1gwFtcJ-Gf7K-g==
-        X-Amz-Cf-Pop:
-          - SFO53-C1
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - fZsj_HuovHcEP3Q=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1446"
-        x-amzn-Remapped-Date:
-          - Wed, 09 Oct 2024 21:24:16 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - dd5305d8-7639-43d7-851d-3eb948891738
+          - Fri, 08 Nov 2024 23:17:17 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
       status:
         code: 200
         message: OK
@@ -266,7 +267,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Wed, 09 Oct 2024 21:24:16 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -322,13 +323,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 09 Oct 2024 21:24:22 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1728509055&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=gDz9HIEzgdHMTCN6ewbBXfnrmRiTmxST7USYD%2BhInQA%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1731107837&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2F052tL2z%2BdNzdHoagC3cvjHVq4tmR4dL6T%2F3i5Ta%2FHY%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1728509055&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=gDz9HIEzgdHMTCN6ewbBXfnrmRiTmxST7USYD%2BhInQA%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1731107837&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2F052tL2z%2BdNzdHoagC3cvjHVq4tmR4dL6T%2F3i5Ta%2FHY%3D
         Server:
           - gunicorn
         Vary:

@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5627,"items":[{"DOI":"10.1038\/s42256-024-00832-8","author":[{"given":"Andres","family":"M.
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5685,"items":[{"DOI":"10.1038\/s42256-024-00832-8","author":[{"given":"Andres","family":"M.
           Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
           D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"title":["Augmenting
           large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
@@ -28,7 +28,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:15 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -64,7 +64,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 175.6079}]}
+          "P. Schwaller"}], "matchScore": 176.3838}]}
 
           '
       headers:
@@ -77,27 +77,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:16 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         Via:
-          - 1.1 83a6f42adff040301dd9cde8ff611a9c.cloudfront.net (CloudFront)
+          - 1.1 edc643c7c426bec36e205453aa531064.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - WhVemdZvVP6fiiZFX4qosTdC61ODR123T2uIjvFPhN_tb85BpyXV6A==
+          - T5_1MUB4qtA4IwcYE0JpsGhKd0xoaJu7JbRWSSH4vKKnlr2YD92B9g==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTiQGFnvHcEjAQ=
+          - A81PoE_wPHcEGcQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "683"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:16 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 8a5d87f9-7c21-4fa0-91f0-af209ee568db
+          - 36d028ac-aad8-4ea1-81fc-4a8418794225
       status:
         code: 200
         message: OK
@@ -122,7 +122,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 07 Oct 2024 01:01:16 GMT
+          - Fri, 08 Nov 2024 23:17:18 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -154,7 +154,7 @@ interactions:
           {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 178.801}]}
+          "matchScore": 176.78436}]}
 
           '
       headers:
@@ -163,31 +163,74 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "346"
+          - "348"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:17 GMT
+          - Fri, 08 Nov 2024 23:17:18 GMT
         Via:
-          - 1.1 01dbe7e23991a177a7cdfba5803db41c.cloudfront.net (CloudFront)
+          - 1.1 30dc54066252ce01682df0394718d89c.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - CbmhN1twyoc7MFlRLT_DVL0OEH-i1HcmIT2In0hi3nkLYpQiR1A3nQ==
+          - UZKJXNrbmrbKcWB8tztZbO13FTgIjNaLAABz6ZI2mWRCkYh8sOJqGg==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTilEv-PHcEg_A=
+          - A81P0FzfPHcEvjg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "346"
+          - "348"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:17 GMT
+          - Fri, 08 Nov 2024 23:17:18 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 99254890-5438-459b-af88-362ea87cf6f4
+          - 3d98445c-a2c4-4bb1-9113-c94291ca5603
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2335032,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 08 Nov 2024 23:17:18 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
       status:
         code: 200
         message: OK
@@ -212,7 +255,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 07 Oct 2024 01:01:17 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -236,49 +279,6 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2315786,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
-          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 07 Oct 2024 01:01:20 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
       uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
     response:
       body:
@@ -287,7 +287,7 @@ interactions:
           {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 175.6079}]}
+          "matchScore": 176.3838}]}
 
           '
       headers:
@@ -300,27 +300,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         Via:
-          - 1.1 acc85cd7bb80090b1fc6f29cede93766.cloudfront.net (CloudFront)
+          - 1.1 97354ec70bdda7ac06cc29aed9bfdb3c.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - w-bQyANGEuO6I37ohePkap1nZwMzYfMjgTk8EeQxiFbaRCWd-RYf8Q==
+          - kCkzT-Z_OrlxyTcaTbwzbRfbog0h6ZhyjHvo4Ntxdp5h6YJm3BdkAg==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTjKF83PHcEG2g=
+          - A81P8G9gPHcEWfg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "347"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 863e3900-2c6a-468e-854e-cd3c5f2fa198
+          - 98df1a22-6b0a-4ac5-8e4c-e39d4bd6d6df
       status:
         code: 200
         message: OK
@@ -332,7 +332,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2315786,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2335032,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
           large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
@@ -347,7 +347,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -388,7 +388,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:19 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -430,27 +430,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Via:
-          - 1.1 a0fdc0fd69b93d134cd1b726f68c77b4.cloudfront.net (CloudFront)
+          - 1.1 97354ec70bdda7ac06cc29aed9bfdb3c.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 9n3O8pYVq6Q7CTYM3oyFW8G_nxTWu_8oCLMydqhyzrEn9cIH-y7JaQ==
+          - 3dSXXZLF93hef9phZr69scS0dnaih_zqvJL7mVSBmfCoAncIPiNsFA==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQTjTEAlvHcER_g=
+          - A81QEHnMvHcEQJw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "197"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 490eeed4-164a-40ec-b244-df64c844e97f
+          - 12e9dad4-3121-4f54-944c-e6b8d2acb998
       status:
         code: 200
         message: OK
@@ -489,7 +489,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:21 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -532,7 +532,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Mon, 07 Oct 2024 01:01:22 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -575,7 +575,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Mon, 07 Oct 2024 01:01:22 GMT
+          - Fri, 08 Nov 2024 23:17:20 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

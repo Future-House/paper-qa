@@ -3,6 +3,49 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2335032,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 08 Nov 2024 23:17:17 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
     response:
       body:
@@ -11,7 +54,7 @@ interactions:
           {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 175.6079}]}
+          "matchScore": 176.78436}]}
 
           '
       headers:
@@ -20,31 +63,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "347"
+          - "348"
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:11 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         Via:
-          - 1.1 68914922a694954838e87fc9b0aa10fe.cloudfront.net (CloudFront)
+          - 1.1 0cb53c06b4d3d66446893feb6331dc78.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - -duX8MoPsSQJ-a7QgIS0Q9zsmjr4Qxqj4tw6RDuLjUWMpzhk9NAS1Q==
+          - yaiXz_Uo8E2FWzeCDDWlOpCOJRJXc7HDlaP2ixGuw7SNvEBR03g14w==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - fQThoHPDvHcEVbg=
+          - A81PoGAmPHcEUyQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "347"
+          - "348"
         x-amzn-Remapped-Date:
-          - Mon, 07 Oct 2024 01:01:11 GMT
+          - Fri, 08 Nov 2024 23:17:17 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 54723c6e-4b8a-4023-ac5b-64906fac2b09
+          - 8292cd13-397d-4762-8e0b-5dae49cc7819
       status:
         code: 200
         message: OK
@@ -69,7 +112,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 07 Oct 2024 01:01:11 GMT
+          - Fri, 08 Nov 2024 23:17:18 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -89,47 +132,4 @@ interactions:
       status:
         code: 404
         message: Not Found
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2315786,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
-          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 07 Oct 2024 01:01:12 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
 version: 1
