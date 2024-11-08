@@ -104,3 +104,4 @@ repos:
           - tiktoken>=0.4.0 # Match pyproject.toml
           - types-setuptools
           - types-PyYAML
+          - sentence-transformers
