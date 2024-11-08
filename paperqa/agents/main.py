@@ -349,9 +349,13 @@ async def run_ldp_agent(
                 )
             ],
         )
-        await rollout_manager.sample_trajectories(
+        trajs = await rollout_manager.sample_trajectories(
             environments=[env], max_steps=query.settings.agent.max_timesteps
         )
+        traj = trajs[0]
+        if traj.steps[-1].truncated:
+            nonlocal status
+            status = AgentStatus.TRUNCATED
 
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
