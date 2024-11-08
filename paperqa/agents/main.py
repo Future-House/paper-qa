@@ -184,13 +184,16 @@ async def run_fake_agent(
         if on_env_step_callback:
             await on_env_step_callback(obs, reward, done, truncated)
 
-    # Seed docs with a few keyword searches
-    for search in await litellm_get_search_query(
-        question, llm=query.settings.get_llm(), count=3
-    ):
-        await step(search_tool, query=search, min_year=None, max_year=None)
-    await step(gather_evidence_tool, question=question)
-    await step(generate_answer_tool, question=question)
+    async def rollout() -> None:
+        # Seed docs with a few keyword searches
+        for search in await litellm_get_search_query(
+            question, llm=query.settings.get_llm(), count=3
+        ):
+            await step(search_tool, query=search, min_year=None, max_year=None)
+        await step(gather_evidence_tool, question=question)
+        await step(generate_answer_tool, question=question)
+
+    await rollout()
     return env.state.session, AgentStatus.SUCCESS
 
 
@@ -209,63 +212,68 @@ async def run_aviary_agent(
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
-    done = False
+    status = AgentStatus.SUCCESS
+
+    async def rollout() -> None:
+        obs, tools = await env.reset()
+        if on_env_reset_callback:
+            await on_env_reset_callback(env.state)
+
+        agent_state = ToolSelectorLedger(
+            messages=(
+                [
+                    Message(
+                        role="system",
+                        content=query.settings.agent.agent_system_prompt,
+                    )
+                ]
+                if query.settings.agent.agent_system_prompt
+                else []
+            ),
+            tools=tools,
+        )
+
+        timestep, max_timesteps = 0, query.settings.agent.max_timesteps
+        done = False
+        while not done:
+            if max_timesteps is not None and timestep >= max_timesteps:
+                logger.warning(
+                    f"Agent didn't finish within {max_timesteps} timesteps, just"
+                    " answering."
+                )
+                generate_answer_tool = next(
+                    filter(
+                        lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME,
+                        env.tools,
+                    )
+                )
+                await generate_answer_tool._tool_fn(
+                    question=query.query, state=env.state
+                )
+                nonlocal status
+                status = AgentStatus.TRUNCATED
+                return
+            agent_state.messages += obs
+            for attempt in Retrying(
+                stop=stop_after_attempt(5),
+                retry=retry_if_exception_type(MalformedMessageError),
+                before_sleep=before_sleep_log(logger, logging.WARNING),
+                reraise=True,
+            ):
+                with attempt:  # Retrying if ToolSelector fails to select a tool
+                    action = await agent(agent_state.messages, tools)
+            agent_state.messages = [*agent_state.messages, action]
+            if on_agent_action_callback:
+                await on_agent_action_callback(action, agent_state)
+
+            obs, reward, done, truncated = await env.step(action)
+            if on_env_step_callback:
+                await on_env_step_callback(obs, reward, done, truncated)
+            timestep += 1
 
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
-            obs, tools = await env.reset()
-            if on_env_reset_callback:
-                await on_env_reset_callback(env.state)
-
-            agent_state = ToolSelectorLedger(
-                messages=(
-                    [
-                        Message(
-                            role="system",
-                            content=query.settings.agent.agent_system_prompt,
-                        )
-                    ]
-                    if query.settings.agent.agent_system_prompt
-                    else []
-                ),
-                tools=tools,
-            )
-
-            timestep, max_timesteps = 0, query.settings.agent.max_timesteps
-            while not done:
-                if max_timesteps is not None and timestep >= max_timesteps:
-                    logger.warning(
-                        f"Agent didn't finish within {max_timesteps} timesteps, just"
-                        " answering."
-                    )
-                    generate_answer_tool = next(
-                        filter(
-                            lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME,
-                            env.tools,
-                        )
-                    )
-                    await generate_answer_tool._tool_fn(
-                        question=query.query, state=env.state
-                    )
-                    return env.state.session, AgentStatus.TRUNCATED
-                agent_state.messages += obs
-                for attempt in Retrying(
-                    stop=stop_after_attempt(5),
-                    retry=retry_if_exception_type(MalformedMessageError),
-                    before_sleep=before_sleep_log(logger, logging.WARNING),
-                    reraise=True,
-                ):
-                    with attempt:  # Retrying if ToolSelector fails to select a tool
-                        action = await agent(agent_state.messages, tools)
-                agent_state.messages = [*agent_state.messages, action]
-                if on_agent_action_callback:
-                    await on_agent_action_callback(action, agent_state)
-
-                obs, reward, done, truncated = await env.step(action)
-                if on_env_step_callback:
-                    await on_env_step_callback(obs, reward, done, truncated)
-                timestep += 1
-            status = AgentStatus.SUCCESS
+            await rollout()
     except TimeoutError:
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
@@ -325,26 +333,29 @@ async def run_ldp_agent(
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
     env = env_class(query, docs, **env_kwargs)
+    status = AgentStatus.SUCCESS
     # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
     # has already taken place, which checks that ldp is installed
 
+    async def rollout() -> None:
+        rollout_manager = RolloutManager(
+            agent,
+            callbacks=[
+                ldp_callback_type(
+                    env,
+                    on_env_reset_callback,
+                    on_agent_action_callback,
+                    on_env_step_callback,
+                )
+            ],
+        )
+        await rollout_manager.sample_trajectories(
+            environments=[env], max_steps=query.settings.agent.max_timesteps
+        )
+
     try:
         async with asyncio.timeout(query.settings.agent.timeout):
-            rollout_manager = RolloutManager(
-                agent,
-                callbacks=[
-                    ldp_callback_type(
-                        env,
-                        on_env_reset_callback,
-                        on_agent_action_callback,
-                        on_env_step_callback,
-                    )
-                ],
-            )
-            await rollout_manager.sample_trajectories(
-                environments=[env], max_steps=query.settings.agent.max_timesteps
-            )
-            status = AgentStatus.SUCCESS
+            await rollout()
     except TimeoutError:
         logger.warning(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
