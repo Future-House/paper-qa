@@ -659,7 +659,7 @@ class DocDetails(Doc):
             return f"{base_message} {citation_message} {retract_info}"
 
         if self.citation_count is None or self.source_quality is None:
-            logger.warning("citation_count and source_quality are not set.")
+            logger.debug("citation_count and source_quality are not set.")
             return self.citation
 
         if self.source_quality_message:
