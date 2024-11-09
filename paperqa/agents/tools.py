@@ -268,11 +268,13 @@ class GenerateAnswer(NamedTool):
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
 
+    # This is not an answer to assign to the current PQASession,
+    # but a status for the agent message history
     FAILED_TO_ANSWER: ClassVar[str] = "Failed to answer question."
 
     @classmethod
-    def did_not_fail_to_answer(cls, message: str) -> bool:
-        return not message.startswith(cls.FAILED_TO_ANSWER)
+    def did_not_fail_to_answer(cls, message: str | None) -> bool:
+        return not (message or "").startswith(cls.FAILED_TO_ANSWER)
 
     async def gen_answer(self, question: str, state: EnvironmentState) -> str:
         """

@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any, Self, assert_never
 from aviary.core import (
     TASK_DATASET_REGISTRY,
     Frame,
-    Message,
+    Messages,
     TaskDataset,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -126,7 +126,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
 
     async def step(
         self, action: ToolRequestMessage
-    ) -> tuple[list[Message], float, bool, bool]:
+    ) -> tuple[Messages, float, bool, bool]:
         messages, reward, done, truncated = await super().step(action)
         if not done or not self._evaluation_from_answer:
             return messages, reward, done, truncated
