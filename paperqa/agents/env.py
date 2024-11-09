@@ -1,11 +1,12 @@
 import logging
 from copy import deepcopy
-from typing import Any, Self, cast
+from typing import Any, ClassVar, Self, cast
 
 from aviary.core import (
     Environment,
     Frame,
     Message,
+    Messages,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -169,22 +170,32 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             > self._query.settings.answer.max_answer_attempts
         )
 
+    USE_POST_PROCESSED_REWARD: ClassVar[float] = 0.0
+
     async def step(
         self, action: ToolRequestMessage
-    ) -> tuple[list[Message], float, bool, bool]:
+    ) -> tuple[Messages, float, bool, bool]:
         self.state.record_action(action)
+        if not action.tool_calls:
+            return (
+                # NOTE: don't put:
+                # - GenerateAnswer.FAILED_TO_ANSWER here because this wasn't a failure
+                # - 'cannot answer' because that information belongs in
+                #   PQASession.answer, not in the message history
+                # Let's just put a nice message about being done :)
+                [Message(content="Agent specified 0 tool calls, which means done.")],
+                self.USE_POST_PROCESSED_REWARD,
+                True,  # Matching LangChain: https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.17/libs/langchain/langchain/agents/output_parsers/openai_functions.py#L38-L77
+                False,  # Let caller determine truncations
+            )
 
         response_messages = cast(
             list[Message],
-            await self.exec_tool_calls(
-                action,
-                state=self.state,
-                handle_tool_exc=True,
-            ),
+            await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
         )
         return (
             response_messages,
-            0,  # Reward is computed in post-processing, use 0 as a placeholder
+            self.USE_POST_PROCESSED_REWARD,
             any(
                 isinstance(msg, ToolResponseMessage)
                 and msg.name == GenerateAnswer.gen_answer.__name__
@@ -192,7 +203,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 for msg in response_messages
             )
             or self._has_excess_answer_failures(),
-            False,
+            False,  # Let caller determine truncations
         )
 
     def __deepcopy__(self, memo) -> Self:
