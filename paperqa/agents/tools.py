@@ -268,6 +268,8 @@ class GenerateAnswer(NamedTool):
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
 
+    # This is not an answer to assign to the current PQASession,
+    # but a status for the agent message history
     FAILED_TO_ANSWER: ClassVar[str] = "Failed to answer question."
 
     @classmethod
