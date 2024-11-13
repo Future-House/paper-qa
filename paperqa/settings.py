@@ -44,6 +44,8 @@ from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
+    agent_env_prompt,
+    agent_system_prompt,
     citation_prompt,
     default_system_prompt,
     qa_prompt,
@@ -443,23 +445,11 @@ class AgentSettings(BaseModel):
         default=None,
         description="Optional kwarg for AGENT constructor",
     )
-
     agent_system_prompt: str | None = Field(
-        # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215
-        default="You are a helpful AI assistant.",
+        default=agent_system_prompt,
         description="Optional system prompt message to precede the below agent_prompt.",
     )
-
-    # TODO: make this prompt more minimalist, instead improving tool descriptions so
-    # how to use them together can be intuited, and exposing them for configuration
-    agent_prompt: str = (
-        "Use the tools to answer the question: {question}\n\nThe {gen_answer_tool_name}"
-        " tool output is visible to the user, so you do not need to restate the answer"
-        " and can simply terminate if the answer looks sufficient. If the answer does"
-        " not look sufficient, and you have already tried to answer several times, you"
-        " can terminate the question by specifying 0 tool calls."
-        " The current status of evidence/papers/cost is {status}"
-    )
+    agent_prompt: str = agent_env_prompt
     return_paper_metadata: bool = Field(
         default=False,
         description=(

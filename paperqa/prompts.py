@@ -77,6 +77,21 @@ Provide a summary of the relevant information that could help answer the questio
 where `summary` is relevant information from text - {summary_length} words and `relevance_score` is the relevance of `summary` to answer question (out of 10).
 """  # noqa: E501
 
+agent_system_prompt = (
+    # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215
+    "Optional system prompt message to precede the below agent_prompt."
+)
+agent_env_prompt = (
+    "Use the tools to answer the question: {question}"
+    "\n\nThe {gen_answer_tool_name} tool output is visible to the user,"
+    " so you do not need to restate the answer"
+    " and can simply terminate if the answer looks sufficient."
+    " If the answer does not look sufficient,"
+    " and you have already tried to answer several times,"
+    " you can terminate the question by specifying 0 tool calls."
+    " The current status of evidence/papers/cost is {status}"
+)
+
 # Prompt templates for use with LitQA
 QA_PROMPT_TEMPLATE = "Q: {question}\n\nOptions:\n{options}"
 EVAL_PROMPT_TEMPLATE = (
