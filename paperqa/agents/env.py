@@ -15,7 +15,7 @@ from aviary.core import (
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import PQASession, check_could_not_answer
+from paperqa.types import PQASession
 from paperqa.utils import get_year
 
 from .models import QueryRequest
@@ -40,9 +40,9 @@ def settings_to_tools(
     embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
 ) -> list[Tool]:
     """
-    Convert a Settings into tools, confirming the gen_answer tool is present.
+    Convert a Settings into tools, confirming the complete tool is present.
 
-    NOTE: the last element of the return will always be GenerateAnswer.
+    NOTE: the last element of the return will always be Complete.
     """
     llm_model = llm_model or settings.get_llm()
     summary_llm_model = summary_llm_model or settings.get_summary_llm()
@@ -87,7 +87,7 @@ def settings_to_tools(
             tool = Tool.from_function(Complete().complete)
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
-        if tool.info.name == GenerateAnswer.gen_answer.__name__:
+        if tool.info.name == Complete.complete.__name__:
             tools.append(tool)  # Place at the end
         else:
             tools.insert(0, tool)
@@ -145,7 +145,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                     content=self._query.settings.agent.agent_prompt.format(
                         question=self.state.session.question,
                         status=self.state.status,
-                        gen_answer_tool_name=GenerateAnswer.TOOL_FN_NAME,
+                        complete_tool_name=Complete.TOOL_FN_NAME,
                     ),
                 )
             ],
@@ -195,8 +195,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             self.USE_POST_PROCESSED_REWARD,
             any(
                 isinstance(msg, ToolResponseMessage)
-                and msg.name == GenerateAnswer.gen_answer.__name__
-                and not check_could_not_answer(msg.content)
+                and msg.name == Complete.complete.__name__
                 for msg in response_messages
             )
             or self._has_excess_answer_failures(),

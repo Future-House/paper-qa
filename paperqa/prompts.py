@@ -83,12 +83,11 @@ env_system_prompt = (
 )
 env_reset_prompt = (
     "Use the tools to answer the question: {question}"
-    "\n\nThe {gen_answer_tool_name} tool output is visible to the user,"
-    " so you do not need to restate the answer"
-    " and can simply terminate if the answer looks sufficient."
+    "\n\nWhen the answer looks sufficient,"
+    " you can terminate by calling the {complete_tool_name} tool."
     " If the answer does not look sufficient,"
     " and you have already tried to answer several times,"
-    " you can terminate the question by specifying 0 tool calls."
+    " you can terminate by calling the {complete_tool_name} tool."
     " The current status of evidence/papers/cost is {status}"
 )
 

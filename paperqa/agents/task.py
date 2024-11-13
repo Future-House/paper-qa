@@ -50,7 +50,7 @@ from paperqa.types import PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .models import QueryRequest
-from .tools import GenerateAnswer
+from .tools import Complete
 
 if TYPE_CHECKING:
     from ldp.data_structures import Trajectory
@@ -266,13 +266,14 @@ class LitQATaskDataset(
                 split_answers
                 for split_answers in (
                     re.split(
-                        pattern=GenerateAnswer.ANSWER_SPLIT_REGEX_PATTERN,
+                        pattern=Complete.ANSWER_SPLIT_REGEX_PATTERN,
                         string=obs.content,
+                        maxsplit=1,
                     )
                     for obs in t.steps[-1].next_observation
                     if (
                         isinstance(obs, ToolResponseMessage)
-                        and obs.name == GenerateAnswer.TOOL_FN_NAME
+                        and obs.name == Complete.TOOL_FN_NAME
                     )
                 )
                 # Filter for places where the regex split succeeded
@@ -284,7 +285,7 @@ class LitQATaskDataset(
             ):
                 metric_list.append(  # Use mean to allow for multiple answers
                     sum(int(sa[i]) for sa in split_answers) / len(split_answers)
-                    if split_answers  # Avoid div0 (when no answer was made)
+                    if split_answers  # Avoid div0 (when complete wasn't called)
                     else 0
                 )
         return super().compute_trajectory_metrics(trajectories) | {

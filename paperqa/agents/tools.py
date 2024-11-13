@@ -324,6 +324,7 @@ class GenerateAnswer(NamedTool):
 
         return f"{answer} | {status}"
 
+    # Use to separate answer from status
     # NOTE: can match failure to answer or an actual answer
     ANSWER_SPLIT_REGEX_PATTERN: ClassVar[str] = (
         r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
@@ -343,7 +344,12 @@ class GenerateAnswer(NamedTool):
 class Complete(NamedTool):
     TOOL_FN_NAME = "complete"
 
-    async def complete(self, state: EnvironmentState) -> None:
+    # Use to separate answer from status
+    ANSWER_SPLIT_REGEX_PATTERN: ClassVar[str] = (
+        r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
+    )
+
+    async def complete(self, state: EnvironmentState) -> str:
         """
         Terminate using the last proposed answer.
 
@@ -352,6 +358,9 @@ class Complete(NamedTool):
         Args:
             state: Current state.
         """
+        logger.info(f"Completing '{state.session.question}'.")
+        # Return answer and status to simplify postprocessing of tool response
+        return f"{state.session.answer} | {state.status}"
 
 
 AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
