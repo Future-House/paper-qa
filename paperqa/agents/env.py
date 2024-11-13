@@ -173,23 +173,11 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self, action: ToolRequestMessage
     ) -> tuple[Messages, float, bool, bool]:
         self.state.record_action(action)
-        if not action.tool_calls:
-            return (
-                # NOTE: don't put:
-                # - GenerateAnswer.FAILED_TO_ANSWER here because this wasn't a failure
-                # - 'cannot answer' because that information belongs in
-                #   PQASession.answer, not in the message history
-                # Let's just put a nice message about being done :)
-                [Message(content="Agent specified 0 tool calls, which means done.")],
-                self.USE_POST_PROCESSED_REWARD,
-                True,  # Matching LangChain: https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.17/libs/langchain/langchain/agents/output_parsers/openai_functions.py#L38-L77
-                False,  # Let caller determine truncations
-            )
 
         response_messages = cast(
             list[Message],
             await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
-        )
+        ) or [Message(content=f"No tool calls input in tool request {action}.")]
         return (
             response_messages,
             self.USE_POST_PROCESSED_REWARD,

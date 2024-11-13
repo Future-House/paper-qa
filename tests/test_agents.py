@@ -814,9 +814,8 @@ class TestGradablePaperQAEnvironment:
         obs, _, done, truncated = await env.step(ToolRequestMessage())
         assert len(obs) == 1
         assert obs[0].content
-        assert not check_could_not_answer(obs[0].content)
-        assert "0 tool calls" in obs[0].content
-        assert done
+        assert "no tool calls" in obs[0].content.lower()
+        assert not done
         assert not truncated
 
     @pytest.mark.asyncio
