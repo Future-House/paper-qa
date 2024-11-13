@@ -709,6 +709,7 @@ class Docs(BaseModel):
             not answer_config.evidence_detailed_citations
             and "\nFrom {citation}" in context_inner_prompt
         ):
+            # Only keep "\nFrom {citation}" if we are showing detailed citations
             context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
 
         inner_context_strs = [
