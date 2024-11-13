@@ -61,7 +61,7 @@ async def litellm_get_search_query(
     result = await model.run_prompt(
         prompt=search_prompt,
         data={"question": question, "count": count},
-        skip_system=True,
+        system_prompt=None,
     )
     search_query = result.text
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004

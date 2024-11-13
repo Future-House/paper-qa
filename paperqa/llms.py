@@ -328,18 +328,15 @@ class LLMModel(ABC, BaseModel):
         data: dict,
         callbacks: list[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
+        system_prompt: str | None = default_system_prompt,
     ) -> LLMResult:
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type()
         if self.llm_type == "chat":
-            return await self._run_chat(
-                prompt, data, callbacks, name, skip_system, system_prompt
-            )
+            return await self._run_chat(prompt, data, callbacks, name, system_prompt)
         if self.llm_type == "completion":
             return await self._run_completion(
-                prompt, data, callbacks, name, skip_system, system_prompt
+                prompt, data, callbacks, name, system_prompt
             )
         raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
 
@@ -349,8 +346,7 @@ class LLMModel(ABC, BaseModel):
         data: dict,
         callbacks: list[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
+        system_prompt: str | None = default_system_prompt,
     ) -> LLMResult:
         """Run a chat prompt.
 
@@ -359,20 +355,18 @@ class LLMModel(ABC, BaseModel):
             data: Keys for the input variables that will be formatted into prompt.
             callbacks: Optional functions to call with each chunk of the completion.
             name: Optional name for the result.
-            skip_system: Set True to skip the system prompt.
-            system_prompt: System prompt to use.
+            system_prompt: System prompt to use, or None/empty string to not use one.
 
         Returns:
             Result of the chat.
         """
-        system_message_prompt = {"role": "system", "content": system_prompt}
         human_message_prompt = {"role": "user", "content": prompt}
         messages = [
             {"role": m["role"], "content": m["content"].format(**data)}
             for m in (
-                [human_message_prompt]
-                if skip_system
-                else [system_message_prompt, human_message_prompt]
+                [{"role": "system", "content": system_prompt}, human_message_prompt]
+                if system_prompt
+                else [human_message_prompt]
             )
         ]
         result = LLMResult(
@@ -425,8 +419,7 @@ class LLMModel(ABC, BaseModel):
         data: dict,
         callbacks: Iterable[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
+        system_prompt: str | None = default_system_prompt,
     ) -> LLMResult:
         """Run a completion prompt.
 
@@ -435,14 +428,13 @@ class LLMModel(ABC, BaseModel):
             data: Keys for the input variables that will be formatted into prompt.
             callbacks: Optional functions to call with each chunk of the completion.
             name: Optional name for the result.
-            skip_system: Set True to skip the system prompt.
-            system_prompt: System prompt to use.
+            system_prompt: System prompt to use, or None/empty string to not use one.
 
         Returns:
             Result of the completion.
         """
         formatted_prompt: str = (
-            prompt if skip_system else system_prompt + "\n\n" + prompt
+            system_prompt + "\n\n" + prompt if system_prompt else prompt
         ).format(**data)
         result = LLMResult(
             model=self.name,
