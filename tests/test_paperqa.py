@@ -423,7 +423,7 @@ async def test_chain_completion() -> None:
     completion = await llm.run_prompt(
         prompt="The {animal} says",
         data={"animal": "duck"},
-        skip_system=True,
+        system_prompt=None,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -432,7 +432,7 @@ async def test_chain_completion() -> None:
     assert str(completion) == "".join(outputs)
 
     completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -453,7 +453,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     completion = await llm.run_prompt(
         prompt="The {animal} says",
         data={"animal": "duck"},
-        skip_system=True,
+        system_prompt=None,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -464,7 +464,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert completion.cost > 0
 
     completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0

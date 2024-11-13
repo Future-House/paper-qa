@@ -276,7 +276,7 @@ class Docs(BaseModel):
             result = await llm_model.run_prompt(
                 prompt=parse_config.citation_prompt,
                 data={"text": texts[0].text},
-                skip_system=True,  # skip system because it's too hesitant to answer
+                system_prompt=None,  # skip system because it's too hesitant to answer
             )
             citation = result.text
             if (
@@ -313,7 +313,7 @@ class Docs(BaseModel):
             result = await llm_model.run_prompt(
                 prompt=parse_config.structured_citation_prompt,
                 data={"citation": citation},
-                skip_system=True,
+                system_prompt=None,
             )
             # This code below tries to isolate the JSON
             # based on observed messages from LLMs
