@@ -48,7 +48,6 @@
     "search_count": 12,
     "wipe_context_on_answer_failure": true,
     "timeout": 500.0,
-    "should_pre_search": false,
     "tool_names": null
   }
 }
