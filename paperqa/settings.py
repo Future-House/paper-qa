@@ -563,6 +563,18 @@ class AgentSettings(BaseModel):
                 setattr(self.index, new_name, value)  # Propagate to new location
         return self
 
+    @field_validator("should_pre_search")
+    @classmethod
+    def _deprecated_should_pre_search(cls, value: bool) -> bool:
+        if value:  # Default is False, so we only warn if it's True
+            warnings.warn(
+                "The 'should_pre_search' field is dead code, and will be"
+                " removed in version 6.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+        return value
+
 
 def make_default_litellm_model_list_settings(
     llm: str, temperature: float = 0.0
