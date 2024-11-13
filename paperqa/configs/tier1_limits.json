@@ -1,7 +1,6 @@
 {
   "answer": {
     "evidence_k": 5,
-    "evidence_detailed_citations": false,
     "evidence_summary_length": "25 to 50 words",
     "answer_max_sources": 3,
     "answer_length": "50 to 100 words",
@@ -11,7 +10,8 @@
     "use_doc_details": false
   },
   "prompts": {
-    "use_json": true
+    "use_json": true,
+    "context_inner": "{name}: {text}"
   },
   "llm_config": {
     "rate_limit": {

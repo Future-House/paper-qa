@@ -43,6 +43,7 @@ from paperqa.agents.tools import (
     make_status,
 )
 from paperqa.docs import Docs
+from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
@@ -381,8 +382,8 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     agent_test_settings.answer.answer_length = "400 words"
     agent_test_settings.prompts.pre = None
     agent_test_settings.prompts.system = "End all responses with ###"
+    agent_test_settings.prompts.context_inner = CONTEXT_INNER_PROMPT_NOT_DETAILED
     agent_test_settings.answer.evidence_skip_summary = True
-    agent_test_settings.answer.evidence_detailed_citations = False
 
     query = QueryRequest(
         query="What is is a self-explanatory model?", settings=agent_test_settings

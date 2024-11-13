@@ -102,4 +102,5 @@ EVAL_PROMPT_TEMPLATE = (
 )
 
 CONTEXT_OUTER_PROMPT = "{context_str}\n\nValid Keys: {valid_keys}"
-CONTEXT_INNER_PROMPT = "{name}: {text}\nFrom {citation}"
+CONTEXT_INNER_PROMPT_NOT_DETAILED = "{name}: {text}"
+CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"

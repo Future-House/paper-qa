@@ -1128,9 +1128,9 @@ def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
 
 
 def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
-
     # TODO: delete this test in v6
     settings = Settings.from_name("fast")
+    # NOTE: this bypasses DeprecationWarning, as the warning is done on construction
     settings.answer.evidence_detailed_citations = False
     docs = Docs()
     docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
@@ -1144,9 +1144,13 @@ def test_case_insensitive_matching():
     assert strings_similarity("A B c d e", "a b c f") == 0.5
 
 
-def test_answer_rename():
+def test_answer_rename(recwarn) -> None:
+    # TODO: delete this test in v6
     answer = Answer(question="")
     assert isinstance(answer, PQASession)
+    assert len(recwarn) == 1
+    warning_msg = recwarn.pop(DeprecationWarning)
+    assert "'Answer' class is deprecated" in str(warning_msg.message)
 
 
 @pytest.mark.parametrize(
