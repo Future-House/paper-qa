@@ -44,10 +44,10 @@ from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
-    agent_env_prompt,
-    agent_system_prompt,
     citation_prompt,
     default_system_prompt,
+    env_reset_prompt,
+    env_system_prompt,
     qa_prompt,
     select_paper_prompt,
     structured_citation_prompt,
@@ -446,10 +446,10 @@ class AgentSettings(BaseModel):
         description="Optional kwarg for AGENT constructor",
     )
     agent_system_prompt: str | None = Field(
-        default=agent_system_prompt,
+        default=env_system_prompt,
         description="Optional system prompt message to precede the below agent_prompt.",
     )
-    agent_prompt: str = agent_env_prompt
+    agent_prompt: str = env_reset_prompt
     return_paper_metadata: bool = Field(
         default=False,
         description=(
