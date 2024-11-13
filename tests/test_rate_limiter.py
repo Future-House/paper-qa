@@ -165,7 +165,7 @@ async def test_rate_limit_on_run_prompt(
         3,
         prompt="The {animal} says",
         data={"animal": "duck"},
-        skip_system=True,
+        system_prompt=None,
         callbacks=[accum],
     )
 
@@ -192,7 +192,7 @@ async def test_rate_limit_on_run_prompt(
         use_gather=True,
         prompt="The {animal} says",
         data={"animal": "duck"},
-        skip_system=True,
+        system_prompt=None,
         callbacks=[accum2],
     )
 
