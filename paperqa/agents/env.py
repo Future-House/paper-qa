@@ -21,6 +21,7 @@ from paperqa.utils import get_year
 from .models import QueryRequest
 from .tools import (
     AVAILABLE_TOOL_NAME_TO_CLASS,
+    Complete,
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
@@ -48,7 +49,7 @@ def settings_to_tools(
     embedding_model = embedding_model or settings.get_embedding_model()
     tools: list[Tool] = []
     for tool_type in (
-        (PaperSearch, GatherEvidence, GenerateAnswer)
+        (PaperSearch, GatherEvidence, GenerateAnswer, Complete)
         if settings.agent.tool_names is None
         else [
             AVAILABLE_TOOL_NAME_TO_CLASS[name]
@@ -82,6 +83,8 @@ def settings_to_tools(
                     embedding_model=embedding_model,
                 ).gen_answer
             )
+        elif issubclass(tool_type, Complete):
+            tool = Tool.from_function(Complete().complete)
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
         if tool.info.name == GenerateAnswer.gen_answer.__name__:

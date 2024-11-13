@@ -340,6 +340,20 @@ class GenerateAnswer(NamedTool):
         return answer
 
 
+class Complete(NamedTool):
+    TOOL_FN_NAME = "complete"
+
+    async def complete(self, state: EnvironmentState) -> None:
+        """
+        Terminate using the last proposed answer.
+
+        Do not invoke this tool in parallel with other tools or itself.
+
+        Args:
+            state: Current state.
+        """
+
+
 AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
     cls.TOOL_FN_NAME: cls
     for _, cls in inspect.getmembers(
