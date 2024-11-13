@@ -1144,9 +1144,13 @@ def test_case_insensitive_matching():
     assert strings_similarity("A B c d e", "a b c f") == 0.5
 
 
-def test_answer_rename():
+def test_answer_rename(recwarn) -> None:
+    # TODO: delete this test in v6
     answer = Answer(question="")
     assert isinstance(answer, PQASession)
+    assert len(recwarn) == 1
+    warning_msg = recwarn.pop(DeprecationWarning)
+    assert "'Answer' class is deprecated" in str(warning_msg.message)
 
 
 @pytest.mark.parametrize(
