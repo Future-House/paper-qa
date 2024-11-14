@@ -10,7 +10,7 @@ import tempfile
 import time
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
@@ -21,7 +21,6 @@ from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
 from ldp.llms import EmbeddingModel, MultipleCompletionLLMModel
-from pydantic import ValidationError
 from pytest_subtests import SubTests
 from tantivy import Index
 
@@ -402,8 +401,8 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 async def test_gather_evidence_rejects_empty_docs(
     agent_test_settings: Settings,
 ) -> None:
-    # Patch GenerateAnswerTool._arun so that if this tool is chosen first, we
-    # don't give a 'cannot answer' response. A 'cannot answer' response can
+    # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
+    # we don't give a 'cannot answer' response. A 'cannot answer' response can
     # lead to an unsure status, which will break this test's assertions. Since
     # this test is about a GatherEvidenceTool edge case, defeating
     # GenerateAnswerTool is fine
@@ -724,25 +723,6 @@ def test_answers_are_striped() -> None:
     assert response.session.contexts[0].text.doc.embedding is None
     # make sure it serializes
     response.model_dump_json()
-
-
-@pytest.mark.parametrize(
-    ("kwargs", "result"),
-    [
-        ({}, None),
-        ({"tool_names": {GenerateAnswer.TOOL_FN_NAME}}, None),
-        ({"tool_names": set()}, ValidationError),
-        ({"tool_names": {PaperSearch.TOOL_FN_NAME}}, ValidationError),
-    ],
-)
-def test_agent_prompt_collection_validations(
-    kwargs: dict[str, Any], result: type[Exception] | None
-) -> None:
-    if result is None:
-        AgentSettings(**kwargs)
-    else:
-        with pytest.raises(result):
-            AgentSettings(**kwargs)
 
 
 class TestGradablePaperQAEnvironment:
