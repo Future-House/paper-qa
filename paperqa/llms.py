@@ -19,6 +19,12 @@ from sys import version_info
 from typing import Any, TypeVar, cast
 
 import litellm
+
+import openai
+import json
+import os
+import tempfile
+
 import numpy as np
 import tiktoken
 from pydantic import (
@@ -325,7 +331,7 @@ class LLMModel(ABC, BaseModel):
     async def run_prompt(
         self,
         prompt: str,
-        data: dict,
+        data: dict | list[dict[str, str]],
         callbacks: list[Callable] | None = None,
         name: str | None = None,
         skip_system: bool = False,
@@ -760,6 +766,207 @@ class LiteLLMModel(LLMModel):
 
     def count_tokens(self, text: str) -> int:
         return litellm.token_counter(model=self.name, text=text)
+
+class OpenAIBatchLLMModel(LLMModel):
+    """A wrapper around the OpenAI library to use the batch API."""
+    name: str = "gpt-4o-mini"
+    config: dict = Field(
+        default_factory=dict,
+        description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
+        )
+
+    def write_jsonl(self, 
+                    data: list[dict[str, str]],
+                    filename: str):
+        
+        batch_template = {
+            "custom_id": None,
+            "method": "POST",
+            "url": self.config.get('endpoint'),
+            "body": {
+                "model": None,
+                "messages": None,
+                "max_tokens": None
+            }
+        }
+        with open(filename, "w") as f:
+            for i, d in enumerate(data):
+                batch_template["custom_id"] = str(i)
+                batch_template["body"]["model"] = self.config.get('model')
+                batch_template["body"]["messages"] = d
+                batch_template["body"]["max_tokens"] = self.config.get('max_tokens')
+                f.write(json.dumps(batch_template) + "\n")
+
+    @rate_limited
+    async def acomplete(self):
+        raise NotImplementedError("Only chat models are supported by openAI batch API.")
+
+    @rate_limited
+    async def acomplete_iter(self):
+        raise NotImplementedError("Async generator not supported for batch calls and nly chat models are supported by openAI batch API.")
+
+    async def _run_chat(
+        self, 
+        prompt: str,
+        data: list[dict[str,str]],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
+    ) -> list[LLMResult]:
+        if callbacks:
+            sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
+            async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+
+        system_message_prompt = {"role": "system", "content": system_prompt}
+        human_message_prompt = {"role": "user", "content": prompt}
+
+        batch = []
+        for d in data:
+            messages = [
+            {"role": m["role"], "content": m["content"].format(**d)}
+            for m in (
+                [human_message_prompt]
+                if skip_system
+                else [system_message_prompt, human_message_prompt]
+            )
+            ]
+            batch.append(messages)
+        
+        start_clock = asyncio.get_running_loop().time()
+        chunks = await self.achat(batch)
+        batch_time = asyncio.get_running_loop().time() - start_clock
+
+        if callbacks:
+            for chunk in chunks:
+                await do_callbacks(
+                        async_callbacks, sync_callbacks, chunk.text, name
+                        )
+
+        results = [
+            LLMResult(
+                model=self.name,
+                name=name,
+                prompt=messages,
+                prompt_count=chunk.prompt_tokens,
+                text=chunk.text,
+                completion_count=chunk.completion_tokens,
+                seconds_to_first_token=batch_time,
+                seconds_to_last_token=batch_time,
+            ) for messages, chunk in zip(batch, chunks)
+        ]
+
+        return results
+
+    @rate_limited
+    async def achat(self,
+        messages: list[dict[str, str]]
+    ) -> list[Chunk]:
+        client = openai.OpenAI()
+
+        with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=True) as tmp_file:
+            tmp_filename = tmp_file.name
+            self.write_jsonl(messages, tmp_filename)
+            file = client.files.create(
+                file=open(tmp_filename, "rb"),
+                purpose="batch"
+            )
+
+        batch = client.batches.create(
+            input_file_id=file.id,
+            endpoint="/v1/chat/completions",
+            completion_window="24h",
+            metadata={
+                "description": ""
+            }
+        )
+
+        while batch.status != "completed":
+            batch = client.batches.retrieve(batch.id)
+            if batch.status == "failed":
+                raise Exception("Batch failed. \n\nReason: \n" + "\n".join([k.message for k in batch.errors.data]))
+            await asyncio.sleep(5)
+
+        responses = client.files.content(batch.output_file_id)
+        response_lines = responses.read().decode('utf-8').splitlines()
+        responses = [json.loads(line) for line in response_lines]
+        sorted_responses = sorted(responses, key=lambda x: int(x["custom_id"])) # The batchAPI doesn't guarantee the order of the responses
+
+        chunks = [
+            Chunk(
+                text=response["response"]["body"]["choices"][0]["message"]["content"],
+                prompt_tokens=response["response"]["body"]["usage"]["prompt_tokens"],
+                completion_tokens=response["response"]["body"]["usage"]["completion_tokens"],
+            ) for response in sorted_responses
+        ]
+
+        return chunks
+    
+    @rate_limited
+    async def achat_iter(self):
+        raise NotImplementedError("Async generator not supported for batch calls. Use achat instead.")
+
+    def infer_llm_type(self):
+        self.config['endpoint'] = "/v1/chat/completions"
+        return "chat"
+
+    def count_tokens(self, text: str) -> int:
+        return len(text) // 4
+
+    async def check_rate_limit(self, token_count: float, **kwargs) -> None:
+        if "rate_limit" in self.config:
+            await GLOBAL_LIMITER.try_acquire(
+                ("client", self.name),
+                self.config["rate_limit"].get(self.name, None),
+                weight=max(int(token_count), 1),
+                **kwargs,
+            )
+
+
+class AnthropicBatchLLMModel(LLMModel):
+    # TODO: This class is not implemented yet.
+
+    @rate_limited
+    async def acomplete(self):
+        raise NotImplementedError("Completion models are not supported yet")
+
+    @rate_limited
+    async def acomplete_iter(self):
+        raise NotImplementedError("Completion models are not supported yet")
+    
+    async def _run_chat(sellf):
+        '''Processes the batch and call the chat completion method'''
+        ...
+
+    @rate_limited
+    async def achat(self, messages):
+        ...
+
+    @rate_limited
+    async def achat_iter(self):
+        raise NotImplementedError("support to callbacks is not implemented yet")
+
+    def infer_llm_type(self):
+        return "chat" #TODO: Support completion models
+
+    def count_tokens(self, text: str) -> int:
+        return len(text) // 4 #TODO: Check if OpenAI has a method for that. Currently it's not being used. The token usage is directly retrieved from the response.
+
+    def __getstate__(self):
+        # Prevent _router from being pickled, SEE: https://stackoverflow.com/a/2345953
+        state = super().__getstate__()
+        state["__dict__"] = state["__dict__"].copy()
+        state["__dict__"].pop("_router", None)
+        return state
+
+    async def check_rate_limit(self, token_count: float, **kwargs) -> None:
+        if "rate_limit" in self.config:
+            await GLOBAL_LIMITER.try_acquire(
+                ("client", self.name),
+                self.config["rate_limit"].get(self.name, None),
+                weight=max(int(token_count), 1),
+                **kwargs,
+            )
 
 
 def cosine_similarity(a, b):

@@ -40,7 +40,7 @@ try:
 except ImportError:
     HAS_LDP_INSTALLED = False
 
-from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
+from paperqa.llms import EmbeddingModel, LiteLLMModel, OpenAIBatchLLMModel, embedding_model_factory
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
@@ -577,6 +577,15 @@ def make_default_litellm_model_list_settings(
         ]
     }
 
+def make_default_openai_batch_llm_settings(
+    llm: str, temperature: float = 0.0
+) -> dict:
+    return {
+        "model": llm,
+        "temperature": temperature,
+        "max_tokens": 2048,
+
+    }
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
@@ -608,6 +617,10 @@ class Settings(BaseSettings):
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
             " router_kwargs key with router kwargs as values."
         ),
+    )
+    use_batch_in_summary: bool = Field(
+        default=False,
+        description="Whether to use batch API for LLMs in summarization",
     )
     embedding: str = Field(
         default="text-embedding-3-small",
@@ -793,6 +806,16 @@ class Settings(BaseSettings):
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
+        if self.use_batch_in_summary:
+            # TODO: support other LLM providers as well.
+            # TODO: Make it fail if we don't support the batchAPI for the LLM being used
+            return OpenAIBatchLLMModel(
+                name=self.summary_llm,
+                config=self.summary_llm_config
+                or make_default_openai_batch_llm_settings(
+                    self.summary_llm, self.temperature
+                ),
+            )
         return LiteLLMModel(
             name=self.summary_llm,
             config=self.summary_llm_config
