@@ -47,7 +47,6 @@ def settings_to_tools(
     summary_llm_model = summary_llm_model or settings.get_summary_llm()
     embedding_model = embedding_model or settings.get_embedding_model()
     tools: list[Tool] = []
-    has_answer_tool = False
     for tool_type in (
         (PaperSearch, GatherEvidence, GenerateAnswer)
         if settings.agent.tool_names is None
@@ -86,14 +85,9 @@ def settings_to_tools(
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
         if tool.info.name == GenerateAnswer.gen_answer.__name__:
-            tools.append(tool)
-            has_answer_tool = True
+            tools.append(tool)  # Place at the end
         else:
             tools.insert(0, tool)
-    if not has_answer_tool:
-        raise ValueError(
-            f"{GenerateAnswer.gen_answer.__name__} must be one of the tools."
-        )
     return tools
 
 
