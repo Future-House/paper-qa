@@ -118,9 +118,6 @@ class TestTaskDataset:
         task_config = TaskConfig(
             name=STUB_TASK_DATASET_NAME,
             eval_kwargs={
-                "base_query": base_query_request.model_dump(
-                    exclude={"id", "settings", "docs_name"}
-                ),
                 "base_docs": docs.model_dump(
                     exclude={
                         "id",
@@ -131,6 +128,13 @@ class TestTaskDataset:
                     }
                 ),
             },
+        )
+        # NOTE: set base_query after construction of the TaskConfig. because in
+        # aviary 0.10 the TaskConfig Pydnatic model has types `BaseModel | JsonValue`,
+        # which lead to base_query being cast into a BaseModel. This is probably a bug
+        # in aviary, but for now let's just assign it after TaskConfig construction
+        task_config.eval_kwargs["base_query"] = base_query_request.model_dump(
+            exclude={"id", "docs_name"}
         )
         dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
