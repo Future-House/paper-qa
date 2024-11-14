@@ -148,11 +148,9 @@ class TestTaskDataset:
         ), "Should not have mutated query in base request"
         assert not docs.docs, "Should not have mutated docs in base docs"
         assert (
-            isinstance(metrics_callback.eval_means["total_paper_count"], float) > 0
+            metrics_callback.eval_means["total_paper_count"] > 0
         ), "Expected some papers to help us answer questions"
-        assert (
-            isinstance(metrics_callback.eval_means["reward"], float) > 0
-        ), "Expected some wins"
+        assert metrics_callback.eval_means["reward"] > 0, "Expected some wins"
 
         with subtests.test(msg="zero-shot"):
             # Confirm we can just directly call gen_answer
