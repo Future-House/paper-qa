@@ -523,21 +523,6 @@ class AgentSettings(BaseModel):
         exclude=True,
     )
 
-    @field_validator("tool_names")
-    @classmethod
-    def validate_tool_names(cls, v: set[str] | None) -> set[str] | None:
-        if v is None:
-            return None
-        # imported here to avoid circular imports
-        from paperqa.agents.tools import GenerateAnswer
-
-        answer_tool_name = GenerateAnswer.TOOL_FN_NAME
-        if answer_tool_name not in v:
-            raise ValueError(
-                f"If using an override, must contain at least the {answer_tool_name}."
-            )
-        return v
-
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
         for deprecated_field_name, new_name in (("index_concurrency", "concurrency"),):
