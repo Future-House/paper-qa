@@ -402,8 +402,8 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 async def test_gather_evidence_rejects_empty_docs(
     agent_test_settings: Settings,
 ) -> None:
-    # Patch GenerateAnswerTool._arun so that if this tool is chosen first, we
-    # don't give a 'cannot answer' response. A 'cannot answer' response can
+    # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
+    # we don't give a 'cannot answer' response. A 'cannot answer' response can
     # lead to an unsure status, which will break this test's assertions. Since
     # this test is about a GatherEvidenceTool edge case, defeating
     # GenerateAnswerTool is fine
