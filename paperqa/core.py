@@ -115,3 +115,50 @@ async def map_fxn_summary(
         ),
         llm_result,
     )
+
+async def gather_with_batch(
+    matches: list[Text],
+    question: str,
+    prompt_runner: PromptRunner | None,
+    extra_prompt_data: dict[str, str] | None = None,
+    parser: Callable[[str], dict[str, Any]] | None = None,
+    callbacks: list[Callable[[str], None]] | None = None,
+    ) -> list[tuple[Context, LLMResult]]:
+        """Gathers a batch of results for a given text."""
+        data = [
+                {"question": question, 
+                    "citation": m.name + ": " + m.doc.formatted_citation, 
+                    "text": m.text} | 
+                    extra_prompt_data or {}
+                for m in matches
+            ]
+
+        llm_results = await prompt_runner(
+                    data,
+                    callbacks,
+                )
+
+        results_data = []
+        scores = []
+        for r in llm_results:
+            try:
+                results_data.append(parser(r.text))
+                scores.append(r.pop("relevance_score"))
+                # just in case question was present
+                r.pop("question", None)
+            except:
+                results_data.append({})
+                scores.append(extract_score(r.text))
+        
+        return [
+                    (
+                        Context(
+                            context=strip_citations(llm_result.text),
+                            text=m,
+                            model_extra={},
+                            score=score,
+                            **r,
+                        ),
+                        llm_result,
+                    ) for r, m, llm_result, score in zip(results_data, matches, llm_results, scores)
+        ]

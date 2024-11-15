@@ -11,6 +11,7 @@ from paperqa import (
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     OpenAIBatchLLMModel,
+    AnthropicBatchLLMModel,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
     embedding_model_factory,
@@ -177,7 +178,7 @@ class TestOpenAIBatchLLMModel:
         ], indirect=True
     )
     async def test_run_prompt(self, config: dict[str, Any], request) -> None:
-        llm = OpenAIBatchLLMModel(name="gpt-4o-mini", config=config)
+        llm = OpenAIBatchLLMModel(name=config['model'], config=config)
 
         data = [
             {"animal": "duck"}, 
@@ -209,6 +210,11 @@ class TestOpenAIBatchLLMModel:
             assert all([completion[k].completion_count < config['max_tokens'] for k, _ in enumerate(data)])
             assert sum([completion[k].cost for k, _ in enumerate(data)]) > 0
 
+    @pytest.mark.parametrize(
+        "config",[
+            pytest.param("gpt-4o-mini"),
+        ], indirect=True
+    )
     def test_pickling(self, tmp_path: pathlib.Path, config: dict[str,Any]) -> None:
         pickle_path = tmp_path / "llm_model.pickle"
         llm = OpenAIBatchLLMModel(
@@ -221,6 +227,37 @@ class TestOpenAIBatchLLMModel:
             rehydrated_llm = pickle.load(f)
         assert llm.name == rehydrated_llm.name
         assert llm.config == rehydrated_llm.config
+
+class TestAnthropicBatchLLMModel:
+    @pytest.fixture(scope="class")
+    def config(self, request) -> dict[str, Any]:
+        model_name = request.param
+        return {
+            "model": model_name,
+            "temperature": 0.0,
+            "max_tokens": 64,
+        }
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "config",[
+            pytest.param("claude-3-haiku-20240307", id="chat-model"),
+        ], indirect=True
+    )
+    async def test_run_prompt(self, config: dict[str, Any], request) -> None:
+        llm = AnthropicBatchLLMModel(name=config['model'], config=config)
+
+        data = [
+            {"animal": "duck"}, 
+            {"animal": "dog"}, 
+            {"animal": "cat"}
+            ]
+        
+        completion = await llm.run_prompt(
+                prompt="The {animal} says",
+                data=data,
+                skip_system=True,
+            )
 
 @pytest.mark.asyncio
 async def test_embedding_model_factory_sentence_transformer() -> None:

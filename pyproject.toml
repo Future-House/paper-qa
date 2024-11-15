@@ -88,6 +88,10 @@ typing = [
 zotero = [
     "pyzotero",
 ]
+batch = [
+    "openai",
+    "anthropic",
+]
 
 [project.scripts]
 pqa = "paperqa.agents:main"

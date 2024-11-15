@@ -16,6 +16,7 @@ from paperqa.llms import (  # noqa: E402
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     OpenAIBatchLLMModel,
+    AnthropicBatchLLMModel,
     LLMModel,
     LLMResult,
     NumpyVectorStore,
@@ -39,7 +40,8 @@ __all__ = [
     "LLMResult",
     "LiteLLMEmbeddingModel",
     "LiteLLMModel",
-    "OpenAIBatchLLMModel"
+    "OpenAIBatchLLMModel",
+    "AnthropicBatchLLMModel",
     "NumpyVectorStore",
     "PQASession",
     "QueryRequest",

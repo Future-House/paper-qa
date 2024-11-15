@@ -513,6 +513,8 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
 def test_evidence(docs_fixture, use_batch) -> None:
     debug_settings = Settings.from_name("debug")
     debug_settings.use_batch_in_summary = use_batch
+    if use_batch:
+        debug_settings.summary_llm = "gpt-3.5-turbo"
     evidence = docs_fixture.get_evidence( 
         PQASession(question="What does XAI stand for?"),
         settings=debug_settings,

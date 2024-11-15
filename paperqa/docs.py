@@ -22,7 +22,11 @@ from pydantic import (
 )
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
-from paperqa.core import llm_parse_json, map_fxn_summary
+from paperqa.core import (
+    llm_parse_json, 
+    map_fxn_summary,
+    gather_with_batch
+)
 from paperqa.llms import (
     EmbeddingModel,
     LLMModel,
@@ -604,47 +608,16 @@ class Docs(BaseModel):
 
         with set_llm_session_ids(session.id):
             if evidence_settings.use_batch_in_summary:
-                # TODO: Should we implement a `gather_with_batch` function that receives `matches` and return results to keep this dry?
-
-                data = [
-                    {"question": session.question, 
-                     "citation": m.name + ": " + m.doc.formatted_citation, 
-                     "text": m.text} | 
-                     {"summary_length": answer_config.evidence_summary_length,
-                      "citation": f"{m.name}: {m.doc.formatted_citation}", 
-                      "evidence": m.name}
-                    for m in matches
-                ]
-
-                llm_results = await prompt_runner(
-                            data,
-                            callbacks,
-                        )
-
-                results_data = []
-                scores = []
-                for r in llm_results:
-                    try:
-                        results_data.append(llm_parse_json(r.text))
-                        scores.append(r.pop("relevance_score"))
-                        # just in case question was present
-                        r.pop("question", None)
-                    except ValueError:
-                        results_data.append({})
-                        scores.append(extract_score(r.text))
-
-                results = [
-                    (
-                        Context(
-                            context=strip_citations(llm_result.text),
-                            text=m,
-                            model_extra={},
-                            score=score,
-                            **r,
-                        ),
-                        llm_result,
-                    ) for r, m, llm_result, score in zip(results_data, matches, llm_results, scores)
-                ]
+                results = await gather_with_batch(
+                    matches = matches,
+                    question = session.question,
+                    prompt_runner=prompt_runner,
+                    extra_prompt_data={
+                        "summary_length": answer_config.evidence_summary_length,
+                    },
+                    parser=llm_parse_json if prompt_config.use_json else None,
+                    callbacks=callbacks,
+                )
             else:
                 results = await gather_with_concurrency(
                     answer_config.max_concurrent_requests,

@@ -20,7 +20,6 @@ from typing import Any, TypeVar, cast
 
 import litellm
 
-import openai
 import json
 import os
 import tempfile
@@ -759,6 +758,7 @@ class LiteLLMModel(LLMModel):
     def count_tokens(self, text: str) -> int:
         return litellm.token_counter(model=self.name, text=text)
 
+
 class OpenAIBatchLLMModel(LLMModel):
     """A wrapper around the OpenAI library to use the batch API."""
     name: str = "gpt-4o-mini"
@@ -854,9 +854,17 @@ class OpenAIBatchLLMModel(LLMModel):
     async def achat(self,
         messages: list[dict[str, str]]
     ) -> list[Chunk]:
+        try:
+            import openai
+        except ImportError as exc:
+            raise ImportError(
+                "Please install paper-qa[batch] to use"
+                " OpenAIBatchLLMModel."
+            )
+
         client = openai.OpenAI()
 
-        with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=True) as tmp_file:
+        with tempfile.NamedTemporaryFile(suffix=".jsonl") as tmp_file:
             tmp_filename = tmp_file.name
             self.write_jsonl(messages, tmp_filename)
             file = client.files.create(
@@ -916,7 +924,12 @@ class OpenAIBatchLLMModel(LLMModel):
 
 
 class AnthropicBatchLLMModel(LLMModel):
-    # TODO: This class is not implemented yet.
+    """A wrapper around the anthropic library to use the batch API."""
+    name: str = "claude-3-5-sonnet-20241022"
+    config: dict = Field(
+        default_factory=dict,
+        description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
+        )
 
     @rate_limited
     async def acomplete(self):
@@ -926,13 +939,77 @@ class AnthropicBatchLLMModel(LLMModel):
     async def acomplete_iter(self):
         raise NotImplementedError("Completion models are not supported yet")
     
-    async def _run_chat(sellf):
-        '''Processes the batch and call the chat completion method'''
-        ...
+    async def _run_chat(
+        self, 
+        prompt: str,
+        data: list[dict[str,str]],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        skip_system: bool = False,
+        system_prompt: str = default_system_prompt,
+    ) -> list[LLMResult]:
+        if callbacks:
+            sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
+            async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+        
+        system_message_prompt = {"role": "system", "content": system_prompt}
+        human_message_prompt = {"role": "user", "content": prompt}
+
+        batch = []
+        for d in data:
+            messages = [
+            {"role": m["role"], "content": m["content"].format(**d)}
+            for m in (
+                [human_message_prompt]
+                if skip_system
+                else [system_message_prompt, human_message_prompt]
+            )
+            ]
+            batch.append(messages)
+        
+        start_clock = asyncio.get_running_loop().time()
+        chunks = await self.achat(batch)
+        batch_time = asyncio.get_running_loop().time() - start_clock
 
     @rate_limited
-    async def achat(self, messages):
-        ...
+    async def achat(self, messages: list[dict[str, str]]) -> list[Chunk]:
+        try:
+            import anthropic
+            from anthropic.types.beta.message_create_params import MessageCreateParamsNonStreaming
+            from anthropic.types.beta.messages.batch_create_params import Request
+        except ImportError as exc:
+            raise ImportError(
+                "Please install paper-qa[batch] to use"
+                " AnthropicBatchLLMModel."
+            )
+        
+        client = anthropic.Anthropic()
+
+        requests = [
+            Request(
+                custom_id=str(i),
+                params=MessageCreateParamsNonStreaming(
+                    model=self.config.get('model'),
+                    max_tokens=self.config.get('max_tokens'),
+                    messages=m
+                )
+            ) for i, m in enumerate(messages)
+        ]
+
+        batch = client.beta.messages.batches.create(
+            requests=requests
+        )
+
+        while batch.processing_status != "ended":
+            batch = client.beta.messages.batches.retrieve(batch.id)
+            print(batch.processing_status)
+            await asyncio.sleep(5)
+
+        responses = client.beta.messages.batches.results(batch.id)
+
+        # TODO: [WIP] Extract the completions from response. But I am having a bad time waiting for the API to return the results.
+        return 
+        
 
     @rate_limited
     async def achat_iter(self):
@@ -942,14 +1019,7 @@ class AnthropicBatchLLMModel(LLMModel):
         return "chat" #TODO: Support completion models
 
     def count_tokens(self, text: str) -> int:
-        return len(text) // 4 #TODO: Check if OpenAI has a method for that. Currently it's not being used. The token usage is directly retrieved from the response.
-
-    def __getstate__(self):
-        # Prevent _router from being pickled, SEE: https://stackoverflow.com/a/2345953
-        state = super().__getstate__()
-        state["__dict__"] = state["__dict__"].copy()
-        state["__dict__"].pop("_router", None)
-        return state
+        return len(text) // 4
 
     async def check_rate_limit(self, token_count: float, **kwargs) -> None:
         if "rate_limit" in self.config:

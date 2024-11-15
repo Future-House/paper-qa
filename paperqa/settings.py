@@ -40,7 +40,13 @@ try:
 except ImportError:
     HAS_LDP_INSTALLED = False
 
-from paperqa.llms import EmbeddingModel, LiteLLMModel, OpenAIBatchLLMModel, embedding_model_factory
+from paperqa.llms import (
+    EmbeddingModel, 
+    LiteLLMModel, 
+    OpenAIBatchLLMModel, 
+    AnthropicBatchLLMModel, 
+    embedding_model_factory
+)
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
@@ -607,7 +613,15 @@ class Settings(BaseSettings):
     )
     use_batch_in_summary: bool = Field(
         default=False,
-        description="Whether to use batch API for LLMs in summarization",
+        description=(
+            "Whether to use batch API for LLMs in summarization."
+            "This option requests a batch of summaries from the LLM on the `GatherEvidence` step."
+            "It uses all the candidate papers found in the `GatherEvidence` step"
+            "to generate a list of prompts that are formatted accordingly to the"
+            "requirements of the llm provider." 
+            "This option is only available for Claude(https://docs.anthropic.com/en/api/creating-message-batches)"
+            "and OpenAI (https://platform.openai.com/docs/guides/batch) chat models."
+        ),
     )
     embedding: str = Field(
         default="text-embedding-3-small",
@@ -794,15 +808,32 @@ class Settings(BaseSettings):
 
     def get_summary_llm(self) -> LiteLLMModel:
         if self.use_batch_in_summary:
-            # TODO: support other LLM providers as well.
-            # TODO: Make it fail if we don't support the batchAPI for the LLM being used
-            return OpenAIBatchLLMModel(
-                name=self.summary_llm,
-                config=self.summary_llm_config
-                or make_default_openai_batch_llm_settings(
-                    self.summary_llm, self.temperature
-                ),
-            )
+            import openai
+            client = openai.OpenAI()
+            openai_models = [k.id for _, k in enumerate(client.models.list().data) 
+                             if k.owned_by in ['system', "openai"]]
+            if self.summary_llm.startswith("claude-"):
+                return AnthropicBatchLLMModel(
+                    name=self.summary_llm,
+                    config=self.summary_llm_config
+                    or make_default_openai_batch_llm_settings(
+                        self.summary_llm, self.temperature
+                    ),
+                )
+            elif self.summary_llm in openai_models:
+                return OpenAIBatchLLMModel(
+                    name=self.summary_llm,
+                    config=self.summary_llm_config
+                    or make_default_openai_batch_llm_settings(
+                        self.summary_llm, self.temperature
+                    ),
+                )
+            else: 
+                raise NotImplementedError(
+                    "`use_batch_in_summary` is set to True, but the summary LLM is not supported"
+                    "for batch processing.\nEither use a Claude or an OpenAI chat model or set "
+                    "`use_batch_in_summary` to False."
+                    )
         return LiteLLMModel(
             name=self.summary_llm,
             config=self.summary_llm_config
