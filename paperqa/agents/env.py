@@ -15,7 +15,7 @@ from aviary.core import (
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import PQASession
+from paperqa.types import PQASession, check_could_not_answer
 from paperqa.utils import get_year
 
 from .models import QueryRequest
@@ -193,7 +193,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             any(
                 isinstance(msg, ToolResponseMessage)
                 and msg.name == GenerateAnswer.gen_answer.__name__
-                and GenerateAnswer.did_not_fail_to_answer(msg.content)
+                and not check_could_not_answer(msg.content)
                 for msg in response_messages
             )
             or self._has_excess_answer_failures(),

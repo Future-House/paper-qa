@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import DocDetails, PQASession
+from paperqa.types import DocDetails, PQASession, check_could_not_answer
 
 from .search import get_directory_index
 
@@ -268,27 +268,18 @@ class GenerateAnswer(NamedTool):
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
 
-    # This is not an answer to assign to the current PQASession,
-    # but a status for the agent message history
-    FAILED_TO_ANSWER: ClassVar[str] = "Failed to answer question."
-
-    @classmethod
-    def did_not_fail_to_answer(cls, message: str | None) -> bool:
-        return not (message or "").startswith(cls.FAILED_TO_ANSWER)
-
-    async def gen_answer(self, question: str, state: EnvironmentState) -> str:
+    async def gen_answer(self, state: EnvironmentState) -> str:
         """
-        Ask a model to propose an answer using current evidence.
+        Generate an answer using current evidence.
 
         The tool may fail, indicating that better or different evidence should be found.
         Aim for at least five pieces of evidence from multiple sources before invoking this tool.
         Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
 
         Args:
-            question: Question to be answered.
             state: Current state.
         """
-        logger.info(f"Generating answer for '{question}'.")
+        logger.info(f"Generating answer for '{state.session.question}'.")
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
             await asyncio.gather(
@@ -300,8 +291,6 @@ class GenerateAnswer(NamedTool):
                 )
             )
 
-        # TODO: Should we allow the agent to change the question?
-        # self.answer.question = query
         state.session = await state.docs.aquery(
             query=state.session,
             settings=self.settings,
@@ -313,13 +302,13 @@ class GenerateAnswer(NamedTool):
             ),
         )
 
-        if state.session.could_not_answer:
-            if self.settings.agent.wipe_context_on_answer_failure:
-                state.session.contexts = []
-                state.session.context = ""
-            answer = self.FAILED_TO_ANSWER
-        else:
-            answer = state.session.answer
+        if (
+            state.session.could_not_answer
+            and self.settings.agent.wipe_context_on_answer_failure
+        ):
+            state.session.contexts = []
+            state.session.context = ""
+        answer = state.session.answer
         status = state.status
         logger.info(status)
 
@@ -346,7 +335,7 @@ class GenerateAnswer(NamedTool):
         answer, *rest = re.split(
             pattern=cls.ANSWER_SPLIT_REGEX_PATTERN, string=content, maxsplit=1
         )
-        if len(rest) != 4 or not cls.did_not_fail_to_answer(answer):  # noqa: PLR2004
+        if len(rest) != 4 or check_could_not_answer(answer):  # noqa: PLR2004
             return ""
         return answer
 

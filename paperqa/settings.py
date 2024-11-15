@@ -884,12 +884,18 @@ class Settings(BaseSettings):
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
 
-MaybeSettings = Settings | str | None
+# Settings: already Settings
+# dict[str, Any]: serialized Settings
+# str: named Settings
+# None: defaulted Settings
+MaybeSettings = Settings | dict[str, Any] | str | None
 
 
 def get_settings(config_or_name: MaybeSettings = None) -> Settings:
     if isinstance(config_or_name, Settings):
         return config_or_name
+    if isinstance(config_or_name, dict):
+        return Settings.model_validate(config_or_name)
     if config_or_name is None:
         return Settings()
     return Settings.from_name(config_name=config_or_name)
