@@ -15,12 +15,13 @@ from aviary.core import (
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import PQASession, check_could_not_answer
+from paperqa.types import PQASession
 from paperqa.utils import get_year
 
 from .models import QueryRequest
 from .tools import (
     AVAILABLE_TOOL_NAME_TO_CLASS,
+    Complete,
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
@@ -39,16 +40,16 @@ def settings_to_tools(
     embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
 ) -> list[Tool]:
     """
-    Convert a Settings into tools, confirming the gen_answer tool is present.
+    Convert a Settings into tools, confirming the complete tool is present.
 
-    NOTE: the last element of the return will always be GenerateAnswer.
+    NOTE: the last element of the return will always be Complete.
     """
     llm_model = llm_model or settings.get_llm()
     summary_llm_model = summary_llm_model or settings.get_summary_llm()
     embedding_model = embedding_model or settings.get_embedding_model()
     tools: list[Tool] = []
     for tool_type in (
-        (PaperSearch, GatherEvidence, GenerateAnswer)
+        (PaperSearch, GatherEvidence, GenerateAnswer, Complete)
         if settings.agent.tool_names is None
         else [
             AVAILABLE_TOOL_NAME_TO_CLASS[name]
@@ -82,9 +83,11 @@ def settings_to_tools(
                     embedding_model=embedding_model,
                 ).gen_answer
             )
+        elif issubclass(tool_type, Complete):
+            tool = Tool.from_function(Complete().complete)
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
-        if tool.info.name == GenerateAnswer.gen_answer.__name__:
+        if tool.info.name == Complete.complete.__name__:
             tools.append(tool)  # Place at the end
         else:
             tools.insert(0, tool)
@@ -142,7 +145,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                     content=self._query.settings.agent.agent_prompt.format(
                         question=self.state.session.question,
                         status=self.state.status,
-                        gen_answer_tool_name=GenerateAnswer.TOOL_FN_NAME,
+                        complete_tool_name=Complete.TOOL_FN_NAME,
                     ),
                 )
             ],
@@ -170,30 +173,17 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self, action: ToolRequestMessage
     ) -> tuple[Messages, float, bool, bool]:
         self.state.record_action(action)
-        if not action.tool_calls:
-            return (
-                # NOTE: don't put:
-                # - GenerateAnswer.FAILED_TO_ANSWER here because this wasn't a failure
-                # - 'cannot answer' because that information belongs in
-                #   PQASession.answer, not in the message history
-                # Let's just put a nice message about being done :)
-                [Message(content="Agent specified 0 tool calls, which means done.")],
-                self.USE_POST_PROCESSED_REWARD,
-                True,  # Matching LangChain: https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.17/libs/langchain/langchain/agents/output_parsers/openai_functions.py#L38-L77
-                False,  # Let caller determine truncations
-            )
 
         response_messages = cast(
             list[Message],
             await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
-        )
+        ) or [Message(content=f"No tool calls input in tool request {action}.")]
         return (
             response_messages,
             self.USE_POST_PROCESSED_REWARD,
             any(
                 isinstance(msg, ToolResponseMessage)
-                and msg.name == GenerateAnswer.gen_answer.__name__
-                and not check_could_not_answer(msg.content)
+                and msg.name == Complete.complete.__name__
                 for msg in response_messages
             )
             or self._has_excess_answer_failures(),

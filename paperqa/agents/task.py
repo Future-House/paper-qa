@@ -50,7 +50,7 @@ from paperqa.types import PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .models import QueryRequest
-from .tools import GenerateAnswer
+from .tools import Complete
 
 if TYPE_CHECKING:
     from ldp.data_structures import Trajectory
@@ -130,31 +130,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         messages, reward, done, truncated = await super().step(action)
         if not done or not self._evaluation_from_answer:
             return messages, reward, done, truncated
-        valid_answers, failed_answer_messages = [], []
-        for m in messages:
-            if (
-                not isinstance(m, ToolResponseMessage)
-                or m.name != GenerateAnswer.gen_answer.__name__
-            ):
-                continue  # Filter out non-answer messages (in case parallel tool calls)
-            if answer := GenerateAnswer.extract_answer_from_message(content=m.content):
-                valid_answers.append(answer)
-            else:
-                failed_answer_messages.append(m)
-        if not valid_answers:  # No answer, so no positive reward
-            return messages, reward, done, truncated
-        if len(valid_answers) != 1:
-            raise NotImplementedError(
-                f"Expected just one answer message, got more than one in {messages}."
-            )
-        answer = valid_answers[0]
-        if failed_answer_messages:
-            logger.warning(
-                "More than one answer detected, discarding failed answer messages"
-                f" {failed_answer_messages}, continuing with answer {answer}."
-            )
-        # Okay, so we have one answer that was not a failed answer. Let's evaluate it
-        evaluation = await self._evaluation_from_answer(answer)
+        evaluation = await self._evaluation_from_answer(self.state.session.answer)
         if evaluation_callback := self._evaluation_callback:
             await evaluation_callback(evaluation)
         return messages, reward + self._rewards[evaluation.value], done, truncated
@@ -266,13 +242,14 @@ class LitQATaskDataset(
                 split_answers
                 for split_answers in (
                     re.split(
-                        pattern=GenerateAnswer.ANSWER_SPLIT_REGEX_PATTERN,
+                        pattern=Complete.ANSWER_SPLIT_REGEX_PATTERN,
                         string=obs.content,
+                        maxsplit=1,
                     )
                     for obs in t.steps[-1].next_observation
                     if (
                         isinstance(obs, ToolResponseMessage)
-                        and obs.name == GenerateAnswer.TOOL_FN_NAME
+                        and obs.name == Complete.TOOL_FN_NAME
                     )
                 )
                 # Filter for places where the regex split succeeded
@@ -284,7 +261,7 @@ class LitQATaskDataset(
             ):
                 metric_list.append(  # Use mean to allow for multiple answers
                     sum(int(sa[i]) for sa in split_answers) / len(split_answers)
-                    if split_answers  # Avoid div0 (when no answer was made)
+                    if split_answers  # Avoid div0 (when complete wasn't called)
                     else 0
                 )
         return super().compute_trajectory_metrics(trajectories) | {
