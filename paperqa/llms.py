@@ -803,7 +803,6 @@ class OpenAIBatchLLMModel(LLMModel):
         data: list[dict[str,str]],
         callbacks: list[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
         system_prompt: str = default_system_prompt,
     ) -> list[LLMResult]:
         if callbacks:
@@ -818,9 +817,9 @@ class OpenAIBatchLLMModel(LLMModel):
             messages = [
             {"role": m["role"], "content": m["content"].format(**d)}
             for m in (
-                [human_message_prompt]
-                if skip_system
-                else [system_message_prompt, human_message_prompt]
+                [{"role": "system", "content": system_prompt}, human_message_prompt]
+                if system_prompt
+                else [human_message_prompt]
             )
             ]
             batch.append(messages)
@@ -945,7 +944,6 @@ class AnthropicBatchLLMModel(LLMModel):
         data: list[dict[str,str]],
         callbacks: list[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
         system_prompt: str = default_system_prompt,
     ) -> list[LLMResult]:
         if callbacks:
@@ -960,9 +958,9 @@ class AnthropicBatchLLMModel(LLMModel):
             messages = [
             {"role": m["role"], "content": m["content"].format(**d)}
             for m in (
-                [human_message_prompt]
-                if skip_system
-                else [system_message_prompt, human_message_prompt]
+                [{"role": "system", "content": system_prompt}, human_message_prompt]
+                if system_prompt
+                else [human_message_prompt]
             )
             ]
             batch.append(messages)

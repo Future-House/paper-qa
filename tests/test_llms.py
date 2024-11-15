@@ -191,7 +191,6 @@ class TestOpenAIBatchLLMModel:
                 completion = await llm.run_prompt(
                     prompt="The {animal} says",
                     data=data,
-                    skip_system=True,
                 )
             assert "Batch failed" in str(e_info.value)
             assert "not supported" in str(e_info.value)
@@ -200,7 +199,6 @@ class TestOpenAIBatchLLMModel:
             completion = await llm.run_prompt(
                 prompt="The {animal} says",
                 data=data,
-                skip_system=True,
             )
 
             assert all([completion[k].model == config['model'] for k, _ in enumerate(data)])
@@ -256,7 +254,6 @@ class TestAnthropicBatchLLMModel:
         completion = await llm.run_prompt(
                 prompt="The {animal} says",
                 data=data,
-                skip_system=True,
             )
 
 @pytest.mark.asyncio
