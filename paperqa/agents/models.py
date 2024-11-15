@@ -34,15 +34,15 @@ class SupportsPickle(Protocol):
     def __setstate__(self, state: object) -> None: ...
 
 
-class AgentStatus(StrEnum):
-    # FAIL - no answer could be generated
+class AgentStatus(StrEnum):  # TODO: rename to AnswerStatus or RolloutStatus
+    # FAIL - during the trajectory encountered an unhandled exception
     FAIL = "fail"
     # SUCCESS - answer was generated
     SUCCESS = "success"
     # TRUNCATED - agent didn't finish naturally (e.g. timeout, too many actions),
-    # so we prematurely answered
+    # so we just generated an answer after the unnatural finish
     TRUNCATED = "truncated"
-    # UNSURE - the agent was unsure, but an answer is present
+    # UNSURE - the gen_answer did not succeed, but an answer is present
     UNSURE = "unsure"
 
 
