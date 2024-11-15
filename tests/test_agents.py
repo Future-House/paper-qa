@@ -44,7 +44,7 @@ from paperqa.agents.tools import (
 from paperqa.docs import Docs
 from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text
+from paperqa.types import Context, Doc, PQASession, Text, check_could_not_answer
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -784,7 +784,7 @@ class TestGradablePaperQAEnvironment:
         obs, _, done, truncated = await env.step(ToolRequestMessage())
         assert len(obs) == 1
         assert obs[0].content
-        assert GenerateAnswer.did_not_fail_to_answer(obs[0].content)
+        assert not check_could_not_answer(obs[0].content)
         assert "0 tool calls" in obs[0].content
         assert done
         assert not truncated
