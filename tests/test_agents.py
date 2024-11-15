@@ -404,7 +404,7 @@ async def test_gather_evidence_rejects_empty_docs(
 ) -> None:
 
     @wraps(GenerateAnswer.gen_answer)
-    async def gen_answer(self, question: str, state) -> str:  # noqa: ARG001
+    async def gen_answer(self, state) -> str:  # noqa: ARG001
         return "I cannot answer."
 
     # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
@@ -525,7 +525,7 @@ async def test_agent_sharing_state(
             summary_llm_model=summary_llm_model,
             embedding_model=embedding_model,
         )
-        result = await generate_answer_tool.gen_answer(answer.question, state=env_state)
+        result = await generate_answer_tool.gen_answer(state=env_state)
 
         if callback_type == "async":
             gen_answer_initialized_callback.assert_awaited_once_with(env_state)
@@ -655,24 +655,14 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             "info": {
                 "name": "gen_answer",
                 "description": (
-                    "Ask a model to propose an answer using current"
-                    " evidence.\n\nThe tool may fail, indicating that better or"
-                    " different evidence should be found.\nAim for at least five"
-                    " pieces of evidence from multiple sources before invoking this"
-                    " tool.\nFeel free to invoke this tool in parallel with other"
-                    " tools, but do not call this tool in parallel with itself."
+                    "Generate an answer using current evidence.\n\nThe tool may fail,"
+                    " indicating that better or different evidence should be"
+                    " found.\nAim for at least five pieces of evidence from multiple"
+                    " sources before invoking this tool.\nFeel free to invoke this tool"
+                    " in parallel with other tools, but do not call this tool in"
+                    " parallel with itself."
                 ),
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "question": {
-                            "type": "string",
-                            "description": "Question to be answered.",
-                            "title": "Question",
-                        }
-                    },
-                    "required": ["question"],
-                },
+                "parameters": {"type": "object", "properties": {}, "required": []},
             },
         },
     ]
@@ -752,7 +742,7 @@ class TestGradablePaperQAEnvironment:
 
         # 3. Generate an answer for both, and confirm they are identical
         gen_answer_action = ToolRequestMessage(
-            tool_calls=[ToolCall.from_name("gen_answer", question=question)]
+            tool_calls=[ToolCall.from_name("gen_answer")]
         )
         _, _, done, _ = await env.step(gen_answer_action)
         assert done
