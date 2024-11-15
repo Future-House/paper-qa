@@ -155,13 +155,15 @@ async def _run_with_timeout_failure(
             f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
         )
         status = AgentStatus.TRUNCATED
+    except Exception:
+        logger.exception("Trajectory failed.")
+        status = AgentStatus.FAIL
+    if status == AgentStatus.TRUNCATED:
+        # Fail over after truncation (too many steps, timeout): just answer
         generate_answer_tool = next(
             filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
         )
         await generate_answer_tool._tool_fn(question=query.query, state=env.state)
-    except Exception:
-        logger.exception("Trajectory failed.")
-        status = AgentStatus.FAIL
     return env.state.session, status
 
 
@@ -262,15 +264,6 @@ async def run_aviary_agent(
                 logger.warning(
                     f"Agent didn't finish within {max_timesteps} timesteps, just"
                     " answering."
-                )
-                generate_answer_tool = next(
-                    filter(
-                        lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME,
-                        env.tools,
-                    )
-                )
-                await generate_answer_tool._tool_fn(
-                    question=query.query, state=env.state
                 )
                 return AgentStatus.TRUNCATED
             agent_state.messages += obs
