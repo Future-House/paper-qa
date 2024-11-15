@@ -60,7 +60,7 @@ class TestLiteLLMModel:
         completion = await llm.run_prompt(
             prompt="The {animal} says",
             data={"animal": "duck"},
-            skip_system=True,
+            system_prompt=None,
             callbacks=[accum],
         )
         assert completion.model == "gpt-4o-mini"
@@ -73,7 +73,7 @@ class TestLiteLLMModel:
         completion = await llm.run_prompt(
             prompt="The {animal} says",
             data={"animal": "duck"},
-            skip_system=True,
+            system_prompt=None,
         )
         assert completion.seconds_to_first_token == 0
         assert completion.seconds_to_last_token > 0
@@ -86,7 +86,7 @@ class TestLiteLLMModel:
         completion = await llm.run_prompt(
             prompt="The {animal} says",
             data={"animal": "duck"},
-            skip_system=True,
+            system_prompt=None,
             callbacks=[accum, ac],
         )
         assert completion.cost > 0

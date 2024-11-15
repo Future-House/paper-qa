@@ -11,7 +11,6 @@
   "verbosity": 0,
   "answer": {
     "evidence_k": 30,
-    "evidence_detailed_citations": true,
     "evidence_retrieval": true,
     "evidence_summary_length": "about 300 words",
     "evidence_skip_summary": false,
@@ -48,7 +47,6 @@
     "search_count": 12,
     "wipe_context_on_answer_failure": true,
     "timeout": 500.0,
-    "should_pre_search": false,
     "tool_names": null
   }
 }

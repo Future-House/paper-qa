@@ -46,6 +46,8 @@ from paperqa.prompts import (
     CONTEXT_OUTER_PROMPT,
     citation_prompt,
     default_system_prompt,
+    env_reset_prompt,
+    env_system_prompt,
     qa_prompt,
     select_paper_prompt,
     structured_citation_prompt,
@@ -443,23 +445,11 @@ class AgentSettings(BaseModel):
         default=None,
         description="Optional kwarg for AGENT constructor",
     )
-
     agent_system_prompt: str | None = Field(
-        # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215
-        default="You are a helpful AI assistant.",
+        default=env_system_prompt,
         description="Optional system prompt message to precede the below agent_prompt.",
     )
-
-    # TODO: make this prompt more minimalist, instead improving tool descriptions so
-    # how to use them together can be intuited, and exposing them for configuration
-    agent_prompt: str = (
-        "Use the tools to answer the question: {question}\n\nThe {gen_answer_tool_name}"
-        " tool output is visible to the user, so you do not need to restate the answer"
-        " and can simply terminate if the answer looks sufficient. If the answer does"
-        " not look sufficient, and you have already tried to answer several times, you"
-        " can terminate the question by specifying 0 tool calls."
-        " The current status of evidence/papers/cost is {status}"
-    )
+    agent_prompt: str = env_reset_prompt
     return_paper_metadata: bool = Field(
         default=False,
         description=(
@@ -533,21 +523,6 @@ class AgentSettings(BaseModel):
         exclude=True,
     )
 
-    @field_validator("tool_names")
-    @classmethod
-    def validate_tool_names(cls, v: set[str] | None) -> set[str] | None:
-        if v is None:
-            return None
-        # imported here to avoid circular imports
-        from paperqa.agents.tools import GenerateAnswer
-
-        answer_tool_name = GenerateAnswer.TOOL_FN_NAME
-        if answer_tool_name not in v:
-            raise ValueError(
-                f"If using an override, must contain at least the {answer_tool_name}."
-            )
-        return v
-
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
         for deprecated_field_name, new_name in (("index_concurrency", "concurrency"),):
@@ -562,6 +537,18 @@ class AgentSettings(BaseModel):
                 )
                 setattr(self.index, new_name, value)  # Propagate to new location
         return self
+
+    @field_validator("should_pre_search")
+    @classmethod
+    def _deprecated_should_pre_search(cls, value: bool) -> bool:
+        if value:  # Default is False, so we only warn if it's True
+            warnings.warn(
+                "The 'should_pre_search' field is dead code, and will be"
+                " removed in version 6.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+        return value
 
 
 def make_default_litellm_model_list_settings(
