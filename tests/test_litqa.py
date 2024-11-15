@@ -14,6 +14,7 @@ class TestLitQAEvaluation:
             assert qa_prompt.count(substr) == 1
 
     @pytest.mark.asyncio
+    @pytest.mark.vcr
     async def test_from_question(self) -> None:
         """Tests that we can create a LitQA question and evaluate answers."""
         question = "What is my office's zip code?"
