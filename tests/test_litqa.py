@@ -10,7 +10,7 @@ class TestLitQAEvaluation:
     def _assert_prompt_is_valid(
         qa_prompt: str, question: str, ideal: str, distractors: list[str]
     ):
-        for substr in [question, "Insufficient information", ideal, *distractors]:
+        for substr in (question, "Insufficient information", ideal, *distractors):
             assert qa_prompt.count(substr) == 1
 
     @pytest.mark.asyncio
@@ -25,14 +25,14 @@ class TestLitQAEvaluation:
         )
         self._assert_prompt_is_valid(qa_prompt, question, ideal, distractors)
 
-        for answer, expected in [
+        for answer, expected in (
             ("the answer is 94107", LitQAEvaluation.CORRECT),
             # NOTE: The below case fails this test, because the LM doesn't accept an answer not in the options.
             # See https://github.com/Future-House/paper-qa/issues/693
             # ("the answer is 14004", LitQAEvaluation.INCORRECT),
             ("the answer is 94106", LitQAEvaluation.INCORRECT),
             ("Insufficient information to answer", LitQAEvaluation.UNSURE),
-        ]:
+        ):
             result = await eval_fn(answer)
             assert result == expected
 
