@@ -268,19 +268,18 @@ class GenerateAnswer(NamedTool):
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
 
-    async def gen_answer(self, question: str, state: EnvironmentState) -> str:
+    async def gen_answer(self, state: EnvironmentState) -> str:
         """
-        Ask a model to propose an answer using current evidence.
+        Generate an answer using current evidence.
 
         The tool may fail, indicating that better or different evidence should be found.
         Aim for at least five pieces of evidence from multiple sources before invoking this tool.
         Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
 
         Args:
-            question: Question to be answered.
             state: Current state.
         """
-        logger.info(f"Generating answer for '{question}'.")
+        logger.info(f"Generating answer for '{state.session.question}'.")
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
             await asyncio.gather(
@@ -292,8 +291,6 @@ class GenerateAnswer(NamedTool):
                 )
             )
 
-        # TODO: Should we allow the agent to change the question?
-        # self.answer.question = query
         state.session = await state.docs.aquery(
             query=state.session,
             settings=self.settings,

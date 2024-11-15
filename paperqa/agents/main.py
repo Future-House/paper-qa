@@ -163,7 +163,7 @@ async def _run_with_timeout_failure(
         generate_answer_tool = next(
             filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
         )
-        await generate_answer_tool._tool_fn(question=query.query, state=env.state)
+        await generate_answer_tool._tool_fn(state=env.state)
     return env.state.session, status
 
 
@@ -216,7 +216,7 @@ async def run_fake_agent(
         ):
             await step(search_tool, query=search, min_year=None, max_year=None)
         await step(gather_evidence_tool, question=question)
-        await step(generate_answer_tool, question=question)
+        await step(generate_answer_tool)
         return AgentStatus.SUCCESS
 
     return await _run_with_timeout_failure(rollout, query, env)
