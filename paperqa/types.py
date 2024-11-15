@@ -158,6 +158,10 @@ class Context(BaseModel):
         return self.context
 
 
+def check_could_not_answer(answer: str) -> bool:
+    return "cannot answer" in answer.lower()
+
+
 class PQASession(BaseModel):
     """A class to hold session about researching/answering."""
 
@@ -254,7 +258,7 @@ class PQASession(BaseModel):
 
     @property
     def could_not_answer(self) -> bool:
-        return "cannot answer" in self.answer.lower()
+        return check_could_not_answer(self.answer)
 
 
 # for backwards compatibility

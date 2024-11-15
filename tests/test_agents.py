@@ -9,6 +9,7 @@ import shutil
 import tempfile
 import time
 from copy import deepcopy
+from functools import wraps
 from pathlib import Path
 from typing import cast
 from unittest.mock import AsyncMock, patch
@@ -44,7 +45,7 @@ from paperqa.agents.tools import (
 from paperqa.docs import Docs
 from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text
+from paperqa.types import Context, Doc, PQASession, Text, check_could_not_answer
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -401,19 +402,14 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 async def test_gather_evidence_rejects_empty_docs(
     agent_test_settings: Settings,
 ) -> None:
+
+    @wraps(GenerateAnswer.gen_answer)
+    async def gen_answer(self, question: str, state) -> str:  # noqa: ARG001
+        return "I cannot answer."
+
     # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
-    # we don't give a 'cannot answer' response. A 'cannot answer' response can
-    # lead to an unsure status, which will break this test's assertions. Since
-    # this test is about a GatherEvidenceTool edge case, defeating
-    # GenerateAnswerTool is fine
-    original_doc = GenerateAnswer.gen_answer.__doc__
-    with patch.object(
-        GenerateAnswer,
-        "gen_answer",
-        return_value="Failed to answer question.",
-        autospec=True,
-    ) as mock_gen_answer:
-        mock_gen_answer.__doc__ = original_doc
+    # we keep running until we get truncated
+    with patch.object(GenerateAnswer, "gen_answer", gen_answer):
         agent_test_settings.agent = AgentSettings(
             tool_names={"gather_evidence", "gen_answer"},
             max_timesteps=3,
@@ -784,7 +780,7 @@ class TestGradablePaperQAEnvironment:
         obs, _, done, truncated = await env.step(ToolRequestMessage())
         assert len(obs) == 1
         assert obs[0].content
-        assert GenerateAnswer.did_not_fail_to_answer(obs[0].content)
+        assert not check_could_not_answer(obs[0].content)
         assert "0 tool calls" in obs[0].content
         assert done
         assert not truncated
