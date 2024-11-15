@@ -8,6 +8,7 @@ from pytest_subtests import SubTests
 from paperqa.settings import (
     AgentSettings,
     IndexSettings,
+    MaybeSettings,
     PromptSettings,
     Settings,
     get_formatted_variables,
@@ -34,8 +35,15 @@ def test_get_formatted_variables() -> None:
     assert variables == {"variable", "another_variable"}
 
 
-def test_get_settings_with_valid_config() -> None:
-    settings = get_settings("fast")
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param("fast", id="name"),
+        pytest.param({"parsing": {"use_doc_details": False}}, id="serialized"),
+    ],
+)
+def test_get_settings_with_valid_config(value: MaybeSettings) -> None:
+    settings = get_settings(value)
     assert not settings.parsing.use_doc_details
 
 
