@@ -212,8 +212,8 @@ def read_litqa_v2_from_hub(
         from datasets import load_dataset
     except ImportError as exc:
         raise ImportError(
-            "Reading in LitQA2 requires the 'datasets' extra for 'datasets'. Please: "
-            "`pip install paper-qa[datasets]`."
+            "Reading in LitQA2 requires the 'datasets' extra for 'datasets'. Please:"
+            " `pip install paper-qa[datasets]`."
         ) from exc
 
     litqa_v2 = load_dataset(labbench_dataset, "LitQA2")["train"].to_pandas()
