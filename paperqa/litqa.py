@@ -49,7 +49,8 @@ def make_mc_options(
     if ideal == "null":
         if not unsure_option:
             raise ValueError(
-                'Dataset configured for "unsure" options via ideal="null", please specify "unsure_option".'
+                'Dataset configured for "unsure" options via '
+                'ideal="null", please specify "unsure_option".'
             )
         correct_answer = unsure_option
     else:
@@ -93,7 +94,8 @@ class LitQAEvaluation(IntEnum):
             )
         except TypeError as exc:
             raise ImportError(
-                "Making discounted returns requires the 'ldp' extra for 'ldp'. Please: `pip install paper-qa[ldp]`."
+                "Making discounted returns requires the 'ldp' extra for 'ldp'. Please:"
+                " `pip install paper-qa[ldp]`."
             ) from exc
 
     @classmethod
@@ -210,7 +212,8 @@ def read_litqa_v2_from_hub(
         from datasets import load_dataset
     except ImportError as exc:
         raise ImportError(
-            "Reading in LitQA2 requires the 'datasets' extra for 'datasets'. Please: `pip install paper-qa[datasets]`."
+            "Reading in LitQA2 requires the 'datasets' extra for 'datasets'. Please: "
+            "`pip install paper-qa[datasets]`."
         ) from exc
 
     litqa_v2 = load_dataset(labbench_dataset, "LitQA2")["train"].to_pandas()
