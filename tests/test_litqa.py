@@ -3,6 +3,7 @@ from typing import cast
 import pytest
 
 from paperqa.litqa import LitQAEvaluation, read_litqa_v2_from_hub
+from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
 class TestLitQAEvaluation:
@@ -14,7 +15,7 @@ class TestLitQAEvaluation:
             assert qa_prompt.count(substr) == 1
 
     @pytest.mark.asyncio
-    @pytest.mark.vcr
+    @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
     async def test_from_question(self) -> None:
         """Tests that we can create a LitQA question and evaluate answers."""
         question = "What is my office's zip code?"
@@ -22,7 +23,10 @@ class TestLitQAEvaluation:
         distractors = ["-8", "94106", "cheesecake"]
 
         qa_prompt, eval_fn = LitQAEvaluation.from_question(
-            ideal=ideal, distractors=distractors, question=question
+            ideal=ideal,
+            distractors=distractors,
+            question=question,
+            seed=42,  # Seed for VCR cassette
         )
         self._assert_prompt_is_valid(qa_prompt, question, ideal, distractors)
 
