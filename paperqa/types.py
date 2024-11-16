@@ -139,7 +139,6 @@ class Doc(Embeddable):
         return self.citation
 
 
-
 class Text(Embeddable):
     text: str
     name: str

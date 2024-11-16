@@ -698,7 +698,7 @@ class Docs(BaseModel):
                 )
             session.add_tokens(pre)
             pre_str = pre.text
-            
+
             # make a context to include this
             pre_context = Context(
                 text=Text(
