@@ -41,6 +41,7 @@ async def litellm_get_search_query(
             " Ignoring template and using default search prompt."
         )
     if not search_prompt:
+        # TODO: move to use tools instead of DIY schema in prompt
         search_prompt = (
             "We want to answer the following question: {question}\nProvide"
             " {count} unique keyword searches (one search per line) and year ranges"
