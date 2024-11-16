@@ -168,6 +168,8 @@ class TestOpenAIBatchLLMModel:
             "model": model_name,
             "temperature": 0.0,
             "max_tokens": 64,
+            "batch_summary_timelimit": 24*60*60,
+            "batch_polling_interval": 5,
         }
 
     # @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON])# , "body"])

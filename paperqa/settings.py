@@ -621,6 +621,14 @@ class Settings(BaseSettings):
             "and OpenAI (https://platform.openai.com/docs/guides/batch) chat models."
         ),
     )
+    batch_summary_timelimit: int = Field(
+        default=24*60*60,
+        description="Time limit for batch summarization in seconds",
+    )
+    batch_polling_interval: int = Field(
+        default=30,
+        description="Polling interval for batch summarization in seconds",
+    )
     embedding: str = Field(
         default="text-embedding-3-small",
         description="Default embedding model for texts",

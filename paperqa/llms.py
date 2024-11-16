@@ -23,6 +23,7 @@ import litellm
 import json
 import os
 import tempfile
+import logging
 
 import numpy as np
 import tiktoken
@@ -39,6 +40,8 @@ from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
 from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
+
+logger = logging.getLogger(__name__)
 
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
@@ -901,13 +904,20 @@ class OpenAIBatchLLMModel(LLMModel):
             }
         )
 
+        start_clock = asyncio.get_running_loop().time()
         while batch.status != self.status.COMPLETE:
             batch = await client.batches.retrieve(batch.id)
             if batch.status == self.status.FAILURE:
                 raise Exception("Batch failed. \n\nReason: \n" + "\n".join([k.message for k in batch.errors.data]))
             elif batch.status == self.status.CANCEL:
                 raise Exception("Batch was cancelled.")
-            await asyncio.sleep(5)
+            
+            batch_time = asyncio.get_running_loop().time() - start_clock
+            if batch_time > self.config.get('batch_summary_timelimit'):
+                raise Exception("Batch took too long to complete.")
+            
+            logger.info(f"Summary batch status: {batch.status} | Time elapsed: {batch_time}")
+            await asyncio.sleep(self.config.get('batch_polling_interval'))
 
         responses = await client.files.content(batch.output_file_id)
         response_lines = responses.read().decode('utf-8').splitlines()
