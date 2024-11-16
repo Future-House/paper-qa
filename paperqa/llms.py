@@ -21,6 +21,7 @@ from typing import Any, TypeVar, cast
 import litellm
 import numpy as np
 import tiktoken
+from aviary.core import ToolRequestMessage, ToolSelector
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -573,7 +574,7 @@ def get_litellm_retrying_config(timeout: float = 60.0) -> dict[str, Any]:
     return {"num_retries": 3, "timeout": timeout}
 
 
-class PassThroughRouter(litellm.Router):
+class PassThroughRouter(litellm.Router):  # TODO: add rate_limited
     """Router that is just a wrapper on LiteLLM's normal free functions."""
 
     def __init__(self, **kwargs):
@@ -752,6 +753,15 @@ class LiteLLMModel(LLMModel):
 
     def count_tokens(self, text: str) -> int:
         return litellm.token_counter(model=self.name, text=text)
+
+    async def select_tool(
+        self, *selection_args, **selection_kwargs
+    ) -> ToolRequestMessage:
+        """Shim to aviary.core.ToolSelector that supports tool schemae."""
+        tool_selector = ToolSelector(
+            model_name=self.name, acompletion=self.router.acompletion
+        )
+        return await tool_selector(*selection_args, **selection_kwargs)
 
 
 def cosine_similarity(a, b):
