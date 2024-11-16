@@ -26,6 +26,7 @@ from .tools import (
     GatherEvidence,
     GenerateAnswer,
     PaperSearch,
+    Reset,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ def settings_to_tools(
     embedding_model = embedding_model or settings.get_embedding_model()
     tools: list[Tool] = []
     for tool_type in (
-        (PaperSearch, GatherEvidence, GenerateAnswer, Complete)
+        (PaperSearch, GatherEvidence, GenerateAnswer, Reset, Complete)
         if settings.agent.tool_names is None
         else [
             AVAILABLE_TOOL_NAME_TO_CLASS[name]
@@ -83,6 +84,8 @@ def settings_to_tools(
                     embedding_model=embedding_model,
                 ).gen_answer
             )
+        elif issubclass(tool_type, Reset):
+            tool = Tool.from_function(Reset().reset)
         elif issubclass(tool_type, Complete):
             tool = Tool.from_function(Complete().complete)
         else:

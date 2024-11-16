@@ -41,6 +41,7 @@ from paperqa.agents.tools import (
     GatherEvidence,
     GenerateAnswer,
     PaperSearch,
+    Reset,
     make_status,
 )
 from paperqa.docs import Docs
@@ -570,6 +571,12 @@ async def test_agent_sharing_state(
             len(answer.used_contexts) <= query.settings.answer.answer_max_sources
         ), "Answer has more sources than expected"
 
+    with subtests.test(msg=f"{Reset.__name__} working"):
+        reset_tool = Reset()
+        await reset_tool.reset(state=env_state)
+        assert not answer.context
+        assert not answer.contexts
+
 
 def test_settings_model_config() -> None:
     settings_name = "tier1_limits"
@@ -604,6 +611,21 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
     """Check the tool schema passed to LLM providers."""
     tools = settings_to_tools(agent_test_settings)
     assert ToolsAdapter.dump_python(tools, exclude_none=True) == [
+        {
+            "type": "function",
+            "info": {
+                "name": "reset",
+                "description": (
+                    "Reset by clearing all current evidence from the system."
+                    "\n\nThis tool is useful when repeatedly failing to answer because"
+                    " new evidence can give new perspective.\nIt does not make sense to"
+                    " call this tool in parallel with other tools, as its resetting all"
+                    " state.\nOnly invoke this tool when the current evidence is above"
+                    " zero, or this tool will be useless."
+                ),
+                "parameters": {"type": "object", "properties": {}, "required": []},
+            },
+        },
         {
             "type": "function",
             "info": {

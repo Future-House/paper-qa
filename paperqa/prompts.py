@@ -86,8 +86,8 @@ env_reset_prompt = (
     "\n\nWhen the answer looks sufficient,"
     " you can terminate by calling the {complete_tool_name} tool."
     " If the answer does not look sufficient,"
-    " and you have already tried to answer several times,"
-    " you can terminate by calling the {complete_tool_name} tool."
+    " and you have already tried to answer several times with different evidence,"
+    " terminate by calling the {complete_tool_name} tool."
     " The current status of evidence/papers/cost is {status}"
 )
 

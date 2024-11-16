@@ -341,6 +341,22 @@ class GenerateAnswer(NamedTool):
         return answer
 
 
+class Reset(NamedTool):
+    TOOL_FN_NAME = "reset"
+
+    async def reset(self, state: EnvironmentState) -> None:
+        """
+        Reset by clearing all current evidence from the system.
+
+        This tool is useful when repeatedly failing to answer because new evidence can give new perspective.
+        It does not make sense to call this tool in parallel with other tools, as its resetting all state.
+        Only invoke this tool when the current evidence is above zero, or this tool will be useless.
+        """
+        logger.info(f"Resetting '{state.session.question}'.")
+        state.session.contexts = []
+        state.session.context = ""
+
+
 class Complete(NamedTool):
     TOOL_FN_NAME = "complete"
 
