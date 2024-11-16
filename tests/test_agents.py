@@ -694,15 +694,28 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             },
         },
         {
-            "type": "function",
             "info": {
-                "name": "complete",
                 "description": (
                     "Terminate using the last proposed answer.\n\nDo not invoke this"
                     " tool in parallel with other tools or itself."
                 ),
-                "parameters": {"type": "object", "properties": {}, "required": []},
+                "name": "complete",
+                "parameters": {
+                    "properties": {
+                        "is_sure": {
+                            "description": (
+                                "Set True if sure of the answer, otherwise False if"
+                                " there remains some uncertainty."
+                            ),
+                            "title": "Is Sure",
+                            "type": "boolean",
+                        }
+                    },
+                    "required": ["is_sure"],
+                    "type": "object",
+                },
             },
+            "type": "function",
         },
     ]
 
@@ -798,14 +811,18 @@ class TestGradablePaperQAEnvironment:
         )
         await stub_gradable_env.step(gen_answer_action)
         _, _, done, _ = await stub_gradable_env.step(
-            ToolRequestMessage(tool_calls=[ToolCall.from_name("complete")])
+            ToolRequestMessage(
+                tool_calls=[ToolCall.from_name("complete", is_sure=True)]
+            )
         )
         assert done
         assert not stub_gradable_env.state.session.could_not_answer
         assert stub_gradable_env.state.session.used_contexts
         await stub_gradable_env_copy.step(gen_answer_action)
-        _, _, done, _ = await stub_gradable_env.step(
-            ToolRequestMessage(tool_calls=[ToolCall.from_name("complete")])
+        _, _, done, _ = await stub_gradable_env_copy.step(
+            ToolRequestMessage(
+                tool_calls=[ToolCall.from_name("complete", is_sure=True)]
+            )
         )
         assert done
         assert not stub_gradable_env_copy.state.session.could_not_answer

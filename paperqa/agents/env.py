@@ -183,15 +183,20 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 handle_tool_exc=True,
             ),
         ) or [Message(content=f"No tool calls input in tool request {action}.")]
+        done = any(
+            isinstance(msg, ToolResponseMessage)
+            and msg.name == Complete.complete.__name__
+            for msg in response_messages
+        )
+        if not done and self._has_excess_answer_failures():
+            # If the caller set max_answer_attempts, and the agent has tried to answer
+            # too many times, we consider this equivalent to the agent being unsure
+            self.state.session.is_sure = False
+            done = True
         return (
             response_messages,
             self.USE_POST_PROCESSED_REWARD,
-            any(
-                isinstance(msg, ToolResponseMessage)
-                and msg.name == Complete.complete.__name__
-                for msg in response_messages
-            )
-            or self._has_excess_answer_failures(),
+            done,
             False,  # Let caller determine truncations
         )
 

@@ -344,23 +344,31 @@ class GenerateAnswer(NamedTool):
 class Complete(NamedTool):
     TOOL_FN_NAME = "complete"
 
-    # Use to separate answer from status
-    ANSWER_SPLIT_REGEX_PATTERN: ClassVar[str] = (
+    # Use to separate certainty from status
+    CERTAINTY_SPLIT_REGEX_PATTERN: ClassVar[str] = (
         r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
-    async def complete(self, state: EnvironmentState) -> str:
+    async def complete(self, is_sure: bool, state: EnvironmentState) -> str:
         """
         Terminate using the last proposed answer.
 
         Do not invoke this tool in parallel with other tools or itself.
 
         Args:
+            is_sure: Set True if sure of the answer, otherwise False if there remains
+                some uncertainty.
             state: Current state.
         """
-        logger.info(f"Completing '{state.session.question}'.")
+        # TODO: eliminate race condition here if agent calls 2+ times in parallel
+        # with opposite is_sure values
+        state.session.is_sure = is_sure
+        logger.info(
+            f"Completing '{state.session.question}' with"
+            f" '{'sure' if is_sure else 'unsure'}' status."
+        )
         # Return answer and status to simplify postprocessing of tool response
-        return f"{state.session.answer} | {state.status}"
+        return f"{is_sure} | {state.status}"
 
 
 AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
