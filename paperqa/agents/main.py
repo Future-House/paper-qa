@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 from aviary.core import (
     MalformedMessageError,
     Message,
-    Tool,
     ToolCall,
     ToolRequestMessage,
     ToolSelector,
@@ -38,7 +37,13 @@ from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
 from .models import AgentStatus, AnswerResponse, QueryRequest, SimpleProfiler
 from .search import SearchDocumentStorage, SearchIndex, get_directory_index
-from .tools import EnvironmentState, GatherEvidence, GenerateAnswer, PaperSearch
+from .tools import (
+    Complete,
+    EnvironmentState,
+    GatherEvidence,
+    GenerateAnswer,
+    PaperSearch,
+)
 
 if TYPE_CHECKING:
     from aviary.core import Environment
@@ -186,7 +191,7 @@ async def run_fake_agent(
             " applicable with the fake agent, ignoring it."
         )
     env = env_class(query, docs, **env_kwargs)
-    _, tools = await env.reset()
+    obs, tools = await env.reset()
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
 
@@ -198,26 +203,42 @@ async def run_fake_agent(
     generate_answer_tool = next(
         filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, tools)
     )
+    complete_tool = next(filter(lambda x: x.info.name == Complete.TOOL_FN_NAME, tools))
+    agent_messages = obs.copy()  # Copy just to be safe
 
-    async def step(tool: Tool, **call_kwargs) -> None:
-        action = ToolRequestMessage(
-            tool_calls=[ToolCall.from_tool(tool, **call_kwargs)]
+    async def step(action: list[ToolCall] | ToolRequestMessage) -> None:
+        action = (
+            action
+            if isinstance(action, ToolRequestMessage)
+            else ToolRequestMessage(tool_calls=action)
         )
+        agent_messages.append(action)
         if on_agent_action_callback:
             await on_agent_action_callback(action, env.state)
         obs, reward, done, truncated = await env.step(action)
+        agent_messages.extend(obs)
         if on_env_step_callback:
             await on_env_step_callback(obs, reward, done, truncated)
 
     async def rollout() -> AgentStatus:
-        # Seed docs with a few keyword searches
+        llm_model = query.settings.get_llm()
+
+        # Seed docs with a few LLM-proposed search calls
         # TODO: make properly support year ranges
-        for search in await litellm_get_search_query(
-            question, llm=query.settings.get_llm(), count=3
-        ):
-            await step(search_tool, query=search, min_year=None, max_year=None)
-        await step(gather_evidence_tool, question=question)
-        await step(generate_answer_tool)
+        for search in await litellm_get_search_query(question, llm=llm_model, count=3):
+            search_tcs = [
+                ToolCall.from_tool(
+                    search_tool, query=search, min_year=None, max_year=None
+                )
+            ]
+            await step(search_tcs)
+        await step([ToolCall.from_tool(gather_evidence_tool, question=question)])
+        await step([ToolCall.from_tool(generate_answer_tool)])
+        # Complete with an LLM-proposed complete call
+        complete_action = await llm_model.select_tool(
+            messages=agent_messages, tools=tools, tool_choice=complete_tool
+        )
+        await step(complete_action)
         return AgentStatus.SUCCESS
 
     return await _run_with_timeout_failure(rollout, query, env)
