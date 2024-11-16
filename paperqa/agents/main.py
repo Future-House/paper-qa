@@ -211,6 +211,7 @@ async def run_fake_agent(
 
     async def rollout() -> AgentStatus:
         # Seed docs with a few keyword searches
+        # TODO: make properly support year ranges
         for search in await litellm_get_search_query(
             question, llm=query.settings.get_llm(), count=3
         ):

@@ -573,7 +573,7 @@ def get_litellm_retrying_config(timeout: float = 60.0) -> dict[str, Any]:
     return {"num_retries": 3, "timeout": timeout}
 
 
-class PassThroughRouter(litellm.Router):
+class PassThroughRouter(litellm.Router):  # TODO: add rate_limited
     """Router that is just a wrapper on LiteLLM's normal free functions."""
 
     def __init__(self, **kwargs):
