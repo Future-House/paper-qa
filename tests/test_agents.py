@@ -9,6 +9,7 @@ import shutil
 import tempfile
 import time
 from copy import deepcopy
+from functools import wraps
 from pathlib import Path
 from typing import cast
 from unittest.mock import AsyncMock, patch
@@ -16,7 +17,7 @@ from uuid import uuid4
 
 import ldp.agent
 import pytest
-from aviary.tools import ToolCall, ToolRequestMessage, ToolsAdapter, ToolSelector
+from aviary.core import Tool, ToolCall, ToolRequestMessage, ToolsAdapter, ToolSelector
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
@@ -44,7 +45,7 @@ from paperqa.agents.tools import (
 from paperqa.docs import Docs
 from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text
+from paperqa.types import Context, Doc, PQASession, Text, check_could_not_answer
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -274,10 +275,12 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     memory = Memory(
         query=(
             "Use the tools to answer the question: How can you use XAI for chemical"
-            " property prediction?\n\nThe gen_answer tool output is visible to the"
-            " user, so you do not need to restate the answer and can simply"
-            " terminate if the answer looks sufficient. The current status of"
-            " evidence/papers/cost is "
+            " property prediction?\n\nWhen the answer looks sufficient,"
+            " you can terminate by calling the {complete_tool_name} tool."
+            " If the answer does not look sufficient,"
+            " and you have already tried to answer several times,"
+            " you can terminate by calling the {complete_tool_name} tool."
+            " The current status of evidence/papers/cost is "
             f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Started 0
             "\n\nTool request message '' for tool calls: paper_search(query='XAI for"
             " chemical property prediction', min_year='2018', max_year='2024')"
@@ -287,10 +290,12 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
         ),
         input=(
             "Use the tools to answer the question: How can you use XAI for chemical"
-            " property prediction?\n\nThe gen_answer tool output is visible to the"
-            " user, so you do not need to restate the answer and can simply terminate"
-            " if the answer looks sufficient. The current status of"
-            " evidence/papers/cost is "
+            " property prediction?\n\nWhen the answer looks sufficient,"
+            " you can terminate by calling the {complete_tool_name} tool."
+            " If the answer does not look sufficient,"
+            " and you have already tried to answer several times,"
+            " you can terminate by calling the {complete_tool_name} tool."
+            " The current status of evidence/papers/cost is "
             f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"
         ),
         output=(
@@ -351,7 +356,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     agent_test_settings.prompts.pre = None
     agent_test_settings.agent.timeout = 0.001
     agent_test_settings.llm = "gpt-4o-mini"
-    agent_test_settings.agent.tool_names = {"gen_answer"}
+    agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
     response = await agent_query(
         QueryRequest(
             query="Are COVID-19 vaccines effective?", settings=agent_test_settings
@@ -401,21 +406,39 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 async def test_gather_evidence_rejects_empty_docs(
     agent_test_settings: Settings,
 ) -> None:
+
+    @wraps(GenerateAnswer.gen_answer)
+    async def gen_answer(self, state) -> str:  # noqa: ARG001
+        return "I cannot answer."
+
     # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
-    # we don't give a 'cannot answer' response. A 'cannot answer' response can
-    # lead to an unsure status, which will break this test's assertions. Since
-    # this test is about a GatherEvidenceTool edge case, defeating
-    # GenerateAnswerTool is fine
-    original_doc = GenerateAnswer.gen_answer.__doc__
-    with patch.object(
-        GenerateAnswer,
-        "gen_answer",
-        return_value="Failed to answer question.",
-        autospec=True,
-    ) as mock_gen_answer:
-        mock_gen_answer.__doc__ = original_doc
+    # we keep running until we get truncated
+    with (
+        patch(
+            "paperqa.agents.env.settings_to_tools",
+            side_effect=[
+                [
+                    Tool.from_function(
+                        GatherEvidence(
+                            settings=agent_test_settings,
+                            summary_llm_model=agent_test_settings.get_summary_llm(),
+                            embedding_model=agent_test_settings.get_embedding_model(),
+                        ).gather_evidence
+                    ),
+                    Tool.from_function(
+                        GenerateAnswer(
+                            settings=agent_test_settings,
+                            llm_model=agent_test_settings.get_llm(),
+                            summary_llm_model=agent_test_settings.get_summary_llm(),
+                            embedding_model=agent_test_settings.get_embedding_model(),
+                        ).gen_answer
+                    ),
+                ]
+            ],
+        ),
+        patch.object(GenerateAnswer, "gen_answer", gen_answer),
+    ):
         agent_test_settings.agent = AgentSettings(
-            tool_names={"gather_evidence", "gen_answer"},
             max_timesteps=3,
             search_count=agent_test_settings.agent.search_count,
             index=IndexSettings(
@@ -529,7 +552,7 @@ async def test_agent_sharing_state(
             summary_llm_model=summary_llm_model,
             embedding_model=embedding_model,
         )
-        result = await generate_answer_tool.gen_answer(answer.question, state=env_state)
+        result = await generate_answer_tool.gen_answer(state=env_state)
 
         if callback_type == "async":
             gen_answer_initialized_callback.assert_awaited_once_with(env_state)
@@ -580,6 +603,21 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
     """Check the tool schema passed to LLM providers."""
     tools = settings_to_tools(agent_test_settings)
     assert ToolsAdapter.dump_python(tools, exclude_none=True) == [
+        {
+            "type": "function",
+            "info": {
+                "name": "gen_answer",
+                "description": (
+                    "Generate an answer using current evidence.\n\nThe tool may fail,"
+                    " indicating that better or different evidence should be"
+                    " found.\nAim for at least five pieces of evidence from multiple"
+                    " sources before invoking this tool.\nFeel free to invoke this tool"
+                    " in parallel with other tools, but do not call this tool in"
+                    " parallel with itself."
+                ),
+                "parameters": {"type": "object", "properties": {}, "required": []},
+            },
+        },
         {
             "type": "function",
             "info": {
@@ -657,26 +695,12 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
         {
             "type": "function",
             "info": {
-                "name": "gen_answer",
+                "name": "complete",
                 "description": (
-                    "Ask a model to propose an answer using current"
-                    " evidence.\n\nThe tool may fail, indicating that better or"
-                    " different evidence should be found.\nAim for at least five"
-                    " pieces of evidence from multiple sources before invoking this"
-                    " tool.\nFeel free to invoke this tool in parallel with other"
-                    " tools, but do not call this tool in parallel with itself."
+                    "Terminate using the last proposed answer.\n\nDo not invoke this"
+                    " tool in parallel with other tools or itself."
                 ),
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "question": {
-                            "type": "string",
-                            "description": "Question to be answered.",
-                            "title": "Question",
-                        }
-                    },
-                    "required": ["question"],
-                },
+                "parameters": {"type": "object", "properties": {}, "required": []},
             },
         },
     ]
@@ -754,15 +778,21 @@ class TestGradablePaperQAEnvironment:
         env_copy = deepcopy(env)
         assert env.state == env_copy.state
 
-        # 3. Generate an answer for both, and confirm they are identical
+        # 3. Generate an answer and complete for both, and confirm they are identical
         gen_answer_action = ToolRequestMessage(
-            tool_calls=[ToolCall.from_name("gen_answer", question=question)]
+            tool_calls=[ToolCall.from_name("gen_answer")]
         )
-        _, _, done, _ = await env.step(gen_answer_action)
+        await env.step(gen_answer_action)
+        _, _, done, _ = await env.step(
+            ToolRequestMessage(tool_calls=[ToolCall.from_name("complete")])
+        )
         assert done
         assert not env.state.session.could_not_answer
         assert env.state.session.used_contexts
-        _, _, done, _ = await env_copy.step(gen_answer_action)
+        await env_copy.step(gen_answer_action)
+        _, _, done, _ = await env.step(
+            ToolRequestMessage(tool_calls=[ToolCall.from_name("complete")])
+        )
         assert done
         assert not env_copy.state.session.could_not_answer
         assert env_copy.state.session.used_contexts
@@ -784,7 +814,32 @@ class TestGradablePaperQAEnvironment:
         obs, _, done, truncated = await env.step(ToolRequestMessage())
         assert len(obs) == 1
         assert obs[0].content
-        assert GenerateAnswer.did_not_fail_to_answer(obs[0].content)
-        assert "0 tool calls" in obs[0].content
-        assert done
+        assert "no tool calls" in obs[0].content.lower()
+        assert not done
+        assert not truncated
+
+    @pytest.mark.asyncio
+    async def test_unsure_answer(self, agent_test_settings: Settings) -> None:
+        env = GradablePaperQAEnvironment(
+            query=QueryRequest(query="stub", settings=agent_test_settings),
+            docs=Docs(),
+        )
+        unsure_answer = "Based on the sources provided, it appears no one has done x."
+
+        async def emulate_answered_but_unsure(
+            *_, query: PQASession, **__
+        ) -> PQASession:
+            query.answer = unsure_answer
+            return query
+
+        await env.reset()
+        with patch.object(type(env.state.docs), "aquery", emulate_answered_but_unsure):
+            obs, _, done, truncated = await env.step(
+                ToolRequestMessage(tool_calls=[ToolCall.from_name("gen_answer")])
+            )
+        assert len(obs) == 1
+        assert obs[0].content
+        assert not check_could_not_answer(obs[0].content)
+        assert unsure_answer in obs[0].content
+        assert not done
         assert not truncated

@@ -43,7 +43,8 @@ def make_mc_options(
             split_distractors = [d.strip("'[ ]\"") for d in distractors.split(",")]
         options: list[str] = split_distractors
     else:
-        options = distractors
+        # We are going to modify options in-place, so copy it first
+        options = distractors.copy()
 
     if ideal == "null":
         if not unsure_option:
