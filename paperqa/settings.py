@@ -614,11 +614,9 @@ class Settings(BaseSettings):
     use_batch_in_summary: bool = Field(
         default=False,
         description=(
-            "Whether to use batch API for LLMs in summarization."
-            "This option requests a batch of summaries from the LLM on the `GatherEvidence` step."
-            "It uses all the candidate papers found in the `GatherEvidence` step"
-            "to generate a list of prompts that are formatted accordingly to the"
-            "requirements of the llm provider." 
+            "Whether to use batch API for LLMs in summarization, "
+            "which means multiple messages are sent in one API request "
+            "to the LLM provider's batch API."
             "This option is only available for Claude(https://docs.anthropic.com/en/api/creating-message-batches)"
             "and OpenAI (https://platform.openai.com/docs/guides/batch) chat models."
         ),

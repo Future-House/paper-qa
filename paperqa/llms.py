@@ -74,6 +74,24 @@ class EmbeddingModes(StrEnum):
     QUERY = "query"
 
 
+class OpenAIBatchStatus(StrEnum):
+    COMPLETE = "completed"
+    PROGRESS = "in_progress"
+    SUCESS   = "completed"
+    FAILURE  = "failed"
+    EXPIRE   = "expired"
+    CANCEL   = "cancelled"
+
+
+class AnthropicBatchStatus(StrEnum):
+    COMPLETE = "ended"
+    PROGRESS = "in_progress"
+    SUCESS   = "succeeded"
+    FAILURE  = "errored"
+    EXPIRE   = "expired"
+    CANCEL   = "canceled"
+
+
 # Estimate from OpenAI's FAQ
 # https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
 CHARACTERS_PER_TOKEN_ASSUMPTION: float = 4.0
@@ -766,6 +784,10 @@ class OpenAIBatchLLMModel(LLMModel):
         default_factory=dict,
         description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
         )
+    status: OpenAIBatchStatus = Field(
+        default=OpenAIBatchStatus,
+        description="Statuses used to report the status of the API request.",
+        )
 
     def write_jsonl(self, 
                     data: list[dict[str, str]],
@@ -809,7 +831,6 @@ class OpenAIBatchLLMModel(LLMModel):
             sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
             async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
 
-        system_message_prompt = {"role": "system", "content": system_prompt}
         human_message_prompt = {"role": "user", "content": prompt}
 
         batch = []
@@ -861,17 +882,17 @@ class OpenAIBatchLLMModel(LLMModel):
                 " OpenAIBatchLLMModel."
             )
 
-        client = openai.OpenAI()
+        client = openai.AsyncOpenAI()
 
         with tempfile.NamedTemporaryFile(suffix=".jsonl") as tmp_file:
             tmp_filename = tmp_file.name
             self.write_jsonl(messages, tmp_filename)
-            file = client.files.create(
-                file=open(tmp_filename, "rb"),
-                purpose="batch"
-            )
+            file = await client.files.create(
+                    file=open(tmp_filename, "rb"),  
+                    purpose="batch"                
+                )
 
-        batch = client.batches.create(
+        batch = await client.batches.create(
             input_file_id=file.id,
             endpoint="/v1/chat/completions",
             completion_window="24h",
@@ -880,13 +901,15 @@ class OpenAIBatchLLMModel(LLMModel):
             }
         )
 
-        while batch.status != "completed":
-            batch = client.batches.retrieve(batch.id)
-            if batch.status == "failed":
+        while batch.status != self.status.COMPLETE:
+            batch = await client.batches.retrieve(batch.id)
+            if batch.status == self.status.FAILURE:
                 raise Exception("Batch failed. \n\nReason: \n" + "\n".join([k.message for k in batch.errors.data]))
+            elif batch.status == self.status.CANCEL:
+                raise Exception("Batch was cancelled.")
             await asyncio.sleep(5)
 
-        responses = client.files.content(batch.output_file_id)
+        responses = await client.files.content(batch.output_file_id)
         response_lines = responses.read().decode('utf-8').splitlines()
         responses = [json.loads(line) for line in response_lines]
         sorted_responses = sorted(responses, key=lambda x: int(x["custom_id"])) # The batchAPI doesn't guarantee the order of the responses
@@ -929,6 +952,10 @@ class AnthropicBatchLLMModel(LLMModel):
         default_factory=dict,
         description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
         )
+    status: AnthropicBatchStatus = Field(
+        default=AnthropicBatchStatus,
+        description="Statuses used to report the status of the API request.",
+        )
 
     @rate_limited
     async def acomplete(self):
@@ -950,7 +977,6 @@ class AnthropicBatchLLMModel(LLMModel):
             sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
             async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
         
-        system_message_prompt = {"role": "system", "content": system_prompt}
         human_message_prompt = {"role": "user", "content": prompt}
 
         batch = []
@@ -998,12 +1024,13 @@ class AnthropicBatchLLMModel(LLMModel):
             requests=requests
         )
 
-        while batch.processing_status != "ended":
+        while batch.processing_status != self.status.COMPLETE:
             batch = client.beta.messages.batches.retrieve(batch.id)
             print(batch.processing_status)
             await asyncio.sleep(5)
 
         responses = client.beta.messages.batches.results(batch.id)
+        
 
         # TODO: [WIP] Extract the completions from response. But I am having a bad time waiting for the API to return the results.
         return 
@@ -1014,7 +1041,7 @@ class AnthropicBatchLLMModel(LLMModel):
         raise NotImplementedError("support to callbacks is not implemented yet")
 
     def infer_llm_type(self):
-        return "chat" #TODO: Support completion models
+        return "chat"
 
     def count_tokens(self, text: str) -> int:
         return len(text) // 4

@@ -170,15 +170,23 @@ class TestOpenAIBatchLLMModel:
             "max_tokens": 64,
         }
 
-    @pytest.mark.asyncio
+    # @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON])# , "body"])
     @pytest.mark.parametrize(
         "config",[
             pytest.param("gpt-4o-mini", id="chat-model"),
             pytest.param("gpt-3.5-turbo-instruct", id="completion-model")
         ], indirect=True
     )
+    @pytest.mark.asyncio
     async def test_run_prompt(self, config: dict[str, Any], request) -> None:
         llm = OpenAIBatchLLMModel(name=config['model'], config=config)
+
+        outputs = []
+        def accum(x) -> None:
+            outputs.append(x)
+
+        async def ac(x) -> None:
+            pass
 
         data = [
             {"animal": "duck"}, 
@@ -199,14 +207,16 @@ class TestOpenAIBatchLLMModel:
             completion = await llm.run_prompt(
                 prompt="The {animal} says",
                 data=data,
+                callbacks=[accum, ac],
             )
 
             assert all([completion[k].model == config['model'] for k, _ in enumerate(data)])
             assert all([completion[k].seconds_to_first_token > 0 for k, _ in enumerate(data)])
             assert all([completion[k].prompt_count > 0 for k, _ in enumerate(data)])
             assert all([completion[k].completion_count > 0 for k, _ in enumerate(data)])
-            assert all([completion[k].completion_count < config['max_tokens'] for k, _ in enumerate(data)])
+            assert all([completion[k].completion_count <= config['max_tokens'] for k, _ in enumerate(data)])
             assert sum([completion[k].cost for k, _ in enumerate(data)]) > 0
+            assert all([str(completion[k]) == outputs[k] for k, _ in enumerate(data)])
 
     @pytest.mark.parametrize(
         "config",[
@@ -236,6 +246,7 @@ class TestAnthropicBatchLLMModel:
             "max_tokens": 64,
         }
 
+    @pytest.mark.vcr
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "config",[
