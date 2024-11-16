@@ -118,9 +118,6 @@ class TestTaskDataset:
         task_config = TaskConfig(
             name=STUB_TASK_DATASET_NAME,
             eval_kwargs={
-                "base_query": base_query_request.model_dump(
-                    exclude={"id", "settings", "docs_name"}
-                ),
                 "base_docs": docs.model_dump(
                     exclude={
                         "id",
@@ -131,6 +128,13 @@ class TestTaskDataset:
                     }
                 ),
             },
+        )
+        # NOTE: set base_query after construction of the TaskConfig. because in
+        # aviary 0.10 the TaskConfig Pydnatic model has types `BaseModel | JsonValue`,
+        # which lead to base_query being cast into a BaseModel. This is probably a bug
+        # in aviary, but for now let's just assign it after TaskConfig construction
+        task_config.eval_kwargs["base_query"] = base_query_request.model_dump(
+            exclude={"id", "docs_name"}
         )
         dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
@@ -148,29 +152,30 @@ class TestTaskDataset:
         ), "Should not have mutated query in base request"
         assert not docs.docs, "Should not have mutated docs in base docs"
         assert (
-            isinstance(metrics_callback.eval_means["total_paper_count"], float) > 0
+            metrics_callback.eval_means["total_paper_count"] > 0
         ), "Expected some papers to help us answer questions"
-        assert (
-            isinstance(metrics_callback.eval_means["reward"], float) > 0
-        ), "Expected some wins"
+        assert metrics_callback.eval_means["reward"] > 0, "Expected some wins"
 
         with subtests.test(msg="zero-shot"):
             # Confirm we can just directly call gen_answer
             base_query_request.settings.agent.tool_names = {
                 GenerateAnswer.gen_answer.__name__
             }
+            base_query_request.settings.answer.max_answer_attempts = 2
             base_query_request.settings.answer.get_evidence_if_no_contexts = False
             dataset = LitQAv2TaskDataset(base_query=base_query_request)
             dataset.data = dataset.data[:2]  # Save the world: just use two questions
             storage_callback = StoreTrajectoriesCallback()
             evaluator = Evaluator(
-                config=EvaluatorConfig(batch_size=len(dataset), max_rollout_steps=2),
+                config=EvaluatorConfig(batch_size=len(dataset), max_rollout_steps=4),
                 agent=SimpleAgent(),
                 dataset=dataset,
                 callbacks=[storage_callback],
             )
             await evaluator.evaluate()
             for traj in storage_callback.eval_trajectories:
+                assert not traj.failed
+                assert traj.done
                 for step in traj.steps:
                     assert all(
                         tc.function.name == GenerateAnswer.gen_answer.__name__

@@ -64,7 +64,7 @@ async def map_fxn_summary(
     # needed empties for failures/skips
     llm_result = LLMResult(model="", date="")
     extras: dict[str, Any] = {}
-    citation = text.name + ": " + text.doc.citation
+    citation = text.name + ": " + text.doc.formatted_citation
     success = False
 
     if prompt_runner:

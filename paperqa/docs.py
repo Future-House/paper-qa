@@ -277,7 +277,7 @@ class Docs(BaseModel):
             result = await llm_model.run_prompt(
                 prompt=parse_config.citation_prompt,
                 data={"text": texts[0].text},
-                skip_system=True,  # skip system because it's too hesitant to answer
+                system_prompt=None,  # skip system because it's too hesitant to answer
             )
             citation = result.text
             if (
@@ -314,7 +314,7 @@ class Docs(BaseModel):
             result = await llm_model.run_prompt(
                 prompt=parse_config.structured_citation_prompt,
                 data={"citation": citation},
-                skip_system=True,
+                system_prompt=None,
             )
             # This code below tries to isolate the JSON
             # based on observed messages from LLMs
@@ -610,7 +610,7 @@ class Docs(BaseModel):
                         prompt_runner=prompt_runner,
                         extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
-                            "citation": f"{m.name}: {m.doc.citation}",
+                            "citation": f"{m.name}: {m.doc.formatted_citation}",
                         },
                         parser=llm_parse_json if prompt_config.use_json else None,
                         callbacks=callbacks,
@@ -698,6 +698,7 @@ class Docs(BaseModel):
                 )
             session.add_tokens(pre)
             pre_str = pre.text
+            
             # make a context to include this
             pre_context = Context(
                 text=Text(
@@ -744,7 +745,7 @@ class Docs(BaseModel):
             answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
         for c in session.contexts:
             name = c.text.name
-            citation = c.text.doc.citation
+            citation = c.text.doc.formatted_citation
             # do check for whole key (so we don't catch Callahan2019a with Callahan2019)
             if name_in_text(name, answer_text):
                 bib[name] = citation

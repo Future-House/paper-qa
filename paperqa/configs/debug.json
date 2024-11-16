@@ -13,6 +13,7 @@
     "defer_embedding": true
   },
   "prompts": {
-    "use_json": false
+    "use_json": false,
+    "context_inner": "{name}: {text}"
   }
 }

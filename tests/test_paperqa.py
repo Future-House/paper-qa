@@ -25,6 +25,7 @@ from paperqa import (
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
+from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.llms import (
     EmbeddingModel,
@@ -422,7 +423,7 @@ async def test_chain_completion() -> None:
     completion = await llm.run_prompt(
         prompt="The {animal} says",
         data={"animal": "duck"},
-        skip_system=True,
+        system_prompt=None,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -431,7 +432,7 @@ async def test_chain_completion() -> None:
     assert str(completion) == "".join(outputs)
 
     completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -452,7 +453,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     completion = await llm.run_prompt(
         prompt="The {animal} says",
         data={"animal": "duck"},
-        skip_system=True,
+        system_prompt=None,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -463,7 +464,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert completion.cost > 0
 
     completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, skip_system=True
+        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -805,6 +806,10 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     assert (
         next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
     )
+    assert (
+        next(iter(docs.docs.values())).formatted_citation
+        == "Wellawatte et al, XAI Review, 2023"
+    ), "Formatted citation should be the same when no metadata is found."
 
 
 def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
@@ -874,8 +879,11 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
         " Models, XAI Review, 2023",
         use_doc_details=True,
-        clients={CrossrefProvider},  # Limit to only crossref since s2 is too flaky
-        fields=["author", "journal"],
+        clients={
+            CrossrefProvider,
+            JournalQualityPostProcessor,
+        },  # Limit to only crossref since s2 is too flaky
+        fields=["author", "journal", "citation_count"],
     )
     doc_details = next(iter(docs.docs.values()))
     # Crossref is non-deterministic in its ordering for results
@@ -896,10 +904,14 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         "10.1021/acs.jctc.2c01235",
         "10.26434/chemrxiv-2022-qfv02",
     }
+    assert "This article has 1 citations." in doc_details.formatted_citation
+    assert "ChemRxiv" in doc_details.formatted_citation
+
     num_retries = 3
     for _ in range(num_retries):
         answer = docs.query("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
+            assert "This article has 1 citations." in answer.context
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
@@ -1121,6 +1133,30 @@ def test_case_insensitive_matching():
     assert strings_similarity("A B c d e", "a b c f") == 0.5
 
 
-def test_answer_rename():
+def test_answer_rename(recwarn) -> None:
+    # TODO: delete this test in v6
     answer = Answer(question="")
     assert isinstance(answer, PQASession)
+    assert len(recwarn) == 1
+    warning_msg = recwarn.pop(DeprecationWarning)
+    assert "'Answer' class is deprecated" in str(warning_msg.message)
+
+
+@pytest.mark.parametrize(
+    "doi_journals",
+    [
+        {"doi": "https://doi.org/10.31224/4087", "journal": "EngRxiv"},
+        {"doi": "10.26434/chemrxiv-2021-hz0qp", "journal": "ChemRxiv"},
+        {"doi": "https://doi.org/10.1101/2024.11.04.621790", "journal": "BioRxiv"},
+        {"doi": "10.1101/2024.11.02.24316629", "journal": "MedRxiv"},
+        # ensure we don't crash when externalIds key is included, but it's None
+        {
+            "doi": "https://doi.org/10.48550/arXiv.2407.10362",
+            "journal": "ArXiv",
+            "other": {"externalIds": None},
+        },
+    ],
+)
+def test_dois_resolve_to_correct_journals(doi_journals):
+    details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
+    assert details.journal == doi_journals["journal"]

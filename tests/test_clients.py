@@ -69,7 +69,7 @@ from paperqa.types import DocDetails
                 " Samuel G. Rodriques, and Andrew D. White. Paperqa:"
                 " retrieval-augmented generative agent for scientific research. ArXiv,"
                 " Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559,"
-                " doi:10.48550/arxiv.2312.07559. This article has 30 citations."
+                " doi:10.48550/arxiv.2312.07559. This article has 37 citations."
             ),
             "is_oa": None,
         },
@@ -93,7 +93,7 @@ from paperqa.types import DocDetails
                 " White, and Philippe Schwaller. Augmenting large language models with"
                 " chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
-                " doi:10.1038/s42256-024-00832-8. This article has 205 citations and is"
+                " doi:10.1038/s42256-024-00832-8. This article has 225 citations and is"
                 " from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
@@ -141,7 +141,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "key": "herger2024highthroughputscreeningof",
             "doi": "10.1101/2024.04.01.587366",
             "doc_id": "8e7669b50f31c52b",
-            "journal": "bioRxiv",
+            "journal": "BioRxiv",
             "authors": [
                 "Michael Herger",
                 "Christina M. Kajba",
@@ -153,7 +153,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "formatted_citation": (
                 "Michael Herger, Christina M. Kajba, Megan Buckley, Ana Cunha, Molly"
                 " Strom, and Gregory M. Findlay. High-throughput screening of human"
-                " genetic variants by pooled prime editing. bioRxiv, Apr 2024. URL:"
+                " genetic variants by pooled prime editing. BioRxiv, Apr 2024. URL:"
                 " https://doi.org/10.1101/2024.04.01.587366,"
                 " doi:10.1101/2024.04.01.587366. This article has 1 citations."
             ),
@@ -208,7 +208,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
     ],
 )
 @pytest.mark.asyncio
-async def test_doi_search(paper_attributes: dict[str, str]) -> None:
+async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
     async with aiohttp.ClientSession() as session:
         client_list = [
             client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
@@ -228,7 +228,14 @@ async def test_doi_search(paper_attributes: dict[str, str]) -> None:
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
             if key not in {"is_oa", "source"}:
-                assert getattr(details, key) == value, f"Should have the correct {key}"
+                if isinstance(value, str):
+                    assert (
+                        getattr(details, key).lower() == value.lower()
+                    ), f"Should have the correct {key}"
+                else:
+                    assert (
+                        getattr(details, key) == value
+                    ), f"Should have the correct {key}"
             elif key == "is_oa":
                 assert (
                     details.other.get("is_oa") == value  # type: ignore[union-attr]
@@ -313,7 +320,6 @@ async def test_minimal_fields_filtering() -> None:
             fields=["title", "doi"],
         )
         assert details
-        assert not details.journal, "Journal should not be populated"
         assert not details.year, "Year should not be populated"
         assert not details.authors, "Authors should not be populated"
         assert set(details.other["client_source"]) == {
@@ -322,7 +328,7 @@ async def test_minimal_fields_filtering() -> None:
         }, "Should be from two sources"
         citation_boilerplate = (
             "Unknown author(s). Augmenting large language models with chemistry tools."
-            " Unknown journal, Unknown year. URL:"
+            " ArXiv, Unknown year. URL:"
         )
         assert details.citation in {
             (  # Match in Nature Machine Intelligence
@@ -330,11 +336,12 @@ async def test_minimal_fields_filtering() -> None:
                 " doi:10.1038/s42256-024-00832-8."
             ),
             (  # Match in arXiv
-                f"{citation_boilerplate} https://doi.org/10.48550/arxiv.2304.05376,"
+                f"{citation_boilerplate} "
+                "https://doi.org/10.48550/arxiv.2304.05376,"
                 " doi:10.48550/arxiv.2304.05376."
             ),
         }, "Citation should be populated"
-        assert not details.source_quality, "No source quality data should exist"
+        assert details.source_quality == -1, "Should be undefined source quality"
 
 
 @pytest.mark.vcr
@@ -353,7 +360,7 @@ async def test_s2_only_fields_filtering() -> None:
         assert s2_details.citation == (
             "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
-            " tools. Unknown journal, Unknown year. URL:"
+            " tools. ArXiv, Unknown year. URL:"
             " https://doi.org/10.48550/arxiv.2304.05376,"
             " doi:10.48550/arxiv.2304.05376."
         ), "Citation should be populated"

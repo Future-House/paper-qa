@@ -1,11 +1,12 @@
 import logging
 from copy import deepcopy
-from typing import Any, Self, cast
+from typing import Any, ClassVar, Self, cast
 
 from aviary.core import (
     Environment,
     Frame,
     Message,
+    Messages,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -20,6 +21,7 @@ from paperqa.utils import get_year
 from .models import QueryRequest
 from .tools import (
     AVAILABLE_TOOL_NAME_TO_CLASS,
+    Complete,
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
@@ -38,17 +40,16 @@ def settings_to_tools(
     embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
 ) -> list[Tool]:
     """
-    Convert a Settings into tools, confirming the gen_answer tool is present.
+    Convert a Settings into tools, confirming the complete tool is present.
 
-    NOTE: the last element of the return will always be GenerateAnswer.
+    NOTE: the last element of the return will always be Complete.
     """
     llm_model = llm_model or settings.get_llm()
     summary_llm_model = summary_llm_model or settings.get_summary_llm()
     embedding_model = embedding_model or settings.get_embedding_model()
     tools: list[Tool] = []
-    has_answer_tool = False
     for tool_type in (
-        (PaperSearch, GatherEvidence, GenerateAnswer)
+        (PaperSearch, GatherEvidence, GenerateAnswer, Complete)
         if settings.agent.tool_names is None
         else [
             AVAILABLE_TOOL_NAME_TO_CLASS[name]
@@ -82,17 +83,14 @@ def settings_to_tools(
                     embedding_model=embedding_model,
                 ).gen_answer
             )
+        elif issubclass(tool_type, Complete):
+            tool = Tool.from_function(Complete().complete)
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
-        if tool.info.name == GenerateAnswer.gen_answer.__name__:
-            tools.append(tool)
-            has_answer_tool = True
+        if tool.info.name == Complete.complete.__name__:
+            tools.append(tool)  # Place at the end
         else:
             tools.insert(0, tool)
-    if not has_answer_tool:
-        raise ValueError(
-            f"{GenerateAnswer.gen_answer.__name__} must be one of the tools."
-        )
     return tools
 
 
@@ -147,7 +145,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                     content=self._query.settings.agent.agent_prompt.format(
                         question=self.state.session.question,
                         status=self.state.status,
-                        gen_answer_tool_name=GenerateAnswer.TOOL_FN_NAME,
+                        complete_tool_name=Complete.TOOL_FN_NAME,
                     ),
                 )
             ],
@@ -157,26 +155,39 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     def export_frame(self) -> Frame:
         return Frame(state=self.state, info={"query": self._query})
 
+    def _has_excess_answer_failures(self) -> bool:
+        if self._query.settings.answer.max_answer_attempts is None:
+            return False
+        return (
+            sum(
+                tn == GenerateAnswer.gen_answer.__name__
+                for s in self.state.tool_history
+                for tn in s
+            )
+            > self._query.settings.answer.max_answer_attempts
+        )
+
+    USE_POST_PROCESSED_REWARD: ClassVar[float] = 0.0
+
     async def step(
         self, action: ToolRequestMessage
-    ) -> tuple[list[Message], float, bool, bool]:
-        self.state.session.add_tokens(action)  # Add usage for action if present
+    ) -> tuple[Messages, float, bool, bool]:
+        self.state.record_action(action)
 
-        # If the action has empty tool_calls, the agent can later take that into account
-        msgs = cast(
+        response_messages = cast(
             list[Message],
             await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
-        )
+        ) or [Message(content=f"No tool calls input in tool request {action}.")]
         return (
-            msgs,
-            0,  # Reward is computed in post-processing, use 0 as a placeholder
+            response_messages,
+            self.USE_POST_PROCESSED_REWARD,
             any(
                 isinstance(msg, ToolResponseMessage)
-                and msg.name == GenerateAnswer.gen_answer.__name__
-                and GenerateAnswer.did_not_fail_to_answer(msg.content)
-                for msg in msgs
-            ),
-            False,
+                and msg.name == Complete.complete.__name__
+                for msg in response_messages
+            )
+            or self._has_excess_answer_failures(),
+            False,  # Let caller determine truncations
         )
 
     def __deepcopy__(self, memo) -> Self:

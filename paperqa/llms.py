@@ -345,7 +345,7 @@ class LLMModel(ABC, BaseModel):
                 # compress them into a single message
                 prompt = "".join([m["text"] for m in msg_parts] + [prompt])
             return await self._run_completion(
-                prompt, data, callbacks, name, skip_system, system_prompt
+                prompt, data, callbacks, name, system_prompt
             )
         raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
 
@@ -452,8 +452,7 @@ class LLMModel(ABC, BaseModel):
         data: dict,
         callbacks: Iterable[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
+        system_prompt: str | None = default_system_prompt,
     ) -> LLMResult:
         """Run a completion prompt.
 
@@ -462,14 +461,13 @@ class LLMModel(ABC, BaseModel):
             data: Keys for the input variables that will be formatted into prompt.
             callbacks: Optional functions to call with each chunk of the completion.
             name: Optional name for the result.
-            skip_system: Set True to skip the system prompt.
-            system_prompt: System prompt to use.
+            system_prompt: System prompt to use, or None/empty string to not use one.
 
         Returns:
             Result of the completion.
         """
         formatted_prompt: str = (
-            prompt if skip_system else system_prompt + "\n\n" + prompt
+            system_prompt + "\n\n" + prompt if system_prompt else prompt
         ).format(**data)
         result = LLMResult(
             model=self.name,
