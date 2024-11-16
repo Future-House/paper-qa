@@ -13,13 +13,17 @@ summary_json_prompt = (
     "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\n"
 )
 
+# The below "cannot answer" sentinel phrase should:
+# 1. Lead to complete tool being called with is_sure=False
+# 2. Can be used for unit testing
+CANNOT_ANSWER_PHRASE = "I cannot answer"
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
     "If the context provides insufficient information reply "
-    '"I cannot answer."'
+    f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
     "like {example_citation}. Only cite from the context "

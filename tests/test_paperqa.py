@@ -34,6 +34,8 @@ from paperqa.llms import (
     LLMModel,
     SparseEmbeddingModel,
 )
+from paperqa.prompts import CANNOT_ANSWER_PHRASE
+from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc
 from paperqa.utils import (
     extract_score,
@@ -761,13 +763,33 @@ def test_docs_pickle(stub_data_dir) -> None:
     assert len(unpickled_docs.docs) == 1
 
 
-def test_bad_context(stub_data_dir) -> None:
+@pytest.mark.parametrize(
+    ("qa_prompt", "unsure_sentinel"),
+    [
+        pytest.param(default_qa_prompt, CANNOT_ANSWER_PHRASE, id="default-unsure"),
+        pytest.param(
+            default_qa_prompt.replace(CANNOT_ANSWER_PHRASE, "I am unsure"),
+            "I am unsure",
+            id="custom-unsure",
+        ),
+    ],
+)
+def test_unrelated_context(
+    agent_test_settings: Settings,
+    stub_data_dir: Path,
+    qa_prompt: str,
+    unsure_sentinel: str,
+) -> None:
+    agent_test_settings.prompts.qa = qa_prompt
+    assert unsure_sentinel in qa_prompt, "Test relies on unsure sentinel in qa prompt"
+
     docs = Docs()
     docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
     session = docs.query(
-        "What do scientist estimate as the planetary composition of Jupyter?"
+        "What do scientist estimate as the planetary composition of Jupyter?",
+        settings=agent_test_settings,
     )
-    assert "cannot answer" in session.answer.lower()
+    assert unsure_sentinel in session.answer
 
 
 def test_repeat_keys(stub_data_dir) -> None:

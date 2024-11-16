@@ -46,7 +46,7 @@ from paperqa.agents.tools import (
     make_status,
 )
 from paperqa.docs import Docs
-from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
+from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
@@ -256,7 +256,7 @@ async def test_agent_types(
         mock_open.call_count <= 1
     ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
     assert response.session.answer, "Answer not generated"
-    assert response.session.answer != "I cannot answer", "Answer not generated"
+    assert response.session.answer != CANNOT_ANSWER_PHRASE, "Answer not generated"
     assert response.session.context, "No contexts were found"
     assert response.session.question == question
     agent_llm = request.settings.agent.agent_llm
@@ -368,7 +368,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     )
     # ensure that GenerateAnswerTool was called
     assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
-    assert "I cannot answer" in response.session.answer
+    assert CANNOT_ANSWER_PHRASE in response.session.answer
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
@@ -412,7 +412,7 @@ async def test_gather_evidence_rejects_empty_docs(
 
     @wraps(GenerateAnswer.gen_answer)
     async def gen_answer(self, state) -> str:  # noqa: ARG001
-        return "I cannot answer."
+        return f"{CANNOT_ANSWER_PHRASE}."
 
     # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
     # we keep running until we get truncated
