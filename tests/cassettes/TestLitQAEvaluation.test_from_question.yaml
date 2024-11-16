@@ -1,0 +1,308 @@
+interactions:
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the single letter answer
+        from the following question and answer\n\nQ: What is my office''s zip code?\n\nOptions:\nA)
+        94107\nB) 94106\nC) cheesecake\nD) Insufficient information to answer this question\nE)
+        -8\n\nthe answer is 94107\n\nSingle Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09",
+        "stream": false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "381"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.54.3
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.54.3
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.7
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4ySzW6DMBCE7zyF5XOoSCBJyy3qJZeqlaKeqgoZeyFOjW3Zi/oT5d0rAw1ETaVe
+          OMy3M8wuHCNCqBQ0J5TvGfLGqnjznJb+oX2c78Qu2b6vDttN+4VPTGf3NdJZcJjyABx/XDfcNFYB
+          SqN7zB0whJA6X6fz9WKd3CYdaIwAFWy1xTiLsXWliRfJIouTLE7uBvfeSA6e5uQlIoSQY/cMPbWA
+          D5qTLqtTGvCe1UDz8xAh1BkVFMq8lx6Z7jsPkBuNoLvqm6nuoGo9C910q9Sgn84vUqa2zpR+4Ge9
+          klr6feGAeaNDqEdjaUdPESGv3ULtRUdqnWksFmjeQIfAddbH0fGMI5wPDA0yNfEsZ1fCCgHIpPKT
+          e1DO+B7E6ByPx1ohzQREk5V/d7mW3a8tdf2f+BFwDhZBFNaBkPxy33HMQfjH/ho7n7grTP2nR2iK
+          SuoanHWy/8KVLZaiTJN0lVYVjU7RNwAAAP//AwB6cqDm7wIAAA==
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8e3454ce1d0cf9ed-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 16 Nov 2024 03:18:00 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=CxagMF3adSImnjurrSLCktMe5rNnZcHIEqsdSZSLDs0-1731727080-1.0.1.1-ymOPVqd8Ak0SpnKXDE8qlUe5mLVyf1O3zKQMu7D8YXYiDiim6f2WDXjvdO4QcJ0ZQlEy8DokE30DJy_Qb9brNg;
+            path=/; expires=Sat, 16-Nov-24 03:48:00 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=s7lDRYJWEVdEktE96XnB5Opmejh.TH4i8F_7V.AuEeM-1731727080955-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "180"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "3000"
+        x-ratelimit-limit-tokens:
+          - "250000"
+        x-ratelimit-remaining-requests:
+          - "2999"
+        x-ratelimit-remaining-tokens:
+          - "249920"
+        x-ratelimit-reset-requests:
+          - 20ms
+        x-ratelimit-reset-tokens:
+          - 19ms
+        x-request-id:
+          - req_2927535f010df8805a554f3886d33a8c
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the single letter answer
+        from the following question and answer\n\nQ: What is my office''s zip code?\n\nOptions:\nA)
+        94107\nB) 94106\nC) cheesecake\nD) Insufficient information to answer this question\nE)
+        -8\n\nthe answer is 94106\n\nSingle Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09",
+        "stream": false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "381"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.54.3
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.54.3
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.7
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4ySUUvDMBSF3/srQp5X6dbNzb05URCF4YMgipQ0ue2iaZIltzIZ+++Srls7nOBL
+          H853z+m5t91GhFAp6JxQvmLIK6vi6+c0x6db+LKw3jwuXpLX9QMs7+zsJr1f0kFwmPwDOB5cF9xU
+          VgFKo/eYO2AIIXU4TYfT0TSZDRtQGQEq2EqL8TjG2uUmHiWjcZyM4+Sqda+M5ODpnLxFhBCybZ6h
+          pxawoXOSDA5KBd6zEuj8OEQIdUYFhTLvpUemkQ46yI1G0E31RV93UNSehW66VqrVd8cXKVNaZ3Lf
+          8qNeSC39KnPAvNEh1KOxtKG7iJD3ZqH6pCO1zlQWMzSfoEPgdLyPo90ZOzhsGRpkqueZDM6EZQKQ
+          SeV796Cc8RWIztkdj9VCmh6Ieiv/7nIue7+21OV/4jvAOVgEkVkHQvLTfbsxB+Ef+2vseOKmMPXf
+          HqHKCqlLcNbJ/RcubDYReZqkl2lR0GgX/QAAAP//AwDGCnMs7wIAAA==
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8e3454d0c819f9ed-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 16 Nov 2024 03:18:01 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "250"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "3000"
+        x-ratelimit-limit-tokens:
+          - "250000"
+        x-ratelimit-remaining-requests:
+          - "2999"
+        x-ratelimit-remaining-tokens:
+          - "249920"
+        x-ratelimit-reset-requests:
+          - 20ms
+        x-ratelimit-reset-tokens:
+          - 19ms
+        x-request-id:
+          - req_e6161561c3d7837f54ffd24aa5959bcc
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the single letter answer
+        from the following question and answer\n\nQ: What is my office''s zip code?\n\nOptions:\nA)
+        94107\nB) 94106\nC) cheesecake\nD) Insufficient information to answer this question\nE)
+        -8\n\nInsufficient information to answer\n\nSingle Letter Answer:"}], "model":
+        "gpt-4-turbo-2024-04-09", "stream": false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "396"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.54.3
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.54.3
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.7
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4ySS2vDMBCE7/4VQue4OI6b16000BAovTS5lGIUaW0rkSUhraEl5L8XOQ87NIVe
+          fJhvZzy79iEihEpB54TyiiGvrYqf1qMtvrrn9/V4s1zsVmnzUizL/erNbzYFHQSH2e6A48X1wE1t
+          FaA0+oS5A4YQUoeT0XCSTpLpsAW1EaCCrbQYZzE2bmviNEmzOMniZHZ2V0Zy8HROPiJCCDm0z9BT
+          C/iic5IMLkoN3rMS6Pw6RAh1RgWFMu+lR6aRDjrIjUbQbfVFX3dQNJ6FbrpR6qwfry9SprTObP2Z
+          X/VCaumr3AHzRodQj8bSlh4jQj7bhZqbjtQ6U1vM0exBh8DJ6BRHuzN2cHhmaJCpnicb3AnLBSCT
+          yvfuQTnjFYjO2R2PNUKaHoh6K//uci/7tLbU5X/iO8A5WASRWwdC8tt9uzEH4R/7a+x64rYw9d8e
+          oc4LqUtw1snTFy5sLh7FNBtPZ2Og0TH6AQAA//8DALbaBE7vAgAA
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8e3454d32aeff9ed-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 16 Nov 2024 03:18:01 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "257"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "3000"
+        x-ratelimit-limit-tokens:
+          - "250000"
+        x-ratelimit-remaining-requests:
+          - "2999"
+        x-ratelimit-remaining-tokens:
+          - "249917"
+        x-ratelimit-reset-requests:
+          - 20ms
+        x-ratelimit-reset-tokens:
+          - 19ms
+        x-request-id:
+          - req_aaa41e9c5fa6a8aaf24acab8d2767b06
+      status:
+        code: 200
+        message: OK
+version: 1
