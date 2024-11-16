@@ -137,7 +137,7 @@ async def run_agent(
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    if session.could_not_answer and agent_status != AgentStatus.TRUNCATED:
+    if agent_status != AgentStatus.TRUNCATED and not session.is_sure:
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
@@ -239,7 +239,7 @@ async def run_fake_agent(
             messages=agent_messages, tools=tools, tool_choice=complete_tool
         )
         await step(complete_action)
-        return AgentStatus.SUCCESS
+        return AgentStatus.SUCCESS if env.state.session.is_sure else AgentStatus.UNSURE
 
     return await _run_with_timeout_failure(rollout, query, env)
 

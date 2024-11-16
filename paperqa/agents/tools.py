@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import DocDetails, PQASession, check_could_not_answer
+from paperqa.types import DocDetails, PQASession
 
 from .search import get_directory_index
 
@@ -302,12 +302,6 @@ class GenerateAnswer(NamedTool):
             ),
         )
 
-        if (
-            state.session.could_not_answer
-            and self.settings.agent.wipe_context_on_answer_failure
-        ):
-            state.session.contexts = []
-            state.session.context = ""
         answer = state.session.answer
         status = state.status
         logger.info(status)
@@ -336,9 +330,7 @@ class GenerateAnswer(NamedTool):
         answer, *rest = re.split(
             pattern=cls.ANSWER_SPLIT_REGEX_PATTERN, string=content, maxsplit=1
         )
-        if len(rest) != 4 or check_could_not_answer(answer):  # noqa: PLR2004
-            return ""
-        return answer
+        return answer if len(rest) == 4 else ""  # noqa: PLR2004
 
 
 class Reset(NamedTool):

@@ -37,6 +37,7 @@ from paperqa.agents.search import (
 )
 from paperqa.agents.task import GradablePaperQAEnvironment
 from paperqa.agents.tools import (
+    Complete,
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
@@ -47,7 +48,7 @@ from paperqa.agents.tools import (
 from paperqa.docs import Docs
 from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text, check_could_not_answer
+from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -838,7 +839,7 @@ class TestGradablePaperQAEnvironment:
             )
         )
         assert done
-        assert not stub_gradable_env.state.session.could_not_answer
+        assert len(stub_gradable_env.state.session.answer) > 10, "Expected an answer"
         assert stub_gradable_env.state.session.used_contexts
         await stub_gradable_env_copy.step(gen_answer_action)
         _, _, done, _ = await stub_gradable_env_copy.step(
@@ -847,7 +848,9 @@ class TestGradablePaperQAEnvironment:
             )
         )
         assert done
-        assert not stub_gradable_env_copy.state.session.could_not_answer
+        assert (
+            len(stub_gradable_env_copy.state.session.answer) > 10
+        ), "Expected an answer"
         assert stub_gradable_env_copy.state.session.used_contexts
         assert sorted(stub_gradable_env.state.session.used_contexts) == sorted(
             stub_gradable_env_copy.state.session.used_contexts
@@ -867,7 +870,9 @@ class TestGradablePaperQAEnvironment:
 
     @pytest.mark.asyncio
     async def test_unsure_answer(
-        self, stub_gradable_env: GradablePaperQAEnvironment
+        self,
+        agent_test_settings: Settings,
+        stub_gradable_env: GradablePaperQAEnvironment,
     ) -> None:
         unsure_answer = "Based on the sources provided, it appears no one has done x."
 
@@ -877,19 +882,34 @@ class TestGradablePaperQAEnvironment:
             query.answer = unsure_answer
             return query
 
-        await stub_gradable_env.reset()
+        reset_obs, tools = await stub_gradable_env.reset()
+
+        # 1. Emulate being unsure after gen_answer
+        answer_action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_name("gen_answer")]
+        )
         with patch.object(
             type(stub_gradable_env.state.docs), "aquery", emulate_answered_but_unsure
         ):
-            obs, _, done, truncated = await stub_gradable_env.step(
-                ToolRequestMessage(tool_calls=[ToolCall.from_name("gen_answer")])
-            )
-        assert len(obs) == 1
-        assert obs[0].content
-        assert not check_could_not_answer(obs[0].content)
-        assert unsure_answer in obs[0].content
+            answer_obs, _, done, truncated = await stub_gradable_env.step(answer_action)
+        assert len(answer_obs) == 1
+        assert answer_obs[0].content
+        assert unsure_answer in answer_obs[0].content
         assert not done
         assert not truncated
+
+        # 2. Check this leads to us being unsure
+        complete_action = await agent_test_settings.get_llm().select_tool(
+            [*reset_obs, answer_action, *answer_obs],
+            tools=tools,
+            tool_choice=next(
+                filter(lambda x: x.info.name == Complete.TOOL_FN_NAME, tools)
+            ),
+        )
+        assert len(complete_action.tool_calls) == 1
+        assert complete_action.tool_calls[0].function.arguments == {
+            "is_sure": False
+        }, "Expected unsure"
 
     @pytest.mark.asyncio
     async def test_sequential_tool_calls(

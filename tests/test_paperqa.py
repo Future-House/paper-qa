@@ -764,10 +764,10 @@ def test_docs_pickle(stub_data_dir) -> None:
 def test_bad_context(stub_data_dir) -> None:
     docs = Docs()
     docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
-    answer = docs.query(
+    session = docs.query(
         "What do scientist estimate as the planetary composition of Jupyter?"
     )
-    assert answer.could_not_answer
+    assert "cannot answer" in session.answer.lower()
 
 
 def test_repeat_keys(stub_data_dir) -> None:
@@ -1007,7 +1007,6 @@ def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
-@pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])  # For couldn't answer
 def test_code() -> None:
     settings = Settings.from_name("fast")
     docs = Docs()
@@ -1016,9 +1015,8 @@ def test_code() -> None:
         THIS_MODULE, "test_paperqa.py", docname="test_paperqa.py", disable_check=True
     )
     assert len(docs.docs) == 1
-    answer = docs.query("What file is read in by test_code?", settings=settings)
-    assert not answer.could_not_answer, "Expected an answer"
-    assert "test_paperqa.py" in answer.answer
+    session = docs.query("What file is read in by test_code?", settings=settings)
+    assert "test_paperqa.py" in session.answer
 
 
 def test_zotero() -> None:
