@@ -789,27 +789,6 @@ async def test_sequential_tool_calls(agent_test_settings: Settings):
 
         assert time.time() - tic > 2 * SLEEP_TIME  # since they are sequential
 
-        with patch(
-            "paperqa.agents.env.ALLOW_PARALLEL_TOOL_CALLS", True  # noqa: FBT003
-        ):
-            tic = time.time()
-            await env.step(
-                ToolRequestMessage(
-                    tool_calls=[
-                        ToolCall.from_name(
-                            "gather_evidence",
-                            question="XAI for chemical property prediction",
-                        ),
-                        ToolCall.from_name(
-                            "gather_evidence",
-                            question="XAI for chemical property prediction",
-                        ),
-                    ]
-                )
-            )
-
-            assert time.time() - tic < SLEEP_TIME * 1.05  # since they are parallel
-
 
 class TestGradablePaperQAEnvironment:
     @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])

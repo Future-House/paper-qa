@@ -1,5 +1,4 @@
 import logging
-import os
 from copy import deepcopy
 from typing import Any, ClassVar, Self, cast
 
@@ -95,11 +94,6 @@ def settings_to_tools(
     return tools
 
 
-ALLOW_PARALLEL_TOOL_CALLS: bool = os.environ.get(
-    "PQA_ALLOW_PARALLEL_TOOL_CALLS", ""
-).lower() in {"true", "1"}
-
-
 class PaperQAEnvironment(Environment[EnvironmentState]):
     """Environment connecting paper-qa's tools with state."""
 
@@ -184,7 +178,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             list[Message],
             await self.exec_tool_calls(
                 action,
-                ordered=not ALLOW_PARALLEL_TOOL_CALLS,
+                ordered=True,  # PQA Environment currently not safe for parallel tool calls
                 state=self.state,
                 handle_tool_exc=True,
             ),
