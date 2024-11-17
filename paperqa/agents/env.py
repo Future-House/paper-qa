@@ -165,8 +165,13 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         # If the action has empty tool_calls, the agent can later take that into account
         msgs = cast(
             list[Message],
-            await self.exec_tool_calls(action, state=self.state, handle_tool_exc=True),
-        )
+            await self.exec_tool_calls(
+                action,
+                ordered=True,  # PQA Environment currently not safe for parallel tool calls
+                state=self.state,
+                handle_tool_exc=True,
+            ),
+        ) or [Message(content=f"No tool calls input in tool request {action}.")]
         return (
             msgs,
             0,  # Reward is computed in post-processing, use 0 as a placeholder
