@@ -1005,6 +1005,27 @@ class AnthropicBatchLLMModel(LLMModel):
         chunks = await self.achat(batch)
         batch_time = asyncio.get_running_loop().time() - start_clock
 
+        if callbacks:
+            for chunk in chunks:
+                await do_callbacks(
+                        async_callbacks, sync_callbacks, chunk.text, name
+                        )
+
+        results = [
+            LLMResult(
+                model=self.name,
+                name=name,
+                prompt=messages,
+                prompt_count=chunk.prompt_tokens,
+                text=chunk.text,
+                completion_count=chunk.completion_tokens,
+                seconds_to_first_token=batch_time,
+                seconds_to_last_token=batch_time,
+            ) for messages, chunk in zip(batch, chunks)
+        ]
+
+        return results
+
     @rate_limited
     async def achat(self, messages: list[dict[str, str]]) -> list[Chunk]:
         try:
@@ -1034,16 +1055,29 @@ class AnthropicBatchLLMModel(LLMModel):
             requests=requests
         )
 
+        start_clock = asyncio.get_running_loop().time()
         while batch.processing_status != self.status.COMPLETE:
             batch = client.beta.messages.batches.retrieve(batch.id)
-            print(batch.processing_status)
-            await asyncio.sleep(5)
+            
+            batch_time = asyncio.get_running_loop().time() - start_clock
+            if batch_time > self.config.get('batch_summary_timelimit'):
+                raise Exception("Batch took too long to complete.")
 
-        responses = client.beta.messages.batches.results(batch.id)
+            logger.info(f"Summary batch status: {batch.processing_status} | Time elapsed: {batch_time}")
+            await asyncio.sleep(self.config.get('batch_polling_interval'))
+
+        responses = [r for r in client.beta.messages.batches.results(batch.id)]
+        sorted_responses = sorted(responses, key=lambda x: int(x.custom_id)) # The batchAPI doesn't guarantee the order of the responses
+
+        chunks = [
+            Chunk(
+                text=response.result.message.content[0].text,
+                prompt_tokens=response.result.message.usage.input_tokens,
+                completion_tokens=response.result.message.usage.output_tokens,
+            ) for response in sorted_responses
+        ]
         
-
-        # TODO: [WIP] Extract the completions from response. But I am having a bad time waiting for the API to return the results.
-        return 
+        return chunks
         
 
     @rate_limited

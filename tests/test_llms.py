@@ -186,15 +186,9 @@ class TestOpenAIBatchLLMModel:
     )
     @pytest.mark.asyncio
     async def test_run_prompt(self, monkeypatch, config: dict[str, Any], request) -> None:
-        ##############################
-        #                            #
-        # Create a mock batch client #
-        #                            #
-        ##############################
-
+        
         mock_client = AsyncMock()
     
-        # Define mock methods for the client
         mock_files_create = AsyncMock()
         mock_batches_create = AsyncMock()
         mock_batches_retrieve = AsyncMock()
@@ -336,9 +330,10 @@ class TestAnthropicBatchLLMModel:
             "model": model_name,
             "temperature": 0.0,
             "max_tokens": 64,
+                "batch_summary_timelimit": 24*60*60,
+            "batch_polling_interval": 5,
         }
 
-    @pytest.mark.vcr
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "config",[
@@ -346,18 +341,132 @@ class TestAnthropicBatchLLMModel:
         ], indirect=True
     )
     async def test_run_prompt(self, config: dict[str, Any], request) -> None:
-        llm = AnthropicBatchLLMModel(name=config['model'], config=config)
 
-        data = [
-            {"animal": "duck"}, 
-            {"animal": "dog"}, 
-            {"animal": "cat"}
-            ]
-        
-        completion = await llm.run_prompt(
-                prompt="The {animal} says",
-                data=data,
-            )
+        mock_client = AsyncMock()
+
+        # Define mock methods for the client
+        mock_client = MagicMock()
+        mock_batches = MagicMock()
+        mock_messages = MagicMock()
+        mock_beta = MagicMock()
+
+        mock_client.beta = mock_beta
+        mock_beta.messages = mock_messages
+        mock_messages.batches = mock_batches
+
+        mock_batches.create = MagicMock()
+        mock_batches.retrieve = MagicMock()
+        mock_batches.results = MagicMock()
+
+        mock_batch_id = 'msgbatch_123'
+        mock_batch = MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.PROGRESS)
+        mock_batches.create.return_value = mock_batch
+
+        batch_retrieve_call = [
+            MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.PROGRESS),
+            MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.COMPLETE, )
+        ]
+        mock_batches.retrieve.side_effect = batch_retrieve_call
+
+        mock_responses = [
+            MagicMock(
+                custom_id='0',
+                result=MagicMock(
+                    message=MagicMock(
+                        id='msg_0143L9rPswgaUyENkHkPJLcn',
+                        content=[
+                            MagicMock(
+                                text="I don't actually hear any ducks saying anything. As an AI assistant, I don't have the ability to hear or interpret sounds from the physical world. I can only respond based on the text you provide to me through this chat interface. If you'd like, you can tell me what you think the duck is",
+                            )
+                        ],
+                        model='claude-3-haiku-20240307',
+                        role='assistant',
+                        stop_reason='max_tokens',
+                        stop_sequence=None,
+                        type='message',
+                        usage=MagicMock(
+                            input_tokens=10,
+                            output_tokens=64
+                        )
+                    ),
+                    type='succeeded'
+                )
+            ),
+            MagicMock(
+                custom_id='1',
+                result=MagicMock(
+                    message=MagicMock(
+                        id='msg_01KujiHEB5S8pfRUCmrbabu4',
+                        content=[
+                            MagicMock(
+                                text="Unfortunately, I don't actually hear a dog speaking. As an AI assistant without physical senses, I can't directly perceive animals making sounds. Could you please provide more context about what the dog is saying, or what you would like me to respond to regarding the dog? I'd be happy to try to assist",
+                            )
+                        ],
+                        model='claude-3-haiku-20240307',
+                        role='assistant',
+                        stop_reason='max_tokens',
+                        stop_sequence=None,
+                        type='message',
+                        usage=MagicMock(
+                            input_tokens=10,
+                            output_tokens=64
+                        )
+                    ),
+                    type='succeeded'
+                )
+            ),
+            MagicMock(
+                custom_id='2',
+                result=MagicMock(
+                    message=MagicMock(
+                        id='msg_01Pf2LqV7wjnwqerkZubbofA',
+                        content=[
+                            MagicMock(
+                                text="I'm afraid I don't actually hear a cat speaking. As an AI assistant, I don't have the ability to hear or communicate with animals directly. I can only respond based on the text you provide to me. If you'd like, you can tell me what you imagine the cat is saying, and I'll",
+                            )
+                        ],
+                        model='claude-3-haiku-20240307',
+                        role='assistant',
+                        stop_reason='max_tokens',
+                        stop_sequence=None,
+                        type='message',
+                        usage=MagicMock(
+                            input_tokens=10,
+                            output_tokens=64
+                        )
+                    ),
+                    type='succeeded'
+                )
+            ),
+        ]
+
+        # Create a generator function
+        def mock_results_generator(batch_id):
+            for response in mock_responses:
+                yield response
+
+        mock_batches.results.return_value = mock_results_generator(mock_batch_id)
+
+        with patch('anthropic.Anthropic', return_value=mock_client):
+            llm = AnthropicBatchLLMModel(name=config['model'], config=config)
+
+            data = [
+                {"animal": "duck"}, 
+                {"animal": "dog"}, 
+                {"animal": "cat"}
+                ]
+            
+            completion = await llm.run_prompt(
+                    prompt="The {animal} says",
+                    data=data,
+                )
+            
+            assert all([completion[k].model == config['model'] for k in range(len(data))])
+            assert all([completion[k].seconds_to_first_token > 0 for k in range(len(data))])
+            assert all([completion[k].prompt_count > 0 for k in range(len(data))])
+            assert all([completion[k].completion_count > 0 for k in range(len(data))])
+            assert all([completion[k].completion_count <= config['max_tokens'] for k in range(len(data))])
+            assert sum([completion[k].cost for k in range(len(data))]) > 0
 
 @pytest.mark.asyncio
 async def test_embedding_model_factory_sentence_transformer() -> None:
