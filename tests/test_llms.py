@@ -1,10 +1,11 @@
 import pathlib
 import pickle
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import litellm
 import pytest
+import json
 
 from paperqa import (
     HybridEmbeddingModel,
@@ -16,7 +17,11 @@ from paperqa import (
     SparseEmbeddingModel,
     embedding_model_factory,
 )
-from paperqa.llms import Chunk
+from paperqa.llms import (
+  Chunk,
+  OpenAIBatchStatus,
+  AnthropicBatchStatus,
+)
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
@@ -160,6 +165,7 @@ class TestLiteLLMModel:
         assert llm.config == rehydrated_llm.config
         assert llm.router.deployment_names == rehydrated_llm.router.deployment_names
 
+
 class TestOpenAIBatchLLMModel:
     @pytest.fixture(scope="class")
     def config(self, request) -> dict[str, Any]:
@@ -172,7 +178,6 @@ class TestOpenAIBatchLLMModel:
             "batch_polling_interval": 5,
         }
 
-    # @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON])# , "body"])
     @pytest.mark.parametrize(
         "config",[
             pytest.param("gpt-4o-mini", id="chat-model"),
@@ -180,45 +185,130 @@ class TestOpenAIBatchLLMModel:
         ], indirect=True
     )
     @pytest.mark.asyncio
-    async def test_run_prompt(self, config: dict[str, Any], request) -> None:
-        llm = OpenAIBatchLLMModel(name=config['model'], config=config)
+    async def test_run_prompt(self, monkeypatch, config: dict[str, Any], request) -> None:
+        ##############################
+        #                            #
+        # Create a mock batch client #
+        #                            #
+        ##############################
 
-        outputs = []
-        def accum(x) -> None:
-            outputs.append(x)
-
-        async def ac(x) -> None:
-            pass
-
-        data = [
-            {"animal": "duck"}, 
-            {"animal": "dog"}, 
-            {"animal": "cat"}
-            ]
+        mock_client = AsyncMock()
+    
+        # Define mock methods for the client
+        mock_files_create = AsyncMock()
+        mock_batches_create = AsyncMock()
+        mock_batches_retrieve = AsyncMock()
+        mock_files_content = AsyncMock()
         
+        mock_client.files.create = mock_files_create
+        mock_client.batches.create = mock_batches_create
+        mock_client.batches.retrieve = mock_batches_retrieve
+        mock_client.files.content = mock_files_content
+
+        mock_file_id = 'file-123'
+        mock_files_create.return_value = MagicMock(id=mock_file_id)
+        
+        mock_batch_id = 'batch_123'
+        mock_batches_create.return_value = MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.PROGRESS)
+
         if request.node.name == "test_run_prompt[completion-model]":
-            with pytest.raises(Exception) as e_info:
+            batch_retrieve_calls = [
+                MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.FAILURE,
+                          errors=MagicMock(
+                              data=[
+                                  MagicMock(message="Batch failed: The model gpt-3.5-turbo-instruct is not supported for batch completions.")]
+                            )
+                        ),
+            ]
+        elif request.node.name == "test_run_prompt[chat-model]":
+            batch_retrieve_calls = [
+                MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.PROGRESS),
+                MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.COMPLETE, output_file_id='file-789')
+            ]
+        mock_batches_retrieve.side_effect = batch_retrieve_calls
+
+        if request.node.name == "test_run_prompt[completion-model]":
+            sample_responses = []
+        elif request.node.name == "test_run_prompt[chat-model]":
+            sample_responses = [
+                {
+                    'id': 'file-789', 'custom_id': '0', 
+                    'response': {
+                        'body': {
+                            'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': 'The duck says "quack." This vocalization is characteristic of the species Anas platyrhynchos, commonly known as the mallard duck, which is often used as a representative example for the duck family, Anatidae.', 'refusal': None}, 'logprobs': None, 'finish_reason': 'stop'}], 'usage': {
+                                'prompt_tokens': 46, 'completion_tokens': 47, 'total_tokens': 93, 'prompt_tokens_details': {'cached_tokens': 0, 'audio_tokens': 0}, 'completion_tokens_details': {'reasoning_tokens': 0, 'audio_tokens': 0, 'accepted_prediction_tokens': 0, 'rejected_prediction_tokens': 0}
+                            },
+                        }
+                    },
+                }, 
+                {
+                    'id': 'file-789', 'custom_id': '1', 
+                    'response': {
+                        'body': {
+                            'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': 'The dog says "bark." This is a vocalization commonly associated with canines, used for communication purposes such as alerting, expressing excitement, or seeking attention.', 'refusal': None}, 'logprobs': None, 'finish_reason': 'stop'}], 
+                            'usage': {
+                                'prompt_tokens': 46, 'completion_tokens': 34, 'total_tokens': 80, 'prompt_tokens_details': {'cached_tokens': 0, 'audio_tokens': 0}, 'completion_tokens_details': {'reasoning_tokens': 0, 'audio_tokens': 0, 'accepted_prediction_tokens': 0, 'rejected_prediction_tokens': 0}
+                            },
+                        }
+                    },
+                }, 
+                {
+                    'id': 'file-789', 'custom_id': '2', 
+                    'response': {
+                        'body': {
+                            'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': 'It seems you\'re quoting or referencing "the cat says." If you\'re looking for a specific context, such as a phrase, a song, or a scientific observation (like feline vocalizations), please provide more details for a precise response.', 'refusal': None}, 'logprobs': None, 'finish_reason': 'stop'}], 
+                            'usage': {
+                                'prompt_tokens': 46, 'completion_tokens': 46, 'total_tokens': 92, 'prompt_tokens_details': {'cached_tokens': 0, 'audio_tokens': 0}, 'completion_tokens_details': {'reasoning_tokens': 0, 'audio_tokens': 0, 'accepted_prediction_tokens': 0, 'rejected_prediction_tokens': 0}
+                            },
+                        }
+                    },
+                }
+            ]
+
+        response_data = '\n'.join(json.dumps(resp) for resp in sample_responses)
+        mock_response_content = MagicMock()
+        mock_response_content.read.return_value = response_data.encode('utf-8')
+        mock_files_content.return_value = mock_response_content
+
+        with patch('openai.AsyncOpenAI', return_value=mock_client):
+            llm = OpenAIBatchLLMModel(name=config['model'], config=config)
+
+            outputs = []
+            def accum(x) -> None:
+                outputs.append(x)
+
+            async def ac(x) -> None:
+                pass
+
+            data = [
+                {"animal": "duck"}, 
+                {"animal": "dog"}, 
+                {"animal": "cat"}
+                ]
+
+            if request.node.name == "test_run_prompt[completion-model]":
+                with pytest.raises(Exception) as e_info:
+                    completion = await llm.run_prompt(
+                        prompt="The {animal} says",
+                        data=data,
+                    )
+                assert "Batch failed" in str(e_info.value)
+                assert "not supported" in str(e_info.value)
+
+            if request.node.name == "test_run_prompt[chat-model]":
                 completion = await llm.run_prompt(
                     prompt="The {animal} says",
                     data=data,
+                    callbacks=[accum, ac],
                 )
-            assert "Batch failed" in str(e_info.value)
-            assert "not supported" in str(e_info.value)
 
-        if request.node.name == "test_run_prompt[chat-model]":
-            completion = await llm.run_prompt(
-                prompt="The {animal} says",
-                data=data,
-                callbacks=[accum, ac],
-            )
-
-            assert all([completion[k].model == config['model'] for k, _ in enumerate(data)])
-            assert all([completion[k].seconds_to_first_token > 0 for k, _ in enumerate(data)])
-            assert all([completion[k].prompt_count > 0 for k, _ in enumerate(data)])
-            assert all([completion[k].completion_count > 0 for k, _ in enumerate(data)])
-            assert all([completion[k].completion_count <= config['max_tokens'] for k, _ in enumerate(data)])
-            assert sum([completion[k].cost for k, _ in enumerate(data)]) > 0
-            assert all([str(completion[k]) == outputs[k] for k, _ in enumerate(data)])
+                assert all([completion[k].model == config['model'] for k in range(len(data))])
+                assert all([completion[k].seconds_to_first_token > 0 for k in range(len(data))])
+                assert all([completion[k].prompt_count > 0 for k in range(len(data))])
+                assert all([completion[k].completion_count > 0 for k in range(len(data))])
+                assert all([completion[k].completion_count <= config['max_tokens'] for k in range(len(data))])
+                assert sum([completion[k].cost for k in range(len(data))]) > 0
+                assert all([str(completion[k]) == outputs[k] for k in range(len(data))])
 
     @pytest.mark.parametrize(
         "config",[

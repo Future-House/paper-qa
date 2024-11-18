@@ -816,8 +816,8 @@ class Settings(BaseSettings):
         if self.use_batch_in_summary:
             import openai
             client = openai.OpenAI()
-            openai_models = [k.id for _, k in enumerate(client.models.list().data) 
-                             if k.owned_by in ['system', "openai"]]
+            openai_models = [k.id for  k in client.models.list().data 
+                             if k.owned_by in ('system', "openai")]
             if self.summary_llm.startswith("claude-"):
                 return AnthropicBatchLLMModel(
                     name=self.summary_llm,
