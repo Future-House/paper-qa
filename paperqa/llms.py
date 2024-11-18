@@ -1048,7 +1048,7 @@ class AnthropicBatchLLMModel(LLMModel):
                 " AnthropicBatchLLMModel."
             )
         
-        client = anthropic.Anthropic()
+        client = anthropic.AsyncAnthropic()
 
         requests = [
             Request(
@@ -1061,13 +1061,13 @@ class AnthropicBatchLLMModel(LLMModel):
             ) for i, m in enumerate(messages)
         ]
 
-        batch = client.beta.messages.batches.create(
+        batch = await client.beta.messages.batches.create(
             requests=requests
         )
 
         start_clock = asyncio.get_running_loop().time()
         while batch.processing_status != self.status.COMPLETE:
-            batch = client.beta.messages.batches.retrieve(batch.id)
+            batch = await client.beta.messages.batches.retrieve(batch.id)
             
             batch_time = asyncio.get_running_loop().time() - start_clock
             if batch_time > self.config.get('batch_summary_timelimit'):
@@ -1076,7 +1076,8 @@ class AnthropicBatchLLMModel(LLMModel):
             logger.info(f"Summary batch status: {batch.processing_status} | Time elapsed: {batch_time}")
             await asyncio.sleep(self.config.get('batch_polling_interval'))
 
-        responses = [r for r in client.beta.messages.batches.results(batch.id)]
+        api_responses = await client.beta.messages.batches.results(batch.id)
+        responses = [r for r in api_responses]
         sorted_responses = sorted(responses, key=lambda x: int(x.custom_id)) # The batchAPI doesn't guarantee the order of the responses
 
         chunks = [

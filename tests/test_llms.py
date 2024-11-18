@@ -4,6 +4,8 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import litellm
+import openai
+import anthropic
 import pytest
 import json
 
@@ -187,23 +189,21 @@ class TestOpenAIBatchLLMModel:
     @pytest.mark.asyncio
     async def test_run_prompt(self, monkeypatch, config: dict[str, Any], request) -> None:
         
-        mock_client = AsyncMock()
+        mock_client = AsyncMock(spec_set=openai.AsyncOpenAI())
     
-        mock_files_create = AsyncMock()
-        mock_batches_create = AsyncMock()
-        mock_batches_retrieve = AsyncMock()
-        mock_files_content = AsyncMock()
-        
-        mock_client.files.create = mock_files_create
-        mock_client.batches.create = mock_batches_create
-        mock_client.batches.retrieve = mock_batches_retrieve
-        mock_client.files.content = mock_files_content
-
         mock_file_id = 'file-123'
-        mock_files_create.return_value = MagicMock(id=mock_file_id)
+        mock_client.files.create = AsyncMock(
+            return_value=MagicMock(
+                id=mock_file_id
+                )
+            )
         
         mock_batch_id = 'batch_123'
-        mock_batches_create.return_value = MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.PROGRESS)
+        mock_client.batches.create = AsyncMock(
+            return_value=MagicMock(
+                id=mock_batch_id,
+                status=OpenAIBatchStatus.PROGRESS)
+            )
 
         if request.node.name == "test_run_prompt[completion-model]":
             batch_retrieve_calls = [
@@ -219,12 +219,11 @@ class TestOpenAIBatchLLMModel:
                 MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.PROGRESS),
                 MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.COMPLETE, output_file_id='file-789')
             ]
-        mock_batches_retrieve.side_effect = batch_retrieve_calls
+        mock_client.batches.retrieve = AsyncMock(
+            side_effect=batch_retrieve_calls
+            )
 
-        if request.node.name == "test_run_prompt[completion-model]":
-            sample_responses = []
-        elif request.node.name == "test_run_prompt[chat-model]":
-            sample_responses = [
+        sample_responses = [
                 {
                     'id': 'file-789', 'custom_id': '0', 
                     'response': {
@@ -262,7 +261,9 @@ class TestOpenAIBatchLLMModel:
         response_data = '\n'.join(json.dumps(resp) for resp in sample_responses)
         mock_response_content = MagicMock()
         mock_response_content.read.return_value = response_data.encode('utf-8')
-        mock_files_content.return_value = mock_response_content
+        mock_client.files.content = AsyncMock(
+            return_value = mock_response_content
+            )
 
         with patch('openai.AsyncOpenAI', return_value=mock_client):
             llm = OpenAIBatchLLMModel(name=config['model'], config=config)
@@ -342,31 +343,29 @@ class TestAnthropicBatchLLMModel:
     )
     async def test_run_prompt(self, config: dict[str, Any], request) -> None:
 
-        mock_client = AsyncMock()
+        mock_client = AsyncMock(spec_set=anthropic.AsyncAnthropic())
 
         # Define mock methods for the client
         mock_client = MagicMock()
         mock_batches = MagicMock()
-        mock_messages = MagicMock()
-        mock_beta = MagicMock()
-
-        mock_client.beta = mock_beta
-        mock_beta.messages = mock_messages
-        mock_messages.batches = mock_batches
-
-        mock_batches.create = MagicMock()
-        mock_batches.retrieve = MagicMock()
-        mock_batches.results = MagicMock()
+        # mock_client.beta = MagicMock()
+        # mock_client.beta.messages = MagicMock()
+        mock_client.beta.messages.batches = mock_batches
 
         mock_batch_id = 'msgbatch_123'
-        mock_batch = MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.PROGRESS)
-        mock_batches.create.return_value = mock_batch
+        mock_batches.create = AsyncMock(
+            return_value=MagicMock(
+                id=mock_batch_id,
+                processing_status=AnthropicBatchStatus.PROGRESS),
+                )
 
         batch_retrieve_call = [
             MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.PROGRESS),
-            MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.COMPLETE, )
+            MagicMock(id=mock_batch_id, processing_status=AnthropicBatchStatus.COMPLETE)
         ]
-        mock_batches.retrieve.side_effect = batch_retrieve_call
+        mock_batches.retrieve = AsyncMock(
+            side_effect=batch_retrieve_call
+            )
 
         mock_responses = [
             MagicMock(
@@ -445,9 +444,11 @@ class TestAnthropicBatchLLMModel:
             for response in mock_responses:
                 yield response
 
-        mock_batches.results.return_value = mock_results_generator(mock_batch_id)
+        mock_batches.results = AsyncMock(
+            return_value=mock_results_generator(mock_batch_id)
+            )
 
-        with patch('anthropic.Anthropic', return_value=mock_client):
+        with patch('anthropic.AsyncAnthropic', return_value=mock_client):
             llm = AnthropicBatchLLMModel(name=config['model'], config=config)
 
             data = [

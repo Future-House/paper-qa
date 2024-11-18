@@ -124,7 +124,7 @@ async def gather_with_batch(
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: list[Callable[[str], None]] | None = None,
     ) -> list[tuple[Context, LLMResult]]:
-        """Gathers a batch of results for a given text."""
+        """Gathers evidence considering a batch of texts. The completions are obtained using a batch API."""
         data = [
                 {"question": question, 
                     "citation": m.name + ": " + m.doc.formatted_citation, 
