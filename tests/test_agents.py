@@ -619,9 +619,10 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                 "description": (
                     "Reset by clearing all current evidence from the system."
                     "\n\nThis tool is useful when repeatedly failing to answer because"
-                    " new evidence can give new perspective.\nIt does not make sense to"
-                    " call this tool in parallel with other tools, as its resetting all"
-                    " state.\nOnly invoke this tool when the current evidence is above"
+                    " the existing evidence may unsuitable for the question.\nIt does"
+                    " not make sense to call this tool in parallel with other tools,"
+                    " as its resetting all state.\n"
+                    "Only invoke this tool when the current evidence is above"
                     " zero, or this tool will be useless."
                 ),
                 "parameters": {"type": "object", "properties": {}, "required": []},

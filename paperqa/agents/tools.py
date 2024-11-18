@@ -340,10 +340,10 @@ class Reset(NamedTool):
         """
         Reset by clearing all current evidence from the system.
 
-        This tool is useful when repeatedly failing to answer because new evidence can give new perspective.
+        This tool is useful when repeatedly failing to answer because the existing evidence may unsuitable for the question.
         It does not make sense to call this tool in parallel with other tools, as its resetting all state.
         Only invoke this tool when the current evidence is above zero, or this tool will be useless.
-        """
+        """  # noqa: E501,W505
         logger.info(f"Resetting '{state.session.question}'.")
         state.session.contexts = []
         state.session.context = ""
