@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib
 import itertools
 import json
@@ -26,7 +27,7 @@ from pytest_subtests import SubTests
 from tantivy import Index
 
 from paperqa.agents import SearchIndex, agent_query
-from paperqa.agents.env import settings_to_tools
+from paperqa.agents.env import PaperQAEnvironment, settings_to_tools
 from paperqa.agents.main import FAKE_AGENT_TYPE
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
 from paperqa.agents.search import (
@@ -747,6 +748,46 @@ def test_answers_are_striped() -> None:
     assert response.session.contexts[0].text.doc.embedding is None
     # make sure it serializes
     response.model_dump_json()
+
+
+@pytest.mark.asyncio
+async def test_sequential_tool_calls(agent_test_settings: Settings):
+
+    SLEEP_TIME = 2.0
+
+    async def fake_gather_evidence(*args, **kwargs) -> str:  # noqa: ARG001
+        await asyncio.sleep(SLEEP_TIME)
+        return "fake evidence"
+
+    question = "How can you use XAI for chemical property prediction?"
+    env = PaperQAEnvironment(
+        query=QueryRequest(query=question, settings=agent_test_settings),
+        docs=Docs(),
+    )
+    await env.reset()
+
+    gather_tool = next(
+        tool for tool in env.tools if tool.info.name == GatherEvidence.TOOL_FN_NAME
+    )
+
+    with patch.object(gather_tool, "_tool_fn", fake_gather_evidence):
+        tic = time.time()
+        await env.step(
+            ToolRequestMessage(
+                tool_calls=[
+                    ToolCall.from_name(
+                        "gather_evidence",
+                        question="XAI for chemical property prediction",
+                    ),
+                    ToolCall.from_name(
+                        "gather_evidence",
+                        question="XAI for chemical property prediction",
+                    ),
+                ]
+            )
+        )
+
+        assert time.time() - tic > 2 * SLEEP_TIME  # since they are sequential
 
 
 class TestGradablePaperQAEnvironment:
