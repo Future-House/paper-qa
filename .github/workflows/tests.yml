@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - uses: pre-commit/action@v3.0.1
-      - uses: pre-commit-ci/lite-action@v1.0.3
+      - uses: pre-commit-ci/lite-action@v1.1.0
         if: always()
   lint:
     runs-on: ubuntu-latest
