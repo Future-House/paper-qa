@@ -113,6 +113,7 @@ class Docs(BaseModel):
         self.texts = []
         self.docs = {}
         self.docnames = set()
+        self.texts_index.clear()
 
     def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name."""
