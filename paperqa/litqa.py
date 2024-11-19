@@ -33,7 +33,20 @@ def make_mc_options(
     unsure_option: str | None = UNSURE_OPTION,
     seed: int | None = None,
 ) -> tuple[str, str, str | None]:
-    """Return string of options (as letters) and correct answer."""
+    r"""
+    Return string of options (as letters) and correct answer.
+
+    Examples:
+        >>> text, ideal_answer, unsure_answer = make_mc_options(
+        ...     ideal="1", distractors=["0", "2", "Dog"], seed=0
+        ... )
+        >>> text
+        'A) Dog\nB) 2\nC) 0\nD) Insufficient information to answer this question\nE) 1'
+        >>> ideal_answer
+        'E'
+        >>> unsure_answer
+        'D'
+    """
     if isinstance(distractors, str):
         try:
             split_distractors = literal_eval(distractors)
