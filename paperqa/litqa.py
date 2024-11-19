@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 import re
+import string
 from ast import literal_eval
 from collections.abc import Awaitable, Callable, Sequence
 from enum import IntEnum
@@ -74,6 +75,11 @@ def make_mc_options(
     if unsure_option:
         options.append(unsure_option)
 
+    if len(options) > len(string.ascii_lowercase):
+        raise NotImplementedError(
+            "Didn't handle more multiple choice options than letters, options were"
+            f" {options}."
+        )
     random.Random(seed).shuffle(options)
     return (
         "\n".join([f"{_CAPITAL_A_INDEX + i:c}) {o}" for i, o in enumerate(options)]),
