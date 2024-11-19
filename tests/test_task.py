@@ -137,10 +137,11 @@ class TestTaskDataset:
             exclude={"id", "docs_name"}
         )
         dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
+        assert isinstance(dataset, StubLitQADataset), "Test assertions depend on this"
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
         evaluator = Evaluator(
-            config=EvaluatorConfig(batch_size=3, max_rollout_steps=10),
+            config=EvaluatorConfig(batch_size=len(dataset.data), max_rollout_steps=10),
             agent=SimpleAgent(),
             dataset=dataset,
             callbacks=[metrics_callback],
