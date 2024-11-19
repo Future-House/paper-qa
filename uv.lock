@@ -1529,7 +1529,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.4.1.dev34+gee351f2.d20241119"
+version = "5.4.1.dev40+g6a7418c.d20241119"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1577,10 +1577,12 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "anthropic" },
     { name = "datasets" },
     { name = "ipython" },
     { name = "ldp" },
     { name = "mypy" },
+    { name = "openai" },
     { name = "pandas-stubs" },
     { name = "pre-commit" },
     { name = "pydantic" },
@@ -1637,7 +1639,7 @@ requires-dist = [
 dev = [
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
-    { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero", "local"] },
+    { name = "paper-qa", extras = ["datasets", "batch", "ldp", "typing", "zotero", "local"] },
     { name = "pre-commit", specifier = ">=3.4" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pylint-pydantic" },

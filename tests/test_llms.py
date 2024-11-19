@@ -197,7 +197,9 @@ class TestOpenAIBatchLLMModel:
 
         mock_batch_id = "batch_123"
         mock_client.batches.create = AsyncMock(
-            return_value=MagicMock(id=mock_batch_id, status=BatchStatus.PROGRESS.from_openai())
+            return_value=MagicMock(
+                id=mock_batch_id, status=BatchStatus.PROGRESS.from_openai()
+            )
         )
 
         if request.node.name == "test_run_prompt[completion-model]":
@@ -451,16 +453,19 @@ class TestAnthropicBatchLLMModel:
         mock_batch_id = "msgbatch_123"
         mock_batches.create = AsyncMock(
             return_value=MagicMock(
-                id=mock_batch_id, processing_status=BatchStatus.PROGRESS.from_anthropic()
+                id=mock_batch_id,
+                processing_status=BatchStatus.PROGRESS.from_anthropic(),
             ),
         )
 
         batch_retrieve_call = [
             MagicMock(
-                id=mock_batch_id, processing_status=BatchStatus.PROGRESS.from_anthropic()
+                id=mock_batch_id,
+                processing_status=BatchStatus.PROGRESS.from_anthropic(),
             ),
             MagicMock(
-                id=mock_batch_id, processing_status=BatchStatus.COMPLETE.from_anthropic()
+                id=mock_batch_id,
+                processing_status=BatchStatus.COMPLETE.from_anthropic(),
             ),
         ]
         mock_batches.retrieve = AsyncMock(side_effect=batch_retrieve_call)
