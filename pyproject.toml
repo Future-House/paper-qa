@@ -6,7 +6,7 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 dev = [
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[datasets,ldp,typing,zotero,local]",
+    "paper-qa[datasets,batch,ldp,typing,zotero,local]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",
