@@ -6,8 +6,8 @@ import random
 import re
 import string
 from ast import literal_eval
-from collections.abc import Awaitable, Callable, Sequence
-from enum import IntEnum
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 try:
@@ -91,20 +91,20 @@ def make_mc_options(
 
 
 DEFAULT_EVAL_MODEL_NAME = "gpt-4-turbo-2024-04-09"
-DEFAULT_REWARD_DISTRIBUTION: tuple[float, float, float] = 1.0, 0.1, -1.0
+DEFAULT_REWARD_MAPPING = {"correct": 1.0, "unsure": 0.1, "incorrect": -1.0}
 
 
-class LitQAEvaluation(IntEnum):
+class LitQAEvaluation(StrEnum):
     """Possible evaluation results for a LitQA question."""
 
-    CORRECT = 0
-    INCORRECT = 2
-    UNSURE = 1
+    CORRECT = "correct"
+    INCORRECT = "incorrect"
+    UNSURE = "unsure"
 
     def make_discounted_returns(
         self,
         num_steps: int,
-        rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
+        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         discount: float = 1.0,
     ) -> list[float]:
         try:
