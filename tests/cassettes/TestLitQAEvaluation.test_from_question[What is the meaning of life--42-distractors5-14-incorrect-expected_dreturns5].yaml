@@ -1,0 +1,115 @@
+interactions:
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the single letter answer
+        from the following question and answer\n\nQuestion: Q: What is the meaning of
+        life?\n\nOptions:\nA) 42\nB) 11\nC) cheesecake\nD) Insufficient information
+        to answer this question\nE) -84\n\nAnswer: 14\n\nSingle Letter Answer:"}], "model":
+        "gpt-4-turbo-2024-04-09", "stream": false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "376"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.54.4
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.54.4
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.7
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4xUUW/bNhB+96848KUrIAeOq9Sp37JmaAsM2NAGA4p6MGjyJN5C8TQeFcco8t8H
+          SrLldBmwF0Pmd/d93x3v+H0GoMiqNSjjdDJN6+c3f3y2/OYr3v0Wvn52q8vFJyxX76X8Nd7631WR
+          M3j3F5p0zLow3LQeE3EYYBNRJ8ysl6s3y8XVanVd9kDDFn1Oq9s0L+epizueLxfLcr4o54t3Y7Zj
+          MihqDd9mAADf+9/sM1h8VGtYFMeTBkV0jWp9CgJQkX0+UVqEJOmQVDGBhkPC0Fu/cwh/dyjZN7SR
+          H8iiBRLQ0DryLNw6MtoDByyAq4QBXNdw5E78AXSQPUa0sKfkYKPK5UbBTgta4AC33NVeC9xY3cgr
+          2PRqHykZ5+ge4yuBDx1ZhMSQHMIH7fXjodgo2DuMCOUyG6npAQNo6UM6n6jRCUfhY2aDOlCogSvw
+          VGExxAZ6wChYgA4W8AHjITkK9QV85H3+O4SNTKfae2kS2KjLcvBCxoFlFAicwFJEk/wBDMeI0nKw
+          2YUOh6yeCbnNzTwa/+mmgJ8LeF/AbQG/vL7YhE34QsHguXjW2qhJpNHJuBc4h1LS+Z1puReoOIIG
+          oVB7BI8pYRypC6AEgtj0/YsIDdUuwQ5BQ0PSBYsxz4ft2xcBY+QIFHqRU08Grgv4VMEewXAQsrn7
+          Dodh6G2Zzqcuag8RK4yYSxzdH80ODTeeBeVY5HiD6dD2Y3acrWNn9tx5Cztc577dvIZymT/uXCcD
+          2cs1nyaw18vT/piG1o0yw83JOHokPwz7ZPi5/vkSRaw60XmRQ+f9eP502krPdRt5JyN+Oq8okLht
+          RC0c8gZK4lb16NMM4M9++7tnC63ayE2btonvMWTC1eVAp6Y3ZwIvV+WIJk7aT8CyvCpe4NtaTJq8
+          nL0fymjj0E6p02OjO0t8BszOqv63nZe4h8op1P+HfgKMwTah3bYRLZnnJU9hEfOb/F9hpy73hpUc
+          JGGzrSjUGNtIw4tYtVt7Za/Lt9fv3qKaPc3+AQAA//8DAFRoDUgfBgAA
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8e53de9d497f175e-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 19 Nov 2024 23:09:52 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=MNWsjeR2aMPqGhyx4Ome7CWhQvu5X0Fqso2NlrQK7p4-1732057792-1.0.1.1-xjn.aYGRV3B7DlJL3JfTUKkJpBrjnq0ecR7RalDuGUb_yRHALOw2_Sq7tpItjxJqOZHOY4dqMdcUdvYA.F4FXw;
+            path=/; expires=Tue, 19-Nov-24 23:39:52 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=pgpnoOerkuwHAV2LDt6_xqP7OjZYP.OyWVrjaoNuRi4-1732057792188-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "8183"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "3000"
+        x-ratelimit-limit-tokens:
+          - "250000"
+        x-ratelimit-remaining-requests:
+          - "2999"
+        x-ratelimit-remaining-tokens:
+          - "249922"
+        x-ratelimit-reset-requests:
+          - 20ms
+        x-ratelimit-reset-tokens:
+          - 18ms
+        x-request-id:
+          - req_ac28a187539ebf04fa1061f3ee8eff3c
+      status:
+        code: 200
+        message: OK
+version: 1
