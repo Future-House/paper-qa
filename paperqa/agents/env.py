@@ -13,7 +13,11 @@ from aviary.core import (
 )
 
 from paperqa.docs import Docs
-from paperqa.llms import EmbeddingModel, LiteLLMModel
+from paperqa.llms import (
+    EmbeddingModel,
+    LiteLLMModel,
+    LLMBatchModel,
+)
 from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.utils import get_year
@@ -36,7 +40,7 @@ POPULATE_FROM_SETTINGS = None
 def settings_to_tools(
     settings: Settings,
     llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
-    summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
+    summary_llm_model: LiteLLMModel | LLMBatchModel | None = POPULATE_FROM_SETTINGS,
     embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
 ) -> list[Tool]:
     """

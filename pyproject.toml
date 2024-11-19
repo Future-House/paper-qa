@@ -71,6 +71,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
+batch = [
+    "anthropic",
+    "openai",
+]
 datasets = [
     "datasets",
 ]
@@ -87,10 +91,6 @@ typing = [
 ]
 zotero = [
     "pyzotero",
-]
-batch = [
-    "openai",
-    "anthropic",
 ]
 
 [project.scripts]

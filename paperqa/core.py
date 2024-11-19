@@ -68,12 +68,13 @@ async def map_fxn_summary(
     success = False
 
     if prompt_runner:
-        llm_result = await prompt_runner(
+        result = await prompt_runner(
             {"question": question, "citation": citation, "text": text.text}
             | (extra_prompt_data or {}),
             callbacks,
             "evidence:" + text.name,
         )
+        llm_result = result if isinstance(result, LLMResult) else result[0]
         context = llm_result.text
         result_data = parser(context) if parser else {}
         success = bool(result_data)
@@ -116,6 +117,7 @@ async def map_fxn_summary(
         llm_result,
     )
 
+
 async def gather_with_batch(
     matches: list[Text],
     question: str,
@@ -123,42 +125,66 @@ async def gather_with_batch(
     extra_prompt_data: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: list[Callable[[str], None]] | None = None,
-    ) -> list[tuple[Context, LLMResult]]:
-        """Gathers evidence considering a batch of texts. The completions are obtained using a batch API."""
-        data = [
-                {"question": question, 
-                    "citation": m.name + ": " + m.doc.formatted_citation, 
-                    "text": m.text} | 
-                    extra_prompt_data or {}
-                for m in matches
-            ]
+) -> list[tuple[Context, LLMResult]]:
+    """
+    Gathers evidence considering a batch of texts. The completions are obtained using a batch API.
 
-        llm_results = await prompt_runner(
-                    data,
-                    callbacks,
-                )
+    Args:
+        matches (list[Text]): A list of text matches to gather evidence from.
+        question (str): The question to be answered.
+        prompt_runner (PromptRunner | None): The prompt runner to use for obtaining completions.
+        extra_prompt_data (dict[str, str] | None, optional): Additional data to include in the prompt.
+        parser (Callable[[str], dict[str, Any]] | None, optional): A function to parse the LLM result text.
+        callbacks (list[Callable[[str], None]] | None, optional): A list of callback functions to be called
+        with the LLM result text.
 
-        results_data = []
-        scores = []
-        for r in llm_results:
-            try:
-                results_data.append(parser(r.text))
-                scores.append(r.pop("relevance_score"))
-                # just in case question was present
-                r.pop("question", None)
-            except:
-                results_data.append({})
-                scores.append(extract_score(r.text))
-        
-        return [
-                    (
-                        Context(
-                            context=strip_citations(llm_result.text),
-                            text=m,
-                            model_extra={},
-                            score=score,
-                            **r,
-                        ),
-                        llm_result,
-                    ) for r, m, llm_result, score in zip(results_data, matches, llm_results, scores)
-        ]
+    Returns:
+        list[tuple[Context, LLMResult]]: A list of tuples containing the context and LLM result for each match.
+    """
+    data = [
+        {
+            "question": question,
+            "citation": m.name + ": " + m.doc.formatted_citation,
+            "text": m.text,
+        }
+        | (extra_prompt_data or {})
+        for m in matches
+    ]
+
+    llm_results : list[LLMResult] = []
+    if prompt_runner:
+        result = await prompt_runner(
+            data,
+            callbacks,
+            "evidence:" + matches[0].name,
+        )
+        llm_results = result if isinstance(result, list) else [result]
+
+    results_data = []
+    scores = []
+    for r in llm_results:
+        if parser:
+            res = parser(r.text)
+            results_data.append(res)
+            scores.append(res.pop("relevance_score"))
+            # just in case question was present
+            res.pop("question", None)
+        else:
+            results_data.append({})
+            scores.append(extract_score(r.text))
+
+    return [
+        (
+            Context(
+                context=strip_citations(llm_result.text),
+                text=m,
+                model_extra={},
+                score=score,
+                **r,
+            ),
+            llm_result,
+        )
+        for r, m, llm_result, score in zip(
+            results_data, matches, llm_results, scores, strict=True
+        )
+    ]

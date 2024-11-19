@@ -505,9 +505,10 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
         assert docs.texts
         assert all(t not in docs.texts_index for t in docs.texts)
 
+
 def test_evidence(docs_fixture) -> None:
     debug_settings = Settings.from_name("debug")
-    evidence = docs_fixture.get_evidence( 
+    evidence = docs_fixture.get_evidence(
         PQASession(question="What does XAI stand for?"),
         settings=debug_settings,
     ).contexts

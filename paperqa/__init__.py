@@ -11,15 +11,15 @@ from paperqa.agents.main import agent_query  # noqa: E402
 from paperqa.agents.models import QueryRequest  # noqa: E402
 from paperqa.docs import Docs, PQASession, print_callback  # noqa: E402
 from paperqa.llms import (  # noqa: E402
+    AnthropicBatchLLMModel,
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
     LiteLLMModel,
-    OpenAIBatchLLMModel,
-    AnthropicBatchLLMModel,
     LLMModel,
     LLMResult,
     NumpyVectorStore,
+    OpenAIBatchLLMModel,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
     embedding_model_factory,
@@ -30,6 +30,7 @@ from paperqa.version import __version__  # noqa: E402
 
 __all__ = [
     "Answer",
+    "AnthropicBatchLLMModel",
     "Context",
     "Doc",
     "DocDetails",
@@ -40,9 +41,8 @@ __all__ = [
     "LLMResult",
     "LiteLLMEmbeddingModel",
     "LiteLLMModel",
-    "OpenAIBatchLLMModel",
-    "AnthropicBatchLLMModel",
     "NumpyVectorStore",
+    "OpenAIBatchLLMModel",
     "PQASession",
     "QueryRequest",
     "SentenceTransformerEmbeddingModel",

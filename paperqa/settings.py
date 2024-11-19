@@ -41,11 +41,12 @@ except ImportError:
     HAS_LDP_INSTALLED = False
 
 from paperqa.llms import (
-    EmbeddingModel, 
-    LiteLLMModel, 
-    OpenAIBatchLLMModel, 
-    AnthropicBatchLLMModel, 
-    embedding_model_factory
+    AnthropicBatchLLMModel,
+    EmbeddingModel,
+    LiteLLMModel,
+    LLMBatchModel,
+    OpenAIBatchLLMModel,
+    embedding_model_factory,
 )
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
@@ -570,15 +571,14 @@ def make_default_litellm_model_list_settings(
         ]
     }
 
-def make_default_openai_batch_llm_settings(
-    llm: str, temperature: float = 0.0
-) -> dict:
+
+def make_default_openai_batch_llm_settings(llm: str, temperature: float = 0.0) -> dict:
     return {
         "model": llm,
         "temperature": temperature,
         "max_tokens": 2048,
-
     }
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
@@ -622,7 +622,7 @@ class Settings(BaseSettings):
         ),
     )
     batch_summary_timelimit: int = Field(
-        default=24*60*60,
+        default=24 * 60 * 60,
         description="Time limit for batch summarization in seconds",
     )
     batch_polling_interval: int = Field(
@@ -812,12 +812,16 @@ class Settings(BaseSettings):
             or make_default_litellm_model_list_settings(self.llm, self.temperature),
         )
 
-    def get_summary_llm(self) -> LiteLLMModel:
+    def get_summary_llm(self) -> LiteLLMModel | LLMBatchModel:
         if self.use_batch_in_summary:
             import openai
+
             client = openai.OpenAI()
-            openai_models = [k.id for  k in client.models.list().data 
-                             if k.owned_by in ('system', "openai")]
+            openai_models = [
+                k.id
+                for k in client.models.list().data
+                if k.owned_by in {"system", "openai"}
+            ]
             if self.summary_llm.startswith("claude-"):
                 return AnthropicBatchLLMModel(
                     name=self.summary_llm,
@@ -826,7 +830,7 @@ class Settings(BaseSettings):
                         self.summary_llm, self.temperature
                     ),
                 )
-            elif self.summary_llm in openai_models:
+            if self.summary_llm in openai_models:
                 return OpenAIBatchLLMModel(
                     name=self.summary_llm,
                     config=self.summary_llm_config
@@ -834,12 +838,11 @@ class Settings(BaseSettings):
                         self.summary_llm, self.temperature
                     ),
                 )
-            else: 
-                raise NotImplementedError(
-                    "`use_batch_in_summary` is set to True, but the summary LLM is not supported"
-                    "for batch processing.\nEither use a Claude or an OpenAI chat model or set "
-                    "`use_batch_in_summary` to False."
-                    )
+            raise NotImplementedError(
+                "`use_batch_in_summary` is set to True, but the summary LLM is not supported"
+                "for batch processing.\nEither use a Claude or an OpenAI chat model or set "
+                "`use_batch_in_summary` to False."
+            )
         return LiteLLMModel(
             name=self.summary_llm,
             config=self.summary_llm_config

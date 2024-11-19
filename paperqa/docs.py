@@ -22,13 +22,10 @@ from pydantic import (
 )
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
-from paperqa.core import (
-    llm_parse_json, 
-    map_fxn_summary,
-    gather_with_batch
-)
+from paperqa.core import gather_with_batch, llm_parse_json, map_fxn_summary
 from paperqa.llms import (
     EmbeddingModel,
+    LLMBatchModel,
     LLMModel,
     NumpyVectorStore,
     PromptRunner,
@@ -44,7 +41,6 @@ from paperqa.types import (
     LLMResult,
     PQASession,
     Text,
-    Context,
     set_llm_session_ids,
 )
 from paperqa.utils import (
@@ -55,8 +51,6 @@ from paperqa.utils import (
     maybe_is_text,
     md5sum,
     name_in_text,
-    extract_score,
-    strip_citations
 )
 
 logger = logging.getLogger(__name__)
@@ -537,14 +531,14 @@ class Docs(BaseModel):
             )
         )
 
-    async def aget_evidence(
+    async def aget_evidence(  # noqa: PLR0912
         self,
         query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
-        summary_llm_model: LLMModel | None = None,
+        summary_llm_model: LLMModel | LLMBatchModel | None = None,
     ) -> PQASession:
 
         evidence_settings = get_settings(settings)
@@ -609,8 +603,8 @@ class Docs(BaseModel):
         with set_llm_session_ids(session.id):
             if evidence_settings.use_batch_in_summary:
                 results = await gather_with_batch(
-                    matches = matches,
-                    question = session.question,
+                    matches=matches,
+                    question=session.question,
                     prompt_runner=prompt_runner,
                     extra_prompt_data={
                         "summary_length": answer_config.evidence_summary_length,
@@ -640,7 +634,7 @@ class Docs(BaseModel):
         for _, llm_result in results:
             session.add_tokens(llm_result)
 
-        session.contexts += [r for r, _ in results if r is not None]
+        session.contexts += [r for r, _ in results]
         return session
 
     def query(
@@ -649,7 +643,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
-        summary_llm_model: LLMModel | None = None,
+        summary_llm_model: LLMModel | LLMBatchModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> PQASession:
         return get_loop().run_until_complete(
@@ -669,7 +663,7 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
-        summary_llm_model: LLMModel | None = None,
+        summary_llm_model: LLMModel | LLMBatchModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> PQASession:
 
