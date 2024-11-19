@@ -1,16 +1,18 @@
 import asyncio
 from collections.abc import Iterable
+from copy import deepcopy
 from unittest.mock import patch
 
 import pytest
 from aviary.env import TASK_DATASET_REGISTRY, TaskConfig, TaskDataset
 from ldp.agent import SimpleAgent
-from ldp.alg.callbacks import MeanMetricsCallback, StoreTrajectoriesCallback
+from ldp.alg.callbacks import Callback, MeanMetricsCallback, StoreTrajectoriesCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 from pytest_subtests import SubTests
 
 from paperqa import Docs, QueryRequest, Settings
 from paperqa.agents import get_directory_index
+from paperqa.agents.env import PaperQAEnvironment
 from paperqa.agents.task import (
     GradablePaperQAEnvironment,
     LitQATaskDataset,
@@ -74,6 +76,27 @@ TASK_DATASET_REGISTRY[STUB_TASK_DATASET_NAME] = (
 )
 
 
+class StoreEnvCallback(Callback):
+    """Test utility to store instantiated environments."""
+
+    def __init__(self):
+        super().__init__()
+        # NOTE: using question-to-env because too lazy to implement __hash__
+        # for this being a set of envs
+        self.query_to_envs: dict[str, PaperQAEnvironment] = {}
+
+    async def before_transition(
+        self, traj_id, agent, env, agent_state, obs  # noqa: ARG002
+    ) -> None:
+        if not isinstance(env, PaperQAEnvironment):
+            raise NotImplementedError(
+                f"Didn't yet handle environment type {type(env).__name__}."
+            )
+        question = env._query.query
+        if env not in self.query_to_envs:
+            self.query_to_envs[question] = env
+
+
 class TestTaskDataset:
 
     @pytest.mark.parametrize(
@@ -113,6 +136,7 @@ class TestTaskDataset:
     ) -> None:
         await get_directory_index(settings=base_query_request.settings)  # Build
         docs = Docs()
+        raw_docs_deepcopy = deepcopy(docs)  # Preserve for later assertions
         # Why are we constructing a TaskConfig here using a serialized QueryRequest and
         # Docs? It's to confirm everything works as if hydrating from a YAML config file
         task_config = TaskConfig(
@@ -137,13 +161,15 @@ class TestTaskDataset:
             exclude={"id", "docs_name"}
         )
         dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
+        assert isinstance(dataset, StubLitQADataset), "Test assertions depend on this"
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
+        store_env_callback = StoreEnvCallback()
 
         evaluator = Evaluator(
-            config=EvaluatorConfig(batch_size=3, max_rollout_steps=10),
+            config=EvaluatorConfig(batch_size=len(dataset.data), max_rollout_steps=10),
             agent=SimpleAgent(),
             dataset=dataset,
-            callbacks=[metrics_callback],
+            callbacks=[metrics_callback, store_env_callback],
         )
         await evaluator.evaluate()
 
@@ -155,6 +181,12 @@ class TestTaskDataset:
             metrics_callback.eval_means["total_paper_count"] > 0
         ), "Expected some papers to help us answer questions"
         assert metrics_callback.eval_means["reward"] > 0, "Expected some wins"
+
+        with subtests.test(msg="confirming-reset-works"):
+            assert len(store_env_callback.query_to_envs) == len(dataset)
+            for env in store_env_callback.query_to_envs.values():
+                await env.reset()
+                assert env.state.docs == raw_docs_deepcopy
 
         with subtests.test(msg="zero-shot"):
             # Confirm we can just directly call gen_answer

@@ -1158,7 +1158,11 @@ class VectorStore(BaseModel, ABC):
     model_config = ConfigDict(extra="forbid")
 
     # can be tuned for different tasks
-    mmr_lambda: float = Field(default=0.9)
+    mmr_lambda: float = Field(
+        default=1.0,
+        ge=0.0,
+        description="MMR lambda value, a value above 1 disables MMR search.",
+    )
     texts_hashes: set[int] = Field(default_factory=set)
 
     def __contains__(self, item) -> bool:

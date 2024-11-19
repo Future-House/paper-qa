@@ -81,6 +81,28 @@ class Docs(BaseModel):
     )
     deleted_dockeys: set[DocKey] = Field(default_factory=set)
 
+    def __eq__(self, other) -> bool:
+        if (
+            not isinstance(other, type(self))
+            or not isinstance(self.texts_index, NumpyVectorStore)
+            or not isinstance(other.texts_index, NumpyVectorStore)
+        ):
+            return NotImplemented
+        return (
+            self.docs == other.docs
+            and len(self.texts) == len(other.texts)
+            and all(  # TODO: implement Text.__eq__
+                getattr(self_text, attr) == getattr(other_text, attr)
+                for attr in ("text", "name", "doc")
+                for self_text, other_text in zip(self.texts, other.texts, strict=True)
+            )
+            and self.docnames == other.docnames
+            and self.texts_index == other.texts_index
+            and self.name == other.name
+            and self.index_path == other.index_path
+            # NOTE: ignoring deleted_dockeys
+        )
+
     @field_validator("index_path")
     @classmethod
     def handle_default(cls, value: Path | None, info: ValidationInfo) -> Path | None:
@@ -92,6 +114,7 @@ class Docs(BaseModel):
         self.texts = []
         self.docs = {}
         self.docnames = set()
+        self.texts_index.clear()
 
     def _get_unique_name(self, docname: str) -> str:
         """Create a unique name given proposed name."""
