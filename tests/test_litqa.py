@@ -10,7 +10,7 @@ class TestLitQAEvaluation:
     @staticmethod
     def _assert_prompt_is_valid(
         qa_prompt: str, question: str, ideal: str, distractors: list[str]
-    ):
+    ) -> None:
         for substr in (question, "Insufficient information", ideal, *distractors):
             assert qa_prompt.count(substr) == 1
 
@@ -55,6 +55,7 @@ class TestLitQAEvaluation:
         qa_prompt_2, _ = LitQAEvaluation.from_question(
             ideal=ideal, distractors=distractors, question=question, seed=0
         )
+        self._assert_prompt_is_valid(qa_prompt_1, question, ideal, distractors)
         assert qa_prompt_1 == qa_prompt_2
 
     def test_creating_litqa_questions(self) -> None:
