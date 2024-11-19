@@ -96,8 +96,8 @@ class LitQAEvaluation(IntEnum):
     """Possible evaluation results for a LitQA question."""
 
     CORRECT = 0
-    INCORRECT = 1
-    UNSURE = 2
+    INCORRECT = 2
+    UNSURE = 1
 
     def make_discounted_returns(
         self,
@@ -107,7 +107,8 @@ class LitQAEvaluation(IntEnum):
     ) -> list[float]:
         try:
             return discounted_returns(
-                [i * rewards[self.value] for i in range(num_steps, 0, -1)],
+                # paper-qa has no intermediary rewards
+                [0] * (num_steps - 1) + [rewards[self.value]],
                 terminated=[False] * (num_steps - 1) + [True],
                 discount=discount,
             )
