@@ -33,12 +33,12 @@ def make_mc_options(
     distractors: str | Sequence[str],
     unsure_option: str | None = UNSURE_OPTION,
     seed: int | None = None,
-) -> tuple[str, str, str | None]:
+) -> tuple[str, str, str | None, list[str]]:
     r"""
     Return string of options (as letters) and correct answer.
 
     Examples:
-        >>> text, ideal_answer, unsure_answer = make_mc_options(
+        >>> text, ideal_answer, unsure_answer, distractor_answers = make_mc_options(
         ...     ideal="1", distractors=["0", "2", "Dog"], seed=0
         ... )
         >>> text
@@ -47,6 +47,8 @@ def make_mc_options(
         'E'
         >>> unsure_answer
         'D'
+        >>> distractor_answers
+        ['C', 'B', 'A']
     """
     if isinstance(distractors, str):
         try:
@@ -84,6 +86,7 @@ def make_mc_options(
         "\n".join([f"{_CAPITAL_A_INDEX + i:c}) {o}" for i, o in enumerate(options)]),
         chr(_CAPITAL_A_INDEX + options.index(correct_answer)),
         chr(_CAPITAL_A_INDEX + options.index(unsure_option)) if unsure_option else None,
+        [chr(_CAPITAL_A_INDEX + options.index(dstr)) for dstr in distractors],
     )
 
 
@@ -119,7 +122,11 @@ class LitQAEvaluation(IntEnum):
 
     @classmethod
     def from_answer(
-        cls, text: str, ideal_mc_answer: str, unsure_mc_answer: str | None = None
+        cls,
+        text: str,
+        ideal_mc_answer: str,
+        unsure_mc_answer: str | None = None,
+        total_options: int | None = None,
     ) -> LitQAEvaluation:
         """Compare text with a multiple choice answer or optionally an unsure answer."""
 
@@ -131,6 +138,14 @@ class LitQAEvaluation(IntEnum):
             return answer.split()[0][0].upper()
 
         result = extract_answer(text)
+        if (
+            total_options is not None
+            and ord(result[0]) - _CAPITAL_A_INDEX + 1 > total_options
+        ):
+            # The result extracted was not in the options
+            return cls.INCORRECT
+        # From here, if we don't match either the ideal or the unsure multiple choice
+        # options then we declare the answer as incorrect.
         evaluation_result = cls.INCORRECT
         if unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
             evaluation_result = cls.UNSURE
@@ -164,7 +179,7 @@ class LitQAEvaluation(IntEnum):
             Two-tuple of created LitQA question, function (that can be thought of as
                 stateless) to use to extract an evaluation result from an answer.
         """
-        text, ideal_answer, unsure_answer = make_mc_options(
+        text, ideal_answer, unsure_answer, distractor_answers = make_mc_options(
             ideal=ideal,
             distractors=distractors,
             seed=seed,
@@ -199,6 +214,7 @@ class LitQAEvaluation(IntEnum):
                 text=eval_chunk.text,
                 ideal_mc_answer=ideal_answer,
                 unsure_mc_answer=unsure_answer,
+                total_options=len(distractor_answers) + (2 if use_unsure else 1),
             )
 
         return qa_prompt, llm_from_answer
