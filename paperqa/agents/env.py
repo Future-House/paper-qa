@@ -193,9 +193,9 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         )
         if not done and self._has_excess_answer_failures():
             # If the caller set max_answer_attempts, and the agent has tried to answer
-            # too many times, we consider this done, but we cannot determine sure-ness
+            # too many times, we consider this done, but we cannot determine success
             # because we're not calling the complete tool
-            self.state.session.is_sure = None
+            self.state.session.has_successful_answer = None
             done = True
         return (
             response_messages,

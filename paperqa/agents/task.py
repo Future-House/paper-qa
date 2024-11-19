@@ -257,7 +257,7 @@ class LitQATaskDataset(
             ]
             for i, metric_list in enumerate(
                 (total_paper_count, relevant_paper_count, evidence_count),
-                start=1,  # Regex extraction of status starts after is_sure
+                start=1,  # Regex extraction of status starts after has_successful_answer
             ):
                 # NOTE: we use mean to not break if there's 2+ complete calls (which
                 # we're prompted not to do). If it happens, they should all have the

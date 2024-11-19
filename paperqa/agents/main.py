@@ -137,7 +137,7 @@ async def run_agent(
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    if agent_status != AgentStatus.TRUNCATED and session.is_sure is False:
+    if agent_status != AgentStatus.TRUNCATED and session.has_successful_answer is False:
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
@@ -241,7 +241,7 @@ async def run_fake_agent(
         await step(complete_action)
         return (
             AgentStatus.SUCCESS
-            if env.state.session.is_sure is not False
+            if env.state.session.has_successful_answer is not False
             else AgentStatus.UNSURE
         )
 

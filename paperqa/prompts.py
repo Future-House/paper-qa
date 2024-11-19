@@ -14,7 +14,7 @@ summary_json_prompt = (
 )
 
 # The below "cannot answer" sentinel phrase should:
-# 1. Lead to complete tool being called with is_sure=False
+# 1. Lead to complete tool being called with has_successful_answer=False
 # 2. Can be used for unit testing
 CANNOT_ANSWER_PHRASE = "I cannot answer"
 qa_prompt = (

@@ -726,16 +726,17 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                 "name": "complete",
                 "parameters": {
                     "properties": {
-                        "is_sure": {
+                        "has_successful_answer": {
                             "description": (
-                                "Set True if sure of the answer, otherwise False if"
-                                " there remains some uncertainty."
+                                "Set True if an answer that addresses all parts of the"
+                                " task has been generated, otherwise set False to"
+                                " indicate unsureness."
                             ),
-                            "title": "Is Sure",
+                            "title": "Has Successful Answer",
                             "type": "boolean",
                         }
                     },
-                    "required": ["is_sure"],
+                    "required": ["has_successful_answer"],
                     "type": "object",
                 },
             },
@@ -836,7 +837,7 @@ class TestGradablePaperQAEnvironment:
         await stub_gradable_env.step(gen_answer_action)
         _, _, done, _ = await stub_gradable_env.step(
             ToolRequestMessage(
-                tool_calls=[ToolCall.from_name("complete", is_sure=True)]
+                tool_calls=[ToolCall.from_name("complete", has_successful_answer=True)]
             )
         )
         assert done
@@ -845,7 +846,7 @@ class TestGradablePaperQAEnvironment:
         await stub_gradable_env_copy.step(gen_answer_action)
         _, _, done, _ = await stub_gradable_env_copy.step(
             ToolRequestMessage(
-                tool_calls=[ToolCall.from_name("complete", is_sure=True)]
+                tool_calls=[ToolCall.from_name("complete", has_successful_answer=True)]
             )
         )
         assert done
@@ -909,7 +910,7 @@ class TestGradablePaperQAEnvironment:
         )
         assert len(complete_action.tool_calls) == 1
         assert complete_action.tool_calls[0].function.arguments == {
-            "is_sure": False
+            "has_successful_answer": False
         }, "Expected unsure"
 
     @pytest.mark.asyncio

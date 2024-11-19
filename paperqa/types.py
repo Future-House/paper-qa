@@ -166,7 +166,7 @@ class PQASession(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
-    is_sure: bool | None = Field(
+    has_successful_answer: bool | None = Field(
         default=None,
         description=(
             "True if the agent was sure of the answer, False if the agent was unsure of"
