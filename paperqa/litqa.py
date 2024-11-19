@@ -30,7 +30,7 @@ _CAPITAL_A_INDEX = ord("A")
 
 def make_mc_options(
     ideal: str,
-    distractors: str | list[str],
+    distractors: str | Sequence[str],
     unsure_option: str | None = UNSURE_OPTION,
     seed: int | None = None,
 ) -> tuple[str, str, str | None]:
@@ -55,10 +55,9 @@ def make_mc_options(
                 raise TypeError("Need split_distractors to be a list.")  # noqa: TRY301
         except (ValueError, SyntaxError, TypeError):
             split_distractors = [d.strip("'[ ]\"") for d in distractors.split(",")]
-        options: list[str] = split_distractors
-    else:
-        # We are going to modify options in-place, so copy it first
-        options = distractors.copy()
+        distractors = split_distractors
+    # We are going to modify options in-place, so copy the distractors
+    options = [*distractors]
 
     if ideal == "null":
         if not unsure_option:
