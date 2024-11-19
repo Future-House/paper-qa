@@ -88,7 +88,7 @@ class BatchStatus(StrEnum):
         mapping = {
             BatchStatus.COMPLETE: "completed",
             BatchStatus.PROGRESS: "in_progress",
-            BatchStatus.SUCCESS: "completed",  # Assuming OpenAI uses "completed" for success
+            BatchStatus.SUCCESS: "completed",
             BatchStatus.FAILURE: "failed",
             BatchStatus.EXPIRE: "expired",
             BatchStatus.CANCEL: "cancelled",
@@ -998,8 +998,6 @@ class OpenAIBatchLLMModel(LLMBatchModel):
                 )
             if batch.status == BatchStatus.CANCEL.from_openai():
                 raise ConnectionError("Batch was cancelled.")
-
-            # if batch.stats == OpenAIBatchStats.PROGRESS:
 
             batch_time = asyncio.get_running_loop().time() - start_clock
             if batch_time > self.config.get("batch_summary_timelimit", 24 * 60 * 60):
