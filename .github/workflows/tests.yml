@@ -35,7 +35,7 @@ jobs:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
       - uses: hynek/build-and-inspect-python-package@v2
-      - run: uv sync --python-preference=only-managed
+      - run: uv sync --python-preference=only-managed --all-extras
       - run: uv run refurb paperqa tests
       - run: uv run pylint paperqa
   test:
@@ -49,7 +49,7 @@ jobs:
         with:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
-      - run: uv sync --python-preference=only-managed
+      - run: uv sync --python-preference=only-managed --all-extras
       - name: Cache datasets
         uses: actions/cache@v4
         with:

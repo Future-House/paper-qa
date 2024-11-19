@@ -151,7 +151,7 @@ async def gather_with_batch(
         for m in matches
     ]
 
-    llm_results : list[LLMResult] = []
+    llm_results: list[LLMResult] = []
     if prompt_runner:
         result = await prompt_runner(
             data,
