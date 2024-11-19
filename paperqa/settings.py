@@ -89,7 +89,7 @@ class AnswerSettings(BaseModel):
         default=None,
         description=(
             "Optional (exclusive) max number (default is no max) of attempts to"
-            " generate an answer before declaring a failure."
+            " generate an answer before declaring done (without a complete tool call). "
         ),
     )
     answer_length: str = Field(
