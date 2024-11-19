@@ -1122,7 +1122,14 @@ class AnthropicBatchLLMModel(LLMBatchModel):
                 params=MessageCreateParamsNonStreaming(
                     model=self.config.get("model"),
                     max_tokens=self.config.get("max_tokens"),
-                    messages=m,
+                    system="".join(
+                        [
+                            user_m["content"]
+                            for user_m in messages[0]
+                            if user_m["role"] == "system"
+                        ]
+                    ),
+                    messages=[user_m for user_m in m if user_m["role"] == "user"],
                 ),
             )
             for i, m in enumerate(messages)
