@@ -31,6 +31,7 @@ from paperqa.llms import (
     VectorStore,
 )
 from paperqa.paths import PAPERQA_DIR
+from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import (
@@ -757,7 +758,7 @@ class Docs(BaseModel):
         bib = {}
         if len(context_str) < 10:  # noqa: PLR2004
             answer_text = (
-                "I cannot answer this question due to insufficient information."
+                f"{CANNOT_ANSWER_PHRASE} this question due to insufficient information."
             )
         else:
             with set_llm_session_ids(session.id):
