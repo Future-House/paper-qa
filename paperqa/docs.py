@@ -436,7 +436,7 @@ class Docs(BaseModel):
         """
         Add chunked texts to the collection.
 
-        NOTE: this is useful if you have already chunked the texts yourself.
+        This is useful to use if you have already chunked the texts yourself.
 
         Returns:
             True if the doc was added, otherwise False if already in the collection.
@@ -450,6 +450,11 @@ class Docs(BaseModel):
         if not all_settings.parsing.defer_embedding and not embedding_model:
             # want to embed now!
             embedding_model = all_settings.get_embedding_model()
+
+        # 0. Short-circuit if it is caught by a filter
+        for doc_filter in all_settings.parsing.doc_filters or []:
+            if not doc.matches_filter_criteria(doc_filter):
+                return False
 
         # 1. Calculate text embeddings if not already present
         if embedding_model and texts[0].embedding is None:

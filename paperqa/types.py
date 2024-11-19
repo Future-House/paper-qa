@@ -134,6 +134,24 @@ class Doc(Embeddable):
     def formatted_citation(self) -> str:
         return self.citation
 
+    def matches_filter_criteria(self, filter_criteria: dict) -> bool:
+        """Returns True if the doc matches the filter criteria, False otherwise."""
+        data_dict = self.model_dump()
+        for key, value in filter_criteria.items():
+            invert = key.startswith("!")
+            relaxed = key.startswith("?")
+            key = key.lstrip("!?")
+            # we check if missing or sentinel/unset
+            if relaxed and (key not in data_dict or data_dict[key] is None):
+                continue
+            if key not in data_dict:
+                return False
+            if invert and data_dict[key] == value:
+                return False
+            if not invert and data_dict[key] != value:
+                return False
+        return True
+
 
 class Text(Embeddable):
     text: str
