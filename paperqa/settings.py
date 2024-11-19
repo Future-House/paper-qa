@@ -89,7 +89,7 @@ class AnswerSettings(BaseModel):
         default=None,
         description=(
             "Optional (exclusive) max number (default is no max) of attempts to"
-            " generate an answer before declaring a failure."
+            " generate an answer before declaring done (without a complete tool call). "
         ),
     )
     answer_length: str = Field(
@@ -538,13 +538,18 @@ class AgentSettings(BaseModel):
                 setattr(self.index, new_name, value)  # Propagate to new location
         return self
 
-    @field_validator("should_pre_search")
+    @field_validator("should_pre_search", "wipe_context_on_answer_failure")
     @classmethod
-    def _deprecated_should_pre_search(cls, value: bool) -> bool:
-        if value:  # Default is False, so we only warn if it's True
+    def _deprecated_bool_fields(cls, value: bool, info) -> bool:
+        custom_message = ""
+        if info.field_name == "should_pre_search" and value:
+            custom_message = "dead code"
+        elif info.field_name == "wipe_context_on_answer_failure" and not value:
+            custom_message = "no longer used due to the reset tool"
+        if custom_message:
             warnings.warn(
-                "The 'should_pre_search' field is dead code, and will be"
-                " removed in version 6.",
+                f"The {info.field_name!r} field is {custom_message},"
+                " and will be removed in version 6.",
                 category=DeprecationWarning,
                 stacklevel=2,
             )
