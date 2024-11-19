@@ -75,22 +75,37 @@ class EmbeddingModes(StrEnum):
     QUERY = "query"
 
 
-class OpenAIBatchStatus(StrEnum):
-    COMPLETE = "completed"
-    PROGRESS = "in_progress"
-    SUCCESS = "completed"
-    FAILURE = "failed"
-    EXPIRE = "expired"
-    CANCEL = "cancelled"
+class BatchStatus(StrEnum):
+    COMPLETE = "complete"
+    PROGRESS = "progress"
+    SUCCESS = "success"
+    FAILURE = "failure"
+    EXPIRE = "expire"
+    CANCEL = "cancel"
 
+    def from_openai(self) -> str:
+        """Convert BatchStatus to OpenAI status."""
+        mapping = {
+            BatchStatus.COMPLETE: "completed",
+            BatchStatus.PROGRESS: "in_progress",
+            BatchStatus.SUCCESS: "completed",  # Assuming OpenAI uses "completed" for success
+            BatchStatus.FAILURE: "failed",
+            BatchStatus.EXPIRE: "expired",
+            BatchStatus.CANCEL: "cancelled",
+        }
+        return mapping[self]
 
-class AnthropicBatchStatus(StrEnum):
-    COMPLETE = "ended"
-    PROGRESS = "in_progress"
-    SUCCESS = "succeeded"
-    FAILURE = "errored"
-    EXPIRE = "expired"
-    CANCEL = "canceled"
+    def from_anthropic(self) -> str:
+        """Convert BatchStatus to Anthropic status."""
+        mapping = {
+            BatchStatus.COMPLETE: "ended",
+            BatchStatus.PROGRESS: "in_progress",
+            BatchStatus.SUCCESS: "succeeded",
+            BatchStatus.FAILURE: "errored",
+            BatchStatus.EXPIRE: "expired",
+            BatchStatus.CANCEL: "canceled",
+        }
+        return mapping[self]
 
 
 # Estimate from OpenAI's FAQ
@@ -968,9 +983,9 @@ class OpenAIBatchLLMModel(LLMBatchModel):
         )
 
         start_clock = asyncio.get_running_loop().time()
-        while batch.status != OpenAIBatchStatus.COMPLETE:
+        while batch.status != BatchStatus.COMPLETE.from_openai():
             batch = await client.batches.retrieve(batch.id)
-            if batch.status == OpenAIBatchStatus.FAILURE:
+            if batch.status == BatchStatus.FAILURE.from_openai():
                 error_messages = []
                 if batch.errors and hasattr(batch.errors, "data") and batch.errors.data:
                     error_messages = [
@@ -981,8 +996,10 @@ class OpenAIBatchLLMModel(LLMBatchModel):
                 raise RuntimeError(
                     "Batch failed. \n\nReason: \n" + "\n".join(error_messages)
                 )
-            if batch.status == OpenAIBatchStatus.CANCEL:
+            if batch.status == BatchStatus.CANCEL.from_openai():
                 raise ConnectionError("Batch was cancelled.")
+
+            # if batch.stats == OpenAIBatchStats.PROGRESS:
 
             batch_time = asyncio.get_running_loop().time() - start_clock
             if batch_time > self.config.get("batch_summary_timelimit", 24 * 60 * 60):
@@ -1116,7 +1133,7 @@ class AnthropicBatchLLMModel(LLMBatchModel):
         batch = await client.beta.messages.batches.create(requests=requests)
 
         start_clock = asyncio.get_running_loop().time()
-        while batch.processing_status != AnthropicBatchStatus.COMPLETE:
+        while batch.processing_status != BatchStatus.COMPLETE.from_anthropic():
             batch = await client.beta.messages.batches.retrieve(batch.id)
 
             batch_time = asyncio.get_running_loop().time() - start_clock

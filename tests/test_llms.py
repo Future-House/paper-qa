@@ -20,9 +20,8 @@ from paperqa import (
     embedding_model_factory,
 )
 from paperqa.llms import (
-    AnthropicBatchStatus,
+    BatchStatus,
     Chunk,
-    OpenAIBatchStatus,
 )
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
@@ -198,14 +197,14 @@ class TestOpenAIBatchLLMModel:
 
         mock_batch_id = "batch_123"
         mock_client.batches.create = AsyncMock(
-            return_value=MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.PROGRESS)
+            return_value=MagicMock(id=mock_batch_id, status=BatchStatus.PROGRESS.from_openai())
         )
 
         if request.node.name == "test_run_prompt[completion-model]":
             batch_retrieve_calls = [
                 MagicMock(
                     id=mock_batch_id,
-                    status=OpenAIBatchStatus.FAILURE,
+                    status=BatchStatus.FAILURE.from_openai(),
                     errors=MagicMock(
                         data=[
                             MagicMock(
@@ -220,10 +219,10 @@ class TestOpenAIBatchLLMModel:
             ]
         elif request.node.name == "test_run_prompt[chat-model]":
             batch_retrieve_calls = [
-                MagicMock(id=mock_batch_id, status=OpenAIBatchStatus.PROGRESS),
+                MagicMock(id=mock_batch_id, status=BatchStatus.PROGRESS.from_openai()),
                 MagicMock(
                     id=mock_batch_id,
-                    status=OpenAIBatchStatus.COMPLETE,
+                    status=BatchStatus.COMPLETE.from_openai(),
                     output_file_id="file-789",
                 ),
             ]
@@ -452,16 +451,16 @@ class TestAnthropicBatchLLMModel:
         mock_batch_id = "msgbatch_123"
         mock_batches.create = AsyncMock(
             return_value=MagicMock(
-                id=mock_batch_id, processing_status=AnthropicBatchStatus.PROGRESS
+                id=mock_batch_id, processing_status=BatchStatus.PROGRESS.from_anthropic()
             ),
         )
 
         batch_retrieve_call = [
             MagicMock(
-                id=mock_batch_id, processing_status=AnthropicBatchStatus.PROGRESS
+                id=mock_batch_id, processing_status=BatchStatus.PROGRESS.from_anthropic()
             ),
             MagicMock(
-                id=mock_batch_id, processing_status=AnthropicBatchStatus.COMPLETE
+                id=mock_batch_id, processing_status=BatchStatus.COMPLETE.from_anthropic()
             ),
         ]
         mock_batches.retrieve = AsyncMock(side_effect=batch_retrieve_call)
