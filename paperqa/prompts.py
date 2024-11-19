@@ -99,8 +99,8 @@ env_reset_prompt = (
 QA_PROMPT_TEMPLATE = "Q: {question}\n\nOptions:\n{options}"
 EVAL_PROMPT_TEMPLATE = (
     "Extract the single letter answer from the following question and answer"
-    "\n\n{qa_prompt}"
-    "\n\n{qa_answer}"
+    "\n\nQuestion: {qa_prompt}"
+    "\n\nAnswer: {qa_answer}"
     "\n\nSingle Letter Answer:"
 )
 

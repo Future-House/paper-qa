@@ -10,7 +10,7 @@ __all__ = [
 import logging
 import re
 from abc import ABC
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from copy import deepcopy
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never
@@ -41,7 +41,7 @@ from paperqa.docs import Docs
 from paperqa.litqa import (
     DEFAULT_EVAL_MODEL_NAME,
     DEFAULT_LABBENCH_HF_HUB_NAME,
-    DEFAULT_REWARD_DISTRIBUTION,
+    DEFAULT_REWARD_MAPPING,
     LitQAEvaluation,
     read_litqa_v2_from_hub,
 )
@@ -72,7 +72,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             Callable[[PQASession | str], Awaitable[LitQAEvaluation]] | None
         ) = None,
         sources: str | list[str] | None = None,
-        rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
+        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         evaluation_callback: Callable[[LitQAEvaluation], Awaitable] | None = None,
         **env_kwargs,
     ):
@@ -187,7 +187,7 @@ class LitQATaskDataset(
         self,
         base_query: QueryRequest | dict | None = None,
         base_docs: Docs | dict | None = None,
-        rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
+        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         **env_kwargs,
     ):
@@ -272,10 +272,14 @@ class LitQATaskDataset(
             "relevant_paper_count": relevant_paper_count,
             "evidence_count": evidence_count,
             "correct": [
-                int(t.steps[-1].reward == self._rewards[0]) for t in trajectories
+                int(t.steps[-1].reward == self._rewards["correct"])
+                for t in trajectories
             ],
             "correct_unsure": [
-                int(t.steps[-1].reward in {self._rewards[0], self._rewards[1]})
+                int(
+                    t.steps[-1].reward
+                    in {self._rewards["correct"], self._rewards["unsure"]}
+                )
                 for t in trajectories
             ],
         }
