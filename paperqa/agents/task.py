@@ -238,11 +238,11 @@ class LitQATaskDataset(
         relevant_paper_count: list[float] = []
         evidence_count: list[float] = []
         for t in trajectories:
-            split_answers = [
-                split_answers
-                for split_answers in (
+            split_certainties = [
+                split_certainty
+                for split_certainty in (
                     re.split(
-                        pattern=Complete.ANSWER_SPLIT_REGEX_PATTERN,
+                        pattern=Complete.CERTAINTY_SPLIT_REGEX_PATTERN,
                         string=obs.content,
                         maxsplit=1,
                     )
@@ -253,15 +253,18 @@ class LitQATaskDataset(
                     )
                 )
                 # Filter for places where the regex split succeeded
-                if len(split_answers) >= 4  # noqa: PLR2004
+                if len(split_certainty) >= 4  # noqa: PLR2004
             ]
             for i, metric_list in enumerate(
                 (total_paper_count, relevant_paper_count, evidence_count),
-                start=1,  # Regex extraction of status starts after answer
+                start=1,  # Regex extraction of status starts after has_successful_answer
             ):
-                metric_list.append(  # Use mean to allow for multiple answers
-                    sum(int(sa[i]) for sa in split_answers) / len(split_answers)
-                    if split_answers  # Avoid div0 (when complete wasn't called)
+                # NOTE: we use mean to not break if there's 2+ complete calls (which
+                # we're prompted not to do). If it happens, they should all have the
+                # same status, so the mean value should equal the individual values
+                metric_list.append(
+                    sum(int(sa[i]) for sa in split_certainties) / len(split_certainties)
+                    if split_certainties  # Avoid div0 (when complete wasn't called)
                     else 0
                 )
         return super().compute_trajectory_metrics(trajectories) | {
