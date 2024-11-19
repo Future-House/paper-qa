@@ -20,7 +20,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.3
+          - AsyncOpenAI/Python 1.54.4
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -30,7 +30,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.3
+          - 1.54.4
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -44,18 +44,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4ySzW6DMBCE7zyF5XOoSCBJyy3qJZeqlaKeqgoZeyFOjW3Zi/oT5d0rAw1ETaVe
-          OMy3M8wuHCNCqBQ0J5TvGfLGqnjznJb+oX2c78Qu2b6vDttN+4VPTGf3NdJZcJjyABx/XDfcNFYB
-          SqN7zB0whJA6X6fz9WKd3CYdaIwAFWy1xTiLsXWliRfJIouTLE7uBvfeSA6e5uQlIoSQY/cMPbWA
-          D5qTLqtTGvCe1UDz8xAh1BkVFMq8lx6Z7jsPkBuNoLvqm6nuoGo9C910q9Sgn84vUqa2zpR+4Ge9
-          klr6feGAeaNDqEdjaUdPESGv3ULtRUdqnWksFmjeQIfAddbH0fGMI5wPDA0yNfEsZ1fCCgHIpPKT
-          e1DO+B7E6ByPx1ohzQREk5V/d7mW3a8tdf2f+BFwDhZBFNaBkPxy33HMQfjH/ho7n7grTP2nR2iK
-          SuoanHWy/8KVLZaiTJN0lVYVjU7RNwAAAP//AwB6cqDm7wIAAA==
+          H4sIAAAAAAAAA4ySzW6DMBCE7zyF5TNUJCFNwy39ufTSQ5uqUlUhYxZwY2zLXpRUUd69MkmBqKnU
+          C4f5dobZhX1ACBUFTQnlNUPeGBmtXp+25vHtGs3L7v7ueYub23We1+vVw01d0dA7dP4JHH9cV1w3
+          RgIKrY6YW2AIPnWymE3jZJHMJh1odAHS2yqDURJha3MdTeNpEsVJFC9P7loLDo6m5D0ghJB99/Q9
+          VQE7mpI4/FEacI5VQNN+iBBqtfQKZc4Jh0whDQfItUJQXfXVWLdQto75bqqV8qQf+hdJXRmrc3fi
+          vV4KJVydWWBOKx/qUBva0UNAyEe3UHvWkRqrG4MZ6g0oH7hIjnF0OOMAJyeGGpkceebhhbCsAGRC
+          utE9KGe8hmJwDsdjbSH0CASjlX93uZR9XFuo6j/xA+AcDEKRGQuF4Of7DmMW/D/211h/4q4wdV8O
+          oclKoSqwxorjFy5Nxst8Xi6hZAsaHIJvAAAA//8DAPd1Ka7vAgAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e3454ce1d0cf9ed-SJC
+          - 8e52e1db4b3c67fe-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -63,14 +63,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sat, 16 Nov 2024 03:18:00 GMT
+          - Tue, 19 Nov 2024 20:17:11 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=CxagMF3adSImnjurrSLCktMe5rNnZcHIEqsdSZSLDs0-1731727080-1.0.1.1-ymOPVqd8Ak0SpnKXDE8qlUe5mLVyf1O3zKQMu7D8YXYiDiim6f2WDXjvdO4QcJ0ZQlEy8DokE30DJy_Qb9brNg;
-            path=/; expires=Sat, 16-Nov-24 03:48:00 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=1QGTxzoUR9sveB0MwB9__sRP9QgAv_e4bqd9oKgVtWU-1732047431-1.0.1.1-YgX4N6muq4gEfK46gnct63SeyHvADO3NNnZ1hD.XbtpnsGna2LUnFP9_HlI82MEUCeReqsBnZ4m73HQjnVit0A;
+            path=/; expires=Tue, 19-Nov-24 20:47:11 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=s7lDRYJWEVdEktE96XnB5Opmejh.TH4i8F_7V.AuEeM-1731727080955-0.0.1.1-604800000;
+          - _cfuvid=2ThQYU8yQ_Ozkf6rXSeZSjJCsZxcEcyZPqU12oC6F9k-1732047431539-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -83,7 +83,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "180"
+          - "374"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -101,7 +101,111 @@ interactions:
         x-ratelimit-reset-tokens:
           - 19ms
         x-request-id:
-          - req_2927535f010df8805a554f3886d33a8c
+          - req_49134f0dc010dc1e2fcb644b6003d3bd
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the single letter answer
+        from the following question and answer\n\nQ: What is my office''s zip code?\n\nOptions:\nA)
+        94107\nB) 94106\nC) cheesecake\nD) Insufficient information to answer this question\nE)
+        -8\n\nthe answer is 14004\n\nSingle Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09",
+        "stream": false, "temperature": 0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "381"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.54.4
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.54.4
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.7
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4xTS2/TQBC+51eM9uxUSesmbW6FIgESQqgFDhhFm92xvXS9s+yMG0LV/47sPJxC
+          K3HxYb6Hv3nswwhAOasWoEytxTTRj6++fFzHeDe5+DTfzN42nz98nd/49v2M5fxuprJOQasfaGSv
+          OjHURI/iKGxhk1ALdq7T+dnpJJ/nZ9MeaMii72RVlHE+ljataHw6Oc3Hk3w8udypa3IGWS3g2wgA
+          4KH/djmDxV9qAZNsX2mQWVeoFgcSgErku4rSzI5FB1HZABoKgqGPfktQumBBagR2ofIIHkUwgQ68
+          xpTBGiEgWhACi4KpcQFhXTtTA8WuXTCUEnKkYLljdVZbMRRqmk8m+Umh4MYFgxAoIFDZc7ZqhqsM
+          XmXwOgNK8AasS2jEb6DRYuq9Q1Yo0MHu/3gNLFqQoVDvArdl6YzDIOBCSanRPUdon0Jqx/CzRe7q
+          nZMTYMSG+xgNsYCnyhntYTt2qNw9BpBaS0+Jie6dRftXW4UCS8gQSHZpddjsu/vtIhiyyOAdC9qT
+          IhThtsaEJSXMXhw4OF4U4fp4XQnLlnV3MqH1fld/POzfUxUTrXiHH+qlC47rZULNFLpds1BUPfo4
+          Avje31n75HRUTNREWQrdYegM5/nWTg3XPYAX8x0oJNoP9elsmj1jt7Qo2nk+OlRltKnRDtLhqnVr
+          HR0Bo6Om/03znPe2cReq/7EfAGMwCtplTGidedrxQEvYPf6XaIch94EVb1iwWZYuVJhictunV8al
+          KVfn5SWWeq5Gj6M/AAAA//8DALP4ykWIBAAA
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8e52e1df5ef067fe-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 19 Nov 2024 20:17:14 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "2745"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "3000"
+        x-ratelimit-limit-tokens:
+          - "250000"
+        x-ratelimit-remaining-requests:
+          - "2999"
+        x-ratelimit-remaining-tokens:
+          - "249920"
+        x-ratelimit-reset-requests:
+          - 20ms
+        x-ratelimit-reset-tokens:
+          - 19ms
+        x-request-id:
+          - req_01ef16136fc52771622da335c1723a4b
       status:
         code: 200
         message: OK
@@ -126,7 +230,7 @@ interactions:
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.3
+          - AsyncOpenAI/Python 1.54.4
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -136,7 +240,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.3
+          - 1.54.4
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -150,18 +254,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4ySUUvDMBSF3/srQp5X6dbNzb05URCF4YMgipQ0ue2iaZIltzIZ+++Srls7nOBL
-          H853z+m5t91GhFAp6JxQvmLIK6vi6+c0x6db+LKw3jwuXpLX9QMs7+zsJr1f0kFwmPwDOB5cF9xU
-          VgFKo/eYO2AIIXU4TYfT0TSZDRtQGQEq2EqL8TjG2uUmHiWjcZyM4+Sqda+M5ODpnLxFhBCybZ6h
-          pxawoXOSDA5KBd6zEuj8OEQIdUYFhTLvpUemkQ46yI1G0E31RV93UNSehW66VqrVd8cXKVNaZ3Lf
-          8qNeSC39KnPAvNEh1KOxtKG7iJD3ZqH6pCO1zlQWMzSfoEPgdLyPo90ZOzhsGRpkqueZDM6EZQKQ
-          SeV796Cc8RWIztkdj9VCmh6Ieiv/7nIue7+21OV/4jvAOVgEkVkHQvLTfbsxB+Ef+2vseOKmMPXf
-          HqHKCqlLcNbJ/RcubDYReZqkl2lR0GgX/QAAAP//AwDGCnMs7wIAAA==
+          H4sIAAAAAAAAA4ySzWrDMBCE734KoXNcnMTBTW7NqVBKAi2htBQjyytHrSwJad0fQt69yElsh6bQ
+          iw/z7Yxn195FhFBZ0gWhfMuQ11bFN5vVp/fwjOu1XG3ubp/0x7V4eLzH5Spd0lFwmOINOJ5cV9zU
+          VgFKow+YO2AIIXWcTSdJmqXTtAW1KUEFW2UxTmNsXGHiSTJJ4ySNk/nRvTWSg6cL8hIRQsiufYae
+          uoQvuiDJ6KTU4D2rgC66IUKoMyoolHkvPTKNdNRDbjSCbqsvh7oD0XgWuulGqaO+716kTGWdKfyR
+          d7qQWvpt7oB5o0OoR2NpS/cRIa/tQs1ZR2qdqS3maN5Bh8AsPcTR/ow9HB8ZGmRq4JmNLoTlJSCT
+          yg/uQTnjWyh7Z3881pTSDEA0WPl3l0vZh7Wlrv4T3wPOwSKUuXVQSn6+bz/mIPxjf411J24LU//t
+          EepcSF2Bs04evrCwORfFTMxBsIxG++gHAAD//wMA3uj6Ou8CAAA=
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e3454d0c819f9ed-SJC
+          - 8e52e1f14fdc67fe-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -169,7 +273,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sat, 16 Nov 2024 03:18:01 GMT
+          - Tue, 19 Nov 2024 20:17:15 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -183,7 +287,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "250"
+          - "546"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -201,7 +305,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 19ms
         x-request-id:
-          - req_e6161561c3d7837f54ffd24aa5959bcc
+          - req_578ea61617de885301fc303b4fceab4f
       status:
         code: 200
         message: OK
@@ -210,8 +314,8 @@ interactions:
         '{"messages": [{"role": "user", "content": "Extract the single letter answer
         from the following question and answer\n\nQ: What is my office''s zip code?\n\nOptions:\nA)
         94107\nB) 94106\nC) cheesecake\nD) Insufficient information to answer this question\nE)
-        -8\n\nInsufficient information to answer\n\nSingle Letter Answer:"}], "model":
-        "gpt-4-turbo-2024-04-09", "stream": false, "temperature": 0.0}'
+        -8\n\nInsufficient information\n\nSingle Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09",
+        "stream": false, "temperature": 0.0}'
       headers:
         accept:
           - application/json
@@ -220,13 +324,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "396"
+          - "386"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.3
+          - AsyncOpenAI/Python 1.54.4
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -236,7 +340,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.3
+          - 1.54.4
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -250,18 +354,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4ySS2vDMBCE7/4VQue4OI6b16000BAovTS5lGIUaW0rkSUhraEl5L8XOQ87NIVe
-          fJhvZzy79iEihEpB54TyiiGvrYqf1qMtvrrn9/V4s1zsVmnzUizL/erNbzYFHQSH2e6A48X1wE1t
-          FaA0+oS5A4YQUoeT0XCSTpLpsAW1EaCCrbQYZzE2bmviNEmzOMniZHZ2V0Zy8HROPiJCCDm0z9BT
-          C/iic5IMLkoN3rMS6Pw6RAh1RgWFMu+lR6aRDjrIjUbQbfVFX3dQNJ6FbrpR6qwfry9SprTObP2Z
-          X/VCaumr3AHzRodQj8bSlh4jQj7bhZqbjtQ6U1vM0exBh8DJ6BRHuzN2cHhmaJCpnicb3AnLBSCT
-          yvfuQTnjFYjO2R2PNUKaHoh6K//uci/7tLbU5X/iO8A5WASRWwdC8tt9uzEH4R/7a+x64rYw9d8e
-          oc4LqUtw1snTFy5sLh7FNBtPZ2Og0TH6AQAA//8DALbaBE7vAgAA
+          H4sIAAAAAAAAA4yST0+EMBDF73yKpmcwLLBu3NtGrka9GI0xpLQDVEvbtENcs9nvbsr+AeOaeOHw
+          fvMebwZ2ESFUCromlHcMeW9Vsnm6/8RVsWhKVj4/bl827a3QD3eurLN0SePgMPU7cDy5rrjprQKU
+          Rh8wd8AQQupilWdpsSry5Qh6I0AFW2sxKRIcXG2SLM2KJC2S9Obo7ozk4OmavEaEELIbn6GnFrCl
+          a5LGJ6UH71kLdH0eIoQ6o4JCmffSI9NI4wlyoxH0WL2c6w6awbPQTQ9KHfX9+UXKtNaZ2h/5WW+k
+          lr6rHDBvdAj1aCwd6T4i5G1caPjRkVpneosVmg/QIXC1OMTR6YwTPDE0yNTMk8UXwioByKTys3tQ
+          zngHYnJOx2ODkGYGotnKv7tcyj6sLXX7n/gJcA4WQVTWgZD8577TmIPwj/01dj7xWJj6L4/QV43U
+          LTjr5OELN7ZaijpP8+u8aWi0j74BAAD//wMACXeah+8CAAA=
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e3454d32aeff9ed-SJC
+          - 8e52e1f59cb067fe-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -269,7 +373,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sat, 16 Nov 2024 03:18:01 GMT
+          - Tue, 19 Nov 2024 20:17:15 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -283,7 +387,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "257"
+          - "282"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -295,13 +399,13 @@ interactions:
         x-ratelimit-remaining-requests:
           - "2999"
         x-ratelimit-remaining-tokens:
-          - "249917"
+          - "249919"
         x-ratelimit-reset-requests:
           - 20ms
         x-ratelimit-reset-tokens:
           - 19ms
         x-request-id:
-          - req_aaa41e9c5fa6a8aaf24acab8d2767b06
+          - req_ec0e3607f84aed7d123ddce0359bc56f
       status:
         code: 200
         message: OK

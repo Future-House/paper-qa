@@ -1,6 +1,7 @@
 from typing import cast
 
 import pytest
+from pytest_subtests import SubTests
 
 from paperqa.litqa import LitQAEvaluation, read_litqa_v2_from_hub
 from tests.conftest import VCR_DEFAULT_MATCH_ON
@@ -16,7 +17,7 @@ class TestLitQAEvaluation:
 
     @pytest.mark.asyncio
     @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
-    async def test_from_question(self) -> None:
+    async def test_from_question(self, subtests: SubTests) -> None:
         """Tests that we can create a LitQA question and evaluate answers."""
         question = "What is my office's zip code?"
         ideal = "94107"
@@ -30,16 +31,19 @@ class TestLitQAEvaluation:
         )
         self._assert_prompt_is_valid(qa_prompt, question, ideal, distractors)
 
-        for answer, expected in (
-            ("the answer is 94107", LitQAEvaluation.CORRECT),
-            # NOTE: The below case fails this test, because the LM doesn't accept an answer not in the options.
-            # See https://github.com/Future-House/paper-qa/issues/693
-            # ("the answer is 14004", LitQAEvaluation.INCORRECT),
-            ("the answer is 94106", LitQAEvaluation.INCORRECT),
-            ("Insufficient information to answer", LitQAEvaluation.UNSURE),
+        for answer, expected_eval, expected_discounted_returns in (
+            ("the answer is 94107", LitQAEvaluation.CORRECT, [0.25, 0.5, 1.0]),
+            ("the answer is 14004", LitQAEvaluation.INCORRECT, [-0.25, -0.5, -1.0]),
+            ("the answer is 94106", LitQAEvaluation.INCORRECT, [-0.25, -0.5, -1.0]),
+            ("Insufficient information", LitQAEvaluation.UNSURE, [0.025, 0.05, 0.1]),
         ):
-            result = await eval_fn(answer)
-            assert result == expected
+            with subtests.test(answer=answer, expected_eval=expected_eval.name):
+                evaluation = await eval_fn(answer)
+                assert evaluation == expected_eval
+                assert (
+                    evaluation.make_discounted_returns(3, discount=0.5)
+                    == expected_discounted_returns
+                )
 
     def test_consistent_mc_options(self) -> None:
         """Tests that creating multiple evaluations with the same seed results in the same prompt."""
