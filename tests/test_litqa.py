@@ -1,7 +1,7 @@
+from collections.abc import Sequence
 from typing import cast
 
 import pytest
-from pytest_subtests import SubTests
 
 from paperqa.litqa import LitQAEvaluation, read_litqa_v2_from_hub
 from tests.conftest import VCR_DEFAULT_MATCH_ON
@@ -10,19 +10,84 @@ from tests.conftest import VCR_DEFAULT_MATCH_ON
 class TestLitQAEvaluation:
     @staticmethod
     def _assert_prompt_is_valid(
-        qa_prompt: str, question: str, ideal: str, distractors: list[str]
+        qa_prompt: str, question: str, ideal: str, distractors: Sequence[str]
     ) -> None:
         for substr in (question, "Insufficient information", ideal, *distractors):
             assert qa_prompt.count(substr) == 1
 
+    # Use for general purpose testing
+    ZIP_CODE_QUESTION_IDEAL_DISTRACTORS = (
+        "What is my office's zip code?",
+        "94107",
+        ["-8", "94106", "cheesecake"],
+    )
+    # Use to check we don't leak on the LLM's innate knowledge
+    MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS = (
+        "What is the meaning of life?",
+        "42",
+        ["-84", "11", "cheesecake"],
+    )
+
     @pytest.mark.asyncio
     @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
-    async def test_from_question(self, subtests: SubTests) -> None:
+    @pytest.mark.parametrize(
+        (
+            "question",
+            "ideal",
+            "distractors",
+            "answer",
+            "expected_eval",
+            "expected_dreturns",
+        ),
+        [
+            (
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "the answer is 94107",
+                LitQAEvaluation.CORRECT,
+                [0.25, 0.5, 1.0],
+            ),
+            (
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "the answer is 14004",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+            ),
+            (
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "the answer is 94106",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+            ),
+            (
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "Insufficient information",
+                LitQAEvaluation.UNSURE,
+                [0.025, 0.05, 0.1],
+            ),
+            (
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "the answer is 94106 or 94107",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+            ),
+            (
+                *MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS,
+                "14",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+            ),
+        ],
+    )
+    async def test_from_question(
+        self,
+        question: str,
+        ideal: str,
+        distractors: str | list[str],
+        answer: str,
+        expected_eval: LitQAEvaluation,
+        expected_dreturns: list[float],
+    ) -> None:
         """Tests that we can create a LitQA question and evaluate answers."""
-        question = "What is my office's zip code?"
-        ideal = "94107"
-        distractors = ["-8", "94106", "cheesecake"]
-
         qa_prompt, eval_fn = LitQAEvaluation.from_question(
             ideal=ideal,
             distractors=distractors,
@@ -31,25 +96,13 @@ class TestLitQAEvaluation:
         )
         self._assert_prompt_is_valid(qa_prompt, question, ideal, distractors)
 
-        for answer, expected_eval, expected_discounted_returns in (
-            ("the answer is 94107", LitQAEvaluation.CORRECT, [0.25, 0.5, 1.0]),
-            ("the answer is 14004", LitQAEvaluation.INCORRECT, [-0.25, -0.5, -1.0]),
-            ("the answer is 94106", LitQAEvaluation.INCORRECT, [-0.25, -0.5, -1.0]),
-            ("Insufficient information", LitQAEvaluation.UNSURE, [0.025, 0.05, 0.1]),
-        ):
-            with subtests.test(answer=answer, expected_eval=expected_eval.name):
-                evaluation = await eval_fn(answer)
-                assert evaluation == expected_eval
-                assert (
-                    evaluation.make_discounted_returns(3, discount=0.5)
-                    == expected_discounted_returns
-                )
+        evaluation = await eval_fn(answer)
+        assert evaluation == expected_eval
+        assert evaluation.make_discounted_returns(3, discount=0.5) == expected_dreturns
 
     def test_consistent_mc_options(self) -> None:
         """Tests that creating multiple evaluations with the same seed results in the same prompt."""
-        question = "What is the meaning of life?"
-        ideal = "42"
-        distractors = ["-84", "11", "cheesecake"]
+        question, ideal, distractors = self.MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS
 
         qa_prompt_1, _ = LitQAEvaluation.from_question(
             ideal=ideal, distractors=distractors, question=question, seed=0
