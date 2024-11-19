@@ -201,7 +201,7 @@ class ParsingSettings(BaseModel):
         description=(
             "Optional filters to only allow documents that match this filter. This is a dictionary where the keys"
             " are the fields from DocDetails or Docs to filter on, and the values are the values to filter for."
-            " to invert filter, prefix the key with a '!'. If the key is not found, by default the Doc is rejected."
+            " To invert filter, prefix the key with a '!'. If the key is not found, by default the Doc is rejected."
             " To change this behavior, prefix the key with a '?' to allow the Doc to pass if the key is not found."
             " For example, {'!title': 'bad title', '?year': '2022'} would only allow Docs with a title that is not"
             " 'bad title' and a year of 2022 or no year at all."

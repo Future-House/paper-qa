@@ -94,92 +94,76 @@ def test_o1_requires_temp_equals_1() -> None:
 
 
 @pytest.mark.parametrize(
-    "test_case",
+    ("doc_class", "doc_data", "filter_criteria", "expected_result"),
     [
         pytest.param(
+            Doc,
             {
-                "doc_class": Doc,
-                "doc_data": {
-                    "docname": "Test Paper",
-                    "citation": "Test Citation",
-                    "dockey": "key1",
-                },
-                "filter_criteria": {"docname": "Test Paper"},
-                "expected_result": True,
+                "docname": "Test Paper",
+                "citation": "Test Citation",
+                "dockey": "key1",
             },
+            {"docname": "Test Paper"},
+            True,
             id="Doc-matching-docname",
         ),
         pytest.param(
+            Doc,
             {
-                "doc_class": Doc,
-                "doc_data": {
-                    "docname": "Test Paper",
-                    "citation": "Test Citation",
-                    "dockey": "key1",
-                },
-                "filter_criteria": {"docname": "Another Paper"},
-                "expected_result": False,
+                "docname": "Test Paper",
+                "citation": "Test Citation",
+                "dockey": "key1",
             },
+            {"docname": "Another Paper"},
+            False,
             id="Doc-nonmatching-docname",
         ),
         pytest.param(
+            DocDetails,
             {
-                "doc_class": DocDetails,
-                "doc_data": {
-                    "title": "Test Paper",
-                    "authors": ["Alice", "Bob"],
-                    "year": 2020,
-                },
-                "filter_criteria": {"title": "Test Paper"},
-                "expected_result": True,
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
             },
+            {"title": "Test Paper"},
+            True,
             id="DocDetails-matching-title",
         ),
         pytest.param(
+            DocDetails,
             {
-                "doc_class": DocDetails,
-                "doc_data": {
-                    "title": "Test Paper",
-                    "authors": ["Alice", "Bob"],
-                    "year": 2020,
-                },
-                "filter_criteria": {"!year": 2020, "?foo": "bar"},
-                "expected_result": False,
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
             },
+            {"!year": 2020, "?foo": "bar"},
+            False,
             id="DocDetails-inverted-matching-year",
         ),
         pytest.param(
+            DocDetails,
             {
-                "doc_class": DocDetails,
-                "doc_data": {
-                    "title": "Test Paper",
-                    "authors": ["Alice", "Bob"],
-                    "year": 2020,
-                },
-                "filter_criteria": {"year": 2020, "foo": "bar"},
-                "expected_result": False,
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
             },
+            {"year": 2020, "foo": "bar"},
+            False,
             id="DocDetails-missing-param-fail",
         ),
         pytest.param(
+            DocDetails,
             {
-                "doc_class": DocDetails,
-                "doc_data": {
-                    "title": "Test Paper",
-                    "authors": ["Alice", "Bob"],
-                    "year": 2020,
-                },
-                "filter_criteria": {"?volume": "10", "!title": "Another Paper"},
-                "expected_result": True,
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
             },
+            {"?volume": "10", "!title": "Another Paper"},
+            True,
             id="DocDetails-relaxed-missing-volume",
         ),
     ],
 )
-def test_matches_filter_criteria(test_case):
-    doc_class = test_case["doc_class"]
-    doc_data = test_case["doc_data"]
-    filter_criteria = test_case["filter_criteria"]
-    expected_result = test_case["expected_result"]
+def test_matches_filter_criteria(doc_class, doc_data, filter_criteria, expected_result):
     doc = doc_class(**doc_data)
     assert doc.matches_filter_criteria(filter_criteria) == expected_result
