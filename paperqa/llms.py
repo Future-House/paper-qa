@@ -330,15 +330,14 @@ class LLMModel(ABC, BaseModel):
         data: dict,
         callbacks: list[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
+        system_prompt: str | None = default_system_prompt,
         msg_parts: list[dict] | None = None,
     ) -> LLMResult:
         if self.llm_type is None:
             self.llm_type = self.infer_llm_type()
         if self.llm_type == "chat":
             return await self._run_chat(
-                prompt, data, callbacks, name, skip_system, system_prompt, msg_parts
+                prompt, data, callbacks, name, system_prompt, msg_parts
             )
         if self.llm_type == "completion":
             if msg_parts:
@@ -349,14 +348,13 @@ class LLMModel(ABC, BaseModel):
             )
         raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
 
-    async def _run_chat(  # noqa: PLR0912
+    async def _run_chat(
         self,
         prompt: str,
         data: dict,
         callbacks: list[Callable] | None = None,
         name: str | None = None,
-        skip_system: bool = False,
-        system_prompt: str = default_system_prompt,
+        system_prompt: str | None = default_system_prompt,
         msg_parts: list[dict] | None = None,
     ) -> LLMResult:
         """Run a chat prompt.
@@ -367,7 +365,7 @@ class LLMModel(ABC, BaseModel):
             callbacks: Optional functions to call with each chunk of the completion.
             name: Optional name for the result.
             skip_system: Set True to skip the system prompt.
-            system_prompt: System prompt to use.
+            system_prompt: System prompt to use, or None/empty string to not use one.
             msg_parts: Additional message parts to be inserted prior to the user message.
 
         Returns:
@@ -376,32 +374,39 @@ class LLMModel(ABC, BaseModel):
         # build up a multipart message and insert the system prompt
         msg_parts = msg_parts or []
         formatted_prompt = prompt.format(**data)
-        # if we're skipping the system prompt, we need to insert msg parts before the user message
-        system_content: str | list[dict] = system_prompt
+        system_content: str | list[dict] | None = system_prompt
         human_content: list[dict] = []
-        if skip_system:
-            system_content = system_prompt
-            human_content = [*msg_parts, {"type": "text", "text": formatted_prompt}]
+        # we will pack the msg_parts in with the system prompt
+        # (because that is how anthropic/gemini examples show it)
+        # find first text content to insert prompt
+        insert_point = next(
+            (i for i, m in enumerate(msg_parts) if m["type"] == "text"), None
+        )
+        if insert_point is None:
+            system_content = [{"type": "text", "text": system_prompt}, *msg_parts]
         else:
-            # we are using system prompt and so will pack the  msg_parts in with the system prompt
-            # (because that is how anthropic/gemini examples show it)
-            # find first text content to insert prompt
-            insert_point = next(
-                (i for i, m in enumerate(msg_parts) if m["type"] == "text"), None
+            # will modify to insert the system prompt before the first text
+            # we do this to preserve any cache control headers
+            system_content = msg_parts
+            msg_parts[insert_point]["text"] = (
+                system_prompt + "\n\n" + msg_parts[insert_point]["text"]
             )
-            if insert_point is None:
-                system_content = [{"type": "text", "text": system_prompt}, *msg_parts]
-            else:
-                # will modify to insert the system prompt before the first text
-                # we do this to preserve any cache control headers
-                system_content = msg_parts
-                msg_parts[insert_point]["text"] = (
-                    system_prompt + "\n\n" + msg_parts[insert_point]["text"]
-                )
-            human_content = [{"type": "text", "text": formatted_prompt}]
+        human_content = [{"type": "text", "text": formatted_prompt}]
         system_message = {"role": "system", "content": system_content}
         human_message = {"role": "user", "content": human_content}
-        messages = [human_message] if skip_system else [system_message, human_message]
+        # look for any non-zero content in the system message
+        # TODO: This is fraught because we could have, for example, an empty text message
+        # but enabled cache-control headers. We'll just assume callers are doing the right thing.
+        # the main things this checks for is that `count_tokens` below will not just die
+        has_content_in_system = any(
+            any(v for k, v in c.items() if k != "type") for c in system_content
+        )
+        messages = (
+            [system_message, human_message]
+            if has_content_in_system
+            else [human_message]
+        )
+        print(messages)
         result = LLMResult(
             model=self.name,
             name=name,
