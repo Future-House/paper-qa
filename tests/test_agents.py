@@ -37,16 +37,18 @@ from paperqa.agents.search import (
 )
 from paperqa.agents.task import GradablePaperQAEnvironment
 from paperqa.agents.tools import (
+    Complete,
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
     PaperSearch,
+    Reset,
     make_status,
 )
 from paperqa.docs import Docs
-from paperqa.prompts import CONTEXT_INNER_PROMPT_NOT_DETAILED
+from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text, check_could_not_answer
+from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 
 
@@ -254,7 +256,7 @@ async def test_agent_types(
         mock_open.call_count <= 1
     ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
     assert response.session.answer, "Answer not generated"
-    assert response.session.answer != "I cannot answer", "Answer not generated"
+    assert response.session.answer != CANNOT_ANSWER_PHRASE, "Answer not generated"
     assert response.session.context, "No contexts were found"
     assert response.session.question == question
     agent_llm = request.settings.agent.agent_llm
@@ -366,7 +368,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     )
     # ensure that GenerateAnswerTool was called
     assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
-    assert "I cannot answer" in response.session.answer
+    assert CANNOT_ANSWER_PHRASE in response.session.answer
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
@@ -410,7 +412,7 @@ async def test_gather_evidence_rejects_empty_docs(
 
     @wraps(GenerateAnswer.gen_answer)
     async def gen_answer(self, state) -> str:  # noqa: ARG001
-        return "I cannot answer."
+        return f"{CANNOT_ANSWER_PHRASE}."
 
     # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
     # we keep running until we get truncated
@@ -487,9 +489,9 @@ async def test_agent_sharing_state(
 
     agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
-    answer = PQASession(question="What is is a self-explanatory model?")
-    query = QueryRequest(query=answer.question, settings=agent_test_settings)
-    env_state = EnvironmentState(docs=Docs(), answer=answer)
+    session = PQASession(question="What is is a self-explanatory model?")
+    query = QueryRequest(query=session.question, settings=agent_test_settings)
+    env_state = EnvironmentState(docs=Docs(), session=session)
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
 
@@ -531,20 +533,20 @@ async def test_agent_sharing_state(
             mock_save_index.assert_not_awaited()
 
     with subtests.test(msg=GatherEvidence.__name__):
-        assert not answer.contexts, "No contexts is required for a later assertion"
+        assert not session.contexts, "No contexts is required for a later assertion"
 
         gather_evidence_tool = GatherEvidence(
             settings=agent_test_settings,
             summary_llm_model=summary_llm_model,
             embedding_model=embedding_model,
         )
-        await gather_evidence_tool.gather_evidence(answer.question, state=env_state)
+        await gather_evidence_tool.gather_evidence(session.question, state=env_state)
 
         if callback_type == "async":
             gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
 
-        assert answer.contexts, "Evidence did not return any results"
+        assert session.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswer.__name__} working"):
         generate_answer_tool = GenerateAnswer(
@@ -562,13 +564,19 @@ async def test_agent_sharing_state(
         assert re.search(
             pattern=EnvironmentState.STATUS_SEARCH_REGEX_PATTERN, string=result
         )
-        assert len(answer.answer) > 200, "Answer did not return any results"
+        assert len(session.answer) > 200, "Answer did not return any results"
         assert (
-            GenerateAnswer.extract_answer_from_message(result) == answer.answer
+            GenerateAnswer.extract_answer_from_message(result) == session.answer
         ), "Failed to regex extract answer from result"
         assert (
-            len(answer.used_contexts) <= query.settings.answer.answer_max_sources
+            len(session.used_contexts) <= query.settings.answer.answer_max_sources
         ), "Answer has more sources than expected"
+
+    with subtests.test(msg=f"{Reset.__name__} working"):
+        reset_tool = Reset()
+        await reset_tool.reset(state=env_state)
+        assert not session.context
+        assert not session.contexts
 
 
 def test_settings_model_config() -> None:
@@ -604,6 +612,22 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
     """Check the tool schema passed to LLM providers."""
     tools = settings_to_tools(agent_test_settings)
     assert ToolsAdapter.dump_python(tools, exclude_none=True) == [
+        {
+            "type": "function",
+            "info": {
+                "name": "reset",
+                "description": (
+                    "Reset by clearing all current evidence from the system."
+                    "\n\nThis tool is useful when repeatedly failing to answer because"
+                    " the existing evidence may unsuitable for the question.\nIt does"
+                    " not make sense to call this tool in parallel with other tools,"
+                    " as its resetting all state.\n"
+                    "Only invoke this tool when the current evidence is above"
+                    " zero, or this tool will be useless."
+                ),
+                "parameters": {"type": "object", "properties": {}, "required": []},
+            },
+        },
         {
             "type": "function",
             "info": {
@@ -694,15 +718,29 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             },
         },
         {
-            "type": "function",
             "info": {
-                "name": "complete",
                 "description": (
                     "Terminate using the last proposed answer.\n\nDo not invoke this"
                     " tool in parallel with other tools or itself."
                 ),
-                "parameters": {"type": "object", "properties": {}, "required": []},
+                "name": "complete",
+                "parameters": {
+                    "properties": {
+                        "has_successful_answer": {
+                            "description": (
+                                "Set True if an answer that addresses all parts of the"
+                                " task has been generated, otherwise set False to"
+                                " indicate unsureness."
+                            ),
+                            "title": "Has Successful Answer",
+                            "type": "boolean",
+                        }
+                    },
+                    "required": ["has_successful_answer"],
+                    "type": "object",
+                },
             },
+            "type": "function",
         },
     ]
 
@@ -740,7 +778,7 @@ def test_answers_are_striped() -> None:
             )
         ],
     )
-    response = AnswerResponse(session=session, bibtex={}, status="success")
+    response = AnswerResponse(session=session, bibtex={}, status=AgentStatus.SUCCESS)
 
     assert response.session.contexts[0].text.embedding is None
     assert response.session.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]
@@ -798,17 +836,23 @@ class TestGradablePaperQAEnvironment:
         )
         await stub_gradable_env.step(gen_answer_action)
         _, _, done, _ = await stub_gradable_env.step(
-            ToolRequestMessage(tool_calls=[ToolCall.from_name("complete")])
+            ToolRequestMessage(
+                tool_calls=[ToolCall.from_name("complete", has_successful_answer=True)]
+            )
         )
         assert done
-        assert not stub_gradable_env.state.session.could_not_answer
+        assert len(stub_gradable_env.state.session.answer) > 10, "Expected an answer"
         assert stub_gradable_env.state.session.used_contexts
         await stub_gradable_env_copy.step(gen_answer_action)
-        _, _, done, _ = await stub_gradable_env.step(
-            ToolRequestMessage(tool_calls=[ToolCall.from_name("complete")])
+        _, _, done, _ = await stub_gradable_env_copy.step(
+            ToolRequestMessage(
+                tool_calls=[ToolCall.from_name("complete", has_successful_answer=True)]
+            )
         )
         assert done
-        assert not stub_gradable_env_copy.state.session.could_not_answer
+        assert (
+            len(stub_gradable_env_copy.state.session.answer) > 10
+        ), "Expected an answer"
         assert stub_gradable_env_copy.state.session.used_contexts
         assert sorted(stub_gradable_env.state.session.used_contexts) == sorted(
             stub_gradable_env_copy.state.session.used_contexts
@@ -828,7 +872,9 @@ class TestGradablePaperQAEnvironment:
 
     @pytest.mark.asyncio
     async def test_unsure_answer(
-        self, stub_gradable_env: GradablePaperQAEnvironment
+        self,
+        agent_test_settings: Settings,
+        stub_gradable_env: GradablePaperQAEnvironment,
     ) -> None:
         unsure_answer = "Based on the sources provided, it appears no one has done x."
 
@@ -838,19 +884,34 @@ class TestGradablePaperQAEnvironment:
             query.answer = unsure_answer
             return query
 
-        await stub_gradable_env.reset()
+        reset_obs, tools = await stub_gradable_env.reset()
+
+        # 1. Emulate being unsure after gen_answer
+        answer_action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_name("gen_answer")]
+        )
         with patch.object(
             type(stub_gradable_env.state.docs), "aquery", emulate_answered_but_unsure
         ):
-            obs, _, done, truncated = await stub_gradable_env.step(
-                ToolRequestMessage(tool_calls=[ToolCall.from_name("gen_answer")])
-            )
-        assert len(obs) == 1
-        assert obs[0].content
-        assert not check_could_not_answer(obs[0].content)
-        assert unsure_answer in obs[0].content
+            answer_obs, _, done, truncated = await stub_gradable_env.step(answer_action)
+        assert len(answer_obs) == 1
+        assert answer_obs[0].content
+        assert unsure_answer in answer_obs[0].content
         assert not done
         assert not truncated
+
+        # 2. Check this leads to us being unsure
+        complete_action = await agent_test_settings.get_llm().select_tool(
+            [*reset_obs, answer_action, *answer_obs],
+            tools=tools,
+            tool_choice=next(
+                filter(lambda x: x.info.name == Complete.TOOL_FN_NAME, tools)
+            ),
+        )
+        assert len(complete_action.tool_calls) == 1
+        assert complete_action.tool_calls[0].function.arguments == {
+            "has_successful_answer": False
+        }, "Expected unsure"
 
     @pytest.mark.asyncio
     async def test_sequential_tool_calls(

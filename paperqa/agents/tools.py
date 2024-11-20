@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import DocDetails, PQASession, check_could_not_answer
+from paperqa.types import DocDetails, PQASession
 
 from .search import get_directory_index
 
@@ -33,7 +33,7 @@ def make_status(
 class EnvironmentState(BaseModel):
     """State here contains documents and answer being populated."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     docs: Docs
     session: PQASession = Field(..., alias="answer")
@@ -302,12 +302,6 @@ class GenerateAnswer(NamedTool):
             ),
         )
 
-        if (
-            state.session.could_not_answer
-            and self.settings.agent.wipe_context_on_answer_failure
-        ):
-            state.session.contexts = []
-            state.session.context = ""
         answer = state.session.answer
         status = state.status
         logger.info(status)
@@ -336,31 +330,55 @@ class GenerateAnswer(NamedTool):
         answer, *rest = re.split(
             pattern=cls.ANSWER_SPLIT_REGEX_PATTERN, string=content, maxsplit=1
         )
-        if len(rest) != 4 or check_could_not_answer(answer):  # noqa: PLR2004
-            return ""
-        return answer
+        return answer if len(rest) == 4 else ""  # noqa: PLR2004
+
+
+class Reset(NamedTool):
+    TOOL_FN_NAME = "reset"
+
+    async def reset(self, state: EnvironmentState) -> None:
+        """
+        Reset by clearing all current evidence from the system.
+
+        This tool is useful when repeatedly failing to answer because the existing evidence may unsuitable for the question.
+        It does not make sense to call this tool in parallel with other tools, as its resetting all state.
+        Only invoke this tool when the current evidence is above zero, or this tool will be useless.
+        """  # noqa: E501,W505
+        logger.info(f"Resetting '{state.session.question}'.")
+        state.session.contexts = []
+        state.session.context = ""
 
 
 class Complete(NamedTool):
     TOOL_FN_NAME = "complete"
 
-    # Use to separate answer from status
-    ANSWER_SPLIT_REGEX_PATTERN: ClassVar[str] = (
+    # Use to separate certainty from status
+    CERTAINTY_SPLIT_REGEX_PATTERN: ClassVar[str] = (
         r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
-    async def complete(self, state: EnvironmentState) -> str:
+    async def complete(
+        self, has_successful_answer: bool, state: EnvironmentState
+    ) -> str:
         """
         Terminate using the last proposed answer.
 
         Do not invoke this tool in parallel with other tools or itself.
 
         Args:
+            has_successful_answer: Set True if an answer that addresses all parts of the
+                task has been generated, otherwise set False to indicate unsureness.
             state: Current state.
         """
-        logger.info(f"Completing '{state.session.question}'.")
+        # TODO: eliminate race condition here if agent calls 2+ times in parallel
+        # with opposite has_successful_answer values
+        state.session.has_successful_answer = has_successful_answer
+        logger.info(
+            f"Completing '{state.session.question}' as"
+            f" '{'a success' if has_successful_answer else 'unsure'}'."
+        )
         # Return answer and status to simplify postprocessing of tool response
-        return f"{state.session.answer} | {state.status}"
+        return f"{'Success' if has_successful_answer else 'Unsure'} | {state.status}"
 
 
 AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {

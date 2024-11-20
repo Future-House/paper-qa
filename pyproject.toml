@@ -199,6 +199,7 @@ disable = [
     "broad-exception-caught",  # Don't care to enforce this
     "broad-exception-raised",  # Rely on ruff TRY002 for this
     "cyclic-import",  # Let Python blow up
+    "dangerous-default-value",  # Rely on ruff W0102 for this
     "expression-not-assigned",  # Rely on mypy func-returns-value for this
     "fixme",  # codetags are useful
     "function-redefined",  # Rely on mypy no-redef for this
@@ -266,6 +267,7 @@ filterwarnings = [
     "ignore:Support for class-based `config` is deprecated, use ConfigDict instead",  # SEE: https://github.com/BerriAI/litellm/issues/5648
     "ignore:The `dict` method is deprecated; use `model_dump` instead",  # SEE: https://github.com/BerriAI/litellm/issues/5987
     "ignore:Use 'content=<...>' to upload raw bytes/text content:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/5986
+    "ignore:builtin type (SwigPyPacked|SwigPyObject|swigvarlink) has no __module__:DeprecationWarning:importlib._bootstrap",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3931 --> https://github.com/swig/swig/issues/2881#issuecomment-2332652634
     'ignore:open_text is deprecated. Use files\(\) instead:DeprecationWarning',  # SEE: https://github.com/BerriAI/litellm/issues/5647
     'ignore:pkg_resources is deprecated as an API.:DeprecationWarning:pybtex',  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/169/replace-pkg_resources-with
 ]

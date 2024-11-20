@@ -20,6 +20,7 @@ from paperqa.agents.task import (
     LitQAv2TaskSplit,
 )
 from paperqa.agents.tools import GenerateAnswer
+from paperqa.litqa import DEFAULT_REWARD_MAPPING, LitQAEvaluation
 
 
 @pytest.fixture(name="base_query_request")
@@ -180,7 +181,19 @@ class TestTaskDataset:
         assert (
             metrics_callback.eval_means["total_paper_count"] > 0
         ), "Expected some papers to help us answer questions"
+        correct_percentage = metrics_callback.eval_means["correct"]
         assert metrics_callback.eval_means["reward"] > 0, "Expected some wins"
+        correct_reward, incorrect_reward = (
+            DEFAULT_REWARD_MAPPING[evaluation.value]
+            for evaluation in (LitQAEvaluation.CORRECT, LitQAEvaluation.INCORRECT)
+        )
+        worst_case_reward_given_correct = (
+            correct_reward * correct_percentage
+            + incorrect_reward * (1 - correct_percentage)
+        )
+        assert (
+            metrics_callback.eval_means["reward"] >= worst_case_reward_given_correct
+        ), "Expected reward to be above worst case value"
 
         with subtests.test(msg="confirming-reset-works"):
             assert len(store_env_callback.query_to_envs) == len(dataset)

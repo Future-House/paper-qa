@@ -10,7 +10,7 @@ __all__ = [
 import logging
 import re
 from abc import ABC
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from copy import deepcopy
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never
@@ -41,7 +41,7 @@ from paperqa.docs import Docs
 from paperqa.litqa import (
     DEFAULT_EVAL_MODEL_NAME,
     DEFAULT_LABBENCH_HF_HUB_NAME,
-    DEFAULT_REWARD_DISTRIBUTION,
+    DEFAULT_REWARD_MAPPING,
     LitQAEvaluation,
     read_litqa_v2_from_hub,
 )
@@ -72,7 +72,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             Callable[[PQASession | str], Awaitable[LitQAEvaluation]] | None
         ) = None,
         sources: str | list[str] | None = None,
-        rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
+        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         evaluation_callback: Callable[[LitQAEvaluation], Awaitable] | None = None,
         **env_kwargs,
     ):
@@ -187,7 +187,7 @@ class LitQATaskDataset(
         self,
         base_query: QueryRequest | dict | None = None,
         base_docs: Docs | dict | None = None,
-        rewards: Sequence[float] = DEFAULT_REWARD_DISTRIBUTION,
+        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         **env_kwargs,
     ):
@@ -238,11 +238,11 @@ class LitQATaskDataset(
         relevant_paper_count: list[float] = []
         evidence_count: list[float] = []
         for t in trajectories:
-            split_answers = [
-                split_answers
-                for split_answers in (
+            split_certainties = [
+                split_certainty
+                for split_certainty in (
                     re.split(
-                        pattern=Complete.ANSWER_SPLIT_REGEX_PATTERN,
+                        pattern=Complete.CERTAINTY_SPLIT_REGEX_PATTERN,
                         string=obs.content,
                         maxsplit=1,
                     )
@@ -253,15 +253,18 @@ class LitQATaskDataset(
                     )
                 )
                 # Filter for places where the regex split succeeded
-                if len(split_answers) >= 4  # noqa: PLR2004
+                if len(split_certainty) >= 4  # noqa: PLR2004
             ]
             for i, metric_list in enumerate(
                 (total_paper_count, relevant_paper_count, evidence_count),
-                start=1,  # Regex extraction of status starts after answer
+                start=1,  # Regex extraction of status starts after has_successful_answer
             ):
-                metric_list.append(  # Use mean to allow for multiple answers
-                    sum(int(sa[i]) for sa in split_answers) / len(split_answers)
-                    if split_answers  # Avoid div0 (when complete wasn't called)
+                # NOTE: we use mean to not break if there's 2+ complete calls (which
+                # we're prompted not to do). If it happens, they should all have the
+                # same status, so the mean value should equal the individual values
+                metric_list.append(
+                    sum(int(sa[i]) for sa in split_certainties) / len(split_certainties)
+                    if split_certainties  # Avoid div0 (when complete wasn't called)
                     else 0
                 )
         return super().compute_trajectory_metrics(trajectories) | {
@@ -269,10 +272,14 @@ class LitQATaskDataset(
             "relevant_paper_count": relevant_paper_count,
             "evidence_count": evidence_count,
             "correct": [
-                int(t.steps[-1].reward == self._rewards[0]) for t in trajectories
+                int(t.steps[-1].reward == self._rewards["correct"])
+                for t in trajectories
             ],
             "correct_unsure": [
-                int(t.steps[-1].reward in {self._rewards[0], self._rewards[1]})
+                int(
+                    t.steps[-1].reward
+                    in {self._rewards["correct"], self._rewards["unsure"]}
+                )
                 for t in trajectories
             ],
         }

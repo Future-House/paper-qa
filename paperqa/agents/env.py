@@ -26,6 +26,7 @@ from .tools import (
     GatherEvidence,
     GenerateAnswer,
     PaperSearch,
+    Reset,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ def settings_to_tools(
     embedding_model = embedding_model or settings.get_embedding_model()
     tools: list[Tool] = []
     for tool_type in (
-        (PaperSearch, GatherEvidence, GenerateAnswer, Complete)
+        (PaperSearch, GatherEvidence, GenerateAnswer, Reset, Complete)
         if settings.agent.tool_names is None
         else [
             AVAILABLE_TOOL_NAME_TO_CLASS[name]
@@ -83,6 +84,8 @@ def settings_to_tools(
                     embedding_model=embedding_model,
                 ).gen_answer
             )
+        elif issubclass(tool_type, Reset):
+            tool = Tool.from_function(Reset().reset)
         elif issubclass(tool_type, Complete):
             tool = Tool.from_function(Complete().complete)
         else:
@@ -126,7 +129,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     def make_initial_state(self) -> EnvironmentState:
         return EnvironmentState(
             docs=self._docs,
-            answer=PQASession(
+            session=PQASession(
                 question=self._query.query,
                 config_md5=self._query.settings.md5,
                 id=self._query.id,
@@ -183,15 +186,21 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 handle_tool_exc=True,
             ),
         ) or [Message(content=f"No tool calls input in tool request {action}.")]
+        done = any(
+            isinstance(msg, ToolResponseMessage)
+            and msg.name == Complete.complete.__name__
+            for msg in response_messages
+        )
+        if not done and self._has_excess_answer_failures():
+            # If the caller set max_answer_attempts, and the agent has tried to answer
+            # too many times, we consider this done, but we cannot determine success
+            # because we're not calling the complete tool
+            self.state.session.has_successful_answer = None
+            done = True
         return (
             response_messages,
             self.USE_POST_PROCESSED_REWARD,
-            any(
-                isinstance(msg, ToolResponseMessage)
-                and msg.name == Complete.complete.__name__
-                for msg in response_messages
-            )
-            or self._has_excess_answer_failures(),
+            done,
             False,  # Let caller determine truncations
         )
 

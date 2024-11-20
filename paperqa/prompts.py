@@ -13,13 +13,17 @@ summary_json_prompt = (
     "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\n"
 )
 
+# The below "cannot answer" sentinel phrase should:
+# 1. Lead to complete tool being called with has_successful_answer=False
+# 2. Can be used for unit testing
+CANNOT_ANSWER_PHRASE = "I cannot answer"
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
     "If the context provides insufficient information reply "
-    '"I cannot answer."'
+    f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
     "like {example_citation}. Only cite from the context "
@@ -86,8 +90,8 @@ env_reset_prompt = (
     "\n\nWhen the answer looks sufficient,"
     " you can terminate by calling the {complete_tool_name} tool."
     " If the answer does not look sufficient,"
-    " and you have already tried to answer several times,"
-    " you can terminate by calling the {complete_tool_name} tool."
+    " and you have already tried to answer several times with different evidence,"
+    " terminate by calling the {complete_tool_name} tool."
     " The current status of evidence/papers/cost is {status}"
 )
 
@@ -95,8 +99,8 @@ env_reset_prompt = (
 QA_PROMPT_TEMPLATE = "Q: {question}\n\nOptions:\n{options}"
 EVAL_PROMPT_TEMPLATE = (
     "Extract the single letter answer from the following question and answer"
-    "\n\n{qa_prompt}"
-    "\n\n{qa_answer}"
+    "\n\nQuestion: {qa_prompt}"
+    "\n\nAnswer: {qa_answer}"
     "\n\nSingle Letter Answer:"
 )
 
