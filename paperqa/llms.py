@@ -973,7 +973,7 @@ class OpenAIBatchLLMModel(LLMBatchModel):
         with tempfile.NamedTemporaryFile(suffix=".jsonl") as tmp_file:
             tmp_filename = tmp_file.name
             self.write_jsonl(messages, tmp_filename)
-            file = await client.files.create(file=tmp_file, purpose="batch")
+            file = await client.files.create(file=open(tmp_filename,"rb"), purpose="batch")
 
         batch = await client.batches.create(
             input_file_id=file.id,
