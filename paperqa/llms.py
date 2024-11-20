@@ -850,7 +850,7 @@ class VectorStore(BaseModel, ABC):
 
 
 class NumpyVectorStore(VectorStore):
-    texts: list[Embeddable] = []
+    texts: list[Embeddable] = Field(default_factory=list)
     _embeddings_matrix: np.ndarray | None = None
 
     def __eq__(self, other) -> bool:
