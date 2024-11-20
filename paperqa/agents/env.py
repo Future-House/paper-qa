@@ -129,7 +129,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
     def make_initial_state(self) -> EnvironmentState:
         return EnvironmentState(
             docs=self._docs,
-            answer=PQASession(
+            session=PQASession(
                 question=self._query.query,
                 config_md5=self._query.settings.md5,
                 id=self._query.id,
