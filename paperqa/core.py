@@ -130,16 +130,16 @@ async def gather_with_batch(
     Gathers evidence considering a batch of texts. The completions are obtained using a batch API.
 
     Args:
-        matches (list[Text]): A list of text matches to gather evidence from.
-        question (str): The question to be answered.
-        prompt_runner (PromptRunner | None): The prompt runner to use for obtaining completions.
-        extra_prompt_data (dict[str, str] | None, optional): Additional data to include in the prompt.
-        parser (Callable[[str], dict[str, Any]] | None, optional): A function to parse the LLM result text.
-        callbacks (list[Callable[[str], None]] | None, optional): A list of callback functions to be called
+        matches: A list of text matches to gather evidence from.
+        question: The question to be answered.
+        prompt_runner: The prompt runner to use for obtaining completions.
+        extra_prompt_data: Additional data to include in the prompt.
+        parser: A function to parse the LLM result text.
+        callbacks: A list of callback functions to be called
         with the LLM result text.
 
     Returns:
-        list[tuple[Context, LLMResult]]: A list of tuples containing the context and LLM result for each match.
+        list: A list of tuples containing the context and LLM result for each match.
     """
     data = [
         {
@@ -178,7 +178,6 @@ async def gather_with_batch(
             Context(
                 context=strip_citations(llm_result.text),
                 text=m,
-                model_extra={},
                 score=score,
                 **r,
             ),
