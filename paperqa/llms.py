@@ -313,7 +313,10 @@ class Chunk(BaseModel):
 class LLMModel(ABC, BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
-    llm_type: str | None = None
+    llm_type: str | StrEnum | None = Field(
+        default=None,
+        description="A string indicating the type of LLM model (e.g., 'chat' or 'completion').",
+    )
     name: str
     llm_result_callback: (
         Callable[[LLMResult], None] | Callable[[LLMResult], Awaitable[None]] | None
@@ -805,7 +808,10 @@ class LiteLLMModel(LLMModel):
 class LLMBatchModel(ABC, BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
-    llm_type: str | None = None
+    llm_type: str | StrEnum | None = Field(
+        default=None,
+        description="A string indicating the type of LLM model (e.g., 'chat' or 'completion').",
+    )
     name: str
     llm_result_callback: (
         Callable[[LLMResult], None] | Callable[[LLMResult], Awaitable[None]] | None
@@ -889,7 +895,7 @@ class OpenAIBatchLLMModel(LLMBatchModel):
     async def write_jsonl(
         self,
         data: list[list[dict[str, str]]],
-        tmp_file: io.BytesIO,
+        mem_buffer: io.BytesIO,
     ):
         batch_template: BatchTemplate = {
             "custom_id": None,
@@ -904,8 +910,7 @@ class OpenAIBatchLLMModel(LLMBatchModel):
             batch_template["body"]["messages"] = d
             batch_template["body"]["max_tokens"] = self.config.get("max_tokens")
             serialized_data = json.dumps(batch_template) + "\n"
-            tmp_file.write(serialized_data.encode())
-            # tmp_file.write(json.dumps(batch_template) + "\n")
+            mem_buffer.write(serialized_data.encode())
 
     async def acomplete(self):
         raise NotImplementedError("Only chat models are supported by openAI batch API.")
@@ -975,10 +980,10 @@ class OpenAIBatchLLMModel(LLMBatchModel):
 
         client = openai.AsyncOpenAI()
 
-        with io.BytesIO() as tmp_file:
-            await self.write_jsonl(messages, tmp_file)
-            tmp_file.seek(0)
-            file = await client.files.create(file=tmp_file, purpose="batch")
+        with io.BytesIO() as mem_buffer:
+            await self.write_jsonl(messages, mem_buffer)
+            mem_buffer.seek(0)
+            file = await client.files.create(file=mem_buffer, purpose="batch")
 
         batch = await client.batches.create(
             input_file_id=file.id,
@@ -1045,7 +1050,7 @@ class OpenAIBatchLLMModel(LLMBatchModel):
 class AnthropicBatchLLMModel(LLMBatchModel):
     """A wrapper around the anthropic library to use the batch API."""
 
-    name: str = "claude-3-5-sonnet-20241022"
+    name: str = "claude-3-5-sonnet-latest"
     config: dict = Field(
         default_factory=dict,
         description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
