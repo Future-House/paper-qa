@@ -6,7 +6,6 @@ import functools
 import io
 import json
 import logging
-import tempfile
 from abc import ABC, abstractmethod
 from collections.abc import (
     AsyncGenerator,
