@@ -489,9 +489,9 @@ async def test_agent_sharing_state(
 
     agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
-    answer = PQASession(question="What is is a self-explanatory model?")
-    query = QueryRequest(query=answer.question, settings=agent_test_settings)
-    env_state = EnvironmentState(docs=Docs(), answer=answer)
+    session = PQASession(question="What is is a self-explanatory model?")
+    query = QueryRequest(query=session.question, settings=agent_test_settings)
+    env_state = EnvironmentState(docs=Docs(), session=session)
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
 
@@ -533,20 +533,20 @@ async def test_agent_sharing_state(
             mock_save_index.assert_not_awaited()
 
     with subtests.test(msg=GatherEvidence.__name__):
-        assert not answer.contexts, "No contexts is required for a later assertion"
+        assert not session.contexts, "No contexts is required for a later assertion"
 
         gather_evidence_tool = GatherEvidence(
             settings=agent_test_settings,
             summary_llm_model=summary_llm_model,
             embedding_model=embedding_model,
         )
-        await gather_evidence_tool.gather_evidence(answer.question, state=env_state)
+        await gather_evidence_tool.gather_evidence(session.question, state=env_state)
 
         if callback_type == "async":
             gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
 
-        assert answer.contexts, "Evidence did not return any results"
+        assert session.contexts, "Evidence did not return any results"
 
     with subtests.test(msg=f"{GenerateAnswer.__name__} working"):
         generate_answer_tool = GenerateAnswer(
@@ -564,19 +564,19 @@ async def test_agent_sharing_state(
         assert re.search(
             pattern=EnvironmentState.STATUS_SEARCH_REGEX_PATTERN, string=result
         )
-        assert len(answer.answer) > 200, "Answer did not return any results"
+        assert len(session.answer) > 200, "Answer did not return any results"
         assert (
-            GenerateAnswer.extract_answer_from_message(result) == answer.answer
+            GenerateAnswer.extract_answer_from_message(result) == session.answer
         ), "Failed to regex extract answer from result"
         assert (
-            len(answer.used_contexts) <= query.settings.answer.answer_max_sources
+            len(session.used_contexts) <= query.settings.answer.answer_max_sources
         ), "Answer has more sources than expected"
 
     with subtests.test(msg=f"{Reset.__name__} working"):
         reset_tool = Reset()
         await reset_tool.reset(state=env_state)
-        assert not answer.context
-        assert not answer.contexts
+        assert not session.context
+        assert not session.contexts
 
 
 def test_settings_model_config() -> None:
@@ -778,7 +778,7 @@ def test_answers_are_striped() -> None:
             )
         ],
     )
-    response = AnswerResponse(session=session, bibtex={}, status="success")
+    response = AnswerResponse(session=session, bibtex={}, status=AgentStatus.SUCCESS)
 
     assert response.session.contexts[0].text.embedding is None
     assert response.session.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]
