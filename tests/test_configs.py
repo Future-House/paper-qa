@@ -14,6 +14,7 @@ from paperqa.settings import (
     get_formatted_variables,
     get_settings,
 )
+from paperqa.types import Doc, DocDetails
 
 
 def test_prompt_settings_validation() -> None:
@@ -90,3 +91,79 @@ def test_o1_requires_temp_equals_1() -> None:
         warnings.simplefilter("always")
         _ = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
         assert not w
+
+
+@pytest.mark.parametrize(
+    ("doc_class", "doc_data", "filter_criteria", "expected_result"),
+    [
+        pytest.param(
+            Doc,
+            {
+                "docname": "Test Paper",
+                "citation": "Test Citation",
+                "dockey": "key1",
+            },
+            {"docname": "Test Paper"},
+            True,
+            id="Doc-matching-docname",
+        ),
+        pytest.param(
+            Doc,
+            {
+                "docname": "Test Paper",
+                "citation": "Test Citation",
+                "dockey": "key1",
+            },
+            {"docname": "Another Paper"},
+            False,
+            id="Doc-nonmatching-docname",
+        ),
+        pytest.param(
+            DocDetails,
+            {
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
+            },
+            {"title": "Test Paper"},
+            True,
+            id="DocDetails-matching-title",
+        ),
+        pytest.param(
+            DocDetails,
+            {
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
+            },
+            {"!year": 2020, "?foo": "bar"},
+            False,
+            id="DocDetails-inverted-matching-year",
+        ),
+        pytest.param(
+            DocDetails,
+            {
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
+            },
+            {"year": 2020, "foo": "bar"},
+            False,
+            id="DocDetails-missing-param-fail",
+        ),
+        pytest.param(
+            DocDetails,
+            {
+                "title": "Test Paper",
+                "authors": ["Alice", "Bob"],
+                "year": 2020,
+            },
+            {"?volume": "10", "!title": "Another Paper"},
+            True,
+            id="DocDetails-relaxed-missing-volume",
+        ),
+    ],
+)
+def test_matches_filter_criteria(doc_class, doc_data, filter_criteria, expected_result):
+    doc = doc_class(**doc_data)
+    assert doc.matches_filter_criteria(filter_criteria) == expected_result

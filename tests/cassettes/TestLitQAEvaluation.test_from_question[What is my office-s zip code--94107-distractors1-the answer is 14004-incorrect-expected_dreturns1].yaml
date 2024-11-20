@@ -1,0 +1,113 @@
+interactions:
+  - request:
+      body:
+        '{"messages": [{"role": "user", "content": "Extract the single letter answer
+        from the following question and answer\n\nQuestion: Q: What is my office''s
+        zip code?\n\nOptions:\nA) 94107\nB) 94106\nC) cheesecake\nD) Insufficient information
+        to answer this question\nE) -8\n\nAnswer: the answer is 14004\n\nSingle Letter
+        Answer:"}], "model": "gpt-4-turbo-2024-04-09", "stream": false, "temperature":
+        0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "399"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.54.4
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.54.4
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.7
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4xTy27bMBC8+ysWvDQB5EBOFCjxpUgfh/bQQ2H0kbowaGolsaW4DLly6gb594K0
+          LTloCvQiQDs7w1nu8GECIHQl5iBUK1l1zkxvPn2s2u3idnHxIXwpZHG7ufPhfXHxdbvY3IosMmj9
+          AxUfWGeKOmeQNdkdrDxKxqg6Ky/O88uyLMsEdFShibTG8bSYcu/XND3Pz4tpXkzz6z27Ja0wiDl8
+          mwAAPKRv9Gkr/CXmkGeHSochyAbFfGgCEJ5MrAgZgg4sLYtsBBVZRpusL1qEoG1jEAwyowdpwz16
+          YAJuEe56DHEmWIrPrWTQAbotUF1rhS8C/NYOFFX4cingXnObOM7TRldYAblIDZH05hTe2dBHnkbL
+          oG1NvpNJmmk4tNVhOPIMFvFXB1ijkn3AJC4V99IcCIejMliKWZHnRbYUUBEGsMTQSVYtSBsNJ/LB
+          7uCs0Ru0cHID5OHVaQbSVqmRuEU/dJ28TsDbU5AeQRmU3mxBe48GN9JyZGuryHtUHG2jx5o8Zklr
+          X4fdStNlnB1vw2PdBxkTYXtj9vXHYb2GGudpHfb4UK+11aFdeZSBbFxlYHIioY8TgO8pRv2TZAjn
+          qXO8YvqJNgqWVzs5MYZ3BK9me5CJpRnrs8vr7Bm5VYUstQlHORRKqharkTqGVvaVpiNgcjT0326e
+          094Nrm3zP/IjoBQ6xmrlPFZaPZ14bPMY3/a/2oZLToZF2AbGblVr26B3Xu9eVu1Wql5f1tdYy1JM
+          Hid/AAAA//8DALHAjWhnBAAA
+      headers:
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-RAY:
+          - 8e53de72fa35171a-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 19 Nov 2024 23:09:40 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=NN_CVQrdtVcfzj3hSKUVLPnr69pGiin75ODPqXRa7mY-1732057780-1.0.1.1-Z5hKrN8tRnSsireFjVAIIkS_RAjKjFet2gGcEusT3eabj9uF2wtvXmPkukpDBVXuGNE4szIXCiH.4lpv39_How;
+            path=/; expires=Tue, 19-Nov-24 23:39:40 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=rmhiOmMva8xhUwvNu2NHd1WUMeR7lCH4QEPePEpAvRg-1732057780929-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "3712"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "3000"
+        x-ratelimit-limit-tokens:
+          - "250000"
+        x-ratelimit-remaining-requests:
+          - "2999"
+        x-ratelimit-remaining-tokens:
+          - "249915"
+        x-ratelimit-reset-requests:
+          - 20ms
+        x-ratelimit-reset-tokens:
+          - 20ms
+        x-request-id:
+          - req_b9c919a23b80fe6870ed431ec2acd624
+      status:
+        code: 200
+        message: OK
+version: 1
