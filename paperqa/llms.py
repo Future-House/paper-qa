@@ -904,7 +904,7 @@ class OpenAIBatchLLMModel(LLMBatchModel):
             batch_template["body"]["messages"] = d
             batch_template["body"]["max_tokens"] = self.config.get("max_tokens")
             serialized_data = json.dumps(batch_template) + "\n"
-            tmp_file.write(serialized_data.encode("utf-8"))
+            tmp_file.write(serialized_data.encode())
             # tmp_file.write(json.dumps(batch_template) + "\n")
 
     async def acomplete(self):
