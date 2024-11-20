@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import functools
+import io
 import json
 import logging
 import tempfile
@@ -886,21 +887,26 @@ class OpenAIBatchLLMModel(LLMBatchModel):
         description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
     )
 
-    def write_jsonl(self, data: list[list[dict[str, str]]], filename: str | Any):
-
+    async def write_jsonl(
+        self,
+        data: list[list[dict[str, str]]],
+        tmp_file: io.BytesIO,
+    ):
         batch_template: BatchTemplate = {
             "custom_id": None,
             "method": "POST",
             "url": "/v1/chat/completions",
             "body": {"model": None, "messages": None, "max_tokens": None},
         }
-        with open(filename, "w") as tmp_file:
-            for i, d in enumerate(data):
-                batch_template["custom_id"] = str(i)
-                batch_template["body"]["model"] = self.config.get("model")
-                batch_template["body"]["messages"] = d
-                batch_template["body"]["max_tokens"] = self.config.get("max_tokens")
-                tmp_file.write(json.dumps(batch_template) + "\n")
+
+        for i, d in enumerate(data):
+            batch_template["custom_id"] = str(i)
+            batch_template["body"]["model"] = self.config.get("model")
+            batch_template["body"]["messages"] = d
+            batch_template["body"]["max_tokens"] = self.config.get("max_tokens")
+            serialized_data = json.dumps(batch_template) + "\n"
+            tmp_file.write(serialized_data.encode("utf-8"))
+            # tmp_file.write(json.dumps(batch_template) + "\n")
 
     async def acomplete(self):
         raise NotImplementedError("Only chat models are supported by openAI batch API.")
@@ -970,12 +976,10 @@ class OpenAIBatchLLMModel(LLMBatchModel):
 
         client = openai.AsyncOpenAI()
 
-        with tempfile.NamedTemporaryFile(suffix=".jsonl") as tmp_file:
-            tmp_filename = tmp_file.name
-            self.write_jsonl(messages, tmp_filename)
-            file = await client.files.create(
-                file=open(tmp_filename, "rb"), purpose="batch"
-            )
+        with io.BytesIO() as tmp_file:
+            await self.write_jsonl(messages, tmp_file)
+            tmp_file.seek(0)
+            file = await client.files.create(file=tmp_file, purpose="batch")
 
         batch = await client.batches.create(
             input_file_id=file.id,
