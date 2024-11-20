@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from paperqa.llms import PromptRunner
@@ -74,6 +74,12 @@ async def map_fxn_summary(
             callbacks,
             "evidence:" + text.name,
         )
+
+        if isinstance(result, Sequence) and len(result) != 1:
+            raise NotImplementedError(
+                f"Expected a single LLMResult, got {len(result)}. : {result}"
+            )
+
         llm_result = result if isinstance(result, LLMResult) else result[0]
         context = llm_result.text
         result_data = parser(context) if parser else {}
@@ -139,7 +145,7 @@ async def gather_with_batch(
         with the LLM result text.
 
     Returns:
-        list: A list of tuples containing the context and LLM result for each match.
+        List of tuples containing the context and LLM result for each match.
     """
     data = [
         {
@@ -158,6 +164,7 @@ async def gather_with_batch(
             callbacks,
             "evidence:" + matches[0].name,
         )
+
         llm_results = result if isinstance(result, list) else [result]
 
     results_data = []

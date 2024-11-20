@@ -637,6 +637,8 @@ class Docs(BaseModel):
                     prompt_runner=prompt_runner,
                     extra_prompt_data={
                         "summary_length": answer_config.evidence_summary_length,
+                        # citations are formatted inside the function
+                        # for each text in matches
                     },
                     parser=llm_parse_json if prompt_config.use_json else None,
                     callbacks=callbacks,
