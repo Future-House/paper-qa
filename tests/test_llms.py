@@ -175,7 +175,7 @@ class TestOpenAIBatchLLMModel:
             "model": model_name,
             "temperature": 0.0,
             "max_tokens": 64,
-            "batch_summary_timelimit": 24 * 60 * 60,
+            "batch_summary_time_limit": 24 * 60 * 60,
             "batch_polling_interval": 5,
         }
 
@@ -430,7 +430,7 @@ class TestAnthropicBatchLLMModel:
             "model": model_name,
             "temperature": 0.0,
             "max_tokens": 64,
-            "batch_summary_timelimit": 24 * 60 * 60,
+            "batch_summary_time_limit": 24 * 60 * 60,
             "batch_polling_interval": 5,
         }
 

@@ -637,9 +637,12 @@ class Settings(BaseSettings):
             "and OpenAI (https://platform.openai.com/docs/guides/batch) chat models."
         ),
     )
-    batch_summary_timelimit: int = Field(
+    batch_summary_time_limit: int = Field(
         default=24 * 60 * 60,
-        description="Time limit for batch summarization in seconds",
+        description=(
+            "Time limit for batch summarization in seconds. "
+            "Default is set to 24 hours to match OpenAI's and Anthropic's limit."
+        ),
     )
     batch_polling_interval: int = Field(
         default=30,

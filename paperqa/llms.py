@@ -1005,7 +1005,7 @@ class OpenAIBatchLLMModel(LLMBatchModel):
                 raise ConnectionError("Batch was cancelled.")
 
             batch_time = asyncio.get_running_loop().time() - start_clock
-            if batch_time > self.config.get("batch_summary_timelimit", 24 * 60 * 60):
+            if batch_time > self.config.get("batch_summary_time_limit", 24 * 60 * 60):
                 raise TimeoutError("Batch took too long to complete.")
 
             logger.info(
@@ -1147,7 +1147,7 @@ class AnthropicBatchLLMModel(LLMBatchModel):
             batch = await client.beta.messages.batches.retrieve(batch.id)
 
             batch_time = asyncio.get_running_loop().time() - start_clock
-            if batch_time > self.config.get("batch_summary_timelimit", 24 * 60 * 60):
+            if batch_time > self.config.get("batch_summary_time_limit", 24 * 60 * 60):
                 raise TimeoutError("Batch took too long to complete.")
 
             logger.info(
