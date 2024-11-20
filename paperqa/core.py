@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from paperqa.llms import PromptRunner
@@ -68,12 +68,19 @@ async def map_fxn_summary(
     success = False
 
     if prompt_runner:
-        llm_result = await prompt_runner(
+        result = await prompt_runner(
             {"question": question, "citation": citation, "text": text.text}
             | (extra_prompt_data or {}),
             callbacks,
             "evidence:" + text.name,
         )
+
+        if isinstance(result, Sequence) and len(result) != 1:
+            raise NotImplementedError(
+                f"Expected a single LLMResult, got {len(result)}. : {result}"
+            )
+
+        llm_result = result if isinstance(result, LLMResult) else result[0]
         context = llm_result.text
         result_data = parser(context) if parser else {}
         success = bool(result_data)
@@ -115,3 +122,75 @@ async def map_fxn_summary(
         ),
         llm_result,
     )
+
+
+async def gather_with_batch(
+    matches: list[Text],
+    question: str,
+    prompt_runner: PromptRunner | None,
+    extra_prompt_data: dict[str, str] | None = None,
+    parser: Callable[[str], dict[str, Any]] | None = None,
+    callbacks: list[Callable[[str], None]] | None = None,
+) -> list[tuple[Context, LLMResult]]:
+    """
+    Gathers evidence considering a batch of texts. The completions are obtained using a batch API.
+
+    Args:
+        matches: A list of text matches to gather evidence from.
+        question: The question to be answered.
+        prompt_runner: The prompt runner to use for obtaining completions.
+        extra_prompt_data: Additional data to include in the prompt.
+        parser: A function to parse the LLM result text.
+        callbacks: A list of callback functions to be called
+        with the LLM result text.
+
+    Returns:
+        List of tuples containing the context and LLM result for each match.
+    """
+    data = [
+        {
+            "question": question,
+            "citation": m.name + ": " + m.doc.formatted_citation,
+            "text": m.text,
+        }
+        | (extra_prompt_data or {})
+        for m in matches
+    ]
+
+    llm_results: list[LLMResult] = []
+    if prompt_runner:
+        result = await prompt_runner(
+            data,
+            callbacks,
+            "evidence:" + matches[0].name,
+        )
+
+        llm_results = result if isinstance(result, list) else [result]
+
+    results_data = []
+    scores = []
+    for r in llm_results:
+        if parser:
+            res = parser(r.text)
+            results_data.append(res)
+            scores.append(res.pop("relevance_score"))
+            # just in case question was present
+            res.pop("question", None)
+        else:
+            results_data.append({})
+            scores.append(extract_score(r.text))
+
+    return [
+        (
+            Context(
+                context=strip_citations(llm_result.text),
+                text=m,
+                score=score,
+                **r,
+            ),
+            llm_result,
+        )
+        for r, m, llm_result, score in zip(
+            results_data, matches, llm_results, scores, strict=True
+        )
+    ]

@@ -3,6 +3,9 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import functools
+import io
+import json
+import logging
 from abc import ABC, abstractmethod
 from collections.abc import (
     AsyncGenerator,
@@ -16,7 +19,7 @@ from collections.abc import (
 from enum import StrEnum
 from inspect import isasyncgenfunction, signature
 from sys import version_info
-from typing import Any, TypeVar, cast
+from typing import Any, TypedDict, TypeVar, cast
 
 import litellm
 import numpy as np
@@ -36,9 +39,11 @@ from paperqa.rate_limiter import GLOBAL_LIMITER
 from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
 
+logger = logging.getLogger(__name__)
+
 PromptRunner = Callable[
-    [dict, list[Callable[[str], None]] | None, str | None],
-    Awaitable[LLMResult],
+    [dict | list[dict], list[Callable[[str], None]] | None, str | None],
+    Awaitable[LLMResult | list[LLMResult]],
 ]
 
 MODEL_COST_MAP = litellm.get_model_cost_map("")
@@ -68,6 +73,39 @@ async def do_callbacks(
 class EmbeddingModes(StrEnum):
     DOCUMENT = "document"
     QUERY = "query"
+
+
+class BatchStatus(StrEnum):
+    COMPLETE = "complete"
+    PROGRESS = "progress"
+    SUCCESS = "success"
+    FAILURE = "failure"
+    EXPIRE = "expire"
+    CANCEL = "cancel"
+
+    def from_openai(self) -> str:
+        """Convert BatchStatus to OpenAI status."""
+        mapping = {
+            BatchStatus.COMPLETE: "completed",
+            BatchStatus.PROGRESS: "in_progress",
+            BatchStatus.SUCCESS: "completed",
+            BatchStatus.FAILURE: "failed",
+            BatchStatus.EXPIRE: "expired",
+            BatchStatus.CANCEL: "cancelled",
+        }
+        return mapping[self]
+
+    def from_anthropic(self) -> str:
+        """Convert BatchStatus to Anthropic status."""
+        mapping = {
+            BatchStatus.COMPLETE: "ended",
+            BatchStatus.PROGRESS: "in_progress",
+            BatchStatus.SUCCESS: "succeeded",
+            BatchStatus.FAILURE: "errored",
+            BatchStatus.EXPIRE: "expired",
+            BatchStatus.CANCEL: "canceled",
+        }
+        return mapping[self]
 
 
 # Estimate from OpenAI's FAQ
@@ -275,7 +313,10 @@ class Chunk(BaseModel):
 class LLMModel(ABC, BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
-    llm_type: str | None = None
+    llm_type: str | StrEnum | None = Field(
+        default=None,
+        description="A string indicating the type of LLM model (e.g., 'chat' or 'completion').",
+    )
     name: str
     llm_result_callback: (
         Callable[[LLMResult], None] | Callable[[LLMResult], Awaitable[None]] | None
@@ -762,6 +803,380 @@ class LiteLLMModel(LLMModel):
             model_name=self.name, acompletion=self.router.acompletion
         )
         return await tool_selector(*selection_args, **selection_kwargs)
+
+
+class LLMBatchModel(ABC, BaseModel):
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+
+    llm_type: str | StrEnum | None = Field(
+        default=None,
+        description="A string indicating the type of LLM model (e.g., 'chat' or 'completion').",
+    )
+    name: str
+    llm_result_callback: (
+        Callable[[LLMResult], None] | Callable[[LLMResult], Awaitable[None]] | None
+    ) = Field(
+        default=None,
+        description=(
+            "An async callback that will be executed on each"
+            " LLMResult (different than callbacks that execute on each chunk)"
+        ),
+        exclude=True,
+    )
+    config: dict = Field(default_factory=dict)
+
+    async def run_prompt(
+        self,
+        prompt: str,
+        data: list[dict],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        system_prompt: str | None = default_system_prompt,
+    ) -> list[LLMResult]:
+        if self.llm_type is None:
+            self.llm_type = self.infer_llm_type()
+        if self.llm_type == "chat":
+            return await self._run_chat(prompt, data, callbacks, name, system_prompt)
+        if self.llm_type == "completion":
+            return await self._run_completion(
+                prompt, data, callbacks, name, system_prompt
+            )
+        raise ValueError(f"Unknown llm_type {self.llm_type!r}.")
+
+    async def _run_chat(
+        self,
+        prompt: str,
+        data: list[dict],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        system_prompt: str | None = default_system_prompt,
+    ) -> list[LLMResult]:
+        raise NotImplementedError
+
+    async def _run_completion(
+        self,
+        prompt: str,
+        data: list[dict],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        system_prompt: str | None = default_system_prompt,
+    ) -> list[LLMResult]:
+        raise NotImplementedError
+
+    def infer_llm_type(self) -> str:
+        return "chat"
+
+    def count_tokens(self, text: str) -> int:
+        return len(text) // 4
+
+
+class Body(TypedDict):
+    model: str | None
+    messages: list[dict[str, str]] | None
+    max_tokens: int | None
+
+
+class BatchTemplate(TypedDict):
+    custom_id: str | None
+    method: str
+    url: str
+    body: Body
+
+
+class OpenAIBatchLLMModel(LLMBatchModel):
+    """A wrapper around the OpenAI library to use the batch API."""
+
+    name: str = "gpt-4o-mini"
+    config: dict = Field(
+        default_factory=dict,
+        description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
+    )
+
+    async def write_jsonl(
+        self,
+        data: list[list[dict[str, str]]],
+        mem_buffer: io.BytesIO,
+    ):
+        batch_template: BatchTemplate = {
+            "custom_id": None,
+            "method": "POST",
+            "url": "/v1/chat/completions",
+            "body": {"model": None, "messages": None, "max_tokens": None},
+        }
+
+        for i, d in enumerate(data):
+            batch_template["custom_id"] = str(i)
+            batch_template["body"]["model"] = self.config.get("model")
+            batch_template["body"]["messages"] = d
+            batch_template["body"]["max_tokens"] = self.config.get("max_tokens")
+            serialized_data = json.dumps(batch_template) + "\n"
+            mem_buffer.write(serialized_data.encode())
+
+    async def acomplete(self):
+        raise NotImplementedError("Only chat models are supported by openAI batch API.")
+
+    async def acomplete_iter(self):
+        raise NotImplementedError(
+            "Async generator not supported for batch calls and nly chat models are supported by openAI batch API."
+        )
+
+    async def _run_chat(
+        self,
+        prompt: str,
+        data: list[dict],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        system_prompt: str | None = default_system_prompt,
+    ) -> list[LLMResult]:
+        if callbacks:
+            sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
+            async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+
+        human_message_prompt = {"role": "user", "content": prompt}
+
+        batch = []
+        for d in data:
+            messages = [
+                {"role": m["role"], "content": m["content"].format(**d)}
+                for m in (
+                    [{"role": "system", "content": system_prompt}, human_message_prompt]
+                    if system_prompt
+                    else [human_message_prompt]
+                )
+            ]
+            batch.append(messages)
+
+        start_clock = asyncio.get_running_loop().time()
+        chunks = await self.achat(batch)
+        batch_time = asyncio.get_running_loop().time() - start_clock
+
+        if callbacks:
+            for chunk in chunks:
+                await do_callbacks(
+                    async_callbacks, sync_callbacks, chunk.text or "", name
+                )
+
+        return [
+            LLMResult(
+                model=self.name,
+                name=name,
+                prompt=messages,
+                prompt_count=chunk.prompt_tokens,
+                text=chunk.text,
+                completion_count=chunk.completion_tokens,
+                seconds_to_first_token=batch_time,
+                seconds_to_last_token=batch_time,
+            )
+            for messages, chunk in zip(batch, chunks, strict=True)
+        ]
+
+    async def achat(self, messages: list[list[dict]]) -> list[Chunk]:
+        try:
+            import openai
+        except ImportError as exc:
+            raise ImportError(
+                "Please install paper-qa[batch] to use OpenAIBatchLLMModel."
+            ) from exc
+
+        client = openai.AsyncOpenAI()
+
+        with io.BytesIO() as mem_buffer:
+            await self.write_jsonl(messages, mem_buffer)
+            mem_buffer.seek(0)
+            file = await client.files.create(file=mem_buffer, purpose="batch")
+
+        batch = await client.batches.create(
+            input_file_id=file.id,
+            endpoint="/v1/chat/completions",
+            completion_window="24h",
+            metadata={"description": ""},
+        )
+
+        start_clock = asyncio.get_running_loop().time()
+        while batch.status != BatchStatus.COMPLETE.from_openai():
+            batch = await client.batches.retrieve(batch.id)
+            if batch.status == BatchStatus.FAILURE.from_openai():
+                error_messages = []
+                if batch.errors and hasattr(batch.errors, "data") and batch.errors.data:
+                    error_messages = [
+                        str(k.message)
+                        for k in batch.errors.data
+                        if k.message is not None
+                    ]
+                raise RuntimeError(
+                    "Batch failed. \n\nReason: \n" + "\n".join(error_messages)
+                )
+            if batch.status == BatchStatus.CANCEL.from_openai():
+                raise ConnectionError("Batch was cancelled.")
+
+            batch_time = asyncio.get_running_loop().time() - start_clock
+            if batch_time > self.config.get("batch_summary_time_limit", 24 * 60 * 60):
+                raise TimeoutError("Batch took too long to complete.")
+
+            logger.info(
+                f"Summary batch status: {batch.status} | Time elapsed: {batch_time}"
+            )
+            await asyncio.sleep(self.config.get("batch_polling_interval", 30))
+
+        if batch.output_file_id:
+            api_responses = await client.files.content(batch.output_file_id)
+        else:
+            raise RuntimeError("Batch failed to generate output file.")
+        sorted_responses = sorted(
+            [
+                json.loads(line)
+                for line in api_responses.read().decode("utf-8").splitlines()
+            ],
+            key=lambda x: int(x["custom_id"]),
+        )  # The batchAPI doesn't guarantee the order of the responses
+
+        return [
+            Chunk(
+                text=response["response"]["body"]["choices"][0]["message"]["content"],
+                prompt_tokens=response["response"]["body"]["usage"]["prompt_tokens"],
+                completion_tokens=response["response"]["body"]["usage"][
+                    "completion_tokens"
+                ],
+            )
+            for response in sorted_responses
+        ]
+
+    async def achat_iter(self):
+        raise NotImplementedError(
+            "Async generator not supported for batch calls. Use achat instead."
+        )
+
+
+class AnthropicBatchLLMModel(LLMBatchModel):
+    """A wrapper around the anthropic library to use the batch API."""
+
+    name: str = "claude-3-5-sonnet-latest"
+    config: dict = Field(
+        default_factory=dict,
+        description="Configuration dictionary for this model. Currently supported keys are `model` and `max_token`.",
+    )
+
+    async def acomplete(self):
+        raise NotImplementedError("Completion models are not supported yet")
+
+    async def acomplete_iter(self):
+        raise NotImplementedError("Completion models are not supported yet")
+
+    async def _run_chat(
+        self,
+        prompt: str,
+        data: list[dict],
+        callbacks: list[Callable] | None = None,
+        name: str | None = None,
+        system_prompt: str | None = default_system_prompt,
+    ) -> list[LLMResult]:
+        if callbacks:
+            sync_callbacks = [f for f in callbacks if not is_coroutine_callable(f)]
+            async_callbacks = [f for f in callbacks if is_coroutine_callable(f)]
+
+        human_message_prompt = {"role": "user", "content": prompt}
+
+        batch = []
+        for d in data:
+            messages = [
+                {"role": m["role"], "content": m["content"].format(**d)}
+                for m in (
+                    [{"role": "system", "content": system_prompt}, human_message_prompt]
+                    if system_prompt
+                    else [human_message_prompt]
+                )
+            ]
+            batch.append(messages)
+
+        start_clock = asyncio.get_running_loop().time()
+        chunks = await self.achat(batch)
+        batch_time = asyncio.get_running_loop().time() - start_clock
+
+        if callbacks:
+            for chunk in chunks:
+                await do_callbacks(
+                    async_callbacks, sync_callbacks, chunk.text or "", name
+                )
+
+        return [
+            LLMResult(
+                model=self.name,
+                name=name,
+                prompt=messages,
+                prompt_count=chunk.prompt_tokens,
+                text=chunk.text,
+                completion_count=chunk.completion_tokens,
+                seconds_to_first_token=batch_time,
+                seconds_to_last_token=batch_time,
+            )
+            for messages, chunk in zip(batch, chunks, strict=True)
+        ]
+
+    async def achat(self, messages: list[list[dict[str, str]]]) -> list[Chunk]:
+        try:
+            import anthropic
+            from anthropic.types.beta.message_create_params import (
+                MessageCreateParamsNonStreaming,
+            )
+            from anthropic.types.beta.messages.batch_create_params import Request
+        except ImportError as exc:
+            raise ImportError(
+                "Please install paper-qa[batch] to use AnthropicBatchLLMModel."
+            ) from exc
+
+        client = anthropic.AsyncAnthropic()
+
+        requests = [
+            Request(
+                custom_id=str(i),
+                params=MessageCreateParamsNonStreaming(
+                    model=self.config.get("model"),
+                    max_tokens=self.config.get("max_tokens"),
+                    system="".join(
+                        [
+                            user_m["content"]
+                            for user_m in messages[0]
+                            if user_m["role"] == "system"
+                        ]
+                    ),
+                    messages=[user_m for user_m in m if user_m["role"] == "user"],
+                ),
+            )
+            for i, m in enumerate(messages)
+        ]
+
+        batch = await client.beta.messages.batches.create(requests=requests)
+
+        start_clock = asyncio.get_running_loop().time()
+        while batch.processing_status != BatchStatus.COMPLETE.from_anthropic():
+            batch = await client.beta.messages.batches.retrieve(batch.id)
+
+            batch_time = asyncio.get_running_loop().time() - start_clock
+            if batch_time > self.config.get("batch_summary_time_limit", 24 * 60 * 60):
+                raise TimeoutError("Batch took too long to complete.")
+
+            logger.info(
+                f"Summary batch status: {batch.processing_status} | Time elapsed: {batch_time}"
+            )
+            await asyncio.sleep(self.config.get("batch_polling_interval", 30))
+
+        api_responses = await client.beta.messages.batches.results(batch.id)
+        responses = list(api_responses)
+        sorted_responses = sorted(
+            responses, key=lambda x: int(x.custom_id)
+        )  # The batchAPI doesn't guarantee the order of the responses
+
+        return [
+            Chunk(
+                text=response.result.message.content[0].text,
+                prompt_tokens=response.result.message.usage.input_tokens,
+                completion_tokens=response.result.message.usage.output_tokens,
+            )
+            for response in sorted_responses
+        ]
+
+    async def achat_iter(self):
+        raise NotImplementedError("support to callbacks is not implemented yet")
 
 
 def cosine_similarity(a, b):
