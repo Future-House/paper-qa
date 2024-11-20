@@ -33,7 +33,7 @@ def make_status(
 class EnvironmentState(BaseModel):
     """State here contains documents and answer being populated."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     docs: Docs
     session: PQASession = Field(..., alias="answer")
