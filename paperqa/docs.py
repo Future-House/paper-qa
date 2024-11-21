@@ -402,7 +402,7 @@ class Docs(BaseModel):
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
                 not parse_config.disable_doc_valid_check
-                and not maybe_is_text(texts[0].text)
+                and not maybe_is_text("".join(text.text for text in texts[:5]))
             )
         ):
             raise ValueError(
