@@ -10,7 +10,7 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Awaitable, Collection, Coroutine, Iterable, Iterator
+from collections.abc import Awaitable, Collection, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
