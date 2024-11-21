@@ -36,7 +36,7 @@ class EnvironmentState(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     docs: Docs
-    session: PQASession = Field(..., alias="session")
+    session: PQASession = Field(..., alias="answer")
     tool_history: list[list[str]] = Field(
         default_factory=list,
         description=(
