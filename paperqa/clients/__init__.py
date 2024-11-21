@@ -176,7 +176,7 @@ class DocMetadataClient:
                 # abuse int handling in __add__ for empty all_doc_details, None types won't work
                 all_doc_details = doc_details + (all_doc_details or 0)
 
-                if all_doc_details.is_hydration_needed(
+                if not all_doc_details.is_hydration_needed(
                     inclusion=kwargs.get("fields", [])
                 ):
                     logger.debug(
