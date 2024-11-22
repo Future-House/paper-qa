@@ -1511,7 +1511,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.4.1.dev31+g0cd74b6.d20241121"
+version = "5.4.1.dev34+g4da48d7.d20241122"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1595,7 +1595,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
     { name = "pybtex" },
-    { name = "pydantic", specifier = "~=2.0,<2.10" },
+    { name = "pydantic", specifier = "~=2.0" },
     { name = "pydantic-settings" },
     { name = "pymupdf", specifier = ">=1.24.12" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
@@ -1615,7 +1615,7 @@ dev = [
     { name = "mypy", specifier = ">=1.8" },
     { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero", "local"] },
     { name = "pre-commit", specifier = ">=3.4" },
-    { name = "pydantic", specifier = "~=2.0,<2.10" },
+    { name = "pydantic", specifier = "~=2.0" },
     { name = "pylint-pydantic" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },

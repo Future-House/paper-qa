@@ -96,7 +96,7 @@ repos:
           - pybtex
           - numpy
           - pandas-stubs
-          - pydantic~=2.0, <2.10 # TODO: Remove <2.10 after https://github.com/pydantic/pydantic/pull/10911 is released
+          - pydantic~=2.0
           - pydantic-settings
           - rich
           - tantivy
