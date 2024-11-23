@@ -44,10 +44,6 @@ logger = logging.getLogger(__name__)
 cvar_session_id = contextvars.ContextVar[UUID | None]("session_id", default=None)
 
 
-def get_session_id() -> UUID | None:
-    return cvar_session_id.get()
-
-
 @contextmanager
 def set_llm_session_ids(session_id: UUID):
     token = cvar_session_id.set(session_id)
@@ -77,7 +73,7 @@ class LLMResult(BaseModel):
 
     id: UUID = Field(default_factory=uuid4)
     session_id: UUID | None = Field(
-        default_factory=get_session_id,
+        default_factory=cvar_session_id.get,  # type: ignore[arg-type]
         description="A persistent ID to associate a group of LLMResults",
         alias="answer_id",
     )
