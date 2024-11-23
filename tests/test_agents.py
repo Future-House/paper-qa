@@ -547,6 +547,7 @@ async def test_agent_sharing_state(
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
 
         assert session.contexts, "Evidence did not return any results"
+        assert not session.answer, "Expected no answer yet"
 
     with subtests.test(msg=f"{GenerateAnswer.__name__} working"):
         generate_answer_tool = GenerateAnswer(
