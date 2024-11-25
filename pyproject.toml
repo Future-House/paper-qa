@@ -46,7 +46,7 @@ dependencies = [
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
-    "litellm>=1.44",  # to prevent sys.stdout on router creation
+    "litellm==1.52.9",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",
