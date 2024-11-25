@@ -175,7 +175,7 @@ def test_maybe_is_text() -> None:
     # now force it to contain lots of weird encoding
     bad_text = r.text.encode("latin1", "ignore").decode("utf-16", "ignore")
     assert not maybe_is_text(bad_text)
-    
+
     # account for possible spaces in the text due to tables or title pages
     assert maybe_is_text("entry1                    entry2                    entry3")
 
