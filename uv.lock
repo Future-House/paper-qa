@@ -1429,7 +1429,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.55.0"
+version = "1.55.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1511,7 +1511,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev15+g1834f6e.d20241125"
+version = "5.5.1.dev16+gac980d3.d20241125"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1591,7 +1591,7 @@ requires-dist = [
     { name = "httpx" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.12" },
     { name = "limits" },
-    { name = "litellm", specifier = "==1.52.9" },
+    { name = "litellm", specifier = ">=1.44" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
     { name = "pybtex" },

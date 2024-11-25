@@ -46,11 +46,11 @@ dependencies = [
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
-    "litellm==1.52.9",  # to prevent sys.stdout on router creation
+    "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",
-    "pydantic~=2.0",  # Match pyproject.toml
+    "pydantic~=2.0",
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
     "tantivy",

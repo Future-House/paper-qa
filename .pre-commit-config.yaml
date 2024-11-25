@@ -96,7 +96,7 @@ repos:
           - pybtex
           - numpy
           - pandas-stubs
-          - pydantic~=2.0
+          - pydantic~=2.0 # Match pyproject.toml
           - pydantic-settings
           - rich
           - tantivy
