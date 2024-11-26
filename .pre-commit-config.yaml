@@ -54,12 +54,10 @@ repos:
     rev: 3.0.0
     hooks:
       - id: check-mailmap
-  - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.23
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: 2024.11.22
     hooks:
       - id: validate-pyproject
-        additional_dependencies:
-          - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.4.30
     hooks:
