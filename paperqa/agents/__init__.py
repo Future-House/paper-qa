@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
 from pydantic_settings import CliSettingsSource
@@ -142,10 +143,7 @@ def build_index(
     return get_loop().run_until_complete(get_directory_index(settings=settings))
 
 
-def save_settings(
-    settings: Settings,
-    settings_path: str | os.PathLike,
-) -> None:
+def save_settings(settings: Settings, settings_path: str | os.PathLike) -> None:
     """Save the settings to a file."""
     configure_cli_logging(settings)
     # check if this could be interpreted at an absolute path
@@ -158,8 +156,7 @@ def save_settings(
 
     is_overwrite = os.path.exists(full_settings_path)
 
-    with open(full_settings_path, "w") as f:
-        f.write(settings.model_dump_json(indent=2))
+    Path(full_settings_path).write_text(settings.model_dump_json(indent=2))
 
     if is_overwrite:
         logger.info(f"Settings overwritten to: {full_settings_path}")
