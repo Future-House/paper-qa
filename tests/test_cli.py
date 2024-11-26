@@ -38,7 +38,7 @@ def test_can_modify_settings(capsys, stub_data_dir: Path) -> None:
         assert settings.llm == "my-model-foo"
         assert settings.agent.index.paper_directory == str(rel_path_home_to_stub_data)
 
-        sys.argv = "paperqa -s unit_test view".split()
+        sys.argv = ["paperqa", "-s", "unit_test", "view"]
         main()
 
         captured = capsys.readouterr()

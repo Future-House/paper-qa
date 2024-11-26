@@ -101,8 +101,7 @@ def hexdigest(data: str | bytes) -> str:
 
 
 def md5sum(file_path: str | os.PathLike) -> str:
-    with open(file_path, "rb") as f:
-        return hexdigest(f.read())
+    return hexdigest(Path(file_path).read_bytes())
 
 
 async def gather_with_concurrency(n: int, coros: Iterable[Awaitable[T]]) -> list[T]:
@@ -165,7 +164,7 @@ def get_citenames(text: str) -> set[str]:
     values = []
     for citation in results:
         citation = citation.strip("() ")
-        for c in re.split(",|;", citation):
+        for c in re.split(r",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces

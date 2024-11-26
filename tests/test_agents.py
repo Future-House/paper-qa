@@ -782,7 +782,7 @@ def test_answers_are_striped() -> None:
     response = AnswerResponse(session=session, bibtex={}, status=AgentStatus.SUCCESS)
 
     assert response.session.contexts[0].text.embedding is None
-    assert response.session.contexts[0].text.text == ""  # type: ignore[unreachable,unused-ignore]
+    assert not response.session.contexts[0].text.text
     assert response.session.contexts[0].text.doc is not None
     assert response.session.contexts[0].text.doc.embedding is None
     # make sure it serializes

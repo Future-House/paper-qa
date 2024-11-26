@@ -660,7 +660,7 @@ async def test_arxiv_doi_is_used_when_available() -> None:
     client = DocMetadataClient(clients={CrossrefProvider, SemanticScholarProvider})
     result = await client.query(
         title="Attention is All you Need",
-        authors=(
+        authors=(  # noqa: SIM905
             "Ashish Vaswani, Noam Shazeer, Niki Parmar, "
             "Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, "
             "Lukasz Kaiser, Illia Polosukhin"
