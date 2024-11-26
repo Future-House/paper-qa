@@ -1511,7 +1511,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev18+g766896d.d20241125"
+version = "5.5.1.dev10+g109dece.d20241126"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1615,7 +1615,7 @@ dev = [
     { name = "mypy", specifier = ">=1.8" },
     { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero", "local"] },
     { name = "pre-commit", specifier = ">=3.4" },
-    { name = "pydantic", specifier = "~=2.0" },
+    { name = "pydantic", specifier = "~=2.0,>=2.10.1,<2.10.2" },
     { name = "pylint-pydantic" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio" },
