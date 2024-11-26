@@ -650,7 +650,7 @@ class Docs(BaseModel):
         for _, llm_result in results:
             session.add_tokens(llm_result)
 
-        session.contexts += [r for r, _ in results if r is not None]
+        session.contexts += [r for r, _ in results]
         return session
 
     def query(

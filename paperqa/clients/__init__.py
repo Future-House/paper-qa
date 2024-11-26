@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import logging
-from collections.abc import Collection, Coroutine, Sequence
+from collections.abc import Awaitable, Collection, Coroutine, Sequence
 from typing import Any, cast
 
 import aiohttp
@@ -161,11 +161,14 @@ class DocMetadataClient:
 
             # then process and re-aggregate the results
             if doc_details and task.processors:
-                doc_details = sum(
-                    await gather_with_concurrency(
-                        len(task.processors),
-                        task.processor_queries(doc_details, session),
+                doc_details = (
+                    sum(
+                        await gather_with_concurrency(
+                            len(task.processors),
+                            task.processor_queries(doc_details, session),
+                        )
                     )
+                    or None
                 )
 
             if doc_details:
@@ -173,7 +176,7 @@ class DocMetadataClient:
                 # abuse int handling in __add__ for empty all_doc_details, None types won't work
                 all_doc_details = doc_details + (all_doc_details or 0)
 
-                if not cast(DocDetails, all_doc_details).is_hydration_needed(
+                if not all_doc_details.is_hydration_needed(
                     inclusion=kwargs.get("fields", [])
                 ):
                     logger.debug(
@@ -191,7 +194,8 @@ class DocMetadataClient:
         self, queries: Collection[dict[str, Any]], concurrency: int = 10
     ) -> list[DocDetails]:
         return await gather_with_concurrency(
-            concurrency, [self.query(**kwargs) for kwargs in queries]
+            concurrency,
+            [cast(Awaitable[DocDetails], self.query(**kwargs)) for kwargs in queries],
         )
 
     async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:

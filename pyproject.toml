@@ -376,9 +376,9 @@ ignore = [
     "S311",  # Ok to use python random
     "SLF001",  # Overly pedantic
     "T201",  # Overly pedantic
-    "TCH001",  # TCH001, TCH002, TCH003: don't care to enforce type checking blocks
-    "TCH002",
-    "TCH003",
+    "TC001",  # TCH001, TCH002, TCH003: don't care to enforce type checking blocks
+    "TC002",
+    "TC003",
     "TD002",  # Don't care for TODO author
     "TD003",  # Don't care for TODO links
     "TRY003",  # Overly pedantic
@@ -391,7 +391,7 @@ unfixable = [
     "ERA001",  # While debugging, temporarily commenting code can be useful
     "F401",  # While debugging, unused imports can be useful
     "F841",  # While debugging, unused locals can be useful
-    "TCH004",  # While debugging, it can be nice to keep TYPE_CHECKING in tact
+    "TC004",  # While debugging, it can be nice to keep TYPE_CHECKING in tact
 ]
 
 [tool.ruff.lint.flake8-annotations]
