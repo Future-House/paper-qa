@@ -21,11 +21,20 @@ class TestLitQAEvaluation:
         "94107",
         ["-8", "94106", "cheesecake"],
     )
-    # Use to check we don't leak on the LLM's innate knowledge
+    # The following two are used to check we don't leak on the LLM's innate knowledge
     MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS = (
         "What is the meaning of life?",
         "42",
         ["-84", "11", "cheesecake"],
+    )
+    # Source: https://github.com/Future-House/LAB-Bench/blob/43b2045c67a2da12c233689cf538f1ed5c42f590/LitQA2/litqa-v2-public.jsonl#L130
+    LITQA2_QUESTION_IDEAL_DISTRACTORS = (
+        (
+            "What method was used to demonstrate that the enzyme PafA is stable after"
+            " incubation with 4M urea for 14 days?"
+        ),
+        "circular dichroism",
+        ["cryo EM", "x-ray crystallography", "NMR"],
     )
 
     @pytest.mark.asyncio
@@ -95,6 +104,13 @@ class TestLitQAEvaluation:
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
                 id="empty-answer2",
+            ),
+            pytest.param(
+                *LITQA2_QUESTION_IDEAL_DISTRACTORS,
+                "",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+                id="empty-answer3",
             ),
         ],
     )
