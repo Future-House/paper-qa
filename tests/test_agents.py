@@ -464,7 +464,7 @@ async def test_gather_evidence_rejects_empty_docs(
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
-    agent_test_settings: Settings, subtests: SubTests, callback_type: str
+    agent_test_settings: Settings, subtests: SubTests, callback_type: str | None
 ) -> None:
     agent_test_settings.agent.search_count = 3  # Keep low for speed
     agent_test_settings.answer.evidence_k = 2
