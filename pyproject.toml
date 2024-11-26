@@ -8,7 +8,7 @@ dev = [
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[datasets,ldp,typing,zotero,local]",
     "pre-commit>=3.4",  # Pin to keep recent
-    "pydantic~=2.0",
+    "pydantic~=2.0,>=2.10.1,<2.10.2",  # Pin 2.10 for typing breaks, downpin 2.10.2 until we fix AgentSettings.callbacks
     "pylint-pydantic",
     "pytest-asyncio",
     "pytest-recording",
@@ -305,9 +305,57 @@ preview = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
+    "A006",
+    "ASYNC116",
+    "B901",
+    "B909",
     "C420",
     "DOC202",
     "DOC403",
+    "DTZ901",
+    "E111",
+    "E112",
+    "E113",
+    "E114",
+    "E115",
+    "E116",
+    "E117",
+    "E201",
+    "E202",
+    "E203",
+    "E204",
+    "E211",
+    "E221",
+    "E222",
+    "E223",
+    "E224",
+    "E225",
+    "E226",
+    "E227",
+    "E228",
+    "E231",
+    "E241",
+    "E242",
+    "E251",
+    "E252",
+    "E261",
+    "E262",
+    "E265",
+    "E266",
+    "E271",
+    "E272",
+    "E273",
+    "E274",
+    "E275",
+    "E301",
+    "E302",
+    "E303",
+    "E304",
+    "E305",
+    "E306",
+    "E502",
+    "FURB101",
+    "FURB103",
     "FURB110",
     "FURB113",
     "FURB116",
@@ -327,10 +375,33 @@ extend-select = [
     "FURB171",
     "FURB180",
     "FURB188",
+    "FURB189",
     "FURB192",
+    "LOG015",
+    "PLC1901",
+    "PLC2701",
+    "PLC2801",
+    "PLE0304",
+    "PLE1141",
+    "PLE4703",
     "PLR6201",
     "PLW0108",
-    "RUF022",
+    "PYI059",
+    "RUF027",
+    "RUF028",
+    "RUF031",
+    "RUF032",
+    "RUF033",
+    "RUF034",
+    "RUF035",
+    "RUF036",
+    "RUF038",
+    "RUF039",
+    "RUF048",
+    "SIM905",
+    "UP042",
+    "UP044",
+    "W391",
 ]
 # List of rule codes that are unsupported by Ruff, but should be preserved when
 # (e.g.) validating # noqa directives. Useful for retaining # noqa directives
@@ -373,12 +444,13 @@ ignore = [
     "PLR0915",  # we can write lots of code
     "PLW2901",  # Allow modifying loop variables
     "PTH",  # Overly pedantic
+    "RUF027",  # Prompt templates may not be f-strings
     "S311",  # Ok to use python random
     "SLF001",  # Overly pedantic
     "T201",  # Overly pedantic
-    "TCH001",  # TCH001, TCH002, TCH003: don't care to enforce type checking blocks
-    "TCH002",
-    "TCH003",
+    "TC001",  # TC001, TC002, TC003: don't care to enforce type checking blocks
+    "TC002",
+    "TC003",
     "TD002",  # Don't care for TODO author
     "TD003",  # Don't care for TODO links
     "TRY003",  # Overly pedantic
@@ -391,7 +463,7 @@ unfixable = [
     "ERA001",  # While debugging, temporarily commenting code can be useful
     "F401",  # While debugging, unused imports can be useful
     "F841",  # While debugging, unused locals can be useful
-    "TCH004",  # While debugging, it can be nice to keep TYPE_CHECKING in tact
+    "TC004",  # While debugging, it can be nice to keep TYPE_CHECKING in tact
 ]
 
 [tool.ruff.lint.flake8-annotations]

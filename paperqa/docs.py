@@ -121,7 +121,7 @@ class Docs(BaseModel):
         suffix = ""
         while docname + suffix in self.docnames:
             # move suffix to next letter
-            suffix = "a" if suffix == "" else chr(ord(suffix) + 1)
+            suffix = "a" if not suffix else chr(ord(suffix) + 1)
         docname += suffix
         return docname
 
@@ -651,7 +651,7 @@ class Docs(BaseModel):
         for _, llm_result in results:
             session.add_tokens(llm_result)
 
-        session.contexts += [r for r, _ in results if r is not None]
+        session.contexts += [r for r, _ in results]
         return session
 
     def query(
@@ -792,7 +792,7 @@ class Docs(BaseModel):
             if name_in_text(name, answer_text):
                 bib[name] = citation
         bib_str = "\n\n".join(
-            [f"{i+1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
+            [f"{i + 1}. ({k}): {c}" for i, (k, c) in enumerate(bib.items())]
         )
 
         if answer_config.answer_filter_extra_background:

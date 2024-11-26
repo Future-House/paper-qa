@@ -10,12 +10,12 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Collection, Coroutine, Iterable, Iterator
+from collections.abc import Awaitable, Collection, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, ClassVar
+from typing import Any, BinaryIO, ClassVar, TypeVar
 from uuid import UUID
 
 import aiohttp
@@ -35,6 +35,8 @@ from tenacity import (
 )
 
 logger = logging.getLogger(__name__)
+
+T = TypeVar("T")
 
 
 class ImpossibleParsingError(Exception):
@@ -106,11 +108,10 @@ def hexdigest(data: str | bytes) -> str:
 
 
 def md5sum(file_path: str | os.PathLike) -> str:
-    with open(file_path, "rb") as f:
-        return hexdigest(f.read())
+    return hexdigest(Path(file_path).read_bytes())
 
 
-async def gather_with_concurrency(n: int, coros: list[Coroutine]) -> list[Any]:
+async def gather_with_concurrency(n: int, coros: Iterable[Awaitable[T]]) -> list[T]:
     # https://stackoverflow.com/a/61478547/2392535
     semaphore = asyncio.Semaphore(n)
 
@@ -170,7 +171,7 @@ def get_citenames(text: str) -> set[str]:
     values = []
     for citation in results:
         citation = citation.strip("() ")
-        for c in re.split(",|;", citation):
+        for c in re.split(r",|;", citation):
             if c == "Extra background information":
                 continue
             # remove leading/trailing spaces

@@ -77,7 +77,7 @@ class GlobalRateLimiter:
     def __init__(
         self,
         rate_config: (
-            None | dict[tuple[str, str | MatchAllInputs], RateLimitItem]
+            dict[tuple[str, str | MatchAllInputs], RateLimitItem] | None
         ) = None,
         use_in_memory: bool = False,
     ):
@@ -189,25 +189,25 @@ class GlobalRateLimiter:
         # this needs to be checked first, since it's more specific than the stub machine id
         if (namespace_w_machine_id_stripped, primary_key) in self.rate_config:
             return (
-                self.rate_config[(namespace_w_machine_id_stripped, primary_key)],
+                self.rate_config[namespace_w_machine_id_stripped, primary_key],
                 namespace_w_machine_id_stripped,
             )
         # we keep the old namespace if we match on the namespace_w_stub_machine_id
         if (namespace_w_stub_machine_id, primary_key) in self.rate_config:
             return (
-                self.rate_config[(namespace_w_stub_machine_id, primary_key)],
+                self.rate_config[namespace_w_stub_machine_id, primary_key],
                 namespace,
             )
         # again we only want the original namespace, keep the old namespace
         if (namespace_w_stub_machine_id, MATCH_ALL) in self.rate_config:
             return (
-                self.rate_config[(namespace_w_stub_machine_id, MATCH_ALL)],
+                self.rate_config[namespace_w_stub_machine_id, MATCH_ALL],
                 namespace,
             )
         # again we want to use the stripped namespace if it matches
         if (namespace_w_machine_id_stripped, MATCH_ALL) in self.rate_config:
             return (
-                self.rate_config[(namespace_w_machine_id_stripped, MATCH_ALL)],
+                self.rate_config[namespace_w_machine_id_stripped, MATCH_ALL],
                 namespace_w_machine_id_stripped,
             )
         return FALLBACK_RATE_LIMIT, namespace
@@ -289,7 +289,7 @@ class GlobalRateLimiter:
                 rate_limit.amount,
                 rate_limit.get_expiry(),
             )
-            limit_status[(namespace, primary_key)] = {
+            limit_status[namespace, primary_key] = {
                 "period_start": period_start,
                 "n_items_in_period": n_items_in_period,
                 "period_seconds": rate_limit.GRANULARITY.seconds,
