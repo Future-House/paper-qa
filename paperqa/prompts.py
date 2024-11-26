@@ -98,9 +98,12 @@ env_reset_prompt = (
 # Prompt templates for use with LitQA
 QA_PROMPT_TEMPLATE = "Q: {question}\n\nOptions:\n{options}"
 EVAL_PROMPT_TEMPLATE = (
-    "Extract the single letter answer from the following question and answer"
+    "Given the following question and a proposed answer to the question, return the"
+    " single-letter choice in the question that matches the proposed answer."
+    " If the proposed answer is blank or an empty string,"
+    " or multiple options are matched, respond with '0'."
     "\n\nQuestion: {qa_prompt}"
-    "\n\nAnswer: {qa_answer}"
+    "\n\nProposed Answer: {qa_answer}"
     "\n\nSingle Letter Answer:"
 )
 
