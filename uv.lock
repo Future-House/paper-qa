@@ -1511,7 +1511,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev12+gbc0ab11.d20241129"
+version = "5.5.1.dev15+ge6eae4d.d20241202"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1595,7 +1595,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
     { name = "pybtex" },
-    { name = "pydantic", specifier = "~=2.0" },
+    { name = "pydantic", specifier = "~=2.0,>=2.10.1" },
     { name = "pydantic-settings" },
     { name = "pymupdf", specifier = ">=1.24.12" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
