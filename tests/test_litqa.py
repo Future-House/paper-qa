@@ -40,41 +40,61 @@ class TestLitQAEvaluation:
             "expected_dreturns",
         ),
         [
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 94107",
                 LitQAEvaluation.CORRECT,
                 [0.25, 0.5, 1.0],
+                id="matched-correct-option",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 14004",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="didnt-match-and-no-llm-innate-knowledge",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 94106",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="matched-incorrect-option",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "Insufficient information",
                 LitQAEvaluation.UNSURE,
                 [0.025, 0.05, 0.1],
+                id="matched-unsure-option",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 94106 or 94107",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="matched-several-options",
             ),
-            (
+            pytest.param(
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+                id="empty-answer1",
+            ),
+            pytest.param(
                 *MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS,
                 "14",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="didnt-match-and-llm-has-innate-knowledge",
+            ),
+            pytest.param(
+                *MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS,
+                "",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+                id="empty-answer2",
             ),
         ],
     )

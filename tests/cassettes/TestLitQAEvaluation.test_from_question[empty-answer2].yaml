@@ -2,11 +2,10 @@ interactions:
   - request:
       body:
         '{"messages": [{"role": "user", "content": "Extract the single letter answer
-        from the following question and answer\n\nQuestion: Q: What is my office''s
-        zip code?\n\nOptions:\nA) 94107\nB) 94106\nC) cheesecake\nD) Insufficient information
-        to answer this question\nE) -8\n\nAnswer: the answer is 14004\n\nSingle Letter
-        Answer:"}], "model": "gpt-4-turbo-2024-04-09", "stream": false, "temperature":
-        0.0}'
+        from the following question and answer\n\nQuestion: Q: What is the meaning of
+        life?\n\nOptions:\nA) 42\nB) 11\nC) cheesecake\nD) Insufficient information
+        to answer this question\nE) -84\n\nAnswer: \n\nSingle Letter Answer:"}], "model":
+        "gpt-4-turbo-2024-04-09", "stream": false, "temperature": 0.0}'
       headers:
         accept:
           - application/json
@@ -15,13 +14,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "399"
+          - "374"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.4
+          - AsyncOpenAI/Python 1.55.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -31,7 +30,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.4
+          - 1.55.1
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -45,22 +44,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4xTy27bMBC8+ysWvDQB5EBOFCjxpUgfh/bQQ2H0kbowaGolsaW4DLly6gb594K0
-          LTloCvQiQDs7w1nu8GECIHQl5iBUK1l1zkxvPn2s2u3idnHxIXwpZHG7ufPhfXHxdbvY3IosMmj9
-          AxUfWGeKOmeQNdkdrDxKxqg6Ky/O88uyLMsEdFShibTG8bSYcu/XND3Pz4tpXkzz6z27Ja0wiDl8
-          mwAAPKRv9Gkr/CXmkGeHSochyAbFfGgCEJ5MrAgZgg4sLYtsBBVZRpusL1qEoG1jEAwyowdpwz16
-          YAJuEe56DHEmWIrPrWTQAbotUF1rhS8C/NYOFFX4cingXnObOM7TRldYAblIDZH05hTe2dBHnkbL
-          oG1NvpNJmmk4tNVhOPIMFvFXB1ijkn3AJC4V99IcCIejMliKWZHnRbYUUBEGsMTQSVYtSBsNJ/LB
-          7uCs0Ru0cHID5OHVaQbSVqmRuEU/dJ28TsDbU5AeQRmU3mxBe48GN9JyZGuryHtUHG2jx5o8Zklr
-          X4fdStNlnB1vw2PdBxkTYXtj9vXHYb2GGudpHfb4UK+11aFdeZSBbFxlYHIioY8TgO8pRv2TZAjn
-          qXO8YvqJNgqWVzs5MYZ3BK9me5CJpRnrs8vr7Bm5VYUstQlHORRKqharkTqGVvaVpiNgcjT0326e
-          094Nrm3zP/IjoBQ6xmrlPFZaPZ14bPMY3/a/2oZLToZF2AbGblVr26B3Xu9eVu1Wql5f1tdYy1JM
-          Hid/AAAA//8DALHAjWhnBAAA
+          H4sIAAAAAAAAA4xSQU7DMBC85xWWzw0KJW2V3CoEJ8QFIUAIRY6zSVwc2/JuoKjq35HT0rSiSFx8
+          mNkZz6y9iRjjquI547IVJDun4+Vz/yLX85vrxRO2T+pxdZ/g/eNHdqveV2s+CQpbrkDSj+pC2s5p
+          IGXNjpYeBEFwvVxcTefpbJalA9HZCnSQNY7iNKbelzaeJtM0TtI4yfbq1ioJyHP2GjHG2GY4Q05T
+          wZrnLJn8IB0gigZ4fhhijHurA8IFokIShvhkJKU1BGaI/qBMo4HdARF4tjT4CT5ny+NpD3WPIiQ2
+          vdZ7fHu4XtvGeVvinj/gtTIK28KDQGvCVUjW8YHdRoy9DTX7k+Tceds5Ksi+gwmG82xnx8fljuRs
+          z5EloUd4kU7OmBUVkFAaj7bEpZAtVKNyXKnoK2WPiOio8u8s57x3tZVp/mM/ElKCI6gK56FS8rTv
+          OOYh/Ly/xg4rHgJz/EKCrqiVacA7r3bvXrtC1uWszqAWCx5to28AAAD//wMADJ0dRQUDAAA=
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e53de72fa35171a-SJC
+          - 8e8bed756e4342d7-EWR
         Connection:
           - keep-alive
         Content-Encoding:
@@ -68,14 +63,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 19 Nov 2024 23:09:40 GMT
+          - Tue, 26 Nov 2024 18:26:35 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=NN_CVQrdtVcfzj3hSKUVLPnr69pGiin75ODPqXRa7mY-1732057780-1.0.1.1-Z5hKrN8tRnSsireFjVAIIkS_RAjKjFet2gGcEusT3eabj9uF2wtvXmPkukpDBVXuGNE4szIXCiH.4lpv39_How;
-            path=/; expires=Tue, 19-Nov-24 23:39:40 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=mBOl0rJw5YuLr2JdtyK70Wrgv1knaOom75rnVy8aUWs-1732645595-1.0.1.1-SUEzQMergTZ4P47_F_DuI5jNkHf.FNGDS5rqlwB1uq.QDd2JZ5Y_SgCyIusbDM5k0zxmANtSQlHueC8JKIrAiQ;
+            path=/; expires=Tue, 26-Nov-24 18:56:35 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=rmhiOmMva8xhUwvNu2NHd1WUMeR7lCH4QEPePEpAvRg-1732057780929-0.0.1.1-604800000;
+          - _cfuvid=Q47Qq.yTaMBFNfYzg_wOz.N2EVNWmlDEScsm.XvlNCA-1732645595102-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -88,25 +83,25 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "3712"
+          - "372"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
-          - "3000"
+          - "10000"
         x-ratelimit-limit-tokens:
-          - "250000"
+          - "2000000"
         x-ratelimit-remaining-requests:
-          - "2999"
+          - "9996"
         x-ratelimit-remaining-tokens:
-          - "249915"
+          - "1999606"
         x-ratelimit-reset-requests:
-          - 20ms
+          - 18ms
         x-ratelimit-reset-tokens:
-          - 20ms
+          - 11ms
         x-request-id:
-          - req_b9c919a23b80fe6870ed431ec2acd624
+          - req_6f3f113008c151c922ac96301b08bfe7
       status:
         code: 200
         message: OK

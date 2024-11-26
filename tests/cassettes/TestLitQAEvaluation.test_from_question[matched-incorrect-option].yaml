@@ -4,8 +4,8 @@ interactions:
         '{"messages": [{"role": "user", "content": "Extract the single letter answer
         from the following question and answer\n\nQuestion: Q: What is my office''s
         zip code?\n\nOptions:\nA) 94107\nB) 94106\nC) cheesecake\nD) Insufficient information
-        to answer this question\nE) -8\n\nAnswer: the answer is 94106 or 94107\n\nSingle
-        Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09", "stream": false, "temperature":
+        to answer this question\nE) -8\n\nAnswer: the answer is 94106\n\nSingle Letter
+        Answer:"}], "model": "gpt-4-turbo-2024-04-09", "stream": false, "temperature":
         0.0}'
       headers:
         accept:
@@ -15,13 +15,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "408"
+          - "399"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.4
+          - AsyncOpenAI/Python 1.55.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -31,7 +31,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.4
+          - 1.55.1
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -45,19 +45,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4ySP2/bMBDFd32KA2crUCQ7jr21Q7q0S9EkQxAINHmSmFAkwTuh+QN/94CyYylI
-          CnTRcL97T++d9JoBCKPFFoTqJKs+2PzbzW/tls8/HoP5+euqwaZYlc5dn99sbosXsUgKv3tAxe+q
-          M+X7YJGNdwesIkrG5Hq+rspitV5fViPovUabZG3gfJnzEHc+L4tymRfLvNgc1Z03Ckls4S4DAHgd
-          nymn0/gktlAs3ic9EskWxfa0BCCit2kiJJEhlo7FYoLKO0Y3Rv/TIZBxrUWwyIwRpKO/GMEQfD+b
-          iyI2A8kU3A3WHuf7Uwrr2xD9jo78NG+MM9TVESV5l95I7IMY6T4DuB/bDh8KiBB9H7hm/4guGV6W
-          Bzsx3XiC6yNjz9LONJvFF2a1RpbG0uxYQknVoZ6U02XloI2fgWxW+XOWr7wPtY1r/8d+AkphYNR1
-          iKiN+th3WouYfsB/rZ1OPAYW9EyMfd0Y12IM0Rw+fxPqld5VRXVRNY3I9tkbAAAA//8DAKFZ6K4M
-          AwAA
+          H4sIAAAAAAAAA4ySMW+DMBCFd36F5TlUkJCmYWuajhm6VI2qChn7Qtwa27IPKVWU/14ZSCBqKnVh
+          eN+9x7uDY0QIlYLmhPI9Q15bFT++NVu+3mzXabnBcpo8P73M7Eq8HrIUkU6Cw5SfwPHsuuOmtgpQ
+          Gt1h7oAhhNR0MZveZ/P5MmtBbQSoYKssxlmMjStNPE2mWZxkcbLs3XsjOXiak/eIEEKO7TP01AIO
+          NCfJ5KzU4D2rgOaXIUKoMyoolHkvPTLdde4hNxpBt9VXY93BrvEsdNONUr1+urxImco6U/qeX/Sd
+          1NLvCwfMGx1CPRpLW3qKCPloF2quOlLrTG2xQPMFOgQuHro4OpxxgGnP0CBTI89yciOsEIBMKj+6
+          B+WM70EMzuF4rBHSjEA0Wvl3l1vZ3dpSV/+JHwDnYBFEYR0Iya/3HcYchH/sr7HLidvC1H97hLrY
+          SV2Bs052X3hnCzEv2UxAKjiNTtEPAAAA//8DAFDTBzLvAgAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e53de938ca39e50-SJC
+          - 8e8bed754f8a32c8-PHL
         Connection:
           - keep-alive
         Content-Encoding:
@@ -65,14 +64,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 19 Nov 2024 23:09:43 GMT
+          - Tue, 26 Nov 2024 18:26:35 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=aV5KoFnZfPtiMFt2Fn3dPJNrEi16NxO9V_yjzRiKygI-1732057783-1.0.1.1-TKyJqB3iZJTwaHunt_z9C9e8SxCETSJDfeHzJnTpjAPZe6d.ZEhu3z6P9SApM0R7vPdiYeurR10N.9ojjRYVzA;
-            path=/; expires=Tue, 19-Nov-24 23:39:43 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=ZmmBDK6yNEfzE4yqjIxu.fcjBsKUeCJ_VefYNcxoQJ0-1732645595-1.0.1.1-QF16PSO_yZCttx08r5rSuCQW9_N8SYagJF8JP96kXRjCA84eO8Ztq6YXlecmQyaPeeodrk1FT.zlw7wgG2UrOw;
+            path=/; expires=Tue, 26-Nov-24 18:56:35 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=K1cOgsWA5ej1vC6E4hZ.2y9sVbaissZfISgHzF3Iw4k-1732057783681-0.0.1.1-604800000;
+          - _cfuvid=B9nJzXEPjlew4l4MBA2A015X1eK1sLgViQgVPTBmp_I-1732645595119-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -85,25 +84,25 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "1256"
+          - "216"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
         x-ratelimit-limit-requests:
-          - "3000"
+          - "10000"
         x-ratelimit-limit-tokens:
-          - "250000"
+          - "2000000"
         x-ratelimit-remaining-requests:
-          - "2999"
+          - "9999"
         x-ratelimit-remaining-tokens:
-          - "249914"
+          - "1999915"
         x-ratelimit-reset-requests:
-          - 20ms
+          - 6ms
         x-ratelimit-reset-tokens:
-          - 20ms
+          - 2ms
         x-request-id:
-          - req_2da12e94b26102dc7526bb046a926b70
+          - req_027f5245f460b33b66dffec04226bf0b
       status:
         code: 200
         message: OK
