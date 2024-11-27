@@ -5,6 +5,7 @@ import inspect
 import logging
 import re
 import sys
+from itertools import chain
 from typing import ClassVar, cast
 
 from aviary.core import ToolRequestMessage
@@ -72,9 +73,7 @@ class EnvironmentState(BaseModel):
 
     def query_tool_history(self, tool_name: str) -> bool:
         """Return true if the tool is has been called in history."""
-        return tool_name in {
-            tool for step_tools in self.session.tool_history for tool in step_tools
-        }
+        return tool_name in set(chain.from_iterable(self.session.tool_history))
 
 
 class NamedTool(BaseModel):
