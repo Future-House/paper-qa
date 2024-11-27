@@ -12,7 +12,6 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
-from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, PQASession
 
@@ -71,9 +70,11 @@ class EnvironmentState(BaseModel):
         self.session.add_tokens(action)
         self.session.tool_history.append([tc.function.name for tc in action.tool_calls])
 
-    def query_tool_history(self, tool_name: str) -> list[int]:
-        """Return the step indices of the tool calls that used the given tool."""
-        return [i for i, tc in enumerate(self.session.tool_history) if tool_name in tc]
+    def query_tool_history(self, tool_name: str) -> bool:
+        """Return true if the tool is has been called in history."""
+        return tool_name in {
+            tool for step_tools in self.session.tool_history for tool in step_tools
+        }
 
 
 class NamedTool(BaseModel):
@@ -354,6 +355,8 @@ class Complete(NamedTool):
         r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
+    NO_ANSWER_PHRASE: ClassVar[str] = "No answer generated."
+
     async def complete(
         self, has_successful_answer: bool, state: EnvironmentState
     ) -> str:
@@ -372,7 +375,7 @@ class Complete(NamedTool):
         state.session.has_successful_answer = has_successful_answer
 
         if not state.session.answer:
-            state.session.answer = CANNOT_ANSWER_PHRASE
+            state.session.answer = self.NO_ANSWER_PHRASE
 
         logger.info(
             f"Completing '{state.session.question}' as"
