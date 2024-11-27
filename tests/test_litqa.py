@@ -21,11 +21,20 @@ class TestLitQAEvaluation:
         "94107",
         ["-8", "94106", "cheesecake"],
     )
-    # Use to check we don't leak on the LLM's innate knowledge
+    # The following two are used to check we don't leak on the LLM's innate knowledge
     MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS = (
         "What is the meaning of life?",
         "42",
         ["-84", "11", "cheesecake"],
+    )
+    # Source: https://github.com/Future-House/LAB-Bench/blob/43b2045c67a2da12c233689cf538f1ed5c42f590/LitQA2/litqa-v2-public.jsonl#L130
+    LITQA2_QUESTION_IDEAL_DISTRACTORS = (
+        (
+            "What method was used to demonstrate that the enzyme PafA is stable after"
+            " incubation with 4M urea for 14 days?"
+        ),
+        "circular dichroism",
+        ["cryo EM", "x-ray crystallography", "NMR"],
     )
 
     @pytest.mark.asyncio
@@ -40,41 +49,68 @@ class TestLitQAEvaluation:
             "expected_dreturns",
         ),
         [
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 94107",
                 LitQAEvaluation.CORRECT,
                 [0.25, 0.5, 1.0],
+                id="matched-correct-option",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 14004",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="didnt-match-and-no-llm-innate-knowledge",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 94106",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="matched-incorrect-option",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "Insufficient information",
                 LitQAEvaluation.UNSURE,
                 [0.025, 0.05, 0.1],
+                id="matched-unsure-option",
             ),
-            (
+            pytest.param(
                 *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
                 "the answer is 94106 or 94107",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="matched-several-options",
             ),
-            (
+            pytest.param(
+                *ZIP_CODE_QUESTION_IDEAL_DISTRACTORS,
+                "",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+                id="empty-answer1",
+            ),
+            pytest.param(
                 *MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS,
                 "14",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                id="didnt-match-and-llm-has-innate-knowledge",
+            ),
+            pytest.param(
+                *MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS,
+                "",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+                id="empty-answer2",
+            ),
+            pytest.param(
+                *LITQA2_QUESTION_IDEAL_DISTRACTORS,
+                "",
+                LitQAEvaluation.INCORRECT,
+                [-0.25, -0.5, -1.0],
+                id="empty-answer3",
             ),
         ],
     )
