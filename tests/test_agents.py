@@ -495,6 +495,17 @@ async def test_agent_sharing_state(
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
 
+    # run an initial complete tool to see that the answer object is populated by it
+    # this simulates if no gen_answer tool was called
+    with subtests.test(msg=Complete.__name__):
+        complete_tool = Complete()
+        await complete_tool.complete(state=env_state, has_successful_answer=False)
+        assert (
+            env_state.session.answer == Complete.NO_ANSWER_PHRASE
+        ), "Complete did not succeed"
+        # now we wipe the answer for further tests
+        env_state.session.answer = ""
+
     with subtests.test(msg=PaperSearch.__name__):
         search_tool = PaperSearch(
             settings=agent_test_settings, embedding_model=embedding_model
@@ -858,6 +869,12 @@ class TestGradablePaperQAEnvironment:
         assert sorted(stub_gradable_env.state.session.used_contexts) == sorted(
             stub_gradable_env_copy.state.session.used_contexts
         )
+        assert stub_gradable_env.state.session.tool_history == (
+            [["paper_search"], ["gather_evidence"], ["gen_answer"], ["complete"]]
+        ), "Correct tool history was not saved in the session."
+        assert stub_gradable_env_copy.state.query_tool_history(
+            "gen_answer"
+        ), "Expected gen_answer tool to be in tool history"
 
     @pytest.mark.asyncio
     async def test_empty_tool_calls(
