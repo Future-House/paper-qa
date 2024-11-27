@@ -5,6 +5,7 @@ import inspect
 import logging
 import re
 import sys
+from itertools import chain
 from typing import ClassVar, cast
 
 from aviary.core import ToolRequestMessage
@@ -37,14 +38,6 @@ class EnvironmentState(BaseModel):
 
     docs: Docs
     session: PQASession = Field(..., alias="answer")
-    tool_history: list[list[str]] = Field(
-        default_factory=list,
-        description=(
-            "History of tool names input to each Environment.step (regardless of being"
-            " a typo or not), where the outer list is steps, and the inner list matches"
-            " the order of tool calls at each step."
-        ),
-    )
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
@@ -76,7 +69,11 @@ class EnvironmentState(BaseModel):
 
     def record_action(self, action: ToolRequestMessage) -> None:
         self.session.add_tokens(action)
-        self.tool_history.append([tc.function.name for tc in action.tool_calls])
+        self.session.tool_history.append([tc.function.name for tc in action.tool_calls])
+
+    def query_tool_history(self, tool_name: str) -> bool:
+        """Return true if the tool is has been called in history."""
+        return tool_name in set(chain.from_iterable(self.session.tool_history))
 
 
 class NamedTool(BaseModel):
@@ -357,6 +354,8 @@ class Complete(NamedTool):
         r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
+    NO_ANSWER_PHRASE: ClassVar[str] = "No answer generated."
+
     async def complete(
         self, has_successful_answer: bool, state: EnvironmentState
     ) -> str:
@@ -373,6 +372,10 @@ class Complete(NamedTool):
         # TODO: eliminate race condition here if agent calls 2+ times in parallel
         # with opposite has_successful_answer values
         state.session.has_successful_answer = has_successful_answer
+
+        if not state.session.answer:
+            state.session.answer = self.NO_ANSWER_PHRASE
+
         logger.info(
             f"Completing '{state.session.question}' as"
             f" '{'a success' if has_successful_answer else 'unsure'}'."

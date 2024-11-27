@@ -206,6 +206,14 @@ class PQASession(BaseModel):
             "MD5 hash of the settings used to generate the answer. Cannot change"
         ),
     )
+    tool_history: list[list[str]] = Field(
+        default_factory=list,
+        description=(
+            "History of tool names input to each Environment.step (regardless of being"
+            " a typo or not), where the outer list is steps, and the inner list matches"
+            " the order of tool calls at each step."
+        ),
+    )
 
     def __str__(self) -> str:
         """Return the answer as a string."""

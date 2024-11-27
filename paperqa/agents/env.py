@@ -164,7 +164,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         return (
             sum(
                 tn == GenerateAnswer.gen_answer.__name__
-                for s in self.state.tool_history
+                for s in self.state.session.tool_history
                 for tn in s
             )
             > self._query.settings.answer.max_answer_attempts
