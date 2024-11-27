@@ -6,7 +6,7 @@ import warnings
 from collections.abc import Callable, Mapping
 from enum import StrEnum
 from pydoc import locate
-from typing import Any, ClassVar, Self, assert_never, cast
+from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
 from aviary.core import ToolSelector
@@ -57,6 +57,10 @@ from paperqa.prompts import (
 )
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
+
+# TODO: move to actual EnvironmentState
+# when we can do so without a circular import
+_EnvironmentState: TypeAlias = Any
 
 
 class AnswerSettings(BaseModel):
@@ -502,7 +506,7 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
-    callbacks: Mapping[str, list[Callable[..., Any]]] = Field(
+    callbacks: Mapping[str, list[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,
         description="""
             A mapping that associates callback names with lists of corresponding callable functions.
