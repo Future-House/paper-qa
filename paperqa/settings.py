@@ -504,7 +504,7 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
-    callbacks: Mapping[str, list[Callable[["EnvironmentState"], Any]]] = Field(
+    callbacks: Mapping[str, list[Callable[..., Any]]] = Field(
         default_factory=dict,
         description="""
             A mapping that associates callback names with lists of corresponding callable functions.
