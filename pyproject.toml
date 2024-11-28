@@ -80,6 +80,9 @@ ldp = [
 local = [
     "sentence-transformers",
 ]
+qdrant = [
+    "qdrant-client",
+]
 typing = [
     "pandas-stubs",
     "types-PyYAML",

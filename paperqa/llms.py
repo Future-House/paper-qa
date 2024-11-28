@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import functools
+import uuid
 from abc import ABC, abstractmethod
 from collections.abc import (
     AsyncGenerator,
@@ -906,6 +907,94 @@ class NumpyVectorStore(VectorStore):
         return (
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
+        )
+
+
+class QdrantVectorStore(VectorStore):
+    client: Any = Field(
+        default=None, description="Instance of qdrant_client.QdrantClient"
+    )
+    collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
+    vector_name: str | None = Field(default=None)
+
+    @model_validator(mode="after")
+    def validate_client(self):
+        from qdrant_client import QdrantClient
+
+        if self.client and not isinstance(self.client, QdrantClient):
+            raise TypeError(
+                f"'client' should be an instance of qdrant_client.QdrantClient. Got {type(self.client)}"
+            )
+
+        if not self.client:
+            self.client = QdrantClient()
+
+        return self
+
+    def clear(self) -> None:
+        super().clear()
+        from qdrant_client import models
+
+        if not self.client.collection_exists(self.collection_name):
+            return
+
+        self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=models.Filter(must=[]),
+            wait=True,
+        )
+
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        super().add_texts_and_embeddings(texts)
+        from qdrant_client import models
+
+        texts_list = list(texts)
+
+        if len(texts_list) > 0 and not self.client.collection_exists(
+            self.collection_name
+        ):
+            params = models.VectorParams(
+                size=len(texts_list[0].embedding), distance=models.Distance.COSINE  # type: ignore[arg-type]
+            )
+            self.client.create_collection(
+                self.collection_name,
+                vectors_config=(
+                    {self.vector_name: params} if self.vector_name else params
+                ),
+            )
+
+        vectors = [
+            {self.vector_name: t.embedding} if self.vector_name else t.embedding
+            for t in texts_list
+        ]
+        self.client.upload_collection(
+            collection_name=self.collection_name, vectors=vectors, wait=True
+        )
+
+    async def similarity_search(
+        self, query: str, k: int, embedding_model: EmbeddingModel
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        if not self.client.collection_exists(self.collection_name):
+            return ([], [])
+
+        embedding_model.set_mode(EmbeddingModes.QUERY)
+        np_query = np.array((await embedding_model.embed_documents([query]))[0])
+        embedding_model.set_mode(EmbeddingModes.DOCUMENT)
+
+        points = self.client.query_points(
+            collection_name=self.collection_name,
+            query=np_query,
+            using=self.vector_name,
+            limit=k,
+            with_vectors=True,
+        ).points
+
+        return (
+            [
+                p.vector[self.vector_name] if self.vector_name else p.vector
+                for p in points
+            ],
+            [p.score for p in points],
         )
 
 
