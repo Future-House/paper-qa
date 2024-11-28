@@ -42,7 +42,7 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.10.0",  # For invalid tool fixes
+    "fhaviary[llm]>=0.10.1",  # For tool execution concurrency
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",

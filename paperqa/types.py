@@ -73,7 +73,7 @@ class LLMResult(BaseModel):
 
     id: UUID = Field(default_factory=uuid4)
     session_id: UUID | None = Field(
-        default_factory=cvar_session_id.get,
+        default_factory=cvar_session_id.get,  # type: ignore[arg-type]
         description="A persistent ID to associate a group of LLMResults",
         alias="answer_id",
     )
