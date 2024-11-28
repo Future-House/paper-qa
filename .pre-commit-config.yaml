@@ -85,7 +85,7 @@ repos:
           - PyMuPDF>=1.24.12
           - anyio
           - coredis
-          - fhaviary[llm]>=0.10.1 # Match pyproject.toml
+          - fhaviary[llm]>=0.10.2 # Match pyproject.toml
           - ldp>=0.12 # Match pyproject.toml
           - html2text
           - litellm>=1.44 # Match pyproject.toml
