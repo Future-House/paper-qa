@@ -488,16 +488,16 @@ wheels = [
 
 [[package]]
 name = "fhaviary"
-version = "0.10.0"
+version = "0.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/88/f132078e5bd4fafbfd6115efcb59a167da2850c135be895d53b288a728a6/fhaviary-0.10.0.tar.gz", hash = "sha256:625f7bbe9f1729f3ddea9e64ecb6c29653b9c6edf302d8d25be1474212472e0e", size = 230750 }
+sdist = { url = "https://files.pythonhosted.org/packages/7e/8a/4f95112343de7671682bb9596a66b0cf9f2b4360c37ef363515e5eaebd28/fhaviary-0.10.1.tar.gz", hash = "sha256:cc921adb7b4fe9437d3bd3931009f939f9dfb9943de52104cecab1b89192bccc", size = 236414 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/3c/8194f303d6ae72e2711f9707244f916787a3c29bce063d8e58f6523009a5/fhaviary-0.10.0-py3-none-any.whl", hash = "sha256:0c801292b55588c85c7d5cf0a773f3a7cfa3d12fce98cc5df91391185a86792d", size = 42334 },
+    { url = "https://files.pythonhosted.org/packages/e9/7a/89af3c7cf718e1309322080306df54865334c8811beba947dffaec611904/fhaviary-0.10.1-py3-none-any.whl", hash = "sha256:6a4630cf8fec1b51951f947df24449e0f17564274f3e30feff15464ec01c05c8", size = 45790 },
 ]
 
 [package.optional-dependencies]
@@ -1511,7 +1511,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev5+g1dad1e3"
+version = "5.5.1.dev7+g31f9825.d20241127"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1586,7 +1586,7 @@ requires-dist = [
     { name = "anyio" },
     { name = "coredis" },
     { name = "datasets", marker = "extra == 'datasets'" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.0" },
+    { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.1" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.12" },
