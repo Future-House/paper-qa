@@ -75,7 +75,7 @@ datasets = [
     "datasets",
 ]
 ldp = [
-    "ldp>=0.12",  # For StoreTrajectoriesCallback
+    "ldp>=0.14.5",  # For Callback.before_rollout
 ]
 local = [
     "sentence-transformers",
