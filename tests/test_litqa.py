@@ -182,3 +182,26 @@ class TestLitQAEvaluation:
                 " information to answer this question\nE) Htr1d"
             ),
         ]
+
+    @pytest.mark.parametrize(
+        ("evals", "accuracy_precision"),
+        [
+            (
+                [
+                    LitQAEvaluation.CORRECT,
+                    LitQAEvaluation.CORRECT,
+                    LitQAEvaluation.CORRECT,
+                ],
+                (1, 1),
+            ),
+            (["correct", "correct", "unsure"], (2 / 3, 1)),
+            (
+                [LitQAEvaluation.CORRECT, LitQAEvaluation.UNSURE, "incorrect"],
+                (1 / 3, 1 / 2),
+            ),
+        ],
+    )
+    def test_calculate_accuracy_precision(
+        self, evals: Sequence[LitQAEvaluation], accuracy_precision: tuple[float, float]
+    ) -> None:
+        assert LitQAEvaluation.calculate_accuracy_precision(evals) == accuracy_precision
