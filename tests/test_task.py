@@ -86,16 +86,8 @@ class StoreEnvCallback(Callback):
         # for this being a set of envs
         self.query_to_envs: dict[str, PaperQAEnvironment] = {}
 
-    async def before_transition(
-        self, traj_id, agent, env, agent_state, obs  # noqa: ARG002
-    ) -> None:
-        if not isinstance(env, PaperQAEnvironment):
-            raise NotImplementedError(
-                f"Didn't yet handle environment type {type(env).__name__}."
-            )
-        question = env._query.query
-        if env not in self.query_to_envs:
-            self.query_to_envs[question] = env
+    async def before_rollout(self, traj_id: str, env) -> None:  # noqa: ARG002
+        self.query_to_envs[env._query.query] = env
 
 
 class TestTaskDataset:
