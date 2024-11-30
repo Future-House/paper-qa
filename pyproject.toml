@@ -42,7 +42,7 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.10.0",  # For invalid tool fixes
+    "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
@@ -75,7 +75,7 @@ datasets = [
     "datasets",
 ]
 ldp = [
-    "ldp>=0.12",  # For StoreTrajectoriesCallback
+    "ldp>=0.14.5",  # For Callback.before_rollout
 ]
 local = [
     "sentence-transformers",
