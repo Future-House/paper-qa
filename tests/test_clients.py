@@ -116,7 +116,8 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             ),
         )
         details = await client.query(title=paper_attributes["title"])
-        assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
+        assert details, "Assertions require successful query"
+        assert set(details.other["client_source"]) == set(
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
@@ -124,7 +125,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
                 assert getattr(details, key) == value, f"Should have the correct {key}"
             elif key == "is_oa":
                 assert (
-                    details.other.get("is_oa") == value  # type: ignore[union-attr]
+                    details.other.get("is_oa") == value
                 ), "Open access data should match"
 
 
@@ -223,7 +224,8 @@ async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
             ),
         )
         details = await client.query(doi=paper_attributes["doi"])
-        assert set(details.other["client_source"]) == set(  # type: ignore[union-attr]
+        assert details, "Assertions require successful query"
+        assert set(details.other["client_source"]) == set(
             paper_attributes["source"]
         ), "Should have the correct source"
         for key, value in paper_attributes.items():
@@ -238,7 +240,7 @@ async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
                     ), f"Should have the correct {key}"
             elif key == "is_oa":
                 assert (
-                    details.other.get("is_oa") == value  # type: ignore[union-attr]
+                    details.other.get("is_oa") == value
                 ), "Open access data should match"
 
 
@@ -414,8 +416,10 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             ),
             fields=["title", "doi", "authors", "journal"],
         )
-
-        assert nejm_crossref_details.source_quality == 3, "Should have source quality data"  # type: ignore[union-attr]
+        assert nejm_crossref_details, "Assertions require successful query"
+        assert (
+            nejm_crossref_details.source_quality == 3
+        ), "Should have source quality data"
 
 
 @pytest.mark.vcr
@@ -458,9 +462,8 @@ async def test_odd_client_requests() -> None:
             authors=["Andres M. Bran", "Sam Cox"],
             fields=["title", "doi"],
         )
-        assert (
-            details.authors  # type: ignore[union-attr]
-        ), "Should return correct author results"
+        assert details, "Assertions require successful query"
+        assert details.authors, "Should return correct author results"
 
     # try querying using a title, asking for no DOI back
     async with aiohttp.ClientSession() as session:
@@ -469,9 +472,8 @@ async def test_odd_client_requests() -> None:
             title="Augmenting large language models with chemistry tools",
             fields=["title"],
         )
-        assert (
-            details.doi  # type: ignore[union-attr]
-        ), "Should return a doi even though we don't ask for it"
+        assert details, "Assertions require successful query"
+        assert details.doi, "Should return a doi even though we don't ask for it"
 
     # try querying using a title, asking for no title back
     async with aiohttp.ClientSession() as session:
@@ -480,9 +482,8 @@ async def test_odd_client_requests() -> None:
             title="Augmenting large language models with chemistry tools",
             fields=["doi"],
         )
-        assert (
-            details.title  # type: ignore[union-attr]
-        ), "Should return a title even though we don't ask for it"
+        assert details, "Assertions require successful query"
+        assert details.title, "Should return a title even though we don't ask for it"
 
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(session)
@@ -490,8 +491,9 @@ async def test_odd_client_requests() -> None:
             doi="10.1007/s40278-023-41815-2",
             fields=["doi", "title", "gibberish-field", "no-field"],
         )
+        assert details, "Assertions require successful query"
         assert (
-            details.title  # type: ignore[union-attr]
+            details.title
         ), "Should return title even though we asked for some bad fields"
 
 
