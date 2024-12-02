@@ -337,6 +337,83 @@ extend-select = [
 external = [
     "FURB",  # refurb
 ]
+ignore = [
+    "ANN",  # Don't care to enforce typing
+    "BLE001",  # Don't care to enforce blind exception catching
+    "C901",  # we can be complex
+    "COM812",  # Trailing comma with black leads to wasting lines
+    "D100",  # D100, D101, D102, D103, D104, D105, D106, D107: don't always need docstrings
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "D203",  # Keep docstring next to the class definition (covered by D211)
+    "D212",  # Summary should be on second line (opposite of D213)
+    "D402",  # It's nice to reuse the method name
+    "D406",  # Google style requires ":" at end
+    "D407",  # We aren't using numpy style
+    "D413",  # Blank line after last section. -> No blank line
+    "DTZ",  # Don't care to have timezone safety
+    "EM",  # Overly pedantic
+    "ERA001",  # Don't care to prevent commented code
+    "FBT001",  # FBT001, FBT002: overly pedantic
+    "FBT002",
+    "FIX",  # Don't care to prevent TODO, FIXME, etc.
+    "FLY002",  # Can be less readable
+    "G004",  # f-strings are convenient
+    "INP001",  # Can use namespace packages
+    "ISC001",  # For ruff format compatibility
+    "N803",  # Want to use 'N', or 'L',
+    "N806",  # Want to use 'N', or 'L',
+    "PLR0913",
+    "PLR0915",  # we can write lots of code
+    "PLW2901",  # Allow modifying loop variables
+    "PTH",  # Overly pedantic
+    "S311",  # Ok to use python random
+    "SLF001",  # Overly pedantic
+    "T201",  # Overly pedantic
+    "TC001",  # TC001, TC002, TC003: don't care to enforce type checking blocks
+    "TC002",
+    "TC003",
+    "TD002",  # Don't care for TODO author
+    "TD003",  # Don't care for TODO links
+    "TRY003",  # Overly pedantic
+]
+preview = true
+select = ["ALL"]
+unfixable = [
+    "B007",  # While debugging, unused loop variables can be useful
+    "B905",  # Default fix is zip(strict=False), but that can hide bugs
+    "ERA001",  # While debugging, temporarily commenting code can be useful
+    "F401",  # While debugging, unused imports can be useful
+    "F841",  # While debugging, unused locals can be useful
+    "TC004",  # While debugging, it can be nice to keep TYPE_CHECKING in tact
+]
+
+[tool.ruff.lint.flake8-annotations]
+mypy-init-return = true
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*.py" = [
+    "N802",  # Tests function names can match class names
+    "PLR2004",  # Tests can have magic values
+    "S101",  # Tests can have assertions
+    "S301",  # can test pickle
+    "S310",
+]
+
+[tool.ruff.lint.pycodestyle]
+# The maximum line length to allow for line-length violations within
+# documentation (W505), including standalone comments.
+max-doc-length = 120  # Match line-length
+
+[tool.ruff.lint.pydocstyle]
+# Whether to use Google-style or NumPy-style conventions or the PEP257
+# defaults when analyzing docstring sections.
+convention = "google"
 
 [tool.setuptools.package-data]
 paperqa = ["configs/**json"]
