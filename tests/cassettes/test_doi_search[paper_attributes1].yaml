@@ -38,27 +38,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:28 GMT
         Via:
-          - 1.1 6cbbecc3198d4b8fe84dc82e5f121ae6.cloudfront.net (CloudFront)
+          - 1.1 fe4ffdbe245129b7503870df74adcb46.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - x74xzo1Vgtf0sHjNYMASzYWHeeaxPOZbFamNxgd55X3Wlg5uBEGjZQ==
+          - OhnynmwOGmRMGIeORgcMem7RrBNgBKtVwoV5QLn60XvnqfhjMIAr1g==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - A81PnEJPPHcEkMA=
+          - CLbZfFGXvHcEQGw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1446"
         x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:28 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 84d31e03-de14-4703-8f90-16f811730d2a
+          - 0e07ad61-bdfb-47eb-92e8-24f5193c0fdc
       status:
         code: 200
         message: OK
@@ -97,7 +97,7 @@ interactions:
           Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"facility","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Ranajit
           K. Banerjee","raw_affiliation_strings":["Department of Physiology, Indian
           Institute of Chemical Biology, Calcutta, India"],"affiliations":[{"raw_affiliation_string":"Department
-          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":0.377,"has_fulltext":true,"fulltext_origin":"ngrams","cited_by_count":7,"citation_normalized_percentile":{"value":0.512852,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":77,"max":78},"biblio":{"volume":"218","issue":"1/2","first_page":"1","last_page":"11"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11848","display_name":"Heme
+          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":0.345,"has_fulltext":true,"fulltext_origin":"ngrams","cited_by_count":7,"citation_normalized_percentile":{"value":0.499122,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":77,"max":78},"biblio":{"volume":"218","issue":"1/2","first_page":"1","last_page":"11"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11848","display_name":"Heme
           Oxygenase and Carbon Monoxide Research","score":0.9979,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
           Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
           Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
@@ -139,8 +139,8 @@ interactions:
           Science+Business Media","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310319900"],"host_organization_lineage_names":["Springer
           Nature","Springer Science+Business Media"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/11330823","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
           Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/6","display_name":"Clean
-          water and sanitation","score":0.74}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":36,"referenced_works":["https://openalex.org/W105515906","https://openalex.org/W1515075543","https://openalex.org/W1565240752","https://openalex.org/W1565691495","https://openalex.org/W1571455001","https://openalex.org/W1578742674","https://openalex.org/W1581359855","https://openalex.org/W1587806072","https://openalex.org/W1589479912","https://openalex.org/W1590103084","https://openalex.org/W1799674254","https://openalex.org/W1849424407","https://openalex.org/W1967044424","https://openalex.org/W1971827843","https://openalex.org/W1986659402","https://openalex.org/W1989790643","https://openalex.org/W1990052170","https://openalex.org/W1998706402","https://openalex.org/W1999881926","https://openalex.org/W2002978594","https://openalex.org/W2003479580","https://openalex.org/W2005601978","https://openalex.org/W2006822851","https://openalex.org/W2017379977","https://openalex.org/W2023180351","https://openalex.org/W2024117678","https://openalex.org/W2055799504","https://openalex.org/W2095100183","https://openalex.org/W2095873332","https://openalex.org/W2154061135","https://openalex.org/W2165898505","https://openalex.org/W2179092050","https://openalex.org/W2411439573","https://openalex.org/W2418888804","https://openalex.org/W91326892","https://openalex.org/W955725593"],"related_works":["https://openalex.org/W2327133413","https://openalex.org/W2122752058","https://openalex.org/W2072464466","https://openalex.org/W2062221185","https://openalex.org/W2044979688","https://openalex.org/W1996602571","https://openalex.org/W1991900549","https://openalex.org/W1978474786","https://openalex.org/W1975984439","https://openalex.org/W1530487393"],"abstract_inverted_index":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W1554322594","counts_by_year":[{"year":2023,"cited_by_count":1}],"updated_date":"2024-10-18T04:09:30.104891","created_date":"2016-06-24"}
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"score":0.74,"display_name":"Clean
+          water and sanitation","id":"https://metadata.un.org/sdg/6"}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":36,"referenced_works":["https://openalex.org/W105515906","https://openalex.org/W1515075543","https://openalex.org/W1565240752","https://openalex.org/W1565691495","https://openalex.org/W1571455001","https://openalex.org/W1578742674","https://openalex.org/W1581359855","https://openalex.org/W1587806072","https://openalex.org/W1589479912","https://openalex.org/W1590103084","https://openalex.org/W1799674254","https://openalex.org/W1849424407","https://openalex.org/W1967044424","https://openalex.org/W1971827843","https://openalex.org/W1986659402","https://openalex.org/W1989790643","https://openalex.org/W1990052170","https://openalex.org/W1998706402","https://openalex.org/W1999881926","https://openalex.org/W2002978594","https://openalex.org/W2003479580","https://openalex.org/W2005601978","https://openalex.org/W2006822851","https://openalex.org/W2017379977","https://openalex.org/W2023180351","https://openalex.org/W2024117678","https://openalex.org/W2055799504","https://openalex.org/W2095100183","https://openalex.org/W2095873332","https://openalex.org/W2154061135","https://openalex.org/W2165898505","https://openalex.org/W2179092050","https://openalex.org/W2411439573","https://openalex.org/W2418888804","https://openalex.org/W91326892","https://openalex.org/W955725593"],"related_works":["https://openalex.org/W2327133413","https://openalex.org/W2122752058","https://openalex.org/W2072464466","https://openalex.org/W2062221185","https://openalex.org/W2044979688","https://openalex.org/W1996602571","https://openalex.org/W1991900549","https://openalex.org/W1978474786","https://openalex.org/W1975984439","https://openalex.org/W1530487393"],"abstract_inverted_index":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W1554322594","counts_by_year":[{"year":2023,"cited_by_count":1}],"updated_date":"2024-11-30T23:11:19.324656","created_date":"2016-06-24"}
 
           '
       headers:
@@ -160,21 +160,21 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3185"
+          - "3192"
         Content-Security-Policy:
           - default-src 'self'; object-src 'none'
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:28 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1731107837&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ZIRBb24HewjZVtKGsZ7ujli7BbeExRdtzRmMlnaDchg%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168188&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=%2Fn6z%2F81qLDUQjrRv90qOIcddDEtGM24evga%2FzNg%2Bk%2Bg%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1731107837&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ZIRBb24HewjZVtKGsZ7ujli7BbeExRdtzRmMlnaDchg%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1733168188&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=%2Fn6z%2F81qLDUQjrRv90qOIcddDEtGM24evga%2FzNg%2Bk%2Bg%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -223,7 +223,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:28 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -267,7 +267,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:29 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -323,13 +323,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:20 GMT
+          - Mon, 02 Dec 2024 19:36:32 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1731107837&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2F052tL2z%2BdNzdHoagC3cvjHVq4tmR4dL6T%2F3i5Ta%2FHY%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168188&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=NFjez%2F60EtbxhurHvF9P2WUSxXGEWAMrN9YVU9nnw8M%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1731107837&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2F052tL2z%2BdNzdHoagC3cvjHVq4tmR4dL6T%2F3i5Ta%2FHY%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1733168188&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=NFjez%2F60EtbxhurHvF9P2WUSxXGEWAMrN9YVU9nnw8M%3D
         Server:
           - gunicorn
         Vary:
