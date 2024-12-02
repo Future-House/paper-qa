@@ -8,7 +8,7 @@ import string
 from ast import literal_eval
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import StrEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 try:
     from ldp.utils import discounted_returns
@@ -218,6 +218,28 @@ class LitQAEvaluation(StrEnum):
             )
 
         return qa_prompt, llm_from_answer
+
+    @classmethod
+    def calculate_accuracy_precision(
+        cls, evaluations: Sequence[Self | str]
+    ) -> tuple[float, float]:
+        """
+        Calculate LitQA-specific accuracy and precision metrics upon evaluations.
+
+        Raises:
+            ZeroDivisionError: if an empty input.
+
+        Returns:
+            Two-tuple of accuracy = (num correct) / (num questions) and
+                precision = (num correct) / ((num questions) - (num unsure)).
+        """
+        evaluations = [e if isinstance(e, cls) else cls(e) for e in evaluations]
+        num_correct = sum(e == cls.CORRECT for e in evaluations)
+        accuracy = num_correct / len(evaluations)
+        precision = num_correct / sum(
+            e in {cls.CORRECT, cls.INCORRECT} for e in evaluations
+        )
+        return accuracy, precision
 
 
 DEFAULT_LABBENCH_HF_HUB_NAME = "futurehouse/lab-bench"
