@@ -23,7 +23,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.4
+    rev: v0.8.0
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -54,12 +54,10 @@ repos:
     rev: 3.0.0
     hooks:
       - id: check-mailmap
-  - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.23
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: 2024.11.25
     hooks:
       - id: validate-pyproject
-        additional_dependencies:
-          - "validate-pyproject-schema-store[all]>=2024.06.24" # Pin for Ruff's FURB154
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.4.30
     hooks:
@@ -96,7 +94,7 @@ repos:
           - pybtex
           - numpy
           - pandas-stubs
-          - pydantic~=2.0 # Match pyproject.toml
+          - pydantic~=2.0,>=2.10.1,<2.10.2 # Match pyproject.toml
           - pydantic-settings
           - rich
           - tantivy
