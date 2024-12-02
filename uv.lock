@@ -1511,7 +1511,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev14+g4c922f2.d20241130"
+version = "5.5.1.dev15+ge6eae4d.d20241202"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },

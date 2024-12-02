@@ -130,6 +130,14 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         messages, reward, done, truncated = await super().step(action)
         if not done or not self._evaluation_from_answer:
             return messages, reward, done, truncated
+        # If the ensuring evaluation fails (e.g. due to OpenAI being down), we can:
+        # - Suppress the exception and declare the evaluation as incorrect, which can
+        #   negatively reward what otherwise was a good trajectory containing a correct
+        #   answer. We don't want "bad" offline data, so it's not what we do.
+        # - Suppress the exception and just give super()'s reward, but again this could
+        #   incorrectly reward what otherwise was a good trajectory.
+        # - Don't suppress the exception, which leads to the trajectory failing, and
+        #   removes it from the learnable pool. This is the only safe default behavior.
         evaluation = await self._evaluation_from_answer(self.state.session.answer)
         if evaluation_callback := self._evaluation_callback:
             await evaluation_callback(evaluation)
