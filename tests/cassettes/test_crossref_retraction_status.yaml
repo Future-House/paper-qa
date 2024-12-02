@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4276707,"items":[{"DOI":"10.1155\/2022\/8341966","author":[{"ORCID":"http:\/\/orcid.org\/0000-0003-3902-2613","authenticated-orcid":true,"given":"Jiaye","family":"Han","sequence":"first","affiliation":[{"name":"Pingdingshan
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4342705,"items":[{"DOI":"10.1155\/2022\/8341966","author":[{"ORCID":"http:\/\/orcid.org\/0000-0003-3902-2613","authenticated-orcid":true,"given":"Jiaye","family":"Han","sequence":"first","affiliation":[{"name":"Pingdingshan
           Polytechnic College, PingDingShan, Henan 467001, China"},{"name":"National
           University of Life and Environmental Sciences of Ukraine, Kyiv 03041, Ukraine"}]}],"container-title":["Wireless
           Communications and Mobile Computing"],"title":["The Dilemma and Countermeasures
@@ -25,7 +25,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 07 Oct 2024 01:01:33 GMT
+          - Mon, 02 Dec 2024 19:37:06 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
