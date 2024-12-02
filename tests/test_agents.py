@@ -371,7 +371,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     assert CANNOT_ANSWER_PHRASE in response.session.answer
 
 
-@pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
+@pytest.mark.flaky(reruns=3, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_propagate_options(agent_test_settings: Settings) -> None:
     llm_name = "gpt-4o-mini"
@@ -464,7 +464,7 @@ async def test_gather_evidence_rejects_empty_docs(
 @pytest.mark.flaky(reruns=3, only_rerun=["AssertionError", "EmptyDocsError"])
 @pytest.mark.asyncio
 async def test_agent_sharing_state(
-    agent_test_settings: Settings, subtests: SubTests, callback_type: str
+    agent_test_settings: Settings, subtests: SubTests, callback_type: str | None
 ) -> None:
     agent_test_settings.agent.search_count = 3  # Keep low for speed
     agent_test_settings.answer.evidence_k = 2
@@ -494,6 +494,17 @@ async def test_agent_sharing_state(
     env_state = EnvironmentState(docs=Docs(), session=session)
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
+
+    # run an initial complete tool to see that the answer object is populated by it
+    # this simulates if no gen_answer tool was called
+    with subtests.test(msg=Complete.__name__):
+        complete_tool = Complete()
+        await complete_tool.complete(state=env_state, has_successful_answer=False)
+        assert (
+            env_state.session.answer == Complete.NO_ANSWER_PHRASE
+        ), "Complete did not succeed"
+        # now we wipe the answer for further tests
+        env_state.session.answer = ""
 
     with subtests.test(msg=PaperSearch.__name__):
         search_tool = PaperSearch(
@@ -858,6 +869,12 @@ class TestGradablePaperQAEnvironment:
         assert sorted(stub_gradable_env.state.session.used_contexts) == sorted(
             stub_gradable_env_copy.state.session.used_contexts
         )
+        assert stub_gradable_env.state.session.tool_history == (
+            [["paper_search"], ["gather_evidence"], ["gen_answer"], ["complete"]]
+        ), "Correct tool history was not saved in the session."
+        assert stub_gradable_env_copy.state.query_tool_history(
+            "gen_answer"
+        ), "Expected gen_answer tool to be in tool history"
 
     @pytest.mark.asyncio
     async def test_empty_tool_calls(

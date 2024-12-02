@@ -164,7 +164,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         return (
             sum(
                 tn == GenerateAnswer.gen_answer.__name__
-                for s in self.state.tool_history
+                for s in self.state.session.tool_history
                 for tn in s
             )
             > self._query.settings.answer.max_answer_attempts
@@ -181,7 +181,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             list[Message],
             await self.exec_tool_calls(
                 action,
-                ordered=True,  # PQA Environment currently not safe for parallel tool calls
+                concurrency=False,  # PQA tools aren't yet concurrency safe
                 state=self.state,
                 handle_tool_exc=True,
             ),

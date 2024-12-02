@@ -163,12 +163,17 @@ async def _run_with_timeout_failure(
     except Exception:
         logger.exception("Trajectory failed.")
         status = AgentStatus.FAIL
-    if status == AgentStatus.TRUNCATED:
+    if status == AgentStatus.TRUNCATED or not env.state.query_tool_history(
+        GenerateAnswer.TOOL_FN_NAME
+    ):
         # Fail over after truncation (too many steps, timeout): just answer
         generate_answer_tool = next(
             filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
         )
         await generate_answer_tool._tool_fn(state=env.state)
+        env.state.record_action(
+            ToolRequestMessage(tool_calls=[ToolCall.from_tool(generate_answer_tool)])
+        )
     return env.state.session, status
 
 

@@ -1,8 +1,6 @@
 interactions:
   - request:
-      body:
-        '{"messages": [{"role": "user", "content": "Please tell me a story"}], "model":
-        "gpt-4o-mini", "max_tokens": 3}'
+      body: '{"messages":[{"role":"user","content":"Please tell me a story"}],"model":"gpt-4o-mini","max_tokens":3}'
       headers:
         accept:
           - application/json
@@ -11,13 +9,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "110"
+          - "102"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.3
+          - AsyncOpenAI/Python 1.56.0
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -27,7 +25,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.3
+          - 1.56.0
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -41,18 +39,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4ySzU7DMBCE73kKy+cGJWlKS28U1BOoEhwAIRS59iYxdbzGdiQQ6rsjpz9JRZG4
-          +LDfznh27e+IECoFnRPKa+Z5Y1R8/fD4dD9j9oo/5/xueftyebNYrprF5mOFNR0FBa7fgfuD6oJj
-          YxR4iXqHuQXmIbim03GaJtPZJO9AgwJUkFXGxznGjdQyzpIsj5NpnM726holB0fn5DUihJDv7gw5
-          tYBPOifJ6FBpwDlWAZ0fmwihFlWoUOacdJ5pT0c95Kg96C76SnMgrUFN2LDDQtk6FlLqVql9fXu8
-          UmFlLK7dnh/rpdTS1YUF5lAHewW68jXt+DYi5K0brj3JS43FxvjC4wZ0sEyznSHtV9rD8Z559EwN
-          NJPRGbNCgGdSucFuKGe8BtEr+0WyVkgcgGgw9O8s57x3g0td/ce+B5yD8SAKY0FIfjpv32Yh/Le/
-          2o4r7gJT9+U8NEUpdQXWWLl77dIUyZolIs3yMqXRNvoBAAD//wMAvrJH0vsCAAA=
+          H4sIAAAAAAAAA4ySy07DMBBF9/kKy+sE5dE2ITvYIBY8JCQWIBS5ziQxOLZrOypQ9d+RkzZJRZHY
+          eDFn7vWdsXceQpiVOEeYNsTSVvHgiqyeWfzyRJLN4128hc13nfLbLrqPbrbX2HcKuX4Hao+qCypb
+          xcEyKQZMNRALzjVKkyRaZdFl1oNWlsCdrFY2WMigZYIFcRgvgjANouygbiSjYHCOXj2EENr1p8sp
+          SvjEOQr9Y6UFY0gNOB+bEMJaclfBxBhmLBEW+xOkUlgQffQHQQF1SgpE5h0aqs4Ql1J0nB/q+/FK
+          Lmul5doc+FivmGCmKTQQI4Wz5yBq2+Ce7z2E3vrhupO8WGnZKltY+QHCWUbxYIinlU4wOTArLeEz
+          zdI/Y1aUYAnjZrYbTAltoJyU0yJJVzI5A95s6N9ZznkPgzNR/8d+ApSCslAWSkPJ6Om8U5sG99/+
+          ahtX3AfG5stYaIuKiRq00mx47UoVYRou11WW0hB7e+8HAAD//wMALERyAfsCAAA=
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8df946f7b869967f-SJC
+          - 8ebdc4544d45159c-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -60,14 +58,14 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:34 GMT
+          - Mon, 02 Dec 2024 19:36:38 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=4Hfn3z1hBbF21VTNTfj0la4U1FprfYGMuW6SJFHFMTk-1731107854-1.0.1.1-IlnK_DV2fPFFo1K.4nwWKrmX7j5rphJ64Dwu4loRbItMxBR3qlUVv5M37TM5si058nrMVjH1XmIwkAsKrnSH3g;
-            path=/; expires=Fri, 08-Nov-24 23:47:34 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=oW7puVMoQxr5tfjOcrapj0cZDKsrgYGaypvH9Uy3hSI-1733168198-1.0.1.1-uJC65w6KU6H27oReIU5GNAQPRZ4qPR3j9dIaq2hz6jVoKgdGs7ORtYIpVqMZj.wvHiGRmjqwMgLXFbenTXS.hw;
+            path=/; expires=Mon, 02-Dec-24 20:06:38 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=8iYvs22_cvb6pdXrAvFmyv9mDiYXEZlmkBAqOnqXYM0-1731107854556-0.0.1.1-604800000;
+          - _cfuvid=1WbywTWsVng0pYLbjxFjjVkHNIA_Tp7Yyi2qWtRgTRA-1733168198303-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
@@ -80,7 +78,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "417"
+          - "355"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -92,13 +90,13 @@ interactions:
         x-ratelimit-remaining-requests:
           - "29999"
         x-ratelimit-remaining-tokens:
-          - "149999990"
+          - "149999989"
         x-ratelimit-reset-requests:
           - 2ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_191720674eda0126fcb1971a5d9a3bf9
+          - req_821f2596e6f5471e8d9b50ea7c01c3b1
       status:
         code: 200
         message: OK
