@@ -3,27 +3,19 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Convalescent-anti-sars-cov-2-plasma/immune-globulin&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
-          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
-          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
-          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
-          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 37, "influentialCitationCount":
-          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
-          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
-          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
-          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
-          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
-          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
-          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
-          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
-          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
-          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}], "matchScore": 247.60916}]}
+          '{"data": [{"paperId": "762ceacc20db232d3f6bcda6e867eb8148848ced", "externalIds":
+          {"DOI": "10.1007/s40278-023-33114-1", "CorpusId": 256742540}, "url": "https://www.semanticscholar.org/paper/762ceacc20db232d3f6bcda6e867eb8148848ced",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
+          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
+          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": null, "publicationDate":
+          "2023-02-01", "journal": {"name": "Reactions Weekly", "pages": "229", "volume":
+          "1943"}, "citationStyles": {"bibtex": "@Article{None,\n booktitle = {Reactions
+          weekly},\n journal = {Reactions Weekly},\n pages = {229},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
+          volume = {1943},\n year = {2023}\n}\n"}, "authors": [], "matchScore": 239.18658}]}
 
           '
       headers:
@@ -32,94 +24,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1386"
+          - "848"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:27 GMT
         Via:
-          - 1.1 b0ed8f5cd57ec24ce179421915a813d6.cloudfront.net (CloudFront)
+          - 1.1 6778e3146eb385e3772c8de867b2c290.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - Ipwhq_IVrvHZTzS0PCEx1vBpc_dAXTehzQ6khOjDnMqn3_HuTMXEKg==
+          - 6gj0f3exL8mzUZQ3DVHsGsDh0OZYgn2vnceemcD2OQSANE1tUw8oGg==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - A81PvEVQPHcENIg=
+          - CLbZTE8aPHcEA5Q=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1386"
+          - "848"
         x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:27 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 266bd8e4-a63f-4271-983d-0a8dc8a0c37b
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
-          "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 225, "influentialCitationCount":
-          11, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
-          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
-          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
-          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
-          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
-          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
-          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
-          {Augmenting large language models with chemistry tools},\n volume = {6},\n
-          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
-          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
-          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
-          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 176.3838}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1550"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        Via:
-          - 1.1 f8b122b964bc12ee7f052daf895c865c.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - ImsOwA_7avf3DJhurD4q2e9ddfoWikAZayRvqgFPeVX3-xetOJTf4Q==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - A81PwGrevHcEImg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1550"
-        x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 2dd88b2c-07a0-457e-8398-94247f74da3a
+          - 2c564990-bd04-42aa-8480-6a748409c785
       status:
         code: 200
         message: OK
@@ -145,7 +74,7 @@ interactions:
           tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
           year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
           Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          283.3764}]}
+          283.44385}]}
 
           '
       headers:
@@ -154,31 +83,31 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1108"
+          - "1109"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:27 GMT
         Via:
-          - 1.1 8aa9515f0608451f7f77b7d0095beae0.cloudfront.net (CloudFront)
+          - 1.1 b0797f10be715dcb685d992d17347df4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - FwtYX26DJkUTsbzpo8C79RwojcxaOto0PcKk0gqUKjJV21fs3EFwGg==
+          - GX8EekzuF6a_nhl2spAX8cvKRJli7xqP1aYR65YID_IgGJRH0maD8g==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - A81PwGksvHcEvYQ=
+          - CLbZTFJ2vHcEhuw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1108"
+          - "1109"
         x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:27 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 4556aa7f-3f3d-43ed-97ef-23422817462f
+          - 30a64d52-0c0e-455c-8fda-e7a4e13c0ba0
       status:
         code: 200
         message: OK
@@ -186,151 +115,20 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Convalescent-anti-sars-cov-2-plasma/immune-globulin&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
     response:
       body:
         string:
-          '{"data": [{"paperId": "762ceacc20db232d3f6bcda6e867eb8148848ced", "externalIds":
-          {"DOI": "10.1007/s40278-023-33114-1", "CorpusId": 256742540}, "url": "https://www.semanticscholar.org/paper/762ceacc20db232d3f6bcda6e867eb8148848ced",
-          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
-          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
-          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": null, "publicationDate":
-          "2023-02-01", "journal": {"name": "Reactions Weekly", "pages": "229", "volume":
-          "1943"}, "citationStyles": {"bibtex": "@Article{None,\n booktitle = {Reactions
-          weekly},\n journal = {Reactions Weekly},\n pages = {229},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
-          volume = {1943},\n year = {2023}\n}\n"}, "authors": [], "matchScore": 240.13841}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "848"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        Via:
-          - 1.1 28da7b50b2dbdddfb257605df1527026.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - Yb4yRHNhZLQZPvcttu77G20xo7AUzm3UnokJ8hgs4CgJz7RRqU-pXg==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - A81PvEzuvHcEFoQ=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "848"
-        x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - bd5c5963-ab7e-40b4-b16f-3008e7251259
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2053545,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
-          University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
-          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
-          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
-          Institutes of Health","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100000002","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
-          automate scientific claim verification using PubMed abstracts.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Materials
-          and Methods<\/jats:title>\n                  <jats:p>We developed CliVER,
-          an end-to-end scientific Claim VERification system that leverages retrieval-augmented
-          techniques to automatically retrieve relevant clinical trial abstracts, extract
-          pertinent sentences, and use the PICO framework to support or refute a scientific
-          claim. We also created an ensemble of three state-of-the-art deep learning
-          models to classify rationale of support, refute, and neutral. We then constructed
-          CoVERt, a new COVID VERification dataset comprising 15 PICO-encoded drug claims
-          accompanied by 96 manually selected and labeled clinical trial abstracts that
-          either support or refute each claim. We used CoVERt and SciFact (a public
-          scientific claim verification dataset) to assess CliVER\u2019s performance
-          in predicting labels. Finally, we compared CliVER to clinicians in the verification
-          of 19 claims from 6 disease domains, using 189\u00a0648 PubMed abstracts extracted
-          from January 2010 to October 2021.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Results<\/jats:title>\n                  <jats:p>In
-          the evaluation of label prediction accuracy on CoVERt, CliVER achieved a notable
-          F1 score of 0.92, highlighting the efficacy of the retrieval-augmented models.
-          The ensemble model outperforms each individual state-of-the-art model by an
-          absolute increase from 3% to 11% in the F1 score. Moreover, when compared
-          with four clinicians, CliVER achieved a precision of 79.0% for abstract retrieval,
-          67.4% for sentence selection, and 63.2% for label prediction, respectively.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Conclusion<\/jats:title>\n                  <jats:p>CliVER
-          demonstrates its early potential to automate scientific claim verification
-          using retrieval-augmented strategies to harness the wealth of clinical trial
-          abstracts in PubMed. Future studies are warranted to further test its clinical
-          utility.<\/jats:p>\n               <\/jats:sec>","DOI":"10.1093\/jamiaopen\/ooae021","type":"journal-article","created":{"date-parts":[[2024,2,22]],"date-time":"2024-02-22T01:48:17Z","timestamp":1708566497000},"source":"Crossref","is-referenced-by-count":0,"title":["Retrieval
-          augmented scientific claim verification"],"prefix":"10.1093","volume":"7","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-1975-1272","authenticated-orcid":false,"given":"Hao","family":"Liu","sequence":"first","affiliation":[{"name":"School
-          of Computing, Montclair State University , Montclair, NJ 07043, United States"}]},{"given":"Ali","family":"Soroush","sequence":"additional","affiliation":[{"name":"Department
-          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0003-1418-3103","authenticated-orcid":false,"given":"Jordan
-          G","family":"Nestor","sequence":"additional","affiliation":[{"name":"Department
-          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"given":"Elizabeth","family":"Park","sequence":"additional","affiliation":[{"name":"Department
-          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-4318-5987","authenticated-orcid":false,"given":"Betina","family":"Idnay","sequence":"additional","affiliation":[{"name":"Department
-          of Biomedical Informatics, Columbia University , New York, NY 10027, United
-          States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-2681-1931","authenticated-orcid":false,"given":"Yilu","family":"Fang","sequence":"additional","affiliation":[{"name":"Department
-          of Biomedical Informatics, Columbia University , New York, NY 10027, United
-          States"}]},{"given":"Jane","family":"Pan","sequence":"additional","affiliation":[{"name":"Department
-          of Applied Physics and Applied Mathematics, Columbia University , New York,
-          NY 10027, United States"}]},{"given":"Stan","family":"Liao","sequence":"additional","affiliation":[{"name":"Department
-          of Applied Physics and Applied Mathematics, Columbia University , New York,
-          NY 10027, United States"}]},{"given":"Marguerite","family":"Bernard","sequence":"additional","affiliation":[{"name":"Institute
-          of Human Nutrition, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0001-9309-8331","authenticated-orcid":false,"given":"Yifan","family":"Peng","sequence":"additional","affiliation":[{"name":"Department
-          of Population Health Sciences, Weill Cornell Medicine , New York, NY 10065,
-          United States"}]},{"given":"Chunhua","family":"Weng","sequence":"additional","affiliation":[{"name":"Department
-          of Biomedical Informatics, Columbia University , New York, NY 10027, United
-          States"}]}],"member":"286","published-online":{"date-parts":[[2024,2,21]]},"reference":[{"issue":"6","key":"2024030720490192400_ooae021-B1","doi-asserted-by":"crossref","first-page":"1192","DOI":"10.1093\/jamia\/ocx050","article-title":"Evidence
-          appraisal: a scoping review, conceptual framework, and research agenda","volume":"24","author":"Goldstein","year":"2017","journal-title":"J
-          Am Med Inform Assoc"},{"issue":"D1","key":"2024030720490192400_ooae021-B2","doi-asserted-by":"crossref","first-page":"D1534","DOI":"10.1093\/nar\/gkaa952","article-title":"LitCovid:
-          an open database of COVID-19 literature","volume":"49","author":"Chen","year":"2021","journal-title":"Nucleic
-          Acids Res"},{"key":"2024030720490192400_ooae021-B3","author":"Medicine NLo"},{"issue":"1","key":"2024030720490192400_ooae021-B4","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1038\/s41591-020-01203-7","article-title":"Automated
-          screening of COVID-19 preprints: can we help authors to improve transparency
-          and reproducibility?","volume":"27","author":"Weissgerber","year":"2021","journal-title":"Nat
-          Med"},{"issue":"2","key":"2024030720490192400_ooae021-B5","doi-asserted-by":"crossref","first-page":"218","DOI":"10.1001\/jama.294.2.218","article-title":"Contradicted
-          and initially stronger effects in highly cited clinical research","volume":"294","author":"Ioannidis","year":"2005","journal-title":"JAMA"},{"issue":"1","key":"2024030720490192400_ooae021-B6","doi-asserted-by":"crossref","first-page":"63","DOI":"10.1162\/coli.2007.33.1.63","article-title":"Answering
-          clinical questions with knowledge-based and statistical techniques","volume":"33","author":"Demner-Fushman","year":"2007","journal-title":"Comput
-          Linguist"},{"issue":"6","key":"2024030720490192400_ooae021-B7","doi-asserted-by":"crossref","first-page":"772","DOI":"10.1197\/jamia.M2407","article-title":"Knowledge-based
-          methods to help clinicians find answers in MEDLINE","volume":"14","author":"Sneiderman","year":"2007","journal-title":"J
-          Am Med Inform Assoc"},{"issue":"5","key":"2024030720490192400_ooae021-B8","doi-asserted-by":"crossref","first-page":"232","DOI":"10.1186\/cc5045","article-title":"Evidence-based
-          medicine: classifying the evidence from clinical trials\u2013the need to consider
-          other dimensions","volume":"10","author":"Bellomo","year":"2006","journal-title":"Crit
-          Care"},{"issue":"1","key":"2024030720490192400_ooae021-B9","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1002\/clc.4960220106","article-title":"The
-          importance of randomized clinical trials and evidence-based medicine: a clinician''s
-          perspective","volume":"22","author":"Kennedy","year":"1999","journal-title":"Clin
-          Cardiol"},{"key":"2024030720490192400_ooae021-B10","first-page":"493","author":"Hanselowski","year":"2019"},{"key":"2024030720490192400_ooae021-B11","first-page":"809","author":"Thorne","year":"2018"},{"key":"2024030720490192400_ooae021-B12","first-page":"7534","author":"Wadden","year":"2020"},{"key":"2024030720490192400_ooae021-B13","first-page":"94","author":"Pradeep","year":"2021"},{"key":"2024030720490192400_ooae021-B14","first-page":"5485","article-title":"Exploring
-          the limits of transfer learning with a unified text-to-text transformer","volume":"140","author":"Raffel","year":"2020","journal-title":"J.
-          Mach. Learn. Res"},{"key":"2024030720490192400_ooae021-B15","author":"Li","year":"2021"},{"key":"2024030720490192400_ooae021-B16","first-page":"61","author":"Wadden","year":"2022"},{"key":"2024030720490192400_ooae021-B17","author":"Beltagy","year":"2020"},{"issue":"7256","key":"2024030720490192400_ooae021-B18","doi-asserted-by":"crossref","first-page":"255","DOI":"10.1136\/bmj.321.7256.255","article-title":"Which
-          clinical studies provide the best evidence?: the best RCT still trumps the
-          best observational study","volume":"321","author":"Barton","year":"2000","journal-title":"BMJ"},{"key":"2024030720490192400_ooae021-B19","doi-asserted-by":"crossref","first-page":"103717","DOI":"10.1016\/j.jbi.2021.103717","article-title":"Toward
-          assessing clinical trial publications for reporting transparency","volume":"116","author":"Kilicoglu","year":"2021","journal-title":"J
-          Biomed Inform"},{"key":"2024030720490192400_ooae021-B20","first-page":"1253","author":"Yang","year":"2017"},{"key":"2024030720490192400_ooae021-B21","first-page":"39","author":"Khattab","year":"2020"},{"key":"2024030720490192400_ooae021-B22","first-page":"19","author":"Yilmaz","year":"2019"},{"key":"2024030720490192400_ooae021-B23","author":"Kuzi","year":"2020"},{"key":"2024030720490192400_ooae021-B24","volume-title":"The
-          Probabilistic Relevance Framework: BM25 and Beyond","author":"Robertson","year":"2009"},{"key":"2024030720490192400_ooae021-B25","first-page":"105","author":"Wang","year":"2011"},{"key":"2024030720490192400_ooae021-B26","first-page":"7740","author":"Kotonya","year":"2020"},{"issue":"1","key":"2024030720490192400_ooae021-B27","doi-asserted-by":"crossref","first-page":"36","DOI":"10.1186\/s13326-016-0083-z","article-title":"A
-          corpus of potentially contradictory research claims from cardiovascular research
-          abstracts","volume":"7","author":"Alamri","year":"2016","journal-title":"J
-          Biomed Semantics"},{"key":"2024030720490192400_ooae021-B28","first-page":"3499","author":"Sarrouti","year":"2021"},{"issue":"9","key":"2024030720490192400_ooae021-B29","doi-asserted-by":"crossref","first-page":"1431","DOI":"10.1093\/jamia\/ocaa091","article-title":"TREC-COVID:
-          rationale and structure of an information retrieval shared task for COVID-19","volume":"27","author":"Roberts","year":"2020","journal-title":"J
-          Am Med Inform Assoc"},{"key":"2024030720490192400_ooae021-B30","author":"Wang","year":"2020"},{"key":"2024030720490192400_ooae021-B31","first-page":"2116","author":"Saakyan","year":"2021"},{"key":"2024030720490192400_ooae021-B32","first-page":"359","author":"Huang","year":"2006"},{"key":"2024030720490192400_ooae021-B33","first-page":"708","author":"Nogueira","year":"2020"},{"key":"2024030720490192400_ooae021-B34","doi-asserted-by":"crossref","first-page":"baw065","DOI":"10.1093\/database\/baw065","article-title":"Mining
-          chemical patents with an ensemble of open systems","volume":"2016","author":"Leaman","year":"2016","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B35","doi-asserted-by":"crossref","first-page":"bay073","DOI":"10.1093\/database\/bay073","article-title":"Extracting
-          chemical\u2013protein relations with ensembles of SVM and deep learning models","volume":"2018","author":"Peng","year":"2018","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B36","author":"Liu","year":"2019"},{"issue":"1","key":"2024030720490192400_ooae021-B37","doi-asserted-by":"crossref","first-page":"1","DOI":"10.1145\/3458754","article-title":"Domain-specific
-          language model pretraining for biomedical natural language processing","volume":"3","author":"Gu","year":"2021","journal-title":"ACM
-          Trans Comput Healthc"},{"issue":"3","key":"2024030720490192400_ooae021-B38","doi-asserted-by":"crossref","first-page":"A12","DOI":"10.7326\/ACPJC-1995-123-3-A12","article-title":"The
-          well-built clinical question: a key to evidence-based decisions","volume":"123","author":"Richardson","year":"1995","journal-title":"ACP
-          J Club"},{"key":"2024030720490192400_ooae021-B39","first-page":"1971","author":"Lee","year":"2021"},{"key":"2024030720490192400_ooae021-B40","author":"Loshchilov","year":"2019"},{"key":"2024030720490192400_ooae021-B41","first-page":"13","author":"Kingma","year":"2015"},{"key":"2024030720490192400_ooae021-B42","first-page":"38","author":"Wolf","year":"2020"},{"key":"2024030720490192400_ooae021-B43","first-page":"2356","author":"Lin","year":"2021"},{"key":"2024030720490192400_ooae021-B44","first-page":"243","author":"J\u00e4rvelin","year":"2017"},{"issue":"4","key":"2024030720490192400_ooae021-B45","doi-asserted-by":"crossref","first-page":"422","DOI":"10.1145\/582415.582418","article-title":"Cumulated
-          gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
-          Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
-          Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
-          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.876652,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":1513586,"items":[{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
+          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
+          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
+          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
+          humoral immunodeficiency - Three consecutive cases and review of the literature.
+          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
+          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
+          Weekly"],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":57.92144,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
+          and mild decrease in baseline oxygen saturation following off-label use: 3
+          case reports"],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"published":{"date-parts":[[2023,6,24]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -344,11 +142,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "4503"
+          - "1207"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:27 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -372,11 +170,258 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e5d4466c8b85f93775fe183e1a318a3e65ac8e4", "externalIds":
+          {"DOI": "10.1101/2024.04.01.587366", "CorpusId": 268890006}, "url": "https://www.semanticscholar.org/paper/7e5d4466c8b85f93775fe183e1a318a3e65ac8e4",
+          "title": "High-throughput screening of human genetic variants by pooled prime
+          editing", "venue": "bioRxiv", "year": 2024, "citationCount": 1, "influentialCitationCount":
+          0, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
+          "status": "GREEN"}, "publicationTypes": null, "publicationDate": "2024-04-01",
+          "journal": {"name": "bioRxiv"}, "citationStyles": {"bibtex": "@Article{Herger2024HighthroughputSO,\n
+          author = {Michael Herger and Christina M. Kajba and Megan Buckley and Ana
+          Cunha and Molly Strom and Gregory M. Findlay},\n booktitle = {bioRxiv},\n
+          journal = {bioRxiv},\n title = {High-throughput screening of human genetic
+          variants by pooled prime editing},\n year = {2024}\n}\n"}, "authors": [{"authorId":
+          "2294884120", "name": "Michael Herger"}, {"authorId": "2163800172", "name":
+          "Christina M. Kajba"}, {"authorId": "2120283350", "name": "Megan Buckley"},
+          {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId": "2294881320",
+          "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory M. Findlay"}],
+          "matchScore": 251.94705}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1362"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:27 GMT
+        Via:
+          - 1.1 cb0f9f6369baeebf7c66aebe4cb453ac.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - MW1BYpJqae4SSpfUxxfV9XdsuHAHyErmqFiORnlDgNAHWbqyL2Yw8A==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - CLbZTHqgvHcEaCA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1362"
+        x-amzn-Remapped-Date:
+          - Mon, 02 Dec 2024 19:36:27 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - e259beb0-2b2d-4d0e-b922-15de842b7ef9
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
+          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
+          "venue": "arXiv.org", "year": 2023, "citationCount": 38, "influentialCitationCount":
+          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
+          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
+          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
+          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
+          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
+          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
+          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
+          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
+          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
+          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
+          "Andrew D. White"}], "matchScore": 247.75336}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1386"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:27 GMT
+        Via:
+          - 1.1 496003b8c4e3056a62dc655a8393be56.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - VkLf8zDf5qhfCnwcwfFm5_csZ48wIJxd6rNRyYTIh-_vq0-wusZ8Jw==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - CLbZTE-SPHcECfw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1386"
+        x-amzn-Remapped-Date:
+          - Mon, 02 Dec 2024 19:36:27 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - a391a28e-27f6-4319-b05d-474ecba4363e
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
+          "title": "Augmenting large language models with chemistry tools", "venue":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 230, "influentialCitationCount":
+          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
+          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
+          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
+          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
+          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
+          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
+          {Augmenting large language models with chemistry tools},\n volume = {6},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
+          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
+          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
+          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
+          "name": "P. Schwaller"}], "matchScore": 176.67178}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1551"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Via:
+          - 1.1 29474fd3a24c6552dfdc04ee03c03aa2.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - vkMTG0CNavGcrF4zPA0lsD_54ChRZVPW379cf4fdF8m2McaZZEleyg==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - CLbZTFF5vHcErVQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1551"
+        x-amzn-Remapped-Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 04c49623-df16-4825-b543-ee36cb9ee8c5
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
+          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
+          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
+          "title": "An essential role of active site arginine residue in iodide binding
+          and histidine residue in electron transfer for iodide oxidation by horseradish
+          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
+          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
+          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
+          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
+          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
+          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
+          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
+          of active site arginine residue in iodide binding and histidine residue in
+          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
+          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
+          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
+          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
+          Banerjee"}], "matchScore": 386.4782}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1482"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Via:
+          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - PRH6qSzotcJCBozUE6JJWapjzFuzpkCBiPzes0w013Up9gBY5uwo3Q==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - CLbZTHGNPHcEcIw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1482"
+        x-amzn-Remapped-Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - ea348bbb-d16e-4fb1-880d-00155cc12907
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2335032,"items":[{"indexed":{"date-parts":[[2024,9,20]],"date-time":"2024-09-20T17:08:43Z","timestamp":1726852123984},"reference-count":103,"publisher":"Springer
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2349040,"items":[{"indexed":{"date-parts":[[2024,11,19]],"date-time":"2024-11-19T19:11:02Z","timestamp":1732043462673},"reference-count":103,"publisher":"Springer
           Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
           Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
           Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
@@ -393,7 +438,7 @@ interactions:
           both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
           in automating a diverse set of chemical tasks. Our work not only aids expert
           chemists and lowers barriers for non-experts but also fosters scientific advancement
-          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":21,"title":["Augmenting
+          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":36,"title":["Augmenting
           large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
           Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
           D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
@@ -682,7 +727,7 @@ interactions:
           (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
           A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
           Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.40466,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.44983,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
           September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
@@ -703,11 +748,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "10574"
+          - "10576"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:28 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -731,83 +776,98 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string:
-          '{"data": [{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
-          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
-          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
-          "title": "An essential role of active site arginine residue in iodide binding
-          and histidine residue in electron transfer for iodide oxidation by horseradish
-          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
-          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
-          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
-          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
-          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
-          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
-          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
-          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
-          of active site arginine residue in iodide binding and histidine residue in
-          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
-          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
-          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
-          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
-          Banerjee"}], "matchScore": 386.2602}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1482"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        Via:
-          - 1.1 a2df2413207d4bf6462c2592b304bffe.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - gLW3vdZGQHyuTR-Z7bSvzT4Ni0OFrzQYA2f0YFxo7OxVrzAB3JPKLQ==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - A81PwFDJPHcEGcQ=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1482"
-        x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 59d7076b-955d-463f-bf78-de7cdb7dde5b
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":1506625,"items":[{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
-          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
-          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
-          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
-          humoral immunodeficiency - Three consecutive cases and review of the literature.
-          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
-          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
-          Weekly"],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":57.865536,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
-          and mild decrease in baseline oxygen saturation following off-label use: 3
-          case reports"],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"published":{"date-parts":[[2023,6,24]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2066122,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
+          University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
+          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
+          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
+          Institutes of Health","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100000002","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
+          automate scientific claim verification using PubMed abstracts.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Materials
+          and Methods<\/jats:title>\n                  <jats:p>We developed CliVER,
+          an end-to-end scientific Claim VERification system that leverages retrieval-augmented
+          techniques to automatically retrieve relevant clinical trial abstracts, extract
+          pertinent sentences, and use the PICO framework to support or refute a scientific
+          claim. We also created an ensemble of three state-of-the-art deep learning
+          models to classify rationale of support, refute, and neutral. We then constructed
+          CoVERt, a new COVID VERification dataset comprising 15 PICO-encoded drug claims
+          accompanied by 96 manually selected and labeled clinical trial abstracts that
+          either support or refute each claim. We used CoVERt and SciFact (a public
+          scientific claim verification dataset) to assess CliVER\u2019s performance
+          in predicting labels. Finally, we compared CliVER to clinicians in the verification
+          of 19 claims from 6 disease domains, using 189\u00a0648 PubMed abstracts extracted
+          from January 2010 to October 2021.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Results<\/jats:title>\n                  <jats:p>In
+          the evaluation of label prediction accuracy on CoVERt, CliVER achieved a notable
+          F1 score of 0.92, highlighting the efficacy of the retrieval-augmented models.
+          The ensemble model outperforms each individual state-of-the-art model by an
+          absolute increase from 3% to 11% in the F1 score. Moreover, when compared
+          with four clinicians, CliVER achieved a precision of 79.0% for abstract retrieval,
+          67.4% for sentence selection, and 63.2% for label prediction, respectively.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Conclusion<\/jats:title>\n                  <jats:p>CliVER
+          demonstrates its early potential to automate scientific claim verification
+          using retrieval-augmented strategies to harness the wealth of clinical trial
+          abstracts in PubMed. Future studies are warranted to further test its clinical
+          utility.<\/jats:p>\n               <\/jats:sec>","DOI":"10.1093\/jamiaopen\/ooae021","type":"journal-article","created":{"date-parts":[[2024,2,22]],"date-time":"2024-02-22T01:48:17Z","timestamp":1708566497000},"source":"Crossref","is-referenced-by-count":0,"title":["Retrieval
+          augmented scientific claim verification"],"prefix":"10.1093","volume":"7","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-1975-1272","authenticated-orcid":false,"given":"Hao","family":"Liu","sequence":"first","affiliation":[{"name":"School
+          of Computing, Montclair State University , Montclair, NJ 07043, United States"}]},{"given":"Ali","family":"Soroush","sequence":"additional","affiliation":[{"name":"Department
+          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0003-1418-3103","authenticated-orcid":false,"given":"Jordan
+          G","family":"Nestor","sequence":"additional","affiliation":[{"name":"Department
+          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"given":"Elizabeth","family":"Park","sequence":"additional","affiliation":[{"name":"Department
+          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-4318-5987","authenticated-orcid":false,"given":"Betina","family":"Idnay","sequence":"additional","affiliation":[{"name":"Department
+          of Biomedical Informatics, Columbia University , New York, NY 10027, United
+          States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-2681-1931","authenticated-orcid":false,"given":"Yilu","family":"Fang","sequence":"additional","affiliation":[{"name":"Department
+          of Biomedical Informatics, Columbia University , New York, NY 10027, United
+          States"}]},{"given":"Jane","family":"Pan","sequence":"additional","affiliation":[{"name":"Department
+          of Applied Physics and Applied Mathematics, Columbia University , New York,
+          NY 10027, United States"}]},{"given":"Stan","family":"Liao","sequence":"additional","affiliation":[{"name":"Department
+          of Applied Physics and Applied Mathematics, Columbia University , New York,
+          NY 10027, United States"}]},{"given":"Marguerite","family":"Bernard","sequence":"additional","affiliation":[{"name":"Institute
+          of Human Nutrition, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0001-9309-8331","authenticated-orcid":false,"given":"Yifan","family":"Peng","sequence":"additional","affiliation":[{"name":"Department
+          of Population Health Sciences, Weill Cornell Medicine , New York, NY 10065,
+          United States"}]},{"given":"Chunhua","family":"Weng","sequence":"additional","affiliation":[{"name":"Department
+          of Biomedical Informatics, Columbia University , New York, NY 10027, United
+          States"}]}],"member":"286","published-online":{"date-parts":[[2024,2,21]]},"reference":[{"issue":"6","key":"2024030720490192400_ooae021-B1","doi-asserted-by":"crossref","first-page":"1192","DOI":"10.1093\/jamia\/ocx050","article-title":"Evidence
+          appraisal: a scoping review, conceptual framework, and research agenda","volume":"24","author":"Goldstein","year":"2017","journal-title":"J
+          Am Med Inform Assoc"},{"issue":"D1","key":"2024030720490192400_ooae021-B2","doi-asserted-by":"crossref","first-page":"D1534","DOI":"10.1093\/nar\/gkaa952","article-title":"LitCovid:
+          an open database of COVID-19 literature","volume":"49","author":"Chen","year":"2021","journal-title":"Nucleic
+          Acids Res"},{"key":"2024030720490192400_ooae021-B3","author":"Medicine NLo"},{"issue":"1","key":"2024030720490192400_ooae021-B4","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1038\/s41591-020-01203-7","article-title":"Automated
+          screening of COVID-19 preprints: can we help authors to improve transparency
+          and reproducibility?","volume":"27","author":"Weissgerber","year":"2021","journal-title":"Nat
+          Med"},{"issue":"2","key":"2024030720490192400_ooae021-B5","doi-asserted-by":"crossref","first-page":"218","DOI":"10.1001\/jama.294.2.218","article-title":"Contradicted
+          and initially stronger effects in highly cited clinical research","volume":"294","author":"Ioannidis","year":"2005","journal-title":"JAMA"},{"issue":"1","key":"2024030720490192400_ooae021-B6","doi-asserted-by":"crossref","first-page":"63","DOI":"10.1162\/coli.2007.33.1.63","article-title":"Answering
+          clinical questions with knowledge-based and statistical techniques","volume":"33","author":"Demner-Fushman","year":"2007","journal-title":"Comput
+          Linguist"},{"issue":"6","key":"2024030720490192400_ooae021-B7","doi-asserted-by":"crossref","first-page":"772","DOI":"10.1197\/jamia.M2407","article-title":"Knowledge-based
+          methods to help clinicians find answers in MEDLINE","volume":"14","author":"Sneiderman","year":"2007","journal-title":"J
+          Am Med Inform Assoc"},{"issue":"5","key":"2024030720490192400_ooae021-B8","doi-asserted-by":"crossref","first-page":"232","DOI":"10.1186\/cc5045","article-title":"Evidence-based
+          medicine: classifying the evidence from clinical trials\u2013the need to consider
+          other dimensions","volume":"10","author":"Bellomo","year":"2006","journal-title":"Crit
+          Care"},{"issue":"1","key":"2024030720490192400_ooae021-B9","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1002\/clc.4960220106","article-title":"The
+          importance of randomized clinical trials and evidence-based medicine: a clinician''s
+          perspective","volume":"22","author":"Kennedy","year":"1999","journal-title":"Clin
+          Cardiol"},{"key":"2024030720490192400_ooae021-B10","first-page":"493","author":"Hanselowski","year":"2019"},{"key":"2024030720490192400_ooae021-B11","first-page":"809","author":"Thorne","year":"2018"},{"key":"2024030720490192400_ooae021-B12","first-page":"7534","author":"Wadden","year":"2020"},{"key":"2024030720490192400_ooae021-B13","first-page":"94","author":"Pradeep","year":"2021"},{"key":"2024030720490192400_ooae021-B14","first-page":"5485","article-title":"Exploring
+          the limits of transfer learning with a unified text-to-text transformer","volume":"140","author":"Raffel","year":"2020","journal-title":"J.
+          Mach. Learn. Res"},{"key":"2024030720490192400_ooae021-B15","author":"Li","year":"2021"},{"key":"2024030720490192400_ooae021-B16","first-page":"61","author":"Wadden","year":"2022"},{"key":"2024030720490192400_ooae021-B17","author":"Beltagy","year":"2020"},{"issue":"7256","key":"2024030720490192400_ooae021-B18","doi-asserted-by":"crossref","first-page":"255","DOI":"10.1136\/bmj.321.7256.255","article-title":"Which
+          clinical studies provide the best evidence?: the best RCT still trumps the
+          best observational study","volume":"321","author":"Barton","year":"2000","journal-title":"BMJ"},{"key":"2024030720490192400_ooae021-B19","doi-asserted-by":"crossref","first-page":"103717","DOI":"10.1016\/j.jbi.2021.103717","article-title":"Toward
+          assessing clinical trial publications for reporting transparency","volume":"116","author":"Kilicoglu","year":"2021","journal-title":"J
+          Biomed Inform"},{"key":"2024030720490192400_ooae021-B20","first-page":"1253","author":"Yang","year":"2017"},{"key":"2024030720490192400_ooae021-B21","first-page":"39","author":"Khattab","year":"2020"},{"key":"2024030720490192400_ooae021-B22","first-page":"19","author":"Yilmaz","year":"2019"},{"key":"2024030720490192400_ooae021-B23","author":"Kuzi","year":"2020"},{"key":"2024030720490192400_ooae021-B24","volume-title":"The
+          Probabilistic Relevance Framework: BM25 and Beyond","author":"Robertson","year":"2009"},{"key":"2024030720490192400_ooae021-B25","first-page":"105","author":"Wang","year":"2011"},{"key":"2024030720490192400_ooae021-B26","first-page":"7740","author":"Kotonya","year":"2020"},{"issue":"1","key":"2024030720490192400_ooae021-B27","doi-asserted-by":"crossref","first-page":"36","DOI":"10.1186\/s13326-016-0083-z","article-title":"A
+          corpus of potentially contradictory research claims from cardiovascular research
+          abstracts","volume":"7","author":"Alamri","year":"2016","journal-title":"J
+          Biomed Semantics"},{"key":"2024030720490192400_ooae021-B28","first-page":"3499","author":"Sarrouti","year":"2021"},{"issue":"9","key":"2024030720490192400_ooae021-B29","doi-asserted-by":"crossref","first-page":"1431","DOI":"10.1093\/jamia\/ocaa091","article-title":"TREC-COVID:
+          rationale and structure of an information retrieval shared task for COVID-19","volume":"27","author":"Roberts","year":"2020","journal-title":"J
+          Am Med Inform Assoc"},{"key":"2024030720490192400_ooae021-B30","author":"Wang","year":"2020"},{"key":"2024030720490192400_ooae021-B31","first-page":"2116","author":"Saakyan","year":"2021"},{"key":"2024030720490192400_ooae021-B32","first-page":"359","author":"Huang","year":"2006"},{"key":"2024030720490192400_ooae021-B33","first-page":"708","author":"Nogueira","year":"2020"},{"key":"2024030720490192400_ooae021-B34","doi-asserted-by":"crossref","first-page":"baw065","DOI":"10.1093\/database\/baw065","article-title":"Mining
+          chemical patents with an ensemble of open systems","volume":"2016","author":"Leaman","year":"2016","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B35","doi-asserted-by":"crossref","first-page":"bay073","DOI":"10.1093\/database\/bay073","article-title":"Extracting
+          chemical\u2013protein relations with ensembles of SVM and deep learning models","volume":"2018","author":"Peng","year":"2018","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B36","author":"Liu","year":"2019"},{"issue":"1","key":"2024030720490192400_ooae021-B37","doi-asserted-by":"crossref","first-page":"1","DOI":"10.1145\/3458754","article-title":"Domain-specific
+          language model pretraining for biomedical natural language processing","volume":"3","author":"Gu","year":"2021","journal-title":"ACM
+          Trans Comput Healthc"},{"issue":"3","key":"2024030720490192400_ooae021-B38","doi-asserted-by":"crossref","first-page":"A12","DOI":"10.7326\/ACPJC-1995-123-3-A12","article-title":"The
+          well-built clinical question: a key to evidence-based decisions","volume":"123","author":"Richardson","year":"1995","journal-title":"ACP
+          J Club"},{"key":"2024030720490192400_ooae021-B39","first-page":"1971","author":"Lee","year":"2021"},{"key":"2024030720490192400_ooae021-B40","author":"Loshchilov","year":"2019"},{"key":"2024030720490192400_ooae021-B41","first-page":"13","author":"Kingma","year":"2015"},{"key":"2024030720490192400_ooae021-B42","first-page":"38","author":"Wolf","year":"2020"},{"key":"2024030720490192400_ooae021-B43","first-page":"2356","author":"Lin","year":"2021"},{"key":"2024030720490192400_ooae021-B44","first-page":"243","author":"J\u00e4rvelin","year":"2017"},{"issue":"4","key":"2024030720490192400_ooae021-B45","doi-asserted-by":"crossref","first-page":"422","DOI":"10.1145\/582415.582418","article-title":"Cumulated
+          gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
+          Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
+          Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
+          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.887123,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -821,11 +881,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "1208"
+          - "4502"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:28 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -849,59 +909,308 @@ interactions:
       body: null
       headers: {}
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
     response:
       body:
         string:
-          '{"data": [{"paperId": "7e5d4466c8b85f93775fe183e1a318a3e65ac8e4", "externalIds":
-          {"DOI": "10.1101/2024.04.01.587366", "CorpusId": 268890006}, "url": "https://www.semanticscholar.org/paper/7e5d4466c8b85f93775fe183e1a318a3e65ac8e4",
-          "title": "High-throughput screening of human genetic variants by pooled prime
-          editing", "venue": "bioRxiv", "year": 2024, "citationCount": 1, "influentialCitationCount":
-          0, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
-          "status": "GREEN"}, "publicationTypes": null, "publicationDate": "2024-04-01",
-          "journal": {"name": "bioRxiv"}, "citationStyles": {"bibtex": "@Article{Herger2024HighthroughputSO,\n
-          author = {Michael Herger and Christina M. Kajba and Megan Buckley and Ana
-          Cunha and Molly Strom and Gregory M. Findlay},\n booktitle = {bioRxiv},\n
-          journal = {bioRxiv},\n title = {High-throughput screening of human genetic
-          variants by pooled prime editing},\n year = {2024}\n}\n"}, "authors": [{"authorId":
-          "2294884120", "name": "Michael Herger"}, {"authorId": "2163800172", "name":
-          "Christina M. Kajba"}, {"authorId": "2120283350", "name": "Megan Buckley"},
-          {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId": "2294881320",
-          "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory M. Findlay"}],
-          "matchScore": 252.34943}]}
-
-          '
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5253170,"items":[{"institution":[{"name":"bioRxiv"}],"indexed":{"date-parts":[[2024,11,19]],"date-time":"2024-11-19T19:09:55Z","timestamp":1732043395754},"posted":{"date-parts":[[2024,4,1]]},"group-title":"Genomics","reference-count":50,"publisher":"Cold
+          Spring Harbor Laboratory","content-domain":{"domain":[],"crossmark-restriction":false},"accepted":{"date-parts":[[2024,4,1]]},"abstract":"<jats:title>ABSTRACT<\/jats:title><jats:p>Understanding
+          the effects of rare genetic variants remains challenging, both in coding and
+          non-coding regions. While multiplexed assays of variant effect (MAVEs) have
+          enabled scalable functional assessment of variants, established MAVEs are
+          limited by either exogenous expression of variants or constraints of genome
+          editing. Here, we introduce a pooled prime editing (PE) platform in haploid
+          human cells to scalably assay variants in their endogenous context. We first
+          optimized delivery of variants to HAP1 cells, defining optimal pegRNA designs
+          and establishing a co-selection strategy for improved efficiency. We characterize
+          our platform in the context of negative selection by testing over 7,500 pegRNAs
+          targeting<jats:italic>SMARCB1<\/jats:italic>for editing activity and observing
+          depletion of highly active pegRNAs installing loss-of-function variants. We
+          next assess variants in<jats:italic>MLH1<\/jats:italic>via 6-thioguanine selection,
+          assaying 65.3% of all possible SNVs in a 200-bp region spanning exon 10 and
+          distinguishing LoF variants with high accuracy. Lastly, we assay 362 non-coding<jats:italic>MLH1<\/jats:italic>variants
+          across a 60 kb region in a single experiment, identifying pathogenic variants
+          acting via multiple mechanisms with high specificity. Our analyses detail
+          how filtering for highly active pegRNAs can facilitate both positive and negative
+          selection screens. Accordingly, our platform promises to enable highly scalable
+          functional assessment of human variants.<\/jats:p>","DOI":"10.1101\/2024.04.01.587366","type":"posted-content","created":{"date-parts":[[2024,4,2]],"date-time":"2024-04-02T02:05:17Z","timestamp":1712023517000},"source":"Crossref","is-referenced-by-count":1,"title":["High-throughput
+          screening of human genetic variants by pooled prime editing"],"prefix":"10.1101","author":[{"given":"Michael","family":"Herger","sequence":"first","affiliation":[]},{"given":"Christina
+          M.","family":"Kajba","sequence":"additional","affiliation":[]},{"given":"Megan","family":"Buckley","sequence":"additional","affiliation":[]},{"given":"Ana","family":"Cunha","sequence":"additional","affiliation":[]},{"given":"Molly","family":"Strom","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-7767-8608","authenticated-orcid":false,"given":"Gregory
+          M.","family":"Findlay","sequence":"additional","affiliation":[]}],"member":"246","reference":[{"key":"2024040415500652000_2024.04.01.587366v1.1","doi-asserted-by":"publisher","DOI":"10.1038\/gim.2015.30"},{"key":"2024040415500652000_2024.04.01.587366v1.2","doi-asserted-by":"crossref","first-page":"116","DOI":"10.1016\/j.cels.2017.11.003","article-title":"Quantitative
+          Missense Variant Effect Prediction Using Large-Scale Mutagenesis Data","volume":"6","year":"2018","journal-title":"Cell
+          Syst"},{"key":"2024040415500652000_2024.04.01.587366v1.3","doi-asserted-by":"publisher","DOI":"10.1126\/science.abi8207"},{"key":"2024040415500652000_2024.04.01.587366v1.4","doi-asserted-by":"publisher","DOI":"10.1016\/J.CELL.2018.12.015"},{"key":"2024040415500652000_2024.04.01.587366v1.5","doi-asserted-by":"crossref","first-page":"eabn8153","DOI":"10.1126\/science.abn8197","article-title":"The
+          landscape of tolerated genetic variation in humans and primates","volume":"380","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.6","doi-asserted-by":"crossref","first-page":"eadg7492","DOI":"10.1126\/science.adg7492","article-title":"Accurate
+          proteome-wide missense variant effect prediction with AlphaMissense","volume":"381","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.7","doi-asserted-by":"publisher","DOI":"10.1093\/nar\/gkv1222"},{"key":"2024040415500652000_2024.04.01.587366v1.8","doi-asserted-by":"crossref","first-page":"1381","DOI":"10.1038\/s41436-021-01172-3","article-title":"ACMG
+          SF v3.0 list for reporting of secondary findings in clinical exome and genome
+          sequencing: a policy statement of the American College of Medical Genetics
+          and Genomics (ACMG)","volume":"23","year":"2021","journal-title":"Genet. Med"},{"key":"2024040415500652000_2024.04.01.587366v1.9","doi-asserted-by":"publisher","DOI":"10.1038\/nprot.2016.135"},{"key":"2024040415500652000_2024.04.01.587366v1.10","doi-asserted-by":"publisher","DOI":"10.1093\/hmg\/ddab219"},{"key":"2024040415500652000_2024.04.01.587366v1.11","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-11526-w"},{"key":"2024040415500652000_2024.04.01.587366v1.12","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-022-02839-z"},{"key":"2024040415500652000_2024.04.01.587366v1.13","doi-asserted-by":"crossref","first-page":"2248","DOI":"10.1016\/j.ajhg.2021.11.001","article-title":"Closing
+          the gap: Systematic integration of multiplexed functional data resolves variants
+          of uncertain significance in BRCA1, TP53, and PTEN","volume":"108","year":"2021","journal-title":"Am.
+          J. Hum. Genet."},{"key":"2024040415500652000_2024.04.01.587366v1.14","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-018-0461-z"},{"key":"2024040415500652000_2024.04.01.587366v1.15","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.10.015"},{"key":"2024040415500652000_2024.04.01.587366v1.16","doi-asserted-by":"crossref","first-page":"7702","DOI":"10.1038\/s41467-023-43041-4","article-title":"Saturation
+          genome editing of DDX3X clarifies pathogenicity of germline and somatic variation","volume":"14","year":"2023","journal-title":"Nat.
+          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.17","doi-asserted-by":"publisher","DOI":"10.1038\/nature13695"},{"key":"2024040415500652000_2024.04.01.587366v1.18","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.012"},{"key":"2024040415500652000_2024.04.01.587366v1.19","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.041"},{"key":"2024040415500652000_2024.04.01.587366v1.20","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-019-1711-4"},{"key":"2024040415500652000_2024.04.01.587366v1.21","doi-asserted-by":"crossref","first-page":"288","DOI":"10.1016\/j.ccell.2022.12.009","article-title":"Base
+          editing screens map mutations affecting interferon-\u03b3 signaling in cancer","volume":"41","year":"2023","journal-title":"Cancer
+          Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.22","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.09.018"},{"key":"2024040415500652000_2024.04.01.587366v1.23","doi-asserted-by":"crossref","first-page":"402","DOI":"10.1038\/s41587-021-01039-7","article-title":"Engineered
+          pegRNAs improve prime editing efficiency","volume":"40","year":"2022","journal-title":"Nat.
+          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.24","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01201-1"},{"key":"2024040415500652000_2024.04.01.587366v1.25","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2023.11.021"},{"key":"2024040415500652000_2024.04.01.587366v1.26","doi-asserted-by":"publisher","DOI":"10.1038\/nature10348"},{"key":"2024040415500652000_2024.04.01.587366v1.27","doi-asserted-by":"publisher","DOI":"10.1126\/science.1247005"},{"key":"2024040415500652000_2024.04.01.587366v1.28","doi-asserted-by":"crossref","first-page":"1151","DOI":"10.1038\/s41587-022-01613-7","article-title":"Predicting
+          prime editing efficiency and product purity by deep learning","volume":"41","year":"2023","journal-title":"Nat.
+          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.29","doi-asserted-by":"crossref","first-page":"2256","DOI":"10.1016\/j.cell.2023.03.034","article-title":"Prediction
+          of efficiencies for diverse prime editing systems in multiple cell types","volume":"186","year":"2023","journal-title":"Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.30","doi-asserted-by":"publisher","DOI":"10.1101\/2022.10.26.513842"},{"key":"2024040415500652000_2024.04.01.587366v1.31","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01172-3"},{"key":"2024040415500652000_2024.04.01.587366v1.32","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-020-0677-y"},{"key":"2024040415500652000_2024.04.01.587366v1.33","doi-asserted-by":"publisher","DOI":"10.1016\/j.tibtech.2018.07.017"},{"key":"2024040415500652000_2024.04.01.587366v1.34","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-020-20810-z"},{"key":"2024040415500652000_2024.04.01.587366v1.35","doi-asserted-by":"crossref","first-page":"5909","DOI":"10.1038\/s41467-022-33669-z","article-title":"Marker-free
+          co-selection for successive rounds of prime editing in human cells","volume":"13","year":"2022","journal-title":"Nat.
+          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.36","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2013.12.001"},{"key":"2024040415500652000_2024.04.01.587366v1.37","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-018-02974-x"},{"key":"2024040415500652000_2024.04.01.587366v1.38","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-27838-9"},{"key":"2024040415500652000_2024.04.01.587366v1.39","doi-asserted-by":"publisher","DOI":"10.1126\/science.1225829"},{"key":"2024040415500652000_2024.04.01.587366v1.40","doi-asserted-by":"publisher","DOI":"10.3390\/cancers14153645"},{"key":"2024040415500652000_2024.04.01.587366v1.41","doi-asserted-by":"publisher","DOI":"10.1126\/science.aac7557"},{"key":"2024040415500652000_2024.04.01.587366v1.42","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-10849-y"},{"key":"2024040415500652000_2024.04.01.587366v1.43","doi-asserted-by":"publisher","DOI":"10.1038\/nbt.3437"},{"key":"2024040415500652000_2024.04.01.587366v1.44","doi-asserted-by":"publisher","DOI":"10.1136\/jmg.2007.056499"},{"key":"2024040415500652000_2024.04.01.587366v1.45","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.12.003"},{"key":"2024040415500652000_2024.04.01.587366v1.46","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-019-0032-3"},{"key":"2024040415500652000_2024.04.01.587366v1.47","doi-asserted-by":"publisher","DOI":"10.1038\/nmeth.3047"},{"key":"2024040415500652000_2024.04.01.587366v1.48","doi-asserted-by":"crossref","first-page":"96","DOI":"10.1089\/hgtb.2017.198","article-title":"Determination
+          of Lentiviral Infectious Titer by a Novel Droplet Digital PCR Method","volume":"29","year":"2018","journal-title":"Hum.
+          Gene Ther. Methods"},{"key":"2024040415500652000_2024.04.01.587366v1.49","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-020-02091-3"},{"key":"2024040415500652000_2024.04.01.587366v1.50","doi-asserted-by":"publisher","DOI":"10.1186\/s13073-021-00835-9"}],"link":[{"URL":"https:\/\/syndication.highwire.org\/content\/doi\/10.1101\/2024.04.01.587366","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,4,4]],"date-time":"2024-04-04T22:50:19Z","timestamp":1712271019000},"score":61.355724,"resource":{"primary":{"URL":"http:\/\/biorxiv.org\/lookup\/doi\/10.1101\/2024.04.01.587366"}},"issued":{"date-parts":[[2024,4,1]]},"references-count":50,"URL":"http:\/\/dx.doi.org\/10.1101\/2024.04.01.587366","published":{"date-parts":[[2024,4,1]]},"subtype":"preprint"}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
         Access-Control-Allow-Origin:
           - "*"
+        Access-Control-Expose-Headers:
+          - Link
         Connection:
-          - keep-alive
+          - close
+        Content-Encoding:
+          - gzip
         Content-Length:
-          - "1362"
+          - "3258"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Via:
-          - 1.1 7dbcbf3457f77b741952e31c6826a8dc.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - buiSme2kqYH2y0xC8lWNUlTG5cRNJCXp1BdAHY8djTipgDc-gpIyDQ==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - A81PwHfAvHcEsBQ=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1362"
-        x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - b18119d4-180d-46d0-aed5-ca252b08e260
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
+          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
+          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
+          pages={145\u2013145} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&rows=1
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4147440,"items":[{"indexed":{"date-parts":[[2024,6,24]],"date-time":"2024-06-24T23:08:06Z","timestamp":1719270486276},"reference-count":40,"publisher":"Elsevier
+          BV","issue":"14","license":[{"start":{"date-parts":[[1992,5,1]],"date-time":"1992-05-01T00:00:00Z","timestamp":704678400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2020,10,3]],"date-time":"2020-10-03T00:00:00Z","timestamp":1601683200000},"content-version":"vor","delay-in-days":10382,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Journal
+          of Biological Chemistry"],"published-print":{"date-parts":[[1992,5]]},"DOI":"10.1016\/s0021-9258(19)50164-8","type":"journal-article","created":{"date-parts":[[2021,1,6]],"date-time":"2021-01-06T15:57:43Z","timestamp":1609948663000},"page":"9800-9804","source":"Crossref","is-referenced-by-count":23,"title":["Chemical
+          and kinetic evidence for an essential histidine in horseradish peroxidase
+          for iodide oxidation."],"prefix":"10.1016","volume":"267","author":[{"given":"D.K.","family":"Bhattacharyya","sequence":"first","affiliation":[]},{"given":"U","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"R.K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/S0021-9258(19)50164-8_bib1","doi-asserted-by":"crossref","first-page":"531","DOI":"10.1093\/oxfordjournals.jbchem.a133961","volume":"92","author":"Aibara","year":"1982","journal-title":"J.
+          Biochem. (Tokyo)"},{"key":"10.1016\/S0021-9258(19)50164-8_bib2","doi-asserted-by":"crossref","first-page":"341","DOI":"10.1016\/0003-2697(62)90097-0","volume":"4","author":"Alexander","year":"1962","journal-title":"Anal.
+          Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib3","doi-asserted-by":"crossref","first-page":"10592","DOI":"10.1016\/S0021-9258(18)67426-5","volume":"261","author":"Banerjee","year":"1986","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib4","doi-asserted-by":"crossref","first-page":"396","DOI":"10.1016\/0005-2744(70)90245-7","volume":"212","author":"Bjorkstein","year":"1970","journal-title":"Biochim.
+          Biophys. Acta"},{"key":"10.1016\/S0021-9258(19)50164-8_bib5","doi-asserted-by":"crossref","first-page":"12454","DOI":"10.1016\/S0021-9258(19)38367-X","volume":"265","author":"Blanke","year":"1990","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib6","doi-asserted-by":"crossref","first-page":"205","DOI":"10.1021\/bi00698a030","volume":"13","author":"Burstein","year":"1974","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib7","doi-asserted-by":"crossref","first-page":"19666","DOI":"10.1016\/S0021-9258(19)47165-2","volume":"264","author":"Chang","year":"1989","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib8","doi-asserted-by":"crossref","first-page":"4936","DOI":"10.1016\/S0021-9258(18)89162-1","volume":"260","author":"Church","year":"1985","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib9","doi-asserted-by":"crossref","first-page":"4992","DOI":"10.1021\/bi00668a008","volume":"15","author":"Cousineau","year":"1976","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib10","doi-asserted-by":"crossref","first-page":"21498","DOI":"10.1016\/S0021-9258(18)45766-3","volume":"265","author":"Dumas","year":"1990","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib11","first-page":"410","volume":"4","author":"Dunford","year":"1982","journal-title":"Adv.
+          Inorg. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib12","doi-asserted-by":"crossref","first-page":"187","DOI":"10.1016\/S0010-8545(00)80316-1","volume":"19","author":"Dunford","year":"1976","journal-title":"Coord.
+          Chem. Rev."},{"key":"10.1016\/S0021-9258(19)50164-8_bib13","doi-asserted-by":"crossref","first-page":"21","DOI":"10.1016\/0022-2836(85)90180-9","volume":"185","author":"Fita","year":"1985","journal-title":"J.
+          Mol. Biol."},{"key":"10.1016\/S0021-9258(19)50164-8_bib14","doi-asserted-by":"crossref","first-page":"15054","DOI":"10.1016\/S0021-9258(18)33392-1","volume":"257","author":"Kaput","year":"1982","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib15","doi-asserted-by":"crossref","first-page":"409","DOI":"10.1016\/0003-9861(87)90118-4","volume":"254","author":"Kenigsberg","year":"1987","journal-title":"Arch.
+          Biochem. Biophys."},{"key":"10.1016\/S0021-9258(19)50164-8_bib16","doi-asserted-by":"crossref","first-page":"55","DOI":"10.1016\/0003-9861(88)90103-8","volume":"261","author":"Konpka","year":"1988","journal-title":"Arch.
+          Biochem. Biophys."},{"key":"10.1016\/S0021-9258(19)50164-8_bib17","doi-asserted-by":"crossref","first-page":"3654","DOI":"10.1016\/S0021-9258(19)75322-8","volume":"238","author":"Levy","year":"1963","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib18","volume":"1","author":"Lundblad","year":"1984"},{"key":"10.1016\/S0021-9258(19)50164-8_bib19","doi-asserted-by":"crossref","first-page":"197","DOI":"10.1016\/S0021-9258(17)43641-6","volume":"259","author":"Magnusson","year":"1984","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib20","doi-asserted-by":"crossref","first-page":"251","DOI":"10.1021\/bi00804a010","volume":"9","author":"Melchior","year":"1970","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib21","doi-asserted-by":"crossref","first-page":"431","DOI":"10.1016\/0076-6879(77)47043-5","volume":"47","author":"Miles","year":"1977","journal-title":"Methods
+          Enzymol."},{"key":"10.1016\/S0021-9258(19)50164-8_bib22","doi-asserted-by":"crossref","first-page":"861","DOI":"10.1146\/annurev.bi.45.070176.004241","volume":"45","author":"Morrison","year":"1976","journal-title":"Annu.
+          Rev. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib23","doi-asserted-by":"crossref","first-page":"13546","DOI":"10.1016\/S0021-9258(17)38757-4","volume":"260","author":"Nakamura","year":"1985","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib24","doi-asserted-by":"crossref","first-page":"805","DOI":"10.1016\/S0021-9258(19)70048-9","volume":"256","author":"Ohtaki","year":"1981","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib25","doi-asserted-by":"crossref","first-page":"761","DOI":"10.1016\/S0021-9258(19)68261-X","volume":"257","author":"Ohtaki","year":"1982","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib26","first-page":"445","volume":"2","author":"Ovadi","year":"1967","journal-title":"Acta
+          Biochim. Biophys. Acad. Sci. Hung."},{"key":"10.1016\/S0021-9258(19)50164-8_bib27","doi-asserted-by":"crossref","first-page":"395","DOI":"10.3891\/acta.chem.scand.32b-0395","volume":"B32","author":"Paul","year":"1978","journal-title":"Acta
+          Chem. Scand."},{"key":"10.1016\/S0021-9258(19)50164-8_bib28","doi-asserted-by":"crossref","first-page":"497","DOI":"10.1111\/j.1432-1033.1973.tb03085.x","volume":"38","author":"Pommier","year":"1973","journal-title":"Eur.
+          J. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib29","doi-asserted-by":"crossref","first-page":"8199","DOI":"10.1016\/S0021-9258(19)70630-9","volume":"255","author":"Poulos","year":"1980","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib30","doi-asserted-by":"crossref","first-page":"2076","DOI":"10.1021\/bi00761a013","volume":"11","author":"Roman","year":"1972","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib31","doi-asserted-by":"crossref","first-page":"211","DOI":"10.1246\/cl.1985.211","author":"Sakurada","year":"1985","journal-title":"Chem.
+          Lett."},{"key":"10.1016\/S0021-9258(19)50164-8_bib32","doi-asserted-by":"crossref","first-page":"9657","DOI":"10.1016\/S0021-9258(18)67564-7","volume":"261","author":"Sakurada","year":"1986","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib33","doi-asserted-by":"crossref","first-page":"4007","DOI":"10.1016\/S0021-9258(18)61303-1","volume":"262","author":"Sakurada","year":"1987","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib34","doi-asserted-by":"crossref","first-page":"6478","DOI":"10.1021\/bi00394a028","volume":"26","author":"Sakurada","year":"1987","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib35","doi-asserted-by":"crossref","first-page":"2277","DOI":"10.1021\/bi00407a005","volume":"27","author":"Sams","year":"1988","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib36","doi-asserted-by":"crossref","first-page":"1571","DOI":"10.1093\/oxfordjournals.jbchem.a135630","volume":"99","author":"Takeuchi","year":"1986","journal-title":"J.
+          Biochem. (Tokyo)"},{"key":"10.1016\/S0021-9258(19)50164-8_bib37","doi-asserted-by":"crossref","first-page":"520","DOI":"10.1038\/326520a0","volume":"326","author":"Tien","year":"1987","journal-title":"Nature"},{"key":"10.1016\/S0021-9258(19)50164-8_bib38","doi-asserted-by":"crossref","first-page":"87","DOI":"10.1111\/j.1432-1033.1986.tb09461.x","volume":"155","author":"Topham","year":"1986","journal-title":"Eur.
+          J. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib39","doi-asserted-by":"crossref","first-page":"210","DOI":"10.1016\/0005-2744(81)90032-2","volume":"662","author":"Ugarova","year":"1981","journal-title":"Biochim.
+          Biophys. Acta"},{"key":"10.1016\/S0021-9258(19)50164-8_bib40","doi-asserted-by":"crossref","first-page":"483","DOI":"10.1111\/j.1432-1033.1979.tb13061.x","volume":"96","author":"Welinder","year":"1979","journal-title":"Eur.
+          J. Biochem."}],"container-title":["Journal of Biological Chemistry"],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2022,1,2]],"date-time":"2022-01-02T19:58:22Z","timestamp":1641153502000},"score":52.67746,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0021925819501648"}},"issued":{"date-parts":[[1992,5]]},"references-count":40,"journal-issue":{"issue":"14","published-print":{"date-parts":[[1992,5]]}},"alternative-id":["S0021925819501648"],"URL":"http:\/\/dx.doi.org\/10.1016\/s0021-9258(19)50164-8","ISSN":["0021-9258"],"issn-type":[{"value":"0021-9258","type":"print"}],"published":{"date-parts":[[1992,5]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "2523"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{M_Bran_2024, title={Augmenting large language models with
+          chemistry tools}, volume={6}, ISSN={2522-5839}, url={http://dx.doi.org/10.1038/s42256-024-00832-8},
+          DOI={10.1038/s42256-024-00832-8}, number={5}, journal={Nature Machine Intelligence},
+          publisher={Springer Science and Business Media LLC}, author={M. Bran, Andres
+          and Cox, Sam and Schilter, Oliver and Baldassari, Carlo and White, Andrew
+          D. and Schwaller, Philippe}, year={2024}, month=may, pages={525\u2013535}
+          }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Herger_2024, title={High-throughput screening of human genetic
+          variants by pooled prime editing}, url={http://dx.doi.org/10.1101/2024.04.01.587366},
+          DOI={10.1101/2024.04.01.587366}, publisher={Cold Spring Harbor Laboratory},
+          author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and Cunha,
+          Ana and Strom, Molly and Findlay, Gregory M.}, year={2024}, month=apr }
+
+          "
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - close
+        Date:
+          - Mon, 02 Dec 2024 19:36:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
       status:
         code: 200
         message: OK
@@ -913,7 +1222,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":11962693,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":12022430,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
           Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
           of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
           layers are likely to be present on metallic nano-structures due to either
@@ -1007,7 +1316,7 @@ interactions:
           Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
           Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
           Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":63.98746,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":64.01677,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -1021,235 +1330,15 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3946"
+          - "3944"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:29 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
           - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5229968,"items":[{"institution":[{"name":"bioRxiv"}],"indexed":{"date-parts":[[2024,4,5]],"date-time":"2024-04-05T00:42:23Z","timestamp":1712277743507},"posted":{"date-parts":[[2024,4,1]]},"group-title":"Genomics","reference-count":50,"publisher":"Cold
-          Spring Harbor Laboratory","content-domain":{"domain":[],"crossmark-restriction":false},"accepted":{"date-parts":[[2024,4,1]]},"abstract":"<jats:title>ABSTRACT<\/jats:title><jats:p>Understanding
-          the effects of rare genetic variants remains challenging, both in coding and
-          non-coding regions. While multiplexed assays of variant effect (MAVEs) have
-          enabled scalable functional assessment of variants, established MAVEs are
-          limited by either exogenous expression of variants or constraints of genome
-          editing. Here, we introduce a pooled prime editing (PE) platform in haploid
-          human cells to scalably assay variants in their endogenous context. We first
-          optimized delivery of variants to HAP1 cells, defining optimal pegRNA designs
-          and establishing a co-selection strategy for improved efficiency. We characterize
-          our platform in the context of negative selection by testing over 7,500 pegRNAs
-          targeting<jats:italic>SMARCB1<\/jats:italic>for editing activity and observing
-          depletion of highly active pegRNAs installing loss-of-function variants. We
-          next assess variants in<jats:italic>MLH1<\/jats:italic>via 6-thioguanine selection,
-          assaying 65.3% of all possible SNVs in a 200-bp region spanning exon 10 and
-          distinguishing LoF variants with high accuracy. Lastly, we assay 362 non-coding<jats:italic>MLH1<\/jats:italic>variants
-          across a 60 kb region in a single experiment, identifying pathogenic variants
-          acting via multiple mechanisms with high specificity. Our analyses detail
-          how filtering for highly active pegRNAs can facilitate both positive and negative
-          selection screens. Accordingly, our platform promises to enable highly scalable
-          functional assessment of human variants.<\/jats:p>","DOI":"10.1101\/2024.04.01.587366","type":"posted-content","created":{"date-parts":[[2024,4,2]],"date-time":"2024-04-02T02:05:17Z","timestamp":1712023517000},"source":"Crossref","is-referenced-by-count":0,"title":["High-throughput
-          screening of human genetic variants by pooled prime editing"],"prefix":"10.1101","author":[{"given":"Michael","family":"Herger","sequence":"first","affiliation":[]},{"given":"Christina
-          M.","family":"Kajba","sequence":"additional","affiliation":[]},{"given":"Megan","family":"Buckley","sequence":"additional","affiliation":[]},{"given":"Ana","family":"Cunha","sequence":"additional","affiliation":[]},{"given":"Molly","family":"Strom","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-7767-8608","authenticated-orcid":false,"given":"Gregory
-          M.","family":"Findlay","sequence":"additional","affiliation":[]}],"member":"246","reference":[{"key":"2024040415500652000_2024.04.01.587366v1.1","doi-asserted-by":"publisher","DOI":"10.1038\/gim.2015.30"},{"key":"2024040415500652000_2024.04.01.587366v1.2","doi-asserted-by":"crossref","first-page":"116","DOI":"10.1016\/j.cels.2017.11.003","article-title":"Quantitative
-          Missense Variant Effect Prediction Using Large-Scale Mutagenesis Data","volume":"6","year":"2018","journal-title":"Cell
-          Syst"},{"key":"2024040415500652000_2024.04.01.587366v1.3","doi-asserted-by":"publisher","DOI":"10.1126\/science.abi8207"},{"key":"2024040415500652000_2024.04.01.587366v1.4","doi-asserted-by":"publisher","DOI":"10.1016\/J.CELL.2018.12.015"},{"key":"2024040415500652000_2024.04.01.587366v1.5","doi-asserted-by":"crossref","first-page":"eabn8153","DOI":"10.1126\/science.abn8197","article-title":"The
-          landscape of tolerated genetic variation in humans and primates","volume":"380","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.6","doi-asserted-by":"crossref","first-page":"eadg7492","DOI":"10.1126\/science.adg7492","article-title":"Accurate
-          proteome-wide missense variant effect prediction with AlphaMissense","volume":"381","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.7","doi-asserted-by":"publisher","DOI":"10.1093\/nar\/gkv1222"},{"key":"2024040415500652000_2024.04.01.587366v1.8","doi-asserted-by":"crossref","first-page":"1381","DOI":"10.1038\/s41436-021-01172-3","article-title":"ACMG
-          SF v3.0 list for reporting of secondary findings in clinical exome and genome
-          sequencing: a policy statement of the American College of Medical Genetics
-          and Genomics (ACMG)","volume":"23","year":"2021","journal-title":"Genet. Med"},{"key":"2024040415500652000_2024.04.01.587366v1.9","doi-asserted-by":"publisher","DOI":"10.1038\/nprot.2016.135"},{"key":"2024040415500652000_2024.04.01.587366v1.10","doi-asserted-by":"publisher","DOI":"10.1093\/hmg\/ddab219"},{"key":"2024040415500652000_2024.04.01.587366v1.11","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-11526-w"},{"key":"2024040415500652000_2024.04.01.587366v1.12","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-022-02839-z"},{"key":"2024040415500652000_2024.04.01.587366v1.13","doi-asserted-by":"crossref","first-page":"2248","DOI":"10.1016\/j.ajhg.2021.11.001","article-title":"Closing
-          the gap: Systematic integration of multiplexed functional data resolves variants
-          of uncertain significance in BRCA1, TP53, and PTEN","volume":"108","year":"2021","journal-title":"Am.
-          J. Hum. Genet."},{"key":"2024040415500652000_2024.04.01.587366v1.14","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-018-0461-z"},{"key":"2024040415500652000_2024.04.01.587366v1.15","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.10.015"},{"key":"2024040415500652000_2024.04.01.587366v1.16","doi-asserted-by":"crossref","first-page":"7702","DOI":"10.1038\/s41467-023-43041-4","article-title":"Saturation
-          genome editing of DDX3X clarifies pathogenicity of germline and somatic variation","volume":"14","year":"2023","journal-title":"Nat.
-          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.17","doi-asserted-by":"publisher","DOI":"10.1038\/nature13695"},{"key":"2024040415500652000_2024.04.01.587366v1.18","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.012"},{"key":"2024040415500652000_2024.04.01.587366v1.19","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.041"},{"key":"2024040415500652000_2024.04.01.587366v1.20","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-019-1711-4"},{"key":"2024040415500652000_2024.04.01.587366v1.21","doi-asserted-by":"crossref","first-page":"288","DOI":"10.1016\/j.ccell.2022.12.009","article-title":"Base
-          editing screens map mutations affecting interferon-\u03b3 signaling in cancer","volume":"41","year":"2023","journal-title":"Cancer
-          Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.22","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.09.018"},{"key":"2024040415500652000_2024.04.01.587366v1.23","doi-asserted-by":"crossref","first-page":"402","DOI":"10.1038\/s41587-021-01039-7","article-title":"Engineered
-          pegRNAs improve prime editing efficiency","volume":"40","year":"2022","journal-title":"Nat.
-          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.24","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01201-1"},{"key":"2024040415500652000_2024.04.01.587366v1.25","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2023.11.021"},{"key":"2024040415500652000_2024.04.01.587366v1.26","doi-asserted-by":"publisher","DOI":"10.1038\/nature10348"},{"key":"2024040415500652000_2024.04.01.587366v1.27","doi-asserted-by":"publisher","DOI":"10.1126\/science.1247005"},{"key":"2024040415500652000_2024.04.01.587366v1.28","doi-asserted-by":"crossref","first-page":"1151","DOI":"10.1038\/s41587-022-01613-7","article-title":"Predicting
-          prime editing efficiency and product purity by deep learning","volume":"41","year":"2023","journal-title":"Nat.
-          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.29","doi-asserted-by":"crossref","first-page":"2256","DOI":"10.1016\/j.cell.2023.03.034","article-title":"Prediction
-          of efficiencies for diverse prime editing systems in multiple cell types","volume":"186","year":"2023","journal-title":"Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.30","doi-asserted-by":"publisher","DOI":"10.1101\/2022.10.26.513842"},{"key":"2024040415500652000_2024.04.01.587366v1.31","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01172-3"},{"key":"2024040415500652000_2024.04.01.587366v1.32","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-020-0677-y"},{"key":"2024040415500652000_2024.04.01.587366v1.33","doi-asserted-by":"publisher","DOI":"10.1016\/j.tibtech.2018.07.017"},{"key":"2024040415500652000_2024.04.01.587366v1.34","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-020-20810-z"},{"key":"2024040415500652000_2024.04.01.587366v1.35","doi-asserted-by":"crossref","first-page":"5909","DOI":"10.1038\/s41467-022-33669-z","article-title":"Marker-free
-          co-selection for successive rounds of prime editing in human cells","volume":"13","year":"2022","journal-title":"Nat.
-          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.36","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2013.12.001"},{"key":"2024040415500652000_2024.04.01.587366v1.37","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-018-02974-x"},{"key":"2024040415500652000_2024.04.01.587366v1.38","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-27838-9"},{"key":"2024040415500652000_2024.04.01.587366v1.39","doi-asserted-by":"publisher","DOI":"10.1126\/science.1225829"},{"key":"2024040415500652000_2024.04.01.587366v1.40","doi-asserted-by":"publisher","DOI":"10.3390\/cancers14153645"},{"key":"2024040415500652000_2024.04.01.587366v1.41","doi-asserted-by":"publisher","DOI":"10.1126\/science.aac7557"},{"key":"2024040415500652000_2024.04.01.587366v1.42","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-10849-y"},{"key":"2024040415500652000_2024.04.01.587366v1.43","doi-asserted-by":"publisher","DOI":"10.1038\/nbt.3437"},{"key":"2024040415500652000_2024.04.01.587366v1.44","doi-asserted-by":"publisher","DOI":"10.1136\/jmg.2007.056499"},{"key":"2024040415500652000_2024.04.01.587366v1.45","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.12.003"},{"key":"2024040415500652000_2024.04.01.587366v1.46","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-019-0032-3"},{"key":"2024040415500652000_2024.04.01.587366v1.47","doi-asserted-by":"publisher","DOI":"10.1038\/nmeth.3047"},{"key":"2024040415500652000_2024.04.01.587366v1.48","doi-asserted-by":"crossref","first-page":"96","DOI":"10.1089\/hgtb.2017.198","article-title":"Determination
-          of Lentiviral Infectious Titer by a Novel Droplet Digital PCR Method","volume":"29","year":"2018","journal-title":"Hum.
-          Gene Ther. Methods"},{"key":"2024040415500652000_2024.04.01.587366v1.49","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-020-02091-3"},{"key":"2024040415500652000_2024.04.01.587366v1.50","doi-asserted-by":"publisher","DOI":"10.1186\/s13073-021-00835-9"}],"link":[{"URL":"https:\/\/syndication.highwire.org\/content\/doi\/10.1101\/2024.04.01.587366","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,4,4]],"date-time":"2024-04-04T22:50:19Z","timestamp":1712271019000},"score":61.358017,"resource":{"primary":{"URL":"http:\/\/biorxiv.org\/lookup\/doi\/10.1101\/2024.04.01.587366"}},"issued":{"date-parts":[[2024,4,1]]},"references-count":50,"URL":"http:\/\/dx.doi.org\/10.1101\/2024.04.01.587366","published":{"date-parts":[[2024,4,1]]},"subtype":"preprint"}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "3247"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&rows=1
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4129108,"items":[{"indexed":{"date-parts":[[2024,6,24]],"date-time":"2024-06-24T23:08:06Z","timestamp":1719270486276},"reference-count":40,"publisher":"Elsevier
-          BV","issue":"14","license":[{"start":{"date-parts":[[1992,5,1]],"date-time":"1992-05-01T00:00:00Z","timestamp":704678400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2020,10,3]],"date-time":"2020-10-03T00:00:00Z","timestamp":1601683200000},"content-version":"vor","delay-in-days":10382,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Journal
-          of Biological Chemistry"],"published-print":{"date-parts":[[1992,5]]},"DOI":"10.1016\/s0021-9258(19)50164-8","type":"journal-article","created":{"date-parts":[[2021,1,6]],"date-time":"2021-01-06T15:57:43Z","timestamp":1609948663000},"page":"9800-9804","source":"Crossref","is-referenced-by-count":23,"title":["Chemical
-          and kinetic evidence for an essential histidine in horseradish peroxidase
-          for iodide oxidation."],"prefix":"10.1016","volume":"267","author":[{"given":"D.K.","family":"Bhattacharyya","sequence":"first","affiliation":[]},{"given":"U","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"R.K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/S0021-9258(19)50164-8_bib1","doi-asserted-by":"crossref","first-page":"531","DOI":"10.1093\/oxfordjournals.jbchem.a133961","volume":"92","author":"Aibara","year":"1982","journal-title":"J.
-          Biochem. (Tokyo)"},{"key":"10.1016\/S0021-9258(19)50164-8_bib2","doi-asserted-by":"crossref","first-page":"341","DOI":"10.1016\/0003-2697(62)90097-0","volume":"4","author":"Alexander","year":"1962","journal-title":"Anal.
-          Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib3","doi-asserted-by":"crossref","first-page":"10592","DOI":"10.1016\/S0021-9258(18)67426-5","volume":"261","author":"Banerjee","year":"1986","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib4","doi-asserted-by":"crossref","first-page":"396","DOI":"10.1016\/0005-2744(70)90245-7","volume":"212","author":"Bjorkstein","year":"1970","journal-title":"Biochim.
-          Biophys. Acta"},{"key":"10.1016\/S0021-9258(19)50164-8_bib5","doi-asserted-by":"crossref","first-page":"12454","DOI":"10.1016\/S0021-9258(19)38367-X","volume":"265","author":"Blanke","year":"1990","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib6","doi-asserted-by":"crossref","first-page":"205","DOI":"10.1021\/bi00698a030","volume":"13","author":"Burstein","year":"1974","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib7","doi-asserted-by":"crossref","first-page":"19666","DOI":"10.1016\/S0021-9258(19)47165-2","volume":"264","author":"Chang","year":"1989","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib8","doi-asserted-by":"crossref","first-page":"4936","DOI":"10.1016\/S0021-9258(18)89162-1","volume":"260","author":"Church","year":"1985","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib9","doi-asserted-by":"crossref","first-page":"4992","DOI":"10.1021\/bi00668a008","volume":"15","author":"Cousineau","year":"1976","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib10","doi-asserted-by":"crossref","first-page":"21498","DOI":"10.1016\/S0021-9258(18)45766-3","volume":"265","author":"Dumas","year":"1990","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib11","first-page":"410","volume":"4","author":"Dunford","year":"1982","journal-title":"Adv.
-          Inorg. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib12","doi-asserted-by":"crossref","first-page":"187","DOI":"10.1016\/S0010-8545(00)80316-1","volume":"19","author":"Dunford","year":"1976","journal-title":"Coord.
-          Chem. Rev."},{"key":"10.1016\/S0021-9258(19)50164-8_bib13","doi-asserted-by":"crossref","first-page":"21","DOI":"10.1016\/0022-2836(85)90180-9","volume":"185","author":"Fita","year":"1985","journal-title":"J.
-          Mol. Biol."},{"key":"10.1016\/S0021-9258(19)50164-8_bib14","doi-asserted-by":"crossref","first-page":"15054","DOI":"10.1016\/S0021-9258(18)33392-1","volume":"257","author":"Kaput","year":"1982","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib15","doi-asserted-by":"crossref","first-page":"409","DOI":"10.1016\/0003-9861(87)90118-4","volume":"254","author":"Kenigsberg","year":"1987","journal-title":"Arch.
-          Biochem. Biophys."},{"key":"10.1016\/S0021-9258(19)50164-8_bib16","doi-asserted-by":"crossref","first-page":"55","DOI":"10.1016\/0003-9861(88)90103-8","volume":"261","author":"Konpka","year":"1988","journal-title":"Arch.
-          Biochem. Biophys."},{"key":"10.1016\/S0021-9258(19)50164-8_bib17","doi-asserted-by":"crossref","first-page":"3654","DOI":"10.1016\/S0021-9258(19)75322-8","volume":"238","author":"Levy","year":"1963","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib18","volume":"1","author":"Lundblad","year":"1984"},{"key":"10.1016\/S0021-9258(19)50164-8_bib19","doi-asserted-by":"crossref","first-page":"197","DOI":"10.1016\/S0021-9258(17)43641-6","volume":"259","author":"Magnusson","year":"1984","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib20","doi-asserted-by":"crossref","first-page":"251","DOI":"10.1021\/bi00804a010","volume":"9","author":"Melchior","year":"1970","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib21","doi-asserted-by":"crossref","first-page":"431","DOI":"10.1016\/0076-6879(77)47043-5","volume":"47","author":"Miles","year":"1977","journal-title":"Methods
-          Enzymol."},{"key":"10.1016\/S0021-9258(19)50164-8_bib22","doi-asserted-by":"crossref","first-page":"861","DOI":"10.1146\/annurev.bi.45.070176.004241","volume":"45","author":"Morrison","year":"1976","journal-title":"Annu.
-          Rev. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib23","doi-asserted-by":"crossref","first-page":"13546","DOI":"10.1016\/S0021-9258(17)38757-4","volume":"260","author":"Nakamura","year":"1985","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib24","doi-asserted-by":"crossref","first-page":"805","DOI":"10.1016\/S0021-9258(19)70048-9","volume":"256","author":"Ohtaki","year":"1981","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib25","doi-asserted-by":"crossref","first-page":"761","DOI":"10.1016\/S0021-9258(19)68261-X","volume":"257","author":"Ohtaki","year":"1982","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib26","first-page":"445","volume":"2","author":"Ovadi","year":"1967","journal-title":"Acta
-          Biochim. Biophys. Acad. Sci. Hung."},{"key":"10.1016\/S0021-9258(19)50164-8_bib27","doi-asserted-by":"crossref","first-page":"395","DOI":"10.3891\/acta.chem.scand.32b-0395","volume":"B32","author":"Paul","year":"1978","journal-title":"Acta
-          Chem. Scand."},{"key":"10.1016\/S0021-9258(19)50164-8_bib28","doi-asserted-by":"crossref","first-page":"497","DOI":"10.1111\/j.1432-1033.1973.tb03085.x","volume":"38","author":"Pommier","year":"1973","journal-title":"Eur.
-          J. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib29","doi-asserted-by":"crossref","first-page":"8199","DOI":"10.1016\/S0021-9258(19)70630-9","volume":"255","author":"Poulos","year":"1980","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib30","doi-asserted-by":"crossref","first-page":"2076","DOI":"10.1021\/bi00761a013","volume":"11","author":"Roman","year":"1972","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib31","doi-asserted-by":"crossref","first-page":"211","DOI":"10.1246\/cl.1985.211","author":"Sakurada","year":"1985","journal-title":"Chem.
-          Lett."},{"key":"10.1016\/S0021-9258(19)50164-8_bib32","doi-asserted-by":"crossref","first-page":"9657","DOI":"10.1016\/S0021-9258(18)67564-7","volume":"261","author":"Sakurada","year":"1986","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib33","doi-asserted-by":"crossref","first-page":"4007","DOI":"10.1016\/S0021-9258(18)61303-1","volume":"262","author":"Sakurada","year":"1987","journal-title":"J.
-          Biol. Chem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib34","doi-asserted-by":"crossref","first-page":"6478","DOI":"10.1021\/bi00394a028","volume":"26","author":"Sakurada","year":"1987","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib35","doi-asserted-by":"crossref","first-page":"2277","DOI":"10.1021\/bi00407a005","volume":"27","author":"Sams","year":"1988","journal-title":"Biochemistry"},{"key":"10.1016\/S0021-9258(19)50164-8_bib36","doi-asserted-by":"crossref","first-page":"1571","DOI":"10.1093\/oxfordjournals.jbchem.a135630","volume":"99","author":"Takeuchi","year":"1986","journal-title":"J.
-          Biochem. (Tokyo)"},{"key":"10.1016\/S0021-9258(19)50164-8_bib37","doi-asserted-by":"crossref","first-page":"520","DOI":"10.1038\/326520a0","volume":"326","author":"Tien","year":"1987","journal-title":"Nature"},{"key":"10.1016\/S0021-9258(19)50164-8_bib38","doi-asserted-by":"crossref","first-page":"87","DOI":"10.1111\/j.1432-1033.1986.tb09461.x","volume":"155","author":"Topham","year":"1986","journal-title":"Eur.
-          J. Biochem."},{"key":"10.1016\/S0021-9258(19)50164-8_bib39","doi-asserted-by":"crossref","first-page":"210","DOI":"10.1016\/0005-2744(81)90032-2","volume":"662","author":"Ugarova","year":"1981","journal-title":"Biochim.
-          Biophys. Acta"},{"key":"10.1016\/S0021-9258(19)50164-8_bib40","doi-asserted-by":"crossref","first-page":"483","DOI":"10.1111\/j.1432-1033.1979.tb13061.x","volume":"96","author":"Welinder","year":"1979","journal-title":"Eur.
-          J. Biochem."}],"container-title":["Journal of Biological Chemistry"],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0021925819501648?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2022,1,2]],"date-time":"2022-01-02T19:58:22Z","timestamp":1641153502000},"score":52.630573,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0021925819501648"}},"issued":{"date-parts":[[1992,5]]},"references-count":40,"journal-issue":{"issue":"14","published-print":{"date-parts":[[1992,5]]}},"alternative-id":["S0021925819501648"],"URL":"http:\/\/dx.doi.org\/10.1016\/s0021-9258(19)50164-8","ISSN":["0021-9258"],"issn-type":[{"value":"0021-9258","type":"print"}],"published":{"date-parts":[[1992,5]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "2524"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{M_Bran_2024, title={Augmenting large language models with
-          chemistry tools}, volume={6}, ISSN={2522-5839}, url={http://dx.doi.org/10.1038/s42256-024-00832-8},
-          DOI={10.1038/s42256-024-00832-8}, number={5}, journal={Nature Machine Intelligence},
-          publisher={Springer Science and Business Media LLC}, author={M. Bran, Andres
-          and Cox, Sam and Schilter, Oliver and Baldassari, Carlo and White, Andrew
-          D. and Schwaller, Philippe}, year={2024}, month=may, pages={525\u2013535}
-          }\n"
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
         permissions-policy:
           - interest-cohort=()
         x-api-pool:
@@ -1292,96 +1381,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
-          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
-          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
-          pages={145\u2013145} }\n"
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{Herger_2024, title={High-throughput screening of human genetic
-          variants by pooled prime editing}, url={http://dx.doi.org/10.1101/2024.04.01.587366},
-          DOI={10.1101/2024.04.01.587366}, publisher={Cold Spring Harbor Laboratory},
-          author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and Cunha,
-          Ana and Strom, Molly and Findlay, Gregory M.}, year={2024}, month=apr }
-
-          "
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
+          - Mon, 02 Dec 2024 19:36:30 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

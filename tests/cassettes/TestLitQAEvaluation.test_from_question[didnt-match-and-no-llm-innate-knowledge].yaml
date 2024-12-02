@@ -1,14 +1,13 @@
 interactions:
   - request:
       body:
-        '{"messages": [{"role": "user", "content": "Given the following question
-        and a proposed answer to the question, return the single-letter choice in the
-        question that matches the proposed answer. If the proposed answer is blank or
-        an empty string, or multiple options are matched, respond with ''0''.\n\nQuestion:
-        Q: What is my office''s zip code?\n\nOptions:\nA) 94107\nB) 94106\nC) cheesecake\nD)
+        '{"messages":[{"role":"user","content":"Given the following question and
+        a proposed answer to the question, return the single-letter choice in the question
+        that matches the proposed answer. If the proposed answer is blank or an empty
+        string, or multiple options are matched, respond with ''0''.\n\nQuestion: Q:
+        What is my office''s zip code?\n\nOptions:\nA) 94107\nB) 94106\nC) cheesecake\nD)
         Insufficient information to answer this question\nE) -8\n\nProposed Answer:
-        the answer is 14004\n\nSingle Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09",
-        "stream": false, "temperature": 0.0}'
+        the answer is 14004\n\nSingle Letter Answer:"}],"model":"gpt-4-turbo-2024-04-09","stream":false,"temperature":0.0}'
       headers:
         accept:
           - application/json
@@ -17,13 +16,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "589"
+          - "579"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.55.1
+          - AsyncOpenAI/Python 1.56.0
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -33,87 +32,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.55.1
-        x-stainless-raw-response:
-          - "true"
-        x-stainless-retry-count:
-          - "0"
-        x-stainless-runtime:
-          - CPython
-        x-stainless-runtime-version:
-          - 3.12.7
-      method: POST
-      uri: https://api.openai.com/v1/chat/completions
-    response:
-      body:
-        string:
-          "<html>\r\n<head><title>503 Service Temporarily Unavailable</title></head>\r\n<body>\r\n<center><h1>503
-          Service Temporarily Unavailable</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
-      headers:
-        CF-Cache-Status:
-          - DYNAMIC
-        CF-RAY:
-          - 8e8c200b0c394cae-PHL
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "190"
-        Content-Type:
-          - text/html
-        Date:
-          - Tue, 26 Nov 2024 19:01:06 GMT
-        Server:
-          - cloudflare
-        Set-Cookie:
-          - __cf_bm=t5Fu8IdE2eRZrdqgG4nm9umYrqAXYoqLY0TEikQqX_Y-1732647666-1.0.1.1-FUyvUJNxQMAgWBL5P1GWPv9_rVZufdee0aa955TpkQpofUDP.ze9SjGsLFamInqIjn0mZxgJxrIMdag.MGaA2Q;
-            path=/; expires=Tue, 26-Nov-24 19:31:06 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=_nGQk9L_67Ieg0rZvDRT40.cwdICkI9gcnjdodRCcys-1732647666433-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
-        X-Content-Type-Options:
-          - nosniff
-        alt-svc:
-          - h3=":443"; ma=86400
-        strict-transport-security:
-          - max-age=31536000; includeSubDomains; preload
-      status:
-        code: 503
-        message: Service Unavailable
-  - request:
-      body:
-        '{"messages": [{"role": "user", "content": "Given the following question
-        and a proposed answer to the question, return the single-letter choice in the
-        question that matches the proposed answer. If the proposed answer is blank or
-        an empty string, or multiple options are matched, respond with ''0''.\n\nQuestion:
-        Q: What is my office''s zip code?\n\nOptions:\nA) 94107\nB) 94106\nC) cheesecake\nD)
-        Insufficient information to answer this question\nE) -8\n\nProposed Answer:
-        the answer is 14004\n\nSingle Letter Answer:"}], "model": "gpt-4-turbo-2024-04-09",
-        "stream": false, "temperature": 0.0}'
-      headers:
-        accept:
-          - application/json
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        content-length:
-          - "589"
-        content-type:
-          - application/json
-        host:
-          - api.openai.com
-        user-agent:
-          - AsyncOpenAI/Python 1.55.1
-        x-stainless-arch:
-          - arm64
-        x-stainless-async:
-          - async:asyncio
-        x-stainless-lang:
-          - python
-        x-stainless-os:
-          - MacOS
-        x-stainless-package-version:
-          - 1.55.1
+          - 1.56.0
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -127,18 +46,18 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4ySP0/DMBDF93wKy3ODkjakbTZEBwY6IDGAEIoc+5oaHNvYF/6o6ndHTkqTiiKx
-          ZHi/ey/vLtlFhFApaEEo3zLkjVXx1cN7frfO/Xr1uEL5kS3WTL2Bv7ld3K+v6SQ4TPUCHH9cF9w0
-          VgFKo3vMHTCEkJrOZ9M8m+fLpAONEaCCrbYYZzG2rjLxNJlmcZLFyfLg3hrJwdOCPEWEELLrnqGn
-          FvBJC9JldUoD3rMaaHEcIoQ6o4JCmffSI9NIJwPkRiPornoy1h1sWs9CN90qddD3xxcpU1tnKn/g
-          R30jtfTb0gHzRodQj8bSju4jQp67hdqTjtQ601gs0byCDoFpmvd5dLjjiB4YGmRqbJpPzsSVApBJ
-          5UcXoZzxLYjBOpyPtUKaEYhGS/8ucy67X1zq+j/xA+AcLIIorQMh+enCw5iD8Jf9NXY8cleY+i+P
-          0JQbqWtw1sn+G29sKS4rNhOQCk6jffQNAAD//wMASaZB8vECAAA=
+          H4sIAAAAAAAAA4yST0+EMBDF73yKpufFwO667nJT78aTHowhpR2gWtraGfwTs9/dFHYXjJp44fB+
+          8x5vBj4TxrhWvGBctoJk5016KTZ3FbTbt809vly/Uq7ur1Z3b0u8eb9FvogOVz2BpKPrTLrOGyDt
+          7IhlAEEQU/OL1SrfbPNdPoDOKTDR1nhK1yn1oXLpMluu02ydZruDu3VaAvKCPSSMMfY5PGNPq+Cd
+          FyxbHJUOEEUDvDgNMcaDM1HhAlEjCUt8MUHpLIEdqmdzPUDdo4jdbG/MQd+fXmRc44Or8MBPeq2t
+          xrYMINDZGIrkPB/oPmHscVio/9aR++A6TyW5Z7AxMM83Yx6f7jijB0aOhJmbLha/xJUKSGiDs4tw
+          KWQLarJO5xO90m4GktnSP8v8lj0urm3zn/gJSAmeQJU+gNLy+8LTWID4l/01djryUJjjBxJ0Za1t
+          A8EHPX7j2pfqvBIrBbmSPNknXwAAAP//AwAh8Hyj8QIAAA==
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e8c202aff624243-EWR
+          - 8ebdc42bfcb717d1-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -146,9 +65,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 26 Nov 2024 19:01:38 GMT
+          - Mon, 02 Dec 2024 19:36:31 GMT
         Server:
           - cloudflare
+        Set-Cookie:
+          - __cf_bm=V9JKZaPgzRXm2xl88rELAhZRtOsnKi8.awEARdtwPRc-1733168191-1.0.1.1-y_01lbvDs5D4yaR_XsSiJ003kKGFo3ffzaIBXcejk7i4A0VjnMOmICblQ.auCgaeqM6BDkb3Tr7pUQNyXRhCgw;
+            path=/; expires=Mon, 02-Dec-24 20:06:31 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=99aBS7wrE5xqZSJQs.R0NgU46C3gmCn3IV6gKlmxQhQ-1733168191813-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -160,13 +85,25 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "611"
+          - "327"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "2000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "1999868"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 3ms
         x-request-id:
-          - req_95e8b707bcf849265f9e0a60b02b4f16
+          - req_c879ae4928bc5c3d47beece7d7bbeeae
       status:
         code: 200
         message: OK
