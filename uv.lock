@@ -1611,7 +1611,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.6.1.dev6+ge347a0b.d20241203"
+version = "5.6.1.dev8+gfa1bc94.d20241203"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1676,6 +1676,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
+    { name = "qdrant-client" },
     { name = "refurb" },
     { name = "sentence-transformers" },
     { name = "typeguard" },
@@ -1717,7 +1718,7 @@ requires-dist = [
 dev = [
     { name = "ipython", specifier = ">=8" },
     { name = "mypy", specifier = ">=1.8" },
-    { name = "paper-qa", extras = ["datasets", "ldp", "typing", "zotero", "local"] },
+    { name = "paper-qa", extras = ["datasets", "ldp", "local", "qdrant", "typing", "zotero"] },
     { name = "pre-commit", specifier = ">=3.4" },
     { name = "pydantic", specifier = "~=2.0" },
     { name = "pylint-pydantic" },

@@ -40,11 +40,6 @@ jobs:
       - run: uv run pylint paperqa
   test:
     runs-on: ubuntu-latest
-    services:
-      qdrant:
-        image: qdrant/qdrant
-        ports:
-          - 6333:6333
     strategy:
       matrix:
         python-version: [3.11, 3.12] # Our min and max supported Python versions
@@ -54,7 +49,7 @@ jobs:
         with:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
-      - run: uv sync --python-preference=only-managed --extra qdrant
+      - run: uv sync --python-preference=only-managed
       - name: Cache datasets
         uses: actions/cache@v4
         with:

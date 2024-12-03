@@ -921,7 +921,7 @@ class NumpyVectorStore(VectorStore):
 class QdrantVectorStore(VectorStore):
     client: Any = Field(
         default=None,
-        description="Instance of `qdrant_client.QdrantClient`. Tries to connect to http://localhost:6333/ by default.",
+        description="Instance of `qdrant_client.QdrantClient`. Defaults to an in-memory instance.",
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
@@ -929,8 +929,11 @@ class QdrantVectorStore(VectorStore):
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
+
         return (
-            self.collection_name == other.collection_name
+            self.texts_hashes == other.texts_hashes
+            and self.mmr_lambda == other.mmr_lambda
+            and self.collection_name == other.collection_name
             and self.vector_name == other.vector_name
             and self.client.init_options == other.client.init_options
         )
@@ -946,12 +949,12 @@ class QdrantVectorStore(VectorStore):
 
         if self.client and not isinstance(self.client, QdrantClient):
             raise TypeError(
-                f"'client' should be an instance of qdrant_client.QdrantClient. Got {type(self.client)}"
+                f"'client' should be an instance of `qdrant_client.QdrantClient`. Got `{type(self.client)}`"
             )
 
         if not self.client:
-            # The default instance connects to http://localhost:6333/
-            self.client = QdrantClient()
+            # Defaults to the Python based in-memory implementation.
+            self.client = QdrantClient(location=":memory:")
 
         return self
 

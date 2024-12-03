@@ -631,7 +631,7 @@ def test_docs_with_custom_embedding(
         name: str = "my_embed"
 
         async def embed_documents(self, texts):
-            return [[1, 2, 3] for _ in texts]
+            return [[0.0, 0.28, 0.95] for _ in texts]
 
     docs = Docs(texts_index=vector_store())
     docs.add(
@@ -640,7 +640,7 @@ def test_docs_with_custom_embedding(
         embedding_model=MyEmbeds(),
     )
     with subtests.test(msg="confirm-embedding"):
-        assert docs.texts[0].embedding == [1, 2, 3]
+        assert docs.texts[0].embedding == [0.0, 0.28, 0.95]
 
     with subtests.test(msg="copying-before-get-evidence"):
         # Before getting evidence, shallow and deep copies are the same
@@ -649,6 +649,7 @@ def test_docs_with_custom_embedding(
             **docs.model_dump(exclude={"texts_index"}),
         )
         docs_deep_copy = deepcopy(docs)
+
         assert (
             docs.texts_index
             == docs_shallow_copy.texts_index
@@ -666,6 +667,7 @@ def test_docs_with_custom_embedding(
             **docs.model_dump(exclude={"texts_index"}),
         )
         docs_deep_copy = deepcopy(docs)
+
         assert docs.texts_index != docs_shallow_copy.texts_index
         assert docs.texts_index == docs_deep_copy.texts_index
 
