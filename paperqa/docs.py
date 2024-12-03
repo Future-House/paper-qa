@@ -236,7 +236,7 @@ class Docs(BaseModel):
 
     def add(
         self,
-        path: Path,
+        path: str | Path,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
@@ -266,7 +266,7 @@ class Docs(BaseModel):
 
     async def aadd(  # noqa: PLR0912
         self,
-        path: Path,
+        path: str | Path,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
