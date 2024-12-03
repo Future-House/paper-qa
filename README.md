@@ -334,7 +334,13 @@ but you can also specify a `"fake"` agent to use a hard coded call path of searc
 
 ### Adding Documents Manually
 
-If you prefer fine grained control, and you wish to add objects to the docs object yourself (rather than using the search tool), then the previously existing `Docs` object interface can be used:
+Normally via agent execution, the agent invokes the search tool,
+which adds documents to the `Docs` object for you behind the scenes.
+However, if you prefer fine-grained control,
+you can directly interact with the `Docs` object.
+
+Note that manually adding and querying `Docs` does not impact performance.
+It just removes the automation associated with an agent picking the documents to add.
 
 ```python
 from paperqa import Docs, Settings
@@ -342,15 +348,17 @@ from paperqa import Docs, Settings
 # valid extensions include .pdf, .txt, and .html
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
+# Prepare the Docs object by adding a bunch of documents
 docs = Docs()
+for doc_path in doc_paths:
+    docs.add(doc_path)
 
-for doc in doc_paths:
-    docs.add(doc)
-
+# Set up how we want to query the Docs object
 settings = Settings()
 settings.llm = "claude-3-5-sonnet-20240620"
 settings.answer.answer_max_sources = 3
 
+# Query the Docs object to get an answer
 session = docs.query(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=settings,
