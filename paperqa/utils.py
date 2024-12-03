@@ -52,12 +52,19 @@ def name_in_text(name: str, text: str) -> bool:
 
 
 def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
+    """
+    Calculate the entropy of the string to discard files with excessively repeated symbols.
+
+    PDF parsing sometimes represents horizontal distances between words on title pages
+    and in tables with spaces, which should therefore not be included in this calculation.
+    """
     if not s:
         return False
-    # Calculate the entropy of the string
+
     entropy = 0.0
+    s_wo_spaces = s.replace(" ", "")
     for c in string.printable:
-        p = s.count(c) / len(s)
+        p = s_wo_spaces.count(c) / len(s_wo_spaces)
         if p > 0:
             entropy += -p * math.log2(p)
 

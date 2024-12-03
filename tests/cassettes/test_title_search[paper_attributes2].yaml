@@ -3,16 +3,192 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.openalex.org/works?filter=title.search:Augmenting+large+language+models+with+chemistry+tools
+    response:
+      body:
+        string:
+          '{"meta":{"count":2,"db_response_time_ms":128,"page":1,"per_page":25,"groups_count":null},"results":[{"id":"https://openalex.org/W4365597205","doi":"https://doi.org/10.48550/arxiv.2304.05376","title":"ChemCrow:
+          Augmenting large-language models with chemistry tools","display_name":"ChemCrow:
+          Augmenting large-language models with chemistry tools","relevance_score":1135.6461,"publication_year":2023,"publication_date":"2023-01-01","ids":{"openalex":"https://openalex.org/W4365597205","doi":"https://doi.org/10.48550/arxiv.2304.05376"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"type":"preprint","type_crossref":"posted-content","indexed_in":["arxiv","datacite"],"open_access":{"is_oa":true,"oa_status":"green","oa_url":"https://arxiv.org/abs/2304.05376","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5055903035","display_name":"Andres
+          M Bran","orcid":"https://orcid.org/0000-0002-4432-3667"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Bran,
+          Andres M","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
+          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Cox,
+          Sam","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
+          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"White,
+          Andrew D","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"last","author":{"id":"https://openalex.org/A5028051805","display_name":"Philippe
+          Schwaller","orcid":"https://orcid.org/0000-0003-3046-6576"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Schwaller,
+          Philippe","raw_affiliation_strings":[],"affiliations":[]}],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":null,"has_fulltext":false,"cited_by_count":84,"citation_normalized_percentile":{"value":0.999834,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":null,"issue":null,"first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},"topics":[{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/limiting","display_name":"Limiting","score":0.706134},{"id":"https://openalex.org/keywords/computational-chemistry","display_name":"Computational
+          Chemistry","score":0.518176}],"concepts":[{"id":"https://openalex.org/C188198153","wikidata":"https://www.wikidata.org/wiki/Q1613840","display_name":"Limiting","level":2,"score":0.706134},{"id":"https://openalex.org/C174348530","wikidata":"https://www.wikidata.org/wiki/Q188635","display_name":"Bridging
+          (networking)","level":2,"score":0.67967176},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
+          science","level":0,"score":0.6176928},{"id":"https://openalex.org/C177264268","wikidata":"https://www.wikidata.org/wiki/Q1514741","display_name":"Set
+          (abstract data type)","level":2,"score":0.47735333},{"id":"https://openalex.org/C74187038","wikidata":"https://www.wikidata.org/wiki/Q1418791","display_name":"Drug
+          discovery","level":2,"score":0.4398606},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.3678416},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
+          science","level":1,"score":0.34021586},{"id":"https://openalex.org/C171250308","wikidata":"https://www.wikidata.org/wiki/Q11468","display_name":"Nanotechnology","level":1,"score":0.3370079},{"id":"https://openalex.org/C154945302","wikidata":"https://www.wikidata.org/wiki/Q11660","display_name":"Artificial
+          intelligence","level":1,"score":0.33441877},{"id":"https://openalex.org/C127413603","wikidata":"https://www.wikidata.org/wiki/Q11023","display_name":"Engineering","level":0,"score":0.19605169},{"id":"https://openalex.org/C199360897","wikidata":"https://www.wikidata.org/wiki/Q9143","display_name":"Programming
+          language","level":1,"score":0.13234842},{"id":"https://openalex.org/C78519656","wikidata":"https://www.wikidata.org/wiki/Q101333","display_name":"Mechanical
+          engineering","level":1,"score":0.0},{"id":"https://openalex.org/C31258907","wikidata":"https://www.wikidata.org/wiki/Q1301371","display_name":"Computer
+          network","level":1,"score":0.0},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.0},{"id":"https://openalex.org/C192562407","wikidata":"https://www.wikidata.org/wiki/Q228736","display_name":"Materials
+          science","level":0,"score":0.0}],"mesh":[],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://api.datacite.org/dois/10.48550/arxiv.2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4393179698","display_name":"DataCite
+          API","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I4210145204","host_organization_name":"DataCite","host_organization_lineage":["https://openalex.org/I4210145204"],"host_organization_lineage_names":["DataCite"],"type":"metadata"},"license":null,"license_id":null,"version":null}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
+          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
+          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
+          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":0,"referenced_works":[],"related_works":["https://openalex.org/W4388870064","https://openalex.org/W4248308508","https://openalex.org/W4235186151","https://openalex.org/W2667588871","https://openalex.org/W2272354214","https://openalex.org/W2210139803","https://openalex.org/W2084768720","https://openalex.org/W2056057048","https://openalex.org/W2054685365","https://openalex.org/W2043010663"],"abstract_inverted_index":{"Over":[0],"the":[1,92,107,117,179],"last":[2],"decades,":[3],"excellent":[4],"computational":[5,184],"chemistry":[6,71],"tools":[7],"have":[8,35],"been":[9],"developed.":[10],"Integrating":[11],"them":[12],"into":[13],"a":[14,120,136],"single":[15],"platform":[16],"with":[17,45],"enhanced":[18],"accessibility":[19],"could":[20],"help":[21],"reaching":[22],"their":[23,58],"full":[24],"potential":[25],"by":[26,177],"overcoming":[27],"steep":[28],"learning":[29],"curves.":[30],"Recently,":[31],"large-language":[32],"models":[33,50],"(LLMs)":[34],"shown":[36],"strong":[37],"performance":[38,94],"in":[39,60,95,134],"tasks":[40,76],"across":[41,77],"domains,":[42],"but":[43,172],"struggle":[44],"chemistry-related":[46],"problems.":[47],"Moreover,":[48],"these":[49],"lack":[51],"access":[52],"to":[53,74],"external":[54],"knowledge":[55],"sources,":[56],"limiting":[57],"usefulness":[59],"scientific":[61,175],"applications.":[62],"In":[63],"this":[64],"study,":[65],"we":[66,143],"introduce":[67],"ChemCrow,":[68],"an":[69,110,148],"LLM":[70,93,127],"agent":[72,102],"designed":[73],"accomplish":[75],"organic":[78],"synthesis,":[79],"drug":[80],"discovery,":[81],"and":[82,97,105,115,128,157,167,183],"materials":[83],"design.":[84],"By":[85],"integrating":[86],"18":[87],"expert-designed":[88],"tools,":[89],"ChemCrow":[90],"augments":[91],"chemistry,":[96],"new":[98],"capabilities":[99],"emerge.":[100],"Our":[101,123,160],"autonomously":[103],"planned":[104],"executed":[106],"syntheses":[108],"of":[109,119,139],"insect":[111],"repellent,":[112],"three":[113],"organocatalysts,":[114],"guided":[116],"discovery":[118],"novel":[121],"chromophore.":[122],"evaluation,":[124],"including":[125],"both":[126],"expert":[129,165],"assessments,":[130],"demonstrates":[131],"ChemCrow''s":[132],"effectiveness":[133],"automating":[135],"diverse":[137],"set":[138],"chemical":[140],"tasks.":[141],"Surprisingly,":[142],"find":[144],"that":[145],"GPT-4":[146,155],"as":[147],"evaluator":[149],"cannot":[150],"distinguish":[151],"between":[152,181],"clearly":[153],"wrong":[154],"completions":[156],"Chemcrow''s":[158],"performance.":[159],"work":[161],"not":[162],"only":[163],"aids":[164],"chemists":[166],"lowers":[168],"barriers":[169],"for":[170],"non-experts,":[171],"also":[173],"fosters":[174],"advancement":[176],"bridging":[178],"gap":[180],"experimental":[182],"chemistry.":[185]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4365597205","counts_by_year":[{"year":2024,"cited_by_count":46},{"year":2023,"cited_by_count":32}],"updated_date":"2024-11-28T14:13:52.508530","created_date":"2023-04-15"},{"id":"https://openalex.org/W4396723768","doi":"https://doi.org/10.1038/s42256-024-00832-8","title":"Augmenting
+          large language models with chemistry tools","display_name":"Augmenting large
+          language models with chemistry tools","relevance_score":942.8967,"publication_year":2024,"publication_date":"2024-05-08","ids":{"openalex":"https://openalex.org/W4396723768","doi":"https://doi.org/10.1038/s42256-024-00832-8","pmid":"https://pubmed.ncbi.nlm.nih.gov/38799228"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
+          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
+          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
+          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"type":"article","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"hybrid","oa_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5031480183","display_name":"Andres
+          M. Bran","orcid":null},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
+          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Andres
+          M. Bran","raw_affiliation_strings":["Laboratory of Artificial Chemical Intelligence
+          (LIAC), ISIC, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"Laboratory
+          of Artificial Chemical Intelligence (LIAC), ISIC, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
+          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
+          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Sam
+          Cox","raw_affiliation_strings":["Department of Chemical Engineering, University
+          of Rochester, Rochester, NY, USA"],"affiliations":[{"raw_affiliation_string":"Department
+          of Chemical Engineering, University of Rochester, Rochester, NY, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5075449407","display_name":"Oliver
+          Schilter","orcid":"https://orcid.org/0000-0003-0310-0851"},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
+          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Oliver
+          Schilter","raw_affiliation_strings":["Laboratory of Artificial Chemical Intelligence
+          (LIAC), ISIC, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"Laboratory
+          of Artificial Chemical Intelligence (LIAC), ISIC, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5092630105","display_name":"Carlo
+          Baldassari","orcid":"https://orcid.org/0009-0008-1199-7113"},"institutions":[{"id":"https://openalex.org/I4210126328","display_name":"IBM
+          Research - Zurich","ror":"https://ror.org/02js37d36","country_code":"CH","type":"facility","lineage":["https://openalex.org/I1341412227","https://openalex.org/I4210114115","https://openalex.org/I4210126328"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Carlo
+          Baldassari","raw_affiliation_strings":["Accelerated Discovery, IBM Research
+          \u2013 Europe, R\u00fcschlikon, Switzerland"],"affiliations":[{"raw_affiliation_string":"Accelerated
+          Discovery, IBM Research \u2013 Europe, R\u00fcschlikon, Switzerland","institution_ids":["https://openalex.org/I4210126328"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
+          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
+          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Andrew
+          D. White","raw_affiliation_strings":["Department of Chemical Engineering,
+          University of Rochester, Rochester, NY, USA"],"affiliations":[{"raw_affiliation_string":"Department
+          of Chemical Engineering, University of Rochester, Rochester, NY, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5028051805","display_name":"Philippe
+          Schwaller","orcid":"https://orcid.org/0000-0003-3046-6576"},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
+          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Philippe
+          Schwaller","raw_affiliation_strings":["National Centre of Competence in Research
+          (NCCR) Catalysis, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"National
+          Centre of Competence in Research (NCCR) Catalysis, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]}],"institution_assertions":[],"countries_distinct_count":2,"institutions_distinct_count":3,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":9750,"currency":"EUR","value_usd":11690,"provenance":"doaj"},"apc_paid":{"value":9750,"currency":"EUR","value_usd":11690,"provenance":"doaj"},"fwci":49.07,"has_fulltext":true,"fulltext_origin":"pdf","cited_by_count":52,"citation_normalized_percentile":{"value":0.999965,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":"6","issue":"5","first_page":"525","last_page":"535"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9998,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},"topics":[{"id":"https://openalex.org/T11948","display_name":"Accelerating
+          Materials Innovation through Informatics","score":0.9998,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
+          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},{"id":"https://openalex.org/T10028","display_name":"Natural Language
+          Processing","score":0.9888,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
+          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}},{"id":"https://openalex.org/T10260","display_name":"Empirical
+          Studies in Software Engineering","score":0.9806,"subfield":{"id":"https://openalex.org/subfields/1710","display_name":"Information
+          Systems"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
+          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/limiting","display_name":"Limiting","score":0.75848544},{"id":"https://openalex.org/keywords/computational-chemistry","display_name":"Computational
+          Chemistry","score":0.503028}],"concepts":[{"id":"https://openalex.org/C188198153","wikidata":"https://www.wikidata.org/wiki/Q1613840","display_name":"Limiting","level":2,"score":0.75848544},{"id":"https://openalex.org/C174348530","wikidata":"https://www.wikidata.org/wiki/Q188635","display_name":"Bridging
+          (networking)","level":2,"score":0.7373165},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
+          science","level":0,"score":0.6407423},{"id":"https://openalex.org/C177264268","wikidata":"https://www.wikidata.org/wiki/Q1514741","display_name":"Set
+          (abstract data type)","level":2,"score":0.44978535},{"id":"https://openalex.org/C74187038","wikidata":"https://www.wikidata.org/wiki/Q1418791","display_name":"Drug
+          discovery","level":2,"score":0.41493544},{"id":"https://openalex.org/C171250308","wikidata":"https://www.wikidata.org/wiki/Q11468","display_name":"Nanotechnology","level":1,"score":0.34248286},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
+          science","level":1,"score":0.3251446},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.3200932},{"id":"https://openalex.org/C127413603","wikidata":"https://www.wikidata.org/wiki/Q11023","display_name":"Engineering","level":0,"score":0.16270861},{"id":"https://openalex.org/C199360897","wikidata":"https://www.wikidata.org/wiki/Q9143","display_name":"Programming
+          language","level":1,"score":0.108196944},{"id":"https://openalex.org/C78519656","wikidata":"https://www.wikidata.org/wiki/Q101333","display_name":"Mechanical
+          engineering","level":1,"score":0.0},{"id":"https://openalex.org/C31258907","wikidata":"https://www.wikidata.org/wiki/Q1301371","display_name":"Computer
+          network","level":1,"score":0.0},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.0},{"id":"https://openalex.org/C192562407","wikidata":"https://www.wikidata.org/wiki/Q228736","display_name":"Materials
+          science","level":0,"score":0.0}],"mesh":[],"locations_count":3,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
+          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
+          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
+          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":true,"landing_page_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","pdf_url":null,"source":{"id":"https://openalex.org/S2764455111","display_name":"PubMed
+          Central","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
+          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/38799228","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
+          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
+          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
+          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
+          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/4","score":0.49,"display_name":"Quality
+          education"}],"grants":[{"funder":"https://openalex.org/F4320306076","funder_display_name":"National
+          Science Foundation","award_id":"1751471"},{"funder":"https://openalex.org/F4320320924","funder_display_name":"Schweizerischer
+          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","award_id":"180544"}],"datasets":[],"versions":[],"referenced_works_count":57,"referenced_works":["https://openalex.org/W1964666522","https://openalex.org/W1972905466","https://openalex.org/W1988037271","https://openalex.org/W1995396482","https://openalex.org/W2034354062","https://openalex.org/W2037825667","https://openalex.org/W2119396661","https://openalex.org/W2126363023","https://openalex.org/W2189911347","https://openalex.org/W2324964582","https://openalex.org/W2478294658","https://openalex.org/W2529996553","https://openalex.org/W2594183968","https://openalex.org/W2606363443","https://openalex.org/W2747592475","https://openalex.org/W2903262661","https://openalex.org/W2966357564","https://openalex.org/W2968071222","https://openalex.org/W2970764640","https://openalex.org/W2987091515","https://openalex.org/W2998702515","https://openalex.org/W3010145447","https://openalex.org/W3014089210","https://openalex.org/W3023658436","https://openalex.org/W3088999551","https://openalex.org/W3094640617","https://openalex.org/W3094686696","https://openalex.org/W3097758405","https://openalex.org/W3098269892","https://openalex.org/W3101155908","https://openalex.org/W3103092523","https://openalex.org/W3121024033","https://openalex.org/W3123901912","https://openalex.org/W3128474010","https://openalex.org/W3129039627","https://openalex.org/W3157679602","https://openalex.org/W3179394107","https://openalex.org/W3198449425","https://openalex.org/W4220681836","https://openalex.org/W4220715560","https://openalex.org/W4220747243","https://openalex.org/W4225876201","https://openalex.org/W4226159083","https://openalex.org/W4281669078","https://openalex.org/W4283034548","https://openalex.org/W4285093994","https://openalex.org/W4306845856","https://openalex.org/W4310603653","https://openalex.org/W4319996831","https://openalex.org/W4327564965","https://openalex.org/W4365794116","https://openalex.org/W4385571219","https://openalex.org/W4387567938","https://openalex.org/W4389519254","https://openalex.org/W4389520103","https://openalex.org/W4389991792","https://openalex.org/W4391561379"],"related_works":["https://openalex.org/W4388870064","https://openalex.org/W4248308508","https://openalex.org/W4235186151","https://openalex.org/W2667588871","https://openalex.org/W2272354214","https://openalex.org/W2210139803","https://openalex.org/W2084768720","https://openalex.org/W2056057048","https://openalex.org/W2054685365","https://openalex.org/W2043010663"],"abstract_inverted_index":{"Abstract":[0],"Large":[1],"language":[2],"models":[3,19],"(LLMs)":[4],"have":[5],"shown":[6],"strong":[7],"performance":[8,67],"in":[9,30,68,108],"tasks":[10,43],"across":[11,44],"domains":[12],"but":[13,128],"struggle":[14],"with":[15],"chemistry-related":[16],"problems.":[17],"These":[18],"also":[20,129],"lack":[21],"access":[22],"to":[23,41],"external":[24],"knowledge":[25],"sources,":[26],"limiting":[27],"their":[28],"usefulness":[29],"scientific":[31,131],"applications.":[32],"We":[33],"introduce":[34],"ChemCrow,":[35],"an":[36,83],"LLM":[37,66,101],"chemistry":[38],"agent":[39,75],"designed":[40],"accomplish":[42],"organic":[45],"synthesis,":[46],"drug":[47],"discovery":[48,92],"and":[49,57,70,78,86,89,102,123,139],"materials":[50],"design.":[51],"By":[52],"integrating":[53],"18":[54],"expert-designed":[55],"tools":[56],"using":[58],"GPT-4":[59],"as":[60],"the":[61,65,80,91,135],"LLM,":[62],"ChemCrow":[63],"augments":[64],"chemistry,":[69],"new":[71],"capabilities":[72],"emerge.":[73],"Our":[74,97,116],"autonomously":[76],"planned":[77],"executed":[79],"syntheses":[81],"of":[82,93,113],"insect":[84],"repellent":[85],"three":[87],"organocatalysts":[88],"guided":[90],"a":[94,110],"novel":[95],"chromophore.":[96],"evaluation,":[98],"including":[99],"both":[100],"expert":[103,121],"assessments,":[104],"demonstrates":[105],"ChemCrow\u2019s":[106],"effectiveness":[107],"automating":[109],"diverse":[111],"set":[112],"chemical":[114],"tasks.":[115],"work":[117],"not":[118],"only":[119],"aids":[120],"chemists":[122],"lowers":[124],"barriers":[125],"for":[126],"non-experts":[127],"fosters":[130],"advancement":[132],"by":[133],"bridging":[134],"gap":[136],"between":[137],"experimental":[138],"computational":[140],"chemistry.":[141]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4396723768","counts_by_year":[{"year":2024,"cited_by_count":46},{"year":2023,"cited_by_count":3}],"updated_date":"2024-11-24T08:11:26.056676","created_date":"2024-05-09"}],"group_by":[]}
+
+          '
+      headers:
+        Access-Control-Allow-Credentials:
+          - "true"
+        Access-Control-Allow-Headers:
+          - Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Authorization,
+            Cache-Control
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Authorization, Cache-Control
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "5987"
+        Content-Security-Policy:
+          - default-src 'self'; object-src 'none'
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:32 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168192&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=WzrrO0uMYZrwdXF6nTj390M%2F%2BiRzDIOCZJwZqsf96HM%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1733168192&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=WzrrO0uMYZrwdXF6nTj390M%2F%2BiRzDIOCZJwZqsf96HM%3D
+        Server:
+          - gunicorn
+        Strict-Transport-Security:
+          - max-age=31556926; includeSubDomains
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+        X-Api-Pool:
+          - common
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - SAMEORIGIN
+        X-Xss-Protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.unpaywall.org/v2/search?query=Augmenting%20large%20language%20models%20with%20chemistry%20tools&email=example@papercrow.ai
     response:
       body:
         string:
-          '{"elapsed_seconds":0.228,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
-          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-10-19T14:56:04.324106","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"data_standard":2,"doi":"10.1038/s42256-024-00832-8","doi_url":"https://doi.org/10.1038/s42256-024-00832-8","first_oa_location":{"endpoint_id":null,"evidence":"open
-          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-10-19T14:56:04.324106","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"genre":"journal-article","has_repository_copy":true,"is_oa":true,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"2522-5839","journal_issns":"2522-5839","journal_name":"Nature
+          '{"elapsed_seconds":0.239,"results":[{"response":{"best_oa_location":{"endpoint_id":null,"evidence":"open
+          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-11-21T12:13:19.078817","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"data_standard":2,"doi":"10.1038/s42256-024-00832-8","doi_url":"https://doi.org/10.1038/s42256-024-00832-8","first_oa_location":{"endpoint_id":null,"evidence":"open
+          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-11-21T12:13:19.078817","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},"genre":"journal-article","has_repository_copy":true,"is_oa":true,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"2522-5839","journal_issns":"2522-5839","journal_name":"Nature
           Machine Intelligence","oa_locations":[{"endpoint_id":null,"evidence":"open
-          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-10-19T14:56:04.324106","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},{"endpoint_id":null,"evidence":"oa
-          repository (via pmcid lookup)","host_type":"repository","is_best":false,"license":null,"oa_date":null,"pmh_id":null,"repository_institution":null,"updated":"2024-10-19T14:56:04.324216","url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","url_for_landing_page":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","url_for_pdf":null,"version":"publishedVersion"}],"oa_locations_embargoed":[],"oa_status":"hybrid","published_date":"2024-05-08","publisher":"Springer
+          (via crossref license)","host_type":"publisher","is_best":true,"license":"cc-by","oa_date":"2024-05-08","pmh_id":null,"repository_institution":null,"updated":"2024-11-21T12:13:19.078817","url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","url_for_landing_page":"https://doi.org/10.1038/s42256-024-00832-8","url_for_pdf":"https://www.nature.com/articles/s42256-024-00832-8.pdf","version":"publishedVersion"},{"endpoint_id":null,"evidence":"oa
+          repository (via pmcid lookup)","host_type":"repository","is_best":false,"license":null,"oa_date":null,"pmh_id":null,"repository_institution":null,"updated":"2024-11-21T12:13:19.078975","url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","url_for_landing_page":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","url_for_pdf":null,"version":"publishedVersion"}],"oa_locations_embargoed":[],"oa_status":"hybrid","published_date":"2024-05-08","publisher":"Springer
           Science and Business Media LLC","title":"Augmenting large language models
           with chemistry tools","updated":"2024-05-09T06:24:40.646053","year":2024,"z_authors":[{"family":"M.
           Bran","given":"Andres","sequence":"first"},{"family":"Cox","given":"Sam","sequence":"additional"},{"ORCID":"http://orcid.org/0000-0003-0310-0851","authenticated-orcid":false,"family":"Schilter","given":"Oliver","sequence":"additional"},{"family":"Baldassari","given":"Carlo","sequence":"additional"},{"ORCID":"http://orcid.org/0000-0002-6647-3965","authenticated-orcid":false,"family":"White","given":"Andrew
@@ -1578,17 +1754,17 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "39651"
+          - "39650"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:32 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1731107837&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2F052tL2z%2BdNzdHoagC3cvjHVq4tmR4dL6T%2F3i5Ta%2FHY%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168192&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=LqmqL4E3lYtXOy34G1aDK6FyQcvHdt1Jyr1ojaUWRDc%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1731107837&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=%2F052tL2z%2BdNzdHoagC3cvjHVq4tmR4dL6T%2F3i5Ta%2FHY%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1733168192&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=LqmqL4E3lYtXOy34G1aDK6FyQcvHdt1Jyr1ojaUWRDc%3D
         Server:
           - gunicorn
         Vary:
@@ -1602,11 +1778,74 @@ interactions:
       body: null
       headers: {}
       method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
+          "title": "Augmenting large language models with chemistry tools", "venue":
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 230, "influentialCitationCount":
+          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
+          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
+          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
+          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
+          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
+          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
+          {Augmenting large language models with chemistry tools},\n volume = {6},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
+          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
+          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
+          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
+          "name": "P. Schwaller"}], "matchScore": 176.67178}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1551"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 02 Dec 2024 19:36:32 GMT
+        Via:
+          - 1.1 29474fd3a24c6552dfdc04ee03c03aa2.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - Cq6VVVw4HEYTOo0LupLQHHcU7OQuxt8d8DeniFdB7bPHbBQdTExPgw==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - CLbaGHmVPHcEBDw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1551"
+        x-amzn-Remapped-Date:
+          - Mon, 02 Dec 2024 19:36:32 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 3ee9e3a2-88d4-45db-911c-0e3f3e5977e0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
       uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2335032,"items":[{"indexed":{"date-parts":[[2024,9,20]],"date-time":"2024-09-20T17:08:43Z","timestamp":1726852123984},"reference-count":103,"publisher":"Springer
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2349040,"items":[{"indexed":{"date-parts":[[2024,11,19]],"date-time":"2024-11-19T19:11:02Z","timestamp":1732043462673},"reference-count":103,"publisher":"Springer
           Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
           Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
           Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
@@ -1623,7 +1862,7 @@ interactions:
           both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
           in automating a diverse set of chemical tasks. Our work not only aids expert
           chemists and lowers barriers for non-experts but also fosters scientific advancement
-          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":21,"title":["Augmenting
+          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":36,"title":["Augmenting
           large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
           Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
           D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
@@ -1912,7 +2151,7 @@ interactions:
           (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
           A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
           Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.40466,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
+          Machine Intelligence"],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":46.434135,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
           September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
           History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
@@ -1933,11 +2172,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "10574"
+          - "10576"
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:17 GMT
+          - Mon, 02 Dec 2024 19:36:33 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -1954,182 +2193,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.openalex.org/works?filter=title.search:Augmenting+large+language+models+with+chemistry+tools
-    response:
-      body:
-        string:
-          '{"meta":{"count":2,"db_response_time_ms":273,"page":1,"per_page":25,"groups_count":null},"results":[{"id":"https://openalex.org/W4365597205","doi":"https://doi.org/10.48550/arxiv.2304.05376","title":"ChemCrow:
-          Augmenting large-language models with chemistry tools","display_name":"ChemCrow:
-          Augmenting large-language models with chemistry tools","relevance_score":1116.1659,"publication_year":2023,"publication_date":"2023-01-01","ids":{"openalex":"https://openalex.org/W4365597205","doi":"https://doi.org/10.48550/arxiv.2304.05376"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
-          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
-          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
-          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"type":"preprint","type_crossref":"posted-content","indexed_in":["arxiv","datacite"],"open_access":{"is_oa":true,"oa_status":"green","oa_url":"https://arxiv.org/abs/2304.05376","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5055903035","display_name":"Andres
-          M Bran","orcid":"https://orcid.org/0000-0002-4432-3667"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Bran,
-          Andres M","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
-          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Cox,
-          Sam","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
-          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"White,
-          Andrew D","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"last","author":{"id":"https://openalex.org/A5028051805","display_name":"Philippe
-          Schwaller","orcid":"https://orcid.org/0000-0003-3046-6576"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Schwaller,
-          Philippe","raw_affiliation_strings":[],"affiliations":[]}],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":null,"has_fulltext":false,"cited_by_count":81,"citation_normalized_percentile":{"value":0.999852,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":null,"issue":null,"first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11948","display_name":"Accelerating
-          Materials Innovation through Informatics","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
-          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},"topics":[{"id":"https://openalex.org/T11948","display_name":"Accelerating
-          Materials Innovation through Informatics","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
-          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/limiting","display_name":"Limiting","score":0.706134},{"id":"https://openalex.org/keywords/computational-chemistry","display_name":"Computational
-          Chemistry","score":0.518176}],"concepts":[{"id":"https://openalex.org/C188198153","wikidata":"https://www.wikidata.org/wiki/Q1613840","display_name":"Limiting","level":2,"score":0.706134},{"id":"https://openalex.org/C174348530","wikidata":"https://www.wikidata.org/wiki/Q188635","display_name":"Bridging
-          (networking)","level":2,"score":0.67967176},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
-          science","level":0,"score":0.6176928},{"id":"https://openalex.org/C177264268","wikidata":"https://www.wikidata.org/wiki/Q1514741","display_name":"Set
-          (abstract data type)","level":2,"score":0.47735333},{"id":"https://openalex.org/C74187038","wikidata":"https://www.wikidata.org/wiki/Q1418791","display_name":"Drug
-          discovery","level":2,"score":0.4398606},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.3678416},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
-          science","level":1,"score":0.34021586},{"id":"https://openalex.org/C171250308","wikidata":"https://www.wikidata.org/wiki/Q11468","display_name":"Nanotechnology","level":1,"score":0.3370079},{"id":"https://openalex.org/C154945302","wikidata":"https://www.wikidata.org/wiki/Q11660","display_name":"Artificial
-          intelligence","level":1,"score":0.33441877},{"id":"https://openalex.org/C127413603","wikidata":"https://www.wikidata.org/wiki/Q11023","display_name":"Engineering","level":0,"score":0.19605169},{"id":"https://openalex.org/C199360897","wikidata":"https://www.wikidata.org/wiki/Q9143","display_name":"Programming
-          language","level":1,"score":0.13234842},{"id":"https://openalex.org/C78519656","wikidata":"https://www.wikidata.org/wiki/Q101333","display_name":"Mechanical
-          engineering","level":1,"score":0.0},{"id":"https://openalex.org/C31258907","wikidata":"https://www.wikidata.org/wiki/Q1301371","display_name":"Computer
-          network","level":1,"score":0.0},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.0},{"id":"https://openalex.org/C192562407","wikidata":"https://www.wikidata.org/wiki/Q228736","display_name":"Materials
-          science","level":0,"score":0.0}],"mesh":[],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
-          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
-          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
-          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://api.datacite.org/dois/10.48550/arxiv.2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4393179698","display_name":"DataCite
-          API","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I4210145204","host_organization_name":"DataCite","host_organization_lineage":["https://openalex.org/I4210145204"],"host_organization_lineage_names":["DataCite"],"type":"metadata"},"license":null,"license_id":null,"version":null}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2304.05376","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
-          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
-          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
-          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":0,"referenced_works":[],"related_works":["https://openalex.org/W4388870064","https://openalex.org/W4248308508","https://openalex.org/W4235186151","https://openalex.org/W2667588871","https://openalex.org/W2272354214","https://openalex.org/W2210139803","https://openalex.org/W2084768720","https://openalex.org/W2056057048","https://openalex.org/W2054685365","https://openalex.org/W2043010663"],"abstract_inverted_index":{"Over":[0],"the":[1,92,107,117,179],"last":[2],"decades,":[3],"excellent":[4],"computational":[5,184],"chemistry":[6,71],"tools":[7],"have":[8,35],"been":[9],"developed.":[10],"Integrating":[11],"them":[12],"into":[13],"a":[14,120,136],"single":[15],"platform":[16],"with":[17,45],"enhanced":[18],"accessibility":[19],"could":[20],"help":[21],"reaching":[22],"their":[23,58],"full":[24],"potential":[25],"by":[26,177],"overcoming":[27],"steep":[28],"learning":[29],"curves.":[30],"Recently,":[31],"large-language":[32],"models":[33,50],"(LLMs)":[34],"shown":[36],"strong":[37],"performance":[38,94],"in":[39,60,95,134],"tasks":[40,76],"across":[41,77],"domains,":[42],"but":[43,172],"struggle":[44],"chemistry-related":[46],"problems.":[47],"Moreover,":[48],"these":[49],"lack":[51],"access":[52],"to":[53,74],"external":[54],"knowledge":[55],"sources,":[56],"limiting":[57],"usefulness":[59],"scientific":[61,175],"applications.":[62],"In":[63],"this":[64],"study,":[65],"we":[66,143],"introduce":[67],"ChemCrow,":[68],"an":[69,110,148],"LLM":[70,93,127],"agent":[72,102],"designed":[73],"accomplish":[75],"organic":[78],"synthesis,":[79],"drug":[80],"discovery,":[81],"and":[82,97,105,115,128,157,167,183],"materials":[83],"design.":[84],"By":[85],"integrating":[86],"18":[87],"expert-designed":[88],"tools,":[89],"ChemCrow":[90],"augments":[91],"chemistry,":[96],"new":[98],"capabilities":[99],"emerge.":[100],"Our":[101,123,160],"autonomously":[103],"planned":[104],"executed":[106],"syntheses":[108],"of":[109,119,139],"insect":[111],"repellent,":[112],"three":[113],"organocatalysts,":[114],"guided":[116],"discovery":[118],"novel":[121],"chromophore.":[122],"evaluation,":[124],"including":[125],"both":[126],"expert":[129,165],"assessments,":[130],"demonstrates":[131],"ChemCrow''s":[132],"effectiveness":[133],"automating":[135],"diverse":[137],"set":[138],"chemical":[140],"tasks.":[141],"Surprisingly,":[142],"find":[144],"that":[145],"GPT-4":[146,155],"as":[147],"evaluator":[149],"cannot":[150],"distinguish":[151],"between":[152,181],"clearly":[153],"wrong":[154],"completions":[156],"Chemcrow''s":[158],"performance.":[159],"work":[161],"not":[162],"only":[163],"aids":[164],"chemists":[166],"lowers":[168],"barriers":[169],"for":[170],"non-experts,":[171],"also":[173],"fosters":[174],"advancement":[176],"bridging":[178],"gap":[180],"experimental":[182],"chemistry.":[185]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4365597205","counts_by_year":[{"year":2024,"cited_by_count":46},{"year":2023,"cited_by_count":32}],"updated_date":"2024-11-07T22:02:28.117373","created_date":"2023-04-15"},{"id":"https://openalex.org/W4396723768","doi":"https://doi.org/10.1038/s42256-024-00832-8","title":"Augmenting
-          large language models with chemistry tools","display_name":"Augmenting large
-          language models with chemistry tools","relevance_score":927.8963,"publication_year":2024,"publication_date":"2024-05-08","ids":{"openalex":"https://openalex.org/W4396723768","doi":"https://doi.org/10.1038/s42256-024-00832-8","pmid":"https://pubmed.ncbi.nlm.nih.gov/38799228"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
-          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
-          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
-          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"type":"article","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"hybrid","oa_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5031480183","display_name":"Andres
-          M. Bran","orcid":null},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
-          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Andres
-          M. Bran","raw_affiliation_strings":["Laboratory of Artificial Chemical Intelligence
-          (LIAC), ISIC, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"Laboratory
-          of Artificial Chemical Intelligence (LIAC), ISIC, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
-          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
-          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Sam
-          Cox","raw_affiliation_strings":["Department of Chemical Engineering, University
-          of Rochester, Rochester, NY, USA"],"affiliations":[{"raw_affiliation_string":"Department
-          of Chemical Engineering, University of Rochester, Rochester, NY, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5075449407","display_name":"Oliver
-          Schilter","orcid":"https://orcid.org/0000-0003-0310-0851"},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
-          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Oliver
-          Schilter","raw_affiliation_strings":["Laboratory of Artificial Chemical Intelligence
-          (LIAC), ISIC, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"Laboratory
-          of Artificial Chemical Intelligence (LIAC), ISIC, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5092630105","display_name":"Carlo
-          Baldassari","orcid":"https://orcid.org/0009-0008-1199-7113"},"institutions":[{"id":"https://openalex.org/I4210126328","display_name":"IBM
-          Research - Zurich","ror":"https://ror.org/02js37d36","country_code":"CH","type":"facility","lineage":["https://openalex.org/I1341412227","https://openalex.org/I4210114115","https://openalex.org/I4210126328"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Carlo
-          Baldassari","raw_affiliation_strings":["Accelerated Discovery, IBM Research
-          \u2013 Europe, R\u00fcschlikon, Switzerland"],"affiliations":[{"raw_affiliation_string":"Accelerated
-          Discovery, IBM Research \u2013 Europe, R\u00fcschlikon, Switzerland","institution_ids":["https://openalex.org/I4210126328"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
-          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
-          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Andrew
-          D. White","raw_affiliation_strings":["Department of Chemical Engineering,
-          University of Rochester, Rochester, NY, USA"],"affiliations":[{"raw_affiliation_string":"Department
-          of Chemical Engineering, University of Rochester, Rochester, NY, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5028051805","display_name":"Philippe
-          Schwaller","orcid":"https://orcid.org/0000-0003-3046-6576"},"institutions":[{"id":"https://openalex.org/I5124864","display_name":"\u00c9cole
-          Polytechnique F\u00e9d\u00e9rale de Lausanne","ror":"https://ror.org/02s376052","country_code":"CH","type":"education","lineage":["https://openalex.org/I2799323385","https://openalex.org/I5124864"]}],"countries":["CH"],"is_corresponding":false,"raw_author_name":"Philippe
-          Schwaller","raw_affiliation_strings":["National Centre of Competence in Research
-          (NCCR) Catalysis, EPFL, Lausanne, Switzerland"],"affiliations":[{"raw_affiliation_string":"National
-          Centre of Competence in Research (NCCR) Catalysis, EPFL, Lausanne, Switzerland","institution_ids":["https://openalex.org/I5124864"]}]}],"institution_assertions":[],"countries_distinct_count":2,"institutions_distinct_count":3,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":9750,"currency":"EUR","value_usd":11690,"provenance":"doaj"},"apc_paid":{"value":9750,"currency":"EUR","value_usd":11690,"provenance":"doaj"},"fwci":12.752,"has_fulltext":true,"fulltext_origin":"pdf","cited_by_count":50,"citation_normalized_percentile":{"value":0.999956,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":"6","issue":"5","first_page":"525","last_page":"535"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11948","display_name":"Accelerating
-          Materials Innovation through Informatics","score":0.9998,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
-          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},"topics":[{"id":"https://openalex.org/T11948","display_name":"Accelerating
-          Materials Innovation through Informatics","score":0.9998,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
-          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T10028","display_name":"Natural Language
-          Processing","score":0.9888,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
-          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T10260","display_name":"Empirical
-          Studies in Software Engineering","score":0.9806,"subfield":{"id":"https://openalex.org/subfields/1710","display_name":"Information
-          Systems"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/limiting","display_name":"Limiting","score":0.75848544},{"id":"https://openalex.org/keywords/computational-chemistry","display_name":"Computational
-          Chemistry","score":0.503028}],"concepts":[{"id":"https://openalex.org/C188198153","wikidata":"https://www.wikidata.org/wiki/Q1613840","display_name":"Limiting","level":2,"score":0.75848544},{"id":"https://openalex.org/C174348530","wikidata":"https://www.wikidata.org/wiki/Q188635","display_name":"Bridging
-          (networking)","level":2,"score":0.7373165},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
-          science","level":0,"score":0.6407423},{"id":"https://openalex.org/C177264268","wikidata":"https://www.wikidata.org/wiki/Q1514741","display_name":"Set
-          (abstract data type)","level":2,"score":0.44978535},{"id":"https://openalex.org/C74187038","wikidata":"https://www.wikidata.org/wiki/Q1418791","display_name":"Drug
-          discovery","level":2,"score":0.41493544},{"id":"https://openalex.org/C171250308","wikidata":"https://www.wikidata.org/wiki/Q11468","display_name":"Nanotechnology","level":1,"score":0.34248286},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
-          science","level":1,"score":0.3251446},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.3200932},{"id":"https://openalex.org/C127413603","wikidata":"https://www.wikidata.org/wiki/Q11023","display_name":"Engineering","level":0,"score":0.16270861},{"id":"https://openalex.org/C199360897","wikidata":"https://www.wikidata.org/wiki/Q9143","display_name":"Programming
-          language","level":1,"score":0.108196944},{"id":"https://openalex.org/C78519656","wikidata":"https://www.wikidata.org/wiki/Q101333","display_name":"Mechanical
-          engineering","level":1,"score":0.0},{"id":"https://openalex.org/C31258907","wikidata":"https://www.wikidata.org/wiki/Q1301371","display_name":"Computer
-          network","level":1,"score":0.0},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.0},{"id":"https://openalex.org/C192562407","wikidata":"https://www.wikidata.org/wiki/Q228736","display_name":"Materials
-          science","level":0,"score":0.0}],"mesh":[],"locations_count":3,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
-          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
-          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
-          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":true,"landing_page_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11116106","pdf_url":null,"source":{"id":"https://openalex.org/S2764455111","display_name":"PubMed
-          Central","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/38799228","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1038/s42256-024-00832-8","pdf_url":"https://www.nature.com/articles/s42256-024-00832-8.pdf","source":{"id":"https://openalex.org/S2912241403","display_name":"Nature
-          Machine Intelligence","issn_l":"2522-5839","issn":["2522-5839"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310319908","host_organization_name":"Nature
-          Portfolio","host_organization_lineage":["https://openalex.org/P4310319908","https://openalex.org/P4310319965"],"host_organization_lineage_names":["Nature
-          Portfolio","Springer Nature"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[{"display_name":"Quality
-          education","id":"https://metadata.un.org/sdg/4","score":0.49}],"grants":[{"funder":"https://openalex.org/F4320306076","funder_display_name":"National
-          Science Foundation","award_id":"1751471"},{"funder":"https://openalex.org/F4320320924","funder_display_name":"Schweizerischer
-          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","award_id":"180544"}],"datasets":[],"versions":[],"referenced_works_count":57,"referenced_works":["https://openalex.org/W1964666522","https://openalex.org/W1972905466","https://openalex.org/W1988037271","https://openalex.org/W1995396482","https://openalex.org/W2034354062","https://openalex.org/W2037825667","https://openalex.org/W2119396661","https://openalex.org/W2126363023","https://openalex.org/W2189911347","https://openalex.org/W2324964582","https://openalex.org/W2478294658","https://openalex.org/W2529996553","https://openalex.org/W2594183968","https://openalex.org/W2606363443","https://openalex.org/W2747592475","https://openalex.org/W2903262661","https://openalex.org/W2966357564","https://openalex.org/W2968071222","https://openalex.org/W2970764640","https://openalex.org/W2987091515","https://openalex.org/W2998702515","https://openalex.org/W3010145447","https://openalex.org/W3014089210","https://openalex.org/W3023658436","https://openalex.org/W3088999551","https://openalex.org/W3094640617","https://openalex.org/W3094686696","https://openalex.org/W3097758405","https://openalex.org/W3098269892","https://openalex.org/W3101155908","https://openalex.org/W3103092523","https://openalex.org/W3121024033","https://openalex.org/W3123901912","https://openalex.org/W3128474010","https://openalex.org/W3129039627","https://openalex.org/W3157679602","https://openalex.org/W3179394107","https://openalex.org/W3198449425","https://openalex.org/W4220681836","https://openalex.org/W4220715560","https://openalex.org/W4220747243","https://openalex.org/W4225876201","https://openalex.org/W4226159083","https://openalex.org/W4281669078","https://openalex.org/W4283034548","https://openalex.org/W4285093994","https://openalex.org/W4306845856","https://openalex.org/W4310603653","https://openalex.org/W4319996831","https://openalex.org/W4327564965","https://openalex.org/W4365794116","https://openalex.org/W4385571219","https://openalex.org/W4387567938","https://openalex.org/W4389519254","https://openalex.org/W4389520103","https://openalex.org/W4389991792","https://openalex.org/W4391561379"],"related_works":["https://openalex.org/W4388870064","https://openalex.org/W4248308508","https://openalex.org/W4235186151","https://openalex.org/W2667588871","https://openalex.org/W2272354214","https://openalex.org/W2210139803","https://openalex.org/W2084768720","https://openalex.org/W2056057048","https://openalex.org/W2054685365","https://openalex.org/W2043010663"],"abstract_inverted_index":{"Abstract":[0],"Large":[1],"language":[2],"models":[3,19],"(LLMs)":[4],"have":[5],"shown":[6],"strong":[7],"performance":[8,67],"in":[9,30,68,108],"tasks":[10,43],"across":[11,44],"domains":[12],"but":[13,128],"struggle":[14],"with":[15],"chemistry-related":[16],"problems.":[17],"These":[18],"also":[20,129],"lack":[21],"access":[22],"to":[23,41],"external":[24],"knowledge":[25],"sources,":[26],"limiting":[27],"their":[28],"usefulness":[29],"scientific":[31,131],"applications.":[32],"We":[33],"introduce":[34],"ChemCrow,":[35],"an":[36,83],"LLM":[37,66,101],"chemistry":[38],"agent":[39,75],"designed":[40],"accomplish":[42],"organic":[45],"synthesis,":[46],"drug":[47],"discovery":[48,92],"and":[49,57,70,78,86,89,102,123,139],"materials":[50],"design.":[51],"By":[52],"integrating":[53],"18":[54],"expert-designed":[55],"tools":[56],"using":[58],"GPT-4":[59],"as":[60],"the":[61,65,80,91,135],"LLM,":[62],"ChemCrow":[63],"augments":[64],"chemistry,":[69],"new":[71],"capabilities":[72],"emerge.":[73],"Our":[74,97,116],"autonomously":[76],"planned":[77],"executed":[79],"syntheses":[81],"of":[82,93,113],"insect":[84],"repellent":[85],"three":[87],"organocatalysts":[88],"guided":[90],"a":[94,110],"novel":[95],"chromophore.":[96],"evaluation,":[98],"including":[99],"both":[100],"expert":[103,121],"assessments,":[104],"demonstrates":[105],"ChemCrow\u2019s":[106],"effectiveness":[107],"automating":[109],"diverse":[111],"set":[112],"chemical":[114],"tasks.":[115],"work":[117],"not":[118],"only":[119],"aids":[120],"chemists":[122],"lowers":[124],"barriers":[125],"for":[126],"non-experts":[127],"fosters":[130],"advancement":[132],"by":[133],"bridging":[134],"gap":[136],"between":[137],"experimental":[138],"computational":[140],"chemistry.":[141]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4396723768","counts_by_year":[{"year":2024,"cited_by_count":46},{"year":2023,"cited_by_count":3}],"updated_date":"2024-11-08T06:24:39.275006","created_date":"2024-05-09"}],"group_by":[]}
-
-          '
-      headers:
-        Access-Control-Allow-Credentials:
-          - "true"
-        Access-Control-Allow-Headers:
-          - Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Authorization,
-            Cache-Control
-        Access-Control-Allow-Methods:
-          - POST, GET, OPTIONS, PUT, DELETE, PATCH
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Authorization, Cache-Control
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "5993"
-        Content-Security-Policy:
-          - default-src 'self'; object-src 'none'
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
-        Nel:
-          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
-        Referrer-Policy:
-          - strict-origin-when-cross-origin
-        Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1731107837&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ZIRBb24HewjZVtKGsZ7ujli7BbeExRdtzRmMlnaDchg%3D"}]}'
-        Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1731107837&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=ZIRBb24HewjZVtKGsZ7ujli7BbeExRdtzRmMlnaDchg%3D
-        Server:
-          - gunicorn
-        Strict-Transport-Security:
-          - max-age=31556926; includeSubDomains
-        Vary:
-          - Accept-Encoding
-        Via:
-          - 1.1 vegur
-        X-Api-Pool:
-          - common
-        X-Content-Type-Options:
-          - nosniff
-        X-Frame-Options:
-          - SAMEORIGIN
-        X-Xss-Protection:
-          - 1; mode=block
       status:
         code: 200
         message: OK
@@ -2159,7 +2222,7 @@ interactions:
         Connection:
           - close
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:33 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -2176,69 +2239,6 @@ interactions:
           - 1s
         x-ratelimit-limit:
           - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
-          "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 225, "influentialCitationCount":
-          11, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
-          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
-          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
-          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
-          author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
-          and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
-          journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
-          {Augmenting large language models with chemistry tools},\n volume = {6},\n
-          year = {2023}\n}\n"}, "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s
-          M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
-          "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
-          {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 176.78436}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1551"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        Via:
-          - 1.1 0ac5a786563da4ae2e2a28a1fe210e04.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - OEVv26roLSfPvUOOIiUDGl-BP8eKkJWPGmQmz7D01DNWnCiSmq3FmQ==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - A81PoFzpvHcElTA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1551"
-        x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 7a2b0ea7-f659-4258-a727-621819fed167
       status:
         code: 200
         message: OK

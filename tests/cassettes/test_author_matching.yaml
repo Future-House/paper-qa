@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4038,"items":[{"DOI":"10.4337\/cilj.2023.02.08","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2467-681X","authenticated-orcid":true,"given":"Jack
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4067,"items":[{"DOI":"10.4337\/cilj.2023.02.08","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2467-681X","authenticated-orcid":true,"given":"Jack
           Wright","family":"Nelson","sequence":"first","affiliation":[{"name":"Doctoral
           Candidate, McGill University Faculty of Law, Montreal, QC, Canada"},{"name":"Adjunct
           Research Fellow, National University of Singapore Faculty of Law, Singapore"}]}],"title":["Large
@@ -25,7 +25,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:18 GMT
+          - Mon, 02 Dec 2024 19:36:31 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -61,7 +61,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 176.78436}]}
+          "P. Schwaller"}], "matchScore": 176.67178}]}
 
           '
       headers:
@@ -74,27 +74,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
+          - Mon, 02 Dec 2024 19:36:31 GMT
         Via:
-          - 1.1 0113a71a4be95c1ea6c4a193aad565aa.cloudfront.net (CloudFront)
+          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - _-OZO0fRyGEzT2D_Nr2fyfQjYnjK-7ulNWryozB_SajlRFgLQsAy0A==
+          - IsbRpJs-6dJesYURz0pMaebcWTWrxJgr4K0youJEPblH2gBzJPfJbw==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - A81P5GD3PHcEfSg=
+          - CLbZ9Hr0vHcEfHg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:19 GMT
+          - Mon, 02 Dec 2024 19:36:31 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 32af7b91-efaf-4905-b650-0a8c559fae51
+          - b5ecf5b2-034c-4d9a-af12-6de8ada94eef
       status:
         code: 200
         message: OK
@@ -114,7 +114,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 176.78436}]}
+          "P. Schwaller"}], "matchScore": 178.39174}]}
 
           '
       headers:
@@ -127,27 +127,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 08 Nov 2024 23:17:20 GMT
+          - Mon, 02 Dec 2024 19:36:32 GMT
         Via:
-          - 1.1 0113a71a4be95c1ea6c4a193aad565aa.cloudfront.net (CloudFront)
+          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - UVqCCLXLgrUygXOnemudQET7cDjPC_U2FNqS9HJErbo00mX4RVxRuw==
+          - EHoVfVgHE9RbrbRi4uuINY4X-WQoORnvqlRHgMG5LRdxwMp9dqjMjg==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - A81P-GfMvHcEQrA=
+          - CLbaDFLKvHcEZrw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Fri, 08 Nov 2024 23:17:20 GMT
+          - Mon, 02 Dec 2024 19:36:32 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 4d65b1f2-c33b-449c-aafb-97a39f59e3fd
+          - bfd45f5b-35bc-42d1-a1f9-011832c60b9a
       status:
         code: 200
         message: OK
@@ -172,7 +172,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Fri, 08 Nov 2024 23:17:20 GMT
+          - Mon, 02 Dec 2024 19:36:32 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

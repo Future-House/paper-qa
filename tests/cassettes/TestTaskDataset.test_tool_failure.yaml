@@ -1,55 +1,44 @@
 interactions:
   - request:
       body:
-        '{"messages": [{"role": "user", "content": "Use the tools to answer the
-        question: Q: Who is Frederick Bates?\n\nOptions:\nA) Plumber\nB) Insufficient
-        information to answer this question\nC) Politician\nD) Technologist\n\nWhen
-        the answer looks sufficient, you can terminate by calling the complete tool.
-        If the answer does not look sufficient, and you have already tried to answer
-        several times with different evidence, terminate by calling the complete tool.
-        The current status of evidence/papers/cost is Status: Paper Count=0 | Relevant
-        Papers=0 | Current Evidence=0 | Current Cost=$0.0000"}], "model": "gpt-4o-2024-08-06",
-        "temperature": 0.1, "tool_choice": "required", "tools": [{"type": "function",
-        "function": {"name": "reset", "description": "Reset by clearing all current
-        evidence from the system.\n\nThis tool is useful when repeatedly failing to
-        answer because new evidence can give new perspective.\nIt does not make sense
-        to call this tool in parallel with other tools, as its resetting all state.\nOnly
-        invoke this tool when the current evidence is above zero, or this tool will
-        be useless.", "parameters": {"type": "object", "properties": {}, "required":
-        []}}}, {"type": "function", "function": {"name": "gen_answer", "description":
-        "Generate an answer using current evidence.\n\nThe tool may fail, indicating
-        that better or different evidence should be found.\nAim for at least five pieces
-        of evidence from multiple sources before invoking this tool.\nFeel free to invoke
-        this tool in parallel with other tools, but do not call this tool in parallel
-        with itself.", "parameters": {"type": "object", "properties": {}, "required":
-        []}}}, {"type": "function", "function": {"name": "gather_evidence", "description":
-        "Gather evidence from previous papers given a specific question to increase
-        evidence and relevant paper counts.\n\nA valuable time to invoke this tool is
-        right after another tool increases paper count.\nFeel free to invoke this tool
-        in parallel with other tools, but do not call this tool in parallel with itself.\nOnly
-        invoke this tool when the paper count is above zero, or this tool will be useless.",
-        "parameters": {"type": "object", "properties": {"question": {"description":
-        "Specific question to gather evidence for.", "title": "Question", "type": "string"}},
-        "required": ["question"]}}}, {"type": "function", "function": {"name": "paper_search",
-        "description": "Search for papers to increase the paper count.\n\nRepeat previous
-        calls with the same query and years to continue a search. Only repeat a maximum
-        of twice.\nThis tool can be called concurrently.\nThis tool introduces novel
-        papers, so invoke this tool when just beginning or when unsatisfied with the
-        current evidence.", "parameters": {"type": "object", "properties": {"query":
-        {"description": "A search query, which can be a specific phrase, complete sentence,
-        or general keywords, e.g. ''machine learning for immunology''. Also can be given
-        search operators.", "title": "Query", "type": "string"}, "min_year": {"anyOf":
-        [{"type": "integer"}, {"type": "null"}], "description": "Filter for minimum
-        publication year, or None for no minimum year. The current year is 2024.", "title":
-        "Min Year"}, "max_year": {"anyOf": [{"type": "integer"}, {"type": "null"}],
-        "description": "Filter for maximum publication year, or None for no maximum
-        year. The current year is 2024.", "title": "Max Year"}}, "required": ["query",
-        "min_year", "max_year"]}}}, {"type": "function", "function": {"name": "complete",
-        "description": "Terminate using the last proposed answer.\n\nDo not invoke this
-        tool in parallel with other tools or itself.", "parameters": {"type": "object",
-        "properties": {"is_sure": {"description": "Set True if sure of the answer, otherwise
-        False if there remains some uncertainty.", "title": "Is Sure", "type": "boolean"}},
-        "required": ["is_sure"]}}}]}'
+        '{"messages":[{"role":"user","content":"Use the tools to answer the question:
+        Q: Who is Frederick Bates?\n\nOptions:\nA) Insufficient information to answer
+        this question\nB) Technologist\nC) Plumber\nD) Politician\n\nWhen the answer
+        looks sufficient, you can terminate by calling the complete tool. If the answer
+        does not look sufficient, and you have already tried to answer several times
+        with different evidence, terminate by calling the complete tool. The current
+        status of evidence/papers/cost is Status: Paper Count=0 | Relevant Papers=0
+        | Current Evidence=0 | Current Cost=$0.0000"}],"model":"gpt-4o-2024-08-06","temperature":0.1,"tool_choice":"required","tools":[{"type":"function","function":{"name":"reset","description":"Reset
+        by clearing all current evidence from the system.\n\nThis tool is useful when
+        repeatedly failing to answer because the existing evidence may unsuitable for
+        the question.\nIt does not make sense to call this tool in parallel with other
+        tools, as its resetting all state.\nOnly invoke this tool when the current evidence
+        is above zero, or this tool will be useless.","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"gen_answer","description":"Generate
+        an answer using current evidence.\n\nThe tool may fail, indicating that better
+        or different evidence should be found.\nAim for at least five pieces of evidence
+        from multiple sources before invoking this tool.\nFeel free to invoke this tool
+        in parallel with other tools, but do not call this tool in parallel with itself.","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"gather_evidence","description":"Gather
+        evidence from previous papers given a specific question to increase evidence
+        and relevant paper counts.\n\nA valuable time to invoke this tool is right after
+        another tool increases paper count.\nFeel free to invoke this tool in parallel
+        with other tools, but do not call this tool in parallel with itself.\nOnly invoke
+        this tool when the paper count is above zero, or this tool will be useless.","parameters":{"type":"object","properties":{"question":{"description":"Specific
+        question to gather evidence for.","title":"Question","type":"string"}},"required":["question"]}}},{"type":"function","function":{"name":"paper_search","description":"Search
+        for papers to increase the paper count.\n\nRepeat previous calls with the same
+        query and years to continue a search. Only repeat a maximum of twice.\nThis
+        tool can be called concurrently.\nThis tool introduces novel papers, so invoke
+        this tool when just beginning or when unsatisfied with the current evidence.","parameters":{"type":"object","properties":{"query":{"description":"A
+        search query, which can be a specific phrase, complete sentence, or general
+        keywords, e.g. ''machine learning for immunology''. Also can be given search
+        operators.","title":"Query","type":"string"},"min_year":{"anyOf":[{"type":"integer"},{"type":"null"}],"description":"Filter
+        for minimum publication year, or None for no minimum year. The current year
+        is 2024.","title":"Min Year"},"max_year":{"anyOf":[{"type":"integer"},{"type":"null"}],"description":"Filter
+        for maximum publication year, or None for no maximum year. The current year
+        is 2024.","title":"Max Year"}},"required":["query","min_year","max_year"]}}},{"type":"function","function":{"name":"complete","description":"Terminate
+        using the last proposed answer.\n\nDo not invoke this tool in parallel with
+        other tools or itself.","parameters":{"type":"object","properties":{"has_successful_answer":{"description":"Set
+        True if an answer that addresses all parts of the task has been generated, otherwise
+        set False to indicate unsureness.","title":"Has Successful Answer","type":"boolean"}},"required":["has_successful_answer"]}}}]}'
       headers:
         accept:
           - application/json
@@ -58,13 +47,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "3843"
+          - "3820"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.3
+          - AsyncOpenAI/Python 1.56.0
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -74,11 +63,11 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.3
+          - 1.56.0
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
-          - "0"
+          - "2"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
@@ -88,21 +77,20 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4xT72vbMBD97r9C3OdkxE6aH/7WQcq2sq5jGZTNxSjS2dEqS4ok05qQ/33YSWwn
-          zWD+YMQ9vXd37067gBAQHGICbEM9K4wc3v7E9efV8n7ycPsUVk+vJf56rfQdlz9W9ysY1Ay9/oPM
-          n1gfmC6MRC+0OsDMIvVYq4azcTifLqJZ1ACF5ihrWm78cKKH0SiaDEfz4Wh6JG60YOggJr8DQgjZ
-          Nf+6RMXxDWIyGpwiBTpHc4S4vUQIWC3rCFDnhPNUeRh0INPKo6qrVqWUPcBrLVNGpewSH75d79z5
-          RKVMH+yWLfVXv/z26ftjdJNn2fbLI46jXr6DdGWagrJSsdafHt7G44tkhICiRcM11KBNHVLLNhd8
-          QoDavCxQ+bp22CWwLdFWCcQJ3FnkaAV7IR+pR5fAIIFCqLRCahOIGxMSKOhbP7KHswT74Nr5uWee
-          xax0VB5dPcb37Zikzo3Va3fhOmRCCbdJLVLXdN8fQnDK1uSB8mzOYKwujE+9fkFVy07DxUEVujXs
-          0Gh2BL32VPZYk+ngil7K0VPRLEK7e4yyDfKO2u0gLbnQPSDo9f6+mmvah/6Fyv9HvgMYQ+ORp8Yi
-          F+y84+6axfqV/uta63JTMLjKeSzSTKgcrbGieSiQmTS8WfD5eBIyBsE++AsAAP//AwBBMkn3MQQA
-          AA==
+          H4sIAAAAAAAAA4xTTW/bMAy9+1cIPCeDEzdfvrXAtmKHFRhWtMM8GKxM21plSZHkIWmQ/17YSWwn
+          y4D5YAh8eo/kI7ULGAORQcyAl+h5ZeT4FufP+f362w/xSE/8+eNk9Ydms3D9ZbN9eINRw9Avv4n7
+          E+sD15WR5IVWB5hbQk+N6mQRRZP5MpqsWqDSGcmGVhg/vtHjaTi9GYfLcTg/EkstODmI2c+AMcZ2
+          7b8pUWW0gZiFo1OkIuewIIi7S4yB1bKJADonnEflYdSDXCtPqqla1VIOAK+1TDlK2Sc+fLvBufcJ
+          pUy/r+4X9NXjY1HP8tvy6e2u/lxH4mGQ7yC9NW1Bea14588A7+LxRTLGQGHVcg0asqkjtLy84DMG
+          aIu6IuWb2mGXwLomu00gTuCTpYys4K/sDj25BEYJVEKlW0KbQNyakECFm2FkD2cJ9sG186+BeZby
+          2qE8unqM77sxSV0Yq1/cheuQCyVcmVpC13Y/HEJwytbmgfpszmCsroxPvX4l1cjOo+lBFfo17NHp
+          4gh67VEOWLPV6IpempFH0S5Ct3sceUlZT+13EOtM6AEQDHr/u5pr2of+hSr+R74HOCfjKUuNpUzw
+          8477a5aaV/qva53LbcHgts5TleZCFWSNFe1Dgdyky2hC4XyRLacQ7IN3AAAA//8DAHEjanQxBAAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e41e44318f2faa2-SJC
+          - 8ebdc74a5a00aab2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -110,15 +98,9 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sun, 17 Nov 2024 18:47:52 GMT
+          - Mon, 02 Dec 2024 19:38:39 GMT
         Server:
           - cloudflare
-        Set-Cookie:
-          - __cf_bm=jhfMKZjWPLSsKzx_16Vo.PS7MbK.m2Yv2L6xzSxiDLs-1731869272-1.0.1.1-Sxas2qCf5B05jFaCrMqoQZxRAFtpXmFYsRvOUMr83Qlzp2abESZKw.Qohl5XoWpbz3QMm9dYwsjMG5nvP_LkDw;
-            path=/; expires=Sun, 17-Nov-24 19:17:52 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=n6noIFkeSNQpekR.9MXcMne3C0jT870V1bj.C6UuKIA-1731869272492-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -130,7 +112,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "485"
+          - "754"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -148,66 +130,52 @@ interactions:
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_e548c88c9a6d130fa58ff0484a6ce9f9
+          - req_49c6030ccc52c2847bcf4a075f0271dc
       status:
         code: 200
         message: OK
   - request:
       body:
-        '{"messages": [{"role": "user", "content": "Use the tools to answer the
-        question: Q: Who is Frederick Bates?\n\nOptions:\nA) Plumber\nB) Insufficient
-        information to answer this question\nC) Politician\nD) Technologist\n\nWhen
-        the answer looks sufficient, you can terminate by calling the complete tool.
-        If the answer does not look sufficient, and you have already tried to answer
-        several times with different evidence, terminate by calling the complete tool.
-        The current status of evidence/papers/cost is Status: Paper Count=0 | Relevant
-        Papers=0 | Current Evidence=0 | Current Cost=$0.0000"}, {"role": "assistant",
-        "content": null, "function_call": null, "tool_calls": [{"id": "call_NrqcEoMtEOHQP25gffqJPe32",
-        "type": "function", "function": {"arguments": "{\"query\": \"Frederick Bates\",
-        \"min_year\": null, \"max_year\": null}", "name": "paper_search"}}]}, {"role":
-        "tool", "content": "Encountered exception during tool call: Totally unexpected
-        but retryable error.", "name": "paper_search", "tool_call_id": "call_NrqcEoMtEOHQP25gffqJPe32"}],
-        "model": "gpt-4o-2024-08-06", "temperature": 0.1, "tool_choice": "required",
-        "tools": [{"type": "function", "function": {"name": "reset", "description":
-        "Reset by clearing all current evidence from the system.\n\nThis tool is useful
-        when repeatedly failing to answer because new evidence can give new perspective.\nIt
-        does not make sense to call this tool in parallel with other tools, as its resetting
-        all state.\nOnly invoke this tool when the current evidence is above zero, or
-        this tool will be useless.", "parameters": {"type": "object", "properties":
-        {}, "required": []}}}, {"type": "function", "function": {"name": "gen_answer",
-        "description": "Generate an answer using current evidence.\n\nThe tool may fail,
-        indicating that better or different evidence should be found.\nAim for at least
-        five pieces of evidence from multiple sources before invoking this tool.\nFeel
-        free to invoke this tool in parallel with other tools, but do not call this
-        tool in parallel with itself.", "parameters": {"type": "object", "properties":
-        {}, "required": []}}}, {"type": "function", "function": {"name": "gather_evidence",
-        "description": "Gather evidence from previous papers given a specific question
-        to increase evidence and relevant paper counts.\n\nA valuable time to invoke
-        this tool is right after another tool increases paper count.\nFeel free to invoke
-        this tool in parallel with other tools, but do not call this tool in parallel
-        with itself.\nOnly invoke this tool when the paper count is above zero, or this
-        tool will be useless.", "parameters": {"type": "object", "properties": {"question":
-        {"description": "Specific question to gather evidence for.", "title": "Question",
-        "type": "string"}}, "required": ["question"]}}}, {"type": "function", "function":
-        {"name": "paper_search", "description": "Search for papers to increase the paper
-        count.\n\nRepeat previous calls with the same query and years to continue a
-        search. Only repeat a maximum of twice.\nThis tool can be called concurrently.\nThis
-        tool introduces novel papers, so invoke this tool when just beginning or when
-        unsatisfied with the current evidence.", "parameters": {"type": "object", "properties":
-        {"query": {"description": "A search query, which can be a specific phrase, complete
-        sentence, or general keywords, e.g. ''machine learning for immunology''. Also
-        can be given search operators.", "title": "Query", "type": "string"}, "min_year":
-        {"anyOf": [{"type": "integer"}, {"type": "null"}], "description": "Filter for
-        minimum publication year, or None for no minimum year. The current year is 2024.",
-        "title": "Min Year"}, "max_year": {"anyOf": [{"type": "integer"}, {"type": "null"}],
-        "description": "Filter for maximum publication year, or None for no maximum
-        year. The current year is 2024.", "title": "Max Year"}}, "required": ["query",
-        "min_year", "max_year"]}}}, {"type": "function", "function": {"name": "complete",
-        "description": "Terminate using the last proposed answer.\n\nDo not invoke this
-        tool in parallel with other tools or itself.", "parameters": {"type": "object",
-        "properties": {"is_sure": {"description": "Set True if sure of the answer, otherwise
-        False if there remains some uncertainty.", "title": "Is Sure", "type": "boolean"}},
-        "required": ["is_sure"]}}}]}'
+        '{"messages":[{"role":"user","content":"Use the tools to answer the question:
+        Q: Who is Frederick Bates?\n\nOptions:\nA) Insufficient information to answer
+        this question\nB) Technologist\nC) Plumber\nD) Politician\n\nWhen the answer
+        looks sufficient, you can terminate by calling the complete tool. If the answer
+        does not look sufficient, and you have already tried to answer several times
+        with different evidence, terminate by calling the complete tool. The current
+        status of evidence/papers/cost is Status: Paper Count=0 | Relevant Papers=0
+        | Current Evidence=0 | Current Cost=$0.0000"},{"role":"assistant","content":null,"function_call":null,"tool_calls":[{"id":"call_T9H7eNtaUgu5fAhWzBuGu3iO","type":"function","function":{"arguments":"{\"query\":
+        \"Frederick Bates\", \"min_year\": null, \"max_year\": null}","name":"paper_search"}}]},{"role":"tool","content":"Encountered
+        exception during tool call: Totally unexpected but retryable error.","name":"paper_search","tool_call_id":"call_T9H7eNtaUgu5fAhWzBuGu3iO"}],"model":"gpt-4o-2024-08-06","temperature":0.1,"tool_choice":"required","tools":[{"type":"function","function":{"name":"reset","description":"Reset
+        by clearing all current evidence from the system.\n\nThis tool is useful when
+        repeatedly failing to answer because the existing evidence may unsuitable for
+        the question.\nIt does not make sense to call this tool in parallel with other
+        tools, as its resetting all state.\nOnly invoke this tool when the current evidence
+        is above zero, or this tool will be useless.","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"gen_answer","description":"Generate
+        an answer using current evidence.\n\nThe tool may fail, indicating that better
+        or different evidence should be found.\nAim for at least five pieces of evidence
+        from multiple sources before invoking this tool.\nFeel free to invoke this tool
+        in parallel with other tools, but do not call this tool in parallel with itself.","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"gather_evidence","description":"Gather
+        evidence from previous papers given a specific question to increase evidence
+        and relevant paper counts.\n\nA valuable time to invoke this tool is right after
+        another tool increases paper count.\nFeel free to invoke this tool in parallel
+        with other tools, but do not call this tool in parallel with itself.\nOnly invoke
+        this tool when the paper count is above zero, or this tool will be useless.","parameters":{"type":"object","properties":{"question":{"description":"Specific
+        question to gather evidence for.","title":"Question","type":"string"}},"required":["question"]}}},{"type":"function","function":{"name":"paper_search","description":"Search
+        for papers to increase the paper count.\n\nRepeat previous calls with the same
+        query and years to continue a search. Only repeat a maximum of twice.\nThis
+        tool can be called concurrently.\nThis tool introduces novel papers, so invoke
+        this tool when just beginning or when unsatisfied with the current evidence.","parameters":{"type":"object","properties":{"query":{"description":"A
+        search query, which can be a specific phrase, complete sentence, or general
+        keywords, e.g. ''machine learning for immunology''. Also can be given search
+        operators.","title":"Query","type":"string"},"min_year":{"anyOf":[{"type":"integer"},{"type":"null"}],"description":"Filter
+        for minimum publication year, or None for no minimum year. The current year
+        is 2024.","title":"Min Year"},"max_year":{"anyOf":[{"type":"integer"},{"type":"null"}],"description":"Filter
+        for maximum publication year, or None for no maximum year. The current year
+        is 2024.","title":"Max Year"}},"required":["query","min_year","max_year"]}}},{"type":"function","function":{"name":"complete","description":"Terminate
+        using the last proposed answer.\n\nDo not invoke this tool in parallel with
+        other tools or itself.","parameters":{"type":"object","properties":{"has_successful_answer":{"description":"Set
+        True if an answer that addresses all parts of the task has been generated, otherwise
+        set False to indicate unsureness.","title":"Has Successful Answer","type":"boolean"}},"required":["has_successful_answer"]}}}]}'
       headers:
         accept:
           - application/json
@@ -216,13 +184,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "4295"
+          - "4248"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.54.3
+          - AsyncOpenAI/Python 1.56.0
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -232,7 +200,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.54.3
+          - 1.56.0
         x-stainless-raw-response:
           - "true"
         x-stainless-retry-count:
@@ -246,20 +214,20 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA4xTTY+bMBC98yusOSdVYLP54Naq3VV7qLpVV2pVKmTsAbxrbNc2EijKf6+ABEia
-          SuWArHl+b2bejA8BISA4xARYST2rjFy+fcbs4/MTp/yx+ZFh2Xz6INj7l4fv2TZaw6Jj6OwFmT+z
-          3jBdGYleaDXAzCL12KmG27twt9lH26gHKs1RdrTC+OVaL6NVtF6udsvV5kQstWDoICY/A0IIOfT/
-          rkTFsYGYrBbnSIXO0QIhHi8RAlbLLgLUOeE8VR4WE8i08qi6qlUt5QzwWsuUUSmnxMN3mJ0nn6iU
-          6ZdWfwtD/zX8XLR5FsrmqbSPnPNZvkG6NX1Bea3Y6M8MH+PxVTJCQNGq5xpq0KYOqWXlFZ8QoLao
-          K1S+qx0OCfyu0bYJxAk8WORoBXsl76hHl8AigUqotEVqE4h7ExKoaDOPHOEiwTG4df41M89iXjsq
-          T66e4sdxTFIXxurMXbkOuVDClalF6vru50MIztn6PFBfzBmM1ZXxqdevqDrZzWY3qMK0hhMabU+g
-          157KGWt/v7ihl3L0VPSLMO4eo6xEPlGnHaQ1F3oGBLPe/67mlvbQv1DF/8hPAGNoPPLUWOSCXXY8
-          XbPYvdJ/XRtd7gsG1zqPVZoLVaA1VvQPBXKThvd7vrtbh4xBcAz+AAAA//8DABdHIWoxBAAA
+          H4sIAAAAAAAAA4xTy66bMBDd8xXWrJOKPJQgdkTqY1Wp3bRRqdDEDOBeY7u2UZNG+fcKJxdImkpl
+          gaw5PmdmzozPEWMgSkgZ8AY9b42cZ7j5Wv/+tTbJ7u1uxzH7WH3JPlf10QnRwKxn6MMP4v6V9Ybr
+          1kjyQqsrzC2hp151sV2tFptktYwD0OqSZE+rjZ+v9XwZL9fzOJnHmxux0YKTg5R9ixhj7Bz+fYmq
+          pCOkLMiESEvOYU2QDpcYA6tlHwF0TjiPysNsBLlWnlRfteqknABea1lwlHJMfP3Ok/PoE0pZvK+q
+          /aEu97tEyYPMth/260R/qrNJvqv0yYSCqk7xwZ8JPsTTh2SMgcI2cA0asoUjtLx54DMGaOuuJeX7
+          2uGcw8+O7CmHNId3lkqygr+wHXpyOcxyaIUqToQ2hzSYkEOLx2nkAncJLtGz8/eJeZaqzqG8uXqL
+          X4YxSV0bqw/uwXWohBKuKSyhC91PhxC9Zgt5oLubMxirW+MLr19I9bKbZHFVhXENR3S5vYFee5Rj
+          fBsnsyd6RUkeRViEYfc48obKkTruIHal0BMgmvT+dzXPtK/9C1X/j/wIcE7GU1kYS6Xg9x2P1yz1
+          r/Rf1waXQ8HgTs5TW1RC1WSNFeGhQGWKZLWgeLMtkyVEl+gPAAAA//8DABRwDu0xBAAA
       headers:
         CF-Cache-Status:
           - DYNAMIC
         CF-RAY:
-          - 8e41e4496df2faa2-SJC
+          - 8ebdc74fef19aab2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -267,7 +235,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sun, 17 Nov 2024 18:47:53 GMT
+          - Mon, 02 Dec 2024 19:38:40 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -281,7 +249,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "387"
+          - "673"
         openai-version:
           - "2020-10-01"
         strict-transport-security:
@@ -293,13 +261,13 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999826"
+          - "29999825"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_a581b64c34b927f0214d7195d6a4cdff
+          - req_4c7f5e8097ad25ebed8c019e58c65207
       status:
         code: 200
         message: OK

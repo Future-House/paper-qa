@@ -236,7 +236,7 @@ class Docs(BaseModel):
 
     def add(
         self,
-        path: Path,
+        path: str | Path,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
@@ -266,7 +266,7 @@ class Docs(BaseModel):
 
     async def aadd(  # noqa: PLR0912
         self,
-        path: Path,
+        path: str | Path,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
@@ -402,7 +402,8 @@ class Docs(BaseModel):
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
                 not parse_config.disable_doc_valid_check
-                and not maybe_is_text(texts[0].text)
+                # Use the first few text chunks to avoid potential issues with title page parsing in the first chunk
+                and not maybe_is_text("".join(text.text for text in texts[:5]))
             )
         ):
             raise ValueError(
