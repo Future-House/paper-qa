@@ -22,6 +22,7 @@ import litellm
 import numpy as np
 import tiktoken
 from aviary.core import ToolRequestMessage, ToolSelector
+from llmclient.utils import is_coroutine_callable
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -34,7 +35,6 @@ from pydantic import (
 from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
 from paperqa.types import Embeddable, LLMResult
-from paperqa.utils import is_coroutine_callable
 
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],

@@ -22,7 +22,8 @@ from aviary.core import Tool, ToolCall, ToolRequestMessage, ToolsAdapter, ToolSe
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
-from ldp.llms import EmbeddingModel, MultipleCompletionLLMModel
+from ldp.llms import MultipleCompletionLLMModel
+from llmclient.embeddings import EmbeddingModel
 from pytest_subtests import SubTests
 from tantivy import Index
 

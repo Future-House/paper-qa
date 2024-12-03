@@ -5,12 +5,12 @@ from typing import Any, ClassVar, Self, cast
 from aviary.core import (
     Environment,
     Frame,
-    Message,
     Messages,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
 )
+from llmclient.messages import Message
 
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel

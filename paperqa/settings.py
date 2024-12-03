@@ -10,6 +10,7 @@ from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
 from aviary.core import ToolSelector
+from llmclient.embeddings import EmbeddingModel as LDPEmbeddingModel
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -32,7 +33,6 @@ try:
     )
     from ldp.graph.memory import Memory, UIndexMemoryModel
     from ldp.graph.op_utils import set_training_mode
-    from ldp.llms import EmbeddingModel as LDPEmbeddingModel
 
     _Memories = TypeAdapter(dict[int, Memory] | list[Memory])  # type: ignore[var-annotated]
 

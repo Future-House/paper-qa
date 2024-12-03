@@ -219,14 +219,6 @@ def get_loop() -> asyncio.AbstractEventLoop:
     return loop
 
 
-def is_coroutine_callable(obj):
-    if inspect.isfunction(obj):
-        return inspect.iscoroutinefunction(obj)
-    elif callable(obj):  # noqa: RET505
-        return inspect.iscoroutinefunction(obj.__call__)
-    return False
-
-
 def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
     """Encode a value (e.g. a DOI) optionally with a max length."""
     if isinstance(value, UUID):

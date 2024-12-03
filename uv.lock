@@ -484,23 +484,148 @@ wheels = [
 ]
 
 [[package]]
+name = "fh-llm-client"
+version = "0.1.dev37+g250d03e.d20241203"
+source = { directory = "../llm-client" }
+dependencies = [
+    { name = "aiofiles" },
+    { name = "coredis" },
+    { name = "dm-tree" },
+    { name = "fhaviary" },
+    { name = "httpx" },
+    { name = "limits" },
+    { name = "litellm" },
+    { name = "networkx", extra = ["default"] },
+    { name = "numpy" },
+    { name = "pydantic" },
+    { name = "pymupdf" },
+    { name = "tenacity" },
+    { name = "tiktoken" },
+    { name = "tqdm" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "usearch" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofiles" },
+    { name = "coredis" },
+    { name = "dm-tree" },
+    { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.109" },
+    { name = "fh-llm-client", extras = ["local", "monitor", "nn", "rich", "server", "typing", "visualization"], marker = "extra == 'dev'" },
+    { name = "fhaviary", directory = "../aviary" },
+    { name = "fhaviary", extras = ["xml"], marker = "extra == 'dev'" },
+    { name = "httpx" },
+    { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "limits" },
+    { name = "litellm", specifier = ">=1.44" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
+    { name = "networkx", extras = ["default"], specifier = "~=3.4" },
+    { name = "numpy" },
+    { name = "pillow", marker = "extra == 'image'" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
+    { name = "pydantic", specifier = "~=2.0,>=2.10.1,<2.10.2" },
+    { name = "pydantic", marker = "extra == 'dev'", specifier = "~=2.0" },
+    { name = "pydot", marker = "extra == 'visualization'", specifier = ">=3.0.1" },
+    { name = "pylint-pydantic", marker = "extra == 'dev'" },
+    { name = "pymupdf", specifier = ">=1.24.12" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
+    { name = "pytest-mock", marker = "extra == 'dev'" },
+    { name = "pytest-recording", marker = "extra == 'dev'" },
+    { name = "pytest-rerunfailures", marker = "extra == 'dev'" },
+    { name = "pytest-subtests", marker = "extra == 'dev'" },
+    { name = "pytest-sugar", marker = "extra == 'dev'" },
+    { name = "pytest-timer", extras = ["colorama"], marker = "extra == 'dev'" },
+    { name = "pytest-xdist", marker = "extra == 'dev'" },
+    { name = "python-dotenv", marker = "extra == 'dev'" },
+    { name = "refurb", marker = "extra == 'dev'", specifier = ">=2" },
+    { name = "rich", marker = "extra == 'rich'" },
+    { name = "sentence-transformers", marker = "extra == 'local'" },
+    { name = "tenacity" },
+    { name = "tiktoken", specifier = ">=0.4.0" },
+    { name = "torch", marker = "extra == 'nn'", specifier = ">=2.2" },
+    { name = "tqdm" },
+    { name = "tqdm", marker = "extra == 'rich'", specifier = ">=4.56" },
+    { name = "types-aiofiles", marker = "extra == 'typing'" },
+    { name = "types-tqdm", marker = "extra == 'typing'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "usearch", specifier = ">=2.13" },
+    { name = "wandb", marker = "extra == 'monitor'" },
+]
+
+[package.metadata.requires-dev]
+codeflash = [
+    { name = "codeflash", specifier = ">=0.7" },
+    { name = "fh-llm-client", extras = ["dev"] },
+]
+dev = [{ name = "fh-llm-client", extras = ["dev"] }]
+
+[[package]]
 name = "fhaviary"
-version = "0.10.2"
-source = { registry = "https://pypi.org/simple" }
+version = "0.10.1.dev14+gf0e1cd5.d20241203"
+source = { editable = "../aviary" }
 dependencies = [
     { name = "docstring-parser" },
+    { name = "fh-llm-client" },
     { name = "httpx" },
     { name = "pydantic" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/63/aa/4a3f65adda59b0333d2993c722830eabfe352356c1ee1327def047708f11/fhaviary-0.10.2.tar.gz", hash = "sha256:fae4964442f3cfb450d642a2a25a08f53ae3603253334790ac7d567d37cca13c", size = 236490 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/5e/f279a4e26128d6c68ecf8a11d1743e428aa72ceac4c70c51983ea6368bf9/fhaviary-0.10.2-py3-none-any.whl", hash = "sha256:41eeb0b21d967bea0c9c9d0d7b02b6c3e5e763d115778554f0ded0fba6739dc3", size = 45807 },
 ]
 
 [package.optional-dependencies]
 llm = [
+    { name = "fh-llm-client" },
     { name = "litellm" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "aviary-gsm8k", marker = "extra == 'gsm8k'", editable = "../aviary/packages/gsm8k" },
+    { name = "aviary-gsm8k", extras = ["typing"], marker = "extra == 'dev'", editable = "../aviary/packages/gsm8k" },
+    { name = "aviary-hotpotqa", marker = "extra == 'dev'", editable = "../aviary/packages/hotpotqa" },
+    { name = "aviary-hotpotqa", marker = "extra == 'hotpotqa'", editable = "../aviary/packages/hotpotqa" },
+    { name = "boto3", marker = "extra == 'cloud'" },
+    { name = "boto3-stubs", extras = ["s3"], marker = "extra == 'typing'" },
+    { name = "click", marker = "extra == 'server'" },
+    { name = "cloudpickle", marker = "extra == 'server'" },
+    { name = "dicttoxml", marker = "extra == 'xml'" },
+    { name = "docstring-parser", specifier = ">=0.16" },
+    { name = "fastapi", marker = "extra == 'server'" },
+    { name = "fh-llm-client", directory = "../llm-client" },
+    { name = "fh-llm-client", marker = "extra == 'llm'", directory = "../llm-client" },
+    { name = "fhaviary", extras = ["image", "llm", "server", "typing", "xml"], marker = "extra == 'dev'", editable = "../aviary" },
+    { name = "httpx" },
+    { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "litellm", marker = "python_full_version >= '3.13' and extra == 'llm'", specifier = ">=1.49.1" },
+    { name = "litellm", marker = "python_full_version < '3.13' and extra == 'llm'" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
+    { name = "numpy", marker = "extra == 'typing'" },
+    { name = "paper-qa", extras = ["ldp"], marker = "extra == 'paperqa'", specifier = ">=5" },
+    { name = "pillow", marker = "extra == 'image'" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
+    { name = "pydantic", specifier = "~=2.0" },
+    { name = "pydantic", marker = "extra == 'dev'", specifier = "~=2.9" },
+    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.2" },
+    { name = "pylint-pydantic", marker = "extra == 'dev'" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
+    { name = "pytest-recording", marker = "extra == 'dev'" },
+    { name = "pytest-subtests", marker = "extra == 'dev'" },
+    { name = "pytest-sugar", marker = "extra == 'dev'" },
+    { name = "pytest-timer", extras = ["colorama"], marker = "extra == 'dev'" },
+    { name = "pytest-xdist", marker = "extra == 'dev'" },
+    { name = "refurb", marker = "extra == 'dev'", specifier = ">=2" },
+    { name = "typeguard", marker = "extra == 'dev'" },
+    { name = "types-pillow", marker = "extra == 'typing'" },
+    { name = "uvicorn", marker = "extra == 'server'" },
+]
+
+[package.metadata.requires-dev]
+codeflash = [
+    { name = "codeflash", specifier = ">=0.7" },
+    { name = "fhaviary", extras = ["dev"], editable = "../aviary" },
+]
+dev = [{ name = "fhaviary", extras = ["dev"], editable = "../aviary" }]
 
 [[package]]
 name = "filelock"
@@ -915,11 +1040,12 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.14.5"
-source = { registry = "https://pypi.org/simple" }
+version = "0.14.4.dev14+gf72ef1b.d20241203"
+source = { directory = "../ldp" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
+    { name = "fh-llm-client" },
     { name = "fhaviary" },
     { name = "httpx" },
     { name = "litellm" },
@@ -932,10 +1058,59 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/d2/c3969d559df3c369f40a302d38ef4499d03f5a75953e0f56a91f914f7a85/ldp-0.14.5.tar.gz", hash = "sha256:377a971bcdf209cefbe813fc3a456708f63eac9444d90d8dcb35bb16438b4d3f", size = 370956 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/c0/865d39c0333d6f525082e525ed81412853ce154d50031819f53f57e10813/ldp-0.14.5-py3-none-any.whl", hash = "sha256:e9959be14eac7352755b50d1b9c223afa585ad3146c5eb2d550f1e8b228fd287", size = 100996 },
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofiles" },
+    { name = "dm-tree" },
+    { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.109" },
+    { name = "fh-llm-client", directory = "../llm-client" },
+    { name = "fhaviary", directory = "../aviary" },
+    { name = "fhaviary", extras = ["xml"], marker = "extra == 'dev'" },
+    { name = "httpx" },
+    { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "ldp", extras = ["monitor", "nn", "rich", "server", "typing", "visualization"], marker = "extra == 'dev'" },
+    { name = "litellm", specifier = ">=1.52.15" },
+    { name = "litellm", marker = "extra == 'dev'", specifier = "!=1.49.4,!=1.49.5,!=1.49.6" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
+    { name = "networkx", extras = ["default"], specifier = "~=3.4" },
+    { name = "numpy", specifier = ">=1.20" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
+    { name = "pydantic", specifier = "~=2.0" },
+    { name = "pydantic", marker = "extra == 'dev'", specifier = "~=2.9" },
+    { name = "pydot", marker = "extra == 'visualization'", specifier = ">=3.0.1" },
+    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.2" },
+    { name = "pylint-pydantic", marker = "extra == 'dev'" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
+    { name = "pytest-mock", marker = "extra == 'dev'" },
+    { name = "pytest-recording", marker = "extra == 'dev'" },
+    { name = "pytest-rerunfailures", marker = "extra == 'dev'" },
+    { name = "pytest-subtests", marker = "extra == 'dev'" },
+    { name = "pytest-sugar", marker = "extra == 'dev'" },
+    { name = "pytest-timer", extras = ["colorama"], marker = "extra == 'dev'" },
+    { name = "pytest-xdist", marker = "extra == 'dev'" },
+    { name = "refurb", marker = "extra == 'dev'", specifier = ">=2" },
+    { name = "rich", marker = "extra == 'rich'" },
+    { name = "tenacity" },
+    { name = "tiktoken" },
+    { name = "torch", marker = "extra == 'nn'", specifier = ">=2.2" },
+    { name = "tqdm" },
+    { name = "tqdm", marker = "extra == 'rich'", specifier = ">=4.56" },
+    { name = "types-aiofiles", marker = "extra == 'typing'" },
+    { name = "types-tqdm", marker = "extra == 'typing'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "usearch", specifier = ">=2.13" },
+    { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
+    { name = "wandb", marker = "extra == 'monitor'" },
 ]
+
+[package.metadata.requires-dev]
+codeflash = [
+    { name = "codeflash", specifier = ">=0.7" },
+    { name = "ldp", extras = ["dev"] },
+]
+dev = [{ name = "ldp", extras = ["dev"] }]
 
 [[package]]
 name = "limits"
@@ -1500,12 +1675,13 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev15+gd03d424"
+version = "5.5.1.dev20+gc8492d9.d20241203"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
     { name = "coredis" },
+    { name = "fh-llm-client" },
     { name = "fhaviary", extra = ["llm"] },
     { name = "html2text" },
     { name = "httpx" },
@@ -1544,9 +1720,11 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "datasets" },
     { name = "ipython" },
+    { name = "ldp" },
     { name = "mypy" },
-    { name = "paper-qa", extra = ["datasets", "ldp", "local", "typing", "zotero"] },
+    { name = "pandas-stubs" },
     { name = "pre-commit" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1559,8 +1737,12 @@ dev = [
     { name = "pytest-timer", extra = ["colorama"] },
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
+    { name = "pyzotero" },
     { name = "refurb" },
+    { name = "sentence-transformers" },
     { name = "typeguard" },
+    { name = "types-pyyaml" },
+    { name = "types-setuptools" },
 ]
 
 [package.metadata]
@@ -1569,10 +1751,11 @@ requires-dist = [
     { name = "anyio" },
     { name = "coredis" },
     { name = "datasets", marker = "extra == 'datasets'" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.2" },
+    { name = "fh-llm-client", directory = "../llm-client" },
+    { name = "fhaviary", extras = ["llm"], directory = "../aviary" },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.14.5" },
+    { name = "ldp", marker = "extra == 'ldp'", directory = "../ldp" },
     { name = "limits" },
     { name = "litellm", specifier = ">=1.44" },
     { name = "numpy" },
@@ -1855,16 +2038,16 @@ wheels = [
 
 [[package]]
 name = "pydantic"
-version = "2.10.2"
+version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-types" },
     { name = "pydantic-core" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/86/a03390cb12cf64e2a8df07c267f3eb8d5035e0f9a04bb20fb79403d2a00e/pydantic-2.10.2.tar.gz", hash = "sha256:2bc2d7f17232e0841cbba4641e65ba1eb6fafb3a08de3a091ff3ce14a197c4fa", size = 785401 }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/bd/7fc610993f616d2398958d0028d15eaf53bde5f80cb2edb7aa4f1feaf3a7/pydantic-2.10.1.tar.gz", hash = "sha256:a4daca2dc0aa429555e0656d6bf94873a7dc5f54ee42b1f5873d666fb3f35560", size = 783717 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/74/da832196702d0c56eb86b75bfa346db9238617e29b0b7ee3b8b4eccfe654/pydantic-2.10.2-py3-none-any.whl", hash = "sha256:cfb96e45951117c3024e6b67b25cdc33a3cb7b2fa62e239f7af1378358a1d99e", size = 456364 },
+    { url = "https://files.pythonhosted.org/packages/e0/fc/fda48d347bd50a788dd2a0f318a52160f911b86fc2d8b4c86f4d7c9bceea/pydantic-2.10.1-py3-none-any.whl", hash = "sha256:a8d20db84de64cf4a7d59e899c2caf0fe9d660c7cfc482528e7020d7dd189a7e", size = 455329 },
 ]
 
 [[package]]

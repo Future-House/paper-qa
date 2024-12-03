@@ -13,7 +13,7 @@ from uuid import UUID, uuid4
 
 import litellm  # for cost
 import tiktoken
-from aviary.core import Message
+from llmclient.messages import Message
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError

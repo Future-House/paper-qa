@@ -42,7 +42,9 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
-    "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
+    "fh-llm-client @ /Users/maykcaldas/Documents/FutureHouse/llm-client",  # TODO: change it to fh-llm-client after next release
+    "fhaviary[llm] @ /Users/maykcaldas/Documents/FutureHouse/aviary",  # TODO: change it to fh-llm-client after next release
+    # "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
@@ -75,7 +77,7 @@ datasets = [
     "datasets",
 ]
 ldp = [
-    "ldp>=0.14.5",  # For Callback.before_rollout
+    "ldp @ /Users/maykcaldas/Documents/FutureHouse/ldp",  # TODO: change it to ldp after next release
 ]
 local = [
     "sentence-transformers",

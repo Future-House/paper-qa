@@ -4,13 +4,13 @@ from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any
 
 from aviary.core import (
-    MalformedMessageError,
-    Message,
     ToolCall,
     ToolRequestMessage,
     ToolSelector,
     ToolSelectorLedger,
 )
+from llmclient.exceptions import MalformedMessageError
+from llmclient.messages import Message
 from pydantic import BaseModel
 from rich.console import Console
 from tenacity import (
