@@ -34,7 +34,7 @@ from pydantic import (
 
 from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
-from paperqa.types import Embeddable, LLMResult
+from paperqa.types import Embeddable, LLMResult, Text
 from paperqa.utils import is_coroutine_callable
 
 try:
@@ -911,6 +911,7 @@ class NumpyVectorStore(VectorStore):
         # we could use arg-partition here
         # but a lot of algorithms expect a sorted list
         sorted_indices = np.argsort(-similarity_scores)
+
         return (
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
@@ -924,6 +925,15 @@ class QdrantVectorStore(VectorStore):
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return (
+            self.collection_name == other.collection_name
+            and self.vector_name == other.vector_name
+            and self.client.init_options == other.client.init_options
+        )
 
     @model_validator(mode="after")
     def validate_client(self):
@@ -975,12 +985,16 @@ class QdrantVectorStore(VectorStore):
                 ),
             )
 
+        payload = [t.model_dump(exclude={"embedding"}) for t in texts_list]
         vectors = [
             {self.vector_name: t.embedding} if self.vector_name else t.embedding
             for t in texts_list
         ]
         self.client.upload_collection(
-            collection_name=self.collection_name, vectors=vectors, wait=True
+            collection_name=self.collection_name,
+            vectors=vectors,
+            payload=payload,
+            wait=True,
         )
 
     async def similarity_search(
@@ -999,11 +1013,17 @@ class QdrantVectorStore(VectorStore):
             using=self.vector_name,
             limit=k,
             with_vectors=True,
+            with_payload=True,
         ).points
 
         return (
             [
-                p.vector[self.vector_name] if self.vector_name else p.vector
+                Text(
+                    **p.payload,
+                    embedding=(
+                        p.vector[self.vector_name] if self.vector_name else p.vector
+                    ),
+                )
                 for p in points
             ],
             [p.score for p in points],
