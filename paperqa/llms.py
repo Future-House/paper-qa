@@ -37,6 +37,13 @@ from paperqa.rate_limiter import GLOBAL_LIMITER
 from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
 
+try:
+    from qdrant_client import QdrantClient, models
+
+    qdrant_installed = True
+except ImportError:
+    qdrant_installed = False
+
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
     Awaitable[LLMResult],
@@ -912,14 +919,20 @@ class NumpyVectorStore(VectorStore):
 
 class QdrantVectorStore(VectorStore):
     client: Any = Field(
-        default=None, description="Instance of qdrant_client.QdrantClient"
+        default=None,
+        description="Instance of `qdrant_client.QdrantClient`. Tries to connect to http://localhost:6333/ by default.",
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
 
     @model_validator(mode="after")
     def validate_client(self):
-        from qdrant_client import QdrantClient
+        if not qdrant_installed:
+            msg = (
+                "`QdrantVectorStore` requires the `qdrant-client` package. "
+                "Install it with `pip install paper-qa[qdrant]`"
+            )
+            raise ImportError(msg)
 
         if self.client and not isinstance(self.client, QdrantClient):
             raise TypeError(
@@ -927,13 +940,13 @@ class QdrantVectorStore(VectorStore):
             )
 
         if not self.client:
+            # The default instance connects to http://localhost:6333/
             self.client = QdrantClient()
 
         return self
 
     def clear(self) -> None:
         super().clear()
-        from qdrant_client import models
 
         if not self.client.collection_exists(self.collection_name):
             return
@@ -946,7 +959,6 @@ class QdrantVectorStore(VectorStore):
 
     def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
-        from qdrant_client import models
 
         texts_list = list(texts)
 
