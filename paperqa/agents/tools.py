@@ -5,8 +5,9 @@ import inspect
 import logging
 import re
 import sys
+from collections.abc import Callable
 from itertools import chain
-from typing import ClassVar, cast
+from typing import ClassVar, Self, cast
 
 from aviary.core import ToolRequestMessage
 from pydantic import BaseModel, ConfigDict, Field, computed_field
@@ -31,6 +32,23 @@ def make_status(
     )
 
 
+def default_status(state: "EnvironmentState") -> str:
+    return make_status(
+        total_paper_count=len(state.docs.docs),
+        relevant_paper_count=len(
+            {
+                c.text.doc.dockey
+                for c in state.session.contexts
+                if c.score > state.RELEVANT_SCORE_CUTOFF
+            }
+        ),
+        evidence_count=len(
+            [c for c in state.session.contexts if c.score > state.RELEVANT_SCORE_CUTOFF]
+        ),
+        cost=state.session.cost,
+    )
+
+
 class EnvironmentState(BaseModel):
     """State here contains documents and answer being populated."""
 
@@ -38,6 +56,14 @@ class EnvironmentState(BaseModel):
 
     docs: Docs
     session: PQASession = Field(..., alias="answer")
+    status_fn: Callable[[Self], str] | None = Field(
+        default=None,
+        description=(
+            "Function used to generate status,"
+            " uses `paperqa.agents.tools.default_status` "
+            "if not provided."
+        ),
+    )
 
     # SEE: https://regex101.com/r/RmuVdC/1
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
@@ -48,24 +74,9 @@ class EnvironmentState(BaseModel):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def status(self) -> str:
-        return make_status(
-            total_paper_count=len(self.docs.docs),
-            relevant_paper_count=len(
-                {
-                    c.text.doc.dockey
-                    for c in self.session.contexts
-                    if c.score > self.RELEVANT_SCORE_CUTOFF
-                }
-            ),
-            evidence_count=len(
-                [
-                    c
-                    for c in self.session.contexts
-                    if c.score > self.RELEVANT_SCORE_CUTOFF
-                ]
-            ),
-            cost=self.session.cost,
-        )
+        if self.status_fn is not None:
+            return self.status_fn(cast(Self, self))
+        return default_status(self)
 
     def record_action(self, action: ToolRequestMessage) -> None:
         self.session.add_tokens(action)
