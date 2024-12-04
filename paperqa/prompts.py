@@ -78,7 +78,7 @@ Provide a summary of the relevant information that could help answer the questio
   "relevance_score": "..."
 }}
 
-where `summary` is relevant information from text - {summary_length} words and `relevance_score` is the relevance of `summary` to answer question (out of 10).
+where `summary` is relevant information from text - {summary_length} words and `relevance_score` is an integer score from 1-10 for the relevance of `summary` to answer question.
 """  # noqa: E501
 
 env_system_prompt = (
