@@ -130,12 +130,19 @@ def strip_citations(text: str) -> str:
 
 
 def extract_score(text: str) -> int:
-    # check for N/A
+    """
+    Extract an integer score from the text in 0 to 10.
+
+    Note: score is 1-10, and we use 0 as a sentinel for not applicable.
+    """
+    # check for N/A, NA, not applicable, not relevant
     last_line = text.split("\n")[-1]
-    if "N/A" in last_line or "n/a" in last_line or "NA" in last_line:
-        return 0
-    # check for not applicable, not relevant in summary
-    if "not applicable" in text.lower() or "not relevant" in text.lower():
+    if (
+        "n/a" in last_line.lower()
+        or "NA" in last_line
+        or "not applicable" in text.lower()
+        or "not relevant" in text.lower()
+    ):
         return 0
 
     score = re.search(r"[sS]core[:is\s]+([0-9]+)", text)
