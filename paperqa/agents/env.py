@@ -10,10 +10,11 @@ from aviary.core import (
     ToolRequestMessage,
     ToolResponseMessage,
 )
+from llmclient.embeddings import EmbeddingModel
 from llmclient.messages import Message
 
 from paperqa.docs import Docs
-from paperqa.llms import EmbeddingModel, LiteLLMModel
+from paperqa.llms import LiteLLMModel
 from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.utils import get_year

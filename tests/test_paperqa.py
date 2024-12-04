@@ -11,6 +11,12 @@ from pathlib import Path
 import httpx
 import numpy as np
 import pytest
+from llmclient.embeddings import (
+    EmbeddingModel,
+    HybridEmbeddingModel,
+    LiteLLMEmbeddingModel,
+    SparseEmbeddingModel,
+)
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -27,13 +33,7 @@ from paperqa import (
 from paperqa.clients import CrossrefProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
-from paperqa.llms import (
-    EmbeddingModel,
-    HybridEmbeddingModel,
-    LiteLLMEmbeddingModel,
-    LLMModel,
-    SparseEmbeddingModel,
-)
+from paperqa.llms import LLMModel
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc

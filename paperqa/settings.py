@@ -40,7 +40,9 @@ try:
 except ImportError:
     HAS_LDP_INSTALLED = False
 
-from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
+from llmclient.embeddings import EmbeddingModel, embedding_model_factory
+
+from paperqa.llms import LiteLLMModel
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,

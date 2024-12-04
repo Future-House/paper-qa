@@ -5,11 +5,11 @@ from typing import Any
 
 import pytest
 from limits import RateLimitItemPerSecond
+from llmclient.embeddings import LiteLLMEmbeddingModel
 
 from paperqa.llms import (
     CHARACTERS_PER_TOKEN_ASSUMPTION,
     Chunk,
-    LiteLLMEmbeddingModel,
     LiteLLMModel,
 )
 from paperqa.types import LLMResult
