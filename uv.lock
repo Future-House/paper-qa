@@ -1611,7 +1611,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.7.1.dev1+g60e3e39.d20241204"
+version = "5.7.1.dev10+g654ff1b.d20241205"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1657,6 +1657,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
+    { name = "qdrant-client" },
     { name = "refurb" },
     { name = "sentence-transformers" },
     { name = "typeguard" },
@@ -1701,6 +1702,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-dotenv" },
     { name = "pyzotero" },
+    { name = "qdrant-client" },
     { name = "refurb" },
     { name = "sentence-transformers" },
     { name = "typeguard" },
@@ -1724,7 +1726,7 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
-    { name = "paper-qa", extras = ["datasets", "ldp", "local", "typing", "zotero"], marker = "extra == 'dev'" },
+    { name = "paper-qa", extras = ["datasets", "ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0,>=2.10.1" },
@@ -1742,6 +1744,7 @@ requires-dist = [
     { name = "pytest-xdist", marker = "extra == 'dev'" },
     { name = "python-dotenv", marker = "extra == 'dev'" },
     { name = "pyzotero", marker = "extra == 'zotero'" },
+    { name = "qdrant-client", marker = "extra == 'qdrant'" },
     { name = "refurb", marker = "extra == 'dev'", specifier = ">=2" },
     { name = "rich" },
     { name = "sentence-transformers", marker = "extra == 'local'" },
