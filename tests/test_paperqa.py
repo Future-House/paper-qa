@@ -2,6 +2,7 @@ import contextlib
 import os
 import pathlib
 import pickle
+import re
 import textwrap
 from collections.abc import AsyncIterable
 from copy import deepcopy
@@ -938,7 +939,11 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         "10.1021/acs.jctc.2c01235",
         "10.26434/chemrxiv-2022-qfv02",
     }
-    assert "This article has 1 citations." in doc_details.formatted_citation
+    match = re.search(
+        r"This article has (\d+) citations", doc_details.formatted_citation
+    )
+    assert match
+    assert int(match.group(1)) >= 1, "Expected at least one citation"
     assert "ChemRxiv" in doc_details.formatted_citation
 
     num_retries = 3

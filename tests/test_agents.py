@@ -495,6 +495,22 @@ async def test_agent_sharing_state(
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
 
+    with subtests.test(msg="Custom and default environment status"):
+        assert re.search(
+            pattern=EnvironmentState.STATUS_SEARCH_REGEX_PATTERN,
+            string=env_state.status,
+        ), "Default status not formatted correctly"
+        # override the status function with a new one
+
+        def new_status(state: EnvironmentState) -> str:
+            return f"Custom status: paper count = {len(state.docs.docs)}"
+
+        env_state.status_fn = new_status
+        assert env_state.status == new_status(
+            env_state
+        ), "Custom status not set correctly."
+        env_state.status_fn = None
+
     # run an initial complete tool to see that the answer object is populated by it
     # this simulates if no gen_answer tool was called
     with subtests.test(msg=Complete.__name__):
