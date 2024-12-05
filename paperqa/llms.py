@@ -925,6 +925,7 @@ class QdrantVectorStore(VectorStore):
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
+    _ids: list[str] = []
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
@@ -936,6 +937,7 @@ class QdrantVectorStore(VectorStore):
             and self.collection_name == other.collection_name
             and self.vector_name == other.vector_name
             and self.client.init_options == other.client.init_options
+            and self._ids == other._ids
         )
 
     @model_validator(mode="after")
@@ -969,6 +971,7 @@ class QdrantVectorStore(VectorStore):
             points_selector=models.Filter(must=[]),
             wait=True,
         )
+        self._ids = []
 
     def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
@@ -988,17 +991,26 @@ class QdrantVectorStore(VectorStore):
                 ),
             )
 
-        payload = [t.model_dump(exclude={"embedding"}) for t in texts_list]
-        vectors = [
-            {self.vector_name: t.embedding} if self.vector_name else t.embedding
-            for t in texts_list
-        ]
+        ids, payloads, vectors = [], [], []
+        for text in texts_list:
+            # Entries with same IDs are overwritten.
+            # We generate deterministic UUIDs based on the embedding vectors.
+            ids.append(uuid.uuid5(uuid.NAMESPACE_URL, str(text.embedding)).hex)
+            payloads.append(text.model_dump(exclude={"embedding"}))
+            vectors.append(
+                {self.vector_name: text.embedding}
+                if self.vector_name
+                else text.embedding
+            )
+
         self.client.upload_collection(
             collection_name=self.collection_name,
             vectors=vectors,
-            payload=payload,
+            payload=payloads,
             wait=True,
+            ids=ids,
         )
+        self._ids = ids
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
