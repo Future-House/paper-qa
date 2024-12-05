@@ -19,7 +19,6 @@ summary_json_prompt = (
 CANNOT_ANSWER_PHRASE = "I cannot answer"
 qa_prompt = (
     "Answer the question below with the context.\n\n"
-    "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
     "If the context provides insufficient information reply "
@@ -107,6 +106,5 @@ EVAL_PROMPT_TEMPLATE = (
     "\n\nSingle Letter Answer:"
 )
 
-CONTEXT_OUTER_PROMPT = "{context_str}\n\nValid Keys: {valid_keys}"
-CONTEXT_INNER_PROMPT_NOT_DETAILED = "{name}: {text}"
-CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"
+CONTEXT_OUTER_PROMPT = "\n\nValid Keys: {valid_keys}"
+CONTEXT_INNER_PROMPT = "{name}: {text}\nFrom {citation}"
