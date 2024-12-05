@@ -1199,3 +1199,68 @@ def test_answer_rename(recwarn) -> None:
 def test_dois_resolve_to_correct_journals(doi_journals):
     details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
     assert details.journal == doi_journals["journal"]
+
+
+@pytest.mark.vcr
+@pytest.mark.parametrize("use_partition", [True, False])
+@pytest.mark.asyncio
+async def test_partitioning_fn_docs(use_partition: bool) -> None:
+    settings = Settings.from_name("fast")
+    settings.answer.evidence_k = 2  # limit to only 2
+
+    # imagine we have some special selection we want to
+    # embedding rank by itself
+    def partition_by_journal(doc: Doc) -> int:
+        if "special" in doc.citation:
+            return 1
+        return 0
+
+    partitioning_fn = None
+
+    if use_partition:
+        partitioning_fn = partition_by_journal
+
+    docs = Docs(partitioning_fn=partitioning_fn)
+
+    assert isinstance(
+        docs.texts_index, NumpyVectorStore
+    ), "We want this test to cover NumpyVectorStore"
+
+    # add docs that we can use our partitioning function on
+    stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    special_doc = Doc(docname="special", citation="special", dockey="special")
+    texts = []
+    for i, (statement, doc) in enumerate(
+        [
+            ("I like turtles", stub_doc),
+            ("I like cats", stub_doc),
+            ("I don't like turtles", special_doc),
+            ("I don't like cats", special_doc),
+        ]
+    ):
+        texts.append(Text(text=statement, name=f"statement_{i}", doc=doc))
+        texts[-1].embedding = (
+            await settings.get_embedding_model().embed_documents([texts[-1].text])
+        )[0]
+    await docs.aadd_texts(
+        texts=[t for t in texts if t.doc.docname == "stub"], doc=stub_doc
+    )
+    await docs.aadd_texts(
+        texts=[t for t in texts if t.doc.docname == "special"], doc=special_doc
+    )
+
+    # Get the contexts -- ranked via partitioning
+    # without partitioning, the "I like X" statements would be ranked first
+    # with partitioning, we are forcing them to be interleaved, thus
+    # at least one "I don't like X" statements will be in the top 2
+    session = await docs.aget_evidence("What do I like?", settings=settings)
+    assert docs.texts_index.texts == docs.texts == texts
+
+    if use_partition:
+        assert any(
+            "don't" in c.text.text for c in session.contexts
+        ), 'Should have at least one "I don\'t like X" statement'
+    else:
+        assert all(
+            "don't" not in c.text.text for c in session.contexts
+        ), "None of the 'don't like X' statements should be included"

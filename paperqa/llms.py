@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import functools
+import itertools
+import logging
 from abc import ABC, abstractmethod
 from collections.abc import (
     AsyncGenerator,
@@ -33,7 +35,7 @@ from pydantic import (
 
 from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
-from paperqa.types import Embeddable, LLMResult
+from paperqa.types import Doc, Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
 
 PromptRunner = Callable[
@@ -42,6 +44,8 @@ PromptRunner = Callable[
 ]
 
 MODEL_COST_MAP = litellm.get_model_cost_map("")
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_args(func: Callable, chunk: str, name: str | None) -> tuple[tuple, dict]:
@@ -794,7 +798,10 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     async def similarity_search(
-        self, query: str, k: int, embedding_model: EmbeddingModel
+        self,
+        query: str,
+        k: int,
+        embedding_model: EmbeddingModel,
     ) -> tuple[Sequence[Embeddable], list[float]]:
         pass
 
@@ -802,8 +809,25 @@ class VectorStore(BaseModel, ABC):
     def clear(self) -> None:
         self.texts_hashes = set()
 
+    async def partitioned_similarity_search(
+        self,
+        query: str,
+        k: int,
+        embedding_model: EmbeddingModel,
+        partitioning_fn: Callable[[Doc], int],
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        raise NotImplementedError(
+            "Need to use the partitioning_fn argument to "
+            "stratify the similarity search."
+        )
+
     async def max_marginal_relevance_search(
-        self, query: str, k: int, fetch_k: int, embedding_model: EmbeddingModel
+        self,
+        query: str,
+        k: int,
+        fetch_k: int,
+        embedding_model: EmbeddingModel,
+        partitioning_fn: Callable[[Doc], int] | None = None,
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
@@ -812,6 +836,8 @@ class VectorStore(BaseModel, ABC):
             k: Number of results to return.
             fetch_k: Number of results to fetch from the vector store.
             embedding_model: model used to embed the query
+            partitioning_fn: optional function to partition the documents into
+                different groups, performing MMR within each group
 
         Returns:
             List of tuples (doc, score) of length k.
@@ -819,7 +845,15 @@ class VectorStore(BaseModel, ABC):
         if fetch_k < k:
             raise ValueError("fetch_k must be greater or equal to k")
 
-        texts, scores = await self.similarity_search(query, fetch_k, embedding_model)
+        if partitioning_fn is None:
+            texts, scores = await self.similarity_search(
+                query, fetch_k, embedding_model
+            )
+        else:
+            texts, scores = await self.partitioned_similarity_search(
+                query, fetch_k, embedding_model, partitioning_fn
+            )
+
         if len(texts) <= k or self.mmr_lambda >= 1.0:
             return texts, scores
 
@@ -852,6 +886,7 @@ class VectorStore(BaseModel, ABC):
 class NumpyVectorStore(VectorStore):
     texts: list[Embeddable] = Field(default_factory=list)
     _embeddings_matrix: np.ndarray | None = None
+    _texts_filter: np.ndarray | None = None
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
@@ -875,11 +910,55 @@ class NumpyVectorStore(VectorStore):
         super().clear()
         self.texts = []
         self._embeddings_matrix = None
+        self._texts_filter = None
 
     def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
+
+    async def partitioned_similarity_search(
+        self,
+        query: str,
+        k: int,
+        embedding_model: EmbeddingModel,
+        partitioning_fn: Callable[[Doc], int],
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        scores = []
+        texts = []
+
+        # duck typing for self.texts since they don't technically
+        # have to have .doc attributes
+        if self.texts and not hasattr(self.texts[0], "doc"):
+            logger.warning(
+                "Skipping partitioning: A partitioning_fn was provided "
+                "but the texts do not have a 'doc' attribute."
+            )
+            return await self.similarity_search(query, k, embedding_model)
+
+        text_partitions = np.array([partitioning_fn(t.doc) for t in self.texts])  # type: ignore[attr-defined]
+        # CPU bound so replacing w a gather wouldn't get us anything
+        # plus we need to reset self._texts_filter each iteration
+        for partition in np.unique(text_partitions):
+            self._texts_filter = text_partitions == partition
+            _texts, _scores = await self.similarity_search(query, k, embedding_model)
+            texts.append(_texts)
+            scores.append(_scores)
+        # reset the filter after running
+        self._texts_filter = None
+
+        return (
+            [
+                t
+                for t in itertools.chain.from_iterable(itertools.zip_longest(*texts))
+                if t is not None
+            ][:k],
+            [
+                s
+                for s in itertools.chain.from_iterable(itertools.zip_longest(*scores))
+                if s is not None
+            ][:k],
+        )
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
@@ -895,8 +974,16 @@ class NumpyVectorStore(VectorStore):
 
         embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
+        embedding_matrix = self._embeddings_matrix
+
+        if self._texts_filter is not None:
+            original_indices = np.where(self._texts_filter)[0]
+            embedding_matrix = embedding_matrix[self._texts_filter]  # type: ignore[index]
+        else:
+            original_indices = np.arange(len(self.texts))
+
         similarity_scores = cosine_similarity(
-            np_query.reshape(1, -1), self._embeddings_matrix
+            np_query.reshape(1, -1), embedding_matrix
         )[0]
         similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
         # minus so descending
@@ -904,7 +991,7 @@ class NumpyVectorStore(VectorStore):
         # but a lot of algorithms expect a sorted list
         sorted_indices = np.argsort(-similarity_scores)
         return (
-            [self.texts[i] for i in sorted_indices[:k]],
+            [self.texts[i] for i in original_indices[sorted_indices][:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
         )
 

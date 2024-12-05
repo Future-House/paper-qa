@@ -80,6 +80,11 @@ class Docs(BaseModel):
         default=PAPERQA_DIR, description="Path to save index", validate_default=True
     )
     deleted_dockeys: set[DocKey] = Field(default_factory=set)
+    partitioning_fn: Callable[[Doc], int] | None = Field(
+        default=None,
+        description="Function to partition documents during retrieval,"
+        " e.g. to partition the embedding ranking according to doc type.",
+    )
 
     def __eq__(self, other) -> bool:
         if (
@@ -533,7 +538,11 @@ class Docs(BaseModel):
             list[Text],
             (
                 await self.texts_index.max_marginal_relevance_search(
-                    query, k=_k, fetch_k=2 * _k, embedding_model=embedding_model
+                    query,
+                    k=_k,
+                    fetch_k=2 * _k,
+                    embedding_model=embedding_model,
+                    partitioning_fn=self.partitioning_fn,
                 )
             )[0],
         )
@@ -600,7 +609,10 @@ class Docs(BaseModel):
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
-                session.question, _k, evidence_settings, embedding_model
+                session.question,
+                _k,
+                evidence_settings,
+                embedding_model,
             )
         else:
             matches = self.texts
