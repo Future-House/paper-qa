@@ -798,10 +798,7 @@ class VectorStore(BaseModel, ABC):
 
     @abstractmethod
     async def similarity_search(
-        self,
-        query: str,
-        k: int,
-        embedding_model: EmbeddingModel,
+        self, query: str, k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
         pass
 
@@ -924,8 +921,8 @@ class NumpyVectorStore(VectorStore):
         embedding_model: EmbeddingModel,
         partitioning_fn: Callable[[Doc], int],
     ) -> tuple[Sequence[Embeddable], list[float]]:
-        scores = []
-        texts = []
+        scores: list[list[float]] = []
+        texts: list[Sequence[Embeddable]] = []
 
         # duck typing for self.texts since they don't technically
         # have to have .doc attributes

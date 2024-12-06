@@ -1210,7 +1210,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
 
     # imagine we have some special selection we want to
     # embedding rank by itself
-    def partition_by_journal(doc: Doc) -> int:
+    def partition_by_citation(doc: Doc) -> int:
         if "special" in doc.citation:
             return 1
         return 0
@@ -1218,7 +1218,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     partitioning_fn = None
 
     if use_partition:
-        partitioning_fn = partition_by_journal
+        partitioning_fn = partition_by_citation
 
     docs = Docs(partitioning_fn=partitioning_fn)
 
@@ -1227,15 +1227,17 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     ), "We want this test to cover NumpyVectorStore"
 
     # add docs that we can use our partitioning function on
-    stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
-    special_doc = Doc(docname="special", citation="special", dockey="special")
+    positive_statements_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    negative_statements_doc = Doc(
+        docname="special", citation="special", dockey="special"
+    )
     texts = []
     for i, (statement, doc) in enumerate(
         [
-            ("I like turtles", stub_doc),
-            ("I like cats", stub_doc),
-            ("I don't like turtles", special_doc),
-            ("I don't like cats", special_doc),
+            ("I like turtles", positive_statements_doc),
+            ("I like cats", positive_statements_doc),
+            ("I don't like turtles", negative_statements_doc),
+            ("I don't like cats", negative_statements_doc),
         ]
     ):
         texts.append(Text(text=statement, name=f"statement_{i}", doc=doc))
@@ -1243,10 +1245,11 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
             await settings.get_embedding_model().embed_documents([texts[-1].text])
         )[0]
     await docs.aadd_texts(
-        texts=[t for t in texts if t.doc.docname == "stub"], doc=stub_doc
+        texts=[t for t in texts if t.doc.docname == "stub"], doc=positive_statements_doc
     )
     await docs.aadd_texts(
-        texts=[t for t in texts if t.doc.docname == "special"], doc=special_doc
+        texts=[t for t in texts if t.doc.docname == "special"],
+        doc=negative_statements_doc,
     )
 
     # Get the contexts -- ranked via partitioning

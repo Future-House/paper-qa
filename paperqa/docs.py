@@ -82,8 +82,9 @@ class Docs(BaseModel):
     deleted_dockeys: set[DocKey] = Field(default_factory=set)
     partitioning_fn: Callable[[Doc], int] | None = Field(
         default=None,
-        description="Function to partition documents during retrieval,"
+        description="Optional function to partition documents during retrieval,"
         " e.g. to partition the embedding ranking according to doc type.",
+        exclude=True,
     )
 
     def __eq__(self, other) -> bool:
