@@ -978,9 +978,7 @@ class QdrantVectorStore(VectorStore):
 
         texts_list = list(texts)
 
-        if len(texts_list) > 0 and not self.client.collection_exists(
-            self.collection_name
-        ):
+        if texts_list and not self.client.collection_exists(self.collection_name):
             params = models.VectorParams(
                 size=len(texts_list[0].embedding), distance=models.Distance.COSINE  # type: ignore[arg-type]
             )
