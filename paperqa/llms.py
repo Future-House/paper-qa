@@ -834,7 +834,7 @@ class VectorStore(BaseModel, ABC):
             fetch_k: Number of results to fetch from the vector store.
             embedding_model: model used to embed the query
             partitioning_fn: optional function to partition the documents into
-                different groups, performing MMR within each group
+                different groups, performing MMR within each group.
 
         Returns:
             List of tuples (doc, score) of length k.
