@@ -911,7 +911,6 @@ class NumpyVectorStore(VectorStore):
         # we could use arg-partition here
         # but a lot of algorithms expect a sorted list
         sorted_indices = np.argsort(-similarity_scores)
-
         return (
             [self.texts[i] for i in sorted_indices[:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
@@ -925,7 +924,7 @@ class QdrantVectorStore(VectorStore):
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
-    _ids: list[str] = []
+    _point_ids: set[str] | None = None
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
@@ -937,7 +936,7 @@ class QdrantVectorStore(VectorStore):
             and self.collection_name == other.collection_name
             and self.vector_name == other.vector_name
             and self.client.init_options == other.client.init_options
-            and self._ids == other._ids
+            and self._point_ids == other._point_ids
         )
 
     @model_validator(mode="after")
@@ -971,7 +970,7 @@ class QdrantVectorStore(VectorStore):
             points_selector=models.Filter(must=[]),
             wait=True,
         )
-        self._ids = []
+        self._point_ids = None
 
     def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
@@ -1008,7 +1007,7 @@ class QdrantVectorStore(VectorStore):
             wait=True,
             ids=ids,
         )
-        self._ids = ids
+        self._point_ids = set(ids)
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
