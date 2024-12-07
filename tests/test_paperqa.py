@@ -1215,10 +1215,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
             return 1
         return 0
 
-    partitioning_fn = None
-
-    if use_partition:
-        partitioning_fn = partition_by_citation
+    partitioning_fn = partition_by_citation if use_partition else None
 
     docs = Docs(partitioning_fn=partitioning_fn)
 
