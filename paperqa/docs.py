@@ -675,6 +675,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
         return get_loop().run_until_complete(
             self.aquery(
@@ -684,6 +685,7 @@ class Docs(BaseModel):
                 llm_model=llm_model,
                 summary_llm_model=summary_llm_model,
                 embedding_model=embedding_model,
+                partitioning_fn=partitioning_fn,
             )
         )
 
@@ -695,6 +697,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
 
         query_settings = get_settings(settings)
@@ -722,6 +725,7 @@ class Docs(BaseModel):
                 settings=settings,
                 embedding_model=embedding_model,
                 summary_llm_model=summary_llm_model,
+                partitioning_fn=partitioning_fn,
             )
             contexts = session.contexts
         pre_str = None
