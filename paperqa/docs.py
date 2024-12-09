@@ -38,6 +38,7 @@ from paperqa.types import (
     Doc,
     DocDetails,
     DocKey,
+    Embeddable,
     LLMResult,
     PQASession,
     Text,
@@ -80,12 +81,6 @@ class Docs(BaseModel):
         default=PAPERQA_DIR, description="Path to save index", validate_default=True
     )
     deleted_dockeys: set[DocKey] = Field(default_factory=set)
-    partitioning_fn: Callable[[Doc], int] | None = Field(
-        default=None,
-        description="Optional function to partition documents during retrieval,"
-        " e.g. to partition the embedding ranking according to doc type.",
-        exclude=True,
-    )
 
     def __eq__(self, other) -> bool:
         if (
@@ -524,6 +519,7 @@ class Docs(BaseModel):
         k: int,
         settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> list[Text]:
 
         settings = get_settings(settings)
@@ -543,7 +539,7 @@ class Docs(BaseModel):
                     k=_k,
                     fetch_k=2 * _k,
                     embedding_model=embedding_model,
-                    partitioning_fn=self.partitioning_fn,
+                    partitioning_fn=partitioning_fn,
                 )
             )[0],
         )
@@ -558,6 +554,7 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
         return get_loop().run_until_complete(
             self.aget_evidence(
@@ -567,6 +564,7 @@ class Docs(BaseModel):
                 callbacks=callbacks,
                 embedding_model=embedding_model,
                 summary_llm_model=summary_llm_model,
+                partitioning_fn=partitioning_fn,
             )
         )
 
@@ -578,6 +576,7 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
 
         evidence_settings = get_settings(settings)
@@ -614,6 +613,7 @@ class Docs(BaseModel):
                 _k,
                 evidence_settings,
                 embedding_model,
+                partitioning_fn=partitioning_fn,
             )
         else:
             matches = self.texts

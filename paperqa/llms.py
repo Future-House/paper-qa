@@ -35,7 +35,7 @@ from pydantic import (
 
 from paperqa.prompts import default_system_prompt
 from paperqa.rate_limiter import GLOBAL_LIMITER
-from paperqa.types import Doc, Embeddable, LLMResult
+from paperqa.types import Embeddable, LLMResult
 from paperqa.utils import is_coroutine_callable
 
 PromptRunner = Callable[
@@ -811,11 +811,21 @@ class VectorStore(BaseModel, ABC):
         query: str,
         k: int,
         embedding_model: EmbeddingModel,
-        partitioning_fn: Callable[[Doc], int],
+        partitioning_fn: Callable[[Embeddable], int],
     ) -> tuple[Sequence[Embeddable], list[float]]:
+        """Partition the documents into different groups and perform similarity search.
+
+        Args:
+            query: query string
+            k: Number of results to return
+            embedding_model: model used to embed the query
+            partitioning_fn: function to partition the documents into different groups.
+
+        Returns:
+            Tuple of lists of Embeddables and scores of length k.
+        """
         raise NotImplementedError(
-            "Need to use the partitioning_fn argument to "
-            "stratify the similarity search."
+            "partitioned_similarity_search is not implemented for this VectorStore."
         )
 
     async def max_marginal_relevance_search(
@@ -824,7 +834,7 @@ class VectorStore(BaseModel, ABC):
         k: int,
         fetch_k: int,
         embedding_model: EmbeddingModel,
-        partitioning_fn: Callable[[Doc], int] | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> tuple[Sequence[Embeddable], list[float]]:
         """Vectorized implementation of Maximal Marginal Relevance (MMR) search.
 
@@ -919,21 +929,12 @@ class NumpyVectorStore(VectorStore):
         query: str,
         k: int,
         embedding_model: EmbeddingModel,
-        partitioning_fn: Callable[[Doc], int],
+        partitioning_fn: Callable[[Embeddable], int],
     ) -> tuple[Sequence[Embeddable], list[float]]:
         scores: list[list[float]] = []
         texts: list[Sequence[Embeddable]] = []
 
-        # duck typing for self.texts since they don't technically
-        # have to have .doc attributes
-        if self.texts and not hasattr(self.texts[0], "doc"):
-            logger.warning(
-                "Skipping partitioning: A partitioning_fn was provided "
-                "but the texts do not have a 'doc' attribute."
-            )
-            return await self.similarity_search(query, k, embedding_model)
-
-        text_partitions = np.array([partitioning_fn(t.doc) for t in self.texts])  # type: ignore[attr-defined]
+        text_partitions = np.array([partitioning_fn(t) for t in self.texts])
         # CPU bound so replacing w a gather wouldn't get us anything
         # plus we need to reset self._texts_filter each iteration
         for partition in np.unique(text_partitions):

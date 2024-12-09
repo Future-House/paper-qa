@@ -4,10 +4,11 @@ import pathlib
 import pickle
 import re
 import textwrap
-from collections.abc import AsyncIterable
+from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
 from io import BytesIO
 from pathlib import Path
+from typing import cast
 
 import httpx
 import numpy as np
@@ -38,6 +39,7 @@ from paperqa.llms import (
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc
+from paperqa.types import Embeddable
 from paperqa.utils import (
     extract_score,
     get_citenames,
@@ -1210,14 +1212,14 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
 
     # imagine we have some special selection we want to
     # embedding rank by itself
-    def partition_by_citation(doc: Doc) -> int:
-        if "special" in doc.citation:
+    def partition_by_citation(t: Embeddable) -> int:
+        if isinstance(t, Text) and "special" in t.doc.citation:
             return 1
         return 0
 
     partitioning_fn = partition_by_citation if use_partition else None
 
-    docs = Docs(partitioning_fn=partitioning_fn)
+    docs = Docs()
 
     assert isinstance(
         docs.texts_index, NumpyVectorStore
@@ -1249,11 +1251,56 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
         doc=negative_statements_doc,
     )
 
+    # look at the raw rankings first, compare them with and without partitioning
+    await docs._build_texts_index(settings.get_embedding_model())
+
+    partitioned_texts, _ = cast(
+        tuple[Sequence[Text], list[float]],
+        await docs.texts_index.partitioned_similarity_search(
+            "What do I like?",
+            k=4,
+            embedding_model=settings.get_embedding_model(),
+            partitioning_fn=partition_by_citation,
+        ),
+    )
+
+    default_texts, _ = cast(
+        tuple[Sequence[Text], list[float]],
+        await docs.texts_index.similarity_search(
+            "What do I like?", k=4, embedding_model=settings.get_embedding_model()
+        ),
+    )
+
+    assert partitioned_texts != default_texts, "Should have different rankings"
+
+    # the "like" statements should be before the "don't" like by default
+    assert all(
+        "don't" not in c.text for c in default_texts[:2]
+    ), "None of the 'don't like X' should be first"
+    assert all(
+        "don't" in c.text for c in default_texts[2:]
+    ), "'don't like X' should be second"
+
+    # Otherwise they should be interleaved
+    assert (
+        sum(int("don't" in c.text) for c in default_texts[:2])
+        + sum(int("don't" not in c.text) for c in default_texts[:2])
+        == 2
+    ), "Should have 1 'like' and 1 'don't like'"
+
+    assert (
+        sum(int("don't" in c.text) for c in default_texts[2:])
+        + sum(int("don't" not in c.text) for c in default_texts[2:])
+        == 2
+    ), "Should have 1 'like' and 1 'don't like'"
+
     # Get the contexts -- ranked via partitioning
     # without partitioning, the "I like X" statements would be ranked first
     # with partitioning, we are forcing them to be interleaved, thus
     # at least one "I don't like X" statements will be in the top 2
-    session = await docs.aget_evidence("What do I like?", settings=settings)
+    session = await docs.aget_evidence(
+        "What do I like?", settings=settings, partitioning_fn=partitioning_fn
+    )
     assert docs.texts_index.texts == docs.texts == texts
 
     if use_partition:
