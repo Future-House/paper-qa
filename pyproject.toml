@@ -26,11 +26,12 @@ dependencies = [
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
     "coredis",
+    "fh-llm-client",
     "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "limits",
-    "litellm>=1.44",  # to prevent sys.stdout on router creation
+    # "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",

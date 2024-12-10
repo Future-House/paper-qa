@@ -32,7 +32,6 @@ try:
     )
     from ldp.graph.memory import Memory, UIndexMemoryModel
     from ldp.graph.op_utils import set_training_mode
-    from ldp.llms import EmbeddingModel as LDPEmbeddingModel
 
     _Memories = TypeAdapter(dict[int, Memory] | list[Memory])  # type: ignore[var-annotated]
 
@@ -40,7 +39,8 @@ try:
 except ImportError:
     HAS_LDP_INSTALLED = False
 
-from paperqa.llms import EmbeddingModel, LiteLLMModel, embedding_model_factory
+from llmclient import EmbeddingModel, LiteLLMModel, embedding_model_factory
+
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
@@ -863,9 +863,8 @@ class Settings(BaseSettings):
                 and "memories" in config
             ):
                 if "embedding_model" in config["memory_model"]:
-                    # Work around LDPEmbeddingModel not yet supporting deserialization
                     config["memory_model"]["embedding_model"] = (
-                        LDPEmbeddingModel.from_name(
+                        EmbeddingModel.from_name(
                             embedding=config["memory_model"].pop("embedding_model")[
                                 "name"
                             ]
