@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import DocDetails, PQASession
+from paperqa.types import DocDetails, Embeddable, PQASession
 
 from .search import get_directory_index
 
@@ -193,6 +193,7 @@ class GatherEvidence(NamedTool):
     settings: Settings
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
+    partitioning_fn: Callable[[Embeddable], int] | None = None
 
     async def gather_evidence(self, question: str, state: EnvironmentState) -> str:
         """
@@ -236,6 +237,7 @@ class GatherEvidence(NamedTool):
                 settings=self.settings,
                 embedding_model=self.embedding_model,
                 summary_llm_model=self.summary_llm_model,
+                partitioning_fn=self.partitioning_fn,
                 callbacks=self.settings.agent.callbacks.get(
                     f"{self.TOOL_FN_NAME}_aget_evidence"
                 ),
@@ -275,6 +277,7 @@ class GenerateAnswer(NamedTool):
     llm_model: LiteLLMModel
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
+    partitioning_fn: Callable[[Embeddable], int] | None = None
 
     async def gen_answer(self, state: EnvironmentState) -> str:
         """
@@ -305,6 +308,7 @@ class GenerateAnswer(NamedTool):
             llm_model=self.llm_model,
             summary_llm_model=self.summary_llm_model,
             embedding_model=self.embedding_model,
+            partitioning_fn=self.partitioning_fn,
             callbacks=self.settings.agent.callbacks.get(
                 f"{self.TOOL_FN_NAME}_aget_query"
             ),

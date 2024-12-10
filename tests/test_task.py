@@ -20,7 +20,7 @@ from paperqa.agents.task import (
     LitQAv2TaskSplit,
 )
 from paperqa.agents.tools import GenerateAnswer
-from paperqa.litqa import DEFAULT_REWARD_MAPPING, LitQAEvaluation
+from paperqa.litqa import DEFAULT_REWARD_MAPPING, SEED_USING_QUESTION, LitQAEvaluation
 
 
 @pytest.fixture(name="base_query_request")
@@ -103,12 +103,27 @@ class TestTaskDataset:
         expected_length: int,
         base_query_request: QueryRequest,
     ) -> None:
-        task_dataset = LitQAv2TaskDataset(base_query=base_query_request, split=split)
+        task_dataset = LitQAv2TaskDataset(
+            base_query=base_query_request,
+            question_kwargs={"seed": 42},
+            read_data_kwargs={"seed": 42},
+            split=split,
+        )
         assert len(task_dataset) == expected_length
 
         # Now let's check we could use the sources in a validation
         for i in range(len(task_dataset)):
             env = task_dataset.get_new_env_by_idx(i)
+            if i == 0 and split == LitQAv2TaskSplit.TRAIN:
+                # Yes this assertion is somewhat brittle, but it reliably
+                # checks the seeding's behavior so we keep it
+                obs, _ = await env.reset()
+                assert (
+                    "Q: SLC14A1 been identified as a specific marker for endothelial"
+                    " cells in which organ?\n\nOptions:\nA) heart\nB) eye\nC)"
+                    " prostate\nD) Insufficient information to answer this question\nE)"
+                    " liver" in (obs[0].content or "")
+                )
             assert env.sources, "Sources need to be accessible"
             assert isinstance(
                 env.sources, Iterable
@@ -144,6 +159,7 @@ class TestTaskDataset:
                         "deleted_dockeys",
                     }
                 ),
+                "question_kwargs": {"seed": SEED_USING_QUESTION},
             },
         )
         # NOTE: set base_query after construction of the TaskConfig. because in

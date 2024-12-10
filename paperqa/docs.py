@@ -38,6 +38,7 @@ from paperqa.types import (
     Doc,
     DocDetails,
     DocKey,
+    Embeddable,
     LLMResult,
     PQASession,
     Text,
@@ -518,6 +519,7 @@ class Docs(BaseModel):
         k: int,
         settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> list[Text]:
 
         settings = get_settings(settings)
@@ -533,7 +535,11 @@ class Docs(BaseModel):
             list[Text],
             (
                 await self.texts_index.max_marginal_relevance_search(
-                    query, k=_k, fetch_k=2 * _k, embedding_model=embedding_model
+                    query,
+                    k=_k,
+                    fetch_k=2 * _k,
+                    embedding_model=embedding_model,
+                    partitioning_fn=partitioning_fn,
                 )
             )[0],
         )
@@ -548,6 +554,7 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
         return get_loop().run_until_complete(
             self.aget_evidence(
@@ -557,6 +564,7 @@ class Docs(BaseModel):
                 callbacks=callbacks,
                 embedding_model=embedding_model,
                 summary_llm_model=summary_llm_model,
+                partitioning_fn=partitioning_fn,
             )
         )
 
@@ -568,6 +576,7 @@ class Docs(BaseModel):
         callbacks: list[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
 
         evidence_settings = get_settings(settings)
@@ -600,7 +609,11 @@ class Docs(BaseModel):
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
-                session.question, _k, evidence_settings, embedding_model
+                session.question,
+                _k,
+                evidence_settings,
+                embedding_model,
+                partitioning_fn=partitioning_fn,
             )
         else:
             matches = self.texts
@@ -662,6 +675,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
         return get_loop().run_until_complete(
             self.aquery(
@@ -671,6 +685,7 @@ class Docs(BaseModel):
                 llm_model=llm_model,
                 summary_llm_model=summary_llm_model,
                 embedding_model=embedding_model,
+                partitioning_fn=partitioning_fn,
             )
         )
 
@@ -682,6 +697,7 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
 
         query_settings = get_settings(settings)
@@ -709,6 +725,7 @@ class Docs(BaseModel):
                 settings=settings,
                 embedding_model=embedding_model,
                 summary_llm_model=summary_llm_model,
+                partitioning_fn=partitioning_fn,
             )
             contexts = session.contexts
         pre_str = None
