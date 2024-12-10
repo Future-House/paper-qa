@@ -3,7 +3,7 @@ from typing import cast
 
 import pytest
 
-from paperqa.litqa import LitQAEvaluation, read_litqa_v2_from_hub
+from paperqa.litqa import SEED_USING_QUESTION, LitQAEvaluation, read_litqa_v2_from_hub
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
@@ -140,16 +140,38 @@ class TestLitQAEvaluation:
         """Tests that creating multiple evaluations with the same seed results in the same prompt."""
         question, ideal, distractors = self.MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS
 
-        qa_prompt_1, _ = LitQAEvaluation.from_question(
+        qa_prompt_1a, _ = LitQAEvaluation.from_question(
             ideal=ideal, distractors=distractors, question=question, seed=0
         )
-        self._assert_prompt_is_valid(qa_prompt_1, question, ideal, distractors)
+        self._assert_prompt_is_valid(qa_prompt_1a, question, ideal, distractors)
 
-        qa_prompt_2, _ = LitQAEvaluation.from_question(
+        qa_prompt_1b, _ = LitQAEvaluation.from_question(
             ideal=ideal, distractors=distractors, question=question, seed=0
         )
-        self._assert_prompt_is_valid(qa_prompt_1, question, ideal, distractors)
-        assert qa_prompt_1 == qa_prompt_2
+        self._assert_prompt_is_valid(qa_prompt_1b, question, ideal, distractors)
+        assert qa_prompt_1a == qa_prompt_1b, "Same seeding should lead to same prompts"
+
+        qa_prompt_2a, _ = LitQAEvaluation.from_question(
+            ideal=ideal,
+            distractors=distractors,
+            question=question,
+            seed=SEED_USING_QUESTION,
+        )
+        self._assert_prompt_is_valid(qa_prompt_2a, question, ideal, distractors)
+
+        qa_prompt_2b, _ = LitQAEvaluation.from_question(
+            ideal=ideal,
+            distractors=distractors,
+            question=question,
+            seed=SEED_USING_QUESTION,
+        )
+        self._assert_prompt_is_valid(qa_prompt_2b, question, ideal, distractors)
+        assert (
+            qa_prompt_2a == qa_prompt_2b
+        ), "Same seeding strategy should lead to same prompts"
+        assert (
+            qa_prompt_2a != qa_prompt_1a
+        ), "Different seeding strategies should lead to different prompts"
 
     def test_creating_litqa_questions(self) -> None:
         """Test making LitQA eval questions after downloading from Hugging Face Hub."""
