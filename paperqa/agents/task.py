@@ -196,6 +196,7 @@ class LitQATaskDataset(
         base_query: QueryRequest | dict | None = None,
         base_docs: Docs | dict | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
+        question_kwargs: Mapping[str, Any] | None = None,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         **env_kwargs,
     ):
@@ -210,23 +211,23 @@ class LitQATaskDataset(
             base_docs = Docs(**base_docs)
         self._base_docs = base_docs
         self._rewards = rewards
-        self._env_kwargs = env_kwargs
+        self._question_kwargs = question_kwargs
         self._eval_model = eval_model
+        self._env_kwargs = env_kwargs
 
     def _make_gradable_environment(
         self,
         ideal: str,
         distractors: str | list[str],
         question: str,
-        use_unsure: bool = True,
         sources: str | list[str] | None = None,
     ) -> GradablePaperQAEnvironment:
         qa_prompt, evaluation_from_answer = LitQAEvaluation.from_question(
             ideal=ideal,
             distractors=distractors,
             question=question,
-            use_unsure=use_unsure,
             eval_model=self._eval_model,
+            **(self._question_kwargs or {}),
         )
         query = self._base_query.model_copy()
         query.query = qa_prompt
@@ -305,11 +306,14 @@ class LitQAv2TaskDataset(LitQATaskDataset):
         self,
         *args,
         labbench_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+        read_data_kwargs: Mapping[str, Any] | None = None,
         split: str | LitQAv2TaskSplit = LitQAv2TaskSplit.EVAL,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        train_df, eval_df = read_litqa_v2_from_hub(labbench_dataset)
+        train_df, eval_df = read_litqa_v2_from_hub(
+            labbench_dataset, **(read_data_kwargs or {})
+        )
         split = LitQAv2TaskSplit(split)
         if split == LitQAv2TaskSplit.TRAIN:
             self.data = train_df

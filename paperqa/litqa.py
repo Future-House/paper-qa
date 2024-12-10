@@ -8,7 +8,7 @@ import string
 from ast import literal_eval
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import StrEnum
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 try:
     from ldp.utils import discounted_returns
@@ -92,6 +92,7 @@ def make_mc_options(
 
 DEFAULT_EVAL_MODEL_NAME = "gpt-4-turbo-2024-04-09"
 DEFAULT_REWARD_MAPPING = {"correct": 1.0, "unsure": 0.1, "incorrect": -1.0}
+SEED_USING_QUESTION: Literal["SEED_USING_QUESTION"] = "SEED_USING_QUESTION"  # Sentinel
 
 
 class LitQAEvaluation(StrEnum):
@@ -161,7 +162,7 @@ class LitQAEvaluation(StrEnum):
         question: str,
         use_unsure: bool = True,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
-        seed: int | None = None,
+        seed: int | Literal["SEED_USING_QUESTION"] | None = None,
     ) -> tuple[str, Callable[[PQASession | str], Awaitable[LitQAEvaluation]]]:
         """
         Create a LitQA question and an answer-to-evaluation function.
@@ -174,11 +175,15 @@ class LitQAEvaluation(StrEnum):
             eval_model: Evaluation model to use for multiple choice letter extraction
                 from a text answer.
             seed: Optional seed to use in randomization of multiple choice letters.
+                Optionally pass in the string literal "SEED_USING_QUESTION" to hash the
+                input question for the seed.
 
         Returns:
             Two-tuple of created LitQA question, function (that can be thought of as
                 stateless) to use to extract an evaluation result from an answer.
         """
+        if seed == SEED_USING_QUESTION:
+            seed = hash(question)
         text, ideal_answer, unsure_answer, distractor_answers = make_mc_options(
             ideal=ideal,
             distractors=distractors,
