@@ -6,21 +6,24 @@ warnings.filterwarnings(
 )
 
 
-from paperqa.agents import ask  # noqa: E402
-from paperqa.agents.main import agent_query  # noqa: E402
-from paperqa.agents.models import QueryRequest  # noqa: E402
-from paperqa.docs import Docs, PQASession, print_callback  # noqa: E402
-from paperqa.llms import (  # noqa: E402
+from llmclient import (  # noqa: E402
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
     LiteLLMModel,
     LLMModel,
     LLMResult,
-    NumpyVectorStore,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
     embedding_model_factory,
+)
+
+from paperqa.agents import ask  # noqa: E402
+from paperqa.agents.main import agent_query  # noqa: E402
+from paperqa.agents.models import QueryRequest  # noqa: E402
+from paperqa.docs import Docs, PQASession, print_callback  # noqa: E402
+from paperqa.llms import (  # noqa: E402
+    NumpyVectorStore,
 )
 from paperqa.settings import Settings, get_settings  # noqa: E402
 from paperqa.types import Answer, Context, Doc, DocDetails, Text  # noqa: E402

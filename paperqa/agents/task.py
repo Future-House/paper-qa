@@ -37,6 +37,8 @@ except ImportError:
         """Placeholder for when ldp isn't installed."""
 
 
+from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
+
 from paperqa.docs import Docs
 from paperqa.litqa import (
     DEFAULT_EVAL_MODEL_NAME,
@@ -45,7 +47,6 @@ from paperqa.litqa import (
     LitQAEvaluation,
     read_litqa_v2_from_hub,
 )
-from paperqa.llms import EmbeddingModel, LiteLLMModel, LLMModel
 from paperqa.types import PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment

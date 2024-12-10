@@ -13,6 +13,13 @@ from typing import cast
 import httpx
 import numpy as np
 import pytest
+from llmclient import (
+    EmbeddingModel,
+    HybridEmbeddingModel,
+    LiteLLMEmbeddingModel,
+    LLMModel,
+    SparseEmbeddingModel,
+)
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -29,13 +36,6 @@ from paperqa import (
 from paperqa.clients import CrossrefProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
-from paperqa.llms import (
-    EmbeddingModel,
-    HybridEmbeddingModel,
-    LiteLLMEmbeddingModel,
-    LLMModel,
-    SparseEmbeddingModel,
-)
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc
@@ -716,7 +716,7 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
-    from paperqa.llms import Chunk
+    from llmclient.types import Chunk
 
     class StubLLMModel(LLMModel):
         name: str = "myllm"

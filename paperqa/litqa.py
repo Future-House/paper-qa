@@ -15,7 +15,9 @@ try:
 except ImportError:
     discounted_returns = None  # type: ignore[assignment]
 
-from paperqa.llms import LiteLLMModel, LLMModel
+from aviary.core import Message
+from llmclient import LiteLLMModel, LLMModel
+
 from paperqa.prompts import EVAL_PROMPT_TEMPLATE, QA_PROMPT_TEMPLATE
 from paperqa.settings import make_default_litellm_model_list_settings
 from paperqa.types import PQASession
@@ -198,13 +200,19 @@ class LitQAEvaluation(StrEnum):
                 answer = answer.answer
             eval_chunk = await eval_model.achat(
                 messages=[
-                    {
-                        "role": "user",
-                        "content": EVAL_PROMPT_TEMPLATE.format(
+                    Message(
+                        role="user",
+                        content=EVAL_PROMPT_TEMPLATE.format(
                             qa_prompt=qa_prompt, qa_answer=answer
                         ),
-                    }
-                ],
+                    ),
+                    # {
+                    #     "role": "user",
+                    #     "content": EVAL_PROMPT_TEMPLATE.format(
+                    #         qa_prompt=qa_prompt, qa_answer=answer
+                    #     ),
+                    # }
+                ]
             )
             if not isinstance(eval_chunk.text, str):
                 raise NotImplementedError(

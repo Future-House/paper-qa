@@ -13,6 +13,10 @@ from pathlib import Path
 from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
+from llmclient import (
+    EmbeddingModel,
+    LLMModel,
+)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -24,8 +28,6 @@ from pydantic import (
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
 from paperqa.llms import (
-    EmbeddingModel,
-    LLMModel,
     NumpyVectorStore,
     PromptRunner,
     VectorStore,

@@ -5,10 +5,10 @@ import re
 from datetime import datetime
 from typing import cast
 
+from llmclient import LiteLLMModel, LLMModel
 from rich.table import Table
 
 from paperqa.docs import Docs
-from paperqa.llms import LiteLLMModel, LLMModel
 
 from .models import AnswerResponse
 
