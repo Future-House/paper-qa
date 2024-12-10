@@ -22,6 +22,7 @@ from paperqa import (
     Docs,
     NumpyVectorStore,
     PQASession,
+    QdrantVectorStore,
     Settings,
     Text,
     print_callback,
@@ -35,6 +36,7 @@ from paperqa.llms import (
     LiteLLMEmbeddingModel,
     LLMModel,
     SparseEmbeddingModel,
+    VectorStore,
 )
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
@@ -624,21 +626,24 @@ def test_duplicate(stub_data_dir: Path) -> None:
     ), "Unique documents should be hashed as unique"
 
 
-def test_docs_with_custom_embedding(subtests: SubTests, stub_data_dir: Path) -> None:
+@pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
+def test_docs_with_custom_embedding(
+    subtests: SubTests, stub_data_dir: Path, vector_store: type[VectorStore]
+) -> None:
     class MyEmbeds(EmbeddingModel):
         name: str = "my_embed"
 
         async def embed_documents(self, texts):
-            return [[1, 2, 3] for _ in texts]
+            return [[0.0, 0.28, 0.95] for _ in texts]
 
-    docs = Docs(texts_index=NumpyVectorStore())
+    docs = Docs(texts_index=vector_store())
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=MyEmbeds(),
     )
     with subtests.test(msg="confirm-embedding"):
-        assert docs.texts[0].embedding == [1, 2, 3]
+        assert docs.texts[0].embedding == [0.0, 0.28, 0.95]
 
     with subtests.test(msg="copying-before-get-evidence"):
         # Before getting evidence, shallow and deep copies are the same
@@ -647,6 +652,7 @@ def test_docs_with_custom_embedding(subtests: SubTests, stub_data_dir: Path) -> 
             **docs.model_dump(exclude={"texts_index"}),
         )
         docs_deep_copy = deepcopy(docs)
+
         assert (
             docs.texts_index
             == docs_shallow_copy.texts_index
@@ -664,12 +670,14 @@ def test_docs_with_custom_embedding(subtests: SubTests, stub_data_dir: Path) -> 
             **docs.model_dump(exclude={"texts_index"}),
         )
         docs_deep_copy = deepcopy(docs)
+
         assert docs.texts_index != docs_shallow_copy.texts_index
         assert docs.texts_index == docs_deep_copy.texts_index
 
 
-def test_sparse_embedding(stub_data_dir: Path) -> None:
-    docs = Docs(texts_index=NumpyVectorStore())
+@pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
+def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
+    docs = Docs(texts_index=vector_store())
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -686,11 +694,12 @@ def test_sparse_embedding(stub_data_dir: Path) -> None:
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
 
-def test_hybrid_embedding(stub_data_dir: Path) -> None:
+@pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
+def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
     emb_model = HybridEmbeddingModel(
         models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()]
     )
-    docs = Docs(texts_index=NumpyVectorStore())
+    docs = Docs(texts_index=vector_store())
     docs.add(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
