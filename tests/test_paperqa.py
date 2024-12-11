@@ -14,6 +14,7 @@ import httpx
 import numpy as np
 import pytest
 from llmclient import (
+    Embeddable,
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
@@ -39,7 +40,6 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc
-from paperqa.types import Embeddable
 from paperqa.utils import (
     extract_score,
     get_citenames,
@@ -675,7 +675,7 @@ def test_sparse_embedding(stub_data_dir: Path) -> None:
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=SparseEmbeddingModel(),
     )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -696,7 +696,7 @@ def test_hybrid_embedding(stub_data_dir: Path) -> None:
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_model,
     )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
@@ -1199,7 +1199,7 @@ def test_answer_rename(recwarn) -> None:
     ],
 )
 def test_dois_resolve_to_correct_journals(doi_journals):
-    details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
+    details = DocDetails(doi=doi_journals["doi"])
     assert details.journal == doi_journals["journal"]
 
 

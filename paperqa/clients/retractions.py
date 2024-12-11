@@ -71,9 +71,7 @@ class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         if not self.doi_set:
             await self.load_data()
 
-        return doc_details + DocDetails(  # type: ignore[call-arg]
-            is_retracted=query.doi in self.doi_set
-        )
+        return doc_details + DocDetails(is_retracted=query.doi in self.doi_set)
 
     def query_creator(self, doc_details: DocDetails, **kwargs) -> DOIQuery | None:
         try:

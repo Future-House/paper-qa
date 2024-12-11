@@ -25,13 +25,10 @@ dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp",  # TODO: remove in favor of httpx
     "anyio",
-    "coredis",
     "fh-llm-client",
     "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
-    "limits",
-    # "litellm>=1.44",  # to prevent sys.stdout on router creation
     "numpy",
     "pybtex",
     "pydantic-settings",
@@ -79,7 +76,8 @@ dev = [
     "typeguard",
 ]
 ldp = [
-    "ldp>=0.14.5",  # For Callback.before_rollout
+    # "ldp>=0.14.5",  # For Callback.before_rollout
+    "ldp @ /Users/maykcaldas/Documents/FutureHouse/ldp",
 ]
 local = [
     "sentence-transformers",

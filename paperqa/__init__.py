@@ -5,7 +5,6 @@ warnings.filterwarnings(
     "ignore", message="Valid config keys have changed in V2:", module="pydantic"
 )
 
-
 from llmclient import (  # noqa: E402
     EmbeddingModel,
     HybridEmbeddingModel,

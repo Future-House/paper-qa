@@ -163,10 +163,13 @@ class DocMetadataClient:
             if doc_details and task.processors:
                 doc_details = (
                     sum(
-                        await gather_with_concurrency(
-                            len(task.processors),
-                            task.processor_queries(doc_details, session),
-                        )
+                        (
+                            await gather_with_concurrency(
+                                doc_details,
+                                task.processor_queries(doc_details, session),
+                            )
+                        ),
+                        start=DocDetails(),  # Ensude doc_details is always a DocDetails object
                     )
                     or None
                 )

@@ -206,12 +206,6 @@ class LitQAEvaluation(StrEnum):
                             qa_prompt=qa_prompt, qa_answer=answer
                         ),
                     ),
-                    # {
-                    #     "role": "user",
-                    #     "content": EVAL_PROMPT_TEMPLATE.format(
-                    #         qa_prompt=qa_prompt, qa_answer=answer
-                    #     ),
-                    # }
                 ]
             )
             if not isinstance(eval_chunk.text, str):

@@ -14,8 +14,10 @@ from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
 from llmclient import (
+    Embeddable,
     EmbeddingModel,
     LLMModel,
+    LLMResult,
 )
 from pydantic import (
     BaseModel,
@@ -40,8 +42,6 @@ from paperqa.types import (
     Doc,
     DocDetails,
     DocKey,
-    Embeddable,
-    LLMResult,
     PQASession,
     Text,
     set_llm_session_ids,
