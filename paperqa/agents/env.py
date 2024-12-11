@@ -109,6 +109,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
         **env_kwargs,
     ):
+        print(env_kwargs)
         super().__init__(**env_kwargs)
         # Hold onto QueryRequest to create fresh tools and answer during each reset
         self._query = query

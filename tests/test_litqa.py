@@ -47,6 +47,7 @@ class TestLitQAEvaluation:
             "answer",
             "expected_eval",
             "expected_dreturns",
+            "extracted_answer",
         ),
         [
             pytest.param(
@@ -54,6 +55,7 @@ class TestLitQAEvaluation:
                 "the answer is 94107",
                 LitQAEvaluation.CORRECT,
                 [0.25, 0.5, 1.0],
+                "94107",
                 id="matched-correct-option",
             ),
             pytest.param(
@@ -61,6 +63,7 @@ class TestLitQAEvaluation:
                 "the answer is 14004",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="didnt-match-and-no-llm-innate-knowledge",
             ),
             pytest.param(
@@ -68,6 +71,7 @@ class TestLitQAEvaluation:
                 "the answer is 94106",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                "94106",
                 id="matched-incorrect-option",
             ),
             pytest.param(
@@ -75,6 +79,7 @@ class TestLitQAEvaluation:
                 "Insufficient information",
                 LitQAEvaluation.UNSURE,
                 [0.025, 0.05, 0.1],
+                "unsure",
                 id="matched-unsure-option",
             ),
             pytest.param(
@@ -82,6 +87,7 @@ class TestLitQAEvaluation:
                 "the answer is 94106 or 94107",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="matched-several-options",
             ),
             pytest.param(
@@ -89,6 +95,7 @@ class TestLitQAEvaluation:
                 "",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="empty-answer1",
             ),
             pytest.param(
@@ -96,6 +103,7 @@ class TestLitQAEvaluation:
                 "14",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="didnt-match-and-llm-has-innate-knowledge",
             ),
             pytest.param(
@@ -103,6 +111,7 @@ class TestLitQAEvaluation:
                 "",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="empty-answer2",
             ),
             pytest.param(
@@ -110,6 +119,7 @@ class TestLitQAEvaluation:
                 "",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="empty-answer3",
             ),
         ],
@@ -122,6 +132,7 @@ class TestLitQAEvaluation:
         answer: str,
         expected_eval: LitQAEvaluation,
         expected_dreturns: list[float],
+        extracted_answer: str,
     ) -> None:
         """Tests that we can create a LitQA question and evaluate answers."""
         qa_prompt, eval_fn = LitQAEvaluation.from_question(
@@ -134,6 +145,9 @@ class TestLitQAEvaluation:
 
         evaluation = await eval_fn(answer)
         assert evaluation == expected_eval
+        if evaluation == LitQAEvaluation.CORRECT:
+            assert evaluation.answer == ideal
+        assert evaluation.answer == extracted_answer
         assert evaluation.make_discounted_returns(3, discount=0.5) == expected_dreturns
 
     def test_consistent_mc_options(self) -> None:

@@ -96,11 +96,21 @@ SEED_USING_QUESTION: Literal["SEED_USING_QUESTION"] = "SEED_USING_QUESTION"  # S
 
 
 class LitQAEvaluation(StrEnum):
-    """Possible evaluation results for a LitQA question."""
+    """Possible evaluation results for a LitQA question and methods for working with answers."""
 
     CORRECT = "correct"
     INCORRECT = "incorrect"
     UNSURE = "unsure"
+
+    @property
+    def answer(self) -> str | None:
+        """Get the stored answer associated with this evaluation."""
+        return getattr(self, "_answer", None)
+
+    @answer.setter
+    def answer(self, value: str | None) -> None:
+        """Set the answer associated with this evaluation."""
+        self._answer = value
 
     def make_discounted_returns(
         self,
@@ -144,15 +154,19 @@ class LitQAEvaluation(StrEnum):
             and ord(result[0]) - _CAPITAL_A_INDEX + 1 > total_options
         ):
             # The result extracted was not in the options
-            return cls.INCORRECT
+            evaluation = cls.INCORRECT
         # From here, if we don't match either the ideal or the unsure multiple choice
         # options then we declare the answer as incorrect.
-        evaluation_result = cls.INCORRECT
-        if unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
-            evaluation_result = cls.UNSURE
-        if result[0].lower() == ideal_mc_answer[0].lower():
-            evaluation_result = cls.CORRECT
-        return evaluation_result
+        elif unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
+            evaluation = cls.UNSURE
+            evaluation.answer = cls.UNSURE.value
+        elif result[0].lower() == ideal_mc_answer[0].lower():
+            evaluation = cls.CORRECT
+            evaluation.answer = ideal_mc_answer
+        else:
+            evaluation = cls.INCORRECT
+            evaluation.answer = result
+        return evaluation
 
     @classmethod
     def from_question(
@@ -215,12 +229,27 @@ class LitQAEvaluation(StrEnum):
                 raise NotImplementedError(
                     f"Expected evaluation chunk to be a string, not {eval_chunk.text}."
                 )
-            return cls.from_answer(
+            evaluation = cls.from_answer(
                 text=eval_chunk.text,
                 ideal_mc_answer=ideal_answer,
                 unsure_mc_answer=unsure_answer,
                 total_options=len(distractor_answers) + (2 if use_unsure else 1),
             )
+            # convert MC answer back to distractor option so that it
+            # is meaningful
+            if evaluation == cls.CORRECT:
+                evaluation.answer = ideal
+            elif evaluation == cls.UNSURE:
+                # set already above
+                pass
+            else:
+                try:
+                    evaluation.answer = distractors[
+                        distractor_answers.index(evaluation.answer or "")
+                    ]
+                except ValueError:
+                    evaluation.answer = None
+            return evaluation
 
         return qa_prompt, llm_from_answer
 
