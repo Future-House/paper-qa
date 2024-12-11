@@ -3,7 +3,12 @@ from typing import cast
 
 import pytest
 
-from paperqa.litqa import SEED_USING_QUESTION, LitQAEvaluation, read_litqa_v2_from_hub
+from paperqa.litqa import (
+    SEED_USING_QUESTION,
+    UNSURE_OPTION,
+    LitQAEvaluation,
+    read_litqa_v2_from_hub,
+)
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
@@ -79,7 +84,7 @@ class TestLitQAEvaluation:
                 "Insufficient information",
                 LitQAEvaluation.UNSURE,
                 [0.025, 0.05, 0.1],
-                "unsure",
+                UNSURE_OPTION,
                 id="matched-unsure-option",
             ),
             pytest.param(

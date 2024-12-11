@@ -166,7 +166,7 @@ class LitQAEvaluation(StrEnum):
         # options then we declare the answer as incorrect.
         elif unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
             evaluation = cls.UNSURE
-            evaluation.answer = cls.UNSURE.value
+            evaluation.answer = unsure_mc_answer
         elif result[0].lower() == ideal_mc_answer[0].lower():
             evaluation = cls.CORRECT
             evaluation.answer = ideal_mc_answer
@@ -249,8 +249,7 @@ class LitQAEvaluation(StrEnum):
             if evaluation == cls.CORRECT:
                 evaluation.answer = ideal
             elif evaluation == cls.UNSURE:
-                # set already above
-                pass
+                evaluation.answer = UNSURE_OPTION
             else:
                 try:
                     evaluation.answer = distractors[
