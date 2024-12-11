@@ -104,13 +104,19 @@ class LitQAEvaluation(StrEnum):
 
     @property
     def answer(self) -> str | None:
-        """Get the stored answer associated with this evaluation."""
         return getattr(self, "_answer", None)
 
     @answer.setter
     def answer(self, value: str | None) -> None:
-        """Set the answer associated with this evaluation."""
         self._answer = value
+
+    @property
+    def ideal(self) -> str | None:
+        return getattr(self, "_ideal", None)
+
+    @ideal.setter
+    def ideal(self, value: str) -> None:
+        self._ideal = value
 
     def make_discounted_returns(
         self,
@@ -155,6 +161,7 @@ class LitQAEvaluation(StrEnum):
         ):
             # The result extracted was not in the options
             evaluation = cls.INCORRECT
+            evaluation.answer = result
         # From here, if we don't match either the ideal or the unsure multiple choice
         # options then we declare the answer as incorrect.
         elif unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
@@ -166,6 +173,7 @@ class LitQAEvaluation(StrEnum):
         else:
             evaluation = cls.INCORRECT
             evaluation.answer = result
+        evaluation.ideal = ideal_mc_answer
         return evaluation
 
     @classmethod
@@ -235,8 +243,9 @@ class LitQAEvaluation(StrEnum):
                 unsure_mc_answer=unsure_answer,
                 total_options=len(distractor_answers) + (2 if use_unsure else 1),
             )
-            # convert MC answer back to distractor option so that it
+            # convert MC answers back to full text option so that it
             # is meaningful
+            evaluation.ideal = ideal
             if evaluation == cls.CORRECT:
                 evaluation.answer = ideal
             elif evaluation == cls.UNSURE:

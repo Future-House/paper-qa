@@ -148,6 +148,7 @@ class TestLitQAEvaluation:
         if evaluation == LitQAEvaluation.CORRECT:
             assert evaluation.answer == ideal
         assert evaluation.answer == extracted_answer
+        assert evaluation.ideal == ideal
         assert evaluation.make_discounted_returns(3, discount=0.5) == expected_dreturns
 
     def test_consistent_mc_options(self) -> None:
