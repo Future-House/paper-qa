@@ -526,7 +526,7 @@ for doc in ("myfile.pdf", "myotherfile.pdf"):
 Note that PaperQA2 uses Numpy as a dense vector store.
 Its design of using a keyword search initially reduces the number of chunks needed for each answer to a relatively small number < 1k.
 Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
-However, if a larger-than-memory vector store is needed, we are currently lacking here.
+However, if a larger-than-memory vector store is needed, you can an external vector database like [Qdrant](https://qdrant.tech/) via the `QdrantVectorStore` class.
 
 The hybrid embeddings can be customized:
 
