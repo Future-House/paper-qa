@@ -76,8 +76,7 @@ dev = [
     "typeguard",
 ]
 ldp = [
-    # "ldp>=0.14.5",  # For Callback.before_rollout
-    "ldp @ /Users/maykcaldas/Documents/FutureHouse/ldp",
+    "ldp>=0.14.5",  # For Callback.before_rollout
 ]
 local = [
     "sentence-transformers",

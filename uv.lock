@@ -485,29 +485,20 @@ wheels = [
 
 [[package]]
 name = "fh-llm-client"
-version = "0.0.3"
+version = "0.0.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "aiofiles" },
     { name = "coredis" },
-    { name = "dm-tree" },
     { name = "fhaviary" },
-    { name = "httpx" },
     { name = "limits" },
     { name = "litellm" },
-    { name = "networkx", extra = ["default"] },
-    { name = "numpy" },
     { name = "pydantic" },
-    { name = "pymupdf" },
-    { name = "tenacity" },
     { name = "tiktoken" },
-    { name = "tqdm" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
-    { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/6a/676d9fd75e4cbc77b1ad67ad6596b1a5064914d6269771de0804a6324eef/fh_llm_client-0.0.3.tar.gz", hash = "sha256:1f6f996f8e8e74f4e20d010d8c241f1dc8790837681a17fc6ef9c2545afba2e0", size = 230014 }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/ba/0395955b6dc64bdfe5724f0b5d8a8e8c916454d1fa0000c0686cd8432d4a/fh_llm_client-0.0.6.tar.gz", hash = "sha256:71ffa711f1bfe2c16b422ee4762a668e443c8351c485924ceb6745db4359dab0", size = 195993 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/71/6012cd770d85644217fd334fca92fa0e7f4f2744a9e196516416457cb7d4/fh_llm_client-0.0.3-py3-none-any.whl", hash = "sha256:b91bd0f9a250f9ab5239c537d9166891b36756002c72c91197c23b61c8a33cfb", size = 33647 },
+    { url = "https://files.pythonhosted.org/packages/30/de/ee766cd71dec5a12cbb0c7bc8d8a90764bde730376ddee466902f239e756/fh_llm_client-0.0.6-py3-none-any.whl", hash = "sha256:7c20364b465db784c0320132c216cadd933fb56972c7bdff3996bd4a14769926", size = 31801 },
 ]
 
 [[package]]
@@ -1053,7 +1044,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.14.5"
+version = "0.15.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1070,9 +1061,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/d2/c3969d559df3c369f40a302d38ef4499d03f5a75953e0f56a91f914f7a85/ldp-0.14.5.tar.gz", hash = "sha256:377a971bcdf209cefbe813fc3a456708f63eac9444d90d8dcb35bb16438b4d3f", size = 370956 }
+sdist = { url = "https://files.pythonhosted.org/packages/06/63/29dc132493bd08d5fd45975ae5bfb83fc095f5b24f2b72f0b720daffe535/ldp-0.15.0.tar.gz", hash = "sha256:780847ddf2eab13af20bf47d5d1085624a2e04524647b35ba28bf175ae9f4ce0", size = 380853 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/c0/865d39c0333d6f525082e525ed81412853ce154d50031819f53f57e10813/ldp-0.14.5-py3-none-any.whl", hash = "sha256:e9959be14eac7352755b50d1b9c223afa585ad3146c5eb2d550f1e8b228fd287", size = 100996 },
+    { url = "https://files.pythonhosted.org/packages/87/07/514ca5bc2487b6c51e5a84ea8c3c58247e911af5943dd8008b67c1a12d2c/ldp-0.15.0-py3-none-any.whl", hash = "sha256:a57a07e6dc3092543ffb67456fa90f6d1f7b0af611bb127185badf06a8a6ca71", size = 102082 },
 ]
 
 [[package]]
@@ -1638,17 +1629,15 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.7.1.dev13+g9143b5c.d20241207"
+version = "5.5.1.dev38+gedf7d8f.d20241212"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "coredis" },
     { name = "fh-llm-client" },
     { name = "fhaviary", extra = ["llm"] },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "limits" },
     { name = "numpy" },
     { name = "pybtex" },
     { name = "pydantic" },
@@ -1741,7 +1730,6 @@ dev = [
 requires-dist = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "coredis" },
     { name = "datasets", marker = "extra == 'datasets'" },
     { name = "fh-llm-client" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.2" },
@@ -1749,7 +1737,6 @@ requires-dist = [
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.14.5" },
-    { name = "limits" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
