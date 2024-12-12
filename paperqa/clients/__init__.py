@@ -62,7 +62,7 @@ class DocMetadataTask(BaseModel):
 
 
 class DocMetadataClient:
-    def __init__(  # pylint: disable=dangerous-default-value
+    def __init__(
         self,
         session: aiohttp.ClientSession | None = None,
         clients: (
@@ -158,21 +158,22 @@ class DocMetadataClient:
                 )
                 or None
             )
-
             # then process and re-aggregate the results
             if doc_details and task.processors:
                 doc_details = (
                     sum(
                         await gather_with_concurrency(
                             len(task.processors),
-                            task.processor_queries(doc_details, session),
+                            task.processor_queries(
+                                cast(DocDetails, doc_details), session
+                            ),
                         )
                     )
                     or None
                 )
 
             if doc_details:
-
+                doc_details = cast(DocDetails, doc_details)
                 # abuse int handling in __add__ for empty all_doc_details, None types won't work
                 all_doc_details = doc_details + (all_doc_details or 0)
 

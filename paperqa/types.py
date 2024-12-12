@@ -648,7 +648,7 @@ class DocDetails(Doc):
 
     OPTIONAL_HYDRATION_FIELDS: ClassVar[Collection[str]] = {"url"}
 
-    def is_hydration_needed(  # pylint: disable=dangerous-default-value
+    def is_hydration_needed(
         self,
         exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS,
         inclusion: Collection[str] = [],
