@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import uuid
 from abc import ABC, abstractmethod
 from collections.abc import (
     Awaitable,
@@ -9,19 +10,34 @@ from collections.abc import (
     Iterable,
     Sequence,
 )
+from typing import Any
 
 import numpy as np
 from llmclient import (
     Embeddable,
     EmbeddingModel,
     EmbeddingModes,
+    HybridEmbeddingModel,
+    LiteLLMEmbeddingModel,
     LLMResult,
+    SentenceTransformerEmbeddingModel,
+    SparseEmbeddingModel,
 )
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    model_validator,
 )
+
+from paperqa.types import Text
+
+try:
+    from qdrant_client import QdrantClient, models
+
+    qdrant_installed = True
+except ImportError:
+    qdrant_installed = False
 
 PromptRunner = Callable[
     [dict, list[Callable[[str], None]] | None, str | None],
@@ -255,3 +271,190 @@ class NumpyVectorStore(VectorStore):
             [self.texts[i] for i in original_indices[sorted_indices][:k]],
             [similarity_scores[i] for i in sorted_indices[:k]],
         )
+
+
+class QdrantVectorStore(VectorStore):
+    client: Any = Field(
+        default=None,
+        description="Instance of `qdrant_client.QdrantClient`. Defaults to an in-memory instance.",
+    )
+    collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
+    vector_name: str | None = Field(default=None)
+    _point_ids: set[str] | None = None
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return (
+            self.texts_hashes == other.texts_hashes
+            and self.mmr_lambda == other.mmr_lambda
+            and self.collection_name == other.collection_name
+            and self.vector_name == other.vector_name
+            and self.client.init_options == other.client.init_options
+            and self._point_ids == other._point_ids
+        )
+
+    @model_validator(mode="after")
+    def validate_client(self):
+        if not qdrant_installed:
+            msg = (
+                "`QdrantVectorStore` requires the `qdrant-client` package. "
+                "Install it with `pip install paper-qa[qdrant]`"
+            )
+            raise ImportError(msg)
+
+        if self.client and not isinstance(self.client, QdrantClient):
+            raise TypeError(
+                f"'client' should be an instance of `qdrant_client.QdrantClient`. Got `{type(self.client)}`"
+            )
+
+        if not self.client:
+            # Defaults to the Python based in-memory implementation.
+            self.client = QdrantClient(location=":memory:")
+
+        return self
+
+    def clear(self) -> None:
+        super().clear()
+
+        if not self.client.collection_exists(self.collection_name):
+            return
+
+        self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=models.Filter(must=[]),
+            wait=True,
+        )
+        self._point_ids = None
+
+    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        super().add_texts_and_embeddings(texts)
+
+        texts_list = list(texts)
+
+        if texts_list and not self.client.collection_exists(self.collection_name):
+            params = models.VectorParams(
+                size=len(texts_list[0].embedding), distance=models.Distance.COSINE
+            )
+            self.client.create_collection(
+                self.collection_name,
+                vectors_config=(
+                    {self.vector_name: params} if self.vector_name else params
+                ),
+            )
+
+        ids, payloads, vectors = [], [], []
+        for text in texts_list:
+            # Entries with same IDs are overwritten.
+            # We generate deterministic UUIDs based on the embedding vectors.
+            ids.append(uuid.uuid5(uuid.NAMESPACE_URL, str(text.embedding)).hex)
+            payloads.append(text.model_dump(exclude={"embedding"}))
+            vectors.append(
+                {self.vector_name: text.embedding}
+                if self.vector_name
+                else text.embedding
+            )
+
+        self.client.upload_collection(
+            collection_name=self.collection_name,
+            vectors=vectors,
+            payload=payloads,
+            wait=True,
+            ids=ids,
+        )
+        self._point_ids = set(ids)
+
+    async def similarity_search(
+        self, query: str, k: int, embedding_model: EmbeddingModel
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        if not self.client.collection_exists(self.collection_name):
+            return ([], [])
+
+        embedding_model.set_mode(EmbeddingModes.QUERY)
+        np_query = np.array((await embedding_model.embed_documents([query]))[0])
+        embedding_model.set_mode(EmbeddingModes.DOCUMENT)
+
+        points = self.client.query_points(
+            collection_name=self.collection_name,
+            query=np_query,
+            using=self.vector_name,
+            limit=k,
+            with_vectors=True,
+            with_payload=True,
+        ).points
+
+        return (
+            [
+                Text(
+                    **p.payload,
+                    embedding=(
+                        p.vector[self.vector_name] if self.vector_name else p.vector
+                    ),
+                )
+                for p in points
+            ],
+            [p.score for p in points],
+        )
+
+
+def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
+    """
+    Factory function to create an appropriate EmbeddingModel based on the embedding string.
+
+    Supports:
+    - SentenceTransformer models prefixed with "st-" (e.g., "st-multi-qa-MiniLM-L6-cos-v1")
+    - LiteLLM models (default if no prefix is provided)
+    - Hybrid embeddings prefixed with "hybrid-", contains a sparse and a dense model
+
+    Args:
+        embedding: The embedding model identifier. Supports prefixes like "st-" for SentenceTransformer
+                   and "hybrid-" for combining multiple embedding models.
+        **kwargs: Additional keyword arguments for the embedding model.
+    """
+    embedding = embedding.strip()  # Remove any leading/trailing whitespace
+
+    if embedding.startswith("hybrid-"):
+        # Extract the component embedding identifiers after "hybrid-"
+        dense_name = embedding[len("hybrid-") :]
+
+        if not dense_name:
+            raise ValueError(
+                "Hybrid embedding must contain at least one component embedding."
+            )
+
+        # Recursively create each component embedding model
+        dense_model = embedding_model_factory(dense_name, **kwargs)
+        sparse_model = SparseEmbeddingModel(**kwargs)
+
+        return HybridEmbeddingModel(models=[dense_model, sparse_model])
+
+    if embedding.startswith("st-"):
+        # Extract the SentenceTransformer model name after "st-"
+        model_name = embedding[len("st-") :].strip()
+        if not model_name:
+            raise ValueError(
+                "SentenceTransformer model name must be specified after 'st-'."
+            )
+
+        return SentenceTransformerEmbeddingModel(
+            name=model_name,
+            config=kwargs,
+        )
+
+    if embedding.startswith("litellm-"):
+        # Extract the LiteLLM model name after "litellm-"
+        model_name = embedding[len("litellm-") :].strip()
+        if not model_name:
+            raise ValueError("model name must be specified after 'litellm-'.")
+
+        return LiteLLMEmbeddingModel(
+            name=model_name,
+            config=kwargs,
+        )
+
+    if embedding == "sparse":
+        return SparseEmbeddingModel(**kwargs)
+
+    # Default to LiteLLMEmbeddingModel if no special prefix is found
+    return LiteLLMEmbeddingModel(name=embedding, config=kwargs)

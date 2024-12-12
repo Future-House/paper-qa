@@ -23,6 +23,8 @@ from paperqa.agents.models import QueryRequest  # noqa: E402
 from paperqa.docs import Docs, PQASession, print_callback  # noqa: E402
 from paperqa.llms import (  # noqa: E402
     NumpyVectorStore,
+    QdrantVectorStore,
+    VectorStore,
 )
 from paperqa.settings import Settings, get_settings  # noqa: E402
 from paperqa.types import Answer, Context, Doc, DocDetails, Text  # noqa: E402
@@ -42,11 +44,13 @@ __all__ = [
     "LiteLLMModel",
     "NumpyVectorStore",
     "PQASession",
+    "QdrantVectorStore",
     "QueryRequest",
     "SentenceTransformerEmbeddingModel",
     "Settings",
     "SparseEmbeddingModel",
     "Text",
+    "VectorStore",
     "__version__",
     "agent_query",
     "ask",

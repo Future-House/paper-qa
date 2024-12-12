@@ -8,7 +8,7 @@ import string
 from ast import literal_eval
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import StrEnum
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 try:
     from ldp.utils import discounted_returns
@@ -94,14 +94,31 @@ def make_mc_options(
 
 DEFAULT_EVAL_MODEL_NAME = "gpt-4-turbo-2024-04-09"
 DEFAULT_REWARD_MAPPING = {"correct": 1.0, "unsure": 0.1, "incorrect": -1.0}
+SEED_USING_QUESTION: Literal["SEED_USING_QUESTION"] = "SEED_USING_QUESTION"  # Sentinel
 
 
 class LitQAEvaluation(StrEnum):
-    """Possible evaluation results for a LitQA question."""
+    """Possible evaluation results for a LitQA question and methods for working with answers."""
 
     CORRECT = "correct"
     INCORRECT = "incorrect"
     UNSURE = "unsure"
+
+    @property
+    def answer(self) -> str | None:
+        return getattr(self, "_answer", None)
+
+    @answer.setter
+    def answer(self, value: str | None) -> None:
+        self._answer = value
+
+    @property
+    def ideal(self) -> str | None:
+        return getattr(self, "_ideal", None)
+
+    @ideal.setter
+    def ideal(self, value: str) -> None:
+        self._ideal = value
 
     def make_discounted_returns(
         self,
@@ -145,15 +162,21 @@ class LitQAEvaluation(StrEnum):
             and ord(result[0]) - _CAPITAL_A_INDEX + 1 > total_options
         ):
             # The result extracted was not in the options
-            return cls.INCORRECT
+            evaluation = cls.INCORRECT
+            evaluation.answer = result
         # From here, if we don't match either the ideal or the unsure multiple choice
         # options then we declare the answer as incorrect.
-        evaluation_result = cls.INCORRECT
-        if unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
-            evaluation_result = cls.UNSURE
-        if result[0].lower() == ideal_mc_answer[0].lower():
-            evaluation_result = cls.CORRECT
-        return evaluation_result
+        elif unsure_mc_answer and result[0].lower() == unsure_mc_answer[0].lower():
+            evaluation = cls.UNSURE
+            evaluation.answer = unsure_mc_answer
+        elif result[0].lower() == ideal_mc_answer[0].lower():
+            evaluation = cls.CORRECT
+            evaluation.answer = ideal_mc_answer
+        else:
+            evaluation = cls.INCORRECT
+            evaluation.answer = result
+        evaluation.ideal = ideal_mc_answer
+        return evaluation
 
     @classmethod
     def from_question(
@@ -163,7 +186,7 @@ class LitQAEvaluation(StrEnum):
         question: str,
         use_unsure: bool = True,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
-        seed: int | None = None,
+        seed: int | Literal["SEED_USING_QUESTION"] | None = None,
     ) -> tuple[str, Callable[[PQASession | str], Awaitable[LitQAEvaluation]]]:
         """
         Create a LitQA question and an answer-to-evaluation function.
@@ -176,11 +199,15 @@ class LitQAEvaluation(StrEnum):
             eval_model: Evaluation model to use for multiple choice letter extraction
                 from a text answer.
             seed: Optional seed to use in randomization of multiple choice letters.
+                Optionally pass in the string literal "SEED_USING_QUESTION" to hash the
+                input question for the seed.
 
         Returns:
             Two-tuple of created LitQA question, function (that can be thought of as
                 stateless) to use to extract an evaluation result from an answer.
         """
+        if seed == SEED_USING_QUESTION:
+            seed = hash(question)
         text, ideal_answer, unsure_answer, distractor_answers = make_mc_options(
             ideal=ideal,
             distractors=distractors,
@@ -212,12 +239,27 @@ class LitQAEvaluation(StrEnum):
                 raise NotImplementedError(
                     f"Expected evaluation chunk to be a string, not {eval_chunk.text}."
                 )
-            return cls.from_answer(
+            evaluation = cls.from_answer(
                 text=eval_chunk.text,
                 ideal_mc_answer=ideal_answer,
                 unsure_mc_answer=unsure_answer,
                 total_options=len(distractor_answers) + (2 if use_unsure else 1),
             )
+            # convert MC answers back to full text option so that it
+            # is meaningful
+            evaluation.ideal = ideal
+            if evaluation == cls.CORRECT:
+                evaluation.answer = ideal
+            elif evaluation == cls.UNSURE:
+                evaluation.answer = UNSURE_OPTION
+            else:
+                try:
+                    evaluation.answer = distractors[
+                        distractor_answers.index(evaluation.answer or "")
+                    ]
+                except ValueError:
+                    evaluation.answer = None
+            return evaluation
 
         return qa_prompt, llm_from_answer
 

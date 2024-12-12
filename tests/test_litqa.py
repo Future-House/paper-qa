@@ -3,7 +3,12 @@ from typing import cast
 
 import pytest
 
-from paperqa.litqa import LitQAEvaluation, read_litqa_v2_from_hub
+from paperqa.litqa import (
+    SEED_USING_QUESTION,
+    UNSURE_OPTION,
+    LitQAEvaluation,
+    read_litqa_v2_from_hub,
+)
 from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 
@@ -47,6 +52,7 @@ class TestLitQAEvaluation:
             "answer",
             "expected_eval",
             "expected_dreturns",
+            "extracted_answer",
         ),
         [
             pytest.param(
@@ -54,6 +60,7 @@ class TestLitQAEvaluation:
                 "the answer is 94107",
                 LitQAEvaluation.CORRECT,
                 [0.25, 0.5, 1.0],
+                "94107",
                 id="matched-correct-option",
             ),
             pytest.param(
@@ -61,6 +68,7 @@ class TestLitQAEvaluation:
                 "the answer is 14004",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="didnt-match-and-no-llm-innate-knowledge",
             ),
             pytest.param(
@@ -68,6 +76,7 @@ class TestLitQAEvaluation:
                 "the answer is 94106",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                "94106",
                 id="matched-incorrect-option",
             ),
             pytest.param(
@@ -75,6 +84,7 @@ class TestLitQAEvaluation:
                 "Insufficient information",
                 LitQAEvaluation.UNSURE,
                 [0.025, 0.05, 0.1],
+                UNSURE_OPTION,
                 id="matched-unsure-option",
             ),
             pytest.param(
@@ -82,6 +92,7 @@ class TestLitQAEvaluation:
                 "the answer is 94106 or 94107",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="matched-several-options",
             ),
             pytest.param(
@@ -89,6 +100,7 @@ class TestLitQAEvaluation:
                 "",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="empty-answer1",
             ),
             pytest.param(
@@ -96,6 +108,7 @@ class TestLitQAEvaluation:
                 "14",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="didnt-match-and-llm-has-innate-knowledge",
             ),
             pytest.param(
@@ -103,6 +116,7 @@ class TestLitQAEvaluation:
                 "",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="empty-answer2",
             ),
             pytest.param(
@@ -110,6 +124,7 @@ class TestLitQAEvaluation:
                 "",
                 LitQAEvaluation.INCORRECT,
                 [-0.25, -0.5, -1.0],
+                None,
                 id="empty-answer3",
             ),
         ],
@@ -122,6 +137,7 @@ class TestLitQAEvaluation:
         answer: str,
         expected_eval: LitQAEvaluation,
         expected_dreturns: list[float],
+        extracted_answer: str,
     ) -> None:
         """Tests that we can create a LitQA question and evaluate answers."""
         qa_prompt, eval_fn = LitQAEvaluation.from_question(
@@ -134,22 +150,48 @@ class TestLitQAEvaluation:
 
         evaluation = await eval_fn(answer)
         assert evaluation == expected_eval
+        if evaluation == LitQAEvaluation.CORRECT:
+            assert evaluation.answer == ideal
+        assert evaluation.answer == extracted_answer
+        assert evaluation.ideal == ideal
         assert evaluation.make_discounted_returns(3, discount=0.5) == expected_dreturns
 
     def test_consistent_mc_options(self) -> None:
         """Tests that creating multiple evaluations with the same seed results in the same prompt."""
         question, ideal, distractors = self.MEANING_OF_LIFE_QUESTION_IDEAL_DISTRACTORS
 
-        qa_prompt_1, _ = LitQAEvaluation.from_question(
+        qa_prompt_1a, _ = LitQAEvaluation.from_question(
             ideal=ideal, distractors=distractors, question=question, seed=0
         )
-        self._assert_prompt_is_valid(qa_prompt_1, question, ideal, distractors)
+        self._assert_prompt_is_valid(qa_prompt_1a, question, ideal, distractors)
 
-        qa_prompt_2, _ = LitQAEvaluation.from_question(
+        qa_prompt_1b, _ = LitQAEvaluation.from_question(
             ideal=ideal, distractors=distractors, question=question, seed=0
         )
-        self._assert_prompt_is_valid(qa_prompt_1, question, ideal, distractors)
-        assert qa_prompt_1 == qa_prompt_2
+        self._assert_prompt_is_valid(qa_prompt_1b, question, ideal, distractors)
+        assert qa_prompt_1a == qa_prompt_1b, "Same seeding should lead to same prompts"
+
+        qa_prompt_2a, _ = LitQAEvaluation.from_question(
+            ideal=ideal,
+            distractors=distractors,
+            question=question,
+            seed=SEED_USING_QUESTION,
+        )
+        self._assert_prompt_is_valid(qa_prompt_2a, question, ideal, distractors)
+
+        qa_prompt_2b, _ = LitQAEvaluation.from_question(
+            ideal=ideal,
+            distractors=distractors,
+            question=question,
+            seed=SEED_USING_QUESTION,
+        )
+        self._assert_prompt_is_valid(qa_prompt_2b, question, ideal, distractors)
+        assert (
+            qa_prompt_2a == qa_prompt_2b
+        ), "Same seeding strategy should lead to same prompts"
+        assert (
+            qa_prompt_2a != qa_prompt_1a
+        ), "Different seeding strategies should lead to different prompts"
 
     def test_creating_litqa_questions(self) -> None:
         """Test making LitQA eval questions after downloading from Hugging Face Hub."""
