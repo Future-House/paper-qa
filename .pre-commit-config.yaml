@@ -81,7 +81,7 @@ repos:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
         additional_dependencies:
-          - aiohttp
+          - aiohttp>=3.10.6 # Match pyproject.toml
           - PyMuPDF>=1.24.12
           - anyio
           - coredis
