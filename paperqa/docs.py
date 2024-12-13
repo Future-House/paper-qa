@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
+from aviary.core import Message
 from llmclient import (
     Embeddable,
     EmbeddingModel,
@@ -570,9 +571,9 @@ class Docs(BaseModel):
             )
         )
 
-    async def aget_evidence(
+    async def aget_evidence(  # noqa: PLR0912
         self,
-        query: PQASession | str,
+        query: PQASession | str | Message,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
@@ -585,11 +586,14 @@ class Docs(BaseModel):
         answer_config = evidence_settings.answer
         prompt_config = evidence_settings.prompts
 
-        session = (
-            PQASession(question=query, config_md5=evidence_settings.md5)
-            if isinstance(query, str)
-            else query
-        )
+        if isinstance(query, str):
+            session = PQASession(question=query, config_md5=evidence_settings.md5)
+        elif isinstance(query, Message):
+            session = PQASession(
+                question=query.content, config_md5=evidence_settings.md5
+            )
+        else:
+            session = query
 
         if not self.docs and len(self.texts_index) == 0:
             return session
@@ -693,7 +697,7 @@ class Docs(BaseModel):
 
     async def aquery(  # noqa: PLR0912
         self,
-        query: PQASession | str,
+        query: PQASession | str | Message,
         settings: MaybeSettings = None,
         callbacks: list[Callable] | None = None,
         llm_model: LLMModel | None = None,
@@ -713,11 +717,12 @@ class Docs(BaseModel):
         if embedding_model is None:
             embedding_model = query_settings.get_embedding_model()
 
-        session = (
-            PQASession(question=query, config_md5=query_settings.md5)
-            if isinstance(query, str)
-            else query
-        )
+        if isinstance(query, str):
+            session = PQASession(question=query, config_md5=query_settings.md5)
+        elif isinstance(query, Message):
+            session = PQASession(question=query.content, config_md5=query_settings.md5)
+        else:
+            session = query
 
         contexts = session.contexts
         if answer_config.get_evidence_if_no_contexts and not contexts:
