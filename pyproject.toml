@@ -76,7 +76,7 @@ dev = [
     "typeguard",
 ]
 ldp = [
-    "ldp>=0.14.5",  # For Callback.before_rollout
+    "ldp>=0.16.0",  # For Callback.before_rollout
 ]
 local = [
     "sentence-transformers",
