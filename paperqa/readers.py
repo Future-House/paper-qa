@@ -10,7 +10,14 @@ import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
 
-from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from paperqa.types import (
+    ChunkMetadata,
+    Doc,
+    ParsedImages,
+    ParsedMetadata,
+    ParsedText,
+    Text,
+)
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
@@ -150,6 +157,49 @@ def parse_text(
             parse_type=parse_type,
         ),
     )
+
+
+def parse_images(
+    path: str | os.PathLike,
+) -> ParsedImages:
+    """Parse images from a document."""
+    path = Path(path)
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File not found at path {path}.")
+    if not path.suffix == ".pdf":
+        raise NotImplementedError(
+            "Currently only PDFs are supported for image parsing."
+        )
+
+    with pymupdf.open(path) as file:
+        images: dict[str, bytes] = {}
+        drawings: dict[str, bytes] = {}
+
+        for i in range(file.page_count):
+            try:
+                page = file.load_page(i)
+            except pymupdf.mupdf.FzErrorFormat as exc:
+                raise ImpossibleParsingError(
+                    f"Page loading via {pymupdf.__name__} failed on page {i} of"
+                    f" {file.page_count} for the PDF at path {path}, likely this PDF"
+                    " file is corrupt."
+                ) from exc
+
+            # Extract images from page
+            for img_j, img in enumerate(page.get_images()):
+                xref = img[0]
+                image = file.extract_image(xref)["image"]
+                images[f"{i + 1}:{img_j + 1}"] = image
+
+            # Extract drawings from page
+            for draw_j, drawing in enumerate(page.get_drawings()):
+                drawings[f"{i + 1}:{draw_j + img_j + 1}"] = drawing
+                # bboxes = page.cluster_drawings()
+                # for k, bbox in enumerate(bboxes):
+                #     pix = page.get_pixmap(clip=bbox, dpi=600)
+                #     pix_bytes = pix.tobytes()
+
+    return ParsedImages(content=images | drawings, metadata=None)
 
 
 def chunk_text(

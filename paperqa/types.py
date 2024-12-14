@@ -120,7 +120,11 @@ class PQASession(BaseModel):
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     id: UUID = Field(default_factory=uuid4)
-    question: str
+    question: str | Message = Field(
+        description=(
+            "The question to be answered. Images are accepted as input if using Message."
+        )
+    )
     answer: str = ""
     has_successful_answer: bool | None = Field(
         default=None,
@@ -279,6 +283,35 @@ class ParsedText(BaseModel):
         if isinstance(self.content, list):
             return "\n\n".join(self.content)
         return "\n\n".join(self.content.values())
+
+
+class ParsedImages(BaseModel):
+    """Parsed images."""
+
+    content: dict | list[bytes]
+    metadata: ParsedMetadata
+
+    # try:
+    #     import numpy as np
+    # except ImportError as exc:
+    #     raise ImportError(
+    #         "Paper-qa requires an extra dependency to work with images. "
+    #         "Please install pip install paper-qa[images]"
+    #     ) from exc
+
+    # def encode_content(self):
+    #     import numpy as np
+
+    #     if isinstance(self.content, list):
+    #         return [
+    #             encode_image_to_base64(np.frombuffer(c, dtype=np.uint8))
+    #             for c in self.content
+    #         ]
+    #     if isinstance(self.content, dict):
+    #         return {k: encode_image_to_base64(v) for k, v in self.content.items()}
+    #     raise NotImplementedError(
+    #         "Encoding only implemented for list[bytes] and dict content."
+    #     )
 
 
 # We use these integer values

@@ -586,12 +586,8 @@ class Docs(BaseModel):
         answer_config = evidence_settings.answer
         prompt_config = evidence_settings.prompts
 
-        if isinstance(query, str):
+        if isinstance(query, str | Message):
             session = PQASession(question=query, config_md5=evidence_settings.md5)
-        elif isinstance(query, Message):
-            session = PQASession(
-                question=query.content, config_md5=evidence_settings.md5
-            )
         else:
             session = query
 
@@ -717,10 +713,8 @@ class Docs(BaseModel):
         if embedding_model is None:
             embedding_model = query_settings.get_embedding_model()
 
-        if isinstance(query, str):
+        if isinstance(query, str | Message):
             session = PQASession(question=query, config_md5=query_settings.md5)
-        elif isinstance(query, Message):
-            session = PQASession(question=query.content, config_md5=query_settings.md5)
         else:
             session = query
 
