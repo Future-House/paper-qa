@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
-    "aiohttp",  # TODO: remove in favor of httpx
+    "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
     "fh-llm-client",
     "fhaviary[llm]>=0.10.2",  # For tool execution concurrency

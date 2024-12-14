@@ -1629,7 +1629,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev38+gedf7d8f.d20241212"
+version = "5.8.1.dev3+ga630d92.d20241212"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1728,7 +1728,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp" },
+    { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
     { name = "fh-llm-client" },
