@@ -1,11 +1,6 @@
 import warnings
 
-# TODO: remove after refactoring all models to avoid using _* private vars
-warnings.filterwarnings(
-    "ignore", message="Valid config keys have changed in V2:", module="pydantic"
-)
-
-from llmclient import (  # noqa: E402
+from llmclient import (
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
@@ -17,18 +12,24 @@ from llmclient import (  # noqa: E402
     embedding_model_factory,
 )
 
-from paperqa.agents import ask  # noqa: E402
-from paperqa.agents.main import agent_query  # noqa: E402
-from paperqa.agents.models import QueryRequest  # noqa: E402
-from paperqa.docs import Docs, PQASession, print_callback  # noqa: E402
-from paperqa.llms import (  # noqa: E402
+from paperqa.agents import ask
+from paperqa.agents.main import agent_query
+from paperqa.agents.models import QueryRequest
+from paperqa.docs import Docs, PQASession, print_callback
+from paperqa.llms import (
     NumpyVectorStore,
     QdrantVectorStore,
     VectorStore,
 )
-from paperqa.settings import Settings, get_settings  # noqa: E402
-from paperqa.types import Answer, Context, Doc, DocDetails, Text  # noqa: E402
-from paperqa.version import __version__  # noqa: E402
+from paperqa.settings import Settings, get_settings
+from paperqa.types import Answer, Context, Doc, DocDetails, Text
+from paperqa.version import __version__
+
+# TODO: remove after refactoring all models to avoid using _* private vars
+warnings.filterwarnings(
+    "ignore", message="Valid config keys have changed in V2:", module="pydantic"
+)
+
 
 __all__ = [
     "Answer",
