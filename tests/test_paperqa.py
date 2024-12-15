@@ -725,7 +725,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
-    from llmclient.types import Chunk
+    from llmclient import Chunk
 
     class StubLLMModel(LLMModel):
         name: str = "myllm"
