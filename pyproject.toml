@@ -23,9 +23,9 @@ classifiers = [
 ]
 dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
-    "aiohttp",  # TODO: remove in favor of httpx
+    "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
-    "fh-llm-client @ /Users/maykcaldas/Documents/FutureHouse/llm-client",
+    "fh-llm-client",
     "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
@@ -76,7 +76,7 @@ dev = [
     "typeguard",
 ]
 ldp = [
-    "ldp>=0.14.5",  # For Callback.before_rollout
+    "ldp>=0.16.0",  # For Callback.before_rollout
 ]
 local = [
     "sentence-transformers",

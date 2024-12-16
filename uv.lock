@@ -1044,14 +1044,14 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.15.0"
+version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
+    { name = "fh-llm-client" },
     { name = "fhaviary" },
     { name = "httpx" },
-    { name = "litellm" },
     { name = "networkx", extra = ["default"] },
     { name = "numpy" },
     { name = "pydantic" },
@@ -1061,9 +1061,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/63/29dc132493bd08d5fd45975ae5bfb83fc095f5b24f2b72f0b720daffe535/ldp-0.15.0.tar.gz", hash = "sha256:780847ddf2eab13af20bf47d5d1085624a2e04524647b35ba28bf175ae9f4ce0", size = 380853 }
+sdist = { url = "https://files.pythonhosted.org/packages/53/4e/3fd29a7188772126bd0fd93f8efb5927b93cbadf0d2c2c93a6c1e200c324/ldp-0.16.0.tar.gz", hash = "sha256:5109ead28b9f40fffc5d953a3e12d0ff34289d33cc4053522ac4e1da26c346ba", size = 376038 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/07/514ca5bc2487b6c51e5a84ea8c3c58247e911af5943dd8008b67c1a12d2c/ldp-0.15.0-py3-none-any.whl", hash = "sha256:a57a07e6dc3092543ffb67456fa90f6d1f7b0af611bb127185badf06a8a6ca71", size = 102082 },
+    { url = "https://files.pythonhosted.org/packages/7e/6a/2733ecac8ca7cb31c00fc9f5f268ad2414171d485e9e34e10f333ac5f81c/ldp-0.16.0-py3-none-any.whl", hash = "sha256:cb1df6fd3d2c8bd5b60b21349f6f555cd43250c45d64a901521dbf424c6eec2f", size = 95278 },
 ]
 
 [[package]]
@@ -1629,7 +1629,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.5.1.dev38+gedf7d8f.d20241212"
+version = "5.8.1.dev12+gd61cdd2.d20241214"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1700,35 +1700,12 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "datasets" },
-    { name = "ipython" },
-    { name = "ldp" },
-    { name = "mypy" },
-    { name = "pandas-stubs" },
-    { name = "pre-commit" },
-    { name = "pydantic" },
-    { name = "pylint-pydantic" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-recording" },
-    { name = "pytest-rerunfailures" },
-    { name = "pytest-subtests" },
-    { name = "pytest-sugar" },
-    { name = "pytest-timer", extra = ["colorama"] },
-    { name = "pytest-xdist" },
-    { name = "python-dotenv" },
-    { name = "pyzotero" },
-    { name = "qdrant-client" },
-    { name = "refurb" },
-    { name = "sentence-transformers" },
-    { name = "typeguard" },
-    { name = "types-pyyaml" },
-    { name = "types-setuptools" },
+    { name = "paper-qa", extra = ["dev"] },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp" },
+    { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
     { name = "fh-llm-client" },
@@ -1736,7 +1713,7 @@ requires-dist = [
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.14.5" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.16.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
