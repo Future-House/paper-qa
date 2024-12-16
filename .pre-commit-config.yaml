@@ -87,7 +87,7 @@ repos:
           - fhaviary[llm]>=0.10.2 # Match pyproject.toml
           - ldp>=0.14.5 # Match pyproject.toml
           - html2text
-          - "fh-llm-client"
+          - fh-llm-client
           - httpx
           - pybtex
           - numpy
