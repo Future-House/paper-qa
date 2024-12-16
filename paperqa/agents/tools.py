@@ -10,12 +10,12 @@ from itertools import chain
 from typing import ClassVar, Self, cast
 
 from aviary.core import ToolRequestMessage
+from llmclient import Embeddable, EmbeddingModel, LiteLLMModel
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from paperqa.docs import Docs
-from paperqa.llms import EmbeddingModel, LiteLLMModel
 from paperqa.settings import Settings
-from paperqa.types import DocDetails, Embeddable, PQASession
+from paperqa.types import DocDetails, PQASession
 
 from .search import get_directory_index
 

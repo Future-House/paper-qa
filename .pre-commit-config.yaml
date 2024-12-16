@@ -84,13 +84,11 @@ repos:
           - aiohttp>=3.10.6 # Match pyproject.toml
           - PyMuPDF>=1.24.12
           - anyio
-          - coredis
           - fhaviary[llm]>=0.10.2 # Match pyproject.toml
           - ldp>=0.14.5 # Match pyproject.toml
           - html2text
-          - litellm>=1.44 # Match pyproject.toml
+          - fh-llm-client
           - httpx
-          - limits
           - pybtex
           - numpy
           - pandas-stubs

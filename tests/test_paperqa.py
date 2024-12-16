@@ -13,6 +13,14 @@ from typing import cast
 import httpx
 import numpy as np
 import pytest
+from llmclient import (
+    Embeddable,
+    EmbeddingModel,
+    HybridEmbeddingModel,
+    LiteLLMEmbeddingModel,
+    LLMModel,
+    SparseEmbeddingModel,
+)
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -25,23 +33,15 @@ from paperqa import (
     QdrantVectorStore,
     Settings,
     Text,
+    VectorStore,
     print_callback,
 )
 from paperqa.clients import CrossrefProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
-from paperqa.llms import (
-    EmbeddingModel,
-    HybridEmbeddingModel,
-    LiteLLMEmbeddingModel,
-    LLMModel,
-    SparseEmbeddingModel,
-    VectorStore,
-)
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc
-from paperqa.types import Embeddable
 from paperqa.utils import (
     extract_score,
     get_citenames,
@@ -683,7 +683,7 @@ def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=SparseEmbeddingModel(),
     )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -705,7 +705,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_model,
     )
-    assert any(docs.texts[0].embedding)  # type: ignore[arg-type]
+    assert any(docs.texts[0].embedding)
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
@@ -725,7 +725,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
-    from paperqa.llms import Chunk
+    from llmclient import Chunk
 
     class StubLLMModel(LLMModel):
         name: str = "myllm"
@@ -946,13 +946,15 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     )
     assert match
     assert int(match.group(1)) >= 1, "Expected at least one citation"
-    assert "ChemRxiv" in doc_details.formatted_citation
+    assert (
+        "Journal of Chemical Theory and Computation" in doc_details.formatted_citation
+    )
 
     num_retries = 3
     for _ in range(num_retries):
         answer = docs.query("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
-            assert "This article has 1 citations." in answer.context
+            assert "This article has 23 citations" in answer.context
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
@@ -1208,7 +1210,7 @@ def test_answer_rename(recwarn) -> None:
     ],
 )
 def test_dois_resolve_to_correct_journals(doi_journals):
-    details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
+    details = DocDetails(doi=doi_journals["doi"])
     assert details.journal == doi_journals["journal"]
 
 
