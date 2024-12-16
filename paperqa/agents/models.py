@@ -8,6 +8,7 @@ from enum import StrEnum
 from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
+from llmclient import LiteLLMModel, LLMModel
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -18,7 +19,6 @@ from pydantic import (
     field_validator,
 )
 
-from paperqa.llms import LiteLLMModel, LLMModel
 from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.version import __version__

@@ -484,6 +484,24 @@ wheels = [
 ]
 
 [[package]]
+name = "fh-llm-client"
+version = "0.0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "coredis" },
+    { name = "fhaviary" },
+    { name = "limits" },
+    { name = "litellm" },
+    { name = "pydantic" },
+    { name = "tiktoken" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e8/ba/0395955b6dc64bdfe5724f0b5d8a8e8c916454d1fa0000c0686cd8432d4a/fh_llm_client-0.0.6.tar.gz", hash = "sha256:71ffa711f1bfe2c16b422ee4762a668e443c8351c485924ceb6745db4359dab0", size = 195993 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/de/ee766cd71dec5a12cbb0c7bc8d8a90764bde730376ddee466902f239e756/fh_llm_client-0.0.6-py3-none-any.whl", hash = "sha256:7c20364b465db784c0320132c216cadd933fb56972c7bdff3996bd4a14769926", size = 31801 },
+]
+
+[[package]]
 name = "fhaviary"
 version = "0.10.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1026,14 +1044,14 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.14.5"
+version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
+    { name = "fh-llm-client" },
     { name = "fhaviary" },
     { name = "httpx" },
-    { name = "litellm" },
     { name = "networkx", extra = ["default"] },
     { name = "numpy" },
     { name = "pydantic" },
@@ -1043,9 +1061,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/d2/c3969d559df3c369f40a302d38ef4499d03f5a75953e0f56a91f914f7a85/ldp-0.14.5.tar.gz", hash = "sha256:377a971bcdf209cefbe813fc3a456708f63eac9444d90d8dcb35bb16438b4d3f", size = 370956 }
+sdist = { url = "https://files.pythonhosted.org/packages/53/4e/3fd29a7188772126bd0fd93f8efb5927b93cbadf0d2c2c93a6c1e200c324/ldp-0.16.0.tar.gz", hash = "sha256:5109ead28b9f40fffc5d953a3e12d0ff34289d33cc4053522ac4e1da26c346ba", size = 376038 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/c0/865d39c0333d6f525082e525ed81412853ce154d50031819f53f57e10813/ldp-0.14.5-py3-none-any.whl", hash = "sha256:e9959be14eac7352755b50d1b9c223afa585ad3146c5eb2d550f1e8b228fd287", size = 100996 },
+    { url = "https://files.pythonhosted.org/packages/7e/6a/2733ecac8ca7cb31c00fc9f5f268ad2414171d485e9e34e10f333ac5f81c/ldp-0.16.0-py3-none-any.whl", hash = "sha256:cb1df6fd3d2c8bd5b60b21349f6f555cd43250c45d64a901521dbf424c6eec2f", size = 95278 },
 ]
 
 [[package]]
@@ -1611,17 +1629,15 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.8.1.dev3+ga630d92.d20241212"
+version = "5.8.1.dev12+gd61cdd2.d20241214"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "coredis" },
+    { name = "fh-llm-client" },
     { name = "fhaviary", extra = ["llm"] },
     { name = "html2text" },
     { name = "httpx" },
-    { name = "limits" },
-    { name = "litellm" },
     { name = "numpy" },
     { name = "pybtex" },
     { name = "pydantic" },
@@ -1684,45 +1700,20 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "datasets" },
-    { name = "ipython" },
-    { name = "ldp" },
-    { name = "mypy" },
-    { name = "pandas-stubs" },
-    { name = "pre-commit" },
-    { name = "pydantic" },
-    { name = "pylint-pydantic" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-recording" },
-    { name = "pytest-rerunfailures" },
-    { name = "pytest-subtests" },
-    { name = "pytest-sugar" },
-    { name = "pytest-timer", extra = ["colorama"] },
-    { name = "pytest-xdist" },
-    { name = "python-dotenv" },
-    { name = "pyzotero" },
-    { name = "qdrant-client" },
-    { name = "refurb" },
-    { name = "sentence-transformers" },
-    { name = "typeguard" },
-    { name = "types-pyyaml" },
-    { name = "types-setuptools" },
+    { name = "paper-qa", extra = ["dev"] },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
-    { name = "coredis" },
     { name = "datasets", marker = "extra == 'datasets'" },
+    { name = "fh-llm-client" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.2" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.14.5" },
-    { name = "limits" },
-    { name = "litellm", specifier = ">=1.44" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.16.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
@@ -2028,16 +2019,16 @@ wheels = [
 
 [[package]]
 name = "pydantic"
-version = "2.10.2"
+version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-types" },
     { name = "pydantic-core" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/86/a03390cb12cf64e2a8df07c267f3eb8d5035e0f9a04bb20fb79403d2a00e/pydantic-2.10.2.tar.gz", hash = "sha256:2bc2d7f17232e0841cbba4641e65ba1eb6fafb3a08de3a091ff3ce14a197c4fa", size = 785401 }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/bd/7fc610993f616d2398958d0028d15eaf53bde5f80cb2edb7aa4f1feaf3a7/pydantic-2.10.1.tar.gz", hash = "sha256:a4daca2dc0aa429555e0656d6bf94873a7dc5f54ee42b1f5873d666fb3f35560", size = 783717 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/74/da832196702d0c56eb86b75bfa346db9238617e29b0b7ee3b8b4eccfe654/pydantic-2.10.2-py3-none-any.whl", hash = "sha256:cfb96e45951117c3024e6b67b25cdc33a3cb7b2fa62e239f7af1378358a1d99e", size = 456364 },
+    { url = "https://files.pythonhosted.org/packages/e0/fc/fda48d347bd50a788dd2a0f318a52160f911b86fc2d8b4c86f4d7c9bceea/pydantic-2.10.1-py3-none-any.whl", hash = "sha256:a8d20db84de64cf4a7d59e899c2caf0fe9d660c7cfc482528e7020d7dd189a7e", size = 455329 },
 ]
 
 [[package]]

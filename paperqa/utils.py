@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import inspect
 import logging
 import logging.config
 import math
@@ -20,8 +19,8 @@ from uuid import UUID
 
 import aiohttp
 import httpx
-import litellm
 import pymupdf
+from llmclient import configure_llm_logs
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -224,14 +223,6 @@ def get_loop() -> asyncio.AbstractEventLoop:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop
-
-
-def is_coroutine_callable(obj):
-    if inspect.isfunction(obj):
-        return inspect.iscoroutinefunction(obj)
-    elif callable(obj):  # noqa: RET505
-        return inspect.iscoroutinefunction(obj.__call__)
-    return False
 
 
 def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
@@ -490,26 +481,7 @@ def setup_default_logs() -> None:
     # Trigger PyMuPDF to use Python logging
     # SEE: https://pymupdf.readthedocs.io/en/latest/app3.html#diagnostics
     pymupdf.set_messages(pylogging=True)
-
-    # Set sane default LiteLLM logging configuration
-    # SEE: https://docs.litellm.ai/docs/observability/telemetry
-    litellm.telemetry = False
-
-    logging.config.dictConfig(
-        {
-            "version": 1,
-            "disable_existing_loggers": False,
-            # Lower level for verbose logs
-            "loggers": {
-                "httpcore": {"level": "WARNING"},
-                "httpx": {"level": "WARNING"},
-                # SEE: https://github.com/BerriAI/litellm/issues/2256
-                "LiteLLM": {"level": "WARNING"},
-                "LiteLLM Router": {"level": "WARNING"},
-                "LiteLLM Proxy": {"level": "WARNING"},
-            },
-        }
-    )
+    configure_llm_logs()
 
 
 def extract_thought(content: str | None) -> str:
