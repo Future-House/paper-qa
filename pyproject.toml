@@ -74,6 +74,7 @@ dev = [
     "python-dotenv",
     "refurb>=2",  # Pin to keep recent
     "typeguard",
+    "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 ldp = [
     "ldp>=0.16.0",  # For Callback.before_rollout
