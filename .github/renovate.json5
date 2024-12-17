@@ -13,6 +13,7 @@
     enabled: true,
     schedule: ["* 2 1-7 * 1"], // Work around https://github.com/renovatebot/renovate/discussions/33152
   },
+  minimumReleaseAge: "2 weeks",
   "pre-commit": { enabled: true },
   packageRules: [
     {
