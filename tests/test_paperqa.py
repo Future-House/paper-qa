@@ -945,7 +945,8 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         r"This article has (\d+) citations", doc_details.formatted_citation
     )
     assert match
-    assert int(match.group(1)) >= 1, "Expected at least one citation"
+    num_citations = int(match.group(1))
+    assert num_citations >= 1, "Expected at least one citation"
     assert (
         "Journal of Chemical Theory and Computation" in doc_details.formatted_citation
     )
@@ -954,7 +955,7 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     for _ in range(num_retries):
         answer = docs.query("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
-            assert "This article has 23 citations" in answer.context
+            assert f"This article has {num_citations} citations" in answer.context
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
