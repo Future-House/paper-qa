@@ -132,7 +132,19 @@ class PQASession(BaseModel):
     context: str = ""
     contexts: list[Context] = Field(default_factory=list)
     references: str = ""
-    formatted_answer: str = ""
+    formatted_answer: str = Field(
+        default="",
+        description=(
+            "Optional prettified answer that includes information like question and"
+            " citations."
+        ),
+    )
+    graded_answer: str | None = Field(
+        default=None,
+        description=(
+            "Optional graded answer, used for things like multiple choice questions."
+        ),
+    )
     cost: float = 0.0
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
