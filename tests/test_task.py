@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pytest
 from aviary.env import TASK_DATASET_REGISTRY, TaskConfig, TaskDataset
+from aviary.utils import MultipleChoiceEvaluation, MultipleChoiceQuestion
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import Callback, MeanMetricsCallback, StoreTrajectoriesCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
@@ -20,7 +21,7 @@ from paperqa.agents.task import (
     LitQAv2TaskSplit,
 )
 from paperqa.agents.tools import GenerateAnswer
-from paperqa.litqa import DEFAULT_REWARD_MAPPING, SEED_USING_QUESTION, LitQAEvaluation
+from paperqa.litqa import DEFAULT_REWARD_MAPPING
 
 
 @pytest.fixture(name="base_query_request")
@@ -60,7 +61,7 @@ class StubLitQADataset(LitQATaskDataset):
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         return self._make_gradable_environment(
-            ideal=self.data[idx][0],
+            ideal_answer=self.data[idx][0],
             distractors=self.data[idx][1],
             question=self.data[idx][2],
             sources=self.data[idx][3],
@@ -87,7 +88,10 @@ class StoreEnvCallback(Callback):
         self.query_to_envs: dict[str, PaperQAEnvironment] = {}
 
     async def before_rollout(self, traj_id: str, env) -> None:  # noqa: ARG002
-        self.query_to_envs[env._query.query] = env
+        query: str | MultipleChoiceQuestion = env._query.query
+        self.query_to_envs[
+            query if isinstance(query, str) else query.question_prompt
+        ] = env
 
 
 class TestTaskDataset:
@@ -120,9 +124,9 @@ class TestTaskDataset:
                 obs, _ = await env.reset()
                 assert (
                     "Q: SLC14A1 been identified as a specific marker for endothelial"
-                    " cells in which organ?\n\nOptions:\nA) heart\nB) eye\nC)"
-                    " prostate\nD) Insufficient information to answer this question\nE)"
-                    " liver" in (obs[0].content or "")
+                    " cells in which organ?\n\nOptions:\nA) liver\nB) eye\nC)"
+                    " prostate\nD) heart\nE) Insufficient information to answer this"
+                    " question" in (obs[0].content or "")
                 )
             assert env.sources, "Sources need to be accessible"
             assert isinstance(
@@ -159,7 +163,7 @@ class TestTaskDataset:
                         "deleted_dockeys",
                     }
                 ),
-                "question_kwargs": {"seed": SEED_USING_QUESTION},
+                "question_kwargs": {"seed": MultipleChoiceQuestion.SEED_USING_QUESTION},
             },
         )
         # NOTE: set base_query after construction of the TaskConfig. because in
@@ -193,7 +197,10 @@ class TestTaskDataset:
         assert metrics_callback.eval_means["reward"] > 0, "Expected some wins"
         correct_reward, incorrect_reward = (
             DEFAULT_REWARD_MAPPING[evaluation.value]
-            for evaluation in (LitQAEvaluation.CORRECT, LitQAEvaluation.INCORRECT)
+            for evaluation in (
+                MultipleChoiceEvaluation.CORRECT,
+                MultipleChoiceEvaluation.INCORRECT,
+            )
         )
         worst_case_reward_given_correct = (
             correct_reward * correct_percentage
