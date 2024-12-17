@@ -9,7 +9,10 @@
   prHourlyLimit: 4,
   timezone: "America/Los_Angeles",
   rangeStrategy: "widen",
-  lockFileMaintenance: { enabled: true },
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["* 2 1-7 * 1"], // Work around https://github.com/renovatebot/renovate/discussions/33152
+  },
   "pre-commit": { enabled: true },
   packageRules: [
     {
