@@ -26,7 +26,7 @@ dependencies = [
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
     "fh-llm-client",
-    "fhaviary[llm]>=0.10.2",  # For tool execution concurrency
+    "fhaviary[llm]>=0.14",  # For MultipleChoiceQuestion
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
