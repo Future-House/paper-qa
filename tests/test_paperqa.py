@@ -683,7 +683,7 @@ def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=SparseEmbeddingModel(),
     )
-    assert any(cast(list, docs.texts[0].embedding))
+    assert isinstance(docs.texts[0].embedding, list)
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -705,7 +705,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_model,
     )
-    assert any(cast(list, docs.texts[0].embedding))
+    assert isinstance(docs.texts[0].embedding, list)
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
