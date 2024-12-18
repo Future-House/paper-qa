@@ -9,6 +9,7 @@ from llmclient import LiteLLMModel, LLMModel
 from rich.table import Table
 
 from paperqa.docs import Docs
+from paperqa.types import DocDetails
 
 from .models import AnswerResponse
 
@@ -91,10 +92,11 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
+            doc = cast(DocDetails, cast(Docs, obj).texts[0].doc)
             try:
-                display_name = cast(Docs, obj).texts[0].doc.title
+                display_name = cast(str, doc.title)
             except AttributeError:
-                display_name = cast(Docs, obj).texts[0].doc.formatted_citation
+                display_name = doc.formatted_citation
             table.add_row(display_name[:max_chars_per_column], filename)
         return table
     raise NotImplementedError(

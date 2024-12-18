@@ -54,9 +54,9 @@ def set_llm_session_ids(session_id: UUID):
 
 
 class Doc(Embeddable):
-    docname: str
+    docname: str | None = None
+    dockey: DocKey | None = None
     citation: str
-    dockey: DocKey
     overwrite_fields_from_metadata: bool = Field(
         default=True,
         description=(
@@ -94,7 +94,7 @@ class Doc(Embeddable):
 class Text(Embeddable):
     text: str
     name: str
-    doc: Doc
+    doc: Doc | DocDetails
 
     def __hash__(self) -> int:
         return hash(self.text)
