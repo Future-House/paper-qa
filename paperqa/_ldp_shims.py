@@ -15,6 +15,7 @@ __all__ = [
     "UIndexMemoryModel",
     "_Memories",
     "discounted_returns",
+    "evaluate_consensus",
     "set_training_mode",
 ]
 
@@ -29,7 +30,12 @@ try:
         SimpleAgent,
         SimpleAgentState,
     )
-    from ldp.alg import Callback, ComputeTrajectoryMetricsMixin, RolloutManager
+    from ldp.alg import (
+        Callback,
+        ComputeTrajectoryMetricsMixin,
+        RolloutManager,
+        evaluate_consensus,
+    )
     from ldp.graph.memory import Memory, UIndexMemoryModel
     from ldp.graph.op_utils import set_training_mode
     from ldp.utils import discounted_returns
@@ -57,4 +63,5 @@ except ImportError:
     SimpleAgentState = None  # type: ignore[assignment,misc]
     UIndexMemoryModel = None  # type: ignore[assignment,misc]
     discounted_returns = None  # type: ignore[assignment]
+    evaluate_consensus = None  # type: ignore[assignment]
     set_training_mode = None  # type: ignore[assignment]
