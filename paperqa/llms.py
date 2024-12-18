@@ -10,7 +10,7 @@ from collections.abc import (
     Iterable,
     Sequence,
 )
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from llmclient import (
@@ -334,8 +334,10 @@ class QdrantVectorStore(VectorStore):
         texts_list = list(texts)
 
         if texts_list and not self.client.collection_exists(self.collection_name):
+
             params = models.VectorParams(
-                size=len(texts_list[0].embedding), distance=models.Distance.COSINE
+                size=len(cast(list, texts_list[0].embedding)),
+                distance=models.Distance.COSINE,
             )
             self.client.create_collection(
                 self.collection_name,

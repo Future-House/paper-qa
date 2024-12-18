@@ -164,16 +164,14 @@ class DocMetadataClient:
                     sum(
                         await gather_with_concurrency(
                             len(task.processors),
-                            task.processor_queries(
-                                cast(DocDetails, doc_details), session
-                            ),
+                            task.processor_queries(doc_details, session),
                         )
                     )
                     or None
                 )
 
             if doc_details:
-                doc_details = cast(DocDetails, doc_details)
+                # doc_details = cast(DocDetails, doc_details)
                 # abuse int handling in __add__ for empty all_doc_details, None types won't work
                 all_doc_details = doc_details + (all_doc_details or 0)
 
