@@ -509,16 +509,16 @@ wheels = [
 
 [[package]]
 name = "fhaviary"
-version = "0.12.0"
+version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5b/46/1b8e95bbfc162b5c8798f217e6b7300baf7e7326619c54659bfff75c9aa5/fhaviary-0.12.0.tar.gz", hash = "sha256:9f8cec92992499d90a37534a2bab54cb41619d5a7556859f75e1a143ed6fb20d", size = 250209 }
+sdist = { url = "https://files.pythonhosted.org/packages/00/72/df04af3d1135b2bfb6af59f327c7759358a82c2ca7dad01156d93cddfdb1/fhaviary-0.14.0.tar.gz", hash = "sha256:99751f6484e28d33b585cd47c95142a589e814571509390e213e336cdd8aab7b", size = 311279 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f3/82/e7924abed9d1dc09d5a2976461c7889ec82403cf64a6a66431f363a01397/fhaviary-0.12.0-py3-none-any.whl", hash = "sha256:cd6e537c497c15966a8e031a7ad2c88fd6fec52d8d060450a653113d76a8acaa", size = 49447 },
+    { url = "https://files.pythonhosted.org/packages/bb/a1/dfb72d03d72606c1ffc0591bc73b7304dff5c4ca8606fa1e9e8cfbbce1b7/fhaviary-0.14.0-py3-none-any.whl", hash = "sha256:ce1b6950b9719cd321c5afe13edefb429319f54c3f5fb18396a57b22ad465822", size = 52312 },
 ]
 
 [package.optional-dependencies]
@@ -1636,7 +1636,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.8.1.dev7+g66412a6.d20241217"
+version = "5.8.1.dev10+g21e6159.d20241218"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1708,7 +1708,31 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "paper-qa", extra = ["dev"] },
+    { name = "datasets" },
+    { name = "ipython" },
+    { name = "ldp" },
+    { name = "mypy" },
+    { name = "pandas-stubs" },
+    { name = "pre-commit" },
+    { name = "pydantic" },
+    { name = "pylint-pydantic" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-recording" },
+    { name = "pytest-rerunfailures" },
+    { name = "pytest-subtests" },
+    { name = "pytest-sugar" },
+    { name = "pytest-timer", extra = ["colorama"] },
+    { name = "pytest-xdist" },
+    { name = "python-dotenv" },
+    { name = "pyzotero" },
+    { name = "qdrant-client" },
+    { name = "refurb" },
+    { name = "sentence-transformers" },
+    { name = "typeguard" },
+    { name = "types-pyyaml" },
+    { name = "types-setuptools" },
+    { name = "vcrpy" },
 ]
 
 [package.metadata]
@@ -1717,7 +1741,7 @@ requires-dist = [
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
     { name = "fh-llm-client" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.2" },
+    { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
