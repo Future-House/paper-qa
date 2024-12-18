@@ -10,13 +10,14 @@ __all__ = [
 import logging
 import re
 from abc import ABC
-from collections.abc import Awaitable, Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from copy import deepcopy
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never
 
 from aviary.core import (
     TASK_DATASET_REGISTRY,
+    Frame,
     Messages,
     TaskDataset,
     ToolRequestMessage,
@@ -31,8 +32,9 @@ from aviary.utils import (
 from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
 
 try:
-    from ldp.alg import ComputeTrajectoryMetricsMixin
+    from ldp.alg import ComputeTrajectoryMetricsMixin, evaluate_consensus
 except ImportError:
+    evaluate_consensus = None  # type: ignore[assignment]
 
     class ComputeTrajectoryMetricsMixin:  # type: ignore[no-redef]
         """Placeholder for when ldp isn't installed."""
@@ -44,12 +46,12 @@ from paperqa.litqa import (
     DEFAULT_REWARD_MAPPING,
     read_litqa_v2_from_hub,
 )
-from paperqa.types import DocDetails
+from paperqa.types import DocDetails, PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .models import QueryRequest
 from .search import SearchIndex, maybe_get_manifest
-from .tools import Complete
+from .tools import Complete, EnvironmentState
 
 if TYPE_CHECKING:
     from ldp.data_structures import Trajectory
@@ -174,6 +176,66 @@ ENV_REGISTRY[ENV_NAME] = (
     GradablePaperQAEnvironment.__module__,
     GradablePaperQAEnvironment.__name__,
 )
+
+
+async def evaluate_consensus_sampling(
+    data: Iterable[GradablePaperQAEnvironment | Frame],
+    num_samples: int = 1,
+    seed: int | None = None,
+) -> tuple[dict[str, list[tuple[str, int]]], float]:
+    def get_question(x: GradablePaperQAEnvironment | Frame) -> str:
+        if isinstance(x, GradablePaperQAEnvironment):
+            query: str | MultipleChoiceQuestion | dict[str, Any] = x._query.query
+        else:
+            qr: QueryRequest | dict[str, Any] = x.info["query"]
+            query = qr.query if isinstance(qr, QueryRequest) else qr["query"]
+        if isinstance(query, str):
+            return query
+        if isinstance(query, MultipleChoiceQuestion):
+            return query.question
+        return query["question"]
+
+    def extract_answer(x: GradablePaperQAEnvironment | Frame) -> str:
+        sess: PQASession | dict[str, Any] = (
+            x.state.session
+            if isinstance(x.state, EnvironmentState)
+            else x.state["session"]
+        )
+        return (
+            sess.graded_answer
+            if isinstance(sess, PQASession)
+            else sess["graded_answer"]
+        )
+
+    def extract_ideal(x: GradablePaperQAEnvironment | Frame) -> str:
+        if isinstance(x, GradablePaperQAEnvironment):
+            query: str | MultipleChoiceQuestion | dict[str, Any] = x._query.query
+        else:
+            qr: QueryRequest | dict[str, Any] = x.info["query"]
+            query = qr.query if isinstance(qr, QueryRequest) else qr["query"]
+        if isinstance(query, str):
+            raise ValueError(  # noqa: TRY004
+                "We require a {MultipleChoiceQuestion.__name__} variant to extract"
+                " ideal answer, not a string."
+            )
+        if isinstance(query, MultipleChoiceQuestion):
+            return query.ideal_answer
+        return query["ideal_answer"]
+
+    try:
+        return await evaluate_consensus(
+            data=data,
+            grouping_fn=get_question,
+            extract_answer_fn=extract_answer,
+            ideal_answer_fn=extract_ideal,
+            num_samples=num_samples,
+            seed=seed,
+        )
+    except TypeError:
+        raise ImportError(
+            "Evaluating consensus requires the 'ldp' extra for 'ldp'. Please:"
+            " `pip install paper-qa[ldp]`."
+        ) from None
 
 
 class LitQATaskDataset(
