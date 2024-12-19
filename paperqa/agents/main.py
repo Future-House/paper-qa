@@ -20,15 +20,7 @@ from tenacity import (
     stop_after_attempt,
 )
 
-try:
-    from ldp.alg import Callback, RolloutManager
-except ImportError:
-
-    class Callback:  # type: ignore[no-redef]
-        """Placeholder parent class for when ldp isn't installed."""
-
-    RolloutManager = None  # type: ignore[assignment,misc]
-
+from paperqa._ldp_shims import Callback, RolloutManager
 from paperqa.docs import Docs
 from paperqa.settings import AgentSettings
 from paperqa.types import PQASession
