@@ -509,16 +509,16 @@ wheels = [
 
 [[package]]
 name = "fhaviary"
-version = "0.12.0"
+version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5b/46/1b8e95bbfc162b5c8798f217e6b7300baf7e7326619c54659bfff75c9aa5/fhaviary-0.12.0.tar.gz", hash = "sha256:9f8cec92992499d90a37534a2bab54cb41619d5a7556859f75e1a143ed6fb20d", size = 250209 }
+sdist = { url = "https://files.pythonhosted.org/packages/00/72/df04af3d1135b2bfb6af59f327c7759358a82c2ca7dad01156d93cddfdb1/fhaviary-0.14.0.tar.gz", hash = "sha256:99751f6484e28d33b585cd47c95142a589e814571509390e213e336cdd8aab7b", size = 311279 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f3/82/e7924abed9d1dc09d5a2976461c7889ec82403cf64a6a66431f363a01397/fhaviary-0.12.0-py3-none-any.whl", hash = "sha256:cd6e537c497c15966a8e031a7ad2c88fd6fec52d8d060450a653113d76a8acaa", size = 49447 },
+    { url = "https://files.pythonhosted.org/packages/bb/a1/dfb72d03d72606c1ffc0591bc73b7304dff5c4ca8606fa1e9e8cfbbce1b7/fhaviary-0.14.0-py3-none-any.whl", hash = "sha256:ce1b6950b9719cd321c5afe13edefb429319f54c3f5fb18396a57b22ad465822", size = 52312 },
 ]
 
 [package.optional-dependencies]
@@ -1051,7 +1051,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.16.0"
+version = "0.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1068,9 +1068,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/4e/3fd29a7188772126bd0fd93f8efb5927b93cbadf0d2c2c93a6c1e200c324/ldp-0.16.0.tar.gz", hash = "sha256:5109ead28b9f40fffc5d953a3e12d0ff34289d33cc4053522ac4e1da26c346ba", size = 376038 }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/e3/cbc57ae5ffaca8ffb0916d874e9c2601e522b1e95e323983681b22e69ff3/ldp-0.17.0.tar.gz", hash = "sha256:3ebe080274bd2dad01a0f4c73f291d31a541954e1052ca7ec231fc0141b84fbf", size = 381280 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/6a/2733ecac8ca7cb31c00fc9f5f268ad2414171d485e9e34e10f333ac5f81c/ldp-0.16.0-py3-none-any.whl", hash = "sha256:cb1df6fd3d2c8bd5b60b21349f6f555cd43250c45d64a901521dbf424c6eec2f", size = 95278 },
+    { url = "https://files.pythonhosted.org/packages/11/c7/fafcec0b757cc08ec5c7954cf9d0be6a285d5a20fdf7e9e0b446ad2cbf55/ldp-0.17.0-py3-none-any.whl", hash = "sha256:dfc16490047ece4b20a42ece371f206d5d01ecd5ee8a2fb5b02cab4b746f1139", size = 97840 },
 ]
 
 [[package]]
@@ -1636,7 +1636,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.8.1.dev7+g66412a6.d20241217"
+version = "5.8.1.dev11+ge1622a8.d20241219"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1708,7 +1708,31 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "paper-qa", extra = ["dev"] },
+    { name = "datasets" },
+    { name = "ipython" },
+    { name = "ldp" },
+    { name = "mypy" },
+    { name = "pandas-stubs" },
+    { name = "pre-commit" },
+    { name = "pydantic" },
+    { name = "pylint-pydantic" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-recording" },
+    { name = "pytest-rerunfailures" },
+    { name = "pytest-subtests" },
+    { name = "pytest-sugar" },
+    { name = "pytest-timer", extra = ["colorama"] },
+    { name = "pytest-xdist" },
+    { name = "python-dotenv" },
+    { name = "pyzotero" },
+    { name = "qdrant-client" },
+    { name = "refurb" },
+    { name = "sentence-transformers" },
+    { name = "typeguard" },
+    { name = "types-pyyaml" },
+    { name = "types-setuptools" },
+    { name = "vcrpy" },
 ]
 
 [package.metadata]
@@ -1717,11 +1741,11 @@ requires-dist = [
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
     { name = "fh-llm-client" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.10.2" },
+    { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.16.0" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.17" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
