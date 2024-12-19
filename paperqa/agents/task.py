@@ -24,21 +24,9 @@ from aviary.core import (
     ToolResponseMessage,
 )
 from aviary.env import ENV_REGISTRY
-
-from paperqa.types import DocDetails
-
-from .search import SearchIndex, maybe_get_manifest
-
-try:
-    from ldp.alg import ComputeTrajectoryMetricsMixin
-except ImportError:
-
-    class ComputeTrajectoryMetricsMixin:  # type: ignore[no-redef]
-        """Placeholder for when ldp isn't installed."""
-
-
 from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
 
+from paperqa._ldp_shims import ComputeTrajectoryMetricsMixin
 from paperqa.docs import Docs
 from paperqa.litqa import (
     DEFAULT_EVAL_MODEL_NAME,
@@ -47,10 +35,11 @@ from paperqa.litqa import (
     LitQAEvaluation,
     read_litqa_v2_from_hub,
 )
-from paperqa.types import PQASession
+from paperqa.types import DocDetails, PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .models import QueryRequest
+from .search import SearchIndex, maybe_get_manifest
 from .tools import Complete
 
 if TYPE_CHECKING:

@@ -10,37 +10,29 @@ from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
 from aviary.core import ToolSelector
+from llmclient import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    TypeAdapter,
     computed_field,
     field_validator,
     model_validator,
 )
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
-try:
-    from ldp.agent import (
-        Agent,
-        HTTPAgentClient,
-        MemoryAgent,
-        ReActAgent,
-        SimpleAgent,
-        SimpleAgentState,
-    )
-    from ldp.graph.memory import Memory, UIndexMemoryModel
-    from ldp.graph.op_utils import set_training_mode
-
-    _Memories = TypeAdapter(dict[int, Memory] | list[Memory])  # type: ignore[var-annotated]
-
-    HAS_LDP_INSTALLED = True
-except ImportError:
-    HAS_LDP_INSTALLED = False
-
-from llmclient import EmbeddingModel, LiteLLMModel, embedding_model_factory
-
+from paperqa._ldp_shims import (
+    HAS_LDP_INSTALLED,
+    Agent,
+    HTTPAgentClient,
+    MemoryAgent,
+    ReActAgent,
+    SimpleAgent,
+    SimpleAgentState,
+    UIndexMemoryModel,
+    _Memories,
+    set_training_mode,
+)
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
