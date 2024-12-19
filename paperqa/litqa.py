@@ -10,14 +10,10 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import StrEnum
 from typing import TYPE_CHECKING, Literal, Self
 
-try:
-    from ldp.utils import discounted_returns
-except ImportError:
-    discounted_returns = None  # type: ignore[assignment]
-
 from aviary.core import Message
 from llmclient import LiteLLMModel, LLMModel
 
+from paperqa._ldp_shims import discounted_returns
 from paperqa.prompts import EVAL_PROMPT_TEMPLATE, QA_PROMPT_TEMPLATE
 from paperqa.settings import make_default_litellm_model_list_settings
 from paperqa.types import PQASession
