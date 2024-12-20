@@ -46,5 +46,15 @@ except ImportError:
     class Callback:  # type: ignore[no-redef]
         """Placeholder parent class for when ldp isn't installed."""
 
+    Agent = None  # type: ignore[assignment,misc]
+    HTTPAgentClient = None  # type: ignore[assignment,misc]
+    _Memories = None  # type: ignore[assignment]
+    Memory = None  # type: ignore[assignment,misc]
+    MemoryAgent = None  # type: ignore[assignment,misc]
+    ReActAgent = None  # type: ignore[assignment,misc]
     RolloutManager = None  # type: ignore[assignment,misc]
+    SimpleAgent = None  # type: ignore[assignment,misc]
+    SimpleAgentState = None  # type: ignore[assignment,misc]
+    UIndexMemoryModel = None  # type: ignore[assignment,misc]
     discounted_returns = None  # type: ignore[assignment]
+    set_training_mode = None  # type: ignore[assignment]
