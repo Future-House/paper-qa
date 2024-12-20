@@ -31,9 +31,11 @@ from pydantic import (
 )
 
 from paperqa.types import Text
+import asyncio
+import atexit
 
 try:
-    from qdrant_client import QdrantClient, models
+    from qdrant_client import AsyncQdrantClient, QdrantClient, models
 
     qdrant_installed = True
 except ImportError:
@@ -281,7 +283,37 @@ class QdrantVectorStore(VectorStore):
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
     _point_ids: set[str] | None = None
+    
+    def __init__(self, **data):
+        super().__init__(**data)
+        if isinstance(self.client, AsyncQdrantClient):
+            # Register cleanup for async client
+            atexit.register(self._cleanup_async_client)
 
+    def _cleanup_async_client(self):
+        """Cleanup async client connection"""
+        if isinstance(self.client, AsyncQdrantClient):
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(self.client.close())
+                else:
+                    loop.run_until_complete(self.client.close())
+            except Exception:
+                pass
+
+    async def aclose(self):
+        """Explicitly close async client"""
+        if isinstance(self.client, AsyncQdrantClient):
+            await self.client.close()
+
+    def close(self):
+        """Synchronously close the client"""
+        if isinstance(self.client, AsyncQdrantClient):
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.aclose())
+        elif isinstance(self.client, QdrantClient):
+            self.client.close()
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -304,9 +336,9 @@ class QdrantVectorStore(VectorStore):
             )
             raise ImportError(msg)
 
-        if self.client and not isinstance(self.client, QdrantClient):
+        if self.client and not isinstance(self.client, (QdrantClient, AsyncQdrantClient)):
             raise TypeError(
-                f"'client' should be an instance of `qdrant_client.QdrantClient`. Got `{type(self.client)}`"
+                f"'client' should be an instance of QdrantClient or AsyncQdrantClient. Got `{type(self.client)}`"
             )
 
         if not self.client:
@@ -315,39 +347,59 @@ class QdrantVectorStore(VectorStore):
 
         return self
 
-    def clear(self) -> None:
+    async def _collection_exists(self) -> bool:
+        if isinstance(self.client, AsyncQdrantClient):
+            return await self.client.collection_exists(self.collection_name)
+        return self.client.collection_exists(self.collection_name)
+
+    async def clear(self) -> None:
         super().clear()
 
-        if not self.client.collection_exists(self.collection_name):
+        if not await self._collection_exists():
             return
 
-        self.client.delete(
-            collection_name=self.collection_name,
-            points_selector=models.Filter(must=[]),
-            wait=True,
-        )
+        if isinstance(self.client, AsyncQdrantClient):
+            await self.client.delete(
+                collection_name=self.collection_name,
+                points_selector=models.Filter(must=[]),
+                wait=True,
+            )
+        else:
+            self.client.delete(
+                collection_name=self.collection_name,
+                points_selector=models.Filter(must=[]),
+                wait=True,
+            )
         self._point_ids = None
 
-    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+    async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         super().add_texts_and_embeddings(texts)
 
         texts_list = list(texts)
 
-        if texts_list and not self.client.collection_exists(self.collection_name):
+        if texts_list and not await self._collection_exists():
             params = models.VectorParams(
-                size=len(texts_list[0].embedding), distance=models.Distance.COSINE
+                size=len(texts_list[0].embedding), 
+                distance=models.Distance.COSINE
             )
-            self.client.create_collection(
-                self.collection_name,
-                vectors_config=(
-                    {self.vector_name: params} if self.vector_name else params
-                ),
-            )
+            
+            if isinstance(self.client, AsyncQdrantClient):
+                await self.client.create_collection(
+                    self.collection_name,
+                    vectors_config=(
+                        {self.vector_name: params} if self.vector_name else params
+                    ),
+                )
+            else:
+                self.client.create_collection(
+                    self.collection_name,
+                    vectors_config=(
+                        {self.vector_name: params} if self.vector_name else params
+                    ),
+                )
 
         ids, payloads, vectors = [], [], []
         for text in texts_list:
-            # Entries with same IDs are overwritten.
-            # We generate deterministic UUIDs based on the embedding vectors.
             ids.append(uuid.uuid5(uuid.NAMESPACE_URL, str(text.embedding)).hex)
             payloads.append(text.model_dump(exclude={"embedding"}))
             vectors.append(
@@ -356,33 +408,56 @@ class QdrantVectorStore(VectorStore):
                 else text.embedding
             )
 
-        self.client.upload_collection(
-            collection_name=self.collection_name,
-            vectors=vectors,
-            payload=payloads,
-            wait=True,
-            ids=ids,
-        )
+        if isinstance(self.client, AsyncQdrantClient):
+            await self.client.upsert(
+                collection_name=self.collection_name,
+                points=[
+                    models.PointStruct(
+                        id=some_id,
+                        payload=some_payload,
+                        vector=some_vector,
+                    ) for some_id, some_payload, some_vector in zip(ids, payloads, vectors)
+                ],
+            )
+
+        else:
+            self.client.upload_collection(
+                collection_name=self.collection_name,
+                vectors=vectors,
+                payload=payloads,
+                wait=True,
+                ids=ids,
+            )
         self._point_ids = set(ids)
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
-        if not self.client.collection_exists(self.collection_name):
+        if not await self._collection_exists():
             return ([], [])
 
         embedding_model.set_mode(EmbeddingModes.QUERY)
         np_query = np.array((await embedding_model.embed_documents([query]))[0])
         embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
-        points = self.client.query_points(
-            collection_name=self.collection_name,
-            query=np_query,
-            using=self.vector_name,
-            limit=k,
-            with_vectors=True,
-            with_payload=True,
-        ).points
+        if isinstance(self.client, AsyncQdrantClient):
+            points = (await self.client.query_points(
+                collection_name=self.collection_name,
+                query=np_query,
+                using=self.vector_name,
+                limit=k,
+                with_vectors=True,
+                with_payload=True,
+            )).points
+        else:
+            points = self.client.query_points(
+                collection_name=self.collection_name,
+                query=np_query,
+                using=self.vector_name,
+                limit=k,
+                with_vectors=True,
+                with_payload=True,
+            ).points
 
         return (
             [

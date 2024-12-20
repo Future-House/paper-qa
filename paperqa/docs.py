@@ -12,7 +12,9 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
-
+from qdrant_client import AsyncQdrantClient
+from paperqa.llms import QdrantVectorStore
+from collections import deque
 from llmclient import (
     Embeddable,
     EmbeddingModel,
@@ -55,7 +57,7 @@ from paperqa.utils import (
     md5sum,
     name_in_text,
 )
-
+import asyncio
 logger = logging.getLogger(__name__)
 
 
@@ -513,7 +515,10 @@ class Docs(BaseModel):
                 strict=True,
             ):
                 t.embedding = t_embedding
-        self.texts_index.add_texts_and_embeddings(texts)
+        if asyncio.iscoroutinefunction(self.texts_index.add_texts_and_embeddings):
+            await self.texts_index.add_texts_and_embeddings(texts)
+        else:
+            self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
         self,
@@ -848,3 +853,119 @@ class Docs(BaseModel):
         session.context = context_str
 
         return session
+    
+    async def load_docs_from_qdrant(
+        client: "AsyncQdrantClient",
+        collection_name: str,
+        vector_name: str | None = None,
+        batch_size: int = 100,
+        max_concurrent_requests: int = 5
+    ) -> "Docs":
+        """
+        Reconstruct a Docs object from a Qdrant collection using async client.
+        
+        Args:
+            client: AsyncQdrantClient instance
+            collection_name: Name of the collection to load
+            vector_name: Optional name of the vector field if using named vectors
+            batch_size: Number of records to fetch per batch
+            max_concurrent_requests: Maximum number of concurrent scroll requests
+        
+        Returns:
+            Reconstructed Docs object
+        """
+        # Initialize docs with vector store
+        vectorstore = QdrantVectorStore(
+            client=client,
+            collection_name=collection_name,
+            vector_name=vector_name
+        )
+        docs = Docs(texts_index=vectorstore)
+        
+        # Get collection info to determine total points
+        collection_info = await client.get_collection(collection_name)
+        total_points = collection_info.points_count
+        
+        async def fetch_batch(offset: int) -> list:
+            return (await client.scroll(
+                collection_name=collection_name,
+                limit=batch_size,
+                offset=offset,
+                with_payload=True,
+                with_vectors=True
+            ))[0]
+        
+        # Create a queue of offsets to process
+        offset_queue = deque(range(0, total_points, batch_size))
+        active_tasks = set()
+        all_points = []
+        
+        # Process batches concurrently
+        while offset_queue or active_tasks:
+            # Start new tasks if we have capacity and offsets to process
+            while len(active_tasks) < max_concurrent_requests and offset_queue:
+                offset = offset_queue.popleft()
+                task = asyncio.create_task(fetch_batch(offset))
+                active_tasks.add(task)
+            
+            if not active_tasks:
+                break
+            
+            # Wait for at least one task to complete
+            done, active_tasks = await asyncio.wait(
+                active_tasks, 
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            
+            # Process completed tasks
+            for task in done:
+                points = await task
+                all_points.extend(points)
+        
+        # Process all points
+        for point in all_points:
+            try:
+                payload = point.payload
+                doc_data = payload['doc']
+                
+                # Only create new Doc if we haven't seen this dockey
+                if doc_data['dockey'] not in docs.docs:
+                    docs.docs[doc_data['dockey']] = Doc(
+                        docname=doc_data['docname'],
+                        citation=doc_data['citation'],
+                        dockey=doc_data['dockey']
+                    )
+                    docs.docnames.add(doc_data['docname'])
+                
+                # Create Text object
+                text = Text(
+                    text=payload['text'],
+                    name=payload['name'],
+                    doc=docs.docs[doc_data['dockey']],
+                    embedding=point.vector[vector_name] if vector_name else point.vector
+                )
+                docs.texts.append(text)
+                
+            except KeyError as e:
+                logger.warning(f"Skipping invalid point due to missing field: {str(e)}")
+                continue
+        
+        return docs
+
+    def load_docs_from_qdrant_sync(
+        client: "AsyncQdrantClient",
+        collection_name: str,
+        vector_name: str | None = None,
+        batch_size: int = 100,
+        max_concurrent_requests: int = 5
+    ) -> "Docs":
+        """Synchronous version of load_docs_from_qdrant"""
+        return get_loop().run_until_complete(
+            Docs.load_docs_from_qdrant(
+                client=client,
+                collection_name=collection_name,
+                vector_name=vector_name,
+                batch_size=batch_size,
+                max_concurrent_requests=max_concurrent_requests
+            )
+        )
