@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import atexit
 import itertools
 import logging
 import uuid
@@ -31,8 +33,6 @@ from pydantic import (
 )
 
 from paperqa.types import Text
-import asyncio
-import atexit
 
 try:
     from qdrant_client import AsyncQdrantClient, QdrantClient, models
@@ -283,7 +283,7 @@ class QdrantVectorStore(VectorStore):
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
     _point_ids: set[str] | None = None
-    
+
     def __init__(self, **data):
         super().__init__(**data)
         if isinstance(self.client, AsyncQdrantClient):
@@ -291,7 +291,7 @@ class QdrantVectorStore(VectorStore):
             atexit.register(self._cleanup_async_client)
 
     def _cleanup_async_client(self):
-        """Cleanup async client connection"""
+        """Cleanup async client connection."""
         if isinstance(self.client, AsyncQdrantClient):
             try:
                 loop = asyncio.get_event_loop()
@@ -303,17 +303,18 @@ class QdrantVectorStore(VectorStore):
                 pass
 
     async def aclose(self):
-        """Explicitly close async client"""
+        """Explicitly close async client."""
         if isinstance(self.client, AsyncQdrantClient):
             await self.client.close()
 
     def close(self):
-        """Synchronously close the client"""
+        """Synchronously close the client."""
         if isinstance(self.client, AsyncQdrantClient):
             loop = asyncio.get_event_loop()
             loop.run_until_complete(self.aclose())
         elif isinstance(self.client, QdrantClient):
             self.client.close()
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -336,7 +337,9 @@ class QdrantVectorStore(VectorStore):
             )
             raise ImportError(msg)
 
-        if self.client and not isinstance(self.client, (QdrantClient, AsyncQdrantClient)):
+        if self.client and not isinstance(
+            self.client, QdrantClient | AsyncQdrantClient
+        ):
             raise TypeError(
                 f"'client' should be an instance of QdrantClient or AsyncQdrantClient. Got `{type(self.client)}`"
             )
@@ -379,10 +382,9 @@ class QdrantVectorStore(VectorStore):
 
         if texts_list and not await self._collection_exists():
             params = models.VectorParams(
-                size=len(texts_list[0].embedding), 
-                distance=models.Distance.COSINE
+                size=len(texts_list[0].embedding), distance=models.Distance.COSINE
             )
-            
+
             if isinstance(self.client, AsyncQdrantClient):
                 await self.client.create_collection(
                     self.collection_name,
@@ -416,7 +418,10 @@ class QdrantVectorStore(VectorStore):
                         id=some_id,
                         payload=some_payload,
                         vector=some_vector,
-                    ) for some_id, some_payload, some_vector in zip(ids, payloads, vectors)
+                    )
+                    for some_id, some_payload, some_vector in zip(
+                        ids, payloads, vectors
+                    )
                 ],
             )
 
@@ -441,14 +446,16 @@ class QdrantVectorStore(VectorStore):
         embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
         if isinstance(self.client, AsyncQdrantClient):
-            points = (await self.client.query_points(
-                collection_name=self.collection_name,
-                query=np_query,
-                using=self.vector_name,
-                limit=k,
-                with_vectors=True,
-                with_payload=True,
-            )).points
+            points = (
+                await self.client.query_points(
+                    collection_name=self.collection_name,
+                    query=np_query,
+                    using=self.vector_name,
+                    limit=k,
+                    with_vectors=True,
+                    with_payload=True,
+                )
+            ).points
         else:
             points = self.client.query_points(
                 collection_name=self.collection_name,
