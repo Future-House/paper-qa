@@ -6,7 +6,6 @@ import logging
 import os
 import re
 import tempfile
-from collections import deque
 from collections.abc import Callable
 from datetime import datetime
 from functools import partial
@@ -28,14 +27,12 @@ from pydantic import (
     ValidationInfo,
     field_validator,
 )
-from qdrant_client import AsyncQdrantClient
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
 from paperqa.llms import (
     NumpyVectorStore,
     PromptRunner,
-    QdrantVectorStore,
     VectorStore,
 )
 from paperqa.paths import PAPERQA_DIR
@@ -855,120 +852,3 @@ class Docs(BaseModel):
         session.context = context_str
 
         return session
-
-    async def load_docs_from_qdrant(
-        self: AsyncQdrantClient,
-        collection_name: str,
-        vector_name: str | None = None,
-        batch_size: int = 100,
-        max_concurrent_requests: int = 5,
-    ) -> Docs:
-        """
-        Reconstruct a Docs object from a Qdrant collection using async client.
-
-        Args:
-            client: AsyncQdrantClient instance
-            collection_name: Name of the collection to load
-            vector_name: Optional name of the vector field if using named vectors
-            batch_size: Number of records to fetch per batch
-            max_concurrent_requests: Maximum number of concurrent scroll requests
-
-        Returns:
-            Reconstructed Docs object
-        """
-        # Initialize docs with vector store
-        vectorstore = QdrantVectorStore(
-            client=self, collection_name=collection_name, vector_name=vector_name
-        )
-        docs = Docs(texts_index=vectorstore)
-
-        # Get collection info to determine total points
-        collection_info = await self.get_collection(collection_name)
-        total_points = collection_info.points_count
-
-        async def fetch_batch(offset: int) -> list:
-            return (
-                await self.scroll(
-                    collection_name=collection_name,
-                    limit=batch_size,
-                    offset=offset,
-                    with_payload=True,
-                    with_vectors=True,
-                )
-            )[0]
-
-        # Create a queue of offsets to process
-        offset_queue = deque(range(0, total_points, batch_size))
-        active_tasks = set()
-        all_points = []
-
-        # Process batches concurrently
-        while offset_queue or active_tasks:
-            # Start new tasks if we have capacity and offsets to process
-            while len(active_tasks) < max_concurrent_requests and offset_queue:
-                offset = offset_queue.popleft()
-                task = asyncio.create_task(fetch_batch(offset))
-                active_tasks.add(task)
-
-            if not active_tasks:
-                break
-
-            # Wait for at least one task to complete
-            done, active_tasks = await asyncio.wait(
-                active_tasks, return_when=asyncio.FIRST_COMPLETED
-            )
-
-            # Process completed tasks
-            for task in done:
-                points = await task
-                all_points.extend(points)
-
-        # Process all points
-        for point in all_points:
-            try:
-                payload = point.payload
-                doc_data = payload["doc"]
-
-                # Only create new Doc if we haven't seen this dockey
-                if doc_data["dockey"] not in docs.docs:
-                    docs.docs[doc_data["dockey"]] = Doc(
-                        docname=doc_data["docname"],
-                        citation=doc_data["citation"],
-                        dockey=doc_data["dockey"],
-                    )
-                    docs.docnames.add(doc_data["docname"])
-
-                # Create Text object
-                text = Text(
-                    text=payload["text"],
-                    name=payload["name"],
-                    doc=docs.docs[doc_data["dockey"]],
-                    embedding=(
-                        point.vector[vector_name] if vector_name else point.vector
-                    ),
-                )
-                docs.texts.append(text)
-
-            except KeyError as e:
-                logger.warning(f"Skipping invalid point due to missing field: {e!s}")
-                continue
-
-        return docs
-
-    def load_docs_from_qdrant_sync(
-        self: AsyncQdrantClient,
-        collection_name: str,
-        vector_name: str | None = None,
-        batch_size: int = 100,
-        max_concurrent_requests: int = 5,
-    ) -> Docs:
-        """Synchronous version of load_docs_from_qdrant."""
-        return get_loop().run_until_complete(
-            Docs.load_docs_from_qdrant(
-                client=self,
-                collection_name=collection_name,
-                vector_name=vector_name,
-                batch_size=batch_size,
-                max_concurrent_requests=max_concurrent_requests,
-            )
-        )
