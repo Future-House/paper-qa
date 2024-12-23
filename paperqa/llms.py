@@ -72,7 +72,8 @@ class VectorStore(BaseModel, ABC):
         return len(self.texts_hashes)
 
     @abstractmethod
-    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+    async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        """Add texts and their embeddings to the store."""
         self.texts_hashes.update(hash(t) for t in texts)
 
     @abstractmethod
@@ -198,8 +199,8 @@ class NumpyVectorStore(VectorStore):
         self._embeddings_matrix = None
         self._texts_filter = None
 
-    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
-        super().add_texts_and_embeddings(texts)
+    async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        await super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
 
@@ -328,8 +329,8 @@ class QdrantVectorStore(VectorStore):
         )
         self._point_ids = None
 
-    def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
-        super().add_texts_and_embeddings(texts)
+    async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        await super().add_texts_and_embeddings(texts)
 
         texts_list = list(texts)
 
