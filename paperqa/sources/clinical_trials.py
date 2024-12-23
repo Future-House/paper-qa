@@ -14,9 +14,9 @@ from tenacity import (
     wait_incrementing,
 )
 
-from paperqa import DocDetails, Docs
+from paperqa.docs import Docs
 from paperqa.settings import Settings
-from paperqa.types import Embeddable, Text
+from paperqa.types import DocDetails, Embeddable, Text
 from paperqa.utils import gather_with_concurrency
 
 logger = logging.getLogger(__name__)

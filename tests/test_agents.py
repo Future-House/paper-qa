@@ -18,7 +18,6 @@ from uuid import uuid4
 
 import ldp.agent
 import pytest
-from aiohttp import ClientSession
 from aviary.core import Tool, ToolCall, ToolRequestMessage, ToolsAdapter, ToolSelector
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
@@ -1024,10 +1023,9 @@ async def test_clinical_tool_usage() -> None:
 class TestClinicalTrialSearchTool:
     @pytest.mark.asyncio
     async def test_continuation(self) -> None:
-        # TODO: get session...
         docs = Docs()
         state = EnvironmentState(
-            docs=docs, session=ClientSession(), status_fn=clinical_trial_status
+            docs=docs, session=PQASession(question=""), status_fn=clinical_trial_status
         )
         tool = ClinicalTrialsSearch(
             search_count=4,  # Keep low for speed
