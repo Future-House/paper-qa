@@ -52,7 +52,7 @@ DEFAULT_TOOL_NAMES: list[str] = [
 ]
 
 
-def settings_to_tools(
+def settings_to_tools(  # noqa: PLR0912
     settings: Settings,
     llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
     summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,

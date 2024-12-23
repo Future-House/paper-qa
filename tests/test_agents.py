@@ -18,6 +18,7 @@ from uuid import uuid4
 
 import ldp.agent
 import pytest
+from aiohttp import ClientSession
 from aviary.core import Tool, ToolCall, ToolRequestMessage, ToolsAdapter, ToolSelector
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
@@ -27,7 +28,7 @@ from pytest_subtests import SubTests
 from tantivy import Index
 
 from paperqa.agents import SearchIndex, agent_query
-from paperqa.agents.env import settings_to_tools, clinical_trial_status
+from paperqa.agents.env import clinical_trial_status, settings_to_tools
 from paperqa.agents.main import FAKE_AGENT_TYPE, run_agent
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
 from paperqa.agents.search import (
@@ -37,13 +38,13 @@ from paperqa.agents.search import (
 )
 from paperqa.agents.task import GradablePaperQAEnvironment
 from paperqa.agents.tools import (
+    ClinicalTrialsSearch,
     Complete,
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
     PaperSearch,
     Reset,
-    ClinicalTrialsSearch,
     make_status,
 )
 from paperqa.docs import Docs
@@ -337,7 +338,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
         # NOTE: "required" will not lead to thoughts being emitted, it has to be "auto"
         # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
         kwargs.pop("tool_choice", MultipleCompletionLLMModel.TOOL_CHOICE_REQUIRED)
-        return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)
+        return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore[misc]
 
     with patch.object(
         MultipleCompletionLLMModel, "call", side_effect=llm_model_call, autospec=True
@@ -984,6 +985,7 @@ class TestGradablePaperQAEnvironment:
 
             assert time.time() - tic > 2 * SLEEP_TIME  # since they are sequential
 
+
 @pytest.mark.asyncio
 async def test_clinical_tool_usage() -> None:
     docs = Docs()
@@ -998,9 +1000,6 @@ async def test_clinical_tool_usage() -> None:
             "answer": {"answer_max_sources": 3, "evidence_k": 10},
             "parsing": {"use_human_readable_clinical_trials": False},
             "agent": {
-                "papers_from_evidence_citations_config": {
-                    "limit_total_papers": 4  # Keep low for speed
-                },
                 "tool_names": {
                     "clinical_trials_search",
                     "gather_evidence",
@@ -1025,10 +1024,10 @@ async def test_clinical_tool_usage() -> None:
 class TestClinicalTrialSearchTool:
     @pytest.mark.asyncio
     async def test_continuation(self) -> None:
-        # TODO: get session... 
+        # TODO: get session...
         docs = Docs()
         state = EnvironmentState(
-            docs=docs, session=session, status_fn=clinical_trial_status
+            docs=docs, session=ClientSession(), status_fn=clinical_trial_status
         )
         tool = ClinicalTrialsSearch(
             search_count=4,  # Keep low for speed
@@ -1037,9 +1036,7 @@ class TestClinicalTrialSearchTool:
         result = await tool.clinical_trials_search("Covid-19 vaccines", state)
         # 4 trials + the metadata context = 5
         assert len(state.docs.docs) == 5, "Search did not return enough trials"
-        assert re.search(
-            pattern=CLINICAL_STATUS_SEARCH_REGEX_PATTERN, string=result
-        )
+        assert re.search(pattern=CLINICAL_STATUS_SEARCH_REGEX_PATTERN, string=result)
         match = re.search(r"Clinical Trial Count=(\d+)", result)
         assert match
         trial_count = int(match.group(1))

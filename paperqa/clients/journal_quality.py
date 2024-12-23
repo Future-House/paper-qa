@@ -44,7 +44,7 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
         # docname can be blank since the validation will add it
         # remember, if both have docnames (i.e. key) they are
         # wiped and re-generated with resultant data
-        return doc_details + DocDetails(
+        return doc_details + DocDetails(  # type: ignore[call-arg]
             source_quality=max(
                 [
                     self.data.get(query.journal.casefold(), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]

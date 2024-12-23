@@ -1,9 +1,8 @@
 import json
 import logging
-import os
 from contextlib import suppress
 from datetime import datetime
-from typing import Any, cast
+from typing import Any
 
 import aiohttp
 from aiohttp import ClientResponseError, ClientSession
@@ -31,6 +30,7 @@ SEARCH_PAGE_SIZE = 1000
 TRIAL_API_FIELDS = "protocolSection,derivedSection"
 DOWNLOAD_CONCURRENCY = 20
 TRIAL_CHAR_TRUNCATION_SIZE = 30_000  # larger will prevent embeddings from working
+MALFORMATTED_QUERY_STATUS: int = 400
 
 
 @retry(
@@ -49,7 +49,7 @@ async def api_search_clinical_trials(query: str, session: ClientSession) -> dict
             "sort": "@relevance",
         },
     ) as response:
-        if response.status == 400:
+        if response.status == MALFORMATTED_QUERY_STATUS:
             # the 400s from clinicaltrials.gov are not JSON
             raise HTTPBadRequest(reason=await response.text())
         response.raise_for_status()
