@@ -5,6 +5,7 @@ import itertools
 import logging
 import uuid
 from abc import ABC, abstractmethod
+from collections import deque
 from collections.abc import (
     Awaitable,
     Callable,
@@ -12,7 +13,6 @@ from collections.abc import (
     Sequence,
 )
 from typing import Any
-from collections import deque
 
 import numpy as np
 from llmclient import (
@@ -32,7 +32,7 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa.types import Text, Doc
+from paperqa.types import Doc, Text
 
 try:
     from qdrant_client import AsyncQdrantClient, models
@@ -386,9 +386,7 @@ class QdrantVectorStore(VectorStore):
                     payload=some_payload,
                     vector=some_vector,
                 )
-                for some_id, some_payload, some_vector in zip(
-                    ids, payloads, vectors
-                )
+                for some_id, some_payload, some_vector in zip(ids, payloads, vectors)
             ],
         )
         self._point_ids = set(ids)
@@ -426,7 +424,7 @@ class QdrantVectorStore(VectorStore):
             ],
             [p.score for p in points],
         )
-    
+
     @classmethod
     async def load_docs(
         cls,
@@ -435,8 +433,7 @@ class QdrantVectorStore(VectorStore):
         vector_name: str | None = None,
         batch_size: int = 100,
         max_concurrent_requests: int = 5,
-    ) -> "Docs":
-        
+    ) -> Docs:
         """
         Reconstruct a Docs object from a Qdrant collection.
 
