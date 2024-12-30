@@ -522,7 +522,7 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> list[Text]:
-
+        """Perform MMR search with the input query on the internal index."""
         settings = get_settings(settings)
         if embedding_model is None:
             embedding_model = settings.get_embedding_model()
@@ -604,9 +604,8 @@ class Docs(BaseModel):
 
         _k = answer_config.evidence_k
         if exclude_text_filter:
-            _k += len(
-                exclude_text_filter
-            )  # heuristic - get enough so we can downselect
+            # Increase k to retrieve so we have enough to down-select after retrieval
+            _k += len(exclude_text_filter)
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(

@@ -27,7 +27,8 @@ question answering, summarization, and contradiction detection.
   - [Async](#async)
   - [Choosing Model](#choosing-model)
     - [Locally Hosted](#locally-hosted)
-  - [Changing Embedding Model](#changing-embedding-model)
+  - [Embedding Model](#embedding-model)
+    - [Specifying the Embedding Model](#specifying-the-embedding-model)
     - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
   - [Adjusting number of sources](#adjusting-number-of-sources)
   - [Using Code or HTML](#using-code-or-html)
@@ -498,9 +499,19 @@ answer_response = ask(
 )
 ```
 
-### Changing Embedding Model
+### Embedding Model
 
-PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
+Embeddings are used to retrieve k texts (where k is specified via `Settings.answer.evidence_k`)
+for re-ranking and contextual summarization.
+If you don't want to use embeddings, but instead just fetch all chunks,
+disable "evidence retrieval" via the `Settings.answer.evidence_retrieval` setting.
+
+PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings,
+but has flexible options for both vector stores and embedding choices.
+
+#### Specifying the Embedding Model
+
+The simplest way to specify the embedding model is via `Settings.embedding`:
 
 ```python
 from paperqa import Settings, ask
