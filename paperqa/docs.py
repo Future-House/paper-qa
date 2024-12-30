@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import tempfile
+import urllib.request
 from collections.abc import Callable
 from datetime import datetime
 from functools import partial
@@ -222,8 +223,6 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
         """Add a document to the collection."""
-        import urllib.request
-
         with urllib.request.urlopen(url) as f:  # noqa: ASYNC210, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
