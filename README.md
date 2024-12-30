@@ -278,7 +278,7 @@ Or by adding into a `Settings` object, if calling imperatively:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
@@ -294,7 +294,7 @@ PaperQA2's full workflow can be accessed via Python directly:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
@@ -310,7 +310,7 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
@@ -321,7 +321,7 @@ answer = ask(
 ```python
 from paperqa import Settings, agent_query, QueryRequest
 
-answer = await agent_query(
+answer_response = await agent_query(
     QueryRequest(
         query="What manufacturing challenges are unique to bispecific antibodies?",
         settings=Settings(temperature=0.5, paper_directory="my_papers"),
@@ -411,7 +411,7 @@ By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranki
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers"
@@ -424,7 +424,7 @@ You can use Anthropic or any other model supported by `litellm`:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
@@ -457,7 +457,7 @@ local_llm_config = dict(
     ]
 )
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="my-llm-model",
@@ -486,7 +486,7 @@ local_llm_config = {
     ]
 }
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="ollama/llama3.2",
@@ -505,7 +505,7 @@ PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="text-embedding-3-large"),
 )
@@ -562,7 +562,7 @@ and then prefix embedding model names with `st-`:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="st-multi-qa-MiniLM-L6-cos-v1"),
 )
@@ -573,7 +573,7 @@ or with a hybrid model
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1"),
 )
