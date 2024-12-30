@@ -22,8 +22,8 @@ question answering, summarization, and contradiction detection.
   - [Bundled Settings](#bundled-settings)
   - [Rate Limits](#rate-limits)
 - [Library Usage](#library-usage)
-  - [`ask` manually](#ask-manually)
-  - [Adding Documents Manually](#adding-documents-manually)
+  - [Agentic Adding/Querying Documents](#agentic-addingquerying-documents)
+  - [Manual (No Agent) Adding/Querying Documents](#manual-no-agent-addingquerying-documents)
   - [Async](#async)
   - [Choosing Model](#choosing-model)
     - [Locally Hosted](#locally-hosted)
@@ -303,7 +303,7 @@ answer_response = ask(
 
 Please see our [installation docs](#installation) for how to install the package from PyPI.
 
-### `ask` manually
+### Agentic Adding/Querying Documents
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
 `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
@@ -333,7 +333,7 @@ answer_response = await agent_query(
 The default agent will use an LLM based agent,
 but you can also specify a `"fake"` agent to use a hard coded call path of search -> gather evidence -> answer to reduce token usage.
 
-### Adding Documents Manually
+### Manual (No Agent) Adding/Querying Documents
 
 Normally via agent execution, the agent invokes the search tool,
 which adds documents to the `Docs` object for you behind the scenes.
