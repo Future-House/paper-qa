@@ -335,9 +335,6 @@ class QdrantVectorStore(VectorStore):
         texts_list = list(texts)
 
         if texts_list and not self.client.collection_exists(self.collection_name):
-            assert (
-                texts_list[0].embedding is not None
-            )  # This helps mypy understand the type
             params = models.VectorParams(
                 size=len(texts_list[0].embedding), distance=models.Distance.COSINE
             )
