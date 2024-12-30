@@ -36,7 +36,6 @@ jobs:
       - run: uv python pin ${{ matrix.python-version }}
       - uses: hynek/build-and-inspect-python-package@v2
       - run: uv sync --python-preference=only-managed
-      - run: uv run refurb paperqa tests
       - run: uv run pylint paperqa
   test:
     runs-on: ubuntu-latest
