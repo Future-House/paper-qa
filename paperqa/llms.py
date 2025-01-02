@@ -13,8 +13,7 @@ from collections.abc import (
     Sequence,
     Sized,
 )
-from typing import Any, cast, List
-from qdrant_client.http.models import Record 
+from typing import Any, List, cast
 
 import numpy as np
 from llmclient import (
@@ -33,6 +32,7 @@ from pydantic import (
     Field,
     model_validator,
 )
+from qdrant_client.http.models import Record
 
 from paperqa.types import Doc, Text
 
@@ -460,7 +460,7 @@ class QdrantVectorStore(VectorStore):
         total_points = collection_info.points_count
 
         semaphore = asyncio.Semaphore(max_concurrent_requests)
-        all_points: List[Record] = []
+        all_points: list[Record] = []
 
         async def fetch_batch_with_semaphore(offset: int) -> None:
             async with semaphore:
