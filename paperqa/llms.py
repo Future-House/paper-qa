@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import datetime
 import itertools
 import logging
 import uuid
@@ -13,7 +14,6 @@ from collections.abc import (
     Sequence,
 )
 from typing import Any
-import datetime
 
 import numpy as np
 from llmclient import (
@@ -427,6 +427,7 @@ class QdrantVectorStore(VectorStore):
             ],
             [p.score for p in points],
         )
+
     @classmethod
     async def load_docs(
         cls,
@@ -552,6 +553,7 @@ class QdrantVectorStore(VectorStore):
             Reconstructed LeanDocs object
         """
         from paperqa import LeanDocs
+
         vectorstore = cls(
             client=client, collection_name=collection_name, vector_name=vector_name
         )
@@ -593,14 +595,16 @@ class QdrantVectorStore(VectorStore):
                             doc = Doc(
                                 docname=doc_data["docname"],
                                 citation=doc_data["citation"],
-                                dockey=dockey
+                                dockey=dockey,
                             )
-                            
+
                             lean_docs.docs[dockey] = doc
                             lean_docs.docnames.add(doc_data["docname"])
 
                     except KeyError as e:
-                        logger.warning(f"Skipping invalid point due to missing field: {e!s}")
+                        logger.warning(
+                            f"Skipping invalid point due to missing field: {e!s}"
+                        )
                         continue
                 
                 if next_offset is None:

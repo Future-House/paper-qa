@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import re
-
 from collections.abc import Callable
 from functools import partial
 from typing import Any
@@ -12,14 +11,15 @@ from llmclient import Embeddable, EmbeddingModel, LLMModel
 from pydantic import BaseModel, ConfigDict, Field
 
 from paperqa.core import llm_parse_json, map_fxn_summary
-from paperqa.prompts import CANNOT_ANSWER_PHRASE
-from paperqa.types import Doc,DocDetails, DocKey, PQASession, Text, set_llm_session_ids
-from paperqa.utils import gather_with_concurrency, get_loop, name_in_text
-from paperqa.settings import MaybeSettings, get_settings
 from paperqa.llms import (
-    QdrantVectorStore,
     PromptRunner,
+    QdrantVectorStore,
 )
+from paperqa.prompts import CANNOT_ANSWER_PHRASE
+from paperqa.settings import MaybeSettings, get_settings
+from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text, set_llm_session_ids
+from paperqa.utils import gather_with_concurrency, get_loop, name_in_text
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,8 +61,12 @@ class LeanDocs(BaseModel):
         self.deleted_dockeys = set()
         get_loop().run_until_complete(self.texts_index.clear())
 
-    def delete(self, name: str | None = None, docname: str | None = None, 
-               dockey: DocKey | None = None) -> None:
+    def delete(
+        self,
+        name: str | None = None,
+        docname: str | None = None,
+        dockey: DocKey | None = None,
+    ) -> None:
         """Delete a document from the collection."""
         name = docname if name is None else name
 
@@ -76,7 +80,6 @@ class LeanDocs(BaseModel):
         if dockey in self.docs:
             del self.docs[dockey]
             self.deleted_dockeys.add(dockey)
-
 
     async def retrieve_texts(
         self,
