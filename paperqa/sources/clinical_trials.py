@@ -233,7 +233,6 @@ async def add_clinical_trials_to_docs(
     Returns:
         tuple[int, int, str | None]:
             Total number of trials found, number of trials added, and error message if any.
-
     """
     session = aiohttp.ClientSession() if session is None else session
 
@@ -312,10 +311,3 @@ def partition_clinical_trials_by_source(text: Embeddable) -> int:
     ):
         return 1
     return 0
-
-
-# SEE: https://regex101.com/r/L0L5MH/1
-CLINICAL_STATUS_SEARCH_REGEX_PATTERN: str = (
-    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial Count=(\d+)\s"
-    r"\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
-)

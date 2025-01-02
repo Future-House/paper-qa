@@ -27,7 +27,11 @@ from pytest_subtests import SubTests
 from tantivy import Index
 
 from paperqa.agents import SearchIndex, agent_query
-from paperqa.agents.env import clinical_trial_status, settings_to_tools
+from paperqa.agents.env import (
+    CLINICAL_STATUS_SEARCH_REGEX_PATTERN,
+    clinical_trial_status,
+    settings_to_tools,
+)
 from paperqa.agents.main import FAKE_AGENT_TYPE, run_agent
 from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
 from paperqa.agents.search import (
@@ -49,7 +53,6 @@ from paperqa.agents.tools import (
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.sources.clinical_trials import CLINICAL_STATUS_SEARCH_REGEX_PATTERN
 from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import extract_thought, get_year, md5sum
 

@@ -151,6 +151,13 @@ def make_clinical_trial_status(
     )
 
 
+# SEE: https://regex101.com/r/L0L5MH/1
+CLINICAL_STATUS_SEARCH_REGEX_PATTERN: str = (
+    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial Count=(\d+)\s"
+    r"\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
+)
+
+
 def clinical_trial_status(state: "EnvironmentState") -> str:
     return make_clinical_trial_status(
         total_paper_count=len(
