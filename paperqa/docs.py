@@ -514,10 +514,8 @@ class Docs(BaseModel):
                 strict=True,
             ):
                 t.embedding = t_embedding
-        if asyncio.iscoroutinefunction(self.texts_index.add_texts_and_embeddings):
-            await self.texts_index.add_texts_and_embeddings(texts)
-        else:
-            self.texts_index.add_texts_and_embeddings(texts)
+
+        await self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
         self,
