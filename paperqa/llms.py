@@ -33,7 +33,7 @@ from pydantic import (
 )
 
 from paperqa.types import Doc, Text
-
+from paperqa import Docs
 try:
     from qdrant_client import AsyncQdrantClient, models
 
