@@ -335,7 +335,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
         # NOTE: "required" will not lead to thoughts being emitted, it has to be "auto"
         # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
         kwargs.pop("tool_choice", MultipleCompletionLLMModel.TOOL_CHOICE_REQUIRED)
-        return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)
+        return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore [misc]
 
     with patch.object(
         MultipleCompletionLLMModel, "call", side_effect=llm_model_call, autospec=True
