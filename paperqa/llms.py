@@ -13,7 +13,8 @@ from collections.abc import (
     Sequence,
     Sized,
 )
-from typing import Any, cast
+from typing import Any, cast, List
+from qdrant_client.http.models import Record 
 
 import numpy as np
 from llmclient import (
@@ -291,9 +292,9 @@ class QdrantVectorStore(VectorStore):
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                loop.create_task(self.client.close())
+                loop.create_task(self.aclose())
             else:
-                loop.run_until_complete(self.client.close())
+                loop.run_until_complete(self.aclose())
         except Exception:
             pass
 
@@ -459,7 +460,7 @@ class QdrantVectorStore(VectorStore):
         total_points = collection_info.points_count
 
         semaphore = asyncio.Semaphore(max_concurrent_requests)
-        all_points = []
+        all_points: List[Record] = []
 
         async def fetch_batch_with_semaphore(offset: int) -> None:
             async with semaphore:
