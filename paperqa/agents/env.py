@@ -1,5 +1,4 @@
 import logging
-import os
 from copy import deepcopy
 from typing import Any, ClassVar, Self, cast
 
@@ -26,6 +25,7 @@ from paperqa.utils import get_year
 from .models import QueryRequest
 from .tools import (
     AVAILABLE_TOOL_NAME_TO_CLASS,
+    DEFAULT_TOOL_NAMES,
     ClinicalTrialsSearch,
     Complete,
     EnvironmentState,
@@ -38,18 +38,6 @@ from .tools import (
 logger = logging.getLogger(__name__)
 
 POPULATE_FROM_SETTINGS = None
-
-DEFAULT_TOOL_NAMES: list[str] = [
-    name.strip()
-    for name in os.environ.get("PAPERQA_DEFAULT_TOOL_NAMES", "").split(",")
-    if name.strip()
-] or [
-    PaperSearch.TOOL_FN_NAME,
-    GatherEvidence.TOOL_FN_NAME,
-    GenerateAnswer.TOOL_FN_NAME,
-    Reset.TOOL_FN_NAME,
-    Complete.TOOL_FN_NAME,
-]
 
 
 def settings_to_tools(  # noqa: PLR0912

@@ -3,6 +3,7 @@
 import asyncio
 import inspect
 import logging
+import os
 import re
 import sys
 from collections.abc import Callable
@@ -403,7 +404,7 @@ class Complete(NamedTool):
 class ClinicalTrialsSearch(NamedTool):
     TOOL_FN_NAME = "clinical_trials_search"
 
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    model_config = ConfigDict(extra="forbid")
 
     search_count: int = 8
     previous_searches: dict[str, int] = Field(default_factory=dict)
@@ -656,3 +657,16 @@ AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
         and v is not NamedTool,
     )
 }
+
+
+DEFAULT_TOOL_NAMES: list[str] = [
+    name.strip()
+    for name in os.environ.get("PAPERQA_DEFAULT_TOOL_NAMES", "").split(",")
+    if name.strip()
+] or [
+    PaperSearch.TOOL_FN_NAME,
+    GatherEvidence.TOOL_FN_NAME,
+    GenerateAnswer.TOOL_FN_NAME,
+    Reset.TOOL_FN_NAME,
+    Complete.TOOL_FN_NAME,
+]
