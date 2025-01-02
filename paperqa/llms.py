@@ -565,7 +565,7 @@ class QdrantVectorStore(VectorStore):
 
         # We only need to fetch the first occurrence of each unique document
         seen_dockeys = set()
-        
+
         async def scroll_all_points():
             offset = None
             while True:
@@ -577,10 +577,10 @@ class QdrantVectorStore(VectorStore):
                     with_vectors=False,
                 )
                 points, next_offset = response
-                
+
                 if not points:
                     break
-                    
+
                 for point in points:
                     try:
                         payload = point.payload
@@ -590,7 +590,7 @@ class QdrantVectorStore(VectorStore):
                         # Only process new documents
                         if dockey not in seen_dockeys:
                             seen_dockeys.add(dockey)
-                            
+
                             # Create Doc object
                             doc = Doc(
                                 docname=doc_data["docname"],
@@ -606,15 +606,17 @@ class QdrantVectorStore(VectorStore):
                             f"Skipping invalid point due to missing field: {e!s}"
                         )
                         continue
-                
+
                 if next_offset is None:
                     break
-                    
+
                 offset = next_offset
-        
+
         await scroll_all_points()
-        
-        logger.info(f"Loaded {len(lean_docs.docs)} documents from {total_points} points")
+
+        logger.info(
+            f"Loaded {len(lean_docs.docs)} documents from {total_points} points"
+        )
         return lean_docs
 
 
