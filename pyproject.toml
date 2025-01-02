@@ -285,9 +285,9 @@ testpaths = ["tests"]
 [tool.refurb]
 enable_all = true
 ignore = [
-    "FURB101",  # FURB101, FURB103, FURB141, FURB144, FURB146, FURB147, FURB150, FURB155: no need for pathlib
-    "FURB103",
-    "FURB141",
+    "FURB101",  # Rely on ruff FURB101 for this
+    "FURB103",  # Rely on ruff FURB103 for this
+    "FURB141",  # FURB141, FURB144, FURB146, FURB147, FURB150, FURB155: don't care to enforce pathlib
     "FURB144",
     "FURB146",
     "FURB147",
@@ -379,6 +379,7 @@ extend-select = [
     "FURB166",
     "FURB171",
     "FURB180",
+    "FURB181",
     "FURB188",
     "FURB189",
     "FURB192",
@@ -440,6 +441,8 @@ ignore = [
     "FBT002",
     "FIX",  # Don't care to prevent TODO, FIXME, etc.
     "FLY002",  # Can be less readable
+    "FURB101",  # FURB101, FURB103: don't care to enforce pathlib
+    "FURB103",
     "G004",  # f-strings are convenient
     "INP001",  # Can use namespace packages
     "ISC001",  # For ruff format compatibility
