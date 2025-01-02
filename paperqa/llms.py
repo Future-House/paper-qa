@@ -279,14 +279,12 @@ class NumpyVectorStore(VectorStore):
 class QdrantVectorStore(VectorStore):
     client: Any = Field(
         default=None,
-        description="Instance of `qdrant_client.QdrantClient`. Defaults to an in-memory instance.",
+        description="Instance of `qdrant_client.AsyncQdrantClient`. Defaults to an in-memory instance.",
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
     _point_ids: set[str] | None = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
 
     def __del__(self):
         """Cleanup async client connection."""
@@ -449,7 +447,7 @@ class QdrantVectorStore(VectorStore):
         Returns:
             Reconstructed Docs object
         """
-        from paperqa.docs import Docs
+        from paperqa.docs import Docs  # Avoid circular imports
 
         vectorstore = cls(
             client=client, collection_name=collection_name, vector_name=vector_name
@@ -460,42 +458,26 @@ class QdrantVectorStore(VectorStore):
         collection_info = await client.get_collection(collection_name)
         total_points = collection_info.points_count
 
-        async def fetch_batch(offset: int) -> list:
-            return (
-                await client.scroll(
+        semaphore = asyncio.Semaphore(max_concurrent_requests)
+        all_points = []
+
+        async def fetch_batch_with_semaphore(offset: int) -> None:
+            async with semaphore:
+                points = await client.scroll(
                     collection_name=collection_name,
                     limit=batch_size,
                     offset=offset,
                     with_payload=True,
                     with_vectors=True,
                 )
-            )[0]
+                all_points.extend(points[0])
 
-        # Create a queue of offsets to process
-        offset_queue = deque(range(0, total_points, batch_size))
-        active_tasks = set()
-        all_points = []
-
-        # Process batches concurrently
-        while offset_queue or active_tasks:
-            # Start new tasks if we have capacity and offsets to process
-            while len(active_tasks) < max_concurrent_requests and offset_queue:
-                offset = offset_queue.popleft()
-                task = asyncio.create_task(fetch_batch(offset))
-                active_tasks.add(task)
-
-            if not active_tasks:
-                break
-
-            # Wait for at least one task to complete
-            done, active_tasks = await asyncio.wait(
-                active_tasks, return_when=asyncio.FIRST_COMPLETED
-            )
-
-            # Process completed tasks
-            for task in done:
-                points = await task
-                all_points.extend(points)
+        # Create and gather all tasks
+        tasks = [
+            fetch_batch_with_semaphore(offset)
+            for offset in range(0, total_points, batch_size)
+        ]
+        await asyncio.gather(*tasks)
 
         # Process all points
         for point in all_points:
@@ -512,7 +494,6 @@ class QdrantVectorStore(VectorStore):
                     )
                     docs.docnames.add(doc_data["docname"])
 
-                # Create Text object
                 text = Text(
                     text=payload["text"],
                     name=payload["name"],
