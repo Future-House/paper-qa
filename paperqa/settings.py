@@ -200,6 +200,10 @@ class ParsingSettings(BaseModel):
             " 'bad title' and a year of 2022 or no year at all."
         ),
     )
+    use_human_readable_clinical_trials: bool = Field(
+        default=False,
+        description="Parse clinical trial JSONs into human readable text",
+    )
 
     def chunk_type(self, chunking_selection: ChunkingOptions | None = None) -> str:
         """Future chunking implementations (i.e. by section) will get an elif clause here."""
