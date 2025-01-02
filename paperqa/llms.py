@@ -285,7 +285,6 @@ class QdrantVectorStore(VectorStore):
     vector_name: str | None = Field(default=None)
     _point_ids: set[str] | None = None
 
-
     def __del__(self):
         """Cleanup async client connection."""
         try:
