@@ -989,27 +989,22 @@ class TestGradablePaperQAEnvironment:
 
 
 @pytest.mark.asyncio
-async def test_clinical_tool_usage() -> None:
+async def test_clinical_tool_usage(agent_test_settings) -> None:
+    agent_test_settings.llm = "gpt-4o"
+    agent_test_settings.summary_llm = "gpt-4o"
+    agent_test_settings.agent.tool_names = {
+        "clinical_trials_search",
+        "gather_evidence",
+        "gen_answer",
+        "complete",
+    }
     docs = Docs()
     query = QueryRequest(
         query=(
             "What are the NCTIDs of clinical trials for depression that focus on health "
             "services research, are in phase 2, have no status type, and started in or after 2017?"
         ),
-        settings={
-            "llm": "gpt-4o",
-            "summary_llm": "gpt-4o",
-            "answer": {"answer_max_sources": 3, "evidence_k": 10},
-            "parsing": {"use_human_readable_clinical_trials": False},
-            "agent": {
-                "tool_names": {
-                    "clinical_trials_search",
-                    "gather_evidence",
-                    "gen_answer",
-                    "complete",
-                },
-            },
-        },
+        settings=agent_test_settings,
     )
     response = await run_agent(docs, query)
     # make sure the tool was used at least once
