@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import os
@@ -514,7 +513,6 @@ class Docs(BaseModel):
                 strict=True,
             ):
                 t.embedding = t_embedding
-
         await self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
