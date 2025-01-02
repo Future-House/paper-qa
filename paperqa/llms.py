@@ -350,7 +350,6 @@ class QdrantVectorStore(VectorStore):
         self._point_ids = None
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
-
         await super().add_texts_and_embeddings(texts)
 
         texts_list = list(texts)
