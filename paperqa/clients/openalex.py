@@ -178,7 +178,7 @@ async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
 
     bibtex_type = BIBTEX_MAPPING.get(message.get("type") or "other", "misc")
 
-    return DocDetails(
+    return DocDetails(  # type: ignore[call-arg]
         key=None,
         bibtex_type=bibtex_type,
         bibtex=None,

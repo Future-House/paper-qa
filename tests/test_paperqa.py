@@ -683,7 +683,7 @@ def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=SparseEmbeddingModel(),
     )
-    assert any(docs.texts[0].embedding)
+    assert any(cast(list[float], docs.texts[0].embedding))
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -705,7 +705,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_model,
     )
-    assert any(docs.texts[0].embedding)
+    assert any(cast(list[float], docs.texts[0].embedding))
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
@@ -1211,7 +1211,7 @@ def test_answer_rename(recwarn) -> None:
     ],
 )
 def test_dois_resolve_to_correct_journals(doi_journals):
-    details = DocDetails(doi=doi_journals["doi"])
+    details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
     assert details.journal == doi_journals["journal"]
 
 
