@@ -32,8 +32,9 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa.types import Doc, Text
 from paperqa import Docs
+from paperqa.types import Doc, Text
+
 try:
     from qdrant_client import AsyncQdrantClient, models
 
