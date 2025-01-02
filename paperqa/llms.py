@@ -562,44 +562,23 @@ class QdrantVectorStore(VectorStore):
         total_points = collection_info.points_count
 
         # We only need to fetch the first occurrence of each unique document
-        # to build our metadata dictionary
         seen_dockeys = set()
-
-        async def fetch_batch(offset: int) -> list:
-            return (
-                await client.scroll(
+        
+        async def scroll_all_points():
+            offset = None
+            while True:
+                response = await client.scroll(
                     collection_name=collection_name,
                     limit=batch_size,
                     offset=offset,
                     with_payload=True,
-                    # No need to fetch vectors since we're just building metadata
                     with_vectors=False,
                 )
-            )[0]
-
-        # Create a queue of offsets to process
-        offset_queue = deque(range(0, total_points, batch_size))
-        active_tasks = set()
-
-        # Process batches concurrently
-        while offset_queue or active_tasks:
-            # Start new tasks if we have capacity and offsets to process
-            while len(active_tasks) < max_concurrent_requests and offset_queue:
-                offset = offset_queue.popleft()
-                task = asyncio.create_task(fetch_batch(offset))
-                active_tasks.add(task)
-
-            if not active_tasks:
-                break
-
-            # Wait for at least one task to complete
-            done, active_tasks = await asyncio.wait(
-                active_tasks, return_when=asyncio.FIRST_COMPLETED
-            )
-
-            # Process completed tasks
-            for task in done:
-                points = await task
+                points, next_offset = response
+                
+                if not points:
+                    break
+                    
                 for point in points:
                     try:
                         payload = point.payload
@@ -610,7 +589,7 @@ class QdrantVectorStore(VectorStore):
                         if dockey not in seen_dockeys:
                             seen_dockeys.add(dockey)
                             
-                            # Create Doc object as before
+                            # Create Doc object
                             doc = Doc(
                                 docname=doc_data["docname"],
                                 citation=doc_data["citation"],
@@ -623,7 +602,15 @@ class QdrantVectorStore(VectorStore):
                     except KeyError as e:
                         logger.warning(f"Skipping invalid point due to missing field: {e!s}")
                         continue
-
+                
+                if next_offset is None:
+                    break
+                    
+                offset = next_offset
+        
+        await scroll_all_points()
+        
+        logger.info(f"Loaded {len(lean_docs.docs)} documents from {total_points} points")
         return lean_docs
 
 
