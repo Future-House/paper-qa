@@ -13,6 +13,7 @@ from collections.abc import (
     Sequence,
 )
 from typing import Any
+import datetime
 
 import numpy as np
 from llmclient import (
@@ -426,7 +427,6 @@ class QdrantVectorStore(VectorStore):
             ],
             [p.score for p in points],
         )
-
     @classmethod
     async def load_docs(
         cls,
@@ -528,6 +528,103 @@ class QdrantVectorStore(VectorStore):
                 continue
 
         return docs
+
+    @classmethod
+    async def load_lean_docs(
+        cls,
+        client: AsyncQdrantClient,
+        collection_name: str,
+        vector_name: str | None = None,
+        batch_size: int = 100,
+        max_concurrent_requests: int = 5,
+    ) -> LeanDocs:
+        """
+        Reconstruct a LeanDocs object from a Qdrant collection.
+
+        Args:
+            client: AsyncQdrantClient instance
+            collection_name: Name of the collection to load
+            vector_name: Optional name of the vector field if using named vectors
+            batch_size: Number of records to fetch per batch
+            max_concurrent_requests: Maximum number of concurrent scroll requests
+
+        Returns:
+            Reconstructed LeanDocs object
+        """
+        from paperqa import LeanDocs
+        vectorstore = cls(
+            client=client, collection_name=collection_name, vector_name=vector_name
+        )
+        lean_docs = LeanDocs(texts_index=vectorstore)
+
+        # Get collection info to determine total points
+        collection_info = await client.get_collection(collection_name)
+        total_points = collection_info.points_count
+
+        # We only need to fetch the first occurrence of each unique document
+        # to build our metadata dictionary
+        seen_dockeys = set()
+
+        async def fetch_batch(offset: int) -> list:
+            return (
+                await client.scroll(
+                    collection_name=collection_name,
+                    limit=batch_size,
+                    offset=offset,
+                    with_payload=True,
+                    # No need to fetch vectors since we're just building metadata
+                    with_vectors=False,
+                )
+            )[0]
+
+        # Create a queue of offsets to process
+        offset_queue = deque(range(0, total_points, batch_size))
+        active_tasks = set()
+
+        # Process batches concurrently
+        while offset_queue or active_tasks:
+            # Start new tasks if we have capacity and offsets to process
+            while len(active_tasks) < max_concurrent_requests and offset_queue:
+                offset = offset_queue.popleft()
+                task = asyncio.create_task(fetch_batch(offset))
+                active_tasks.add(task)
+
+            if not active_tasks:
+                break
+
+            # Wait for at least one task to complete
+            done, active_tasks = await asyncio.wait(
+                active_tasks, return_when=asyncio.FIRST_COMPLETED
+            )
+
+            # Process completed tasks
+            for task in done:
+                points = await task
+                for point in points:
+                    try:
+                        payload = point.payload
+                        doc_data = payload["doc"]
+                        dockey = doc_data["dockey"]
+
+                        # Only process new documents
+                        if dockey not in seen_dockeys:
+                            seen_dockeys.add(dockey)
+                            
+                            # Create Doc object as before
+                            doc = Doc(
+                                docname=doc_data["docname"],
+                                citation=doc_data["citation"],
+                                dockey=dockey
+                            )
+                            
+                            lean_docs.docs[dockey] = doc
+                            lean_docs.docnames.add(doc_data["docname"])
+
+                    except KeyError as e:
+                        logger.warning(f"Skipping invalid point due to missing field: {e!s}")
+                        continue
+
+        return lean_docs
 
 
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:

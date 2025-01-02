@@ -16,6 +16,7 @@ from paperqa.agents import ask
 from paperqa.agents.main import agent_query
 from paperqa.agents.models import QueryRequest
 from paperqa.docs import Docs, PQASession, print_callback
+from paperqa.lean_docs import LeanDocs
 from paperqa.llms import (
     NumpyVectorStore,
     QdrantVectorStore,
@@ -37,6 +38,7 @@ __all__ = [
     "Doc",
     "DocDetails",
     "Docs",
+    "LeanDocs",
     "EmbeddingModel",
     "HybridEmbeddingModel",
     "LLMModel",
