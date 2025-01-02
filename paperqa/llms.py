@@ -32,7 +32,6 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa import Docs
 from paperqa.types import Doc, Text
 
 try:
