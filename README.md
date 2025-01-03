@@ -22,12 +22,13 @@ question answering, summarization, and contradiction detection.
   - [Bundled Settings](#bundled-settings)
   - [Rate Limits](#rate-limits)
 - [Library Usage](#library-usage)
-  - [`ask` manually](#ask-manually)
-  - [Adding Documents Manually](#adding-documents-manually)
+  - [Agentic Adding/Querying Documents](#agentic-addingquerying-documents)
+  - [Manual (No Agent) Adding/Querying Documents](#manual-no-agent-addingquerying-documents)
   - [Async](#async)
   - [Choosing Model](#choosing-model)
     - [Locally Hosted](#locally-hosted)
-  - [Changing Embedding Model](#changing-embedding-model)
+  - [Embedding Model](#embedding-model)
+    - [Specifying the Embedding Model](#specifying-the-embedding-model)
     - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
   - [Adjusting number of sources](#adjusting-number-of-sources)
   - [Using Code or HTML](#using-code-or-html)
@@ -278,7 +279,7 @@ Or by adding into a `Settings` object, if calling imperatively:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
@@ -294,7 +295,7 @@ PaperQA2's full workflow can be accessed via Python directly:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
@@ -302,7 +303,7 @@ answer = ask(
 
 Please see our [installation docs](#installation) for how to install the package from PyPI.
 
-### `ask` manually
+### Agentic Adding/Querying Documents
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
 `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
@@ -310,7 +311,7 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
@@ -321,7 +322,7 @@ answer = ask(
 ```python
 from paperqa import Settings, agent_query, QueryRequest
 
-answer = await agent_query(
+answer_response = await agent_query(
     QueryRequest(
         query="What manufacturing challenges are unique to bispecific antibodies?",
         settings=Settings(temperature=0.5, paper_directory="my_papers"),
@@ -332,7 +333,7 @@ answer = await agent_query(
 The default agent will use an LLM based agent,
 but you can also specify a `"fake"` agent to use a hard coded call path of search -> gather evidence -> answer to reduce token usage.
 
-### Adding Documents Manually
+### Manual (No Agent) Adding/Querying Documents
 
 Normally via agent execution, the agent invokes the search tool,
 which adds documents to the `Docs` object for you behind the scenes.
@@ -411,7 +412,7 @@ By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranki
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers"
@@ -424,7 +425,7 @@ You can use Anthropic or any other model supported by `litellm`:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
@@ -457,7 +458,7 @@ local_llm_config = dict(
     ]
 )
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="my-llm-model",
@@ -486,7 +487,7 @@ local_llm_config = {
     ]
 }
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="ollama/llama3.2",
@@ -498,14 +499,24 @@ answer = ask(
 )
 ```
 
-### Changing Embedding Model
+### Embedding Model
 
-PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
+Embeddings are used to retrieve k texts (where k is specified via `Settings.answer.evidence_k`)
+for re-ranking and contextual summarization.
+If you don't want to use embeddings, but instead just fetch all chunks,
+disable "evidence retrieval" via the `Settings.answer.evidence_retrieval` setting.
+
+PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings,
+but has flexible options for both vector stores and embedding choices.
+
+#### Specifying the Embedding Model
+
+The simplest way to specify the embedding model is via `Settings.embedding`:
 
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="text-embedding-3-large"),
 )
@@ -562,7 +573,7 @@ and then prefix embedding model names with `st-`:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="st-multi-qa-MiniLM-L6-cos-v1"),
 )
@@ -573,7 +584,7 @@ or with a hybrid model
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1"),
 )

@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import tempfile
+import urllib.request
 from collections.abc import Callable
 from datetime import datetime
 from functools import partial
@@ -222,8 +223,6 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
         """Add a document to the collection."""
-        import urllib.request
-
         with urllib.request.urlopen(url) as f:  # noqa: ASYNC210, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
@@ -523,7 +522,7 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> list[Text]:
-
+        """Perform MMR search with the input query on the internal index."""
         settings = get_settings(settings)
         if embedding_model is None:
             embedding_model = settings.get_embedding_model()
@@ -605,9 +604,8 @@ class Docs(BaseModel):
 
         _k = answer_config.evidence_k
         if exclude_text_filter:
-            _k += len(
-                exclude_text_filter
-            )  # heuristic - get enough so we can downselect
+            # Increase k to retrieve so we have enough to down-select after retrieval
+            _k += len(exclude_text_filter)
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
