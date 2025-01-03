@@ -12,7 +12,7 @@ from collections.abc import (
     Sequence,
     Sized,
 )
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from llmclient import (
@@ -32,6 +32,7 @@ from pydantic import (
     model_validator,
 )
 from qdrant_client.http.models import Record
+from typing_extensions import override
 
 from paperqa.types import Doc, Text
 
