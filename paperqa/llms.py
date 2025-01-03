@@ -12,7 +12,7 @@ from collections.abc import (
     Sequence,
     Sized,
 )
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast, override
 
 import numpy as np
 from llmclient import (
@@ -35,6 +35,8 @@ from qdrant_client.http.models import Record
 
 from paperqa.types import Doc, Text
 
+if TYPE_CHECKING:
+    from paperqa.docs import Docs
 try:
     from qdrant_client import AsyncQdrantClient, models
 
@@ -291,11 +293,11 @@ class QdrantVectorStore(VectorStore):
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                loop.create_task(self.aclose())
+                _ = loop.create_task(self.aclose())  # noqa: RUF006
             else:
                 loop.run_until_complete(self.aclose())
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error closing client connection: {e}")
 
     async def aclose(self):
         """Explicitly close async client."""
@@ -337,18 +339,27 @@ class QdrantVectorStore(VectorStore):
     async def _collection_exists(self) -> bool:
         return await self.client.collection_exists(self.collection_name)
 
-    async def clear(self) -> None:
+    @override
+    def clear(self) -> None:
+        """Clear the vector store."""
         super().clear()
 
-        if not await self._collection_exists():
-            return
+        async def _async_clear() -> None:
+            if not await self._collection_exists():
+                return
 
-        await self.client.delete(
-            collection_name=self.collection_name,
-            points_selector=models.Filter(must=[]),
-            wait=True,
-        )
-        self._point_ids = None
+            await self.client.delete(
+                collection_name=self.collection_name,
+                points_selector=models.Filter(must=[]),
+                wait=True,
+            )
+            self._point_ids = None
+
+        try:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(_async_clear())
+        except Exception as e:
+            logger.warning(f"Error clearing vector store: {e}")
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         await super().add_texts_and_embeddings(texts)
@@ -386,7 +397,9 @@ class QdrantVectorStore(VectorStore):
                     payload=some_payload,
                     vector=some_vector,
                 )
-                for some_id, some_payload, some_vector in zip(ids, payloads, vectors)
+                for some_id, some_payload, some_vector in zip(
+                    ids, payloads, vectors, strict=True
+                )
             ],
         )
         self._point_ids = set(ids)
@@ -434,19 +447,6 @@ class QdrantVectorStore(VectorStore):
         batch_size: int = 100,
         max_concurrent_requests: int = 5,
     ) -> Docs:
-        """
-        Reconstruct a Docs object from a Qdrant collection.
-
-        Args:
-            client: AsyncQdrantClient instance
-            collection_name: Name of the collection to load
-            vector_name: Optional name of the vector field if using named vectors
-            batch_size: Number of records to fetch per batch
-            max_concurrent_requests: Maximum number of concurrent scroll requests
-
-        Returns:
-            Reconstructed Docs object
-        """
         from paperqa.docs import Docs  # Avoid circular imports
 
         vectorstore = cls(
@@ -454,9 +454,8 @@ class QdrantVectorStore(VectorStore):
         )
         docs = Docs(texts_index=vectorstore)
 
-        # Get collection info to determine total points
         collection_info = await client.get_collection(collection_name)
-        total_points = collection_info.points_count
+        total_points = collection_info.points_count or 0
 
         semaphore = asyncio.Semaphore(max_concurrent_requests)
         all_points: list[Record] = []
@@ -472,35 +471,44 @@ class QdrantVectorStore(VectorStore):
                 )
                 all_points.extend(points[0])
 
-        # Create and gather all tasks
         tasks = [
             fetch_batch_with_semaphore(offset)
             for offset in range(0, total_points, batch_size)
         ]
         await asyncio.gather(*tasks)
 
-        # Process all points
         for point in all_points:
             try:
-                payload = point.payload
-                doc_data = payload["doc"]
+                if point.payload is None:
+                    continue
 
-                # Only create new Doc if we haven't seen this dockey
-                if doc_data["dockey"] not in docs.docs:
+                payload = point.payload
+                doc_data = payload.get("doc", {})
+                if not isinstance(doc_data, dict):
+                    continue
+
+                if doc_data.get("dockey") not in docs.docs:
                     docs.docs[doc_data["dockey"]] = Doc(
-                        docname=doc_data["docname"],
-                        citation=doc_data["citation"],
+                        docname=doc_data.get("docname", ""),
+                        citation=doc_data.get("citation", ""),
                         dockey=doc_data["dockey"],
                     )
-                    docs.docnames.add(doc_data["docname"])
+                    docs.docnames.add(doc_data.get("docname", ""))
+
+                if point.vector is None:
+                    continue
+
+                vector_value = (
+                    point.vector.get(vector_name)
+                    if vector_name and isinstance(point.vector, dict)
+                    else point.vector
+                )
 
                 text = Text(
-                    text=payload["text"],
-                    name=payload["name"],
+                    text=payload.get("text", ""),
+                    name=payload.get("name", ""),
                     doc=docs.docs[doc_data["dockey"]],
-                    embedding=(
-                        point.vector[vector_name] if vector_name else point.vector
-                    ),
+                    embedding=vector_value,
                 )
                 docs.texts.append(text)
 
