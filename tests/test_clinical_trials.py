@@ -43,7 +43,7 @@ def mock_session():
 @pytest.mark.asyncio
 async def test_api_search_clinical_trials_success(mock_session):
     mock_response = AsyncMock(status=200)
-    mock_response.raise_for_status.return_value = None
+    mock_response.raise_for_status = Mock()
     mock_response.text.return_value = json.dumps({"studies": [SAMPLE_TRIAL_DATA]})
     mock_response.json.return_value = {"studies": [SAMPLE_TRIAL_DATA]}
     mock_session.get.return_value.__aenter__.return_value = mock_response
@@ -52,18 +52,20 @@ async def test_api_search_clinical_trials_success(mock_session):
 
     assert result == {"studies": [SAMPLE_TRIAL_DATA]}
     mock_session.get.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_api_get_clinical_trial_success(mock_session):
     mock_response = AsyncMock()
-    mock_response.raise_for_status.return_value = None
+    mock_response.raise_for_status = Mock()
     mock_response.json.return_value = SAMPLE_TRIAL_DATA
     mock_session.get.return_value.__aenter__.return_value = mock_response
 
     result = await api_get_clinical_trial("NCT12345678", mock_session)
 
     assert result == SAMPLE_TRIAL_DATA
+    mock_response.raise_for_status.assert_called_once()
 
 
 @pytest.mark.asyncio
