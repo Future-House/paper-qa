@@ -11,6 +11,7 @@ from aviary.core import (
     ToolRequestMessage,
     ToolResponseMessage,
 )
+from aviary.utils import MultipleChoiceQuestion
 from llmclient import EmbeddingModel, LiteLLMModel
 
 from paperqa.docs import Docs
@@ -238,10 +239,11 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         ):
             status_fn = clinical_trial_status
 
+        query: str | MultipleChoiceQuestion = self._query.query
         return EnvironmentState(
             docs=self._docs,
             session=PQASession(
-                question=self._query.query,
+                question=query if isinstance(query, str) else query.question_prompt,
                 config_md5=self._query.settings.md5,
                 id=self._query.id,
             ),

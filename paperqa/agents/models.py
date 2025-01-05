@@ -8,6 +8,7 @@ from enum import StrEnum
 from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
+from aviary.utils import MultipleChoiceQuestion
 from llmclient import LiteLLMModel, LLMModel
 from pydantic import (
     BaseModel,
@@ -55,7 +56,13 @@ class MismatchedModelsError(Exception):
 class QueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    query: str = ""
+    query: str | MultipleChoiceQuestion = Field(
+        default="",
+        description=(
+            "The query to be answered. Set to a multiple choice question when grading"
+            " (e.g. for training)."
+        ),
+    )
     id: UUID = Field(
         default_factory=uuid4,
         description="Identifier which will be propagated to the Answer object.",
