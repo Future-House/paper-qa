@@ -447,7 +447,7 @@ class QdrantVectorStore(VectorStore):
     @classmethod
     async def load_docs(
         cls,
-        client: AsyncQdrantClient,
+        client: "AsyncQdrantClient",
         collection_name: str,
         vector_name: str | None = None,
         batch_size: int = 100,
