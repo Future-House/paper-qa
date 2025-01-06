@@ -1643,7 +1643,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.8.1.dev15+gf68b03e.d20250102"
+version = "5.9.1.dev0+gf4c299a.d20250106"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1747,7 +1747,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
-    { name = "fh-llm-client" },
+    { name = "fh-llm-client", specifier = ">=0.0.3" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
     { name = "html2text" },
     { name = "httpx" },
