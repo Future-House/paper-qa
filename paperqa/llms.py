@@ -348,9 +348,7 @@ class QdrantVectorStore(VectorStore):
         if not await self._collection_exists():
             return
 
-        await self.client.delete_collection(
-            collection_name=self.collection_name
-        )
+        await self.client.delete_collection(collection_name=self.collection_name)
         self._point_ids = None
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:

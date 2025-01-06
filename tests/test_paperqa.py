@@ -643,7 +643,7 @@ async def test_docs_with_custom_embedding(
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=MyEmbeds(),
     )
-    
+
     with subtests.test(msg="confirm-embedding"):
         assert docs.texts[0].embedding == [0.0, 0.28, 0.95]
 
@@ -664,8 +664,10 @@ async def test_docs_with_custom_embedding(
     with subtests.test(msg="copying-after-get-evidence"):
         # After getting evidence, a shallow copy of Docs is not the same because its
         # texts index gets lazily populated, while a deep copy should preserve it
-        evidence = await docs.aget_evidence(  # Changed from get_evidence to aget_evidence
-            "What country is Frederick Bates from?", embedding_model=MyEmbeds()
+        evidence = (
+            await docs.aget_evidence(  # Changed from get_evidence to aget_evidence
+                "What country is Frederick Bates from?", embedding_model=MyEmbeds()
+            )
         )
         docs_shallow_copy = Docs(
             texts_index=type(docs.texts_index)(**docs.texts_index.model_dump()),
@@ -706,6 +708,7 @@ async def test_docs_with_custom_embedding(
             assert len(docs.texts_index.texts_hashes) == 0
             assert len(docs.texts_index.texts) == 0
             assert docs.texts_index._embeddings_matrix is None
+
 
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
 def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
