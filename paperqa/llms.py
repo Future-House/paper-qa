@@ -30,13 +30,15 @@ from pydantic import (
     Field,
     model_validator,
 )
-from qdrant_client.http.models import Record
 from typing_extensions import override
 
 from paperqa.types import Doc, Text
 
 if TYPE_CHECKING:
+    from qdrant_client.http.models import Record
+
     from paperqa.docs import Docs
+
 try:
     from qdrant_client import AsyncQdrantClient, models
 
