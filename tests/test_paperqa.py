@@ -664,7 +664,7 @@ async def test_docs_with_custom_embedding(
     with subtests.test(msg="copying-after-get-evidence"):
         # After getting evidence, a shallow copy of Docs is not the same because its
         # texts index gets lazily populated, while a deep copy should preserve it
-        _ = await docs.aget_evidence(  # Changed from get_evidence to aget_evidence
+        _ = await docs.aget_evidence(
             "What country is Frederick Bates from?", embedding_model=MyEmbeds()
         )
         docs_shallow_copy = Docs(
