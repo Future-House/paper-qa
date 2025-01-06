@@ -626,8 +626,9 @@ def test_duplicate(stub_data_dir: Path) -> None:
     ), "Unique documents should be hashed as unique"
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
-def test_docs_with_custom_embedding(
+async def test_docs_with_custom_embedding(
     subtests: SubTests, stub_data_dir: Path, vector_store: type[VectorStore]
 ) -> None:
     class MyEmbeds(EmbeddingModel):
@@ -637,11 +638,12 @@ def test_docs_with_custom_embedding(
             return [[0.0, 0.28, 0.95] for _ in texts]
 
     docs = Docs(texts_index=vector_store())
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=MyEmbeds(),
     )
+    
     with subtests.test(msg="confirm-embedding"):
         assert docs.texts[0].embedding == [0.0, 0.28, 0.95]
 
@@ -662,7 +664,7 @@ def test_docs_with_custom_embedding(
     with subtests.test(msg="copying-after-get-evidence"):
         # After getting evidence, a shallow copy of Docs is not the same because its
         # texts index gets lazily populated, while a deep copy should preserve it
-        docs.get_evidence(
+        evidence = await docs.aget_evidence(  # Changed from get_evidence to aget_evidence
             "What country is Frederick Bates from?", embedding_model=MyEmbeds()
         )
         docs_shallow_copy = Docs(
@@ -674,6 +676,36 @@ def test_docs_with_custom_embedding(
         assert docs.texts_index != docs_shallow_copy.texts_index
         assert docs.texts_index == docs_deep_copy.texts_index
 
+    with subtests.test(msg="clear-vector-store"):
+        # Test that the vector store has content before clearing
+        if isinstance(docs.texts_index, QdrantVectorStore):
+            # For QdrantVectorStore, we need to check if collection exists and has points
+            assert await docs.texts_index._collection_exists()
+            collection_info = await docs.texts_index.client.get_collection(
+                docs.texts_index.collection_name
+            )
+            assert collection_info.points_count > 0
+        else:
+            assert len(docs.texts_index) > 0
+            assert len(docs.texts_index.texts_hashes) > 0
+            assert len(docs.texts_index.texts) > 0
+            assert docs.texts_index._embeddings_matrix is not None
+
+        # Clear the vector store
+        if isinstance(docs.texts_index, QdrantVectorStore):
+            await docs.texts_index.clear()
+        else:
+            docs.texts_index.clear()
+
+        # Verify the vector store is empty
+        if isinstance(docs.texts_index, QdrantVectorStore):
+            assert not await docs.texts_index._collection_exists()
+            assert docs.texts_index._point_ids is None
+        else:
+            assert len(docs.texts_index) == 0
+            assert len(docs.texts_index.texts_hashes) == 0
+            assert len(docs.texts_index.texts) == 0
+            assert docs.texts_index._embeddings_matrix is None
 
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
 def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
