@@ -343,12 +343,22 @@ class QdrantVectorStore(VectorStore):
     @override
     def clear(self) -> None:
         """Synchronous clear method that matches parent class."""
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            raise RuntimeError(
-                "Cannot call synchronous clear() from an async context. Use aclear() instead."
-            )
-        loop.run_until_complete(self.aclear())
+        super().clear()  # Clear the base class attributes first
+
+        # Create a new event loop in a new thread to avoid nested loop issues
+        import threading
+
+        def run_async():
+            new_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(new_loop)
+            try:
+                new_loop.run_until_complete(self.aclear())
+            finally:
+                new_loop.close()
+
+        thread = threading.Thread(target=run_async)
+        thread.start()
+        thread.join()
 
     async def aclear(self) -> None:
         """Asynchronous clear implementation."""
