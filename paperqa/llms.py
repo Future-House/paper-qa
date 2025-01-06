@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import asyncio
 import itertools
 import logging
+import threading
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import (
@@ -11,7 +13,7 @@ from collections.abc import (
     Sequence,
     Sized,
 )
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from llmclient import (
@@ -30,11 +32,15 @@ from pydantic import (
     Field,
     model_validator,
 )
+from qdrant_client.http.models import Record
+from typing_extensions import override
 
-from paperqa.types import Text
+from paperqa.types import Doc, Text
 
+if TYPE_CHECKING:
+    from paperqa.docs import Docs
 try:
-    from qdrant_client import QdrantClient, models
+    from qdrant_client import AsyncQdrantClient, models
 
     qdrant_installed = True
 except ImportError:
@@ -278,11 +284,26 @@ class NumpyVectorStore(VectorStore):
 class QdrantVectorStore(VectorStore):
     client: Any = Field(
         default=None,
-        description="Instance of `qdrant_client.QdrantClient`. Defaults to an in-memory instance.",
+        description="Instance of `qdrant_client.AsyncQdrantClient`. Defaults to an in-memory instance.",
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
     _point_ids: set[str] | None = None
+
+    def __del__(self):
+        """Cleanup async client connection."""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                _ = loop.create_task(self.aclose())  # noqa: RUF006
+            else:
+                loop.run_until_complete(self.aclose())
+        except Exception as e:
+            logger.warning(f"Error closing client connection: {e}")
+
+    async def aclose(self):
+        """Explicitly close async client."""
+        await self.client.close()
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, type(self)):
@@ -306,28 +327,44 @@ class QdrantVectorStore(VectorStore):
             )
             raise ImportError(msg)
 
-        if self.client and not isinstance(self.client, QdrantClient):
+        if self.client and not isinstance(self.client, AsyncQdrantClient):
             raise TypeError(
-                f"'client' should be an instance of `qdrant_client.QdrantClient`. Got `{type(self.client)}`"
+                f"'client' should be an instance of AsyncQdrantClient. Got `{type(self.client)}`"
             )
 
         if not self.client:
             # Defaults to the Python based in-memory implementation.
-            self.client = QdrantClient(location=":memory:")
+            self.client = AsyncQdrantClient(location=":memory:")
 
         return self
 
-    def clear(self) -> None:
-        super().clear()
+    async def _collection_exists(self) -> bool:
+        return await self.client.collection_exists(self.collection_name)
 
-        if not self.client.collection_exists(self.collection_name):
+    @override
+    def clear(self) -> None:
+        """Synchronous clear method that matches parent class."""
+        super().clear()  # Clear the base class attributes first
+
+        # Create a new event loop in a new thread to avoid nested loop issues
+        def run_async():
+            new_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(new_loop)
+            try:
+                new_loop.run_until_complete(self.aclear())
+            finally:
+                new_loop.close()
+
+        thread = threading.Thread(target=run_async)
+        thread.start()
+        thread.join()
+
+    async def aclear(self) -> None:
+        """Asynchronous clear implementation."""
+        if not await self._collection_exists():
             return
 
-        self.client.delete(
-            collection_name=self.collection_name,
-            points_selector=models.Filter(must=[]),
-            wait=True,
-        )
+        await self.client.delete_collection(collection_name=self.collection_name)
         self._point_ids = None
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
@@ -335,12 +372,13 @@ class QdrantVectorStore(VectorStore):
 
         texts_list = list(texts)
 
-        if texts_list and not self.client.collection_exists(self.collection_name):
+        if texts_list and not await self._collection_exists():
             params = models.VectorParams(
                 size=len(cast(Sized, texts_list[0].embedding)),
                 distance=models.Distance.COSINE,
             )
-            self.client.create_collection(
+
+            await self.client.create_collection(
                 self.collection_name,
                 vectors_config=(
                     {self.vector_name: params} if self.vector_name else params
@@ -349,8 +387,6 @@ class QdrantVectorStore(VectorStore):
 
         ids, payloads, vectors = [], [], []
         for text in texts_list:
-            # Entries with same IDs are overwritten.
-            # We generate deterministic UUIDs based on the embedding vectors.
             ids.append(uuid.uuid5(uuid.NAMESPACE_URL, str(text.embedding)).hex)
             payloads.append(text.model_dump(exclude={"embedding"}))
             vectors.append(
@@ -359,32 +395,40 @@ class QdrantVectorStore(VectorStore):
                 else text.embedding
             )
 
-        self.client.upload_collection(
+        await self.client.upsert(
             collection_name=self.collection_name,
-            vectors=vectors,
-            payload=payloads,
-            wait=True,
-            ids=ids,
+            points=[
+                models.PointStruct(
+                    id=some_id,
+                    payload=some_payload,
+                    vector=some_vector,
+                )
+                for some_id, some_payload, some_vector in zip(
+                    ids, payloads, vectors, strict=True
+                )
+            ],
         )
         self._point_ids = set(ids)
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
-        if not self.client.collection_exists(self.collection_name):
+        if not await self._collection_exists():
             return ([], [])
 
         embedding_model.set_mode(EmbeddingModes.QUERY)
         np_query = np.array((await embedding_model.embed_documents([query]))[0])
         embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
-        points = self.client.query_points(
-            collection_name=self.collection_name,
-            query=np_query,
-            using=self.vector_name,
-            limit=k,
-            with_vectors=True,
-            with_payload=True,
+        points = (
+            await self.client.query_points(
+                collection_name=self.collection_name,
+                query=np_query,
+                using=self.vector_name,
+                limit=k,
+                with_vectors=True,
+                with_payload=True,
+            )
         ).points
 
         return (
@@ -399,6 +443,86 @@ class QdrantVectorStore(VectorStore):
             ],
             [p.score for p in points],
         )
+
+    @classmethod
+    async def load_docs(
+        cls,
+        client: AsyncQdrantClient,
+        collection_name: str,
+        vector_name: str | None = None,
+        batch_size: int = 100,
+        max_concurrent_requests: int = 5,
+    ) -> Docs:
+        from paperqa.docs import Docs  # Avoid circular imports
+
+        vectorstore = cls(
+            client=client, collection_name=collection_name, vector_name=vector_name
+        )
+        docs = Docs(texts_index=vectorstore)
+
+        collection_info = await client.get_collection(collection_name)
+        total_points = collection_info.points_count or 0
+
+        semaphore = asyncio.Semaphore(max_concurrent_requests)
+        all_points: list[Record] = []
+
+        async def fetch_batch_with_semaphore(offset: int) -> None:
+            async with semaphore:
+                points = await client.scroll(
+                    collection_name=collection_name,
+                    limit=batch_size,
+                    offset=offset,
+                    with_payload=True,
+                    with_vectors=True,
+                )
+                all_points.extend(points[0])
+
+        tasks = [
+            fetch_batch_with_semaphore(offset)
+            for offset in range(0, total_points, batch_size)
+        ]
+        await asyncio.gather(*tasks)
+
+        for point in all_points:
+            try:
+                if point.payload is None:
+                    continue
+
+                payload = point.payload
+                doc_data = payload.get("doc", {})
+                if not isinstance(doc_data, dict):
+                    continue
+
+                if doc_data.get("dockey") not in docs.docs:
+                    docs.docs[doc_data["dockey"]] = Doc(
+                        docname=doc_data.get("docname", ""),
+                        citation=doc_data.get("citation", ""),
+                        dockey=doc_data["dockey"],
+                    )
+                    docs.docnames.add(doc_data.get("docname", ""))
+
+                if point.vector is None:
+                    continue
+
+                vector_value = (
+                    point.vector.get(vector_name)
+                    if vector_name and isinstance(point.vector, dict)
+                    else point.vector
+                )
+
+                text = Text(
+                    text=payload.get("text", ""),
+                    name=payload.get("name", ""),
+                    doc=docs.docs[doc_data["dockey"]],
+                    embedding=vector_value,
+                )
+                docs.texts.append(text)
+
+            except KeyError as e:
+                logger.warning(f"Skipping invalid point due to missing field: {e!s}")
+                continue
+
+        return docs
 
 
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
