@@ -341,26 +341,17 @@ class QdrantVectorStore(VectorStore):
         return await self.client.collection_exists(self.collection_name)
 
     @override
-    def clear(self) -> None:
+    async def clear(self) -> None:
         """Clear the vector store."""
         super().clear()
 
-        async def _async_clear() -> None:
-            if not await self._collection_exists():
-                return
+        if not await self._collection_exists():
+            return
 
-            await self.client.delete(
-                collection_name=self.collection_name,
-                points_selector=models.Filter(must=[]),
-                wait=True,
-            )
-            self._point_ids = None
-
-        try:
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(_async_clear())
-        except Exception as e:
-            logger.warning(f"Error clearing vector store: {e}")
+        await self.client.delete_collection(
+            collection_name=self.collection_name
+        )
+        self._point_ids = None
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         await super().add_texts_and_embeddings(texts)
