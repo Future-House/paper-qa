@@ -644,6 +644,7 @@ async def test_docs_with_custom_embedding(
         embedding_model=MyEmbeds(),
     )
 
+
     with subtests.test(msg="confirm-embedding"):
         assert docs.texts[0].embedding == [0.0, 0.28, 0.95]
 
@@ -702,7 +703,6 @@ async def test_docs_with_custom_embedding(
         else:
             assert len(docs.texts_index) == 0
             assert len(docs.texts_index.texts_hashes) == 0
-
 
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
 def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
