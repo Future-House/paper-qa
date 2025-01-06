@@ -20,6 +20,7 @@ from llmclient import (
     LLMModel,
     LLMResult,
 )
+from llmclient.types import set_llm_session_ids
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -39,14 +40,7 @@ from paperqa.paths import PAPERQA_DIR
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
-from paperqa.types import (
-    Doc,
-    DocDetails,
-    DocKey,
-    PQASession,
-    Text,
-    set_llm_session_ids,
-)
+from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     gather_with_concurrency,
     get_loop,

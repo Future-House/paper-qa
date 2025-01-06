@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import contextvars
 import logging
 import os
 import re
 import warnings
 from collections.abc import Collection
-from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
@@ -39,18 +37,6 @@ from paperqa.version import __version__ as pqa_version
 # the type
 DocKey = Any
 logger = logging.getLogger(__name__)
-
-# A context var that will be unique to threads/processes
-cvar_session_id = contextvars.ContextVar[UUID | None]("session_id", default=None)
-
-
-@contextmanager
-def set_llm_session_ids(session_id: UUID):
-    token = cvar_session_id.set(session_id)
-    try:
-        yield
-    finally:
-        cvar_session_id.reset(token)
 
 
 class Doc(Embeddable):
