@@ -689,11 +689,8 @@ async def test_docs_with_custom_embedding(
             assert len(docs.texts_index) > 0
             assert len(docs.texts_index.texts_hashes) > 0
 
-        # Clear the vector store
-        if isinstance(docs.texts_index, QdrantVectorStore):
-            await docs.texts_index.aclear()  # Use aclear() instead of clear()
-        else:
-            docs.texts_index.clear()
+        # Clear the vector store via Docs
+        docs.clear_docs()
 
         # Verify the vector store is empty
         if isinstance(docs.texts_index, QdrantVectorStore):
