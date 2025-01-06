@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import asyncio
 import itertools
 import logging
@@ -32,13 +30,15 @@ from pydantic import (
     Field,
     model_validator,
 )
-from qdrant_client.http.models import Record
 from typing_extensions import override
 
 from paperqa.types import Doc, Text
 
 if TYPE_CHECKING:
+    from qdrant_client.http.models import Record
+
     from paperqa.docs import Docs
+
 try:
     from qdrant_client import AsyncQdrantClient, models
 
@@ -447,12 +447,12 @@ class QdrantVectorStore(VectorStore):
     @classmethod
     async def load_docs(
         cls,
-        client: AsyncQdrantClient,
+        client: "AsyncQdrantClient",
         collection_name: str,
         vector_name: str | None = None,
         batch_size: int = 100,
         max_concurrent_requests: int = 5,
-    ) -> Docs:
+    ) -> "Docs":
         from paperqa.docs import Docs  # Avoid circular imports
 
         vectorstore = cls(
