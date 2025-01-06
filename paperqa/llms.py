@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import asyncio
 import itertools
 import logging
@@ -452,7 +450,7 @@ class QdrantVectorStore(VectorStore):
         vector_name: str | None = None,
         batch_size: int = 100,
         max_concurrent_requests: int = 5,
-    ) -> Docs:
+    ) -> "Docs":
         from paperqa.docs import Docs  # Avoid circular imports
 
         vectorstore = cls(
