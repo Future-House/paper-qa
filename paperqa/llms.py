@@ -341,16 +341,21 @@ class QdrantVectorStore(VectorStore):
         return await self.client.collection_exists(self.collection_name)
 
     @override
-    async def clear(self) -> None:
-        """Clear the vector store."""
-        super().clear()
+    def clear(self) -> None:
+        """Synchronous clear method that matches parent class."""
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            raise RuntimeError(
+                "Cannot call synchronous clear() from an async context. Use aclear() instead."
+            )
+        loop.run_until_complete(self.aclear())
 
+    async def aclear(self) -> None:
+        """Asynchronous clear implementation."""
         if not await self._collection_exists():
             return
 
-        await self.client.delete_collection(
-            collection_name=self.collection_name
-        )
+        await self.client.delete_collection(collection_name=self.collection_name)
         self._point_ids = None
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
