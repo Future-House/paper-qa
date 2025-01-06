@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import itertools
 import logging
+import threading
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import (
@@ -346,8 +347,6 @@ class QdrantVectorStore(VectorStore):
         super().clear()  # Clear the base class attributes first
 
         # Create a new event loop in a new thread to avoid nested loop issues
-        import threading
-
         def run_async():
             new_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(new_loop)

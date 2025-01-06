@@ -685,9 +685,8 @@ async def test_docs_with_custom_embedding(
                 docs.texts_index.collection_name
             )
             assert collection_info.points_count > 0
-        else:
-            assert len(docs.texts_index) > 0
-            assert len(docs.texts_index.texts_hashes) > 0
+        assert len(docs.texts_index) > 0
+        assert len(docs.texts_index.texts_hashes) > 0
 
         # Clear the vector store via Docs
         docs.clear_docs()
@@ -696,9 +695,8 @@ async def test_docs_with_custom_embedding(
         if isinstance(docs.texts_index, QdrantVectorStore):
             assert not await docs.texts_index._collection_exists()
             assert docs.texts_index._point_ids is None
-        else:
-            assert len(docs.texts_index) == 0
-            assert len(docs.texts_index.texts_hashes) == 0
+        assert len(docs.texts_index) == 0
+        assert len(docs.texts_index.texts_hashes) == 0
 
 
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
