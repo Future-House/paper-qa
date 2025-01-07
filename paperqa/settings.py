@@ -469,6 +469,7 @@ class AgentSettings(BaseModel):
     wipe_context_on_answer_failure: bool = True
     agent_evidence_n: int = Field(
         default=1,
+        ge=1,
         description="Top n ranked evidences shown to the "
         "agent after the GatherEvidence tool.",
     )
