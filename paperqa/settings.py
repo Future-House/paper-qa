@@ -467,6 +467,11 @@ class AgentSettings(BaseModel):
     )
     search_count: int = 8
     wipe_context_on_answer_failure: bool = True
+    agent_evidence_n: int = Field(
+        default=1,
+        description="Top n ranked evidences shown to the "
+        "agent after the GatherEvidence tool.",
+    )
     timeout: float = Field(
         default=500.0,
         description=(
