@@ -572,11 +572,29 @@ async def test_agent_sharing_state(
             summary_llm_model=summary_llm_model,
             embedding_model=embedding_model,
         )
-        await gather_evidence_tool.gather_evidence(session.question, state=env_state)
+
+        response = await gather_evidence_tool.gather_evidence(
+            session.question, state=env_state
+        )
 
         if callback_type == "async":
             gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
+
+        # ensure 1 piece of top evidence is returned
+        assert "\n1." in response, "gather_evidence did not return any results"
+        assert (
+            "\n2." not in response
+        ), "gather_evidence should return only 1 context, not 2"
+
+        # now adjust to give the agent 2x pieces of evidence
+        gather_evidence_tool.settings.agent.agent_evidence_n = 2
+        response = await gather_evidence_tool.gather_evidence(
+            session.question, state=env_state
+        )
+        # ensure both evidences are returned
+        assert "\n1." in response, "gather_evidence did not return any results"
+        assert "\n2." in response, "gather_evidence should return 2 contexts"
 
         assert session.contexts, "Evidence did not return any results"
         assert not session.answer, "Expected no answer yet"
