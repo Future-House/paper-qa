@@ -253,11 +253,17 @@ class GatherEvidence(NamedTool):
         sorted_contexts = sorted(
             state.session.contexts, key=lambda x: x.score, reverse=True
         )
-        best_evidence = (
-            f" Best evidence:\n\n{sorted_contexts[0].context}"
-            if sorted_contexts
-            else ""
+
+        top_contexts = "\n".join(
+            [
+                f"{n + 1}. {sc.context}\n"
+                for n, sc in enumerate(
+                    sorted_contexts[: self.settings.agent.agent_evidence_n]
+                )
+            ]
         )
+
+        best_evidence = f" Best evidence(s):\n\n{top_contexts}" if top_contexts else ""
 
         if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
             await asyncio.gather(
