@@ -59,24 +59,24 @@ class AnswerSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     evidence_k: int = Field(
-        default=10, description="Number of evidence pieces to retrieve"
+        default=10, description="Number of evidence pieces to retrieve."
     )
     evidence_detailed_citations: bool = Field(
         default=True,
-        description="Whether to include detailed citations in summaries",
+        description="Whether to include detailed citations in summaries.",
     )
     evidence_retrieval: bool = Field(
         default=True,
-        description="Whether to use retrieval instead of processing all docs",
+        description="Whether to use retrieval instead of processing all docs.",
     )
     evidence_summary_length: str = Field(
-        default="about 100 words", description="Length of evidence summary"
+        default="about 100 words", description="Length of evidence summary."
     )
     evidence_skip_summary: bool = Field(
-        default=False, description="Whether to summarization"
+        default=False, description="Whether to summarization."
     )
     answer_max_sources: int = Field(
-        default=5, description="Max number of sources to use for an answer"
+        default=5, description="Max number of sources to use for an answer."
     )
     max_answer_attempts: int | None = Field(
         default=None,
@@ -86,10 +86,10 @@ class AnswerSettings(BaseModel):
         ),
     )
     answer_length: str = Field(
-        "about 200 words, but can be longer", description="Length of final answer"
+        "about 200 words, but can be longer", description="Length of final answer."
     )
     max_concurrent_requests: int = Field(
-        default=4, description="Max concurrent requests to LLMs"
+        default=4, description="Max concurrent requests to LLMs."
     )
     answer_filter_extra_background: bool = Field(
         default=False,
@@ -159,26 +159,26 @@ class ParsingSettings(BaseModel):
         ),
     )
     use_doc_details: bool = Field(
-        default=True, description="Whether to try to get metadata details for a Doc"
+        default=True, description="Whether to try to get metadata details for a Doc."
     )
     overlap: int = Field(
-        default=250, description="Number of characters to overlap chunks"
+        default=250, description="Number of characters to overlap chunks."
     )
     citation_prompt: str = Field(
         default=citation_prompt,
-        description="Prompt that tries to create citation from peeking one page",
+        description="Prompt that tries to create citation from peeking one page.",
     )
     structured_citation_prompt: str = Field(
         default=structured_citation_prompt,
         description=(
-            "Prompt that tries to creates a citation in JSON from peeking one page"
+            "Prompt that tries to creates a citation in JSON from peeking one page."
         ),
     )
     disable_doc_valid_check: bool = Field(
         default=False,
         description=(
             "Whether to disable checking if a document looks like text (was parsed"
-            " correctly)"
+            " correctly)."
         ),
     )
     defer_embedding: bool = Field(
@@ -202,7 +202,7 @@ class ParsingSettings(BaseModel):
     )
     use_human_readable_clinical_trials: bool = Field(
         default=False,
-        description="Parse clinical trial JSONs into human readable text",
+        description="Parse clinical trial JSONs into human readable text.",
     )
 
     def chunk_type(self, chunking_selection: ChunkingOptions | None = None) -> str:
@@ -437,12 +437,12 @@ class AgentSettings(BaseModel):
 
     agent_llm: str = Field(
         default="gpt-4o-2024-08-06",
-        description="Model to use for agent",
+        description="Model to use for agent.",
     )
 
     agent_llm_config: dict | None = Field(
         default=None,
-        description="Optional kwargs for LLM constructor",
+        description="Optional kwargs for LLM constructor.",
     )
 
     agent_type: str = Field(
@@ -451,7 +451,7 @@ class AgentSettings(BaseModel):
     )
     agent_config: dict[str, Any] | None = Field(
         default=None,
-        description="Optional kwarg for AGENT constructor",
+        description="Optional kwarg for AGENT constructor.",
     )
     agent_system_prompt: str | None = Field(
         default=env_system_prompt,
@@ -496,7 +496,7 @@ class AgentSettings(BaseModel):
 
     index_concurrency: int = Field(
         default=5,  # low default for folks without S2/Crossref keys
-        description="Number of concurrent filesystem reads for indexing",
+        description="Number of concurrent filesystem reads for indexing.",
         exclude=True,
         frozen=True,
     )
@@ -584,7 +584,7 @@ class Settings(BaseSettings):
     llm: str = Field(
         default="gpt-4o-2024-08-06",
         description=(
-            "Default LLM for most things, including answers. Should be 'best' LLM"
+            "Default LLM for most things, including answers. Should be 'best' LLM."
         ),
     )
     llm_config: dict | None = Field(
@@ -598,7 +598,7 @@ class Settings(BaseSettings):
     )
     summary_llm: str = Field(
         default="gpt-4o-2024-08-06",
-        description="Default LLM for summaries and parsing citations",
+        description="Default LLM for summaries and parsing citations.",
     )
     summary_llm_config: dict | None = Field(
         default=None,
@@ -615,16 +615,16 @@ class Settings(BaseSettings):
     )
     embedding_config: dict | None = Field(
         default=None,
-        description="Extra kwargs to pass to embedding model",
+        description="Extra kwargs to pass to embedding model.",
     )
-    temperature: float = Field(default=0.0, description="Temperature for LLMs")
-    batch_size: int = Field(default=1, description="Batch size for calling LLMs")
+    temperature: float = Field(default=0.0, description="Temperature for LLMs.")
+    batch_size: int = Field(default=1, description="Batch size for calling LLMs.")
     texts_index_mmr_lambda: float = Field(
-        default=1.0, description="Lambda for MMR in text index"
+        default=1.0, description="Lambda for MMR in text index."
     )
     index_absolute_directory: bool = Field(
         default=False,
-        description="Whether to use the absolute paper directory for the PQA index",
+        description="Whether to use the absolute paper directory for the PQA index.",
         exclude=True,
         frozen=True,
     )
@@ -647,7 +647,7 @@ class Settings(BaseSettings):
         default=0,
         description=(
             "Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls"
-            " logged"
+            " logged."
         ),
     )
     manifest_file: str | os.PathLike | None = Field(
