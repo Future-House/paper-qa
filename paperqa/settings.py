@@ -444,7 +444,13 @@ class AgentSettings(BaseModel):
 
     agent_llm_config: dict | None = Field(
         default=None,
-        description="Optional kwargs for LLM constructor.",
+        description=(
+            "Optional configuration for the agent_llm model. More specifically, it's"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " `model_list` key (corresponding to model_list inputs here:"
+            " https://docs.litellm.ai/docs/routing), and can optionally include a"
+            " router_kwargs key with router kwargs as values."
+        ),
     )
 
     agent_type: str = Field(
@@ -592,7 +598,8 @@ class Settings(BaseSettings):
     llm_config: dict | None = Field(
         default=None,
         description=(
-            "LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            "Optional configuration for the llm model. More specifically, it's"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
             " router_kwargs key with router kwargs as values."
@@ -605,7 +612,8 @@ class Settings(BaseSettings):
     summary_llm_config: dict | None = Field(
         default=None,
         description=(
-            "LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            "Optional configuration for the summary_llm model. More specifically, it's"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
             " router_kwargs key with router kwargs as values."
@@ -617,7 +625,7 @@ class Settings(BaseSettings):
     )
     embedding_config: dict | None = Field(
         default=None,
-        description="Extra kwargs to pass to embedding model.",
+        description="Optional configuration for the embedding model.",
     )
     temperature: float = Field(default=0.0, description="Temperature for LLMs.")
     batch_size: int = Field(default=1, description="Batch size for calling LLMs.")
