@@ -76,6 +76,8 @@ def read_litqa_v2_from_hub(
     # Convert to list so it's not unexpectedly a numpy array
     train_eval["distractors"] = train_eval["distractors"].apply(list)
     test["distractors"] = test["distractors"].apply(list)
+    # Let downstream usage in the TaskDataset's environment factories check for the
+    # presence of other DataFrame columns
     if randomize:
         train_eval = train_eval.sample(frac=1, random_state=seed)
         test = test.sample(frac=1, random_state=seed)
