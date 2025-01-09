@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from aviary.utils import MultipleChoiceQuestion
 from pydantic_settings import CliSettingsSource
 from rich.logging import RichHandler
 
@@ -97,7 +98,7 @@ def configure_cli_logging(verbosity: int | Settings = 0) -> None:
         print(f"PaperQA version: {__version__}")
 
 
-def ask(query: str, settings: Settings) -> AnswerResponse:
+def ask(query: str | MultipleChoiceQuestion, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
     configure_cli_logging(settings)
     return get_loop().run_until_complete(
