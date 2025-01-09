@@ -25,7 +25,7 @@ def test_make_discounted_returns(
 
 def test_creating_litqa_questions() -> None:
     """Test making LitQA eval questions after downloading from Hugging Face Hub."""
-    _, eval_split = read_litqa_v2_from_hub(seed=42)
+    eval_split = read_litqa_v2_from_hub(seed=42)[1]
     assert len(eval_split) > 3
     assert [
         MultipleChoiceQuestion(
