@@ -39,6 +39,7 @@ from paperqa._ldp_shims import (
 )
 from paperqa.docs import Docs
 from paperqa.litqa import (
+    DEFAULT_AVIARY_PAPER_HF_HUB_NAME,
     DEFAULT_LABBENCH_HF_HUB_NAME,
     DEFAULT_REWARD_MAPPING,
     read_litqa_v2_from_hub,
@@ -408,6 +409,7 @@ class LitQATaskDataset(
 class LitQAv2TaskSplit(StrEnum):
     TRAIN = "train"
     EVAL = "eval"
+    TEST = "test"
 
 
 class LitQAv2TaskDataset(LitQATaskDataset):
@@ -416,20 +418,23 @@ class LitQAv2TaskDataset(LitQATaskDataset):
     def __init__(
         self,
         *args,
-        labbench_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+        train_eval_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+        test_dataset: str = DEFAULT_AVIARY_PAPER_HF_HUB_NAME,
         read_data_kwargs: Mapping[str, Any] | None = None,
         split: str | LitQAv2TaskSplit = LitQAv2TaskSplit.EVAL,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        train_df, eval_df = read_litqa_v2_from_hub(
-            labbench_dataset, **(read_data_kwargs or {})
+        train_df, eval_df, test_df = read_litqa_v2_from_hub(
+            train_eval_dataset, test_dataset, **(read_data_kwargs or {})
         )
         split = LitQAv2TaskSplit(split)
         if split == LitQAv2TaskSplit.TRAIN:
             self.data = train_df
         elif split == LitQAv2TaskSplit.EVAL:
             self.data = eval_df
+        elif split == LitQAv2TaskSplit.TEST:
+            self.data = test_df
         else:
             assert_never(split)
 
