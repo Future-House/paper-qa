@@ -98,7 +98,11 @@ class TestTaskDataset:
 
     @pytest.mark.parametrize(
         ("split", "expected_length"),
-        [(LitQAv2TaskSplit.TRAIN, 159), (LitQAv2TaskSplit.EVAL, 40)],
+        [
+            (LitQAv2TaskSplit.TRAIN, 159),
+            (LitQAv2TaskSplit.EVAL, 40),
+            (LitQAv2TaskSplit.TEST, 49),
+        ],
     )
     @pytest.mark.asyncio
     async def test___len__(

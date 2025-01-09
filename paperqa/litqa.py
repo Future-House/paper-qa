@@ -37,26 +37,30 @@ def make_discounted_returns(
 
 
 DEFAULT_LABBENCH_HF_HUB_NAME = "futurehouse/lab-bench"
+# Test split from Aviary paper's section 4.3: https://doi.org/10.48550/arXiv.2412.21154
+DEFAULT_AVIARY_PAPER_HF_HUB_NAME = "futurehouse/aviary-paper-data"
 
 
 def read_litqa_v2_from_hub(
-    labbench_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+    train_eval_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+    test_dataset: str = DEFAULT_AVIARY_PAPER_HF_HUB_NAME,
     randomize: bool = True,
     seed: int | None = None,
     train_eval_split: float = 0.8,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Read LitQA v2 JSONL into train and eval DataFrames.
+    Read LitQA v2 JSONL into train, eval, and test DataFrames.
 
     Args:
-        labbench_dataset: The Hugging Face Hub dataset's name corresponding with the
-            LAB-Bench dataset.
+        train_eval_dataset: Hugging Face Hub dataset's name corresponding with train
+            and eval splits.
+        test_dataset: Hugging Face Hub dataset's name corresponding with a test split.
         randomize: Opt-out flag to shuffle the dataset after loading in by question.
         seed: Random seed to use for the shuffling.
         train_eval_split: Train/eval split fraction, default is 80% train 20% eval.
 
     Raises:
-        DatasetNotFoundError: If the LAB-Bench dataset is not found, or the
+        DatasetNotFoundError: If any of the datasets are not found, or the
             user is unauthenticated.
     """
     try:
@@ -67,9 +71,13 @@ def read_litqa_v2_from_hub(
             " `pip install paper-qa[datasets]`."
         ) from exc
 
-    litqa_v2 = load_dataset(labbench_dataset, "LitQA2")["train"].to_pandas()
-    litqa_v2["distractors"] = litqa_v2["distractors"].apply(list)
+    train_eval = load_dataset(train_eval_dataset, "LitQA2")["train"].to_pandas()
+    test = load_dataset(test_dataset, "LitQA2")["test"].to_pandas()
+    # Convert to list so it's not unexpectedly a numpy array
+    train_eval["distractors"] = train_eval["distractors"].apply(list)
+    test["distractors"] = test["distractors"].apply(list)
     if randomize:
-        litqa_v2 = litqa_v2.sample(frac=1, random_state=seed)
-    num_train = int(len(litqa_v2) * train_eval_split)
-    return litqa_v2[:num_train], litqa_v2[num_train:]
+        train_eval = train_eval.sample(frac=1, random_state=seed)
+        test = test.sample(frac=1, random_state=seed)
+    num_train = int(len(train_eval) * train_eval_split)
+    return train_eval[:num_train], train_eval[num_train:], test
