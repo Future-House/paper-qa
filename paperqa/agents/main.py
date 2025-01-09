@@ -11,6 +11,7 @@ from aviary.core import (
     ToolSelector,
     ToolSelectorLedger,
 )
+from aviary.utils import MultipleChoiceQuestion
 from pydantic import BaseModel
 from rich.console import Console
 from tenacity import (
@@ -49,12 +50,12 @@ DEFAULT_AGENT_TYPE = AgentSettings.model_fields["agent_type"].default
 
 
 async def agent_query(
-    query: str | QueryRequest,
+    query: str | MultipleChoiceQuestion | QueryRequest,
     docs: Docs | None = None,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
     **runner_kwargs,
 ) -> AnswerResponse:
-    if isinstance(query, str):
+    if isinstance(query, str | MultipleChoiceQuestion):
         query = QueryRequest(query=query)
     if docs is None:
         docs = Docs()
