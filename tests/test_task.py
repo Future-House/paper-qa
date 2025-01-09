@@ -109,7 +109,7 @@ class TestTaskDataset:
     ) -> None:
         task_dataset = LitQAv2TaskDataset(
             base_query=base_query_request,
-            question_kwargs={"seed": 42},
+            question_kwargs={"shuffle_seed": 42},
             read_data_kwargs={"seed": 42},
             split=split,
         )
@@ -124,9 +124,9 @@ class TestTaskDataset:
                 obs, _ = await env.reset()
                 assert (
                     "Q: SLC14A1 been identified as a specific marker for endothelial"
-                    " cells in which organ?\n\nOptions:\nA) liver\nB) eye\nC)"
-                    " prostate\nD) heart\nE) Insufficient information to answer this"
-                    " question" in (obs[0].content or "")
+                    " cells in which organ?\n\nOptions:\nA) liver\nB) Insufficient"
+                    " information to answer this question\nC) prostate\nD) eye\nE)"
+                    " heart" in (obs[0].content or "")
                 )
             assert env.sources, "Sources need to be accessible"
             assert isinstance(
@@ -163,7 +163,9 @@ class TestTaskDataset:
                         "deleted_dockeys",
                     }
                 ),
-                "question_kwargs": {"seed": MultipleChoiceQuestion.SEED_USING_QUESTION},
+                "question_kwargs": {
+                    "shuffle_seed": MultipleChoiceQuestion.SEED_USING_QUESTION
+                },
             },
         )
         # NOTE: set base_query after construction of the TaskConfig. because in
