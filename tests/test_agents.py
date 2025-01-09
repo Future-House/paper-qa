@@ -33,7 +33,7 @@ from paperqa.agents.env import (
     settings_to_tools,
 )
 from paperqa.agents.main import FAKE_AGENT_TYPE, run_agent
-from paperqa.agents.models import AgentStatus, AnswerResponse, QueryRequest
+from paperqa.agents.models import AgentStatus, AnswerResponse
 from paperqa.agents.search import (
     FAILED_DOCUMENT_ADD_ID,
     get_directory_index,
@@ -252,11 +252,12 @@ async def test_agent_types(
         "\n\nCall each tool once in appropriate order and"
         " accept the answer for now, as we're in debug mode."
     )
-    request = QueryRequest(query=question, settings=agent_test_settings)
     with patch.object(
         Index, "open", side_effect=Index.open, autospec=True
     ) as mock_open:
-        response = await agent_query(request, agent_type=agent_type)
+        response = await agent_query(
+            question, agent_test_settings, agent_type=agent_type
+        )
     assert (
         mock_open.call_count <= 1
     ), "Expected one Index.open call, or possibly zero if multiprocessing tests"
@@ -264,7 +265,7 @@ async def test_agent_types(
     assert response.session.answer != CANNOT_ANSWER_PHRASE, "Answer not generated"
     assert response.session.context, "No contexts were found"
     assert response.session.question == question
-    agent_llm = request.settings.agent.agent_llm
+    agent_llm = agent_test_settings.agent.agent_llm
     # TODO: once LDP can track tokens, we can remove this check
     if agent_type not in {FAKE_AGENT_TYPE, SimpleAgent}:
         assert (
@@ -319,13 +320,10 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     )
     await memory_model.add_memory(memory)
     serialized_memory_model = memory_model.model_dump(exclude_none=True)
-    query = QueryRequest(
-        query="How can you use XAI for chemical property prediction?",
-        settings=agent_test_settings,
-    )
+    query = "How can you use XAI for chemical property prediction?"
     # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
-    query.settings.agent.agent_llm = "claude-3-5-sonnet-20240620"
-    query.settings.agent.agent_config = {
+    agent_test_settings.agent.agent_llm = "claude-3-5-sonnet-20240620"
+    agent_test_settings.agent.agent_config = {
         "memories": serialized_memory_model.pop("memories"),
         "memory_model": serialized_memory_model,
     }
@@ -347,13 +345,14 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     ):
         response = await agent_query(
             query,
+            agent_test_settings,
             Docs(),
             agent_type=f"{ldp.agent.__name__}.{MemoryAgent.__name__}",
             on_agent_action_callback=on_agent_action,
         )
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
     assert (
-        time.perf_counter() - tic <= query.settings.agent.timeout
+        time.perf_counter() - tic <= agent_test_settings.agent.timeout
     ), "Agent should not have timed out"
     assert all(thought and "<thinking>" not in thought for thought in thoughts)
 
@@ -366,9 +365,8 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
     response = await agent_query(
-        QueryRequest(
-            query="Are COVID-19 vaccines effective?", settings=agent_test_settings
-        ),
+        query="Are COVID-19 vaccines effective?",
+        settings=agent_test_settings,
         agent_type=agent_type,
     )
     # ensure that GenerateAnswerTool was called
@@ -397,10 +395,11 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     agent_test_settings.prompts.context_inner = CONTEXT_INNER_PROMPT_NOT_DETAILED
     agent_test_settings.answer.evidence_skip_summary = True
 
-    query = QueryRequest(
-        query="What is is a self-explanatory model?", settings=agent_test_settings
+    response = await agent_query(
+        query="What is is a self-explanatory model?",
+        settings=agent_test_settings,
+        agent_type=FAKE_AGENT_TYPE,
     )
-    response = await agent_query(query, agent_type=FAKE_AGENT_TYPE)
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
     result = response.session
     assert len(result.answer) > 200, "Answer did not return any results"
@@ -455,9 +454,8 @@ async def test_gather_evidence_rejects_empty_docs(
             ),
         )
         response = await agent_query(
-            query=QueryRequest(
-                query="Are COVID-19 vaccines effective?", settings=agent_test_settings
-            ),
+            query="Are COVID-19 vaccines effective?",
+            settings=agent_test_settings,
             docs=Docs(),
         )
     assert (
@@ -495,7 +493,6 @@ async def test_agent_sharing_state(
     agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
 
     session = PQASession(question="What is is a self-explanatory model?")
-    query = QueryRequest(query=session.question, settings=agent_test_settings)
     env_state = EnvironmentState(docs=Docs(), session=session)
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
@@ -620,7 +617,7 @@ async def test_agent_sharing_state(
             GenerateAnswer.extract_answer_from_message(result) == session.answer
         ), "Failed to regex extract answer from result"
         assert (
-            len(session.used_contexts) <= query.settings.answer.answer_max_sources
+            len(session.used_contexts) <= agent_test_settings.answer.answer_max_sources
         ), "Answer has more sources than expected"
 
     with subtests.test(msg=f"{Reset.__name__} working"):
@@ -796,17 +793,6 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
     ]
 
 
-def test_query_request_docs_name_serialized() -> None:
-    """Test that the query request has a docs_name property."""
-    request = QueryRequest(query="Are COVID-19 vaccines effective?")
-    request_data = json.loads(request.model_dump_json())
-    assert "docs_name" in request_data
-    assert request_data["docs_name"] is None
-    request.set_docs_name("my_doc")
-    request_data = json.loads(request.model_dump_json())
-    assert request_data["docs_name"] == "my_doc"
-
-
 def test_answers_are_striped() -> None:
     """Test that answers are striped."""
     session = PQASession(
@@ -844,10 +830,8 @@ def fixture_stub_gradable_env(
     agent_test_settings: Settings,
 ) -> GradablePaperQAEnvironment:
     return GradablePaperQAEnvironment(
-        query=QueryRequest(
-            query="How can you use XAI for chemical property prediction?",
-            settings=agent_test_settings,
-        ),
+        query="How can you use XAI for chemical property prediction?",
+        settings=agent_test_settings,
         docs=Docs(),
     )
 
@@ -872,7 +856,7 @@ class TestGradablePaperQAEnvironment:
                 max_year=2024,
             ),
             ToolCall.from_name(
-                "gather_evidence", question=stub_gradable_env._query.query
+                "gather_evidence", question=cast(str, stub_gradable_env._query)
             ),
         ):
             await stub_gradable_env.step(ToolRequestMessage(tool_calls=[tool_call]))
@@ -1017,14 +1001,15 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
         "complete",
     }
     docs = Docs()
-    query = QueryRequest(
+    response = await run_agent(
+        docs,
         query=(
-            "What are the NCTIDs of clinical trials for depression that focus on health "
-            "services research, are in phase 2, have no status type, and started in or after 2017?"
+            "What are the NCTIDs of clinical trials for depression that focus on health"
+            " services research, are in phase 2, have no status type, and started in or"
+            " after 2017?"
         ),
         settings=agent_test_settings,
     )
-    response = await run_agent(docs, query)
     # make sure the tool was used at least once
     assert any(
         ClinicalTrialsSearch.TOOL_FN_NAME in step
