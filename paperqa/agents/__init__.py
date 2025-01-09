@@ -110,7 +110,7 @@ def ask(query: str | MultipleChoiceQuestion, settings: Settings) -> AnswerRespon
 
 
 def search_query(
-    query: str,
+    query: str | MultipleChoiceQuestion,
     index_name: str,
     settings: Settings,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
@@ -120,7 +120,7 @@ def search_query(
         index_name = settings.get_index_name()
     return get_loop().run_until_complete(
         index_search(
-            query,
+            query if isinstance(query, str) else query.question_prompt,
             index_name=index_name,
             index_directory=settings.agent.index.index_directory,
         )
