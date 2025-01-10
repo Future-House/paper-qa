@@ -1240,8 +1240,7 @@ def test_dois_resolve_to_correct_journals(doi_journals):
     assert details.journal == doi_journals["journal"]
 
 
-@pytest.mark.asyncio
-async def test_docdetails_merge_with_non_list_fields():
+def test_docdetails_merge_with_non_list_fields():
     # Test merging a DocDetail that was republished
     initial_date = datetime(2023, 1, 1)
     doc1 = DocDetails(
@@ -1257,18 +1256,20 @@ async def test_docdetails_merge_with_non_list_fields():
         citation=doc1.citation,
         publication_date=later_publication_date,
         docname=doc1.docname,
-        dockey="key2",
+        dockey=doc1.dockey,
         other={"bibtex_source": ["source2"], "client_source": "client2"},
     )
 
     # Merge the two DocDetails instances
     merged_doc = doc1 + doc2
 
-    # use set operations to check for containment
-    assert {"source1", "source2"}.issubset(merged_doc.other["bibtex_source"])
-    assert {"client1", "client2"}.issubset(merged_doc.other["client_source"])
-    # Check that the merged_doc is an instance of DocDetails
-    assert isinstance(merged_doc, DocDetails)
+    assert {"source1", "source2"}.issubset(
+        merged_doc.other["bibtex_source"]
+    ), "Expected merge to keep both bibtex sources"
+    assert {"client1", "client2"}.issubset(
+        merged_doc.other["client_source"]
+    ), "Expected merge to keep both client sources"
+    assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
 
 
 @pytest.mark.asyncio
@@ -1288,19 +1289,20 @@ def test_docdetails_merge_with_list_fields():
         citation=doc1.citation,
         publication_date=later_publication_date,
         docname=doc1.docname,
-        dockey="key2",
+        dockey=doc1.dockey,
         other={"bibtex_source": ["source2"], "client_source": ["client2"]},
     )
 
     # Merge the two DocDetails instances
     merged_doc = doc1 + doc2
 
-    # Check that 'other' fields are merged correctly
-    assert {"source1", "source2"}.issubset(merged_doc.other["bibtex_source"])
-    assert {"client1", "client2"}.issubset(merged_doc.other["client_source"])
-
-    # Check that the merged_doc is an instance of DocDetails
-    assert isinstance(merged_doc, DocDetails)
+    assert {"source1", "source2"}.issubset(
+        merged_doc.other["bibtex_source"]
+    ), "Expected merge to keep both bibtex sources"
+    assert {"client1", "client2"}.issubset(
+        merged_doc.other["client_source"]
+    ), "Expected merge to keep both client sources"
+    assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
 
 
 @pytest.mark.vcr
