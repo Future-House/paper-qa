@@ -281,7 +281,7 @@ class TestTaskDataset:
 
 
 @pytest.mark.asyncio
-async def test_docdetails_add():
+async def test_docdetails_merge_with_non_list_fields():
     # Create two DocDetails instances
     doc1 = DocDetails(
         citation="Citation 1",
