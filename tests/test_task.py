@@ -307,3 +307,28 @@ async def test_docdetails_add():
     assert {"client1", "client2"}.issubset(merged_doc.other["client_source"])
     # Check that the merged_doc is an instance of DocDetails
     assert isinstance(merged_doc, DocDetails)
+
+
+@pytest.mark.asyncio
+def test_docdetails_merge_with_list_fields():
+    doc1 = DocDetails(
+        citation="Citation 1",
+        publication_date=datetime(2023, 1, 1),
+        other={"bibtex_source": ["source1"], "client_source": ["client1"]},
+    )
+
+    doc2 = DocDetails(
+        citation="Citation 2",
+        publication_date=datetime(2024, 1, 1),
+        other={"bibtex_source": ["source2"], "client_source": ["client2"]},
+    )
+
+    # Merge the two DocDetails instances
+    merged_doc = doc1 + doc2
+
+    # Check that 'other' fields are merged correctly
+    assert {"source1", "source2"}.issubset(merged_doc.other["bibtex_source"])
+    assert {"client1", "client2"}.issubset(merged_doc.other["client_source"])
+
+    # Check that the merged_doc is an instance of DocDetails
+    assert isinstance(merged_doc, DocDetails)
