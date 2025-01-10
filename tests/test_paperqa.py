@@ -1272,7 +1272,6 @@ def test_docdetails_merge_with_non_list_fields():
     assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
 
 
-@pytest.mark.asyncio
 def test_docdetails_merge_with_list_fields():
     # Test merging a DocDetail that was republished
     initial_date = datetime(2023, 1, 1)
