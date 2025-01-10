@@ -33,7 +33,7 @@ def reformat_name(name: str) -> str:
     return f"{given_names} {family}"
 
 
-async def get_openalex_mailto() -> str | None:
+def get_openalex_mailto() -> str | None:
     """Get the OpenAlex mailto address.
 
     Returns:
@@ -71,7 +71,7 @@ async def get_doc_details_from_openalex(
         ValueError: If neither DOI nor title is provided.
         DOINotFoundError: If the paper cannot be found.
     """
-    mailto = await get_openalex_mailto()
+    mailto = get_openalex_mailto()
     params = {"mailto": mailto} if mailto else {}
 
     if doi is title is None:
@@ -126,10 +126,10 @@ async def get_doc_details_from_openalex(
         if doi and results_data.get("doi") != doi:
             raise DOINotFoundError(f"DOI {doi!r} not found in OpenAlex.")
 
-        return await parse_openalex_to_doc_details(results_data)
+        return parse_openalex_to_doc_details(results_data)
 
 
-async def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
+def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
     """Parse OpenAlex API response to DocDetails.
 
     Args:

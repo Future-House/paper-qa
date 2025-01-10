@@ -287,12 +287,12 @@ enable_all = true
 ignore = [
     "FURB101",  # Rely on ruff FURB101 for this
     "FURB103",  # Rely on ruff FURB103 for this
-    "FURB141",  # FURB141, FURB144, FURB146, FURB147, FURB150, FURB155: don't care to enforce pathlib
-    "FURB144",
-    "FURB146",
-    "FURB147",
-    "FURB150",
-    "FURB155",
+    "FURB141",  # Rely on ruff PTH110 for this
+    "FURB144",  # Rely on ruff PTH107 for this
+    "FURB146",  # Rely on ruff PTH113 for this
+    "FURB147",  # Rely on ruff PTH118 for this
+    "FURB150",  # Rely on ruff PTH102 for this
+    "FURB155",  # Rely on ruff PTH202 for this
 ]
 
 [tool.ruff]
@@ -310,10 +310,13 @@ preview = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
-    "A006",
+    "AIR301",
+    "AIR302",
+    "AIR303",
     "ASYNC116",
     "B901",
     "B909",
+    "B911",
     "C420",
     "DOC202",
     "DOC403",
@@ -359,6 +362,7 @@ extend-select = [
     "E305",
     "E306",
     "E502",
+    "FAST003",
     "FURB101",
     "FURB103",
     "FURB110",
@@ -379,32 +383,51 @@ extend-select = [
     "FURB166",
     "FURB171",
     "FURB180",
-    "FURB181",
-    "FURB188",
     "FURB189",
     "FURB192",
     "LOG015",
+    "PLC1802",
     "PLC1901",
     "PLC2701",
     "PLC2801",
     "PLE0304",
     "PLE1141",
     "PLE4703",
+    "PLR0202",
+    "PLR0203",
+    "PLR0916",
+    "PLR1733",
+    "PLR6104",
     "PLR6201",
     "PLW0108",
+    "PLW0177",
+    "PLW1507",
+    "PLW3201",
+    "PTH210",
     "PYI059",
+    "PYI061",
     "RUF027",
     "RUF028",
+    "RUF029",
     "RUF031",
-    "RUF032",
-    "RUF033",
-    "RUF034",
     "RUF035",
     "RUF036",
+    "RUF037",
     "RUF038",
     "RUF039",
+    "RUF040",
+    "RUF041",
+    "RUF043",
     "RUF048",
+    "RUF049",
+    "RUF051",
+    "RUF052",
+    "RUF055",
+    "RUF056",
+    "RUF057",
     "SIM905",
+    "TC007",
+    "TC008",
     "UP042",
     "UP044",
     "W391",
@@ -416,6 +439,7 @@ external = [
     "FURB",  # refurb
 ]
 ignore = [
+    "A005",  # Overly pedantic
     "ANN",  # Don't care to enforce typing
     "BLE001",  # Don't care to enforce blind exception catching
     "C901",  # we can be complex
@@ -453,6 +477,7 @@ ignore = [
     "PLW2901",  # Allow modifying loop variables
     "PTH",  # Overly pedantic
     "RUF027",  # Prompt templates may not be f-strings
+    "RUF052",  # Previous code uses leading underscore to indicate throwaway
     "S311",  # Ok to use python random
     "SLF001",  # Overly pedantic
     "T201",  # Overly pedantic
