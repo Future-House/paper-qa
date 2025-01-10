@@ -1241,7 +1241,7 @@ def test_dois_resolve_to_correct_journals(doi_journals):
 
 
 def test_docdetails_merge_with_non_list_fields() -> None:
-    """Check republication where the source metadata is the same shape."""
+    """Check republication where the source metadata has different shapes."""
     initial_date = datetime(2023, 1, 1)
     doc1 = DocDetails(
         citation="Citation 1",
