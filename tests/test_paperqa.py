@@ -1242,8 +1242,8 @@ def test_dois_resolve_to_correct_journals(doi_journals):
 
 @pytest.mark.asyncio
 async def test_docdetails_merge_with_non_list_fields():
-    # Test merging two DocDetails that were republished
-    # (so they have a new publication date but represent the same document)
+    # Test merging a DocDetail that was republished
+    # (so it has a new publication date but represents the same document)
     # Create two DocDetails instances
     doc1 = DocDetails(
         citation="Citation 1",
@@ -1273,8 +1273,9 @@ async def test_docdetails_merge_with_non_list_fields():
 
 @pytest.mark.asyncio
 def test_docdetails_merge_with_list_fields():
-    # Test merging two DocDetails that were republished
-    # (so they have a new publication date but represent the same document)
+    # Test merging a DocDetail that was republished
+    # (so it has a new publication date but represents the same document)
+    # Create two DocDetails instances
     doc1 = DocDetails(
         citation="Citation 1",
         publication_date=datetime(2023, 1, 1),
