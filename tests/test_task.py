@@ -314,12 +314,16 @@ def test_docdetails_merge_with_list_fields():
     doc1 = DocDetails(
         citation="Citation 1",
         publication_date=datetime(2023, 1, 1),
+        docname="Document 1",
+        dockey="key1",
         other={"bibtex_source": ["source1"], "client_source": ["client1"]},
     )
 
     doc2 = DocDetails(
         citation="Citation 2",
         publication_date=datetime(2024, 1, 1),
+        docname="Document 2",
+        dockey="key2",
         other={"bibtex_source": ["source2"], "client_source": ["client2"]},
     )
 
