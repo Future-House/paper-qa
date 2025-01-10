@@ -8,19 +8,15 @@ from enum import StrEnum
 from typing import Any, ClassVar, Protocol
 from uuid import UUID, uuid4
 
-from aviary.utils import MultipleChoiceQuestion
 from llmclient import LiteLLMModel, LLMModel
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    PrivateAttr,
     ValidationInfo,
-    computed_field,
     field_validator,
 )
 
-from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.version import __version__
 
@@ -51,44 +47,6 @@ class MismatchedModelsError(Exception):
     """Error to throw when model clients clash ."""
 
     LOG_METHOD_NAME: ClassVar[str] = "warning"
-
-
-class QueryRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    query: str | MultipleChoiceQuestion = Field(
-        default="",
-        description=(
-            "The query to be answered. Set to a multiple choice question when grading"
-            " (e.g. for training)."
-        ),
-    )
-    id: UUID = Field(
-        default_factory=uuid4,
-        description="Identifier which will be propagated to the Answer object.",
-    )
-    settings_template: str | None = None
-    settings: Settings = Field(default_factory=Settings, validate_default=True)
-    # provides post-hoc linkage of request to a docs object
-    # NOTE: this isn't a unique field, on the user to keep straight
-    _docs_name: str | None = PrivateAttr(default=None)
-
-    @field_validator("settings")
-    @classmethod
-    def apply_settings_template(cls, v: Settings, info: ValidationInfo) -> Settings:
-        if info.data["settings_template"] and isinstance(v, Settings):
-            base_settings = Settings.from_name(info.data["settings_template"])
-            return Settings(**(base_settings.model_dump() | v.model_dump()))
-        return v
-
-    @computed_field  # type: ignore[prop-decorator]
-    @property
-    def docs_name(self) -> str | None:
-        return self._docs_name
-
-    def set_docs_name(self, docs_name: str) -> None:
-        """Set the internal docs name for tracking."""
-        self._docs_name = docs_name
 
 
 class AnswerResponse(BaseModel):

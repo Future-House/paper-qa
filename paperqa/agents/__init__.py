@@ -15,7 +15,7 @@ from paperqa.utils import get_loop, pqa_directory, setup_default_logs
 from paperqa.version import __version__
 
 from .main import agent_query, index_search
-from .models import AnswerResponse, QueryRequest
+from .models import AnswerResponse
 from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
@@ -102,10 +102,7 @@ def ask(query: str | MultipleChoiceQuestion, settings: Settings) -> AnswerRespon
     """Query PaperQA via an agent."""
     configure_cli_logging(settings)
     return get_loop().run_until_complete(
-        agent_query(
-            QueryRequest(query=query, settings=settings),
-            agent_type=settings.agent.agent_type,
-        )
+        agent_query(query, settings, agent_type=settings.agent.agent_type)
     )
 
 

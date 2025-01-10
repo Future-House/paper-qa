@@ -321,13 +321,11 @@ answer_response = ask(
 `ask` is just a convenience wrapper around the real entrypoint, which can be accessed if you'd like to run concurrent asynchronous workloads:
 
 ```python
-from paperqa import Settings, agent_query, QueryRequest
+from paperqa import Settings, agent_query
 
 answer_response = await agent_query(
-    QueryRequest(
-        query="What manufacturing challenges are unique to bispecific antibodies?",
-        settings=Settings(temperature=0.5, paper_directory="my_papers"),
-    )
+    query="What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
 
@@ -682,7 +680,6 @@ import os
 
 from paperqa import Settings
 from paperqa.agents.main import agent_query
-from paperqa.agents.models import QueryRequest
 from paperqa.agents.search import get_directory_index
 
 
@@ -696,15 +693,12 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
 
     # 2. Use the settings as many times as you want with ask
     answer_response_1 = await agent_query(
-        query=QueryRequest(
-            query="What is the best way to make a vaccine?", settings=settings
-        )
+        query="What is the best way to make a vaccine?",
+        settings=settings,
     )
     answer_response_2 = await agent_query(
-        query=QueryRequest(
-            query="What manufacturing challenges are unique to bispecific antibodies?",
-            settings=settings,
-        )
+        query="What manufacturing challenges are unique to bispecific antibodies?",
+        settings=settings,
     )
 ```
 
@@ -726,15 +720,13 @@ from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 
-from paperqa import QueryRequest, Settings
+from paperqa import Settings
 from paperqa.agents.task import TASK_DATASET_NAME
 
 
 async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
-    base_query = QueryRequest(
-        settings=Settings(paper_directory=folder_of_litqa_v2_papers)
-    )
-    dataset = TaskDataset.from_name(TASK_DATASET_NAME, base_query=base_query)
+    settings = Settings(paper_directory=folder_of_litqa_v2_papers)
+    dataset = TaskDataset.from_name(TASK_DATASET_NAME, settings=settings)
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
     evaluator = Evaluator(

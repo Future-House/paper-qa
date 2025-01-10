@@ -12,7 +12,7 @@ from ldp.alg.callbacks import Callback, MeanMetricsCallback, StoreTrajectoriesCa
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 from pytest_subtests import SubTests
 
-from paperqa import Docs, QueryRequest, Settings
+from paperqa import Docs, Settings
 from paperqa.agents import get_directory_index
 from paperqa.agents.env import PaperQAEnvironment
 from paperqa.agents.task import (
@@ -25,10 +25,10 @@ from paperqa.agents.tools import GenerateAnswer
 from paperqa.litqa import DEFAULT_REWARD_MAPPING
 
 
-@pytest.fixture(name="base_query_request")
-def fixture_base_query_request(agent_test_settings: Settings) -> QueryRequest:
+@pytest.fixture(name="agent_task_settings")
+def fixture_agent_task_settings(agent_test_settings: Settings) -> Settings:
     agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
-    return QueryRequest(settings=agent_test_settings)
+    return agent_test_settings
 
 
 class StubLitQADataset(LitQATaskDataset):
@@ -89,9 +89,8 @@ class StoreEnvCallback(Callback):
         self.query_to_envs: dict[str, PaperQAEnvironment] = {}
 
     async def before_rollout(self, traj_id: str, env) -> None:  # noqa: ARG002
-        query: str | MultipleChoiceQuestion = env._query.query
         self.query_to_envs[
-            query if isinstance(query, str) else query.question_prompt
+            env._query if isinstance(env._query, str) else env._query.question_prompt
         ] = env
 
 
@@ -111,10 +110,10 @@ class TestTaskDataset:
         self,
         split: LitQAv2TaskSplit,
         expected_length: int,
-        base_query_request: QueryRequest,
+        agent_task_settings: Settings,
     ) -> None:
         task_dataset = LitQAv2TaskDataset(
-            base_query=base_query_request,
+            settings=agent_task_settings,
             question_kwargs={"shuffle_seed": 42},
             read_data_kwargs={"seed": 42},
             split=split,
@@ -145,21 +144,21 @@ class TestTaskDataset:
 
     @pytest.mark.asyncio
     async def test_can_validate_stub_dataset_sources(
-        self, base_query_request: QueryRequest
+        self, agent_task_settings: Settings
     ) -> None:
-        ds = StubLitQADataset(base_query=base_query_request)
+        ds = StubLitQADataset(settings=agent_task_settings)
         await asyncio.gather(
             *(ds.get_new_env_by_idx(i).validate_sources() for i in range(len(ds)))
         )
 
     @pytest.mark.asyncio
     async def test_evaluation(
-        self, subtests: SubTests, base_query_request: QueryRequest
+        self, subtests: SubTests, agent_task_settings: Settings
     ) -> None:
-        await get_directory_index(settings=base_query_request.settings)  # Build
+        await get_directory_index(settings=agent_task_settings)  # Build
         docs = Docs()
         raw_docs_deepcopy = deepcopy(docs)  # Preserve for later assertions
-        # Why are we constructing a TaskConfig here using a serialized QueryRequest and
+        # Why are we constructing a TaskConfig here using a serialized Settings and
         # Docs? It's to confirm everything works as if hydrating from a YAML config file
         task_config = TaskConfig(
             name=STUB_TASK_DATASET_NAME,
@@ -179,12 +178,11 @@ class TestTaskDataset:
             },
         )
         # NOTE: set base_query after construction of the TaskConfig. because in
-        # aviary 0.10 the TaskConfig Pydnatic model has types `BaseModel | JsonValue`,
-        # which lead to base_query being cast into a BaseModel. This is probably a bug
+        # aviary 0.10 the TaskConfig Pydantic model has types `BaseModel | JsonValue`,
+        # which lead to settings being cast into a BaseModel. This is probably a bug
         # in aviary, but for now let's just assign it after TaskConfig construction
-        task_config.eval_kwargs["base_query"] = base_query_request.model_dump(
-            exclude={"id", "docs_name"}
-        )
+        task_config.eval_kwargs["settings"] = agent_task_settings.model_dump()
+        original_agent_task_settings = agent_task_settings.model_copy(deep=True)
         dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
         assert isinstance(dataset, StubLitQADataset), "Test assertions depend on this"
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
@@ -199,8 +197,8 @@ class TestTaskDataset:
         await evaluator.evaluate()
 
         assert (
-            not base_query_request.query
-        ), "Should not have mutated query in base request"
+            agent_task_settings == original_agent_task_settings
+        ), "Should not have mutated settings"
         assert not docs.docs, "Should not have mutated docs in base docs"
         assert (
             metrics_callback.eval_means["total_paper_count"] > 0
@@ -230,12 +228,10 @@ class TestTaskDataset:
 
         with subtests.test(msg="zero-shot"):
             # Confirm we can just directly call gen_answer
-            base_query_request.settings.agent.tool_names = {
-                GenerateAnswer.gen_answer.__name__
-            }
-            base_query_request.settings.answer.max_answer_attempts = 2
-            base_query_request.settings.answer.get_evidence_if_no_contexts = False
-            dataset = LitQAv2TaskDataset(base_query=base_query_request)
+            agent_task_settings.agent.tool_names = {GenerateAnswer.gen_answer.__name__}
+            agent_task_settings.answer.max_answer_attempts = 2
+            agent_task_settings.answer.get_evidence_if_no_contexts = False
+            dataset = LitQAv2TaskDataset(settings=agent_task_settings)
             dataset.data = dataset.data[:2]  # Save the world: just use two questions
             storage_callback = StoreTrajectoriesCallback()
             evaluator = Evaluator(
@@ -256,10 +252,10 @@ class TestTaskDataset:
 
     @pytest.mark.vcr
     @pytest.mark.asyncio
-    async def test_tool_failure(self, base_query_request: QueryRequest) -> None:
+    async def test_tool_failure(self, agent_task_settings: Settings) -> None:
         docs = Docs()
         dataset = TaskDataset.from_name(
-            STUB_TASK_DATASET_NAME, base_query=base_query_request, base_docs=docs
+            STUB_TASK_DATASET_NAME, settings=agent_task_settings, base_docs=docs
         )
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
