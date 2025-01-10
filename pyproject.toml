@@ -287,12 +287,12 @@ enable_all = true
 ignore = [
     "FURB101",  # Rely on ruff FURB101 for this
     "FURB103",  # Rely on ruff FURB103 for this
-    "FURB141",  # FURB141, FURB144, FURB146, FURB147, FURB150, FURB155: don't care to enforce pathlib
-    "FURB144",
-    "FURB146",
-    "FURB147",
-    "FURB150",
-    "FURB155",
+    "FURB141",  # Rely on ruff PTH110 for this
+    "FURB144",  # Rely on ruff PTH107 for this
+    "FURB146",  # Rely on ruff PTH113 for this
+    "FURB147",  # Rely on ruff PTH118 for this
+    "FURB150",  # Rely on ruff PTH102 for this
+    "FURB155",  # Rely on ruff PTH202 for this
 ]
 
 [tool.ruff]
