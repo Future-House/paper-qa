@@ -23,7 +23,6 @@ from paperqa.agents.task import (
 )
 from paperqa.agents.tools import GenerateAnswer
 from paperqa.litqa import DEFAULT_REWARD_MAPPING
-from paperqa.types import DocDetails
 
 
 @pytest.fixture(name="base_query_request")

@@ -6,9 +6,9 @@ import re
 import textwrap
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
+from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from datetime import datetime
 from typing import cast
 
 import httpx
@@ -1238,6 +1238,7 @@ def test_answer_rename(recwarn) -> None:
 def test_dois_resolve_to_correct_journals(doi_journals):
     details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
     assert details.journal == doi_journals["journal"]
+
 
 @pytest.mark.asyncio
 async def test_docdetails_merge_with_non_list_fields():
