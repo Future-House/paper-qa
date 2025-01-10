@@ -529,10 +529,9 @@ async def test_ensure_robust_to_timeouts() -> None:
     assert details is None, "Should return None for timeout"
 
 
-@pytest.mark.asyncio
-async def test_bad_init() -> None:
+def test_bad_init() -> None:
     with pytest.raises(
-        ValueError, match="At least one MetadataProvider must be provided."
+        ValueError, match=r"At least one MetadataProvider must be provided."
     ):
         client = DocMetadataClient(clients=[])  # noqa: F841
 
