@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Iterable
 from copy import deepcopy
+from datetime import datetime
 from unittest.mock import patch
 
 import pytest
@@ -22,6 +23,7 @@ from paperqa.agents.task import (
 )
 from paperqa.agents.tools import GenerateAnswer
 from paperqa.litqa import DEFAULT_REWARD_MAPPING
+from paperqa.types import DocDetails
 
 
 @pytest.fixture(name="base_query_request")
@@ -276,3 +278,32 @@ class TestTaskDataset:
         mock_SearchIndex.assert_called(), "Expected failures to come from unit test"
         assert metrics_callback.eval_means["correct"] == 0.0
         assert metrics_callback.eval_means["correct_unsure"] == 0.0
+
+
+@pytest.mark.asyncio
+async def test_docdetails_add():
+    # Create two DocDetails instances
+    doc1 = DocDetails(
+        citation="Citation 1",
+        publication_date=datetime(2023, 1, 1),
+        docname="Document 1",
+        dockey="key1",
+        other={"bibtex_source": "source1", "client_source": ["client1"]},
+    )
+
+    doc2 = DocDetails(
+        citation="Citation 2",
+        publication_date=datetime(2024, 1, 1),
+        docname="Document 2",
+        dockey="key2",
+        other={"bibtex_source": ["source2"], "client_source": "client2"},
+    )
+
+    # Merge the two DocDetails instances
+    merged_doc = doc1 + doc2
+
+    # use set operations to check for containment
+    assert {"source1", "source2"}.issubset(merged_doc.other["bibtex_source"])
+    assert {"client1", "client2"}.issubset(merged_doc.other["client_source"])
+    # Check that the merged_doc is an instance of DocDetails
+    assert isinstance(merged_doc, DocDetails)
