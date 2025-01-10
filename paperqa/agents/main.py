@@ -166,10 +166,11 @@ async def _run_with_timeout_failure(
         generate_answer_tool = next(
             filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
         )
-        await generate_answer_tool._tool_fn(state=env.state)
-        env.state.record_action(
-            ToolRequestMessage(tool_calls=[ToolCall.from_tool(generate_answer_tool)])
+        action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_tool(generate_answer_tool)]
         )
+        await env.exec_tool_calls(message=action, state=env.state, handle_tool_exc=True)
+        env.state.record_action(action)
     return env.state.session, status
 
 
