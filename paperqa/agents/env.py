@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
 from typing import Any, ClassVar, Self, cast
+from uuid import UUID
 
 from aviary.core import (
     Environment,
@@ -23,7 +24,6 @@ from paperqa.sources.clinical_trials import (
 from paperqa.types import PQASession
 from paperqa.utils import get_year
 
-from .models import QueryRequest
 from .tools import (
     AVAILABLE_TOOL_NAME_TO_CLASS,
     DEFAULT_TOOL_NAMES,
@@ -207,25 +207,27 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
 
     def __init__(
         self,
-        query: QueryRequest,
+        query: str | MultipleChoiceQuestion,
+        settings: Settings,
         docs: Docs,
         llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
         summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
         embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
+        session_id: UUID | None = None,
         **env_kwargs,
     ):
         super().__init__(**env_kwargs)
-        # Hold onto QueryRequest to create fresh tools and answer during each reset
         self._query = query
-        # Hold onto Docs to clear and reuse in state during each reset
+        self._settings = settings
         self._docs = docs
         self._llm_model = llm_model
         self._summary_llm_model = summary_llm_model
         self._embedding_model = embedding_model
+        self._session_id = session_id
 
     def make_tools(self) -> list[Tool]:
         return settings_to_tools(
-            settings=self._query.settings,
+            settings=self._settings,
             llm_model=self._llm_model,
             summary_llm_model=self._summary_llm_model,
             embedding_model=self._embedding_model,
@@ -235,17 +237,23 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         status_fn = None
 
         if ClinicalTrialsSearch.TOOL_FN_NAME in (
-            self._query.settings.agent.tool_names or DEFAULT_TOOL_NAMES
+            self._settings.agent.tool_names or DEFAULT_TOOL_NAMES
         ):
             status_fn = clinical_trial_status
 
-        query: str | MultipleChoiceQuestion = self._query.query
+        session_kwargs: dict[str, Any] = {}
+        if self._session_id:
+            session_kwargs["id"] = self._session_id
         return EnvironmentState(
             docs=self._docs,
             session=PQASession(
-                question=query if isinstance(query, str) else query.question_prompt,
-                config_md5=self._query.settings.md5,
-                id=self._query.id,
+                question=(
+                    self._query
+                    if isinstance(self._query, str)
+                    else self._query.question_prompt
+                ),
+                config_md5=self._settings.md5,
+                **session_kwargs,
             ),
             status_fn=status_fn,
         )
@@ -259,7 +267,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         return (
             [
                 Message(
-                    content=self._query.settings.agent.agent_prompt.format(
+                    content=self._settings.agent.agent_prompt.format(
                         question=self.state.session.question,
                         status=self.state.status,
                         complete_tool_name=Complete.TOOL_FN_NAME,
@@ -273,7 +281,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         return Frame(state=self.state, info={"query": self._query})
 
     def _has_excess_answer_failures(self) -> bool:
-        if self._query.settings.answer.max_answer_attempts is None:
+        if self._settings.answer.max_answer_attempts is None:
             return False
         return (
             sum(
@@ -281,7 +289,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
                 for s in self.state.session.tool_history
                 for tn in s
             )
-            > self._query.settings.answer.max_answer_attempts
+            > self._settings.answer.max_answer_attempts
         )
 
     USE_POST_PROCESSED_REWARD: ClassVar[float] = 0.0
@@ -331,7 +339,8 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             )
         }
         copy_self = type(self)(
-            query=deepcopy(self._query, memo),  # deepcopy for _docs_name
+            query=self._query,  # No need to copy since we read only
+            settings=deepcopy(self._settings, memo),  # Deepcopy just to be safe
             docs=copy_state.docs,
             **env_model_kwargs,
         )

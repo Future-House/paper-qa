@@ -14,7 +14,6 @@ from llmclient import (
 
 from paperqa.agents import ask
 from paperqa.agents.main import agent_query
-from paperqa.agents.models import QueryRequest
 from paperqa.docs import Docs, PQASession, print_callback
 from paperqa.llms import (
     NumpyVectorStore,
@@ -46,7 +45,6 @@ __all__ = [
     "NumpyVectorStore",
     "PQASession",
     "QdrantVectorStore",
-    "QueryRequest",
     "SentenceTransformerEmbeddingModel",
     "Settings",
     "SparseEmbeddingModel",
