@@ -6,7 +6,7 @@ import re
 import textwrap
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import cast
@@ -1243,17 +1243,19 @@ def test_dois_resolve_to_correct_journals(doi_journals):
 @pytest.mark.asyncio
 async def test_docdetails_merge_with_non_list_fields():
     # Test merging a DocDetail that was republished
+    initial_date = datetime(2023, 1, 1)
     doc1 = DocDetails(
         citation="Citation 1",
-        publication_date=datetime(2023, 1, 1),
+        publication_date=initial_date,
         docname="Document 1",
         dockey="key1",
         other={"bibtex_source": "source1", "client_source": ["client1"]},
     )
 
+    later_publication_date = initial_date + timedelta(weeks=13)
     doc2 = DocDetails(
         citation=doc1.citation,
-        publication_date=datetime(2024, 1, 1),
+        publication_date=later_publication_date,
         docname=doc1.docname,
         dockey="key2",
         other={"bibtex_source": ["source2"], "client_source": "client2"},
@@ -1272,17 +1274,19 @@ async def test_docdetails_merge_with_non_list_fields():
 @pytest.mark.asyncio
 def test_docdetails_merge_with_list_fields():
     # Test merging a DocDetail that was republished
+    initial_date = datetime(2023, 1, 1)
     doc1 = DocDetails(
         citation="Citation 1",
-        publication_date=datetime(2023, 1, 1),
+        publication_date=initial_date,
         docname="Document 1",
         dockey="key1",
         other={"bibtex_source": ["source1"], "client_source": ["client1"]},
     )
 
+    later_publication_date = initial_date + timedelta(weeks=13)
     doc2 = DocDetails(
         citation=doc1.citation,
-        publication_date=datetime(2024, 1, 1),
+        publication_date=later_publication_date,
         docname=doc1.docname,
         dockey="key2",
         other={"bibtex_source": ["source2"], "client_source": ["client2"]},
