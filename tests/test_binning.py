@@ -3,7 +3,7 @@ from collections.abc import Collection
 import pytest
 from llmclient import MultipleCompletionLLMModel as LLMModel
 
-from paperqa.binning import BinningFunction, llm_categorize_then_bin
+from paperqa.binning import BinningFunction, llm_categorize_then_bin, llm_tournament_bin
 
 
 @pytest.mark.parametrize(
@@ -61,7 +61,9 @@ from paperqa.binning import BinningFunction, llm_categorize_then_bin
         ),
     ],
 )
-@pytest.mark.parametrize("binning_function", [llm_categorize_then_bin])
+@pytest.mark.parametrize(
+    "binning_function", [llm_categorize_then_bin, llm_tournament_bin]
+)
 @pytest.mark.asyncio
 async def test_llm_categorize_then_bin(
     binning_function: BinningFunction,
