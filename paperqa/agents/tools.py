@@ -201,9 +201,9 @@ class GatherEvidence(NamedTool):
         """
         Gather evidence from previous papers given a specific question to increase evidence and relevant paper counts.
 
+        This tool is only useful when the paper count is above zero.
         A valuable time to invoke this tool is right after another tool increases paper count.
         Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
-        Only invoke this tool when the paper count is above zero, or this tool will be useless.
 
         Args:
             question: Specific question to gather evidence for.
@@ -291,6 +291,7 @@ class GenerateAnswer(NamedTool):
         """
         Generate an answer using current evidence.
 
+        This tool is only useful when the current evidence is above zero.
         The tool may fail, indicating that better or different evidence should be found.
         Aim for at least five pieces of evidence from multiple sources before invoking this tool.
         Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
@@ -360,9 +361,8 @@ class Reset(NamedTool):
         """
         Reset by clearing all current evidence from the system.
 
-        This tool is useful when repeatedly failing to answer because the existing evidence may unsuitable for the question.
-        It does not make sense to call this tool in parallel with other tools, as its resetting all state.
-        Only invoke this tool when the current evidence is above zero, or this tool will be useless.
+        This tool is only useful when the current evidence is above zero and repeatedly failing to answer because the existing evidence may unsuitable for the question.
+        It does not make sense to call this tool in parallel with other tools, as it's resetting all state.
         """  # noqa: E501,W505
         logger.info(f"Resetting '{state.session.question}'.")
         state.session.contexts = []

@@ -665,13 +665,11 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             "info": {
                 "name": "reset",
                 "description": (
-                    "Reset by clearing all current evidence from the system."
-                    "\n\nThis tool is useful when repeatedly failing to answer because"
-                    " the existing evidence may unsuitable for the question.\nIt does"
-                    " not make sense to call this tool in parallel with other tools,"
-                    " as its resetting all state.\n"
-                    "Only invoke this tool when the current evidence is above"
-                    " zero, or this tool will be useless."
+                    "Reset by clearing all current evidence from the system.\n\nThis"
+                    " tool is only useful when the current evidence is above zero and"
+                    " repeatedly failing to answer because the existing evidence may"
+                    " unsuitable for the question.\nIt does not make sense to call this"
+                    " tool in parallel with other tools, as it's resetting all state."
                 ),
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
@@ -681,8 +679,9 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             "info": {
                 "name": "gen_answer",
                 "description": (
-                    "Generate an answer using current evidence.\n\nThe tool may fail,"
-                    " indicating that better or different evidence should be"
+                    "Generate an answer using current evidence.\n\nThis tool is only"
+                    " useful when the current evidence is above zero.\nThe tool may"
+                    " fail, indicating that better or different evidence should be"
                     " found.\nAim for at least five pieces of evidence from multiple"
                     " sources before invoking this tool.\nFeel free to invoke this tool"
                     " in parallel with other tools, but do not call this tool in"
@@ -696,13 +695,12 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             "info": {
                 "name": "gather_evidence",
                 "description": (
-                    "Gather evidence from previous papers given a specific question"
-                    " to increase evidence and relevant paper counts.\n\nA valuable"
-                    " time to invoke this tool is right after another tool"
-                    " increases paper count.\nFeel free to invoke this tool in"
-                    " parallel with other tools, but do not call this tool in"
-                    " parallel with itself.\nOnly invoke this tool when the paper"
-                    " count is above zero, or this tool will be useless."
+                    "Gather evidence from previous papers given a specific question to"
+                    " increase evidence and relevant paper counts.\n\nThis tool is only"
+                    " useful when the paper count is above zero.\nA valuable time to"
+                    " invoke this tool is right after another tool increases paper"
+                    " count.\nFeel free to invoke this tool in parallel with other"
+                    " tools, but do not call this tool in parallel with itself."
                 ),
                 "parameters": {
                     "type": "object",
