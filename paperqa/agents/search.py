@@ -9,7 +9,7 @@ import pathlib
 import pickle
 import warnings
 import zlib
-from collections.abc import Awaitable, Callable, Collection, Sequence
+from collections.abc import Callable, Collection, Sequence
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID
@@ -456,7 +456,7 @@ async def process_file(
     manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
-    progress_bar_update: Callable[[], Awaitable] | None = None,
+    progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
@@ -500,7 +500,7 @@ async def process_file(
                 # separate process_file invocation leads to a segfault or crash
                 await search_index.save_index()
                 if progress_bar_update:
-                    await progress_bar_update()
+                    progress_bar_update()
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
@@ -527,7 +527,7 @@ async def process_file(
 
         # Update progress bar for either a new or previously indexed file
         if progress_bar_update:
-            await progress_bar_update()
+            progress_bar_update()
 
 
 WARN_IF_INDEXING_MORE_THAN = 999
@@ -535,7 +535,7 @@ WARN_IF_INDEXING_MORE_THAN = 999
 
 def _make_progress_bar_update(
     sync_index_w_directory: bool, total: int
-) -> tuple[contextlib.AbstractContextManager, Callable[[], Awaitable] | None]:
+) -> tuple[contextlib.AbstractContextManager, Callable[[], Any] | None]:
     # Disable should override enable
     env_var_disable = (
         os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
@@ -562,7 +562,7 @@ def _make_progress_bar_update(
         )
         task_id = progress.add_task("Indexing...", total=total)
 
-        async def progress_bar_update() -> None:
+        def progress_bar_update() -> None:
             progress.update(task_id, advance=1)
 
         return progress, progress_bar_update

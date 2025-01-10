@@ -331,7 +331,9 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     thoughts: list[str] = []
     orig_llm_model_call = MultipleCompletionLLMModel.call
 
-    async def on_agent_action(action: OpResult[ToolRequestMessage], *_) -> None:
+    async def on_agent_action(  # noqa: RUF029
+        action: OpResult[ToolRequestMessage], *_
+    ) -> None:
         thoughts.append(extract_thought(content=action.value.content))
 
     async def llm_model_call(*args, **kwargs):
@@ -415,7 +417,7 @@ async def test_gather_evidence_rejects_empty_docs(
 ) -> None:
 
     @wraps(GenerateAnswer.gen_answer)
-    async def gen_answer(self, state) -> str:  # noqa: ARG001
+    async def gen_answer(self, state) -> str:  # noqa: ARG001, RUF029
         return f"{CANNOT_ANSWER_PHRASE}."
 
     # Patch GenerateAnswerTool.gen_answer so that if this tool is chosen first,
@@ -919,7 +921,7 @@ class TestGradablePaperQAEnvironment:
     ) -> None:
         unsure_answer = "Based on the sources provided, it appears no one has done x."
 
-        async def emulate_answered_but_unsure(
+        async def emulate_answered_but_unsure(  # noqa: RUF029
             *_, query: PQASession, **__
         ) -> PQASession:
             query.answer = unsure_answer
