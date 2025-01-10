@@ -1240,14 +1240,15 @@ def test_dois_resolve_to_correct_journals(doi_journals):
     assert details.journal == doi_journals["journal"]
 
 
-def test_docdetails_merge_with_non_list_fields():
-    # Test merging a DocDetail that was republished
+def test_docdetails_merge_with_non_list_fields() -> None:
+    """Check republication where the source metadata is the same shape."""
     initial_date = datetime(2023, 1, 1)
     doc1 = DocDetails(
         citation="Citation 1",
         publication_date=initial_date,
         docname="Document 1",
         dockey="key1",
+        # NOTE: doc1 has non-list bibtex_source and list client_source
         other={"bibtex_source": "source1", "client_source": ["client1"]},
     )
 
@@ -1257,6 +1258,7 @@ def test_docdetails_merge_with_non_list_fields():
         publication_date=later_publication_date,
         docname=doc1.docname,
         dockey=doc1.dockey,
+        # NOTE: doc2 has list bibtex_source and non-list client_source
         other={"bibtex_source": ["source2"], "client_source": "client2"},
     )
 
@@ -1272,14 +1274,15 @@ def test_docdetails_merge_with_non_list_fields():
     assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
 
 
-def test_docdetails_merge_with_list_fields():
-    # Test merging a DocDetail that was republished
+def test_docdetails_merge_with_list_fields() -> None:
+    """Check republication where the source metadata is the same shape."""
     initial_date = datetime(2023, 1, 1)
     doc1 = DocDetails(
         citation="Citation 1",
         publication_date=initial_date,
         docname="Document 1",
         dockey="key1",
+        # NOTE: doc1 has list bibtex_source and list client_source
         other={"bibtex_source": ["source1"], "client_source": ["client1"]},
     )
 
@@ -1289,6 +1292,7 @@ def test_docdetails_merge_with_list_fields():
         publication_date=later_publication_date,
         docname=doc1.docname,
         dockey=doc1.dockey,
+        # NOTE: doc2 has list bibtex_source and list client_source
         other={"bibtex_source": ["source2"], "client_source": ["client2"]},
     )
 
