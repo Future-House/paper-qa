@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Iterable
 from copy import deepcopy
+from typing import ClassVar
 from unittest.mock import patch
 
 import pytest
@@ -95,6 +96,7 @@ class StoreEnvCallback(Callback):
 
 
 class TestTaskDataset:
+    EXPECTED_LENGTHS: ClassVar[tuple[int, ...]] = (159, 40, 49)
 
     @pytest.mark.parametrize(
         ("split", "expected_length"),
@@ -107,7 +109,7 @@ class TestTaskDataset:
     @pytest.mark.asyncio
     async def test___len__(
         self,
-        split: str | LitQAv2TaskSplit,
+        split: LitQAv2TaskSplit,
         expected_length: int,
         base_query_request: QueryRequest,
     ) -> None:
@@ -117,7 +119,11 @@ class TestTaskDataset:
             read_data_kwargs={"seed": 42},
             split=split,
         )
-        assert len(task_dataset) == expected_length
+        assert (
+            len(task_dataset)
+            == expected_length
+            == self.EXPECTED_LENGTHS[split.get_index()]
+        )
 
         # Now let's check we could use the sources in a validation
         for i in range(len(task_dataset)):
