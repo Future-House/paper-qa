@@ -411,6 +411,20 @@ class LitQAv2TaskSplit(StrEnum):
     EVAL = "eval"
     TEST = "test"
 
+    def get_index(self) -> int:
+        """
+        Get the index of the train (0), eval (1), or test (2) split.
+
+        NOTE: the value matches the index in read_litqa_v2_from_hub's returned splits.
+        """
+        if self == self.TRAIN:
+            return 0
+        if self == self.EVAL:
+            return 1
+        if self == self.TEST:
+            return 2
+        assert_never(self)  # type: ignore[arg-type]
+
 
 class LitQAv2TaskDataset(LitQATaskDataset):
     """Task dataset of LitQA v2 questions."""
@@ -425,18 +439,10 @@ class LitQAv2TaskDataset(LitQATaskDataset):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        train_df, eval_df, test_df = read_litqa_v2_from_hub(
+        split_dfs = read_litqa_v2_from_hub(
             train_eval_dataset, test_dataset, **(read_data_kwargs or {})
         )
-        split = LitQAv2TaskSplit(split)
-        if split == LitQAv2TaskSplit.TRAIN:
-            self.data = train_df
-        elif split == LitQAv2TaskSplit.EVAL:
-            self.data = eval_df
-        elif split == LitQAv2TaskSplit.TEST:
-            self.data = test_df
-        else:
-            assert_never(split)
+        self.data = split_dfs[LitQAv2TaskSplit(split).get_index()]
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         sources = []
