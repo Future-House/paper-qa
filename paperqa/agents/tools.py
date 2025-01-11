@@ -227,11 +227,12 @@ class GatherEvidence(NamedTool):
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.session.question
+        l1_all = l1_relevant = l0 = len(state.session.contexts)
+
         try:
             # Swap out the question with the more specific question
             # TODO: remove this swap, as it prevents us from supporting parallel calls
             state.session.question = question
-            l0 = len(state.session.contexts)
 
             # TODO: refactor answer out of this...
             state.session = await state.docs.aget_evidence(
@@ -244,7 +245,14 @@ class GatherEvidence(NamedTool):
                     f"{self.TOOL_FN_NAME}_aget_evidence"
                 ),
             )
-            l1 = len(state.session.contexts)
+            l1_all = len(state.session.contexts)
+            l1_relevant = len(
+                [
+                    c
+                    for c in state.session.contexts
+                    if c.score > state.RELEVANT_SCORE_CUTOFF
+                ]
+            )
         finally:
             state.session.question = original_question
 
@@ -275,7 +283,10 @@ class GatherEvidence(NamedTool):
                 )
             )
 
-        return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
+        return (
+            f"Added {l1_all - l0} pieces of evidence, {l1_relevant - l0} of which were"
+            f" relevant.{best_evidence}\n\n" + status
+        )
 
 
 class GenerateAnswer(NamedTool):
