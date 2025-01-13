@@ -92,6 +92,8 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
+            # NOTE: Text.doc is typed as a `Doc`. But it should be a `DocDetails`.
+            # TODO: Change the type of Text.doc to DocDetails | Doc.
             doc = cast(DocDetails, cast(Docs, obj).texts[0].doc)
             try:
                 display_name = cast(str, doc.title)

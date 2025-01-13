@@ -65,7 +65,7 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
     )
     found_answer = search_result[0][0]
     assert isinstance(found_answer, AnswerResponse)
-    assert found_answer.model_dump_json() == response.model_dump_json()
+    assert found_answer.model_dump() == response.model_dump()
 
 
 def test_cli_can_build_and_search_index(

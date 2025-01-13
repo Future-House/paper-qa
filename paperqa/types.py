@@ -94,7 +94,7 @@ class Doc(Embeddable):
 class Text(Embeddable):
     text: str
     name: str
-    doc: Doc
+    doc: Doc | DocDetails
 
     def __hash__(self) -> int:
         return hash(self.text)

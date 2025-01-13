@@ -684,6 +684,7 @@ def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         embedding_model=SparseEmbeddingModel(),
     )
     assert isinstance(docs.texts[0].embedding, list)
+    assert any(docs.texts[0].embedding)
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -706,6 +707,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         embedding_model=emb_model,
     )
     assert isinstance(docs.texts[0].embedding, list)
+    assert any(docs.texts[0].embedding)
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
