@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from aviary.utils import MultipleChoiceQuestion
 from pydantic_settings import CliSettingsSource
 from rich.logging import RichHandler
 
@@ -14,7 +15,7 @@ from paperqa.utils import get_loop, pqa_directory, setup_default_logs
 from paperqa.version import __version__
 
 from .main import agent_query, index_search
-from .models import AnswerResponse, QueryRequest
+from .models import AnswerResponse
 from .search import SearchIndex, get_directory_index
 
 logger = logging.getLogger(__name__)
@@ -97,19 +98,16 @@ def configure_cli_logging(verbosity: int | Settings = 0) -> None:
         print(f"PaperQA version: {__version__}")
 
 
-def ask(query: str, settings: Settings) -> AnswerResponse:
+def ask(query: str | MultipleChoiceQuestion, settings: Settings) -> AnswerResponse:
     """Query PaperQA via an agent."""
     configure_cli_logging(settings)
     return get_loop().run_until_complete(
-        agent_query(
-            QueryRequest(query=query, settings=settings),
-            agent_type=settings.agent.agent_type,
-        )
+        agent_query(query, settings, agent_type=settings.agent.agent_type)
     )
 
 
 def search_query(
-    query: str,
+    query: str | MultipleChoiceQuestion,
     index_name: str,
     settings: Settings,
 ) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
@@ -119,7 +117,7 @@ def search_query(
         index_name = settings.get_index_name()
     return get_loop().run_until_complete(
         index_search(
-            query,
+            query if isinstance(query, str) else query.question_prompt,
             index_name=index_name,
             index_directory=settings.agent.index.index_directory,
         )

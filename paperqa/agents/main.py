@@ -11,6 +11,7 @@ from aviary.core import (
     ToolSelector,
     ToolSelectorLedger,
 )
+from aviary.utils import MultipleChoiceQuestion
 from pydantic import BaseModel
 from rich.console import Console
 from tenacity import (
@@ -20,22 +21,14 @@ from tenacity import (
     stop_after_attempt,
 )
 
-try:
-    from ldp.alg import Callback, RolloutManager
-except ImportError:
-
-    class Callback:  # type: ignore[no-redef]
-        """Placeholder parent class for when ldp isn't installed."""
-
-    RolloutManager = None  # type: ignore[assignment,misc]
-
+from paperqa._ldp_shims import Callback, RolloutManager
 from paperqa.docs import Docs
-from paperqa.settings import AgentSettings
+from paperqa.settings import AgentSettings, Settings
 from paperqa.types import PQASession
 
 from .env import PaperQAEnvironment
 from .helpers import litellm_get_search_query, table_formatter
-from .models import AgentStatus, AnswerResponse, QueryRequest, SimpleProfiler
+from .models import AgentStatus, AnswerResponse, SimpleProfiler
 from .search import SearchDocumentStorage, SearchIndex, get_directory_index
 from .tools import (
     Complete,
@@ -57,24 +50,23 @@ DEFAULT_AGENT_TYPE = AgentSettings.model_fields["agent_type"].default
 
 
 async def agent_query(
-    query: str | QueryRequest,
+    query: str | MultipleChoiceQuestion,
+    settings: Settings,
     docs: Docs | None = None,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
     **runner_kwargs,
 ) -> AnswerResponse:
-    if isinstance(query, str):
-        query = QueryRequest(query=query)
     if docs is None:
         docs = Docs()
 
     answers_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "question"],
         index_name="answers",
-        index_directory=query.settings.agent.index.index_directory,
+        index_directory=settings.agent.index.index_directory,
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 
-    response = await run_agent(docs, query, agent_type, **runner_kwargs)
+    response = await run_agent(docs, query, settings, agent_type, **runner_kwargs)
     agent_logger.debug(f"agent_response: {response}")
 
     agent_logger.info(f"[bold blue]Answer: {response.session.answer}[/bold blue]")
@@ -96,7 +88,8 @@ FAKE_AGENT_TYPE = "fake"  # No agent, just invoke tools in deterministic order
 
 async def run_agent(
     docs: Docs,
-    query: QueryRequest,
+    query: str | MultipleChoiceQuestion,
+    settings: Settings,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
     **runner_kwargs,
 ) -> AnswerResponse:
@@ -106,6 +99,7 @@ async def run_agent(
     Args:
         docs: Docs to run upon.
         query: Query to answer.
+        settings: Settings to use.
         agent_type: Agent type (or fully qualified name to the type) to pass to
             AgentType.get_agent, or "fake" to TODOC.
         runner_kwargs: Keyword arguments to pass to the runner.
@@ -114,25 +108,27 @@ async def run_agent(
         Tuple of resultant answer, token counts, and agent status.
     """
     profiler = SimpleProfiler()
-    outer_profile_name = f"agent-{agent_type}-{query.settings.agent.agent_llm}"
+    outer_profile_name = f"agent-{agent_type}-{settings.agent.agent_llm}"
     profiler.start(outer_profile_name)
-
+    question = query if isinstance(query, str) else query.question_prompt
     logger.info(
-        f"Beginning agent {agent_type!r} run with question {query.query!r} and full"
-        f" query {query.model_dump()}."
+        f"Beginning agent {agent_type!r} run with question {question!r} and full"
+        f" settings {settings.model_dump()}."
     )
 
     # Build the index once here, and then all tools won't need to rebuild it
-    await get_directory_index(settings=query.settings)
+    await get_directory_index(settings=settings)
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
-        session, agent_status = await run_fake_agent(query, docs, **runner_kwargs)
-    elif tool_selector_or_none := query.settings.make_aviary_tool_selector(agent_type):
-        session, agent_status = await run_aviary_agent(
-            query, docs, tool_selector_or_none, **runner_kwargs
+        session, agent_status = await run_fake_agent(
+            query, settings, docs, **runner_kwargs
         )
-    elif ldp_agent_or_none := await query.settings.make_ldp_agent(agent_type):
+    elif tool_selector_or_none := settings.make_aviary_tool_selector(agent_type):
+        session, agent_status = await run_aviary_agent(
+            query, settings, docs, tool_selector_or_none, **runner_kwargs
+        )
+    elif ldp_agent_or_none := await settings.make_ldp_agent(agent_type):
         session, agent_status = await run_ldp_agent(
-            query, docs, ldp_agent_or_none, **runner_kwargs
+            query, settings, docs, ldp_agent_or_none, **runner_kwargs
         )
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
@@ -141,7 +137,7 @@ async def run_agent(
         agent_status = AgentStatus.UNSURE
     # stop after, so overall isn't reported as long-running step.
     logger.info(
-        f"Finished agent {agent_type!r} run with question {query.query!r} and status"
+        f"Finished agent {agent_type!r} run with question {question!r} and status"
         f" {agent_status}."
     )
     return AnswerResponse(session=session, status=agent_status)
@@ -149,15 +145,15 @@ async def run_agent(
 
 async def _run_with_timeout_failure(
     rollout: Callable[[], Awaitable[AgentStatus]],
-    query: QueryRequest,
+    settings: Settings,
     env: PaperQAEnvironment,
 ) -> tuple[PQASession, AgentStatus]:
     try:
-        async with asyncio.timeout(query.settings.agent.timeout):
+        async with asyncio.timeout(settings.agent.timeout):
             status = await rollout()
     except TimeoutError:
         logger.warning(
-            f"Agent timeout after {query.settings.agent.timeout}-sec, just answering."
+            f"Agent timeout after {settings.agent.timeout}-sec, just answering."
         )
         status = AgentStatus.TRUNCATED
     except Exception:
@@ -170,15 +166,17 @@ async def _run_with_timeout_failure(
         generate_answer_tool = next(
             filter(lambda x: x.info.name == GenerateAnswer.TOOL_FN_NAME, env.tools)
         )
-        await generate_answer_tool._tool_fn(state=env.state)
-        env.state.record_action(
-            ToolRequestMessage(tool_calls=[ToolCall.from_tool(generate_answer_tool)])
+        action = ToolRequestMessage(
+            tool_calls=[ToolCall.from_tool(generate_answer_tool)]
         )
+        await env.exec_tool_calls(message=action, state=env.state, handle_tool_exc=True)
+        env.state.record_action(action)
     return env.state.session, status
 
 
 async def run_fake_agent(
-    query: QueryRequest,
+    query: str | MultipleChoiceQuestion,
+    settings: Settings,
     docs: Docs,
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
@@ -190,12 +188,12 @@ async def run_fake_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
-    if query.settings.agent.max_timesteps is not None:
+    if settings.agent.max_timesteps is not None:
         logger.warning(
-            f"Max timesteps (configured {query.settings.agent.max_timesteps}) is not"
+            f"Max timesteps (configured {settings.agent.max_timesteps}) is not"
             " applicable with the fake agent, ignoring it."
         )
-    env = env_class(query, docs, **env_kwargs)
+    env = env_class(query, settings, docs, **env_kwargs)
     obs, tools = await env.reset()
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
@@ -226,7 +224,7 @@ async def run_fake_agent(
             await on_env_step_callback(obs, reward, done, truncated)
 
     async def rollout() -> AgentStatus:
-        llm_model = query.settings.get_llm()
+        llm_model = settings.get_llm()
 
         # Seed docs with a few LLM-proposed search calls
         # TODO: make properly support year ranges
@@ -250,11 +248,12 @@ async def run_fake_agent(
             else AgentStatus.UNSURE
         )
 
-    return await _run_with_timeout_failure(rollout, query, env)
+    return await _run_with_timeout_failure(rollout, settings, env)
 
 
 async def run_aviary_agent(
-    query: QueryRequest,
+    query: str | MultipleChoiceQuestion,
+    settings: Settings,
     docs: Docs,
     agent: ToolSelector,
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
@@ -267,7 +266,7 @@ async def run_aviary_agent(
     ) = None,
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
-    env = env_class(query, docs, **env_kwargs)
+    env = env_class(query, settings, docs, **env_kwargs)
 
     async def rollout() -> AgentStatus:
         obs, tools = await env.reset()
@@ -279,16 +278,16 @@ async def run_aviary_agent(
                 [
                     Message(
                         role="system",
-                        content=query.settings.agent.agent_system_prompt,
+                        content=settings.agent.agent_system_prompt,
                     )
                 ]
-                if query.settings.agent.agent_system_prompt
+                if settings.agent.agent_system_prompt
                 else []
             ),
             tools=tools,
         )
 
-        timestep, max_timesteps = 0, query.settings.agent.max_timesteps
+        timestep, max_timesteps = 0, settings.agent.max_timesteps
         done = False
         while not done:
             if max_timesteps is not None and timestep >= max_timesteps:
@@ -316,7 +315,7 @@ async def run_aviary_agent(
             timestep += 1
         return AgentStatus.SUCCESS
 
-    return await _run_with_timeout_failure(rollout, query, env)
+    return await _run_with_timeout_failure(rollout, settings, env)
 
 
 class LDPRolloutCallback(Callback):
@@ -350,7 +349,8 @@ class LDPRolloutCallback(Callback):
 
 
 async def run_ldp_agent(
-    query: QueryRequest,
+    query: str | MultipleChoiceQuestion,
+    settings: Settings,
     docs: Docs,
     agent: "Agent[SimpleAgentState]",
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
@@ -362,7 +362,7 @@ async def run_ldp_agent(
     ldp_callback_type: type[LDPRolloutCallback] = LDPRolloutCallback,
     **env_kwargs,
 ) -> tuple[PQASession, AgentStatus]:
-    env = env_class(query, docs, **env_kwargs)
+    env = env_class(query, settings, docs, **env_kwargs)
     # NOTE: don't worry about ldp import checks, because we know Settings.make_ldp_agent
     # has already taken place, which checks that ldp is installed
 
@@ -379,14 +379,14 @@ async def run_ldp_agent(
             ],
         )
         trajs = await rollout_manager.sample_trajectories(
-            environments=[env], max_steps=query.settings.agent.max_timesteps
+            environments=[env], max_steps=settings.agent.max_timesteps
         )
         traj = trajs[0]
         if traj.steps[-1].truncated:
             return AgentStatus.TRUNCATED
         return AgentStatus.SUCCESS
 
-    return await _run_with_timeout_failure(rollout, query, env)
+    return await _run_with_timeout_failure(rollout, settings, env)
 
 
 async def index_search(

@@ -1,16 +1,18 @@
 import asyncio
 from collections.abc import Iterable
 from copy import deepcopy
+from typing import ClassVar
 from unittest.mock import patch
 
 import pytest
 from aviary.env import TASK_DATASET_REGISTRY, TaskConfig, TaskDataset
+from aviary.utils import MultipleChoiceEvaluation, MultipleChoiceQuestion
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import Callback, MeanMetricsCallback, StoreTrajectoriesCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 from pytest_subtests import SubTests
 
-from paperqa import Docs, QueryRequest, Settings
+from paperqa import Docs, Settings
 from paperqa.agents import get_directory_index
 from paperqa.agents.env import PaperQAEnvironment
 from paperqa.agents.task import (
@@ -20,13 +22,13 @@ from paperqa.agents.task import (
     LitQAv2TaskSplit,
 )
 from paperqa.agents.tools import GenerateAnswer
-from paperqa.litqa import DEFAULT_REWARD_MAPPING, SEED_USING_QUESTION, LitQAEvaluation
+from paperqa.litqa import DEFAULT_REWARD_MAPPING
 
 
-@pytest.fixture(name="base_query_request")
-def fixture_base_query_request(agent_test_settings: Settings) -> QueryRequest:
+@pytest.fixture(name="agent_task_settings")
+def fixture_agent_task_settings(agent_test_settings: Settings) -> Settings:
     agent_test_settings.agent.index.manifest_file = "stub_manifest.csv"
-    return QueryRequest(settings=agent_test_settings)
+    return agent_test_settings
 
 
 class StubLitQADataset(LitQATaskDataset):
@@ -60,7 +62,7 @@ class StubLitQADataset(LitQATaskDataset):
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         return self._make_gradable_environment(
-            ideal=self.data[idx][0],
+            ideal_answer=self.data[idx][0],
             distractors=self.data[idx][1],
             question=self.data[idx][2],
             sources=self.data[idx][3],
@@ -87,29 +89,40 @@ class StoreEnvCallback(Callback):
         self.query_to_envs: dict[str, PaperQAEnvironment] = {}
 
     async def before_rollout(self, traj_id: str, env) -> None:  # noqa: ARG002
-        self.query_to_envs[env._query.query] = env
+        self.query_to_envs[
+            env._query if isinstance(env._query, str) else env._query.question_prompt
+        ] = env
 
 
 class TestTaskDataset:
+    EXPECTED_LENGTHS: ClassVar[tuple[int, ...]] = (159, 40, 49)
 
     @pytest.mark.parametrize(
         ("split", "expected_length"),
-        [(LitQAv2TaskSplit.TRAIN, 159), (LitQAv2TaskSplit.EVAL, 40)],
+        [
+            (LitQAv2TaskSplit.TRAIN, 159),
+            (LitQAv2TaskSplit.EVAL, 40),
+            (LitQAv2TaskSplit.TEST, 49),
+        ],
     )
     @pytest.mark.asyncio
     async def test___len__(
         self,
-        split: str | LitQAv2TaskSplit,
+        split: LitQAv2TaskSplit,
         expected_length: int,
-        base_query_request: QueryRequest,
+        agent_task_settings: Settings,
     ) -> None:
         task_dataset = LitQAv2TaskDataset(
-            base_query=base_query_request,
-            question_kwargs={"seed": 42},
+            settings=agent_task_settings,
+            question_kwargs={"shuffle_seed": 42},
             read_data_kwargs={"seed": 42},
             split=split,
         )
-        assert len(task_dataset) == expected_length
+        assert (
+            len(task_dataset)
+            == expected_length
+            == self.EXPECTED_LENGTHS[split.get_index()]
+        )
 
         # Now let's check we could use the sources in a validation
         for i in range(len(task_dataset)):
@@ -120,9 +133,9 @@ class TestTaskDataset:
                 obs, _ = await env.reset()
                 assert (
                     "Q: SLC14A1 been identified as a specific marker for endothelial"
-                    " cells in which organ?\n\nOptions:\nA) heart\nB) eye\nC)"
-                    " prostate\nD) Insufficient information to answer this question\nE)"
-                    " liver" in (obs[0].content or "")
+                    " cells in which organ?\n\nOptions:\nA) liver\nB) Insufficient"
+                    " information to answer this question\nC) prostate\nD) eye\nE)"
+                    " heart" in (obs[0].content or "")
                 )
             assert env.sources, "Sources need to be accessible"
             assert isinstance(
@@ -131,21 +144,21 @@ class TestTaskDataset:
 
     @pytest.mark.asyncio
     async def test_can_validate_stub_dataset_sources(
-        self, base_query_request: QueryRequest
+        self, agent_task_settings: Settings
     ) -> None:
-        ds = StubLitQADataset(base_query=base_query_request)
+        ds = StubLitQADataset(settings=agent_task_settings)
         await asyncio.gather(
             *(ds.get_new_env_by_idx(i).validate_sources() for i in range(len(ds)))
         )
 
     @pytest.mark.asyncio
     async def test_evaluation(
-        self, subtests: SubTests, base_query_request: QueryRequest
+        self, subtests: SubTests, agent_task_settings: Settings
     ) -> None:
-        await get_directory_index(settings=base_query_request.settings)  # Build
+        await get_directory_index(settings=agent_task_settings)  # Build
         docs = Docs()
         raw_docs_deepcopy = deepcopy(docs)  # Preserve for later assertions
-        # Why are we constructing a TaskConfig here using a serialized QueryRequest and
+        # Why are we constructing a TaskConfig here using a serialized Settings and
         # Docs? It's to confirm everything works as if hydrating from a YAML config file
         task_config = TaskConfig(
             name=STUB_TASK_DATASET_NAME,
@@ -159,16 +172,17 @@ class TestTaskDataset:
                         "deleted_dockeys",
                     }
                 ),
-                "question_kwargs": {"seed": SEED_USING_QUESTION},
+                "question_kwargs": {
+                    "shuffle_seed": MultipleChoiceQuestion.SEED_USING_QUESTION
+                },
             },
         )
         # NOTE: set base_query after construction of the TaskConfig. because in
-        # aviary 0.10 the TaskConfig Pydnatic model has types `BaseModel | JsonValue`,
-        # which lead to base_query being cast into a BaseModel. This is probably a bug
+        # aviary 0.10 the TaskConfig Pydantic model has types `BaseModel | JsonValue`,
+        # which lead to settings being cast into a BaseModel. This is probably a bug
         # in aviary, but for now let's just assign it after TaskConfig construction
-        task_config.eval_kwargs["base_query"] = base_query_request.model_dump(
-            exclude={"id", "docs_name"}
-        )
+        task_config.eval_kwargs["settings"] = agent_task_settings.model_dump()
+        original_agent_task_settings = agent_task_settings.model_copy(deep=True)
         dataset = task_config.make_dataset(split="eval")  # noqa: FURB184
         assert isinstance(dataset, StubLitQADataset), "Test assertions depend on this"
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
@@ -183,8 +197,8 @@ class TestTaskDataset:
         await evaluator.evaluate()
 
         assert (
-            not base_query_request.query
-        ), "Should not have mutated query in base request"
+            agent_task_settings == original_agent_task_settings
+        ), "Should not have mutated settings"
         assert not docs.docs, "Should not have mutated docs in base docs"
         assert (
             metrics_callback.eval_means["total_paper_count"] > 0
@@ -193,7 +207,10 @@ class TestTaskDataset:
         assert metrics_callback.eval_means["reward"] > 0, "Expected some wins"
         correct_reward, incorrect_reward = (
             DEFAULT_REWARD_MAPPING[evaluation.value]
-            for evaluation in (LitQAEvaluation.CORRECT, LitQAEvaluation.INCORRECT)
+            for evaluation in (
+                MultipleChoiceEvaluation.CORRECT,
+                MultipleChoiceEvaluation.INCORRECT,
+            )
         )
         worst_case_reward_given_correct = (
             correct_reward * correct_percentage
@@ -211,12 +228,10 @@ class TestTaskDataset:
 
         with subtests.test(msg="zero-shot"):
             # Confirm we can just directly call gen_answer
-            base_query_request.settings.agent.tool_names = {
-                GenerateAnswer.gen_answer.__name__
-            }
-            base_query_request.settings.answer.max_answer_attempts = 2
-            base_query_request.settings.answer.get_evidence_if_no_contexts = False
-            dataset = LitQAv2TaskDataset(base_query=base_query_request)
+            agent_task_settings.agent.tool_names = {GenerateAnswer.gen_answer.__name__}
+            agent_task_settings.answer.max_answer_attempts = 2
+            agent_task_settings.answer.get_evidence_if_no_contexts = False
+            dataset = LitQAv2TaskDataset(settings=agent_task_settings)
             dataset.data = dataset.data[:2]  # Save the world: just use two questions
             storage_callback = StoreTrajectoriesCallback()
             evaluator = Evaluator(
@@ -237,10 +252,10 @@ class TestTaskDataset:
 
     @pytest.mark.vcr
     @pytest.mark.asyncio
-    async def test_tool_failure(self, base_query_request: QueryRequest) -> None:
+    async def test_tool_failure(self, agent_task_settings: Settings) -> None:
         docs = Docs()
         dataset = TaskDataset.from_name(
-            STUB_TASK_DATASET_NAME, base_query=base_query_request, base_docs=docs
+            STUB_TASK_DATASET_NAME, settings=agent_task_settings, base_docs=docs
         )
         metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 

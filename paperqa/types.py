@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import contextvars
 import logging
 import os
 import re
 import warnings
 from collections.abc import Collection
-from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
@@ -39,18 +37,6 @@ from paperqa.version import __version__ as pqa_version
 # the type
 DocKey = Any
 logger = logging.getLogger(__name__)
-
-# A context var that will be unique to threads/processes
-cvar_session_id = contextvars.ContextVar[UUID | None]("session_id", default=None)
-
-
-@contextmanager
-def set_llm_session_ids(session_id: UUID):
-    token = cvar_session_id.set(session_id)
-    try:
-        yield
-    finally:
-        cvar_session_id.reset(token)
 
 
 class Doc(Embeddable):
@@ -132,7 +118,19 @@ class PQASession(BaseModel):
     context: str = ""
     contexts: list[Context] = Field(default_factory=list)
     references: str = ""
-    formatted_answer: str = ""
+    formatted_answer: str = Field(
+        default="",
+        description=(
+            "Optional prettified answer that includes information like question and"
+            " citations."
+        ),
+    )
+    graded_answer: str | None = Field(
+        default=None,
+        description=(
+            "Optional graded answer, used for things like multiple choice questions."
+        ),
+    )
     cost: float = 0.0
     # Map model name to a two-item list of LLM prompt token counts
     # and LLM completion token counts
@@ -688,6 +686,16 @@ class DocDetails(Doc):
                 merged_data[field] = {**self.other, **other.other}
                 # handle the bibtex / sources as special fields
                 for field_to_combine in ("bibtex_source", "client_source"):
+                    # Ensure the fields are lists before combining
+                    if self.other.get(field_to_combine) and not isinstance(
+                        self.other[field_to_combine], list
+                    ):
+                        self.other[field_to_combine] = [self.other[field_to_combine]]
+                    if other.other.get(field_to_combine) and not isinstance(
+                        other.other[field_to_combine], list
+                    ):
+                        other.other[field_to_combine] = [other.other[field_to_combine]]
+
                     if self.other.get(field_to_combine) and other.other.get(
                         field_to_combine
                     ):

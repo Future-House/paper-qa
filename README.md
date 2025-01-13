@@ -22,12 +22,13 @@ question answering, summarization, and contradiction detection.
   - [Bundled Settings](#bundled-settings)
   - [Rate Limits](#rate-limits)
 - [Library Usage](#library-usage)
-  - [`ask` manually](#ask-manually)
-  - [Adding Documents Manually](#adding-documents-manually)
+  - [Agentic Adding/Querying Documents](#agentic-addingquerying-documents)
+  - [Manual (No Agent) Adding/Querying Documents](#manual-no-agent-addingquerying-documents)
   - [Async](#async)
   - [Choosing Model](#choosing-model)
     - [Locally Hosted](#locally-hosted)
-  - [Changing Embedding Model](#changing-embedding-model)
+  - [Embedding Model](#embedding-model)
+    - [Specifying the Embedding Model](#specifying-the-embedding-model)
     - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
   - [Adjusting number of sources](#adjusting-number-of-sources)
   - [Using Code or HTML](#using-code-or-html)
@@ -37,6 +38,7 @@ question answering, summarization, and contradiction detection.
   - [Reusing Index](#reusing-index)
   - [Running on LitQA v2](#running-on-litqa-v2)
   - [Using Clients Directly](#using-clients-directly)
+- [Settings Cheatsheet](#settings-cheatsheet)
 - [Where do I get papers?](#where-do-i-get-papers)
   - [Zotero](#zotero)
   - [Paper Scraper](#paper-scraper)
@@ -278,7 +280,7 @@ Or by adding into a `Settings` object, if calling imperatively:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
@@ -294,7 +296,7 @@ PaperQA2's full workflow can be accessed via Python directly:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
@@ -302,7 +304,7 @@ answer = ask(
 
 Please see our [installation docs](#installation) for how to install the package from PyPI.
 
-### `ask` manually
+### Agentic Adding/Querying Documents
 
 The answer object has the following attributes: `formatted_answer`, `answer` (answer alone), `question` , and `context` (the summaries of passages found for answer).
 `ask` will use the `SearchPapers` tool, which will query a local index of files, you can specify this location via the `Settings` object:
@@ -310,7 +312,7 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
@@ -319,20 +321,18 @@ answer = ask(
 `ask` is just a convenience wrapper around the real entrypoint, which can be accessed if you'd like to run concurrent asynchronous workloads:
 
 ```python
-from paperqa import Settings, agent_query, QueryRequest
+from paperqa import Settings, agent_query
 
-answer = await agent_query(
-    QueryRequest(
-        query="What manufacturing challenges are unique to bispecific antibodies?",
-        settings=Settings(temperature=0.5, paper_directory="my_papers"),
-    )
+answer_response = await agent_query(
+    query="What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
 
 The default agent will use an LLM based agent,
 but you can also specify a `"fake"` agent to use a hard coded call path of search -> gather evidence -> answer to reduce token usage.
 
-### Adding Documents Manually
+### Manual (No Agent) Adding/Querying Documents
 
 Normally via agent execution, the agent invokes the search tool,
 which adds documents to the `Docs` object for you behind the scenes.
@@ -411,7 +411,7 @@ By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranki
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers"
@@ -424,7 +424,7 @@ You can use Anthropic or any other model supported by `litellm`:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
@@ -457,7 +457,7 @@ local_llm_config = dict(
     ]
 )
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="my-llm-model",
@@ -486,7 +486,7 @@ local_llm_config = {
     ]
 }
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="ollama/llama3.2",
@@ -498,14 +498,24 @@ answer = ask(
 )
 ```
 
-### Changing Embedding Model
+### Embedding Model
 
-PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings, but has flexible options for both vector stores and embedding choices. The simplest way to change an embedding is via the `embedding` argument to the `Settings` object constructor:
+Embeddings are used to retrieve k texts (where k is specified via `Settings.answer.evidence_k`)
+for re-ranking and contextual summarization.
+If you don't want to use embeddings, but instead just fetch all chunks,
+disable "evidence retrieval" via the `Settings.answer.evidence_retrieval` setting.
+
+PaperQA2 defaults to using OpenAI (`text-embedding-3-small`) embeddings,
+but has flexible options for both vector stores and embedding choices.
+
+#### Specifying the Embedding Model
+
+The simplest way to specify the embedding model is via `Settings.embedding`:
 
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="text-embedding-3-large"),
 )
@@ -562,7 +572,7 @@ and then prefix embedding model names with `st-`:
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="st-multi-qa-MiniLM-L6-cos-v1"),
 )
@@ -573,7 +583,7 @@ or with a hybrid model
 ```python
 from paperqa import Settings, ask
 
-answer = ask(
+answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1"),
 )
@@ -670,7 +680,6 @@ import os
 
 from paperqa import Settings
 from paperqa.agents.main import agent_query
-from paperqa.agents.models import QueryRequest
 from paperqa.agents.search import get_directory_index
 
 
@@ -684,15 +693,12 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
 
     # 2. Use the settings as many times as you want with ask
     answer_response_1 = await agent_query(
-        query=QueryRequest(
-            query="What is the best way to make a vaccine?", settings=settings
-        )
+        query="What is the best way to make a vaccine?",
+        settings=settings,
     )
     answer_response_2 = await agent_query(
-        query=QueryRequest(
-            query="What manufacturing challenges are unique to bispecific antibodies?",
-            settings=settings,
-        )
+        query="What manufacturing challenges are unique to bispecific antibodies?",
+        settings=settings,
     )
 ```
 
@@ -714,15 +720,13 @@ from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 
-from paperqa import QueryRequest, Settings
+from paperqa import Settings
 from paperqa.agents.task import TASK_DATASET_NAME
 
 
 async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
-    base_query = QueryRequest(
-        settings=Settings(paper_directory=folder_of_litqa_v2_papers)
-    )
-    dataset = TaskDataset.from_name(TASK_DATASET_NAME, base_query=base_query)
+    settings = Settings(paper_directory=folder_of_litqa_v2_papers)
+    dataset = TaskDataset.from_name(TASK_DATASET_NAME, settings=settings)
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
     evaluator = Evaluator(
@@ -776,6 +780,71 @@ details = await client.query(
 ```
 
 will return much faster than the first query and we'll be certain the authors match.
+
+## Settings Cheatsheet
+
+| Setting                                      | Default                                | Description                                                                                             |
+| -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `llm`                                        | `"gpt-4o-2024-08-06"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
+| `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
+| `summary_llm`                                | `"gpt-4o-2024-08-06"`                  | Default LLM for summaries and parsing citations.                                                        |
+| `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
+| `embedding`                                  | `"text-embedding-3-small"`             | Default embedding model for texts.                                                                      |
+| `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                 |
+| `temperature`                                | `0.0`                                  | Temperature for LLMs.                                                                                   |
+| `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                            |
+| `texts_index_mmr_lambda`                     | `1.0`                                  | Lambda for MMR in text index.                                                                           |
+| `verbosity`                                  | `0`                                    | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                         |
+| `answer.evidence_k`                          | `10`                                   | Number of evidence pieces to retrieve.                                                                  |
+| `answer.evidence_detailed_citations`         | `True`                                 | Include detailed citations in summaries.                                                                |
+| `answer.evidence_retrieval`                  | `True`                                 | Use retrieval vs processing all docs.                                                                   |
+| `answer.evidence_summary_length`             | `"about 100 words"`                    | Length of evidence summary.                                                                             |
+| `answer.evidence_skip_summary`               | `False`                                | Whether to skip summarization.                                                                          |
+| `answer.answer_max_sources`                  | `5`                                    | Max number of sources for an answer.                                                                    |
+| `answer.max_answer_attempts`                 | `None`                                 | Max attempts to generate an answer.                                                                     |
+| `answer.answer_length`                       | `"about 200 words, but can be longer"` | Length of final answer.                                                                                 |
+| `answer.max_concurrent_requests`             | `4`                                    | Max concurrent requests to LLMs.                                                                        |
+| `answer.answer_filter_extra_background`      | `False`                                | Whether to cite background info from model.                                                             |
+| `answer.get_evidence_if_no_contexts`         | `True`                                 | Allow lazy evidence gathering.                                                                          |
+| `parsing.chunk_size`                         | `5000`                                 | Characters per chunk (0 for no chunking).                                                               |
+| `parsing.page_size_limit`                    | `1,280,000`                            | Character limit per page.                                                                               |
+| `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                               |
+| `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                           |
+| `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                         |
+| `parsing.chunking_algorithm`                 | `ChunkingOptions.SIMPLE_OVERLAP`       | Algorithm for chunking.                                                                                 |
+| `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                 |
+| `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                          |
+| `prompt.summary`                             | `summary_prompt`                       | Template for summarizing text, must contain variables matching `summary_prompt`.                        |
+| `prompt.qa`                                  | `qa_prompt`                            | Template for QA, must contain variables matching `qa_prompt`.                                           |
+| `prompt.select`                              | `select_paper_prompt`                  | Template for selecting papers, must contain variables matching `select_paper_prompt`.                   |
+| `prompt.pre`                                 | `None`                                 | Optional pre-prompt templated with just the original question to append information before a qa prompt. |
+| `prompt.post`                                | `None`                                 | Optional post-processing prompt that can access PQASession fields.                                      |
+| `prompt.system`                              | `default_system_prompt`                | System prompt for the model.                                                                            |
+| `prompt.use_json`                            | `True`                                 | Whether to use JSON formatting.                                                                         |
+| `prompt.summary_json`                        | `summary_json_prompt`                  | JSON-specific summary prompt.                                                                           |
+| `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
+| `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
+| `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
+| `agent.agent_llm`                            | `"gpt-4o-2024-08-06"`                  | Model to use for agent.                                                                                 |
+| `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                 |
+| `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                   |
+| `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                   |
+| `agent.agent_system_prompt`                  | `env_system_prompt`                    | Optional system prompt message.                                                                         |
+| `agent.agent_prompt`                         | `env_reset_prompt`                     | Agent prompt.                                                                                           |
+| `agent.return_paper_metadata`                | `False`                                | Whether to include paper title/year in search tool results.                                             |
+| `agent.search_count`                         | `8`                                    | Search count.                                                                                           |
+| `agent.timeout`                              | `500.0`                                | Timeout on agent execution (seconds).                                                                   |
+| `agent.should_pre_search`                    | `False`                                | Whether to run search tool before invoking agent.                                                       |
+| `agent.tool_names`                           | `None`                                 | Optional override on tools to provide the agent.                                                        |
+| `agent.max_timesteps`                        | `None`                                 | Optional upper limit on environment steps.                                                              |
+| `agent.index.name`                           | `None`                                 | Optional name of the index.                                                                             |
+| `agent.index.paper_directory`                | `Current working directory`            | Directory containing papers to be indexed.                                                              |
+| `agent.index.manifest_file`                  | `None`                                 | Path to manifest CSV with document attributes.                                                          |
+| `agent.index.index_directory`                | `pqa_directory("indexes")`             | Directory to store PQA indexes.                                                                         |
+| `agent.index.use_absolute_paper_directory`   | `False`                                | Whether to use absolute paper directory path.                                                           |
+| `agent.index.recurse_subdirectories`         | `True`                                 | Whether to recurse into subdirectories when indexing.                                                   |
+| `agent.index.concurrency`                    | `5`                                    | Number of concurrent filesystem reads.                                                                  |
+| `agent.index.sync_with_paper_directory`      | `True`                                 | Whether to sync index with paper directory on load.                                                     |
 
 ## Where do I get papers?
 

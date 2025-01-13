@@ -10,13 +10,15 @@ __all__ = [
 import logging
 import re
 from abc import ABC
-from collections.abc import Awaitable, Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from copy import deepcopy
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, Self, assert_never
+from typing import TYPE_CHECKING, Any, Self, assert_never, cast
+from uuid import UUID
 
 from aviary.core import (
     TASK_DATASET_REGISTRY,
+    Environment,
     Frame,
     Messages,
     TaskDataset,
@@ -24,37 +26,35 @@ from aviary.core import (
     ToolResponseMessage,
 )
 from aviary.env import ENV_REGISTRY
-
-from paperqa.types import DocDetails
-
-from .search import SearchIndex, maybe_get_manifest
-
-try:
-    from ldp.alg import ComputeTrajectoryMetricsMixin
-except ImportError:
-
-    class ComputeTrajectoryMetricsMixin:  # type: ignore[no-redef]
-        """Placeholder for when ldp isn't installed."""
-
-
+from aviary.utils import (
+    DEFAULT_EVAL_MODEL_NAME,
+    MultipleChoiceEvaluation,
+    MultipleChoiceQuestion,
+)
 from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
 
+from paperqa._ldp_shims import (
+    Callback,
+    ComputeTrajectoryMetricsMixin,
+    evaluate_consensus,
+)
 from paperqa.docs import Docs
 from paperqa.litqa import (
-    DEFAULT_EVAL_MODEL_NAME,
+    DEFAULT_AVIARY_PAPER_HF_HUB_NAME,
     DEFAULT_LABBENCH_HF_HUB_NAME,
     DEFAULT_REWARD_MAPPING,
-    LitQAEvaluation,
     read_litqa_v2_from_hub,
 )
-from paperqa.types import PQASession
+from paperqa.settings import Settings
+from paperqa.types import DocDetails, PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
-from .models import QueryRequest
-from .tools import Complete
+from .search import SearchIndex, maybe_get_manifest
+from .tools import Complete, EnvironmentState
 
 if TYPE_CHECKING:
-    from ldp.data_structures import Trajectory
+    from ldp.agent import Agent
+    from ldp.data_structures import Trajectory, Transition
 
 logger = logging.getLogger(__name__)
 
@@ -64,31 +64,36 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
 
     def __init__(
         self,
-        query: QueryRequest,
+        query: str | MultipleChoiceQuestion,
+        settings: Settings,
         docs: Docs,
         llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
         summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
         embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
-        evaluation_from_answer: (
-            Callable[[PQASession | str], Awaitable[LitQAEvaluation]] | None
-        ) = None,
+        session_id: UUID | None = None,
         sources: str | list[str] | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
-        evaluation_callback: Callable[[LitQAEvaluation], Awaitable] | None = None,
+        evaluation_callback: (
+            Callable[[MultipleChoiceEvaluation], Awaitable] | None
+        ) = None,
         **env_kwargs,
     ):
         super().__init__(
-            query, docs, llm_model, summary_llm_model, embedding_model, **env_kwargs
+            query,
+            settings,
+            docs,
+            llm_model,
+            summary_llm_model,
+            embedding_model,
+            session_id,
+            **env_kwargs,
         )
-        self._evaluation_from_answer = evaluation_from_answer
         # Enables checking an Index has the right DOI(s)
         self.sources: list[str] | None = (
             [sources] if isinstance(sources, str) else sources
         )
         self._evaluation_callback = evaluation_callback
         self._rewards = rewards
-        self.answer = ""
-        self.ideal = ""
 
     async def validate_sources(
         self, manifest_or_index: dict[str, DocDetails] | SearchIndex | None = None
@@ -98,7 +103,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             return
         if manifest_or_index is None:  # Let's try to load in the manifest
             manifest_or_index = await maybe_get_manifest(
-                filename=await self._query.settings.agent.index.finalize_manifest_file()
+                filename=await self._settings.agent.index.finalize_manifest_file()
             )
         if isinstance(manifest_or_index, SearchIndex):
             entity: str = "index"
@@ -122,16 +127,21 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             if s not in file_names and s.lower() not in lowercased_dois
         ]
         if not_found:
+            question = (
+                self._query
+                if isinstance(self._query, str)
+                else self._query.question_prompt
+            )
             raise ValueError(
                 f"Sources {not_found} of {self.sources} not found in the {entity},"
-                f" the corresponding query was {self._query.query!r}."
+                f" the corresponding query was {question!r}."
             )
 
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[Messages, float, bool, bool]:
         messages, reward, done, truncated = await super().step(action)
-        if not done or not self._evaluation_from_answer:
+        if not done or not isinstance(self._query, MultipleChoiceQuestion):
             return messages, reward, done, truncated
         # If the ensuring evaluation fails (e.g. due to OpenAI being down), we can:
         # - Suppress the exception and declare the evaluation as incorrect, which can
@@ -141,22 +151,12 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         #   incorrectly reward what otherwise was a good trajectory.
         # - Don't suppress the exception, which leads to the trajectory failing, and
         #   removes it from the learnable pool. This is the only safe default behavior.
-        evaluation = await self._evaluation_from_answer(self.state.session.answer)
+        evaluation, self.state.session.graded_answer = await self._query.grade(
+            self.state.session.answer
+        )
         if evaluation_callback := self._evaluation_callback:
             await evaluation_callback(evaluation)
-        self.answer = evaluation.answer or ""
-        self.ideal = evaluation.ideal or ""
         return messages, reward + self._rewards[evaluation.value], done, truncated
-
-    def export_frame(self) -> Frame:
-        return Frame(
-            state=self.state,
-            info={
-                "query": self._query,
-                "answer": self.answer,
-                "ideal": self.ideal,
-            },
-        )
 
     def __deepcopy__(self, memo) -> Self:
         copy_state = deepcopy(self.state, memo)
@@ -171,9 +171,9 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             )
         }
         copy_self = type(self)(
-            query=deepcopy(self._query, memo),  # deepcopy for _docs_name
+            query=self._query,  # No need to copy since we read only
+            settings=deepcopy(self._settings, memo),  # Deepcopy just to be safe
             docs=copy_state.docs,
-            evaluation_from_answer=self._evaluation_from_answer,
             sources=self.sources,
             rewards=self._rewards,
             evaluation_callback=self._evaluation_callback,
@@ -193,6 +193,118 @@ ENV_REGISTRY[ENV_NAME] = (
 )
 
 
+async def evaluate_consensus_sampling(
+    data: Iterable[GradablePaperQAEnvironment | Frame],
+    exclude_no_answer: bool = False,
+    num_samples: int = 1,
+    seed: int | None = None,
+) -> tuple[dict[str, list[tuple[str, int]]], float]:
+    """
+    Create consensus groups based on question and evaluate the consensus for each.
+
+    Args:
+        data: Data to evaluate consensus upon, either gradable environments or frames.
+        exclude_no_answer: Opt-in flag to filter out empty answers (due to the
+            Environment/Frame not having a graded answer). Use of this flag does not
+            affect the accuracy term of the return.
+        num_samples: Passed through to evaluate_consensus.
+        seed: Passed through to evaluate_consensus.
+
+    Returns:
+        Two-tuple of consensus list generated by collections.Counter.most_common (keys
+            are question, values are list of (answer, vote count)) and the proportion of
+            groups for which the consensus matches the ideal.
+    """
+
+    def extract_question(x: GradablePaperQAEnvironment | Frame) -> str:
+        if isinstance(x, GradablePaperQAEnvironment):
+            query: str | MultipleChoiceQuestion | dict[str, Any] = x._query
+        else:
+            query = x.info["query"]  # type: ignore[call-overload,index]
+        if isinstance(query, str):
+            return query
+        if isinstance(query, MultipleChoiceQuestion):
+            return query.question_prompt
+        return query["question"]
+
+    def extract_answer(x: GradablePaperQAEnvironment | Frame) -> str:
+        ses: PQASession | dict[str, Any] = (
+            x.state.session
+            if isinstance(x.state, EnvironmentState)
+            else cast(PQASession | dict[str, Any], x.state["session"])  # type: ignore[call-overload,index]
+        )
+        graded_answer = (
+            ses.graded_answer if isinstance(ses, PQASession) else ses["graded_answer"]
+        )
+        # One can filter the below empty string injection via the exclude_no_answer arg
+        return graded_answer or ""
+
+    def extract_ideal(x: GradablePaperQAEnvironment | Frame) -> str:
+        if isinstance(x, GradablePaperQAEnvironment):
+            query: str | MultipleChoiceQuestion | dict[str, Any] = x._query
+        else:
+            query = x.info["query"]  # type: ignore[call-overload,index]
+        if isinstance(query, str):
+            raise ValueError(  # noqa: TRY004
+                f"We require a {MultipleChoiceQuestion.__name__} variant to extract"
+                " ideal answer, not a string."
+            )
+        if isinstance(query, MultipleChoiceQuestion):
+            return query.ideal_answer
+        return query["ideal_answer"]
+
+    try:
+        consensus, accuracy = await evaluate_consensus(
+            data=data,
+            grouping_fn=extract_question,
+            extract_answer_fn=extract_answer,
+            ideal_answer_fn=extract_ideal,
+            num_samples=num_samples,
+            seed=seed,
+        )
+    except TypeError:
+        raise ImportError(
+            "Evaluating consensus requires the 'ldp' extra for 'ldp'. Please:"
+            " `pip install paper-qa[ldp]`."
+        ) from None
+    if exclude_no_answer:
+        consensus = {
+            q: [(a, c) for a, c in answers if a] for q, answers in consensus.items()
+        }
+    return consensus, accuracy
+
+
+class StoreForConsensusSamplingCallback(Callback):
+    """Store environments or frames for later consensus sampling."""
+
+    def __init__(self):
+        super().__init__()
+        self.stored: list[GradablePaperQAEnvironment | Frame] = []
+
+    async def after_transition(
+        self,
+        traj_id: str,  # noqa: ARG002
+        agent: "Agent",  # noqa: ARG002
+        env: Environment,
+        transition: "Transition",
+    ) -> None:
+        if not isinstance(env, GradablePaperQAEnvironment):
+            raise NotImplementedError(
+                f"So far only handled {GradablePaperQAEnvironment} in this callback,"
+                f" not {type(env)}."
+            )
+        if transition.done and not transition.failed:  # Only store once
+            return
+        self.stored.append(env.export_frame())
+
+    async def evaluate_consensus_sampling(
+        self, num_samples: int = 1, seed: int | None = None
+    ) -> tuple[dict[str, list[tuple[str, int]]], float]:
+        return await evaluate_consensus_sampling(
+            data=self.stored, num_samples=num_samples, seed=seed
+        )
+
+
 class LitQATaskDataset(
     TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin, ABC
 ):
@@ -205,18 +317,18 @@ class LitQATaskDataset(
 
     def __init__(
         self,
-        base_query: QueryRequest | dict | None = None,
+        settings: Settings | dict | None = None,
         base_docs: Docs | dict | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         question_kwargs: Mapping[str, Any] | None = None,
         eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
         **env_kwargs,
     ):
-        if base_query is None:
-            base_query = QueryRequest()
-        if isinstance(base_query, dict):
-            base_query = QueryRequest(**base_query)
-        self._base_query = base_query
+        if settings is None:
+            settings = Settings()
+        if isinstance(settings, dict):
+            settings = Settings(**settings)
+        self._settings = settings
         if base_docs is None:
             base_docs = Docs()
         if isinstance(base_docs, dict):
@@ -229,24 +341,25 @@ class LitQATaskDataset(
 
     def _make_gradable_environment(
         self,
-        ideal: str,
+        ideal_answer: str,
         distractors: str | list[str],
         question: str,
         sources: str | list[str] | None = None,
     ) -> GradablePaperQAEnvironment:
-        qa_prompt, evaluation_from_answer = LitQAEvaluation.from_question(
-            ideal=ideal,
-            distractors=distractors,
+        mc_question = MultipleChoiceQuestion(
             question=question,
-            eval_model=self._eval_model,
+            options=(
+                distractors
+                if isinstance(distractors, list)
+                else MultipleChoiceQuestion.split_options(distractors)
+            ),
+            ideal_answer=ideal_answer,
             **(self._question_kwargs or {}),
         )
-        query = self._base_query.model_copy()
-        query.query = qa_prompt
         return GradablePaperQAEnvironment(
-            query=query,
+            query=mc_question,
+            settings=self._settings,
             docs=self._base_docs.model_copy(),
-            evaluation_from_answer=evaluation_from_answer,
             sources=sources,
             rewards=self._rewards,
             **self._env_kwargs,
@@ -309,6 +422,21 @@ class LitQATaskDataset(
 class LitQAv2TaskSplit(StrEnum):
     TRAIN = "train"
     EVAL = "eval"
+    TEST = "test"
+
+    def get_index(self) -> int:
+        """
+        Get the index of the train (0), eval (1), or test (2) split.
+
+        NOTE: the value matches the index in read_litqa_v2_from_hub's returned splits.
+        """
+        if self == self.TRAIN:
+            return 0
+        if self == self.EVAL:
+            return 1
+        if self == self.TEST:
+            return 2
+        assert_never(self)  # type: ignore[arg-type]
 
 
 class LitQAv2TaskDataset(LitQATaskDataset):
@@ -317,22 +445,17 @@ class LitQAv2TaskDataset(LitQATaskDataset):
     def __init__(
         self,
         *args,
-        labbench_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+        train_eval_dataset: str = DEFAULT_LABBENCH_HF_HUB_NAME,
+        test_dataset: str = DEFAULT_AVIARY_PAPER_HF_HUB_NAME,
         read_data_kwargs: Mapping[str, Any] | None = None,
         split: str | LitQAv2TaskSplit = LitQAv2TaskSplit.EVAL,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        train_df, eval_df = read_litqa_v2_from_hub(
-            labbench_dataset, **(read_data_kwargs or {})
+        split_dfs = read_litqa_v2_from_hub(
+            train_eval_dataset, test_dataset, **(read_data_kwargs or {})
         )
-        split = LitQAv2TaskSplit(split)
-        if split == LitQAv2TaskSplit.TRAIN:
-            self.data = train_df
-        elif split == LitQAv2TaskSplit.EVAL:
-            self.data = eval_df
-        else:
-            assert_never(split)
+        self.data = split_dfs[LitQAv2TaskSplit(split).get_index()]
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         sources = []
@@ -349,7 +472,7 @@ class LitQAv2TaskDataset(LitQATaskDataset):
                 ) from exc
             sources.append(doi)
         return self._make_gradable_environment(
-            ideal=self.data.iloc[idx].ideal,
+            ideal_answer=self.data.iloc[idx].ideal,
             distractors=self.data.iloc[idx].distractors,
             question=self.data.iloc[idx].question,
             sources=sources,

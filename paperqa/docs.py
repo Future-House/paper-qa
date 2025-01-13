@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import tempfile
+import urllib.request
 from collections.abc import Callable
 from datetime import datetime
 from functools import partial
@@ -19,6 +20,7 @@ from llmclient import (
     LLMModel,
     LLMResult,
 )
+from llmclient.types import set_llm_session_ids
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -38,14 +40,7 @@ from paperqa.paths import PAPERQA_DIR
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
-from paperqa.types import (
-    Doc,
-    DocDetails,
-    DocKey,
-    PQASession,
-    Text,
-    set_llm_session_ids,
-)
+from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     gather_with_concurrency,
     get_loop,
@@ -222,8 +217,6 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
         """Add a document to the collection."""
-        import urllib.request
-
         with urllib.request.urlopen(url) as f:  # noqa: ASYNC210, S310
             # need to wrap to enable seek
             file = BytesIO(f.read())
@@ -516,7 +509,7 @@ class Docs(BaseModel):
                 strict=True,
             ):
                 t.embedding = t_embedding
-        self.texts_index.add_texts_and_embeddings(texts)
+        await self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
         self,
@@ -526,7 +519,7 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> list[Text]:
-
+        """Perform MMR search with the input query on the internal index."""
         settings = get_settings(settings)
         if embedding_model is None:
             embedding_model = settings.get_embedding_model()
@@ -608,9 +601,8 @@ class Docs(BaseModel):
 
         _k = answer_config.evidence_k
         if exclude_text_filter:
-            _k += len(
-                exclude_text_filter
-            )  # heuristic - get enough so we can downselect
+            # Increase k to retrieve so we have enough to down-select after retrieval
+            _k += len(exclude_text_filter)
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(

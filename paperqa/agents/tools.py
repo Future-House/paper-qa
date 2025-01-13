@@ -3,6 +3,7 @@
 import asyncio
 import inspect
 import logging
+import os
 import re
 import sys
 from collections.abc import Callable
@@ -15,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from paperqa.docs import Docs
 from paperqa.settings import Settings
+from paperqa.sources.clinical_trials import add_clinical_trials_to_docs
 from paperqa.types import DocDetails, PQASession
 
 from .search import get_directory_index
@@ -225,11 +227,12 @@ class GatherEvidence(NamedTool):
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.session.question
+        l1_all = l1_relevant = l0 = len(state.session.contexts)
+
         try:
             # Swap out the question with the more specific question
             # TODO: remove this swap, as it prevents us from supporting parallel calls
             state.session.question = question
-            l0 = len(state.session.contexts)
 
             # TODO: refactor answer out of this...
             state.session = await state.docs.aget_evidence(
@@ -242,7 +245,14 @@ class GatherEvidence(NamedTool):
                     f"{self.TOOL_FN_NAME}_aget_evidence"
                 ),
             )
-            l1 = len(state.session.contexts)
+            l1_all = len(state.session.contexts)
+            l1_relevant = len(
+                [
+                    c
+                    for c in state.session.contexts
+                    if c.score > state.RELEVANT_SCORE_CUTOFF
+                ]
+            )
         finally:
             state.session.question = original_question
 
@@ -251,11 +261,17 @@ class GatherEvidence(NamedTool):
         sorted_contexts = sorted(
             state.session.contexts, key=lambda x: x.score, reverse=True
         )
-        best_evidence = (
-            f" Best evidence:\n\n{sorted_contexts[0].context}"
-            if sorted_contexts
-            else ""
+
+        top_contexts = "\n".join(
+            [
+                f"{n + 1}. {sc.context}\n"
+                for n, sc in enumerate(
+                    sorted_contexts[: self.settings.agent.agent_evidence_n]
+                )
+            ]
         )
+
+        best_evidence = f" Best evidence(s):\n\n{top_contexts}" if top_contexts else ""
 
         if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
             await asyncio.gather(
@@ -267,7 +283,10 @@ class GatherEvidence(NamedTool):
                 )
             )
 
-        return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
+        return (
+            f"Added {l1_all - l0} pieces of evidence, {l1_relevant - l0} of which were"
+            f" relevant.{best_evidence}\n\n" + status
+        )
 
 
 class GenerateAnswer(NamedTool):
@@ -399,6 +418,251 @@ class Complete(NamedTool):
         return f"{'Success' if has_successful_answer else 'Unsure'} | {state.status}"
 
 
+class ClinicalTrialsSearch(NamedTool):
+    TOOL_FN_NAME = "clinical_trials_search"
+
+    model_config = ConfigDict(extra="forbid")
+
+    search_count: int = 8
+    previous_searches: dict[str, int] = Field(default_factory=dict)
+    settings: Settings = Field(default_factory=Settings)
+
+    # Gather evidence tool must be modified to understand the new evidence
+    GATHER_EVIDENCE_TOOL_PROMPT_OVERRIDE: ClassVar[str] = (
+        """Gather evidence from previous papers and clinical trials given a specific question.
+
+        Will increase evidence, relevant paper counts, and relevant clinical trial counts.
+        A valuable time to invoke this tool is right after another tool increases paper or clinical trials count.
+        Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
+        Only invoke this tool when the paper count or clinical trial count is above zero, or this tool will be useless.
+
+        Args:
+            question: Specific question to gather evidence for.
+            state: Current state.
+
+        Returns:
+            String describing gathered evidence and the current status.
+        """
+    )
+
+    async def clinical_trials_search(self, query: str, state: EnvironmentState) -> str:
+        r"""Search for clinical trials, with support for repeated calls and concurrent execution.
+
+        Will add new clinical trials to the state, and return metadata about the number of trials found.
+
+        Args:
+            query: The search query string. Supports complex boolean expressions, field-specific
+                searches, and query modifiers through operators. All configuration is done through
+                operators in the query string.
+                Query Syntax:
+                    Basic Search:
+                        Simple text automatically uses default EXPANSION[Relaxation] and COVERAGE[Contains]
+                        >>> "heart attack"
+
+                    Modified Search:
+                        Use operators to modify search behavior:
+                        >>> 'EXPANSION[None]COVERAGE[FullMatch]"exact phrase"'
+                        >>> 'EXPANSION[Concept]heart attack'
+
+                    Field Search:
+                        Specify fields using AREA operator:
+                        >>> 'AREA[InterventionName]aspirin'
+                        >>> 'AREA[Phase]PHASE3'
+
+                    Location Search:
+                        Use SEARCH operator for compound location queries:
+                        >>> 'cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)'
+
+                    Complex Boolean:
+                        Combine terms with AND, OR, NOT and parentheses:
+                        >>> '(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)'
+
+                    Date Ranges:
+                        Use RANGE to specify date ranges with formats like "yyyy-MM" or "yyyy-MM-dd".
+                        Note that MIN and MAX can be used for open-ended ranges:
+                        >>> AREA[ResultsFirstPostDate]RANGE[2015-01-01, MAX]
+
+                Operators:
+                    EXPANSION[type]: Controls term expansion
+                        - None: Exact match only, case and accent sensitive
+                        - Term: Includes lexical variants (plurals, spellings)
+                        - Concept: Includes UMLS synonyms
+                        - Relaxation: Relaxes adjacency requirements (default)
+                        - Lossy: Allows missing partial terms
+
+                    COVERAGE[type]: Controls text matching
+                        - FullMatch: Must match entire field
+                        - StartsWith: Must match beginning of field
+                        - EndsWith: Must match end of field
+                        - Contains: Must match part of field (default)
+
+                    AREA[field]: Specifies field to search
+                        - See Field Reference for available fields
+
+                    SEARCH[type]: Groups field searches
+                        - Location: Groups location-related fields
+                        - Study: Groups study-related fields
+
+                Usage Notes:
+                    - All search expressions are implicitly OR expressions
+                    - Operator precedence (highest to lowest): terms/source operators, NOT/context operators, AND, OR
+                    - Use quotes for exact phrase matching: "heart attack"
+                    - Use parentheses for grouping: (heart OR cardiac) AND attack
+                    - Use backslash to escape operators: \AND
+                    - Default expansion is EXPANSION[Relaxation]
+                    - Default coverage is COVERAGE[Contains]
+
+                Field Reference:
+                    High Priority Fields (weight >= 0.8):
+                        - NCTId (1.0): Trial identifier
+                        - Acronym (1.0): Study acronym
+                        - BriefTitle (0.89): Short title
+                        - OfficialTitle (0.85): Full official title
+                        - Condition (0.81): Medical condition
+                        - InterventionName (0.8): Primary intervention name
+                        - OverallStatus: Trial status
+
+                    Medium Priority Fields (0.5-0.79):
+                        - InterventionOtherName (0.75): Alternative intervention names
+                        - Phase (0.65): Trial phase
+                        - StdAge (0.65): Standard age groups
+                        - Keyword (0.6): Study keywords
+                        - BriefSummary (0.6): Short description
+                        - SecondaryOutcomeMeasure (0.5): Secondary outcomes
+
+                    Low Priority Fields (< 0.5):
+                        - DesignPrimaryPurpose (0.3): Primary purpose of study
+                        - StudyType (0.3)
+                        - Various descriptive, location, and administrative fields
+
+                Supported Enums:
+                    Phase:
+                        - EARLY_PHASE1: Early Phase 1
+                        - PHASE1: Phase 1
+                        - PHASE2: Phase 2
+                        - PHASE3: Phase 3
+                        - PHASE4: Phase 4
+                        - NA: Not Applicable
+
+                    StandardAge:
+                        - CHILD: Child
+                        - ADULT: Adult
+                        - OLDER_ADULT: Older Adult
+
+                    Status:
+                        - RECRUITING: Currently recruiting participants
+                        - ACTIVE_NOT_RECRUITING: Active but not recruiting
+                        - COMPLETED: Study completed
+                        - ENROLLING_BY_INVITATION: Enrolling by invitation only
+                        - NOT_YET_RECRUITING: Not yet recruiting
+                        - SUSPENDED: Study suspended
+                        - TERMINATED: Study terminated
+                        - WITHDRAWN: Study withdrawn
+                        - AVAILABLE: Available
+                        - NO_LONGER_AVAILABLE: No longer available
+                        - TEMPORARILY_NOT_AVAILABLE: Temporarily not available
+                        - APPROVED_FOR_MARKETING: Approved for marketing
+                        - WITHHELD: Withheld
+                        - UNKNOWN: Unknown status
+
+                    StudyType:
+                        - INTERVENTIONAL: Interventional studies
+                        - OBSERVATIONAL: Observational studies
+                        - EXPANDED_ACCESS: Expanded access studies
+
+                    PrimaryPurpose:
+                        - TREATMENT: Treatment
+                        - PREVENTION: Prevention
+                        - DIAGNOSTIC: Diagnostic
+                        - ECT: Educational/Counseling/Training
+                        - SUPPORTIVE_CARE: Supportive Care
+                        - SCREENING: Screening
+                        - HEALTH_SERVICES_RESEARCH: Health Services Research
+                        - BASIC_SCIENCE: Basic Science
+                        - DEVICE_FEASIBILITY: Device Feasibility
+                        - OTHER: Other
+
+                    InterventionType:
+                        - BEHAVIORAL: Behavioral interventions
+                        - BIOLOGICAL: Biological interventions
+                        - COMBINATION_PRODUCT: Combination product interventions
+                        - DEVICE: Device interventions
+                        - DIAGNOSTIC_TEST: Diagnostic test interventions
+                        - DIETARY_SUPPLEMENT: Dietary supplement interventions
+                        - DRUG: Drug interventions
+                        - GENETIC: Genetic interventions
+                        - PROCEDURE: Procedure interventions
+                        - RADIATION: Radiation interventions
+                        - OTHER: Other interventions
+
+                    DesignAllocation:
+                        - RANDOMIZED: Randomized allocation
+                        - NON_RANDOMIZED: Non-randomized allocation
+                        - NA: Not applicable
+
+                    InterventionalAssignment:
+                        - SINGLE_GROUP: Single group assignment
+                        - PARALLEL: Parallel assignment
+                        - CROSSOVER: Crossover assignment
+                        - FACTORIAL: Factorial assignment
+                        - SEQUENTIAL: Sequential assignment
+
+                    ObservationalModel:
+                        - COHORT: Cohort
+                        - CASE_CONTROL: Case-Control
+                        - CASE_ONLY: Case-Only
+                        - CASE_CROSSOVER: Case-Crossover
+                        - ECOLOGIC_OR_COMMUNITY: Ecologic or Community
+                        - FAMILY_BASED: Family-Based
+                        - DEFINED_POPULATION: Defined Population
+                        - NATURAL_HISTORY: Natural History
+                        - OTHER: Other
+
+                    DesignMasking:
+                        - NONE: None (Open Label)
+                        - SINGLE: Single
+                        - DOUBLE: Double
+                        - TRIPLE: Triple
+                        - QUADRUPLE: Quadruple
+
+                    WhoMasked:
+                        - PARTICIPANT: Participant
+                        - CARE_PROVIDER: Care Provider
+                        - INVESTIGATOR: Investigator
+                        - OUTCOMES_ASSESSOR: Outcomes Assessor
+
+            state: Current state
+
+        Returns:
+            String describing current status
+        """
+        # get offset if we've done this search before (continuation of search)
+        # or mark this search as new (so offset 0)
+        try:
+            offset = self.previous_searches[query]
+        except KeyError:
+            offset = self.previous_searches[query] = 0
+
+        total_result_count, new_result_count, error_message = (
+            await add_clinical_trials_to_docs(
+                query,
+                state.docs,
+                self.settings,
+                limit=self.search_count,
+                offset=offset,
+            )
+        )
+        # mark how far we've searched so that continuation will start at the right place
+        self.previous_searches[query] += self.search_count
+        if error_message is None:
+            return (
+                f"Found clinical trial search results from search {offset} to {offset + new_result_count}"
+                f" among {total_result_count} total results."
+                f" {state.status}"
+            )
+        return f"Error in clinical trial query syntax: {error_message}"
+
+
 AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
     cls.TOOL_FN_NAME: cls
     for _, cls in inspect.getmembers(
@@ -408,3 +672,16 @@ AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
         and v is not NamedTool,
     )
 }
+
+
+DEFAULT_TOOL_NAMES: list[str] = [
+    name.strip()
+    for name in os.environ.get("PAPERQA_DEFAULT_TOOL_NAMES", "").split(",")
+    if name.strip()
+] or [
+    PaperSearch.TOOL_FN_NAME,
+    GatherEvidence.TOOL_FN_NAME,
+    GenerateAnswer.TOOL_FN_NAME,
+    Reset.TOOL_FN_NAME,
+    Complete.TOOL_FN_NAME,
+]
