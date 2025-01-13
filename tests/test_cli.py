@@ -59,7 +59,7 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
     assert response.session.formatted_answer
 
     search_result = search_query(
-        " ".join(response.session.formatted_answer.split()[:5]),
+        " ".join(response.session.formatted_answer.split()),
         "answers",
         settings,
     )
