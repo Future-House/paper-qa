@@ -166,7 +166,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
         if data.best_oa_location:
             pdf_url = data.best_oa_location.url_for_pdf
             license = data.best_oa_location.license  # noqa: A001
-        return DocDetails(  # type: ignore[call-arg]
+        return DocDetails(
             authors=[
                 f"{author.given} {author.family}" for author in (data.z_authors or [])
             ],

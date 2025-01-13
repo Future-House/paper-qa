@@ -1238,7 +1238,7 @@ def test_answer_rename(recwarn) -> None:
     ],
 )
 def test_dois_resolve_to_correct_journals(doi_journals):
-    details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
+    details = DocDetails(doi=doi_journals["doi"])
     assert details.journal == doi_journals["journal"]
 
 

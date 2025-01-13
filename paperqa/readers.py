@@ -13,7 +13,6 @@ from html2text import html2text
 from paperqa.types import (
     ChunkMetadata,
     Doc,
-    DocDetails,
     ParsedMetadata,
     ParsedText,
     Text,

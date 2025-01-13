@@ -182,7 +182,7 @@ async def parse_s2_to_doc_details(
 
     journal_data = paper_data.get("journal") or {}
 
-    doc_details = DocDetails(  # type: ignore[call-arg]
+    doc_details = DocDetails(
         key=None if not bibtex else bibtex.split("{")[1].split(",")[0],
         bibtex_type="article",  # s2 should be basically all articles
         bibtex=bibtex,
