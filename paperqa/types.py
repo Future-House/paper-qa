@@ -686,6 +686,16 @@ class DocDetails(Doc):
                 merged_data[field] = {**self.other, **other.other}
                 # handle the bibtex / sources as special fields
                 for field_to_combine in ("bibtex_source", "client_source"):
+                    # Ensure the fields are lists before combining
+                    if self.other.get(field_to_combine) and not isinstance(
+                        self.other[field_to_combine], list
+                    ):
+                        self.other[field_to_combine] = [self.other[field_to_combine]]
+                    if other.other.get(field_to_combine) and not isinstance(
+                        other.other[field_to_combine], list
+                    ):
+                        other.other[field_to_combine] = [other.other[field_to_combine]]
+
                     if self.other.get(field_to_combine) and other.other.get(
                         field_to_combine
                     ):
