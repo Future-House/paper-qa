@@ -80,7 +80,11 @@ class Doc(Embeddable):
 class Text(Embeddable):
     text: str
     name: str
-    doc: Doc | DocDetails
+    # TODO: doc is often used as `DocDetails`.
+    # However, typing it as `Doc | DocDetails` makes SearchIndex.query
+    # to fail to return the correct results.
+    # Will keep it as `Doc` and cast to `DocDetails` when needed for now.
+    doc: Doc
 
     def __hash__(self) -> int:
         return hash(self.text)
