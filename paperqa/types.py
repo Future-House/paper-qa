@@ -5,6 +5,7 @@ import os
 import re
 import warnings
 from collections.abc import Collection
+from copy import deepcopy
 from datetime import datetime
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
@@ -19,6 +20,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    ValidationError,
     computed_field,
     field_validator,
     model_validator,
@@ -40,6 +42,8 @@ logger = logging.getLogger(__name__)
 
 
 class Doc(Embeddable):
+    model_config = ConfigDict(extra="forbid")
+
     docname: str
     dockey: DocKey
     citation: str
@@ -52,6 +56,15 @@ class Doc(Embeddable):
 
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
+
+    @model_validator(mode="before")
+    @classmethod
+    def ensure_no_extra(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # formatted_citation is serialized by model_dump
+            # but it's not an attribute
+            data.pop("formatted_citation", None)
+        return data
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -80,11 +93,7 @@ class Doc(Embeddable):
 class Text(Embeddable):
     text: str
     name: str
-    # TODO: doc is often used as `DocDetails`.
-    # However, typing it as `Doc | DocDetails` makes SearchIndex.query
-    # to fail to return the correct results.
-    # Will keep it as `Doc` and cast to `DocDetails` when needed for now.
-    doc: Doc | DocDetails
+    doc: DocDetails | Doc
 
     @model_validator(mode="before")
     @classmethod
@@ -95,18 +104,31 @@ class Text(Embeddable):
             return values
 
         doc_data = values.get("doc")
-        if isinstance(doc_data, Doc | DocDetails):
+        if isinstance(doc_data, Doc):
             # If not deserializing, we don't need to change anything
             return values
 
         if doc_data:
-            maybe_is_docdetails = all(
-                k in doc_data for k in list(DocDetails.model_fields.keys())
-            )
-            maybe_is_doc = all(k in doc_data for k in list(Doc.model_fields.keys()))
-            if maybe_is_doc and not maybe_is_docdetails:
-                doc = Doc(**doc_data)
+            copy_doc_data = deepcopy(doc_data)
+            # Formatted citation is a computed field
+            # not an attribute
+            copy_doc_data.pop("formatted_citation", None)
+            try:
+                doc = Doc(**copy_doc_data)
                 values["doc"] = doc
+            except ValidationError as exc:
+                logger.debug(
+                    f"Failed to deserialize doc data {doc_data} due to {exc}."
+                    f"Trying to deserialize it into a DocDetails."
+                )
+                try:
+                    doc = DocDetails(**copy_doc_data)
+                    values["doc"] = doc
+                except ValidationError as exc:
+                    raise ValidationError(
+                        f"Failed to deserialize doc data from {doc_data}."
+                    ) from exc
+
         return values
 
     def __hash__(self) -> int:
@@ -242,7 +264,7 @@ class PQASession(BaseModel):
                 text=Text(
                     text="",
                     **c.text.model_dump(exclude={"text", "embedding", "doc"}),
-                    doc=Doc(**c.text.doc.model_dump(exclude={"embedding"})),
+                    doc=c.text.doc.model_dump(exclude={"embedding"}),
                 ),
             )
             for c in self.contexts
@@ -626,6 +648,8 @@ class DocDetails(Doc):
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if isinstance(data, Doc):  # type: ignore[unreachable]
+            data = data.model_dump()  # type: ignore[unreachable]
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)

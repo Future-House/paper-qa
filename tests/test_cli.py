@@ -80,5 +80,5 @@ def test_cli_can_build_and_search_index(
     result = search_query("XAI", index_name, settings)
     assert len(result) == 1
     assert isinstance(result[0][0], Docs)
-    assert result[0][0].docnames == {"Wellawatte2024"}
+    assert all(d.startswith("Wellawatte") for d in result[0][0].docnames)
     assert result[0][1] == "paper.pdf"
