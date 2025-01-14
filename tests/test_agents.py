@@ -22,7 +22,7 @@ from aviary.core import Tool, ToolCall, ToolRequestMessage, ToolsAdapter, ToolSe
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
-from llmclient import EmbeddingModel, MultipleCompletionLLMModel
+from llmclient import CommonLLMNames, EmbeddingModel, MultipleCompletionLLMModel
 from pytest_subtests import SubTests
 from tantivy import Index
 
@@ -245,7 +245,7 @@ async def test_agent_types(
 
     # make sure agent_llm is different from default, so we can correctly track tokens
     # for agent
-    agent_test_settings.agent.agent_llm = "gpt-4o-2024-08-06"
+    agent_test_settings.agent.agent_llm = "gpt-4o"
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.summary_llm = "gpt-4o-mini"
     agent_test_settings.agent.agent_prompt += (
@@ -322,7 +322,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     serialized_memory_model = memory_model.model_dump(exclude_none=True)
     query = "How can you use XAI for chemical property prediction?"
     # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
-    agent_test_settings.agent.agent_llm = "claude-3-5-sonnet-20240620"
+    agent_test_settings.agent.agent_llm = CommonLLMNames.CLAUDE_35_SONNET.value
     agent_test_settings.agent.agent_config = {
         "memories": serialized_memory_model.pop("memories"),
         "memory_model": serialized_memory_model,
