@@ -405,10 +405,10 @@ class Complete(NamedTool):
 
         logger.info(
             f"Completing '{state.session.question}' as"
-            f" '{'sure' if has_successful_answer else 'unsure'}'."
+            f" '{'certain' if has_successful_answer else 'unsure'}'."
         )
         # Return answer and status to simplify postprocessing of tool response
-        return f"{'Sure' if has_successful_answer else 'Unsure'} | {state.status}"
+        return f"{'Certain' if has_successful_answer else 'Unsure'} | {state.status}"
 
 
 class ClinicalTrialsSearch(NamedTool):
