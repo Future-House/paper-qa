@@ -10,7 +10,12 @@ from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
 from aviary.core import ToolSelector
-from llmclient import EmbeddingModel, LiteLLMModel, embedding_model_factory
+from llmclient import (
+    CommonLLMNames,
+    EmbeddingModel,
+    LiteLLMModel,
+    embedding_model_factory,
+)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -438,7 +443,7 @@ class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_llm: str = Field(
-        default="gpt-4o-2024-08-06",
+        default=CommonLLMNames.GPT_4O.value,
         description="Model to use for agent.",
     )
 
@@ -596,7 +601,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
-        default="gpt-4o-2024-08-06",
+        default=CommonLLMNames.GPT_4O.value,
         description=(
             "Default LLM for most things, including answers. Should be 'best' LLM."
         ),
@@ -612,7 +617,7 @@ class Settings(BaseSettings):
         ),
     )
     summary_llm: str = Field(
-        default="gpt-4o-2024-08-06",
+        default=CommonLLMNames.GPT_4O.value,
         description="Default LLM for summaries and parsing citations.",
     )
     summary_llm_config: dict | None = Field(
