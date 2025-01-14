@@ -225,7 +225,8 @@ class GatherEvidence(NamedTool):
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.session.question
-        l1_all = l1_relevant = l0 = len(state.session.contexts)
+        l1 = l0 = len(state.session.contexts)
+        l1_relevant = l0_relevant = len(state.get_relevant_contexts())
 
         try:
             # Swap out the question with the more specific question
@@ -243,7 +244,7 @@ class GatherEvidence(NamedTool):
                     f"{self.TOOL_FN_NAME}_aget_evidence"
                 ),
             )
-            l1_all = len(state.session.contexts)
+            l1 = len(state.session.contexts)
             l1_relevant = len(state.get_relevant_contexts())
         finally:
             state.session.question = original_question
@@ -276,7 +277,7 @@ class GatherEvidence(NamedTool):
             )
 
         return (
-            f"Added {l1_all - l0} pieces of evidence, {l1_relevant - l0} of which were"
+            f"Added {l1 - l0} pieces of evidence, {l1_relevant - l0_relevant} of which were"
             f" relevant.{best_evidence}\n\n" + status
         )
 
