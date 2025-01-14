@@ -40,8 +40,8 @@ logger = logging.getLogger(__name__)
 
 
 class Doc(Embeddable):
-    docname: str | None = None
-    dockey: DocKey | None = None
+    docname: str
+    dockey: DocKey
     citation: str
     overwrite_fields_from_metadata: bool = Field(
         default=True,
@@ -84,7 +84,28 @@ class Text(Embeddable):
     # However, typing it as `Doc | DocDetails` makes SearchIndex.query
     # to fail to return the correct results.
     # Will keep it as `Doc` and cast to `DocDetails` when needed for now.
-    doc: Doc
+    doc: Doc | DocDetails
+
+    @model_validator(mode="before")
+    @classmethod
+    def ensure_doc(cls, values: Any) -> Any:
+        if not isinstance(values, dict):
+            # NOTE: If I don't know what is being passed, I don't change it
+            # This happens in some tests
+            return values
+
+        doc_data = values.get("doc")
+        if isinstance(doc_data, Doc | DocDetails):
+            # If not deserializing, we don't need to change anything
+            return values
+
+        if doc_data:
+            maybe_is_docdetails = all(k in doc_data for k in DocDetails.model_fields)
+            maybe_is_doc = all(k in doc_data for k in Doc.model_fields)
+            if maybe_is_doc and not maybe_is_docdetails:
+                doc = Doc(**doc_data)
+                values["doc"] = doc
+        return values
 
     def __hash__(self) -> int:
         return hash(self.text)
@@ -309,6 +330,11 @@ JOURNAL_EXPECTED_DOI_LENGTHS = {
 
 class DocDetails(Doc):
     model_config = ConfigDict(validate_assignment=True)
+
+    AUTOPOPULATE_VALUE: ClassVar[str] = ""
+
+    docname: str = AUTOPOPULATE_VALUE
+    dockey: DocKey = AUTOPOPULATE_VALUE
 
     citation: str = ""
     key: str | None = None
