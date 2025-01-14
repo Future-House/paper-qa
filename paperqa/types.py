@@ -100,8 +100,10 @@ class Text(Embeddable):
             return values
 
         if doc_data:
-            maybe_is_docdetails = all(k in doc_data for k in DocDetails.model_fields)
-            maybe_is_doc = all(k in doc_data for k in Doc.model_fields)
+            maybe_is_docdetails = all(
+                k in doc_data for k in list(DocDetails.model_fields.keys())
+            )
+            maybe_is_doc = all(k in doc_data for k in list(Doc.model_fields.keys()))
             if maybe_is_doc and not maybe_is_docdetails:
                 doc = Doc(**doc_data)
                 values["doc"] = doc
