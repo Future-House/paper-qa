@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from paperqa.docs import Docs
 from paperqa.settings import Settings
 from paperqa.sources.clinical_trials import add_clinical_trials_to_docs
-from paperqa.types import DocDetails, PQASession
+from paperqa.types import Context, DocDetails, PQASession
 
 from .search import get_directory_index
 
@@ -35,18 +35,11 @@ def make_status(
 
 
 def default_status(state: "EnvironmentState") -> str:
+    relevant_contexts = state.get_relevant_contexts()
     return make_status(
         total_paper_count=len(state.docs.docs),
-        relevant_paper_count=len(
-            {
-                c.text.doc.dockey
-                for c in state.session.contexts
-                if c.score > state.RELEVANT_SCORE_CUTOFF
-            }
-        ),
-        evidence_count=len(
-            [c for c in state.session.contexts if c.score > state.RELEVANT_SCORE_CUTOFF]
-        ),
+        relevant_paper_count=len({c.text.doc.dockey for c in relevant_contexts}),
+        evidence_count=len(relevant_contexts),
         cost=state.session.cost,
     )
 
@@ -79,6 +72,11 @@ class EnvironmentState(BaseModel):
         if self.status_fn is not None:
             return self.status_fn(cast(Self, self))
         return default_status(self)
+
+    def get_relevant_contexts(self) -> list[Context]:
+        return [
+            c for c in self.session.contexts if c.score > self.RELEVANT_SCORE_CUTOFF
+        ]
 
     def record_action(self, action: ToolRequestMessage) -> None:
         self.session.add_tokens(action)
@@ -246,13 +244,7 @@ class GatherEvidence(NamedTool):
                 ),
             )
             l1_all = len(state.session.contexts)
-            l1_relevant = len(
-                [
-                    c
-                    for c in state.session.contexts
-                    if c.score > state.RELEVANT_SCORE_CUTOFF
-                ]
-            )
+            l1_relevant = len(state.get_relevant_contexts())
         finally:
             state.session.question = original_question
 
