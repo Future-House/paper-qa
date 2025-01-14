@@ -359,7 +359,6 @@ class DocDetails(Doc):
 
     docname: str = AUTOPOPULATE_VALUE
     dockey: DocKey = AUTOPOPULATE_VALUE
-
     citation: str = ""
     key: str | None = None
     bibtex: str | None = Field(
