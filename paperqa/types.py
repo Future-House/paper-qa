@@ -124,10 +124,10 @@ class Text(Embeddable):
                 try:
                     doc = DocDetails(**copy_doc_data)
                     values["doc"] = doc
-                except ValidationError as exc:
+                except ValidationError as e:
                     raise ValidationError(
                         f"Failed to deserialize doc data from {doc_data}."
-                    ) from exc
+                    ) from e
 
         return values
 
