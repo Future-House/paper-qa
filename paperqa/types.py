@@ -5,7 +5,6 @@ import os
 import re
 import warnings
 from collections.abc import Collection
-from copy import deepcopy
 from datetime import datetime
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
@@ -20,7 +19,6 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    ValidationError,
     computed_field,
     field_validator,
     model_validator,
@@ -42,8 +40,6 @@ logger = logging.getLogger(__name__)
 
 
 class Doc(Embeddable):
-    model_config = ConfigDict(extra="forbid")
-
     docname: str
     dockey: DocKey
     citation: str
@@ -56,15 +52,6 @@ class Doc(Embeddable):
 
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
-
-    @model_validator(mode="before")
-    @classmethod
-    def ensure_no_extra(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            # formatted_citation is serialized by model_dump
-            # but it's not an attribute
-            data.pop("formatted_citation", None)
-        return data
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -93,43 +80,7 @@ class Doc(Embeddable):
 class Text(Embeddable):
     text: str
     name: str
-    doc: DocDetails | Doc
-
-    @model_validator(mode="before")
-    @classmethod
-    def ensure_doc(cls, values: Any) -> Any:
-        if not isinstance(values, dict):
-            # NOTE: If I don't know what is being passed, I don't change it
-            # This happens in some tests
-            return values
-
-        doc_data = values.get("doc")
-        if isinstance(doc_data, Doc):
-            # If not deserializing, we don't need to change anything
-            return values
-
-        if doc_data:
-            copy_doc_data = deepcopy(doc_data)
-            # Formatted citation is a computed field
-            # not an attribute
-            copy_doc_data.pop("formatted_citation", None)
-            try:
-                doc = Doc(**copy_doc_data)
-                values["doc"] = doc
-            except ValidationError as exc:
-                logger.debug(
-                    f"Failed to deserialize doc data {doc_data} due to {exc}."
-                    f"Trying to deserialize it into a DocDetails."
-                )
-                try:
-                    doc = DocDetails(**copy_doc_data)
-                    values["doc"] = doc
-                except ValidationError as e:
-                    raise ValidationError(
-                        f"Failed to deserialize doc data from {doc_data}."
-                    ) from e
-
-        return values
+    doc: Doc | DocDetails = Field(union_mode="left_to_right")
 
     def __hash__(self) -> int:
         return hash(self.text)
