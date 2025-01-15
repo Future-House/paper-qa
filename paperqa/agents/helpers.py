@@ -92,10 +92,13 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
-            doc = cast(DocDetails, cast(Docs, obj).texts[0].doc)
+            doc = cast(Docs, obj).texts[0].doc
             try:
+                # Tries to use `doc` as a `DocDetails` object
+                doc = cast(DocDetails, doc)
                 display_name = cast(str, doc.title)
             except AttributeError:
+                # Falls back to using `formatted_citation` from `Doc`
                 display_name = doc.formatted_citation
             table.add_row(display_name[:max_chars_per_column], filename)
         return table
