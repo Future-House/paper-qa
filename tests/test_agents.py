@@ -580,6 +580,17 @@ async def test_agent_sharing_state(
             gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
 
+        split = re.split(
+            r"(\d+) pieces of evidence, (\d+) of which were relevant",
+            response,
+            maxsplit=1,
+        )
+        assert len(split) == 4, "Unexpected response shape"
+        total_added_1, relevant_added_1 = int(split[1]), int(split[2])
+        assert all(
+            x >= 0 for x in (total_added_1, relevant_added_1)
+        ), "Expected non-negative counts"
+        assert len(env_state.get_relevant_contexts()) == relevant_added_1
         # ensure 1 piece of top evidence is returned
         assert "\n1." in response, "gather_evidence did not return any results"
         assert (
@@ -590,6 +601,21 @@ async def test_agent_sharing_state(
         gather_evidence_tool.settings.agent.agent_evidence_n = 2
         response = await gather_evidence_tool.gather_evidence(
             session.question, state=env_state
+        )
+
+        split = re.split(
+            r"(\d+) pieces of evidence, (\d+) of which were relevant",
+            response,
+            maxsplit=1,
+        )
+        assert len(split) == 4, "Unexpected response shape"
+        total_added_2, relevant_added_2 = int(split[1]), int(split[2])
+        assert all(
+            x >= 0 for x in (total_added_2, relevant_added_2)
+        ), "Expected non-negative counts"
+        assert (
+            len(env_state.get_relevant_contexts())
+            == relevant_added_1 + relevant_added_2
         )
         # ensure both evidences are returned
         assert "\n1." in response, "gather_evidence did not return any results"
