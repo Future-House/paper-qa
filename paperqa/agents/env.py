@@ -160,6 +160,7 @@ CLINICAL_STATUS_SEARCH_REGEX_PATTERN: str = (
 
 
 def clinical_trial_status(state: "EnvironmentState") -> str:
+    relevant_contexts = state.get_relevant_contexts()
     return make_clinical_trial_status(
         total_paper_count=len(
             {
@@ -172,9 +173,8 @@ def clinical_trial_status(state: "EnvironmentState") -> str:
         relevant_paper_count=len(
             {
                 c.text.doc.dockey
-                for c in state.session.contexts
-                if c.score > state.RELEVANT_SCORE_CUTOFF
-                and CLINICAL_TRIALS_BASE
+                for c in relevant_contexts
+                if CLINICAL_TRIALS_BASE
                 not in getattr(c.text.doc, "other", {}).get("client_source", [])
             }
         ),
@@ -189,15 +189,12 @@ def clinical_trial_status(state: "EnvironmentState") -> str:
         relevant_clinical_trials=len(
             {
                 c.text.doc.dockey
-                for c in state.session.contexts
-                if c.score > state.RELEVANT_SCORE_CUTOFF
-                and CLINICAL_TRIALS_BASE
+                for c in relevant_contexts
+                if CLINICAL_TRIALS_BASE
                 in getattr(c.text.doc, "other", {}).get("client_source", [])
             }
         ),
-        evidence_count=len(
-            [c for c in state.session.contexts if c.score > state.RELEVANT_SCORE_CUTOFF]
-        ),
+        evidence_count=len(relevant_contexts),
         cost=state.session.cost,
     )
 
