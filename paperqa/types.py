@@ -312,7 +312,7 @@ JOURNAL_EXPECTED_DOI_LENGTHS = {
 
 
 class DocDetails(Doc):
-    model_config = ConfigDict(validate_assignment=True)
+    model_config = ConfigDict(validate_assignment=True, extra="ignore")
 
     # Sentinel to auto-populate a field within model_validator
     AUTOPOPULATE_VALUE: ClassVar[str] = ""
