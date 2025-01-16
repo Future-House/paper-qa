@@ -22,7 +22,7 @@ from aviary.core import Tool, ToolCall, ToolRequestMessage, ToolsAdapter, ToolSe
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
-from llmclient import EmbeddingModel, MultipleCompletionLLMModel
+from llmclient import CommonLLMNames, EmbeddingModel, MultipleCompletionLLMModel
 from pytest_subtests import SubTests
 from tantivy import Index
 
@@ -245,7 +245,7 @@ async def test_agent_types(
 
     # make sure agent_llm is different from default, so we can correctly track tokens
     # for agent
-    agent_test_settings.agent.agent_llm = "gpt-4o-2024-08-06"
+    agent_test_settings.agent.agent_llm = "gpt-4o"
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.summary_llm = "gpt-4o-mini"
     agent_test_settings.agent.agent_prompt += (
@@ -322,7 +322,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     serialized_memory_model = memory_model.model_dump(exclude_none=True)
     query = "How can you use XAI for chemical property prediction?"
     # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
-    agent_test_settings.agent.agent_llm = "claude-3-5-sonnet-20240620"
+    agent_test_settings.agent.agent_llm = CommonLLMNames.CLAUDE_35_SONNET.value
     agent_test_settings.agent.agent_config = {
         "memories": serialized_memory_model.pop("memories"),
         "memory_model": serialized_memory_model,
@@ -580,6 +580,17 @@ async def test_agent_sharing_state(
             gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
 
+        split = re.split(
+            r"(\d+) pieces of evidence, (\d+) of which were relevant",
+            response,
+            maxsplit=1,
+        )
+        assert len(split) == 4, "Unexpected response shape"
+        total_added_1, relevant_added_1 = int(split[1]), int(split[2])
+        assert all(
+            x >= 0 for x in (total_added_1, relevant_added_1)
+        ), "Expected non-negative counts"
+        assert len(env_state.get_relevant_contexts()) == relevant_added_1
         # ensure 1 piece of top evidence is returned
         assert "\n1." in response, "gather_evidence did not return any results"
         assert (
@@ -590,6 +601,21 @@ async def test_agent_sharing_state(
         gather_evidence_tool.settings.agent.agent_evidence_n = 2
         response = await gather_evidence_tool.gather_evidence(
             session.question, state=env_state
+        )
+
+        split = re.split(
+            r"(\d+) pieces of evidence, (\d+) of which were relevant",
+            response,
+            maxsplit=1,
+        )
+        assert len(split) == 4, "Unexpected response shape"
+        total_added_2, relevant_added_2 = int(split[1]), int(split[2])
+        assert all(
+            x >= 0 for x in (total_added_2, relevant_added_2)
+        ), "Expected non-negative counts"
+        assert (
+            len(env_state.get_relevant_contexts())
+            == relevant_added_1 + relevant_added_2
         )
         # ensure both evidences are returned
         assert "\n1." in response, "gather_evidence did not return any results"

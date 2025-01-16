@@ -15,6 +15,7 @@ import httpx
 import numpy as np
 import pytest
 from llmclient import (
+    CommonLLMNames,
     Embeddable,
     EmbeddingModel,
     HybridEmbeddingModel,
@@ -455,7 +456,7 @@ async def test_chain_completion() -> None:
 @pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
 async def test_anthropic_chain(stub_data_dir: Path) -> None:
-    anthropic_settings = Settings(llm="claude-3-haiku-20240307")
+    anthropic_settings = Settings(llm=CommonLLMNames.ANTHROPIC_TEST.value)
     outputs: list[str] = []
 
     def accum(x) -> None:
