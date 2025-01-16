@@ -54,9 +54,9 @@ class Doc(Embeddable):
 
     @model_validator(mode="before")
     @classmethod
-    def remove_computed_fields(cls, data: Any) -> Any:
+    def remove_computed_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
         if isinstance(data, dict):
-            data.pop("used_contexts", None)
+            data.pop("formatted_citation", None)
         return data
 
     def __hash__(self) -> int:
@@ -163,6 +163,13 @@ class PQASession(BaseModel):
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
+
+    @model_validator(mode="before")
+    @classmethod
+    def remove_computed(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            data.pop("used_contexts", None)
+        return data
 
     @computed_field  # type: ignore[prop-decorator]
     @property
