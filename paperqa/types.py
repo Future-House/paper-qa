@@ -52,10 +52,17 @@ class Doc(Embeddable):
         ),
     )
 
+    @model_validator(mode="before")
+    @classmethod
+    def remove_computed_fields(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            data.pop("used_contexts", None)
+        return data
+
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
 
-    # @computed_field  # type: ignore[prop-decorator]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def formatted_citation(self) -> str:
         return self.citation
@@ -156,13 +163,6 @@ class PQASession(BaseModel):
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
-
-    @model_validator(mode="before")
-    @classmethod
-    def remove_computed(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            data.pop("used_contexts", None)
-        return data
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -599,9 +599,9 @@ class DocDetails(Doc):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
-        if isinstance(data, Doc):  # type: ignore[unreachable]
-            data = data.model_dump()  # type: ignore[unreachable]
+    def validate_all_fields(cls, data: dict[str, Any] | Doc) -> dict[str, Any]:
+        if isinstance(data, Doc):
+            data = data.model_dump()
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
