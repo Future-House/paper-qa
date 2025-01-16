@@ -606,9 +606,7 @@ class DocDetails(Doc):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_all_fields(cls, data: dict[str, Any] | Doc) -> dict[str, Any]:
-        if isinstance(data, Doc):
-            data = data.model_dump()
+    def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
