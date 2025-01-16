@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 class Doc(Embeddable):
     model_config = ConfigDict(extra="forbid")
-    
+
     docname: str
     dockey: DocKey
     citation: str
@@ -306,7 +306,7 @@ JOURNAL_EXPECTED_DOI_LENGTHS = {
 
 
 class DocDetails(Doc):
-    model_config = ConfigDict(validate_assignment=True, extra='ignore')
+    model_config = ConfigDict(validate_assignment=True, extra="ignore")
 
     AUTOPOPULATE_VALUE: ClassVar[str] = ""
 
