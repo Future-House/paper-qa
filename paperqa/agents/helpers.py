@@ -92,11 +92,13 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
-            try:
-                display_name = cast(DocDetails, cast(Docs, obj).texts[0].doc).title
-            except AttributeError:
-                display_name = cast(Docs, obj).texts[0].doc.formatted_citation
-            table.add_row(cast(str, display_name)[:max_chars_per_column], filename)
+            docs = cast(Docs, obj)  # Assume homogeneous objects
+            doc = docs.texts[0].doc
+            if isinstance(doc, DocDetails) and doc.title:
+                display_name: str = doc.title  # Prefer title if available
+            else:
+                display_name = doc.formatted_citation
+            table.add_row(display_name[:max_chars_per_column], filename)
         return table
     raise NotImplementedError(
         f"Object type {type(example_object)} can not be converted to table."
