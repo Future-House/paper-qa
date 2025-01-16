@@ -4,8 +4,7 @@ import logging
 import os
 import re
 import warnings
-from collections.abc import Collection
-from copy import deepcopy
+from collections.abc import Collection, Mapping
 from datetime import datetime
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
@@ -609,8 +608,8 @@ class DocDetails(Doc):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_all_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
-        data = deepcopy(data)  # Avoid mutating input
+    def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
+        data = dict(data.items()) # Avoid mutating input
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
