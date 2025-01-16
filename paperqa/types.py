@@ -5,6 +5,7 @@ import os
 import re
 import warnings
 from collections.abc import Collection, Mapping
+from copy import deepcopy
 from datetime import datetime
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
@@ -54,10 +55,8 @@ class Doc(Embeddable):
 
     @model_validator(mode="before")
     @classmethod
-    def remove_computed_fields(cls, data: dict[str, Any]) -> dict[str, Any]:
-        if isinstance(data, dict):
-            data.pop("formatted_citation", None)
-        return data
+    def remove_computed_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
+        return {k: v for k, v in data.items() if k != "formatted_citation"}
 
     def __hash__(self) -> int:
         return hash((self.docname, self.dockey))
@@ -609,7 +608,8 @@ class DocDetails(Doc):
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
-        data = dict(data.items()) # Avoid mutating input
+        data = deepcopy(data)  # Avoid mutating input
+        data = dict(data.items())
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
