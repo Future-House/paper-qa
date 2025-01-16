@@ -108,7 +108,7 @@ async def map_fxn_summary(
             text=Text(
                 text=text.text,
                 name=text.name,
-                doc=text.doc.__class__(**text.doc.model_dump(exclude={"embedding"})),
+                doc=text.doc.model_dump(exclude={"embedding"}),
             ),
             score=score,  # pylint: disable=possibly-used-before-assignment
             **extras,
