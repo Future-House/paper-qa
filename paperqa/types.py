@@ -609,7 +609,7 @@ class DocDetails(Doc):
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
         data = deepcopy(data)  # Avoid mutating input
-        data = dict(data.items())
+        data = dict(data)
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
