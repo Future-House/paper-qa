@@ -197,7 +197,7 @@ async def parse_crossref_to_doc_details(
         elif len(date_parts) == 1:
             publication_date = datetime(date_parts[0], 1, 1)
 
-    doc_details = DocDetails(  # type: ignore[call-arg]
+    doc_details = DocDetails(
         key=None if not bibtex else bibtex.split("{")[1].split(",")[0],
         bibtex_type=CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING.get(
             message.get("type", "other"), "misc"

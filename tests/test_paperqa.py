@@ -709,7 +709,10 @@ def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=SparseEmbeddingModel(),
     )
-    assert any(cast(list[float], docs.texts[0].embedding))
+    assert isinstance(
+        docs.texts[0].embedding, list
+    ), "We require embeddings to be a list"
+    assert any(docs.texts[0].embedding), "We require embeddings to be populated"
     assert all(
         len(np.array(x.embedding).shape) == 1 for x in docs.texts
     ), "Embeddings should be 1D"
@@ -731,7 +734,10 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_model,
     )
-    assert any(cast(list[float], docs.texts[0].embedding))
+    assert isinstance(
+        docs.texts[0].embedding, list
+    ), "We require embeddings to be a list"
+    assert any(docs.texts[0].embedding), "We require embeddings to be populated"
 
     # check the embeddings are the same size
     assert docs.texts[0].embedding is not None
@@ -1237,7 +1243,7 @@ def test_answer_rename(recwarn) -> None:
     ],
 )
 def test_dois_resolve_to_correct_journals(doi_journals):
-    details = DocDetails(doi=doi_journals["doi"])  # type: ignore[call-arg]
+    details = DocDetails(doi=doi_journals["doi"])
     assert details.journal == doi_journals["journal"]
 
 
@@ -1307,6 +1313,45 @@ def test_docdetails_merge_with_list_fields() -> None:
         merged_doc.other["client_source"]
     ), "Expected merge to keep both client sources"
     assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
+
+
+def test_docdetails_deserialization() -> None:
+    deserialize_to_doc = {
+        "citation": "stub",
+        "dockey": "stub",
+        "docname": "Stub",
+        "embedding": None,
+        "formatted_citation": "stub",
+        "overwrite_fields_from_metadata": True,
+    }
+    deepcopy_deserialize_to_doc = deepcopy(deserialize_to_doc)
+    doc = Doc(**deserialize_to_doc)
+    assert not isinstance(doc, DocDetails), "Should just be Doc, not DocDetails"
+    assert (
+        deserialize_to_doc == deepcopy_deserialize_to_doc
+    ), "Deserialization should not mutate input"
+
+    doc_details = DocDetails(**deserialize_to_doc)
+    serialized_doc_details = doc_details.model_dump(exclude_none=True)
+    for key, value in {
+        "docname": "unknownauthorsUnknownyearunknowntitle",
+        "citation": "Unknown authors. Unknown title. Unknown journal, Unknown year.",
+        "overwrite_fields_from_metadata": True,
+        "key": "unknownauthorsUnknownyearunknowntitle",
+        "bibtex": (
+            '@article{unknownauthorsUnknownyearunknowntitle,\n    author = "authors,'
+            ' Unknown",\n    title = "Unknown title",\n    year = "Unknown year",\n   '
+            ' journal = "Unknown journal"\n}\n'
+        ),
+        "other": {},
+        "formatted_citation": (
+            "Unknown authors. Unknown title. Unknown journal, Unknown year."
+        ),
+    }.items():
+        assert serialized_doc_details[key] == value
+    assert (
+        deserialize_to_doc == deepcopy_deserialize_to_doc
+    ), "Deserialization should not mutate input"
 
 
 @pytest.mark.vcr

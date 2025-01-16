@@ -470,10 +470,12 @@ class Docs(BaseModel):
         # 3. Update self
         # NOTE: we defer adding texts to the texts index to retrieval time
         # (e.g. `self.texts_index.add_texts_and_embeddings(texts)`)
-        self.docs[doc.dockey] = doc
-        self.texts += texts
-        self.docnames.add(doc.docname)
-        return True
+        if doc.docname and doc.dockey:
+            self.docs[doc.dockey] = doc
+            self.texts += texts
+            self.docnames.add(doc.docname)
+            return True
+        return False
 
     def delete(
         self,
@@ -489,8 +491,9 @@ class Docs(BaseModel):
             doc = next((doc for doc in self.docs.values() if doc.docname == name), None)
             if doc is None:
                 return
-            self.docnames.remove(doc.docname)
-            dockey = doc.dockey
+            if doc.docname and doc.dockey:
+                self.docnames.remove(doc.docname)
+                dockey = doc.dockey
         del self.docs[dockey]
         self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
