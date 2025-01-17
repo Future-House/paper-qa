@@ -10,6 +10,7 @@ import pickle
 import warnings
 import zlib
 from collections.abc import Callable, Collection, Sequence
+from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID
@@ -70,6 +71,8 @@ class RobustEncoder(json.JSONEncoder):
             return list(o)
         if isinstance(o, os.PathLike):
             return str(o)
+        if isinstance(o, datetime):
+            return o.isoformat()
         return json.JSONEncoder.default(self, o)
 
 

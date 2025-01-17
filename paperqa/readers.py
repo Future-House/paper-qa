@@ -10,7 +10,13 @@ import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
 
-from paperqa.types import ChunkMetadata, Doc, ParsedMetadata, ParsedText, Text
+from paperqa.types import (
+    ChunkMetadata,
+    Doc,
+    ParsedMetadata,
+    ParsedText,
+    Text,
+)
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
