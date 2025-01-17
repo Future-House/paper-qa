@@ -3,7 +3,7 @@ import importlib.resources
 import os
 import pathlib
 import warnings
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
 from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
@@ -521,7 +521,7 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
-    callbacks: Mapping[str, list[Callable[[_EnvironmentState], Any]]] = Field(
+    callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,
         description="""
             A mapping that associates callback names with lists of corresponding callable functions.

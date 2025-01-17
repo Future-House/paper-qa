@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from paperqa.llms import PromptRunner
@@ -41,7 +41,7 @@ async def map_fxn_summary(
     prompt_runner: PromptRunner | None,
     extra_prompt_data: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
-    callbacks: list[Callable[[str], None]] | None = None,
+    callbacks: Sequence[Callable[[str], None]] | None = None,
 ) -> tuple[Context, LLMResult]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
