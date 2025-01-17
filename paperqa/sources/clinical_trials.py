@@ -29,12 +29,15 @@ SEARCH_API_FIELDS = "NCTId,OfficialTitle"
 SEARCH_PAGE_SIZE = 1000
 TRIAL_API_FIELDS = "protocolSection,derivedSection"
 DOWNLOAD_CONCURRENCY = 20
-TRIAL_CHAR_TRUNCATION_SIZE = 28_000  # larger will prevent embeddings from working
+TRIAL_CHAR_TRUNCATION_SIZE = 28_000  # stay under 8k tokens for embeddings context limit
 MALFORMATTED_QUERY_STATUS: int = 400
 
 
 class CookieWarningFilter(logging.Filter):
-    """Filters out bad cookie warning due to clincialtrials.gov response."""
+    """Filters out invalid cookie warning.
+
+    clincialtrials.gov always sends an x-enc header which aiohttp parsers can't handle
+    """
 
     def filter(self, record):
         return "Can not load response cookies" not in record.getMessage()

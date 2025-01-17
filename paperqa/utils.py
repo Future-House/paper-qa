@@ -528,10 +528,10 @@ def logging_filters(loggers: set[str], filters: set[type[logging.Filter]]):
     filters_added: dict[str, list[logging.Filter]] = {}
     try:
         for logger_name in loggers:
-            logger = logging.getLogger(logger_name)
+            log_to_filter = logging.getLogger(logger_name)
             for log_filter in filters:
                 _filter = log_filter()
-                logger.addFilter(_filter)
+                log_to_filter.addFilter(_filter)
                 if logger_name not in filters_added:
                     filters_added[logger_name] = [_filter]
                 else:
@@ -539,6 +539,6 @@ def logging_filters(loggers: set[str], filters: set[type[logging.Filter]]):
         yield
     finally:
         for logger_name, log_filters_to_remove in filters_added.items():
-            logger = logging.getLogger(logger_name)
+            log_with_filter = logging.getLogger(logger_name)
             for log_filter_to_remove in log_filters_to_remove:
-                logger.removeFilter(log_filter_to_remove)
+                log_with_filter.removeFilter(log_filter_to_remove)
