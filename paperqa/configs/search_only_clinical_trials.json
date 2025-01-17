@@ -1,0 +1,20 @@
+{
+  "answer": {
+    "evidence_k": 15,
+    "answer_max_sources": 5,
+    "max_concurrent_requests": 10
+  },
+  "agent": {
+    "tool_names": [
+      "gather_evidence",
+      "gen_answer",
+      "clinical_trials_search",
+      "complete"
+    ]
+  },
+  "parsing": {
+    "use_doc_details": true,
+    "chunk_size": 9000,
+    "overlap": 750
+  }
+}
