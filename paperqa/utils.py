@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import hashlib
 import logging
 import logging.config
@@ -519,3 +520,25 @@ BIBTEX_MAPPING: dict[str, str] = {
     "peer-review": "misc",  # No direct equivalent, so 'misc' is used
     "other": "article",  # Assume an article if we don't know the type
 }
+
+
+@contextlib.contextmanager
+def logging_filters(loggers: set[str], filters: set[type[logging.Filter]]):
+    """Temporarily add a filter to each specified logger."""
+    filters_added: dict[str, list[logging.Filter]] = {}
+    try:
+        for logger_name in loggers:
+            logger = logging.getLogger(logger_name)
+            for log_filter in filters:
+                _filter = log_filter()
+                logger.addFilter(_filter)
+                if logger_name not in filters_added:
+                    filters_added[logger_name] = [_filter]
+                else:
+                    filters_added[logger_name] += [_filter]
+        yield
+    finally:
+        for logger_name, log_filters_to_remove in filters_added.items():
+            logger = logging.getLogger(logger_name)
+            for log_filter_to_remove in log_filters_to_remove:
+                logger.removeFilter(log_filter_to_remove)
