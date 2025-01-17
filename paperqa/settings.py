@@ -194,7 +194,7 @@ class ParsingSettings(BaseModel):
         ),
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
-    doc_filters: list[dict] | None = Field(
+    doc_filters: Sequence[Mapping[str, Any]] | None = Field(
         default=None,
         description=(
             "Optional filters to only allow documents that match this filter. This is a"
@@ -498,7 +498,7 @@ class AgentSettings(BaseModel):
         description="If set to true, run the search tool before invoking agent.",
     )
 
-    tool_names: set[str] | None = Field(
+    tool_names: set[str] | Sequence[str] | None = Field(
         default=None,
         description=(
             "Optional override on the tools to provide the agent. Leaving as the"
