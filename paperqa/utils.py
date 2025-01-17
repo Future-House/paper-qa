@@ -523,7 +523,9 @@ BIBTEX_MAPPING: dict[str, str] = {
 
 
 @contextlib.contextmanager
-def logging_filters(loggers: Collection[str], filters: Collection[type[logging.Filter]]):
+def logging_filters(
+    loggers: Collection[str], filters: Collection[type[logging.Filter]]
+):
     """Temporarily add a filter to each specified logger."""
     filters_added: dict[str, list[logging.Filter]] = {}
     try:
