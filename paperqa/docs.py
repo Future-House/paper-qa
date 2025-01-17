@@ -42,6 +42,7 @@ from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
+    citation_to_docname,
     gather_with_concurrency,
     get_loop,
     maybe_is_html,
@@ -306,23 +307,7 @@ class Docs(BaseModel):
             ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
-        if docname is None:
-            # get first name and year from citation
-            match = re.search(r"([A-Z][a-z]+)", citation)
-            if match is not None:
-                author = match.group(1)
-            else:
-                # panicking - no word??
-                raise ValueError(
-                    f"Could not parse docname from citation {citation}. "
-                    "Consider just passing key explicitly - e.g. docs.py "
-                    "(path, citation, key='mykey')"
-                )
-            year = ""
-            match = re.search(r"(\d{4})", citation)
-            if match is not None:
-                year = match.group(1)
-            docname = f"{author}{year}"
+        docname = citation_to_docname(citation) if docname is None else docname
         docname = self._get_unique_name(docname)
 
         doc = Doc(docname=docname, citation=citation, dockey=dockey)

@@ -544,3 +544,23 @@ def logging_filters(
             log_with_filter = logging.getLogger(logger_name)
             for log_filter_to_remove in log_filters_to_remove:
                 log_with_filter.removeFilter(log_filter_to_remove)
+
+
+def citation_to_docname(citation: str) -> str:
+    """Create a docname that follows MLA parenthetical in-text citation."""
+    # get first name and year from citation
+    match = re.search(r"([A-Z][a-z]+)", citation)
+    if match is not None:
+        author = match.group(1)
+    else:
+        # panicking - no word??
+        raise ValueError(
+            f"Could not parse docname from citation {citation}. "
+            "Consider just passing key explicitly - e.g. docs.py "
+            "(path, citation, key='mykey')"
+        )
+    year = ""
+    match = re.search(r"(\d{4})", citation)
+    if match is not None:
+        year = match.group(1)
+    return f"{author}{year}"
