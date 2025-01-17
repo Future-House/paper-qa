@@ -258,7 +258,6 @@ async def add_clinical_trials_to_docs(
         )
     except Exception as e:
         logger.warning(f"Failed to retrieve clinical trials for query: {query}.")
-        logger.warning(e)
         # close session if it was ephemeral
         if session is None:
             await _session.close()
