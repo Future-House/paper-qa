@@ -31,6 +31,7 @@ from .helpers import litellm_get_search_query, table_formatter
 from .models import AgentStatus, AnswerResponse, SimpleProfiler
 from .search import SearchDocumentStorage, SearchIndex, get_directory_index
 from .tools import (
+    DEFAULT_TOOL_NAMES,
     Complete,
     EnvironmentState,
     GatherEvidence,
@@ -117,7 +118,10 @@ async def run_agent(
     )
 
     # Build the index once here, and then all tools won't need to rebuild it
-    await get_directory_index(settings=settings)
+    # only build if the a search tool is requested
+    if PaperSearch.TOOL_FN_NAME in (settings.agent.tool_names or DEFAULT_TOOL_NAMES):
+        await get_directory_index(settings=settings)
+
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         session, agent_status = await run_fake_agent(
             query, settings, docs, **runner_kwargs
