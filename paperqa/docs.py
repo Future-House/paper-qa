@@ -771,15 +771,13 @@ class Docs(BaseModel):
             )
         else:
             with set_llm_session_ids(session.id):
-                example_citation, style = prompt_config.EXAMPLE_CITATION_AND_STYLE
                 answer_result = await llm_model.run_prompt(
                     prompt=prompt_config.qa,
                     data={
                         "context": context_str,
                         "answer_length": answer_config.answer_length,
                         "question": session.question,
-                        "example_citation": example_citation,
-                        "citation_style": style,
+                        "example_citation": prompt_config.EXAMPLE_CITATION,
                     },
                     callbacks=callbacks,
                     name="answer",
@@ -788,7 +786,7 @@ class Docs(BaseModel):
             answer_text = answer_result.text
             session.add_tokens(answer_result)
         # it still happens
-        if (ex_citation := prompt_config.EXAMPLE_CITATION_AND_STYLE[0]) in answer_text:
+        if (ex_citation := prompt_config.EXAMPLE_CITATION) in answer_text:
             answer_text = answer_text.replace(ex_citation, "")
         for c in filtered_contexts:
             name = c.text.name

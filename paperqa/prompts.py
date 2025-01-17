@@ -26,10 +26,9 @@ qa_prompt = (
     f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
-    "like {example_citation}, which uses the {citation_style} citation style. "
-    "Only cite from the context below and only use the valid keys. "
-    "Write in the style of a Wikipedia article, "
-    "with concise sentences and coherent paragraphs. "
+    "like {example_citation}. Only cite from the context "
+    "below and only use the valid keys. Write in the style of a "
+    "Wikipedia article, with concise sentences and coherent paragraphs. "
     "The context comes from a variety of sources and is only a summary, "
     "so there may inaccuracies or ambiguities. If quotes are present and "
     "relevant, use them in the answer. This answer will go directly onto "
