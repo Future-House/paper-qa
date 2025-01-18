@@ -259,6 +259,7 @@ def get_formatted_variables(s: str) -> set[str]:
 class PromptSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
+    # MLA parenthetical in-text citation, SEE: https://nwtc.libguides.com/citations/MLA#s-lg-box-707489
     EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
 
     summary: str = summary_prompt
