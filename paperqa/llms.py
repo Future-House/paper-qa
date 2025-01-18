@@ -47,7 +47,7 @@ except ImportError:
     qdrant_installed = False
 
 PromptRunner = Callable[
-    [dict, list[Callable[[str], None]] | None, str | None],
+    [dict, Sequence[Callable[[str], None]] | None, str | None],
     Awaitable[LLMResult],
 ]
 

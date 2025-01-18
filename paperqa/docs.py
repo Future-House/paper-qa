@@ -6,7 +6,7 @@ import os
 import re
 import tempfile
 import urllib.request
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from datetime import datetime
 from functools import partial
 from io import BytesIO
@@ -42,6 +42,7 @@ from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
+    citation_to_docname,
     gather_with_concurrency,
     get_loop,
     maybe_is_html,
@@ -306,23 +307,7 @@ class Docs(BaseModel):
             ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
-        if docname is None:
-            # get first name and year from citation
-            match = re.search(r"([A-Z][a-z]+)", citation)
-            if match is not None:
-                author = match.group(1)
-            else:
-                # panicking - no word??
-                raise ValueError(
-                    f"Could not parse docname from citation {citation}. "
-                    "Consider just passing key explicitly - e.g. docs.py "
-                    "(path, citation, key='mykey')"
-                )
-            year = ""
-            match = re.search(r"(\d{4})", citation)
-            if match is not None:
-                year = match.group(1)
-            docname = f"{author}{year}"
+        docname = citation_to_docname(citation) if docname is None else docname
         docname = self._get_unique_name(docname)
 
         doc = Doc(docname=docname, citation=citation, dockey=dockey)
@@ -549,7 +534,7 @@ class Docs(BaseModel):
         query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
@@ -571,7 +556,7 @@ class Docs(BaseModel):
         query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
@@ -668,7 +653,7 @@ class Docs(BaseModel):
         self,
         query: PQASession | str,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
@@ -690,12 +675,16 @@ class Docs(BaseModel):
         self,
         query: PQASession | str,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
+        # TODO: remove list cast after release of https://github.com/Future-House/llm-client/pull/36
+        callbacks = cast(
+            list[Callable] | None, list(callbacks) if callbacks else callbacks
+        )
 
         query_settings = get_settings(settings)
         answer_config = query_settings.answer
@@ -797,8 +786,8 @@ class Docs(BaseModel):
             answer_text = answer_result.text
             session.add_tokens(answer_result)
         # it still happens
-        if prompt_config.EXAMPLE_CITATION in answer_text:
-            answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
+        if (ex_citation := prompt_config.EXAMPLE_CITATION) in answer_text:
+            answer_text = answer_text.replace(ex_citation, "")
         for c in filtered_contexts:
             name = c.text.name
             citation = c.text.doc.formatted_citation

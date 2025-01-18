@@ -17,7 +17,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, Embeddable, Text
-from paperqa.utils import gather_with_concurrency
+from paperqa.utils import gather_with_concurrency, logging_filters
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,18 @@ SEARCH_API_FIELDS = "NCTId,OfficialTitle"
 SEARCH_PAGE_SIZE = 1000
 TRIAL_API_FIELDS = "protocolSection,derivedSection"
 DOWNLOAD_CONCURRENCY = 20
-TRIAL_CHAR_TRUNCATION_SIZE = 30_000  # larger will prevent embeddings from working
+TRIAL_CHAR_TRUNCATION_SIZE = 28_000  # stay under 8k tokens for embeddings context limit
 MALFORMATTED_QUERY_STATUS: int = 400
+
+
+class CookieWarningFilter(logging.Filter):
+    """Filters out invalid cookie warning.
+
+    clincialtrials.gov always sends an x-enc header which aiohttp parsers can't handle
+    """
+
+    def filter(self, record):
+        return "Can not load response cookies" not in record.getMessage()
 
 
 @retry(
@@ -39,21 +49,25 @@ MALFORMATTED_QUERY_STATUS: int = 400
     retry=retry_if_exception_type(ClientResponseError),
 )
 async def api_search_clinical_trials(query: str, session: ClientSession) -> dict:
-    async with session.get(
-        STUDIES_API_URL,
-        params={
-            "query.term": query,
-            "fields": SEARCH_API_FIELDS,
-            "pageSize": SEARCH_PAGE_SIZE,
-            "countTotal": "true",
-            "sort": "@relevance",
-        },
-    ) as response:
-        if response.status == MALFORMATTED_QUERY_STATUS:
-            # the 400s from clinicaltrials.gov are not JSON
-            raise HTTPBadRequest(reason=await response.text())
-        response.raise_for_status()
-        return await response.json()
+
+    with logging_filters(loggers={"aiohttp.client"}, filters={CookieWarningFilter}):
+        async with (
+            session.get(
+                STUDIES_API_URL,
+                params={
+                    "query.term": query,
+                    "fields": SEARCH_API_FIELDS,
+                    "pageSize": SEARCH_PAGE_SIZE,
+                    "countTotal": "true",
+                    "sort": "@relevance",
+                },
+            ) as response,
+        ):
+            if response.status == MALFORMATTED_QUERY_STATUS:
+                # the 400s from clinicaltrials.gov are not JSON
+                raise HTTPBadRequest(reason=await response.text())
+            response.raise_for_status()
+            return await response.json()
 
 
 @retry(
@@ -61,13 +75,15 @@ async def api_search_clinical_trials(query: str, session: ClientSession) -> dict
     wait=wait_incrementing(0.1, 0.1),
 )
 async def api_get_clinical_trial(nct_id: str, session: ClientSession) -> dict | None:
-    with suppress(ClientResponseError):
-        async with session.get(
-            f"{STUDIES_API_URL}/{nct_id}", params={"fields": TRIAL_API_FIELDS}
-        ) as response:
-            response.raise_for_status()
-            return await response.json()
-    return None
+    with logging_filters(loggers={"aiohttp.client"}, filters={CookieWarningFilter}):
+        with suppress(ClientResponseError):
+            async with session.get(
+                f"{STUDIES_API_URL}/{nct_id}",
+                params={"fields": TRIAL_API_FIELDS},
+            ) as response:
+                response.raise_for_status()
+                return await response.json()
+        return None
 
 
 async def search_retrieve_clinical_trials(
@@ -234,16 +250,20 @@ async def add_clinical_trials_to_docs(
         tuple[int, int, str | None]:
             Total number of trials found, number of trials added, and error message if any.
     """
-    session = aiohttp.ClientSession() if session is None else session
+    # Cookies are not needed, and malformed via clinicaltrials.gov
+    _session = aiohttp.ClientSession() if session is None else session
 
     logger.info(f"Querying clinical trials for: {query}.")
 
     try:
         trials, total_result_count = await search_retrieve_clinical_trials(
-            query, session, limit, offset
+            query, _session, limit, offset
         )
     except Exception as e:
         logger.warning(f"Failed to retrieve clinical trials for query: {query}.")
+        # close session if it was ephemeral
+        if session is None:
+            await _session.close()
         return (0, 0, str(e))
 
     logger.info(f"Successfully found {len(trials)} trials.")
@@ -299,6 +319,10 @@ async def add_clinical_trials_to_docs(
         doc=meta_details,
         settings=settings,
     )
+
+    # close session if it was ephemeral
+    if session is None:
+        await _session.close()
 
     return (total_result_count, len(docs.texts) - inital_docs_size, None)
 
