@@ -66,7 +66,7 @@ class Doc(Embeddable):
     def formatted_citation(self) -> str:
         return self.citation
 
-    def matches_filter_criteria(self, filter_criteria: dict) -> bool:
+    def matches_filter_criteria(self, filter_criteria: Mapping[str, Any]) -> bool:
         """Returns True if the doc matches the filter criteria, False otherwise."""
         data_dict = self.model_dump()
         for key, value in filter_criteria.items():

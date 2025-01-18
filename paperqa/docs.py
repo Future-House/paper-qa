@@ -6,7 +6,7 @@ import os
 import re
 import tempfile
 import urllib.request
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from datetime import datetime
 from functools import partial
 from io import BytesIO
@@ -549,7 +549,7 @@ class Docs(BaseModel):
         query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
@@ -571,7 +571,7 @@ class Docs(BaseModel):
         query: PQASession | str,
         exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
@@ -668,7 +668,7 @@ class Docs(BaseModel):
         self,
         query: PQASession | str,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
@@ -690,12 +690,16 @@ class Docs(BaseModel):
         self,
         query: PQASession | str,
         settings: MaybeSettings = None,
-        callbacks: list[Callable] | None = None,
+        callbacks: Sequence[Callable] | None = None,
         llm_model: LLMModel | None = None,
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
+        # TODO: remove list cast after release of https://github.com/Future-House/llm-client/pull/36
+        callbacks = cast(
+            list[Callable] | None, list(callbacks) if callbacks else callbacks
+        )
 
         query_settings = get_settings(settings)
         answer_config = query_settings.answer
