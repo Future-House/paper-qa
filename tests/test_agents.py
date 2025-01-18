@@ -492,7 +492,7 @@ async def test_agent_sharing_state(
             "gather_evidence_completed": [gather_evidence_completed_callback],
         }
 
-    agent_test_settings.agent.callbacks = callbacks  # type: ignore[assignment]
+    agent_test_settings.agent.callbacks = callbacks
 
     session = PQASession(question="What is is a self-explanatory model?")
     env_state = EnvironmentState(docs=Docs(), session=session)

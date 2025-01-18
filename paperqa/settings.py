@@ -3,7 +3,7 @@ import importlib.resources
 import os
 import pathlib
 import warnings
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
 from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
@@ -194,7 +194,7 @@ class ParsingSettings(BaseModel):
         ),
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
-    doc_filters: list[dict] | None = Field(
+    doc_filters: Sequence[Mapping[str, Any]] | None = Field(
         default=None,
         description=(
             "Optional filters to only allow documents that match this filter. This is a"
@@ -498,7 +498,7 @@ class AgentSettings(BaseModel):
         description="If set to true, run the search tool before invoking agent.",
     )
 
-    tool_names: set[str] | None = Field(
+    tool_names: set[str] | Sequence[str] | None = Field(
         default=None,
         description=(
             "Optional override on the tools to provide the agent. Leaving as the"
@@ -521,7 +521,7 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
-    callbacks: Mapping[str, list[Callable[[_EnvironmentState], Any]]] = Field(
+    callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,
         description="""
             A mapping that associates callback names with lists of corresponding callable functions.
