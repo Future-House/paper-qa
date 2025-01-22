@@ -86,7 +86,7 @@ repos:
           - anyio
           - fh-llm-client>=0.0.9 # Match pyproject.toml
           - fhaviary[llm]>=0.14 # Match pyproject.toml
-          - ldp>=0.17 # Match pyproject.toml
+          - ldp>=0.20 # Match pyproject.toml
           - html2text
           - httpx
           - pybtex
