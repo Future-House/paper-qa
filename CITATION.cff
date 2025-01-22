@@ -1,51 +1,64 @@
+---
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
 authors:
-  - family-names: "Skarlinski"
-    given-names: "Michael D."
-  - family-names: "Cox"
-    given-names: "Sam"
-  - family-names: "Laurent"
-    given-names: "Jon M."
-  - family-names: "Braza"
-    given-names: "James D."
-  - family-names: "Hinks"
-    given-names: "Michaela"
-  - family-names: "Hammerling"
-    given-names: "Michael J."
-  - family-names: "Ponnapati"
-    given-names: "Manvitha"
-  - family-names: "Rodriques"
-    given-names: "Samuel G."
-  - family-names: "White"
-    given-names: "Andrew D."
+  - family-names: Skarlinski
+    given-names: Michael D.
+  - family-names: Cox
+    given-names: Sam
+  - family-names: Laurent
+    given-names: Jon M.
+  - family-names: Braza
+    given-names: James D.
+  - family-names: Hinks
+    given-names: Michaela
+  - family-names: Hammerling
+    given-names: Michael J.
+  - family-names: Ponnapati
+    given-names: Manvitha
+  - family-names: Rodriques
+    given-names: Samuel G.
+  - family-names: White
+    given-names: Andrew D.
 title: "Language agents achieve superhuman synthesis of scientific knowledge"
-version: 2024
-doi: "10.48550/arXiv.2409.13740"
-date-released: 2024
-url: "https://arxiv.org/abs/2409.13740"
+identifiers:
+  - type: doi
+    value: 10.48550/arXiv.2409.13740
+    description: ArXiv DOI
+  - type: url
+    value: https://arxiv.org/abs/2409.13740
+    description: ArXiv abstract
+repository-code: https://github.com/Future-House/paper-qa
+keywords:
+  - Artificial Intelligence
+  - Computation and Language
+  - Machine Learning
+license: Apache-2.0
 preferred-citation:
-  type: article
   authors:
-    - family-names: "Skarlinski"
-      given-names: "Michael D."
-    - family-names: "Cox"
-      given-names: "Sam"
-    - family-names: "Laurent"
-      given-names: "Jon M."
-    - family-names: "Braza"
-      given-names: "James D."
-    - family-names: "Hinks"
-      given-names: "Michaela"
-    - family-names: "Hammerling"
-      given-names: "Michael J."
-    - family-names: "Ponnapati"
-      given-names: "Manvitha"
-    - family-names: "Rodriques"
-      given-names: "Samuel G."
-    - family-names: "White"
-      given-names: "Andrew D."
+    - family-names: Skarlinski
+      given-names: Michael D.
+    - family-names: Cox
+      given-names: Sam
+    - family-names: Laurent
+      given-names: Jon M.
+    - family-names: Braza
+      given-names: James D.
+    - family-names: Hinks
+      given-names: Michaela
+    - family-names: Hammerling
+      given-names: Michael J.
+    - family-names: Ponnapati
+      given-names: Manvitha
+    - family-names: Rodriques
+      given-names: Samuel G.
+    - family-names: White
+      given-names: Andrew D.
+  date-published: 2024-09-10
+  doi: 10.48550/arXiv.2409.13740
+  journal: preprint
   title: "Language agents achieve superhuman synthesis of scientific knowledge"
-  journal: "preprint"
-  year: 2024
-  month: 9
+  type: article
+  url: https://arxiv.org/abs/2409.13740
