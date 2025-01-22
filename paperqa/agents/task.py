@@ -36,7 +36,7 @@ from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
 from paperqa._ldp_shims import (
     Callback,
     ComputeTrajectoryMetricsMixin,
-    evaluate_consensus,
+    bulk_evaluate_consensus,
 )
 from paperqa.docs import Docs
 from paperqa.litqa import (
@@ -254,7 +254,7 @@ async def evaluate_consensus_sampling(
         return query["ideal_answer"]
 
     try:
-        consensus, accuracy = await evaluate_consensus(
+        consensus, accuracy = await bulk_evaluate_consensus(
             data=data,
             grouping_fn=extract_question,
             extract_answer_fn=extract_answer,

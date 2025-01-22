@@ -77,7 +77,7 @@ dev = [
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 ldp = [
-    "ldp>=0.17",  # For evaluate_consensus
+    "ldp>=0.20",  # For bulk_evaluate_consensus
 ]
 local = [
     "sentence-transformers",
