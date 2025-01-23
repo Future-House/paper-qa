@@ -25,7 +25,7 @@ dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
-    "fh-llm-client>=0.0.9",  # Pin for CommonLLMNames
+    "fh-llm-client>=0.0.11",  # Pin for LLMModel.run_prompt allowing Iterable
     "fhaviary[llm]>=0.14",  # For MultipleChoiceQuestion
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
@@ -57,8 +57,8 @@ datasets = [
     "datasets",
 ]
 dev = [
+    "fh-llm-client[deepseek]>=0.0.11",  # Pin to ensure DeepSeek compatibility
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.58",  # Pin to keep this (transistive fh-llm-client dependency) recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[datasets,ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
