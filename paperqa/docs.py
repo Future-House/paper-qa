@@ -681,11 +681,6 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
-        # TODO: remove list cast after release of https://github.com/Future-House/llm-client/pull/36
-        callbacks = cast(
-            list[Callable] | None, list(callbacks) if callbacks else callbacks
-        )
-
         query_settings = get_settings(settings)
         answer_config = query_settings.answer
         prompt_config = query_settings.prompts
