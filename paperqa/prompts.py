@@ -1,4 +1,5 @@
 from .agents.helpers import get_year
+
 summary_prompt = (
     "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
     " {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly"
