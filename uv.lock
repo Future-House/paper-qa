@@ -485,7 +485,7 @@ wheels = [
 
 [[package]]
 name = "fh-llm-client"
-version = "0.0.10"
+version = "0.0.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coredis" },
@@ -496,9 +496,14 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/7e/8db139f394ba9c29f947b9c0b4dfa8eb8602b6c4a5c2fce3d368264dff52/fh_llm_client-0.0.10.tar.gz", hash = "sha256:88c84d59cc564cb9ea2f416108444c24d3c36ff4e51a88832bd3114e5bb2fdc1", size = 191055 }
+sdist = { url = "https://files.pythonhosted.org/packages/90/c4/e8195b7c9b5139fdfcec8246ee079fb0d1e24599a55c11872b2f4488262c/fh_llm_client-0.0.11.tar.gz", hash = "sha256:4288daba94da3a11b77ff6e45b1e85355f4b0a445a1488ff70636bc519132192", size = 194844 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/52/cfe2de37dc629e4429c2356b5f54a04db587871b52a7be45456f7ffaac83/fh_llm_client-0.0.10-py3-none-any.whl", hash = "sha256:47aa3b3ca5711bbba675ab86c093bca8d2c240b85b61ea4c4496f15a1c71da81", size = 34267 },
+    { url = "https://files.pythonhosted.org/packages/29/a6/321cd434ce2c013f38ed1423a85bbf23bb4c47f98f108a0e8d0580f0acb0/fh_llm_client-0.0.11-py3-none-any.whl", hash = "sha256:408073277834c9212883bac731eedcdf52fe2cef7e5eb48fd8d6fcdeb3c0336f", size = 34519 },
+]
+
+[package.optional-dependencies]
+deepseek = [
+    { name = "litellm" },
 ]
 
 [[package]]
@@ -1094,7 +1099,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.59.3"
+version = "1.59.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1109,9 +1114,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/e6/5e45636e1eb6833f5048ff4ec5b8d3a899ee129dd0b6aa728cf0349f3d9b/litellm-1.59.3.tar.gz", hash = "sha256:5e625e07a97346704d67f04265253acfc6a0c7e3afad82c2ed57fcdaae066add", size = 6378806 }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/7d/0e7361a6547d651f37ce2a1ddc1d0c918bfa8d2cb09e404ef78d31709793/litellm-1.59.5.tar.gz", hash = "sha256:5124014c0c239ee63adc8aa29f1c396bc653e2b53e5aceca9081cd665e58202f", size = 6378619 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d3/d8/f8c64a54e43ea26604e88f1ec7b80bfa56a9a71599232170cede2d0ea7d9/litellm-1.59.3-py3-none-any.whl", hash = "sha256:17c6fe3b9ccd54fbdb73d2389268864296f9601c5cb29d80061489e0a984e5c0", size = 6666184 },
+    { url = "https://files.pythonhosted.org/packages/fa/fe/4c1c62223758c5c7f7f449cc4e964729209b27f7ad931dc5ca1d9b050dc5/litellm-1.59.5-py3-none-any.whl", hash = "sha256:2e3a5242c41203e08500d5d1bad746ad67869842227b8f8f768795c627cb85f6", size = 6665867 },
 ]
 
 [[package]]
@@ -1644,7 +1649,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.10.3.dev9+g1cf3118.d20250123"
+version = "5.11.1.dev0+gbb497c4.d20250123"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1671,9 +1676,9 @@ datasets = [
 ]
 dev = [
     { name = "datasets" },
+    { name = "fh-llm-client", extra = ["deepseek"] },
     { name = "ipython" },
     { name = "ldp" },
-    { name = "litellm" },
     { name = "mypy" },
     { name = "pandas-stubs" },
     { name = "pre-commit" },
@@ -1718,9 +1723,9 @@ zotero = [
 [package.dev-dependencies]
 dev = [
     { name = "datasets" },
+    { name = "fh-llm-client", extra = ["deepseek"] },
     { name = "ipython" },
     { name = "ldp" },
-    { name = "litellm" },
     { name = "mypy" },
     { name = "pandas-stubs" },
     { name = "pre-commit" },
@@ -1750,13 +1755,13 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
-    { name = "fh-llm-client", specifier = ">=0.0.9" },
+    { name = "fh-llm-client", specifier = ">=0.0.11" },
+    { name = "fh-llm-client", extras = ["deepseek"], marker = "extra == 'dev'", specifier = ">=0.0.11" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.20" },
-    { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.58" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "pandas-stubs", marker = "extra == 'typing'" },
