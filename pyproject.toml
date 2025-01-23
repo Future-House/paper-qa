@@ -58,6 +58,7 @@ datasets = [
 ]
 dev = [
     "ipython>=8",  # Pin to keep recent
+    "litellm>=1.58",  # Pin to keep this (transistive fh-llm-client dependency) recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[datasets,ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
