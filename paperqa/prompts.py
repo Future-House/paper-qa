@@ -1,3 +1,5 @@
+from datetime import datetime
+
 summary_prompt = (
     "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
     " {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly"
@@ -51,7 +53,7 @@ select_paper_prompt = (
 citation_prompt = (
     "Provide the citation for the following text in MLA Format. "
     "Do not write an introductory sentence. "
-    "If reporting date accessed, the current year is 2025\n\n"
+    f"If reporting date accessed, the current year is {datetime.now().year}\n\n"
     "{text}\n\n"
     "Citation:"
 )
