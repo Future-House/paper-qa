@@ -1,5 +1,4 @@
 import warnings
-from datetime import datetime
 from unittest.mock import patch
 
 import pytest
@@ -17,6 +16,7 @@ from paperqa.settings import (
     get_settings,
 )
 from paperqa.types import Doc, DocDetails
+from paperqa.utils import get_year
 
 
 def test_prompt_settings_validation() -> None:
@@ -172,7 +172,7 @@ def test_matches_filter_criteria(doc_class, doc_data, filter_criteria, expected_
 
 
 def test_citation_prompt_current_year():
-    expected_year_text = f"the current year is {datetime.now().year}"
+    expected_year_text = f"the current year is {get_year()}"
 
     assert (
         expected_year_text in citation_prompt
