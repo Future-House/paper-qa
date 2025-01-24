@@ -1649,7 +1649,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
-version = "5.11.1.dev0+gbb497c4.d20250123"
+version = "5.11.1.dev5+g8ac704a.d20250123"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1722,32 +1722,7 @@ zotero = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "datasets" },
-    { name = "fh-llm-client", extra = ["deepseek"] },
-    { name = "ipython" },
-    { name = "ldp" },
-    { name = "mypy" },
-    { name = "pandas-stubs" },
-    { name = "pre-commit" },
-    { name = "pydantic" },
-    { name = "pylint-pydantic" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-recording" },
-    { name = "pytest-rerunfailures" },
-    { name = "pytest-subtests" },
-    { name = "pytest-sugar" },
-    { name = "pytest-timer", extra = ["colorama"] },
-    { name = "pytest-xdist" },
-    { name = "python-dotenv" },
-    { name = "pyzotero" },
-    { name = "qdrant-client" },
-    { name = "refurb" },
-    { name = "sentence-transformers" },
-    { name = "typeguard" },
-    { name = "types-pyyaml" },
-    { name = "types-setuptools" },
-    { name = "vcrpy" },
+    { name = "paper-qa", extra = ["dev"] },
 ]
 
 [package.metadata]
