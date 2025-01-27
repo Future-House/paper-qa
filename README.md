@@ -861,7 +861,7 @@ which relies on [pyzotero](https://github.com/urschrei/pyzotero).
 Install `pyzotero` via the `zotero` extra for this feature:
 
 ```bash
-pip install paperqa[zotero]
+pip install paper-qa[zotero]
 ```
 
 First, note that PaperQA2 parses the PDFs of papers to store in the database,
