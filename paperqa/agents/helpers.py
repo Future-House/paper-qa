@@ -63,7 +63,7 @@ async def litellm_get_search_query(
         model = llm
     data = {"question": question, "count": count}
     messages = [
-        Message(role="user", content=search_prompt.format(**data)),
+        Message(content=search_prompt.format(**data)),
     ]
     result = await model.call_single(  # run_prompt is deprecated
         messages=messages,

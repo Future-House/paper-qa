@@ -438,7 +438,7 @@ async def test_chain_completion() -> None:
     prompt = "The {animal} says"
     data = {"animal": "duck"}
     messages = [
-        Message(role="user", content=prompt.format(**data)),
+        Message(content=prompt.format(**data)),
     ]
     completion = await llm.call_single(  # run_prompt is deprecated
         messages=messages,

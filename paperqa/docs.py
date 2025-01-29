@@ -295,9 +295,7 @@ class Docs(BaseModel):
                 raise ValueError(f"Could not read document {path}. Is it empty?")
             data = {"text": texts[0].text}
             messages = [
-                Message(
-                    role="user", content=parse_config.citation_prompt.format(**data)
-                ),
+                Message(content=parse_config.citation_prompt.format(**data)),
             ]
             result = await llm_model.call_single(  # run_prompt is deprecated
                 messages=messages,
@@ -321,7 +319,6 @@ class Docs(BaseModel):
             data = {"citation": citation}
             messages = [
                 Message(
-                    role="user",
                     content=parse_config.structured_citation_prompt.format(**data),
                 ),
             ]
