@@ -80,11 +80,15 @@ class AnswerResponse(BaseModel):
         model = (
             LiteLLMModel(name=llm_model) if isinstance(llm_model, str) else llm_model
         )
-        data = {"question": self.session.question, "answer": self.session.answer}
         prompt = "{question}\n\n{answer}"
         messages = [
             Message(role="system", content=sys_prompt),
-            Message(role="user", content=prompt.format(**data)),
+            Message(
+                role="user",
+                content=prompt.format(
+                    question=self.session.question, answer=self.session.answer
+                ),
+            ),
         ]
         result = await model.call_single(  # run_prompt is deprecated
             messages=messages,

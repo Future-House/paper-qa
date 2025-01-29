@@ -485,8 +485,8 @@ wheels = [
 
 [[package]]
 name = "fh-llm-client"
-version = "0.0.12.dev5+g96bbce5"
-source = { git = "https://github.com/Future-House/llm-client.git?rev=main#96bbce5b9f02fadff4411ca0b49aada2af2ee836" }
+version = "0.0.12.dev6+g6d49735"
+source = { git = "https://github.com/Future-House/llm-client.git?rev=main#6d49735e44faa84ad24651fc738250cc7ba5bb6d" }
 dependencies = [
     { name = "coredis" },
     { name = "fhaviary" },

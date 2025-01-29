@@ -293,9 +293,10 @@ class Docs(BaseModel):
             )
             if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            data = {"text": texts[0].text}
             messages = [
-                Message(content=parse_config.citation_prompt.format(**data)),
+                Message(
+                    content=parse_config.citation_prompt.format(text=texts[0].text)
+                ),
             ]
             result = await llm_model.call_single(  # run_prompt is deprecated
                 messages=messages,
@@ -816,10 +817,12 @@ class Docs(BaseModel):
 
         if prompt_config.post is not None:
             with set_llm_session_ids(session.id):
-                data = {"question": session.question}
                 messages = [
                     Message(role="system", content=prompt_config.system),
-                    Message(role="user", content=prompt_config.post.format(**data)),
+                    Message(
+                        role="user",
+                        content=prompt_config.post.format(question=session.question),
+                    ),
                 ]
                 post = await llm_model.call_single(  # is deprecated
                     messages=messages,

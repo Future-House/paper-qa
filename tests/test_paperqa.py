@@ -436,9 +436,8 @@ async def test_chain_completion() -> None:
     llm = s.get_llm()
 
     prompt = "The {animal} says"
-    data = {"animal": "duck"}
     messages = [
-        Message(content=prompt.format(**data)),
+        Message(content=prompt.format(animal="duck")),
     ]
     completion = await llm.call_single(  # run_prompt is deprecated
         messages=messages,
@@ -469,9 +468,8 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
 
     llm = anthropic_settings.get_llm()
     prompt = "The {animal} says"
-    data = {"animal": "duck"}
     messages = [
-        Message(role="user", content=prompt.format(**data)),
+        Message(role="user", content=prompt.format(animal="duck")),
     ]
     completion = await llm.call_single(  # run_prompt is deprecated
         messages=messages,
