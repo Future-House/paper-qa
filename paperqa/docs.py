@@ -317,10 +317,11 @@ class Docs(BaseModel):
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
             # TODO: specify a JSON schema here when many LLM providers support this
-            data = {"citation": citation}
             messages = [
                 Message(
-                    content=parse_config.structured_citation_prompt.format(**data),
+                    content=parse_config.structured_citation_prompt.format(
+                        citation=citation
+                    ),
                 ),
             ]
             result = await llm_model.call_single(  # run_prompt is deprecated
@@ -717,10 +718,12 @@ class Docs(BaseModel):
         pre_str = None
         if prompt_config.pre is not None:
             with set_llm_session_ids(session.id):
-                data = {"question": session.question}
                 messages = [
                     Message(role="system", content=prompt_config.system),
-                    Message(role="user", content=prompt_config.pre.format(**data)),
+                    Message(
+                        role="user",
+                        content=prompt_config.pre.format(question=session.question),
+                    ),
                 ]
                 pre = await llm_model.call_single(  # run_prompt is deprecated
                     messages=messages,
