@@ -353,7 +353,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
         # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
         # kwargs.pop("tool_choice", LiteLLMModel.TOOL_CHOICE_REQUIRED)
         # tool_choice is now a arg, not a kwarg
-        args.pop()  # removing it from args # ASK: I accept ideas on how to handle this better
+        args = args[:-1]  # removing last element from args
         return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore[misc]
 
     with patch.object(LiteLLMModel, "call", side_effect=llm_model_call, autospec=True):

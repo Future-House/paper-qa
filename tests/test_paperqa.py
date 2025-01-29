@@ -427,9 +427,7 @@ def test_llm_parse_json_newlines() -> None:
 
 @pytest.mark.asyncio
 async def test_chain_completion() -> None:
-    s = Settings(
-        llm="babbage-002", temperature=0.2
-    )
+    s = Settings(llm="babbage-002", temperature=0.2)
     outputs = []
 
     def accum(x) -> None:
