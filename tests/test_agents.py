@@ -351,12 +351,12 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     async def llm_model_call(*args, **kwargs):
         # NOTE: "required" will not lead to thoughts being emitted, it has to be "auto"
         # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
-        kwargs.pop("tool_choice", LiteLLMModel.TOOL_CHOICE_REQUIRED)
+        # kwargs.pop("tool_choice", LiteLLMModel.TOOL_CHOICE_REQUIRED)
+        # tool_choice is now a arg, not a kwarg
+        args.pop()  # removing it from args # ASK: I accept ideas on how to handle this better
         return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore[misc]
 
-    with patch.object(
-        LiteLLMModel, "call", side_effect=llm_model_call, autospec=True
-    ):
+    with patch.object(LiteLLMModel, "call", side_effect=llm_model_call, autospec=True):
         response = await agent_query(
             query,
             agent_test_settings,

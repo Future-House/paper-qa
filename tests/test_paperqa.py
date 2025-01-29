@@ -14,6 +14,7 @@ from typing import cast
 import httpx
 import numpy as np
 import pytest
+from aviary.core import Message
 from llmclient import (
     CommonLLMNames,
     Embeddable,
@@ -426,17 +427,23 @@ def test_llm_parse_json_newlines() -> None:
 
 @pytest.mark.asyncio
 async def test_chain_completion() -> None:
-    s = Settings(llm="babbage-002", temperature=0.2)
+    s = Settings(
+        llm="babbage-002", temperature=0.2
+    )
     outputs = []
 
     def accum(x) -> None:
         outputs.append(x)
 
     llm = s.get_llm()
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        system_prompt=None,
+
+    prompt = "The {animal} says"
+    data = {"animal": "duck"}
+    messages = [
+        Message(role="user", content=prompt.format(**data)),
+    ]
+    completion = await llm.call_single(  # run_prompt is deprecated
+        messages=messages,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -444,8 +451,8 @@ async def test_chain_completion() -> None:
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
 
-    completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
+    completion = await llm.call_single(  # run_prompt is deprecated
+        messages=messages,
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -463,10 +470,13 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
         outputs.append(x)
 
     llm = anthropic_settings.get_llm()
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        system_prompt=None,
+    prompt = "The {animal} says"
+    data = {"animal": "duck"}
+    messages = [
+        Message(role="user", content=prompt.format(**data)),
+    ]
+    completion = await llm.call_single(  # run_prompt is deprecated
+        messages=messages,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -476,8 +486,8 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
+    completion = await llm.call_single(  # run_prompt is deprecated
+        messages=messages,
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -757,18 +767,50 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
-    from llmclient import Chunk
+    # ASK: Because acompletion_iter is @rate_limited in LiteLLMModel, we need to mock it here.
+    # I accept ideas on how to handle this better
+    def mock_rate_limited(func):
+        async def wrapper(self, *args, **kwargs):  # noqa: RUF029
+            async def mock_rate_limited_generator():
+                async for item in func(self, *args, **kwargs):
+                    yield item
+
+            return mock_rate_limited_generator()
+
+        return wrapper
 
     class StubLLMModel(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, prompt: str) -> Chunk:  # noqa: ARG002
-            return Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
+        async def acompletion(
+            self, messages: list[Message], **kwargs
+        ) -> list[LLMResult]:
+            # NOTE: Here we add kwargs to the function signature to make it compatible with the superclass
+            # and avoid #type: ignore[override]
+            # and we delete kwargs to avoid ARG002 (unused argument)
+            del kwargs
+            return [
+                LLMResult(
+                    model=self.name,
+                    text="Echo",
+                    prompt=messages,
+                    prompt_count=1,
+                    completion_count=1,
+                )
+            ]
 
-        async def acomplete_iter(
-            self, prompt: str  # noqa: ARG002
-        ) -> AsyncIterable[Chunk]:
-            yield Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
+        @mock_rate_limited
+        async def acompletion_iter(
+            self, messages: list[Message], **kwargs
+        ) -> AsyncIterable[LLMResult]:
+            del kwargs
+            yield LLMResult(
+                model=self.name,
+                text="Echo",
+                prompt=messages,
+                prompt_count=1,
+                completion_count=1,
+            )
 
     docs = Docs()
     docs.add(

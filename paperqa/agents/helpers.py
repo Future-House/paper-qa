@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from typing import cast
 
+from aviary.core import Message
 from llmclient import LiteLLMModel, LLMModel
 from rich.table import Table
 
@@ -60,12 +61,14 @@ async def litellm_get_search_query(
         )
     else:
         model = llm
-    result = await model.run_prompt(
-        prompt=search_prompt,
-        data={"question": question, "count": count},
-        system_prompt=None,
+    data = {"question": question, "count": count}
+    messages = [
+        Message(role="user", content=search_prompt.format(**data)),
+    ]
+    result = await model.call_single(  # run_prompt is deprecated
+        messages=messages,
     )
-    search_query = result.text
+    search_query = cast(str, result.text)
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004
     # remove "2.", "3.", etc. -- https://regex101.com/r/W2f7F1/1
     queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
