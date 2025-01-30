@@ -40,6 +40,7 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,
 )
+from tqdm import tqdm
 
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
@@ -426,9 +427,13 @@ async def maybe_get_manifest(
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
             
-            # With 1% of the data this line takes forever
             csv_content = csv.DictReader(content.splitlines())
-            records = [DocDetails(**r) for r in csv_content]
+            records = [DocDetails(**r) for r in tqdm(
+                csv_content, 
+                desc="Processing CSV records", 
+                unit="%",
+                bar_format='{desc}: {percentage:3.0f}%|{bar}|'
+            )]
             
             file_loc_to_records = {
                 str(r.file_location): r for r in records if r.file_location
