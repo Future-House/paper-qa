@@ -589,6 +589,7 @@ def make_default_litellm_model_list_settings(
 ) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
     return {
+        "name": llm,
         "model_list": [
             {
                 "model_name": llm,
@@ -902,12 +903,12 @@ class Settings(BaseSettings):
                     )
                 )
             return agent_cls(
-                llm_model={"model": agent_llm, "temperature": self.temperature},
+                llm_model={"name": agent_llm, "temperature": self.temperature},
                 **config,
             )
         if issubclass(agent_cls, SimpleAgent):
             return agent_cls(
-                llm_model={"model": agent_llm, "temperature": self.temperature},
+                llm_model={"name": agent_llm, "temperature": self.temperature},
                 sys_prompt=agent_settings.agent_system_prompt,
                 **config,
             )
