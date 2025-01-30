@@ -26,7 +26,7 @@ def llm_parse_json(text: str) -> dict:
     pattern = r'"(?:[^"\\]|\\.)*"'
     ptext = re.sub(pattern, escape_newlines, ptext)
     try:
-        return json.loads(ptext)
+        return json.loads(ptext.replace("\\", "\\\\"))
     except json.JSONDecodeError as e:
         raise ValueError(
             f"Failed to parse JSON from text {text!r}. Your model may not be capable of"

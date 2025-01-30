@@ -7,15 +7,20 @@ __all__ = [
     "LitQAv2TaskSplit",
 ]
 
+import random
 import logging
 import re
+import time
+import json
+import os
 from abc import ABC
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from copy import deepcopy
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never, cast
 from uuid import UUID
-
+from paperqa.prompts import lfrqa_system_prompt, lfrqa_prompt
+from paperqa.utils import strip_citations
 from aviary.core import (
     TASK_DATASET_REGISTRY,
     Environment,
@@ -45,7 +50,7 @@ from paperqa.litqa import (
     DEFAULT_REWARD_MAPPING,
     read_litqa_v2_from_hub,
 )
-from paperqa.settings import Settings
+from paperqa.settings import Settings, get_settings
 from paperqa.types import DocDetails, PQASession
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
@@ -73,9 +78,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         session_id: UUID | None = None,
         sources: str | list[str] | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
-        evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation], Awaitable] | None
-        ) = None,
+        evaluation_callback: Callable[[MultipleChoiceEvaluation], Awaitable] | None = None,
         **env_kwargs,
     ):
         super().__init__(
@@ -89,9 +92,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             **env_kwargs,
         )
         # Enables checking an Index has the right DOI(s)
-        self.sources: list[str] | None = (
-            [sources] if isinstance(sources, str) else sources
-        )
+        self.sources: list[str] | None = [sources] if isinstance(sources, str) else sources
         self._evaluation_callback = evaluation_callback
         self._rewards = rewards
 
@@ -112,34 +113,23 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         else:
             entity = "manifest"
             file_names = {k for k in manifest_or_index if k}
-            lowercased_dois = {
-                v["doi"].lower() for v in manifest_or_index.values() if v["doi"]
-            }
+            lowercased_dois = {v["doi"].lower() for v in manifest_or_index.values() if v["doi"]}
         if not file_names:  # File names being empty means something's wrong
             logger.warning(
-                f"Can't validate sources {self.sources} without a correctly specified"
-                f" {entity}."
+                f"Can't validate sources {self.sources} without a correctly specified" f" {entity}."
             )
             return
         not_found = [
-            s
-            for s in self.sources
-            if s not in file_names and s.lower() not in lowercased_dois
+            s for s in self.sources if s not in file_names and s.lower() not in lowercased_dois
         ]
         if not_found:
-            question = (
-                self._query
-                if isinstance(self._query, str)
-                else self._query.question_prompt
-            )
+            question = self._query if isinstance(self._query, str) else self._query.question_prompt
             raise ValueError(
                 f"Sources {not_found} of {self.sources} not found in the {entity},"
                 f" the corresponding query was {question!r}."
             )
 
-    async def step(
-        self, action: ToolRequestMessage
-    ) -> tuple[Messages, float, bool, bool]:
+    async def step(self, action: ToolRequestMessage) -> tuple[Messages, float, bool, bool]:
         messages, reward, done, truncated = await super().step(action)
         if not done or not isinstance(self._query, MultipleChoiceQuestion):
             return messages, reward, done, truncated
@@ -233,9 +223,7 @@ async def evaluate_consensus_sampling(
             if isinstance(x.state, EnvironmentState)
             else cast(PQASession | dict[str, Any], x.state["session"])  # type: ignore[call-overload,index]
         )
-        graded_answer = (
-            ses.graded_answer if isinstance(ses, PQASession) else ses["graded_answer"]
-        )
+        graded_answer = ses.graded_answer if isinstance(ses, PQASession) else ses["graded_answer"]
         # One can filter the below empty string injection via the exclude_no_answer arg
         return graded_answer or ""
 
@@ -268,9 +256,7 @@ async def evaluate_consensus_sampling(
             " `pip install paper-qa[ldp]`."
         ) from None
     if exclude_no_answer:
-        consensus = {
-            q: [(a, c) for a, c in answers if a] for q, answers in consensus.items()
-        }
+        consensus = {q: [(a, c) for a, c in answers if a] for q, answers in consensus.items()}
     return consensus, accuracy
 
 
@@ -305,9 +291,7 @@ class StoreForConsensusSamplingCallback(Callback):
         )
 
 
-class LitQATaskDataset(
-    TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin, ABC
-):
+class LitQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin, ABC):
     """
     Abstract base class for a task dataset of LitQA v1 or v2 questions.
 
@@ -381,10 +365,7 @@ class LitQATaskDataset(
                         maxsplit=1,
                     )
                     for obs in t.steps[-1].next_observation
-                    if (
-                        isinstance(obs, ToolResponseMessage)
-                        and obs.name == Complete.TOOL_FN_NAME
-                    )
+                    if (isinstance(obs, ToolResponseMessage) and obs.name == Complete.TOOL_FN_NAME)
                 )
                 # Filter for places where the regex split succeeded
                 if len(split_certainty) >= 4  # noqa: PLR2004
@@ -405,15 +386,9 @@ class LitQATaskDataset(
             "total_paper_count": total_paper_count,
             "relevant_paper_count": relevant_paper_count,
             "evidence_count": evidence_count,
-            "correct": [
-                int(t.steps[-1].reward == self._rewards["correct"])
-                for t in trajectories
-            ],
+            "correct": [int(t.steps[-1].reward == self._rewards["correct"]) for t in trajectories],
             "correct_unsure": [
-                int(
-                    t.steps[-1].reward
-                    in {self._rewards["correct"], self._rewards["unsure"]}
-                )
+                int(t.steps[-1].reward in {self._rewards["correct"], self._rewards["unsure"]})
                 for t in trajectories
             ],
         }
@@ -486,4 +461,179 @@ TASK_DATASET_NAME = "litqa-v2"
 TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
     LitQAv2TaskDataset.__module__,
     LitQAv2TaskDataset.__name__,
+)
+
+
+class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin):
+    """Task dataset for custom evaluation of non-multiple choice questions."""
+
+    def __init__(
+        self,
+        data_path: str,
+        settings: Settings | dict | None = None,
+        base_docs: Docs | dict | None = None,
+        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
+        eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
+        **env_kwargs,
+    ):
+        if settings is None:
+            settings = Settings()
+        if isinstance(settings, dict):
+            settings = Settings(**settings)
+        self._settings = settings
+
+        if base_docs is None:
+            base_docs = Docs()
+        if isinstance(base_docs, dict):
+            base_docs = Docs(**base_docs)
+        self._base_docs = base_docs
+
+        self._rewards = rewards
+        self._eval_model = eval_model
+        self._env_kwargs = env_kwargs
+
+        import pandas as pd
+
+        self.data = pd.read_csv(data_path)
+
+    def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
+        """Create a new environment instance for the given index."""
+        row = self.data.iloc[idx]
+
+        class CustomEvalEnv(GradablePaperQAEnvironment):
+            async def custom_evaluation(self, messages: Messages, pqa_answer: str) -> float:
+
+                llm_model = get_settings(self._settings).get_llm()
+
+                pqa_answer = strip_citations(pqa_answer)
+
+                human_answer = row.answer
+
+                if random.random() < 0.5:
+                    data = {
+                        "question": row.question,
+                        "answer1": pqa_answer,
+                        "answer2": human_answer,
+                    }
+                    pqa_answer_index = 1
+                else:
+                    data = {
+                        "question": row.question,
+                        "answer1": human_answer,
+                        "answer2": pqa_answer,
+                    }
+                    pqa_answer_index = 2
+
+                result = await llm_model.run_prompt(
+                    prompt=lfrqa_prompt,
+                    data=data,
+                    system_prompt=lfrqa_system_prompt,
+                )
+                
+                def extract_best_answer_index(text):
+                    match = re.search(r'<rating>(\d+)</rating>', text)
+                    if match:
+                        return int(match.group(1))
+                    return None
+
+                best_answer_index = extract_best_answer_index(result.text)
+
+                # Create evaluation results dictionary
+                evaluation_results = {
+                    "question": row.question,
+                    "paperqa_answer": pqa_answer,
+                    "human_answer": human_answer,
+                    "winner": "paperqa" if best_answer_index == pqa_answer_index else "human" if best_answer_index != 0 else "tie",
+                    "llm_response": result.text
+                }
+
+                os.makedirs("benchmark", exist_ok=True)
+                json_path = f"benchmark/{row.qid}.json"
+                with open(json_path, 'w') as f:
+                    json.dump(evaluation_results, f, indent=2)
+
+                print("--------------------------------")
+                print("For question", row.question, "\n")
+                print("PQa answer was:\n", pqa_answer, "\n\n")
+                print("Human answer was:\n", human_answer, "\n\n")
+
+                if best_answer_index == pqa_answer_index:
+                    reward = self._rewards["correct"]
+                    print("Best answer was PaperQA's")
+                elif best_answer_index == 0:
+                    reward = 0
+                    print("Tie!")
+                else:
+                    reward = self._rewards["incorrect"]
+                    print("Best answer was Human's")
+                print("--------------------------------")
+
+                return reward
+
+            async def step(self, action: ToolRequestMessage) -> tuple[Messages, float, bool, bool]:
+                messages, reward, done, truncated = await super().step(action)
+                if done:
+                    reward = await self.custom_evaluation(messages, self.state.session.answer)
+                return messages, reward, done, truncated
+
+        return CustomEvalEnv(
+            query=row.question,
+            settings=self._settings,
+            docs=self._base_docs.model_copy(),
+            sources=row.get("sources", None),
+            rewards=self._rewards,
+            **self._env_kwargs,
+        )
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+    def compute_trajectory_metrics(
+        self, trajectories: "Sequence[Trajectory]"
+    ) -> dict[str, list[float]]:
+        metrics = super().compute_trajectory_metrics(trajectories)
+
+        # Add custom metrics similar to LitQATaskDataset
+        total_paper_count: list[float] = []
+        relevant_paper_count: list[float] = []
+        evidence_count: list[float] = []
+
+        for t in trajectories:
+            split_certainties = [
+                split_certainty
+                for split_certainty in (
+                    re.split(
+                        pattern=Complete.CERTAINTY_SPLIT_REGEX_PATTERN,
+                        string=obs.content,
+                        maxsplit=1,
+                    )
+                    for obs in t.steps[-1].next_observation
+                    if (isinstance(obs, ToolResponseMessage) and obs.name == Complete.TOOL_FN_NAME)
+                )
+                if len(split_certainty) >= 4
+            ]
+
+            for i, metric_list in enumerate(
+                (total_paper_count, relevant_paper_count, evidence_count),
+                start=1,
+            ):
+                metric_list.append(
+                    sum(int(sa[i]) for sa in split_certainties) / len(split_certainties)
+                    if split_certainties
+                    else 0
+                )
+
+        return metrics | {
+            "total_paper_count": total_paper_count,
+            "relevant_paper_count": relevant_paper_count,
+            "evidence_count": evidence_count,
+            "correct": [int(t.steps[-1].reward == self._rewards["correct"]) for t in trajectories],
+        }
+
+
+# Register your custom dataset
+CUSTOM_TASK_DATASET_NAME = "custom-qa"
+TASK_DATASET_REGISTRY[CUSTOM_TASK_DATASET_NAME] = (
+    LFRQATaskDataset.__module__,
+    LFRQATaskDataset.__name__,
 )

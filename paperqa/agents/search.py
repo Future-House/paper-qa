@@ -380,7 +380,7 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~", '"'):
+        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~", '"', "^", ">", "<", "+"):
             query = query.replace(replace, "")
         return query
 
@@ -399,10 +399,10 @@ class SearchIndex:
         addresses = [
             s[1]
             for s in searcher.search(
-                index.parse_query(self.clean_query(query), query_fields), top_n
+                index.parse_query(self.clean_query(query), query_fields), top_n, offset=offset
             ).hits
             if s[0] > min_score
-        ][offset : offset + top_n]
+        ]
         search_index_docs = [searcher.doc(address) for address in addresses]
         return [
             result
@@ -425,7 +425,11 @@ async def maybe_get_manifest(
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
-            records = [DocDetails(**r) for r in csv.DictReader(content.splitlines())]
+            
+            # With 1% of the data this line takes forever
+            csv_content = csv.DictReader(content.splitlines())
+            records = [DocDetails(**r) for r in csv_content]
+            
             file_loc_to_records = {
                 str(r.file_location): r for r in records if r.file_location
             }
@@ -453,6 +457,18 @@ async def maybe_get_manifest(
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
 
+def get_manifest_kwargs(
+    manifest: dict[str, Any], manifest_fallback_location: str, file_location: str
+) -> dict[str, Any]:
+    if file_location in manifest:
+        manifest_entry: DocDetails = manifest[file_location]
+        return manifest_entry.model_dump()
+    if manifest_fallback_location in manifest:
+        manifest_entry: DocDetails = manifest[manifest_fallback_location]
+        return manifest_entry.model_dump()
+    return {}
+
+
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
@@ -476,23 +492,17 @@ async def process_file(
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            doi, title = None, None
-            if file_location in manifest:
-                manifest_entry = manifest[file_location]
-                doi, title = manifest_entry.doi, manifest_entry.title
-            elif manifest_fallback_location in manifest:
-                # Perhaps manifest used the opposite pathing scheme
-                manifest_entry = manifest[manifest_fallback_location]
-                doi, title = manifest_entry.doi, manifest_entry.title
+            manifest_kwargs = get_manifest_kwargs(
+                manifest, manifest_fallback_location, file_location
+            )
 
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
                     path=abs_file_path,
-                    title=title,
-                    doi=doi,
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
+                    **manifest_kwargs,
                 )
             except (ValueError, ImpossibleParsingError):
                 logger.exception(
