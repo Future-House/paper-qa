@@ -234,7 +234,8 @@ class PQASession(BaseModel):
 class Answer(PQASession):
     def __init__(self, *args, **kwargs):
         warnings.warn(
-            "The 'Answer' class is deprecated and will be removed in future versions. Use 'PQASession' instead.",
+            "The 'Answer' class is deprecated and will be removed in future versions."
+            " Use 'PQASession' instead.",
             DeprecationWarning,
             stacklevel=2,
         )
