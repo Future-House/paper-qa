@@ -80,6 +80,7 @@ async def agent_query(
         },
         document=response,
     )
+    answers_index.commit()
     await answers_index.save_index()
     return response
 
