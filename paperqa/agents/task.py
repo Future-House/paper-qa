@@ -495,8 +495,8 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             "llm_response": result.text,
         }
 
-        os.makedirs("benchmark", exist_ok=True)
-        json_path = f"benchmark/{qid}.json"
+        os.makedirs("rag-qa-benchmarking/results", exist_ok=True)
+        json_path = f"rag-qa-benchmarking/results/{qid}.json"
         with open(json_path, "w") as f:
             json.dump(evaluation_results, f, indent=2)
 
