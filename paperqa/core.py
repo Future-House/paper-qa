@@ -32,32 +32,36 @@ def llm_parse_json(text: str) -> dict:
     try:
         return json.loads(ptext)
     except json.JSONDecodeError as e:
-        print(f"[WARNING] Failed to parse JSON. Attempting to wrap response in dictionary")
+        print(
+            "[WARNING] Failed to parse JSON. Attempting to wrap response in dictionary"
+        )
     except Exception as e:
         raise ValueError(
             f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
             " supporting JSON output or our parsing technique could use some work. Try"
             " a different model or specify `Settings(prompts={'use_json': False})`"
         ) from e
-    
+
     # Removing <think> tags for reasoning models (happens if the LLM does not produce a JSON response)
     if "<think>" in ptext:
-        ptext = text.strip("{}").strip() # Removes {} added previously
+        ptext = text.strip("{}").strip()  # Removes {} added previously
         ptext = re.sub(r"<think>.*?</think>", "", ptext, flags=re.DOTALL).strip()
 
     #  Wrap the response in a dictionary if not json compatible
     ptext = {"summary": ptext}
     ptext = json.dumps(ptext)
 
-    try: 
+    try:
         response = json.loads(ptext)
-        # Handle variations of the key "relevance_score" which the model sometimes outputs incorrectly        
-        relevance_keys = [key for key in response.keys() if re.search(r"relevance", key, re.IGNORECASE)]
+        # Handle variations of the key "relevance_score" which the model sometimes outputs incorrectly
+        relevance_keys = [
+            key for key in response if re.search(r"relevance", key, re.IGNORECASE)
+        ]
         if relevance_keys:
             response["relevance_score"] = response.pop(relevance_keys[0])
 
         return response
-    
+
     except json.JSONDecodeError as e:
         raise ValueError(
             f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
@@ -141,7 +145,9 @@ async def map_fxn_summary(
                 name=text.name,
                 doc=text.doc.model_dump(exclude={"embedding"}),
             ),
-            score=round(float(score)),  # pylint: disable=possibly-used-before-assignment
+            score=round(
+                float(score)
+            ),  # pylint: disable=possibly-used-before-assignment
             **extras,
         ),
         llm_result,
