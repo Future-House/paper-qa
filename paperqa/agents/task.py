@@ -466,18 +466,18 @@ TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
 
 class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
     def __init__(self, qid: str, question: str, human_answer: str, *args, **kwargs):
+        #NOTE I'm using qid and question and 
+        # maybe we could use session_id and query instead?
         kwargs["query"] = question
+        
+        # NOTE: I'm also passing this docs because they are required
+        # but don't know if/how they are used
+        kwargs["docs"] = Docs()
         super().__init__(*args, **kwargs)
 
         self.qid = qid
         self.question = question
         self.human_answer = human_answer
-
-        self._rewards = {
-            "win": 1,
-            "tie": 0,
-            "lose": -1,
-        }
 
     def extract_best_answer_index(self, text: str) -> int:
         match = re.search(r"<rating>(\d+)</rating>", text)
@@ -566,10 +566,6 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
         data_path: str,
         num_questions: int | None = None,
         settings: Settings | dict | None = None,
-        base_docs: Docs | dict | None = None,
-        rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
-        eval_model: LLMModel | str = DEFAULT_EVAL_MODEL_NAME,
-        **env_kwargs,
     ):
         if settings is None:
             settings = Settings()
@@ -577,20 +573,16 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
             settings = Settings(**settings)
         self._settings = settings
 
-        if base_docs is None:
-            base_docs = Docs()
-        if isinstance(base_docs, dict):
-            base_docs = Docs(**base_docs)
-        self._base_docs = base_docs
-
-        self._rewards = rewards
-        self._eval_model = eval_model
-        self._env_kwargs = env_kwargs
-
         if num_questions is not None:
             self.data = pd.read_csv(data_path).head(num_questions)
         else:
             self.data = pd.read_csv(data_path)
+            
+        self._rewards = {
+            "win": 1,
+            "tie": 0,
+            "lose": -1,
+        }
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         """Create a new environment instance for the given index."""
@@ -601,14 +593,8 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
             question=row.question,
             human_answer=row.answer,
             settings=self._settings,
-            docs=self._base_docs.model_copy(),
-            sources=row.get("sources", None),
             rewards=self._rewards,
-            **self._env_kwargs,
         )
-
-    def __len__(self) -> int:
-        return len(self.data)
 
     def compute_trajectory_metrics(
         self, trajectories: "Sequence[Trajectory]"
@@ -650,13 +636,16 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
             "relevant_paper_count": relevant_paper_count,
             "evidence_count": evidence_count,
             "paperqa_won": [
-                int(t.steps[-1].reward == self._rewards["correct"]) for t in trajectories
+                int(t.steps[-1].reward == self._rewards["win"]) for t in trajectories
             ],
         }
+        
+    def __len__(self) -> int:
+        return len(self.data)
 
 
 # Register your custom dataset
-CUSTOM_TASK_DATASET_NAME = "custom-qa"
+CUSTOM_TASK_DATASET_NAME = "lfrqa"
 TASK_DATASET_REGISTRY[CUSTOM_TASK_DATASET_NAME] = (
     LFRQATaskDataset.__module__,
     LFRQATaskDataset.__name__,
