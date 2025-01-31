@@ -464,6 +464,100 @@ TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
 )
 
 
+class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
+    def __init__(self, qid: str, question: str, human_answer: str, *args, **kwargs):
+        kwargs["query"] = question
+        super().__init__(*args, **kwargs)
+
+        self.qid = qid
+        self.question = question
+        self.human_answer = human_answer
+
+        self._rewards = {
+            "win": 1,
+            "tie": 0,
+            "lose": -1,
+        }
+
+    def extract_best_answer_index(self, text: str) -> int:
+        match = re.search(r"<rating>(\d+)</rating>", text)
+        return int(match.group(1)) if match else None
+
+    def log_results_to_json(
+        self, qid: str, question: str, pqa_answer: str, human_answer: str, pqa_answer_index: int, winner: str, result: str
+    ):
+        evaluation_results = {
+            "question": question,
+            "paperqa_answer": pqa_answer,
+            "human_answer": human_answer,
+            "pqa_answer_index": pqa_answer_index,
+            "winner": winner,
+            "llm_response": result.text,
+        }
+
+        os.makedirs("benchmark", exist_ok=True)
+        json_path = f"benchmark/{qid}.json"
+        with open(json_path, "w") as f:
+            json.dump(evaluation_results, f, indent=2)
+
+    async def pairwise_evaluation(
+        self, qid: str, question: str, pqa_answer: str, human_answer: str
+    ) -> float:
+
+        llm_model = get_settings(self._settings).get_llm()
+        pqa_answer = strip_citations(pqa_answer)
+
+        if random.random() < 0.5:
+            data = {
+                "question": question,
+                "answer1": pqa_answer,
+                "answer2": human_answer,
+            }
+            pqa_answer_index = 1
+        else:
+            data = {
+                "question": question,
+                "answer1": human_answer,
+                "answer2": pqa_answer,
+            }
+            pqa_answer_index = 2
+
+        result = await llm_model.run_prompt(
+            prompt=lfrqa_prompt,
+            data=data,
+            system_prompt=lfrqa_system_prompt,
+        )
+
+        best_answer_index = self.extract_best_answer_index(result.text)
+        winner = (
+            "paperqa"
+            if best_answer_index == pqa_answer_index
+            else "human" if best_answer_index != 0 else "tie"
+        )
+
+        print("--------------------------------")
+        print(f"For question {question} \n")
+        print(f"PQa answer was:\n{pqa_answer} \n\n")
+        print(f"Human answer was:\n{human_answer} \n\n")
+        print(f"Winner is: {winner}\n")
+        self.log_results_to_json(qid, question, pqa_answer, human_answer, pqa_answer_index, winner, result)
+        
+        reward = (
+            self._rewards["win"]
+            if winner == "paperqa"
+            else self._rewards["lose"] if winner == "human" else self._rewards["tie"]
+        )
+        return reward
+
+    async def step(self, action: ToolRequestMessage) -> tuple[Messages, float, bool, bool]:
+        messages, reward, done, truncated = await super().step(action)
+        if done:
+            reward = await self.pairwise_evaluation(
+                self.qid, self.question, self.state.session.answer, self.human_answer
+            )
+        return messages, reward, done, truncated
+
+
 class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin):
     """Task dataset for custom evaluation of non-multiple choice questions."""
 
@@ -502,84 +596,10 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
         """Create a new environment instance for the given index."""
         row = self.data.iloc[idx]
 
-        class CustomEvalEnv(GradablePaperQAEnvironment):
-            async def custom_evaluation(self, messages: Messages, pqa_answer: str) -> float:
-
-                llm_model = get_settings(self._settings).get_llm()
-
-                pqa_answer = strip_citations(pqa_answer)
-
-                human_answer = row.answer
-
-                if random.random() < 0.5:
-                    data = {
-                        "question": row.question,
-                        "answer1": pqa_answer,
-                        "answer2": human_answer,
-                    }
-                    pqa_answer_index = 1
-                else:
-                    data = {
-                        "question": row.question,
-                        "answer1": human_answer,
-                        "answer2": pqa_answer,
-                    }
-                    pqa_answer_index = 2
-
-                result = await llm_model.run_prompt(
-                    prompt=lfrqa_prompt,
-                    data=data,
-                    system_prompt=lfrqa_system_prompt,
-                )
-                
-                def extract_best_answer_index(text):
-                    match = re.search(r'<rating>(\d+)</rating>', text)
-                    if match:
-                        return int(match.group(1))
-                    return None
-
-                best_answer_index = extract_best_answer_index(result.text)
-
-                # Create evaluation results dictionary
-                evaluation_results = {
-                    "question": row.question,
-                    "paperqa_answer": pqa_answer,
-                    "human_answer": human_answer,
-                    "winner": "paperqa" if best_answer_index == pqa_answer_index else "human" if best_answer_index != 0 else "tie",
-                    "llm_response": result.text
-                }
-
-                os.makedirs("benchmark", exist_ok=True)
-                json_path = f"benchmark/{row.qid}.json"
-                with open(json_path, 'w') as f:
-                    json.dump(evaluation_results, f, indent=2)
-
-                print("--------------------------------")
-                print("For question", row.question, "\n")
-                print("PQa answer was:\n", pqa_answer, "\n\n")
-                print("Human answer was:\n", human_answer, "\n\n")
-
-                if best_answer_index == pqa_answer_index:
-                    reward = self._rewards["correct"]
-                    print("Best answer was PaperQA's")
-                elif best_answer_index == 0:
-                    reward = 0
-                    print("Tie!")
-                else:
-                    reward = self._rewards["incorrect"]
-                    print("Best answer was Human's")
-                print("--------------------------------")
-
-                return reward
-
-            async def step(self, action: ToolRequestMessage) -> tuple[Messages, float, bool, bool]:
-                messages, reward, done, truncated = await super().step(action)
-                if done:
-                    reward = await self.custom_evaluation(messages, self.state.session.answer)
-                return messages, reward, done, truncated
-
-        return CustomEvalEnv(
-            query=row.question,
+        return LFRQAPairwiseEvalEnv(
+            qid=row.qid,
+            question=row.question,
+            human_answer=row.answer,
             settings=self._settings,
             docs=self._base_docs.model_copy(),
             sources=row.get("sources", None),
@@ -629,7 +649,9 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
             "total_paper_count": total_paper_count,
             "relevant_paper_count": relevant_paper_count,
             "evidence_count": evidence_count,
-            "correct": [int(t.steps[-1].reward == self._rewards["correct"]) for t in trajectories],
+            "paperqa_won": [
+                int(t.steps[-1].reward == self._rewards["correct"]) for t in trajectories
+            ],
         }
 
 
