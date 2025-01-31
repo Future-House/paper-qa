@@ -22,7 +22,7 @@ async def evaluate() -> None:
 
     settings.parsing.use_doc_details = False
 
-    dataset = LFRQATaskDataset(data_path="rag-qa-benchmarking/lfrqa/questions.csv", settings=settings)
+    dataset = LFRQATaskDataset(data_path="rag-qa-benchmarking/lfrqa/questions.csv", num_questions=2, settings=settings)
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
     evaluator = Evaluator(

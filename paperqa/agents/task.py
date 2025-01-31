@@ -6,7 +6,7 @@ __all__ = [
     "LitQAv2TaskDataset",
     "LitQAv2TaskSplit",
 ]
-
+import pandas as pd
 import random
 import logging
 import re
@@ -470,6 +470,7 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
     def __init__(
         self,
         data_path: str,
+        num_questions: int | None = None,
         settings: Settings | dict | None = None,
         base_docs: Docs | dict | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
@@ -492,9 +493,10 @@ class LFRQATaskDataset(TaskDataset[GradablePaperQAEnvironment], ComputeTrajector
         self._eval_model = eval_model
         self._env_kwargs = env_kwargs
 
-        import pandas as pd
-
-        self.data = pd.read_csv(data_path)
+        if num_questions is not None:
+            self.data = pd.read_csv(data_path).head(num_questions)
+        else:
+            self.data = pd.read_csv(data_path)
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         """Create a new environment instance for the given index."""
