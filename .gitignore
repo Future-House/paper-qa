@@ -311,3 +311,7 @@ paperqa/clients/client_data/retractions.csv
 
 # Benchmark
 benchmark/*
+
+lotte/
+
+rag-qa-benchmarking/

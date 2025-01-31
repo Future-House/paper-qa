@@ -427,10 +427,10 @@ async def maybe_get_manifest(
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
             
-            csv_content = csv.DictReader(content.splitlines())
+            csv_content = list(csv.DictReader(content.splitlines()))
             records = [DocDetails(**r) for r in tqdm(
                 csv_content, 
-                desc="Processing CSV records", 
+                desc="Creating DocDetails from manifest", 
                 unit="%",
                 bar_format='{desc}: {percentage:3.0f}%|{bar}|'
             )]
@@ -649,15 +649,19 @@ async def get_directory_index(  # noqa: PLR0912
     manifest = await maybe_get_manifest(
         filename=await index_settings.finalize_manifest_file()
     )
-    valid_papers_rel_file_paths = [
-        file.relative_to(paper_directory)
-        async for file in (
+    path_iterator = (
             paper_directory.rglob("*")
             if index_settings.recurse_subdirectories
             else paper_directory.iterdir()
-        )
-        if file.suffix in {".txt", ".pdf", ".html"}
-    ]
+    )
+    valid_papers_rel_file_paths = []
+    async for file in path_iterator:
+        if file.suffix in {".txt", ".pdf", ".html"}:
+            valid_papers_rel_file_paths.append(file.relative_to(paper_directory))
+            if len(valid_papers_rel_file_paths) % int(0.05*len(manifest)) == 0:
+                percentage_processed = 100*len(valid_papers_rel_file_paths) / len(manifest)
+                print(f"Loaded {percentage_processed:.1f}% of the papers present in the manifest")
+            
     if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
             f"Indexing {len(valid_papers_rel_file_paths)} files into the index"
