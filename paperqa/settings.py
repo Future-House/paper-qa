@@ -595,7 +595,7 @@ def make_default_litellm_model_list_settings(
                 "model_name": llm,
                 "litellm_params": {"model": llm, "temperature": temperature},
             }
-        ]
+        ],
     }
 
 

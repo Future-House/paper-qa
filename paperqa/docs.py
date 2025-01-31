@@ -21,6 +21,7 @@ from llmclient import (
     LLMResult,
 )
 from llmclient.types import set_llm_session_ids
+from llmclient.utils import gather_with_concurrency
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -42,7 +43,6 @@ from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
-    gather_with_concurrency,
     get_loop,
     maybe_is_html,
     maybe_is_pdf,
