@@ -272,7 +272,7 @@ class SearchIndex:
         (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
         self.changed = True
 
-    @property 
+    @property
     async def writer(self) -> IndexWriter:
         if not self._writer:
             self._writer = (await self.index).writer()
@@ -331,7 +331,7 @@ class SearchIndex:
                 f" within {lock_acquisition_max_retries} attempts."
             )
             raise
-        
+
     async def commit(self) -> None:
         """Commit all pending changes to the index."""
         if self._writer:
@@ -394,7 +394,22 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~", '"', "^", ">", "<", "+"):
+        for replace in (
+            "*",
+            "[",
+            "]",
+            ":",
+            "(",
+            ")",
+            "{",
+            "}",
+            "~",
+            '"',
+            "^",
+            ">",
+            "<",
+            "+",
+        ):
             query = query.replace(replace, "")
         return query
 
@@ -413,7 +428,9 @@ class SearchIndex:
         addresses = [
             s[1]
             for s in searcher.search(
-                index.parse_query(self.clean_query(query), query_fields), top_n, offset=offset
+                index.parse_query(self.clean_query(query), query_fields),
+                top_n,
+                offset=offset,
             ).hits
             if s[0] > min_score
         ]
@@ -439,15 +456,18 @@ async def maybe_get_manifest(
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
-            
+
             csv_content = list(csv.DictReader(content.splitlines()))
-            records = [DocDetails(**r) for r in tqdm(
-                csv_content, 
-                desc="Creating DocDetails from manifest", 
-                unit="%",
-                bar_format='{desc}: {percentage:3.0f}%|{bar}|'
-            )]
-            
+            records = [
+                DocDetails(**r)
+                for r in tqdm(
+                    csv_content,
+                    desc="Creating DocDetails from manifest",
+                    unit="%",
+                    bar_format="{desc}: {percentage:3.0f}%|{bar}|",
+                )
+            ]
+
             file_loc_to_records = {
                 str(r.file_location): r for r in records if r.file_location
             }
@@ -486,7 +506,10 @@ def get_manifest_kwargs(
         return manifest_entry.model_dump()
     return {}
 
+
 processed = 0
+
+
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
@@ -496,7 +519,7 @@ async def process_file(
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
     global processed
-    
+
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
     )
@@ -558,7 +581,9 @@ async def process_file(
             if processed % settings.agent.index.concurrency == 0:
                 await search_index.commit()
                 await search_index.save_index()
-                logger.info(f"Committed batch of {settings.agent.index.concurrency} documents")
+                logger.info(
+                    f"Committed batch of {settings.agent.index.concurrency} documents"
+                )
 
             logger.info(f"Complete ({title}).")
 
@@ -676,7 +701,7 @@ async def get_directory_index(  # noqa: PLR0912
             else paper_directory.iterdir()
         )
         if file.suffix in {".txt", ".pdf", ".html"}
-    ]       
+    ]
     if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
             f"Indexing {len(valid_papers_rel_file_paths)} files into the index"
