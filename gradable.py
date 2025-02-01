@@ -10,7 +10,7 @@ from paperqa.agents.task import LFRQATaskDataset
 
 async def evaluate() -> None:
     settings = Settings()
-    settings.agent.index.name = "lfrqa_science_docs"
+    settings.agent.index.name = "lfrqa_science_index_complete"
     settings.agent.index.paper_directory = (
         "rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
     )

@@ -1,8 +1,7 @@
 from paperqa import Settings, ask
 
-
 settings = Settings()
-settings.agent.index.name = "lfrqa_science_docs"
+settings.agent.index.name = "lfrqa_science_index_complete"
 settings.agent.index.paper_directory = f"rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
 settings.agent.index.index_directory = f"rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
 
