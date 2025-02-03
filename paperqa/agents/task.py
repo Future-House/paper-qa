@@ -595,6 +595,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             if winner == "paperqa"
             else self._rewards["lose"] if winner == "human" else self._rewards["tie"]
         )
+        return reward
 
     async def step(
         self, action: ToolRequestMessage
