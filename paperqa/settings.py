@@ -631,20 +631,6 @@ class Settings(BaseSettings):
             " router_kwargs key with router kwargs as values."
         ),
     )
-    pair_eval_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
-        description="LLM to use for pairwise evaluation.",
-    )
-    pair_eval_llm_config: dict | None = Field(
-        default=None,
-        description=(
-            "Optional configuration for the pair_eval_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
-        ),
-    )
     embedding: str = Field(
         default="text-embedding-3-small",
         description="Default embedding model for texts",
@@ -835,15 +821,6 @@ class Settings(BaseSettings):
             config=self.summary_llm_config
             or make_default_litellm_model_list_settings(
                 self.summary_llm, self.temperature
-            ),
-        )
-
-    def get_pairwise_eval_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.pair_eval_llm,
-            config=self.pair_eval_llm_config
-            or make_default_litellm_model_list_settings(
-                self.pair_eval_llm, self.temperature
             ),
         )
 
