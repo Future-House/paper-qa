@@ -9,6 +9,7 @@ import re
 import shutil
 import tempfile
 import time
+import zlib
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
@@ -25,6 +26,7 @@ from ldp.graph.ops import OpResult
 from llmclient import CommonLLMNames, EmbeddingModel, MultipleCompletionLLMModel
 from pytest_subtests import SubTests
 from tantivy import Index
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
 from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import (
@@ -147,8 +149,18 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
     mock_aadd.assert_awaited()
 
     # 2. Resume and complete building the index
-    with patch.object(Docs, "aadd", autospec=True, side_effect=Docs.aadd) as mock_aadd:
-        index = await get_directory_index(settings=agent_test_settings)
+    for attempt in Retrying(
+        stop=stop_after_attempt(3),
+        # zlib.error: Error -5 while decompressing data: incomplete or truncated stream
+        retry=retry_if_exception_type(zlib.error),
+    ):
+        with (
+            attempt,
+            patch.object(
+                Docs, "aadd", autospec=True, side_effect=Docs.aadd
+            ) as mock_aadd,
+        ):
+            index = await get_directory_index(settings=agent_test_settings)
     assert (
         mock_aadd.await_count <= crash_threshold
     ), "Should have been able to resume build"
