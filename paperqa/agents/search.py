@@ -373,6 +373,7 @@ class SearchIndex:
             self.changed = True
 
     async def save_index(self) -> None:
+        self.commit()
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -579,7 +580,6 @@ async def process_file(
 
             processed += 1
             if processed % settings.agent.index.concurrency == 0:
-                await search_index.commit()
                 await search_index.save_index()
                 logger.info(
                     f"Committed batch of {settings.agent.index.concurrency} documents"
@@ -749,7 +749,6 @@ async def get_directory_index(  # noqa: PLR0912
                     )
 
     if search_index.changed:
-        await search_index.commit()
         await search_index.save_index()
     else:
         logger.debug("No changes to index.")
