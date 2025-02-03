@@ -496,7 +496,15 @@ TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
 
 
 class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
-    def __init__(self, qid: str, question: str, human_answer: str, *args, **kwargs):
+    def __init__(
+        self,
+        qid: str,
+        question: str,
+        human_answer: str,
+        gt_doc_ids: list[str],
+        *args,
+        **kwargs,
+    ):
         # NOTE I'm using qid and question and
         # maybe we could use session_id and query instead?
         kwargs["query"] = question
@@ -509,6 +517,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         self.qid = qid
         self.question = question
         self.human_answer = human_answer
+        self.gt_doc_ids = gt_doc_ids
 
     def extract_best_answer_index(self, text: str) -> int:
         match = re.search(r"<rating>(\d+)</rating>", text)
@@ -520,11 +529,15 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         qid: str,
         question: str,
         pqa_answer: str,
+        paper_search_ids: list[str],
+        pqa_context: str,
         human_answer: str,
+        gt_doc_ids: list[str],
         pqa_answer_index: int,
         winner: str,
         result: str,
     ):
+        were_gt_docs_found = len(set(gt_doc_ids) & set(paper_search_ids)) > 0
         evaluation_results = {
             "question": question,
             "paperqa_answer": pqa_answer,
@@ -532,6 +545,10 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             "pqa_answer_index": pqa_answer_index,
             "winner": winner,
             "llm_response": result.text,
+            "paper_search_ids": paper_search_ids,
+            "pqa_context": pqa_context,
+            "gt_doc_ids": gt_doc_ids,
+            "were_gt_docs_found": were_gt_docs_found,
         }
 
         os.makedirs(f"rag-qa-benchmarking/results_{llm_model_name}", exist_ok=True)
@@ -542,6 +559,8 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
     async def pairwise_evaluation(
         self, qid: str, question: str, pqa_answer: str, human_answer: str
     ) -> float:
+
+        paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
 
         pairwise_eval_llm = get_settings(self._settings).get_pairwise_eval_llm()
         pqa_answer = strip_citations(pqa_answer)
@@ -584,7 +603,10 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             qid,
             question,
             pqa_answer,
+            paper_search_ids,
+            self.state.session.context,
             human_answer,
+            self.gt_doc_ids,
             pqa_answer_index,
             winner,
             result,
@@ -646,6 +668,7 @@ class LFRQATaskDataset(
             human_answer=row.answer,
             settings=self._settings,
             rewards=self._rewards,
+            gt_doc_ids=pd.eval(row.gold_doc_ids),
         )
 
     def compute_trajectory_metrics(

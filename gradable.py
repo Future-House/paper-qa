@@ -1,7 +1,4 @@
 import asyncio
-import os
-
-from aviary.env import TaskDataset
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
@@ -26,7 +23,7 @@ async def evaluate() -> None:
 
     dataset = LFRQATaskDataset(
         data_path="rag-qa-benchmarking/lfrqa/questions.csv",
-        num_questions=2,
+        num_questions=20,
         settings=settings,
     )
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
