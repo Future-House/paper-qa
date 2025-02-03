@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **LFRQA dataset** was introduced in the paper [*LFRQA: Large-Scale Few-Shot Retrieval Question Answering*](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use.
+The **LFRQA dataset** was introduced in the paper [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use.
 
 ## Step 1: Download the Annotations
 
@@ -41,7 +41,7 @@ LFRQA is built upon **Robust-QA**, so we must download the relevant documents:
 !rm -rf lotte
 ```
 
-For more details, refer to the original paper: [*LFRQA: Large-Scale Few-Shot Retrieval Question Answering*](https://arxiv.org/pdf/2407.13998).
+For more details, refer to the original paper: [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998).
 
 ## Step 3: Load the Data
 
@@ -52,7 +52,9 @@ import os
 import pandas as pd
 
 # Load questions and answers dataset
-questions = pd.read_json("rag-qa-benchmarking/annotations_science_with_citation.jsonl", lines=True)
+questions = pd.read_json(
+    "rag-qa-benchmarking/annotations_science_with_citation.jsonl", lines=True
+)
 
 # Load documents dataset
 docs = pd.read_csv(
@@ -61,12 +63,11 @@ docs = pd.read_csv(
     header=None,
 )
 docs.columns = ["doc_id", "doc_text"]
-
 ```
 
 ## Step 4: Select the Documents to Use
 
-If needed, we can limit the number of documents used. RobustQA consists on 1.7M documents, so the index will take a long time to build. 
+If needed, we can limit the number of documents used. RobustQA consists on 1.7M documents, so the index will take a long time to build.
 
 If you want to run a quick test, you can use a small proportion.
 
@@ -77,7 +78,6 @@ proportion_to_use = 1 / 100
 amount_of_docs_to_use = int(len(docs) * proportion_to_use)
 partial_docs = docs.head(amount_of_docs_to_use)
 print(f"Using {amount_of_docs_to_use} out of {len(docs)} documents")
-
 ```
 
 ## Step 5: Prepare the Document Files
@@ -94,7 +94,11 @@ for i, row in partial_docs.iterrows():
     doc_id = row["doc_id"]
     doc_text = row["doc_text"]
 
-    with open(f"{papers_directory}/science_docs_for_paperqa/files/{doc_id}.txt", "w", encoding="utf-8") as f:
+    with open(
+        f"{papers_directory}/science_docs_for_paperqa/files/{doc_id}.txt",
+        "w",
+        encoding="utf-8",
+    ) as f:
         f.write(doc_text)
 
     if i % int(len(partial_docs) * 0.05) == 0:
@@ -108,15 +112,16 @@ The **manifest file** keeps track of document metadata for the dataset. It is al
 
 ```python
 manifest = partial_docs.copy()
-manifest['file_location'] = manifest['doc_id'].apply(lambda x: f"files/{x}.txt")
-manifest['doi'] = ""
-manifest['title'] = manifest['doc_id']
-manifest['key'] = manifest['doc_id']
-manifest['docname'] = manifest['doc_id']
-manifest['citation'] = "_"
-manifest.drop(columns=['doc_id', 'doc_text'], inplace=True)
-manifest.to_csv(f"{papers_directory}/science_docs_for_paperqa/manifest.csv", index=False)
-
+manifest["file_location"] = manifest["doc_id"].apply(lambda x: f"files/{x}.txt")
+manifest["doi"] = ""
+manifest["title"] = manifest["doc_id"]
+manifest["key"] = manifest["doc_id"]
+manifest["docname"] = manifest["doc_id"]
+manifest["citation"] = "_"
+manifest.drop(columns=["doc_id", "doc_text"], inplace=True)
+manifest.to_csv(
+    f"{papers_directory}/science_docs_for_paperqa/manifest.csv", index=False
+)
 ```
 
 ## Step 7: Filter and Save Questions
@@ -125,15 +130,16 @@ Finally, we filter the question set to ensure we only include questions that ref
 
 ```python
 partial_questions = questions[
-    questions.gold_doc_ids.apply(lambda ids: all(id < amount_of_docs_to_use for id in ids))
+    questions.gold_doc_ids.apply(
+        lambda ids: all(id < amount_of_docs_to_use for id in ids)
+    )
 ]
 partial_questions.to_csv(f"{papers_directory}/questions.csv", index=False)
-
 ```
 
 ## Step 8: Index the documents
 
-Copy the following to a file and run it. Feel free to adjust the concurrency as you like. 
+Copy the following to a file and run it. Feel free to adjust the concurrency as you like.
 
 PaperQA builds the index every time a question is asked and new files are present. So running this will build the index for you.
 
@@ -169,16 +175,15 @@ answer_response = (
 )
 
 print("_" * 100)
-
 ```
 
 After this runs, you will get an answer!
 
-## Step 9:  Benchmark!
+## Step 9: Benchmark!
 
 After you have built the index, you are ready to run the benchmark.
 
-Copy the following into a file `gradable.py`  and run it. You can also use the parameter num_questions in `LFRQATaskDataset` so you can make quick tests. 
+Copy the following into a file `gradable.py` and run it. You can also use the parameter num_questions in `LFRQATaskDataset` so you can make quick tests.
 
 ```python
 import asyncio
@@ -188,6 +193,7 @@ from ldp.alg.runners import Evaluator, EvaluatorConfig
 
 from paperqa import Settings
 from paperqa.agents.task import LFRQATaskDataset
+
 
 async def evaluate() -> None:
     settings = Settings()
@@ -218,9 +224,9 @@ async def evaluate() -> None:
 
     print(metrics_callback.eval_means)
 
+
 if __name__ == "__main__":
     asyncio.run(evaluate())
-
 ```
 
 ## Conclusion
