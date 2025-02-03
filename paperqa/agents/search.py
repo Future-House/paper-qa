@@ -399,10 +399,12 @@ class SearchIndex:
         addresses = [
             s[1]
             for s in searcher.search(
-                index.parse_query(self.clean_query(query), query_fields), top_n
+                index.parse_query(self.clean_query(query), query_fields),
+                top_n,
+                offset=offset,
             ).hits
             if s[0] > min_score
-        ][offset : offset + top_n]
+        ]
         search_index_docs = [searcher.doc(address) for address in addresses]
         return [
             result
