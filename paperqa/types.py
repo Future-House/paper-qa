@@ -665,7 +665,7 @@ class DocDetails(Doc):
     def is_hydration_needed(
         self,
         exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS,
-        inclusion: Collection[str] = [],
+        inclusion: Collection[str] = (),
     ) -> bool:
         """Determine if we have unfilled attributes."""
         if inclusion:
