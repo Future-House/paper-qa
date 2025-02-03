@@ -1059,34 +1059,26 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
     assert any(
         "ClinicalTrials.gov" in c.text.doc.citation for c in response.session.contexts
     ), "No clinical trials were put into contexts"
-    
+
+
 @pytest.mark.asyncio
 async def test_search_pagination(agent_test_settings: Settings) -> None:
     """Test that pagination works correctly in SearchIndex.query()."""
-    
     index = await get_directory_index(settings=agent_test_settings)
-    
+
     page_size = 1
-    
-    results1 = await index.query(
-        query="test", 
-        top_n=page_size,
-        offset=0
-    )
-    results2 = await index.query(
-        query="test", 
-        top_n=page_size,
-        offset=page_size
-    )
-    all_results = await index.query(
-        query="test",
-        top_n=2*page_size,
-        offset=0
-    )
-        
-    assert results1 == all_results[:page_size], "First page should match start of all results"
-    assert results2 == all_results[page_size:page_size*2], "Second page should match second slice of all results"
-    
+
+    results1 = await index.query(query="test", top_n=page_size, offset=0)
+    results2 = await index.query(query="test", top_n=page_size, offset=page_size)
+    all_results = await index.query(query="test", top_n=2 * page_size, offset=0)
+
+    assert (
+        results1 == all_results[:page_size]
+    ), "First page should match start of all results"
+    assert (
+        results2 == all_results[page_size : page_size * 2]
+    ), "Second page should match second slice of all results"
+
 
 class TestClinicalTrialSearchTool:
     @pytest.mark.asyncio
