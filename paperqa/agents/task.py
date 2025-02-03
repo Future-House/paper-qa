@@ -484,7 +484,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         return int(match.group(1)) if match else None
 
     def log_results_to_json(
-        self, qid: str, question: str, pqa_answer: str, human_answer: str, pqa_answer_index: int, winner: str, result: str
+        self, llm_model_name: str, qid: str, question: str, pqa_answer: str, human_answer: str, pqa_answer_index: int, winner: str, result: str
     ):
         evaluation_results = {
             "question": question,
@@ -495,8 +495,8 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             "llm_response": result.text,
         }
 
-        os.makedirs("rag-qa-benchmarking/results", exist_ok=True)
-        json_path = f"rag-qa-benchmarking/results/{qid}.json"
+        os.makedirs(f"rag-qa-benchmarking/results_{llm_model_name}", exist_ok=True)
+        json_path = f"rag-qa-benchmarking/results_{llm_model_name}/{qid}.json"
         with open(json_path, "w") as f:
             json.dump(evaluation_results, f, indent=2)
 
@@ -504,7 +504,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         self, qid: str, question: str, pqa_answer: str, human_answer: str
     ) -> float:
 
-        llm_model = get_settings(self._settings).get_llm()
+        pairwise_eval_llm = get_settings(self._settings).get_pairwise_eval_llm()
         pqa_answer = strip_citations(pqa_answer)
 
         if random.random() < 0.5:
@@ -522,7 +522,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             }
             pqa_answer_index = 2
 
-        result = await llm_model.run_prompt(
+        result = await pairwise_eval_llm.run_prompt(
             prompt=lfrqa_prompt,
             data=data,
             system_prompt=lfrqa_system_prompt,
@@ -540,7 +540,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         print(f"PQa answer was:\n{pqa_answer} \n\n")
         print(f"Human answer was:\n{human_answer} \n\n")
         print(f"Winner is: {winner}\n")
-        self.log_results_to_json(qid, question, pqa_answer, human_answer, pqa_answer_index, winner, result)
+        self.log_results_to_json(self._settings.llm, qid, question, pqa_answer, human_answer, pqa_answer_index, winner, result)
         
         reward = (
             self._rewards["win"]
