@@ -516,6 +516,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
 
     def log_results_to_json(
         self,
+        llm_model_name: str,
         qid: str,
         question: str,
         pqa_answer: str,
