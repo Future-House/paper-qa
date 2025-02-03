@@ -1059,13 +1059,13 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
     assert any(
         "ClinicalTrials.gov" in c.text.doc.citation for c in response.session.contexts
     ), "No clinical trials were put into contexts"
-    
+
+
 @pytest.mark.asyncio
 async def test_search_pagination(agent_test_settings: Settings) -> None:
     """Test that pagination works correctly in SearchIndex.query()."""
-    
     index = await get_directory_index(settings=agent_test_settings)
-    
+
     page_size = 1
     
     page1_results = await index.query(
