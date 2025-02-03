@@ -837,7 +837,7 @@ class Settings(BaseSettings):
                 self.summary_llm, self.temperature
             ),
         )
-    
+
     def get_pairwise_eval_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.pair_eval_llm,
@@ -855,7 +855,6 @@ class Settings(BaseSettings):
                 self.agent.agent_llm, self.temperature
             ),
         )
-    
 
     def get_embedding_model(self) -> EmbeddingModel:
         return embedding_model_factory(self.embedding, **(self.embedding_config or {}))

@@ -578,8 +578,17 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         print(f"PQa answer was:\n{pqa_answer} \n\n")
         print(f"Human answer was:\n{human_answer} \n\n")
         print(f"Winner is: {winner}\n")
-        self.log_results_to_json(self._settings.llm, qid, question, pqa_answer, human_answer, pqa_answer_index, winner, result)
-        
+        self.log_results_to_json(
+            self._settings.llm,
+            qid,
+            question,
+            pqa_answer,
+            human_answer,
+            pqa_answer_index,
+            winner,
+            result,
+        )
+
         reward = (
             self._rewards["win"]
             if winner == "paperqa"
