@@ -1068,24 +1068,24 @@ async def test_search_pagination(agent_test_settings: Settings) -> None:
     
     page_size = 1
     
-    results1 = await index.query(
+    page1_results = await index.query(
         query="test", 
         top_n=page_size,
         offset=0
     )
-    results2 = await index.query(
+    page2_results = await index.query(
         query="test", 
         top_n=page_size,
         offset=page_size
     )
-    all_results = await index.query(
+    page1and2_results = await index.query(
         query="test",
         top_n=2*page_size,
         offset=0
     )
         
-    assert results1 == all_results[:page_size], "First page should match start of all results"
-    assert results2 == all_results[page_size:page_size*2], "Second page should match second slice of all results"
+    assert page1_results == page1and2_results[:page_size], "First page should match start of all results"
+    assert page2_results == page1and2_results[page_size:page_size*2], "Second page should match second slice of all results"
     
 
 class TestClinicalTrialSearchTool:
