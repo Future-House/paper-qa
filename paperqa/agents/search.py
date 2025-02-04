@@ -417,6 +417,7 @@ class SearchIndex:
             if result is not None
         ]
 
+
 def fetch_kwargs_from_manifest(
     file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
 ) -> dict[str, Any]:
@@ -427,6 +428,7 @@ def fetch_kwargs_from_manifest(
         manifest_entry: DocDetails = manifest[manifest_fallback_location]
         return manifest_entry.model_dump()
     return {}
+
 
 async def maybe_get_manifest(
     filename: anyio.Path | None = None,
@@ -463,6 +465,7 @@ async def maybe_get_manifest(
 
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
+
 
 async def process_file(
     rel_file_path: anyio.Path,
