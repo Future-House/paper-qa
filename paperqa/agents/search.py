@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections import Counter
 
 import contextlib
 import csv
@@ -45,7 +46,7 @@ from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
-
+from collections import Counter
 from .models import SupportsPickle
 
 if TYPE_CHECKING:
@@ -468,18 +469,15 @@ async def maybe_get_manifest(
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
-processed = 0
-
-
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
     manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
+    processed_counter: Counter,
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
-    global processed
 
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
@@ -546,11 +544,11 @@ async def process_file(
                 document=tmp_docs,
             )
 
-            processed += 1
-            if processed == settings.agent.index.batch_size:
+            processed_counter["n_processed_files"] += 1
+            if processed_counter["n_processed_files"] == settings.agent.index.batch_size:
                 await search_index.save_index()
-                logger.info(f"Saved index after processing {processed} files.")
-                processed = 0
+                print(f"Saved index after processing {processed_counter['n_processed_files']} files.")
+                processed_counter["n_processed_files"] = 0
 
             logger.info(f"Complete ({title}).")
 
@@ -698,6 +696,7 @@ async def get_directory_index(  # noqa: PLR0912
     )
     with progress_bar:
         async with anyio.create_task_group() as tg:
+            processed_counter = Counter()
             for rel_file_path in valid_papers_rel_file_paths:
                 if index_settings.sync_with_paper_directory:
                     tg.start_soon(
@@ -707,7 +706,8 @@ async def get_directory_index(  # noqa: PLR0912
                         manifest,
                         semaphore,
                         _settings,
-                        progress_bar_update_fn,
+                        processed_counter,
+                        progress_bar_update_fn
                     )
                 else:
                     logger.debug(
