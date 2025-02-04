@@ -711,6 +711,7 @@ async def get_directory_index(  # noqa: PLR0912
     progress_bar, progress_bar_update_fn = _make_progress_bar_update(
         index_settings.sync_with_paper_directory, total=len(valid_papers_rel_file_paths)
     )
+    await search_index.release_lock()
     with progress_bar:
         async with anyio.create_task_group() as tg:
             for rel_file_path in valid_papers_rel_file_paths:

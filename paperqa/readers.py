@@ -20,6 +20,8 @@ from paperqa.types import (
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
+import asyncio
+
 
 def parse_pdf_to_pages(
     path: str | os.PathLike, page_size_limit: int | None = None
@@ -252,7 +254,7 @@ def chunk_code_text(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
@@ -264,7 +266,7 @@ def read_doc(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False] = ...,
@@ -276,7 +278,7 @@ def read_doc(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[True],
@@ -288,7 +290,7 @@ def read_doc(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
@@ -299,7 +301,7 @@ def read_doc(
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: bool = False,
@@ -308,32 +310,32 @@ def read_doc(
     overlap: int = 100,
     page_size_limit: int | None = None,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
-    """Parse a document and split into chunks.
+    """Parse a document and split into chunks without blocking the event loop.
 
-    Optionally can include just the parsing as well as metadata about the parsing/chunking
-
-    Args:
-        path: local document path
-        doc: object with document metadata
-        parsed_text_only: return parsed text without chunking
-        include_metadata: return a tuple
-        chunk_chars: size of chunks
-        overlap: size of overlap between chunks
-        page_size_limit: optional limit on the number of characters per page
+    Offloads blocking I/O and CPU operations to a thread pool.
     """
     str_path = str(path)
-    parsed_text = None
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        parsed_text = parse_pdf_to_pages(path, page_size_limit=page_size_limit)
+        parsed_text = await asyncio.to_thread(
+            parse_pdf_to_pages, path, page_size_limit=page_size_limit
+        )
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path, page_size_limit=page_size_limit)
+        parsed_text = await asyncio.to_thread(
+            parse_text, path, page_size_limit=page_size_limit
+        )
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True, page_size_limit=page_size_limit)
+        parsed_text = await asyncio.to_thread(
+            parse_text, path, html=True, page_size_limit=page_size_limit
+        )
     else:
-        parsed_text = parse_text(
-            path, split_lines=True, use_tiktoken=False, page_size_limit=page_size_limit
+        parsed_text = await asyncio.to_thread(
+            parse_text,
+            path,
+            split_lines=True,
+            use_tiktoken=False,
+            page_size_limit=page_size_limit,
         )
 
     if parsed_text_only:
@@ -341,32 +343,41 @@ def read_doc(
 
     # next chunk the parsed text
 
-    # check if chunk is 0 (no chunking)
+    # check if chunk_chars is 0 (no chunking)
     if chunk_chars == 0:
+        # Offload reduce_content to a thread as well
         chunked_text = [
-            Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
+            Text(
+                text=await asyncio.to_thread(parsed_text.reduce_content),
+                name=doc.docname,
+                doc=doc,
+            )
         ]
         chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
     elif str_path.endswith(".pdf"):
-        chunked_text = chunk_pdf(
-            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        chunked_text = await asyncio.to_thread(
+            chunk_pdf, parsed_text, doc, chunk_chars, overlap
         )
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap_pdf_by_page"
+            chunk_chars=chunk_chars,
+            overlap=overlap,
+            chunk_type="overlap_pdf_by_page",
         )
     elif str_path.endswith((".txt", ".html")):
-        chunked_text = chunk_text(
-            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        chunked_text = await asyncio.to_thread(
+            chunk_text, parsed_text, doc, chunk_chars, overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
         )
     else:
-        chunked_text = chunk_code_text(
-            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        chunked_text = await asyncio.to_thread(
+            chunk_code_text, parsed_text, doc, chunk_chars, overlap
         )
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap_code_by_line"
+            chunk_chars=chunk_chars,
+            overlap=overlap,
+            chunk_type="overlap_code_by_line",
         )
 
     if include_metadata:
