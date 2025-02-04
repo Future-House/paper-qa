@@ -408,6 +408,10 @@ class IndexSettings(BaseModel):
         default=5,  # low default for folks without S2/Crossref keys
         description="Number of concurrent filesystem reads for indexing",
     )
+    batch_size: int = Field(
+        default=1,
+        description="Number of files to process before committing to the index.",
+    )
     sync_with_paper_directory: bool = Field(
         default=True,
         description=(

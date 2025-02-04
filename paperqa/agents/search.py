@@ -305,8 +305,6 @@ class SearchIndex:
                 try:
                     writer: IndexWriter = await self.writer
                     writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
-                    # writer.commit()
-                    # writer.wait_merging_threads()
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
@@ -334,8 +332,8 @@ class SearchIndex:
             )
             raise
 
-    async def commit(self) -> None:
-        """Commit all pending changes to the index."""
+    async def checkpoint(self) -> None:
+        """Commit all pending changes, merge threads, and reset."""
         if self._writer:
             self._writer.commit()
             self._writer.wait_merging_threads()
@@ -375,7 +373,7 @@ class SearchIndex:
             self.changed = True
 
     async def save_index(self) -> None:
-        await self.commit()
+        await self.checkpoint()
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -550,7 +548,7 @@ async def process_file(
             )
 
             processed += 1
-            if processed == settings.agent.index.concurrency:
+            if processed == settings.agent.index.batch_size:
                 await search_index.save_index()
                 logger.info(f"Saved index after processing {processed} files.")
                 processed = 0

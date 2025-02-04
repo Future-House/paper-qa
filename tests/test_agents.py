@@ -1114,7 +1114,9 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     high_concurrency_settings.agent.index.name = "high_concurrency"
     
     low_concurrency_settings.agent.index.concurrency = 1
+    low_concurrency_settings.agent.index.batch_size = 1
     high_concurrency_settings.agent.index.concurrency = 2
+    high_concurrency_settings.agent.index.batch_size = 2
 
     # Measure time taken to build index with high concurrency
     start_time = time.perf_counter()
