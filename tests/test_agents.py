@@ -1089,7 +1089,7 @@ async def test_agent_empty_index(agent_test_settings: Settings):
             query="Are COVID-19 vaccines effective?",
             settings=agent_test_settings,
             agent_type=FAKE_AGENT_TYPE,
-            rebuild_index=False,
+            force_index_rebuild=False,
         )
 
 
