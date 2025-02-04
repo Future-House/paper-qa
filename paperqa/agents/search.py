@@ -1,5 +1,4 @@
 from __future__ import annotations
-from collections import Counter
 
 import contextlib
 import csv
@@ -10,6 +9,7 @@ import pathlib
 import pickle
 import warnings
 import zlib
+from collections import Counter
 from collections.abc import Callable, Collection, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
@@ -46,7 +46,7 @@ from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
-from collections import Counter
+
 from .models import SupportsPickle
 
 if TYPE_CHECKING:
@@ -469,6 +469,7 @@ async def maybe_get_manifest(
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
+
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
@@ -545,9 +546,14 @@ async def process_file(
             )
 
             processed_counter["n_processed_files"] += 1
-            if processed_counter["n_processed_files"] == settings.agent.index.batch_size:
+            if (
+                processed_counter["n_processed_files"]
+                == settings.agent.index.batch_size
+            ):
                 await search_index.save_index()
-                print(f"Saved index after processing {processed_counter['n_processed_files']} files.")
+                print(
+                    f"Saved index after processing {processed_counter['n_processed_files']} files."
+                )
                 processed_counter["n_processed_files"] = 0
 
             logger.info(f"Complete ({title}).")
@@ -707,7 +713,7 @@ async def get_directory_index(  # noqa: PLR0912
                         semaphore,
                         _settings,
                         processed_counter,
-                        progress_bar_update_fn
+                        progress_bar_update_fn,
                     )
                 else:
                     logger.debug(
