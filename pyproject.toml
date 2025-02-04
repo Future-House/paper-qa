@@ -225,6 +225,7 @@ disable = [
     "redefined-builtin",  # Rely on ruff A002 for this
     "super-init-not-called",  # Don't care to enforce this
     "too-few-public-methods",  # Don't care to enforce this
+    "too-many-public-methods",  # Rely on ruff PLR0904 for this
     "too-many-ancestors",  # Don't care to enforce this
     "too-many-arguments",  # Don't care to enforce this
     "too-many-branches",  # Rely on ruff PLR0912 for this
