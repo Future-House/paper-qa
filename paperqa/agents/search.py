@@ -417,6 +417,16 @@ class SearchIndex:
             if result is not None
         ]
 
+def fetch_kwargs_from_manifest(
+    file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
+) -> dict[str, Any]:
+    if file_location in manifest:
+        manifest_entry: DocDetails = manifest[file_location]
+        return manifest_entry.model_dump()
+    if manifest_fallback_location in manifest:
+        manifest_entry: DocDetails = manifest[manifest_fallback_location]
+        return manifest_entry.model_dump()
+    return {}
 
 async def maybe_get_manifest(
     filename: anyio.Path | None = None,
@@ -454,19 +464,6 @@ async def maybe_get_manifest(
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
-
-def get_manifest_kwargs(
-    manifest: dict[str, Any], manifest_fallback_location: str, file_location: str
-) -> dict[str, Any]:
-    if file_location in manifest:
-        manifest_entry: DocDetails = manifest[file_location]
-        return manifest_entry.model_dump()
-    if manifest_fallback_location in manifest:
-        manifest_entry: DocDetails = manifest[manifest_fallback_location]
-        return manifest_entry.model_dump()
-    return {}
-
-
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
@@ -490,8 +487,8 @@ async def process_file(
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            manifest_kwargs = get_manifest_kwargs(
-                manifest, manifest_fallback_location, file_location
+            kwargs = fetch_kwargs_from_manifest(
+                file_location, manifest, manifest_fallback_location
             )
 
             tmp_docs = Docs()
@@ -500,7 +497,7 @@ async def process_file(
                     path=abs_file_path,
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
-                    **manifest_kwargs,
+                    **kwargs,
                 )
             except (ValueError, ImpossibleParsingError):
                 logger.exception(
