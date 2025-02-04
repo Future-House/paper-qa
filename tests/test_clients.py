@@ -376,8 +376,9 @@ async def test_s2_only_fields_filtering() -> None:
         assert s2_details
         assert s2_details.authors, "Authors should be populated"
         assert set(s2_details.other["client_source"]) == {"semantic_scholar"}
-        assert s2_details.citation == (
-            "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
+        assert (
+            s2_details.citation
+            == "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
             " tools. ArXiv, Unknown year. URL:"
             " https://doi.org/10.48550/arxiv.2304.05376,"
@@ -429,7 +430,8 @@ async def test_crossref_journalquality_fields_filtering() -> None:
         )
         nejm_crossref_details = await crossref_client.query(
             title=(
-                "Beta-Blocker Interruption or Continuation after Myocardial Infarction"  # codespell:ignore
+                "Beta-Blocker Interruption or Continuation after Myocardial"
+                " Infarction"  # codespell:ignore
             ),
             fields=["title", "doi", "authors", "journal"],
         )

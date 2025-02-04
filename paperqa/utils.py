@@ -501,7 +501,9 @@ BIBTEX_MAPPING: dict[str, str] = {
     "dataset": "misc",  # No direct equivalent, so 'misc' is used
     "component": "misc",  # No direct equivalent, so 'misc' is used
     "report": "techreport",
-    "report-series": "techreport",  # 'series' implies multiple tech reports, but each is still a 'techreport'
+    "report-series": (  # 'series' implies multiple tech reports, but each is still a 'techreport'
+        "techreport"
+    ),
     "standard": "misc",  # No direct equivalent, so 'misc' is used
     "standard-series": "misc",  # No direct equivalent, so 'misc' is used
     "edited-book": "book",  # Edited books are considered books in BibTeX
@@ -514,7 +516,9 @@ BIBTEX_MAPPING: dict[str, str] = {
     "book-section": "inbook",  # Sections in books can be considered as 'inbook'
     "book-part": "inbook",  # Parts of books can be considered as 'inbook'
     "book-track": "inbook",  # Tracks in books can be considered as 'inbook'
-    "reference-entry": "inbook",  # Entries in reference books can be considered as 'inbook'
+    "reference-entry": (  # Entries in reference books can be considered as 'inbook'
+        "inbook"
+    ),
     "dissertation": "phdthesis",  # Dissertations are usually PhD thesis
     "posted-content": "misc",  # No direct equivalent, so 'misc' is used
     "peer-review": "misc",  # No direct equivalent, so 'misc' is used

@@ -277,8 +277,8 @@ class GatherEvidence(NamedTool):
             )
 
         return (
-            f"Added {l1 - l0} pieces of evidence, {l1_relevant - l0_relevant} of which were"
-            f" relevant.{best_evidence}\n\n" + status
+            f"Added {l1 - l0} pieces of evidence, {l1_relevant - l0_relevant} of which"
+            f" were relevant.{best_evidence}\n\n" + status
         )
 
 
@@ -649,9 +649,9 @@ class ClinicalTrialsSearch(NamedTool):
         self.previous_searches[query] += self.search_count
         if error_message is None:
             return (
-                f"Found clinical trial search results from search {offset} to {offset + new_result_count}"
-                f" among {total_result_count} total results."
-                f" {state.status}"
+                f"Found clinical trial search results from search {offset} to"
+                f" {offset + new_result_count} among {total_result_count} total"
+                f" results. {state.status}"
             )
         return f"Error in clinical trial query syntax: {error_message}"
 
