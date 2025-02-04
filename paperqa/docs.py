@@ -280,8 +280,8 @@ class Docs(BaseModel):
         parse_config = all_settings.parsing
         if dockey is None:
             # md5 sum of file contents (not path!)
-            
-            # NOTE: test_get_directory_index_w_manifest fails because now we are getting 
+
+            # NOTE: test_get_directory_index_w_manifest fails because now we are getting
             # the dockey from the manifest, so this line doesn't run
             dockey = md5sum(path)
         if llm_model is None:
