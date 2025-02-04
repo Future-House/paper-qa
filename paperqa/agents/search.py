@@ -272,10 +272,24 @@ class SearchIndex:
         (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
         self.changed = True
 
+    async def release_lock(self) -> None:
+        """Remove any stale lock files from the index metadata directory."""
+        index_meta_dir = pathlib.Path(str(await self.index_filename))
+        for lock_file in index_meta_dir.glob("*.lock"):
+            try:
+                lock_file.unlink()
+                logger.info(f"Removed stale lock file: {lock_file}")
+            except Exception as ex:
+                logger.exception(
+                    f"Could not remove stale lock file: {lock_file}: {ex}"
+                )
+
     @property
     async def writer(self) -> IndexWriter:
         if not self._writer:
-            self._writer = (await self.index).writer()
+            index = await self.index
+            index.reload()
+            self._writer = index.writer()
         return self._writer
 
     async def add_document(
@@ -373,7 +387,7 @@ class SearchIndex:
             self.changed = True
 
     async def save_index(self) -> None:
-        self.commit()
+        await self.commit()
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -729,6 +743,9 @@ async def get_directory_index(  # noqa: PLR0912
     progress_bar, progress_bar_update_fn = _make_progress_bar_update(
         index_settings.sync_with_paper_directory, total=len(valid_papers_rel_file_paths)
     )
+    
+    search_index.release_lock() 
+    
     with progress_bar:
         async with anyio.create_task_group() as tg:
             for rel_file_path in valid_papers_rel_file_paths:
