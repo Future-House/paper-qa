@@ -405,7 +405,7 @@ class IndexSettings(BaseModel):
         description="Whether to recurse into subdirectories when indexing sources.",
     )
     concurrency: int = Field(
-        default=2,  # low default for folks without S2/Crossref keys
+        default=5,  # low default for folks without S2/Crossref keys
         description="Number of concurrent filesystem reads for indexing",
     )
     sync_with_paper_directory: bool = Field(
