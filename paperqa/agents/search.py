@@ -337,7 +337,6 @@ class SearchIndex:
         if self._writer:
             self._writer.commit()
             self._writer.wait_merging_threads()
-            self._searcher = None
             self._writer = None
 
     @staticmethod
