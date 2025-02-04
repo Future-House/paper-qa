@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from math import ceil
 from pathlib import Path
@@ -19,8 +20,6 @@ from paperqa.types import (
 )
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
-
-import asyncio
 
 
 def parse_pdf_to_pages(

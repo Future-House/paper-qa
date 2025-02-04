@@ -237,7 +237,7 @@ class SearchIndex:
             index.reload()
             self._searcher = index.searcher()
         return self._searcher
-    
+
     @property
     async def writer(self) -> IndexWriter:
         if not self._writer:
@@ -277,7 +277,7 @@ class SearchIndex:
     async def mark_failed_document(self, path: str | os.PathLike) -> None:
         (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
         self.changed = True
-        
+
     async def release_lock(self) -> None:
         """Remove any stale lock files from the index metadata directory."""
         index_meta_dir = pathlib.Path(str(await self.index_filename))
@@ -286,9 +286,7 @@ class SearchIndex:
                 lock_file.unlink()
                 logger.info(f"Removed stale lock file: {lock_file}")
             except Exception as ex:
-                logger.exception(
-                    f"Could not remove stale lock file: {lock_file}: {ex}"
-                )
+                logger.exception(f"Could not remove stale lock file: {lock_file}: {ex}")
 
     async def add_document(
         self,
@@ -345,7 +343,7 @@ class SearchIndex:
                 f" within {lock_acquisition_max_retries} attempts."
             )
             raise
-        
+
     async def commit(self) -> None:
         """Commit all pending changes to the index."""
         if self._writer:
@@ -353,7 +351,6 @@ class SearchIndex:
             self._writer.wait_merging_threads()
             self._searcher = None
             self._writer = None
-
 
     @staticmethod
     @retry(
@@ -484,6 +481,7 @@ async def maybe_get_manifest(
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
+
 def get_manifest_kwargs(
     manifest: dict[str, Any], manifest_fallback_location: str, file_location: str
 ) -> dict[str, Any]:
@@ -495,7 +493,10 @@ def get_manifest_kwargs(
         return manifest_entry.model_dump()
     return {}
 
+
 processed = 0
+
+
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
@@ -505,7 +506,7 @@ async def process_file(
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
     global processed
-    
+
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
     )
@@ -521,7 +522,9 @@ async def process_file(
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            manifest_kwargs = get_manifest_kwargs(manifest, manifest_fallback_location, file_location)  
+            manifest_kwargs = get_manifest_kwargs(
+                manifest, manifest_fallback_location, file_location
+            )
 
             tmp_docs = Docs()
             try:
@@ -560,13 +563,13 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
-            
+
             processed += 1
             if processed == settings.agent.index.concurrency:
                 await search_index.save_index()
                 logger.info(f"Saved index after processing {processed} files.")
                 processed = 0
-            
+
             logger.info(f"Complete ({title}).")
 
         # Update progress bar for either a new or previously indexed file

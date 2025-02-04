@@ -161,7 +161,7 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
             ) as mock_aadd,
         ):
             index = await get_directory_index(settings=agent_test_settings)
-    
+
     assert len(await index.index_files) == num_source_files
     assert (
         mock_aadd.await_count != num_source_files
