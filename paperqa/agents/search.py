@@ -45,7 +45,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import DocDetails
-from paperqa.utils import ImpossibleParsingError, hexdigest
+from paperqa.utils import hexdigest
 
 from .models import SupportsPickle
 
