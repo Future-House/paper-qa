@@ -411,6 +411,9 @@ class DocDetails(Doc):
             data["doc_id"] = encode_id(uuid4())
 
         if data.get("overwrite_fields_from_metadata", True):
+            # NOTE: This is called then constructing the manifest file
+            # Here we are setting the dockey to the doc_id
+            # but then we override it with md5sum(path) in the docs.py
             data["dockey"] = data["doc_id"]
 
         return data
