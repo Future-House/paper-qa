@@ -278,16 +278,6 @@ class SearchIndex:
         (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
         self.changed = True
 
-    async def release_lock(self) -> None:
-        """Remove any stale lock files from the index metadata directory."""
-        index_meta_dir = pathlib.Path(str(await self.index_filename))
-        for lock_file in index_meta_dir.glob("*.lock"):
-            try:
-                lock_file.unlink()
-                logger.info(f"Removed stale lock file: {lock_file}")
-            except Exception as ex:
-                logger.exception(f"Could not remove stale lock file: {lock_file}: {ex}")
-
     async def add_document(
         self,
         index_doc: dict[str, Any],  # TODO: rename to something more intuitive
@@ -527,13 +517,15 @@ async def process_file(
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
                 )
-            except (ValueError, ImpossibleParsingError):
+            except Exception:
+                # We handle any exception here because we want to save_index so we
+                # 1. can resume the build without rebuilding this file if a separate
+                # process_file invocation leads to a segfault or crash.
+                # don't have deadlock issues after.
                 logger.exception(
                     f"Error parsing {file_location}, skipping index for this file."
                 )
                 await search_index.mark_failed_document(file_location)
-                # Save so we can resume the build without rebuilding this file if a
-                # separate process_file invocation leads to a segfault or crash
                 await search_index.save_index()
                 if progress_bar_update:
                     progress_bar_update()
@@ -707,7 +699,6 @@ async def get_directory_index(  # noqa: PLR0912
     progress_bar, progress_bar_update_fn = _make_progress_bar_update(
         index_settings.sync_with_paper_directory, total=len(valid_papers_rel_file_paths)
     )
-    await search_index.release_lock()
     with progress_bar:
         async with anyio.create_task_group() as tg:
             for rel_file_path in valid_papers_rel_file_paths:
