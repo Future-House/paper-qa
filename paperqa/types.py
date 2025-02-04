@@ -615,7 +615,7 @@ class DocDetails(Doc):
         data = cls.misc_string_cleaning(data)
         data = cls.inject_clean_doi_url_into_data(data)
         data = cls.add_preprint_journal_from_doi_if_missing(data)
-        # data = cls.populate_bibtex_key_citation(data)
+        data = cls.populate_bibtex_key_citation(data)
         return cls.overwrite_docname_dockey_for_compatibility_w_doc(data)
 
     def __getitem__(self, item: str):
