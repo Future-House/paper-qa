@@ -280,9 +280,7 @@ class SearchIndex:
                 lock_file.unlink()
                 logger.info(f"Removed stale lock file: {lock_file}")
             except Exception as ex:
-                logger.exception(
-                    f"Could not remove stale lock file: {lock_file}: {ex}"
-                )
+                logger.exception(f"Could not remove stale lock file: {lock_file}: {ex}")
 
     @property
     async def writer(self) -> IndexWriter:
@@ -743,9 +741,9 @@ async def get_directory_index(  # noqa: PLR0912
     progress_bar, progress_bar_update_fn = _make_progress_bar_update(
         index_settings.sync_with_paper_directory, total=len(valid_papers_rel_file_paths)
     )
-    
-    search_index.release_lock() 
-    
+
+    search_index.release_lock()
+
     with progress_bar:
         async with anyio.create_task_group() as tg:
             for rel_file_path in valid_papers_rel_file_paths:
