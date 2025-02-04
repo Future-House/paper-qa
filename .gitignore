@@ -308,3 +308,5 @@ tests/example2.*
 
 # Client data
 paperqa/clients/client_data/retractions.csv
+
+rag-qa-benchmarking/

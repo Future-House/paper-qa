@@ -152,6 +152,7 @@ class SearchIndex:
         self._schema: Schema | None = None
         self._index: Index | None = None
         self._searcher: Searcher | None = None
+        self._writer: IndexWriter | None = None
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
@@ -236,6 +237,13 @@ class SearchIndex:
             index.reload()
             self._searcher = index.searcher()
         return self._searcher
+    
+    @property
+    async def writer(self) -> IndexWriter:
+        if not self._writer:
+            index = await self.index
+            self._writer = index.writer()
+        return self._writer
 
     @property
     async def count(self) -> int:
@@ -269,6 +277,18 @@ class SearchIndex:
     async def mark_failed_document(self, path: str | os.PathLike) -> None:
         (await self.index_files)[str(path)] = FAILED_DOCUMENT_ADD_ID
         self.changed = True
+        
+    async def release_lock(self) -> None:
+        """Remove any stale lock files from the index metadata directory."""
+        index_meta_dir = pathlib.Path(str(await self.index_filename))
+        for lock_file in index_meta_dir.glob("*.lock"):
+            try:
+                lock_file.unlink()
+                logger.info(f"Removed stale lock file: {lock_file}")
+            except Exception as ex:
+                logger.exception(
+                    f"Could not remove stale lock file: {lock_file}: {ex}"
+                )
 
     async def add_document(
         self,
@@ -295,10 +315,10 @@ class SearchIndex:
         async def _add_document() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
-                    writer: IndexWriter = (await self.index).writer()
+                    writer: IndexWriter = await self.writer
                     writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
-                    writer.commit()
-                    writer.wait_merging_threads()
+                    # writer.commit()
+                    # writer.wait_merging_threads()
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
@@ -325,6 +345,15 @@ class SearchIndex:
                 f" within {lock_acquisition_max_retries} attempts."
             )
             raise
+        
+    async def commit(self) -> None:
+        """Commit all pending changes to the index."""
+        if self._writer:
+            self._writer.commit()
+            self._writer.wait_merging_threads()
+            self._searcher = None
+            self._writer = None
+
 
     @staticmethod
     @retry(
@@ -359,6 +388,7 @@ class SearchIndex:
             self.changed = True
 
     async def save_index(self) -> None:
+        await self.commit()
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -454,7 +484,7 @@ async def maybe_get_manifest(
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
-
+processed = 0
 async def process_file(
     rel_file_path: anyio.Path,
     search_index: SearchIndex,
@@ -463,6 +493,8 @@ async def process_file(
     settings: Settings,
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
+    global processed
+    
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
     )
@@ -525,9 +557,13 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
-            # Save so we can resume the build without rebuilding this file if a
-            # separate process_file invocation leads to a segfault or crash
-            await search_index.save_index()
+            
+            processed += 1
+            if processed == settings.agent.index.concurrency:
+                await search_index.save_index()
+                logger.info(f"Saved index after processing {processed} files.")
+                processed = 0
+            
             logger.info(f"Complete ({title}).")
 
         # Update progress bar for either a new or previously indexed file
