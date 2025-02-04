@@ -1107,13 +1107,15 @@ class TestClinicalTrialSearchTool:
 
 @pytest.mark.asyncio
 async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
-    
+
     high_concurrency_settings = agent_test_settings.model_copy(deep=True)
     high_concurrency_settings.agent.index.name = "high_concurrency"
     high_concurrency_settings.agent.index.concurrency = 3
     high_concurrency_settings.agent.index.batch_size = 3
     start_time = time.perf_counter()
-    high_concurrency_index = await get_directory_index(settings=high_concurrency_settings)
+    high_concurrency_index = await get_directory_index(
+        settings=high_concurrency_settings
+    )
     high_concurrency_duration = time.perf_counter() - start_time
 
     low_concurrency_settings = agent_test_settings.model_copy(deep=True)
