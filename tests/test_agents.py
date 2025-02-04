@@ -1112,7 +1112,7 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     low_concurrency_settings.agent.index.name = "low_concurrency"
     high_concurrency_settings = agent_test_settings.model_copy(deep=True)
     high_concurrency_settings.agent.index.name = "high_concurrency"
-    
+
     low_concurrency_settings.agent.index.concurrency = 1
     low_concurrency_settings.agent.index.batch_size = 1
     high_concurrency_settings.agent.index.concurrency = 2
@@ -1122,14 +1122,14 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     start_time = time.perf_counter()
     await get_directory_index(settings=high_concurrency_settings)
     high_concurrency_duration = time.perf_counter() - start_time
-    
+
     # Measure time taken to build index with low concurrency
     start_time = time.perf_counter()
     await get_directory_index(settings=low_concurrency_settings)
     low_concurrency_duration = time.perf_counter() - start_time
 
     # Assert that high concurrency takes less time
-    assert high_concurrency_duration*1.1 < low_concurrency_duration, (
+    assert high_concurrency_duration * 1.1 < low_concurrency_duration, (
         f"Expected high concurrency to be faster, but took {high_concurrency_duration:.2f}s "
         f"compared to {low_concurrency_duration:.2f}s"
     )
