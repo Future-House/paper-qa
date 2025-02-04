@@ -517,7 +517,7 @@ async def process_file(
                 # We handle any exception here because we want to save_index so we
                 # 1. can resume the build without rebuilding this file if a separate
                 # process_file invocation leads to a segfault or crash.
-                # don't have deadlock issues after.
+                # 2. don't have deadlock issues after.
                 logger.exception(
                     f"Error parsing {file_location}, skipping index for this file."
                 )
@@ -545,16 +545,13 @@ async def process_file(
                 document=tmp_docs,
             )
 
-            processed_counter["n_processed_files"] += 1
+            processed_counter["batched_save_counter"] += 1
             if (
-                processed_counter["n_processed_files"]
+                processed_counter["batched_save_counter"]
                 == settings.agent.index.batch_size
             ):
                 await search_index.save_index()
-                print(
-                    f"Saved index after processing {processed_counter['n_processed_files']} files."
-                )
-                processed_counter["n_processed_files"] = 0
+                processed_counter["batched_save_counter"] = 0
 
             logger.info(f"Complete ({title}).")
 
