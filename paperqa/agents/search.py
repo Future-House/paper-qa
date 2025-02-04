@@ -481,19 +481,6 @@ async def maybe_get_manifest(
 
 FAILED_DOCUMENT_ADD_ID = "ERROR"
 
-
-def get_manifest_kwargs(
-    manifest: dict[str, Any], manifest_fallback_location: str, file_location: str
-) -> dict[str, Any]:
-    if file_location in manifest:
-        manifest_entry: DocDetails = manifest[file_location]
-        return manifest_entry.model_dump()
-    if manifest_fallback_location in manifest:
-        manifest_entry: DocDetails = manifest[manifest_fallback_location]
-        return manifest_entry.model_dump()
-    return {}
-
-
 processed = 0
 
 
@@ -522,17 +509,23 @@ async def process_file(
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            manifest_kwargs = get_manifest_kwargs(
-                manifest, manifest_fallback_location, file_location
-            )
+            doi, title = None, None
+            if file_location in manifest:
+                manifest_entry = manifest[file_location]
+                doi, title = manifest_entry.doi, manifest_entry.title
+            elif manifest_fallback_location in manifest:
+                # Perhaps manifest used the opposite pathing scheme
+                manifest_entry = manifest[manifest_fallback_location]
+                doi, title = manifest_entry.doi, manifest_entry.title
 
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
                     path=abs_file_path,
+                    title=title,
+                    doi=doi,
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
-                    **manifest_kwargs,
                 )
             except (ValueError, ImpossibleParsingError):
                 logger.exception(
