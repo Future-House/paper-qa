@@ -309,7 +309,7 @@ async def read_doc(
     overlap: int = 100,
     page_size_limit: int | None = None,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
-    """Parse a document and split into chunks without blocking the event loop.
+    """Parse a document and split into chunks.
 
     Optionally can include just the parsing as well as metadata about the parsing/chunking
     Args:
