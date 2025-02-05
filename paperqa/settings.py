@@ -410,6 +410,7 @@ class IndexSettings(BaseModel):
     )
     batch_size: int = Field(
         default=1,
+        ge=1,
         description="Number of files to process before committing to the index.",
     )
     sync_with_paper_directory: bool = Field(
