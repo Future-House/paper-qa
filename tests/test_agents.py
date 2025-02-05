@@ -248,10 +248,12 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
         assert top_result.dockey == top_result.doc_id
         # note: this title comes from the manifest, so we know it worked
         assert top_result.title == "Frederick Bates (Wikipedia article)"
-        
+
 
 @pytest.mark.asyncio
-async def test_get_directory_index_w_no_citations(agent_test_settings: Settings) -> None:
+async def test_get_directory_index_w_no_citations(
+    agent_test_settings: Settings,
+) -> None:
     agent_test_settings.agent.index.manifest_file = "stub_manifest_nocitation.csv"
     index = await get_directory_index(settings=agent_test_settings)
 
@@ -259,6 +261,7 @@ async def test_get_directory_index_w_no_citations(agent_test_settings: Settings)
     top_result = next(iter(results[0].docs.values()))
 
     assert top_result.citation == ""
+
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", [FAKE_AGENT_TYPE, ToolSelector, SimpleAgent])
