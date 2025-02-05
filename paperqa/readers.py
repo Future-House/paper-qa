@@ -352,9 +352,8 @@ async def read_doc(
 
     # next chunk the parsed text
 
-    # check if chunk_chars is 0 (no chunking)
+    # check if chunk is 0 (no chunking)
     if chunk_chars == 0:
-        # Offload reduce_content to a thread as well
         chunked_text = [
             Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
         ]
@@ -369,7 +368,7 @@ async def read_doc(
             chunk_type="overlap_pdf_by_page",
         )
     elif str_path.endswith((".txt", ".html")):
-        chunked_text = chunked_text = chunk_text(
+        chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
