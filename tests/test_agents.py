@@ -243,9 +243,9 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
         results = await index.query(query="who is Frederick Bates?")
         top_result = next(iter(results[0].docs.values()))
 
-        # NOTE: This is failing because now the dockey comes from the manifest.
-        # In the doctdetails object we are setting the dockey to the doc_id
-        assert top_result.dockey == md5sum(abs_paper_dir / "bates.txt")
+        # note: we get every possible field from the manifest constructed in maybe_get_manifest,
+        # so the dockey will now be equal to the doc_id.
+        assert top_result.dockey == top_result.doc_id
         # note: this title comes from the manifest, so we know it worked
         assert top_result.title == "Frederick Bates (Wikipedia article)"
 

@@ -201,7 +201,7 @@ class DocMetadataClient:
         # note we have some extra fields which may have come from reading the doc text,
         # but aren't in the doc object, we add them here too.
         extra_fields = {
-            k: v for k, v in kwargs.items() if k in {"title", "authors", "doi"}
+            k: v for k, v in kwargs.items() if k in set(DocDetails.model_fields)
         }
         # abuse our doc_details object to be an int if it's empty
         # our __add__ operation supports int by doing nothing
