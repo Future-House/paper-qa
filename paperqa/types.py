@@ -590,6 +590,9 @@ class DocDetails(Doc):
                 data["bibtex"] = BibliographyData(
                     entries={data["key"]: new_entry}
                 ).to_string("bibtex")
+                # clear out the citation, since it will be regenerated
+                if data.get("overwrite_fields_from_metadata", True):
+                    data["citation"] = None
             except Exception:
                 logger.warning(
                     "Failed to generate bibtex for"
