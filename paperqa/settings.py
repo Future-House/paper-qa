@@ -523,6 +523,11 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
+    rebuild_index: bool = Field(
+        default=True,
+        description="If True, we force the index to be rebuild.",
+    )
+
     callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,
         description="""

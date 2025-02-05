@@ -55,7 +55,6 @@ async def agent_query(
     settings: Settings,
     docs: Docs | None = None,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
-    force_index_rebuild: bool = True,
     **runner_kwargs,
 ) -> AnswerResponse:
     if docs is None:
@@ -69,7 +68,7 @@ async def agent_query(
     )
 
     response = await run_agent(
-        docs, query, settings, agent_type, force_index_rebuild, **runner_kwargs
+        docs, query, settings, agent_type, **runner_kwargs
     )
     agent_logger.debug(f"agent_response: {response}")
 
@@ -95,7 +94,6 @@ async def run_agent(
     query: str | MultipleChoiceQuestion,
     settings: Settings,
     agent_type: str | type = DEFAULT_AGENT_TYPE,
-    force_index_rebuild: bool = True,
     **runner_kwargs,
 ) -> AnswerResponse:
     """
@@ -107,7 +105,6 @@ async def run_agent(
         settings: Settings to use.
         agent_type: Agent type (or fully qualified name to the type) to pass to
             AgentType.get_agent, or "fake" to TODOC.
-        force_index_rebuild: If True, we force the index to be rebuild.
         runner_kwargs: Keyword arguments to pass to the runner.
 
     Returns:
@@ -125,7 +122,7 @@ async def run_agent(
     # Build the index once here, and then all tools won't need to rebuild it
     # only build if the a search tool is requested
     if PaperSearch.TOOL_FN_NAME in (settings.agent.tool_names or DEFAULT_TOOL_NAMES):
-        await get_directory_index(settings=settings, build=force_index_rebuild)
+        await get_directory_index(settings=settings, build=settings.agent.rebuild_index)
 
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         session, agent_status = await run_fake_agent(

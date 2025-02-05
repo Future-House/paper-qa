@@ -1081,10 +1081,11 @@ async def test_search_pagination(agent_test_settings: Settings) -> None:
 
 
 @pytest.mark.asyncio
-async def test_agent_empty_index(agent_test_settings: Settings):
+async def test_empty_index_without_index_rebuild(agent_test_settings: Settings):
     """Test that empty index and `rebuild_index=False` lead to a RuntimeError."""
     agent_test_settings.agent = AgentSettings(index=IndexSettings()) # empty index
-    with pytest.raises(RuntimeError):
+    agent_test_settings.agent.rebuild_index = False
+    with pytest.raises(RuntimeError, match=f"Index .* was empty, please rebuild it."):
         await agent_query(
             query="Are COVID-19 vaccines effective?",
             settings=agent_test_settings,
