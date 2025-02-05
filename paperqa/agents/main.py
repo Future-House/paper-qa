@@ -67,9 +67,7 @@ async def agent_query(
         storage=SearchDocumentStorage.JSON_MODEL_DUMP,
     )
 
-    response = await run_agent(
-        docs, query, settings, agent_type, **runner_kwargs
-    )
+    response = await run_agent(docs, query, settings, agent_type, **runner_kwargs)
     agent_logger.debug(f"agent_response: {response}")
 
     agent_logger.info(f"[bold blue]Answer: {response.session.answer}[/bold blue]")
