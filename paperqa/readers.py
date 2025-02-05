@@ -311,16 +311,26 @@ async def read_doc(
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks without blocking the event loop.
 
-    Offloads blocking I/O and CPU operations to a thread pool.
+    Optionally can include just the parsing as well as metadata about the parsing/chunking
+    Args:
+        path: local document path
+        doc: object with document metadata
+        parsed_text_only: return parsed text without chunking
+        include_metadata: return a tuple
+        chunk_chars: size of chunks
+        overlap: size of overlap between chunks
+        page_size_limit: optional limit on the number of characters per page
     """
     str_path = str(path)
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
+        # TODO: Make parse_pdf_to_pages async
         parsed_text = await asyncio.to_thread(
             parse_pdf_to_pages, path, page_size_limit=page_size_limit
         )
     elif str_path.endswith(".txt"):
+        # TODO: Make parse_text async
         parsed_text = await asyncio.to_thread(
             parse_text, path, page_size_limit=page_size_limit
         )
@@ -346,16 +356,12 @@ async def read_doc(
     if chunk_chars == 0:
         # Offload reduce_content to a thread as well
         chunked_text = [
-            Text(
-                text=await asyncio.to_thread(parsed_text.reduce_content),
-                name=doc.docname,
-                doc=doc,
-            )
+            Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
         ]
         chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
     elif str_path.endswith(".pdf"):
-        chunked_text = await asyncio.to_thread(
-            chunk_pdf, parsed_text, doc, chunk_chars, overlap
+        chunked_text = chunk_pdf(
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars,
@@ -363,15 +369,15 @@ async def read_doc(
             chunk_type="overlap_pdf_by_page",
         )
     elif str_path.endswith((".txt", ".html")):
-        chunked_text = await asyncio.to_thread(
-            chunk_text, parsed_text, doc, chunk_chars, overlap
+        chunked_text = chunked_text = chunk_text(
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
         )
     else:
-        chunked_text = await asyncio.to_thread(
-            chunk_code_text, parsed_text, doc, chunk_chars, overlap
+        chunked_text = chunk_code_text(
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars,
