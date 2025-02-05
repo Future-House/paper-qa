@@ -476,7 +476,7 @@ async def process_file(
     manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
-    processed_counter: Counter,
+    processed_counter: Counter[str],
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
 
