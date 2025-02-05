@@ -1107,12 +1107,7 @@ class TestClinicalTrialSearchTool:
 
 @pytest.mark.asyncio
 async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
-    high_batch_size_save_index_count = 0
-
-    def high_batch_size_increment_save_index_count(*args, **kwargs):
-        nonlocal high_batch_size_save_index_count
-        high_batch_size_save_index_count += 1
-
+    
     high_concurrency_settings = agent_test_settings.model_copy(deep=True)
     high_concurrency_settings.agent.index.name = "high_concurrency"
     high_concurrency_settings.agent.index.concurrency = 3
@@ -1120,17 +1115,13 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     with patch.object(
         SearchIndex,
         "save_index",
-        side_effect=high_batch_size_increment_save_index_count,
-    ):
+        side_effect=SearchIndex.save_index,
+        autospec=True
+    ) as mock_save_index:
         start_time = time.perf_counter()
         await get_directory_index(settings=high_concurrency_settings)
         high_concurrency_duration = time.perf_counter() - start_time
-
-    low_batch_size_save_index_count_ = 0
-
-    def low_batch_size_increment_save_index_count_(*args, **kwargs):
-        nonlocal low_batch_size_save_index_count_
-        low_batch_size_save_index_count_ += 1
+    high_batch_save_count = mock_save_index.call_count
 
     low_concurrency_settings = agent_test_settings.model_copy(deep=True)
     low_concurrency_settings.agent.index.name = "low_concurrency"
@@ -1139,16 +1130,18 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     with patch.object(
         SearchIndex,
         "save_index",
-        side_effect=low_batch_size_increment_save_index_count_,
-    ):
+        side_effect=SearchIndex.save_index,
+        autospec=True
+    ) as mock_save_index:
         start_time = time.perf_counter()
         await get_directory_index(settings=low_concurrency_settings)
         low_concurrency_duration = time.perf_counter() - start_time
+    low_batch_save_count = mock_save_index.call_count
 
     assert high_concurrency_duration * 1.1 < low_concurrency_duration, (
         f"Expected high concurrency to be faster, but took {high_concurrency_duration:.2f}s "
         f"compared to {low_concurrency_duration:.2f}s"
     )
     assert (
-        high_batch_size_save_index_count < low_batch_size_save_index_count_
-    ), f"Expected fewer save_index with high batch size, but got {high_batch_size_save_index_count} vs {low_batch_size_save_index_count_}"
+        high_batch_save_count < low_batch_save_count
+    ), f"Expected fewer save_index with high batch size, but got {high_batch_save_count} vs {low_batch_save_count}"
