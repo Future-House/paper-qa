@@ -163,8 +163,8 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
 
     assert len(await index.index_files) == num_source_files
     assert (
-        mock_aadd.await_count != num_source_files
-    ), "Should have been able to resume build"
+        mock_aadd.await_count < num_source_files
+    ), "Should not rebuild the whole index"
 
 
 @pytest.mark.asyncio
