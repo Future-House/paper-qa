@@ -1107,25 +1107,36 @@ class TestClinicalTrialSearchTool:
 
 @pytest.mark.asyncio
 async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
-
+    high_batch_size_save_index_count = 0
+    def high_batch_size_increment_save_index_count(*args, **kwargs):
+        nonlocal high_batch_size_save_index_count
+        high_batch_size_save_index_count += 1
     high_concurrency_settings = agent_test_settings.model_copy(deep=True)
     high_concurrency_settings.agent.index.name = "high_concurrency"
     high_concurrency_settings.agent.index.concurrency = 3
     high_concurrency_settings.agent.index.batch_size = 3
-    start_time = time.perf_counter()
-    await get_directory_index(settings=high_concurrency_settings)
-    high_concurrency_duration = time.perf_counter() - start_time
+    with patch.object(SearchIndex, "save_index", side_effect=high_batch_size_increment_save_index_count):
+        start_time = time.perf_counter()
+        await get_directory_index(settings=high_concurrency_settings)
+        high_concurrency_duration = time.perf_counter() - start_time
 
+    low_batch_size_save_index_count_ = 0
+    def low_batch_size_increment_save_index_count_(*args, **kwargs):
+        nonlocal low_batch_size_save_index_count_
+        low_batch_size_save_index_count_ += 1
     low_concurrency_settings = agent_test_settings.model_copy(deep=True)
     low_concurrency_settings.agent.index.name = "low_concurrency"
     low_concurrency_settings.agent.index.concurrency = 1
     low_concurrency_settings.agent.index.batch_size = 1
-    start_time = time.perf_counter()
-    await get_directory_index(settings=low_concurrency_settings)
-    low_concurrency_duration = time.perf_counter() - start_time
+    with patch.object(SearchIndex, "save_index", side_effect=low_batch_size_increment_save_index_count_):
+        start_time = time.perf_counter()
+        await get_directory_index(settings=low_concurrency_settings)
+        low_concurrency_duration = time.perf_counter() - start_time
 
-    # Assert that high concurrency takes less time
     assert high_concurrency_duration * 1.1 < low_concurrency_duration, (
         f"Expected high concurrency to be faster, but took {high_concurrency_duration:.2f}s "
         f"compared to {low_concurrency_duration:.2f}s"
+    )
+    assert high_batch_size_save_index_count < low_batch_size_save_index_count_, (
+        f"Expected fewer save_index with high batch size, but got {high_batch_size_save_index_count} vs {low_batch_size_save_index_count_}"
     )
