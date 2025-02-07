@@ -526,7 +526,7 @@ async def process_file(
                 if progress_bar_update:
                     progress_bar_update()
 
-                if not (isinstance(e, ValueError | ImpossibleParsingError)):
+                if not isinstance(e, ValueError | ImpossibleParsingError):
                     raise e
                 return
 
