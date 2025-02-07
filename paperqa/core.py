@@ -12,9 +12,22 @@ from paperqa.utils import extract_score, strip_citations
 
 def llm_parse_json(text: str) -> dict:
     """Read LLM output and extract JSON data from it."""
-    # fetch from markdown ```json if present
-    ptext = text.strip().split("```json")[-1].split("```")[0]
-    # split anything before the first { after the last }
+
+    # Remove leading/trailing whitespaces
+    ptext = text.strip()
+
+    # Removing <think> tags for reasoning models
+    ptext = re.sub(r"<think>.*?</think>", "", ptext, flags=re.DOTALL).strip()
+
+    # fetches from markdown ```json if present
+    ptext = ptext.split("```json")[-1].split("```")[0]
+
+    # Wrap non-JSON text in a dictionary
+    if "{" not in ptext and "}" not in ptext:
+        print("WRAPPING IN DICT")
+        ptext = json.dumps({"summary": ptext})
+
+    # Remove any introductory/closing text and ensure {} to make it a valid JSON
     ptext = ("{" + ptext.split("{", 1)[-1]).rsplit("}", 1)[0] + "}"
 
     def escape_newlines(match: re.Match) -> str:
@@ -29,45 +42,62 @@ def llm_parse_json(text: str) -> dict:
     pattern = r'"(?:[^"\\]|\\.)*"'
     ptext = re.sub(pattern, escape_double_backslashes, ptext)
     ptext = re.sub(pattern, escape_newlines, ptext)
+
+    def fraction_replacer(match):
+        key = match.group(1)  # The key (unchanged)
+
+        # Case 1: If quoted fraction `"5/10"`
+        if match.group(2) and match.group(3):
+            numerator = int(match.group(2))
+            denominator = int(match.group(3))
+
+        # Case 2: If unquoted fraction `5/10`
+        elif match.group(4) and match.group(5):
+            numerator = int(match.group(4))
+            denominator = int(match.group(5))
+
+        else:
+            return match.group(0)  # No change if no fraction is found
+
+        fraction_value = round(numerator / denominator * 10)  # Convert to integer
+        return f"{key}{fraction_value}"
+
+    # Replace X/Y scores with integer value from 0-10
+    # e.g. "relevance_score": "8/10" -> "relevance_score": 8
+    # e.g. "relevance_score": 3/5 -> "relevance_score": 6
+    pattern = r'("\s*(?:relevance|score)[\w\s\-]*"\s*:\s*)(?:"(\d+)\s*/\s*(\d+)"|(\d+)\s*/\s*(\d+))'
+    ptext = re.sub(pattern, fraction_replacer, ptext)
+
+    # Remove extra commas
+    ptext = re.sub(r",\s*,+", ",", ptext)  # Remove multiple consecutive commas
+    ptext = re.sub(r",\s*}", "}", ptext)  # Remove trailing commas before closing brace
+    ptext = re.sub(r"\{\s*,", "{", ptext)  # Remove leading commas inside object
+
+    # Handling incorrect key names for "relevance_score"
     try:
-        return json.loads(ptext)
+        data = json.loads(ptext)
     except json.JSONDecodeError as e:
-        print(
-            "[WARNING] Failed to parse JSON. Attempting to wrap response in dictionary"
-        )
-    except Exception as e:
         raise ValueError(
             f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
             " supporting JSON output or our parsing technique could use some work. Try"
             " a different model or specify `Settings(prompts={'use_json': False})`"
         ) from e
 
-    # Removing <think> tags for reasoning models (happens if the LLM does not produce a JSON response)
-    if "<think>" in ptext:
-        ptext = text.strip("{}").strip()  # Removes {} added previously
-        ptext = re.sub(r"<think>.*?</think>", "", ptext, flags=re.DOTALL).strip()
+    for key in list(data.keys()):
+        if re.search(r"re.?levance|score", key, re.IGNORECASE):
+            data["relevance_score"] = data.pop(key)  # Renaming key
 
-    #  Wrap the response in a dictionary if not json compatible
-    ptext = {"summary": ptext}
-    ptext = json.dumps(ptext)
+    # Handling float, str values for relevance_score
+    if "relevance_score" in data:
+        try:
+            data["relevance_score"] = round(float(data["relevance_score"]))
 
-    try:
-        response = json.loads(ptext)
-        # Handle variations of the key "relevance_score" which the model sometimes outputs incorrectly
-        relevance_keys = [
-            key for key in response if re.search(r"relevance", key, re.IGNORECASE)
-        ]
-        if relevance_keys:
-            response["relevance_score"] = response.pop(relevance_keys[0])
+        except ValueError:
+            data["relevance_score"] = (
+                0  # Default if relevance_score is empty/not a number
+            )
 
-        return response
-
-    except json.JSONDecodeError as e:
-        raise ValueError(
-            f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
-            " supporting JSON output or our parsing technique could use some work. Try"
-            " a different model or specify `Settings(prompts={'use_json': False})`"
-        ) from e
+    return data
 
 
 async def map_fxn_summary(
@@ -145,9 +175,7 @@ async def map_fxn_summary(
                 name=text.name,
                 doc=text.doc.model_dump(exclude={"embedding"}),
             ),
-            score=round(
-                float(score)
-            ),  # pylint: disable=possibly-used-before-assignment
+            score=score,  # pylint: disable=possibly-used-before-assignment
             **extras,
         ),
         llm_result,
