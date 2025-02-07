@@ -523,6 +523,14 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
+    rebuild_index: bool = Field(
+        default=True,
+        description=(
+            "Flag to rebuild the index at the start of agent runners, default is True"
+            " for CLI users to ensure all source PDFs are pulled in."
+        ),
+    )
+
     callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,
         description="""
