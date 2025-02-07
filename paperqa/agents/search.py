@@ -340,19 +340,17 @@ class SearchIndex:
             self._writer.wait_merging_threads()
             self._writer = None
 
-    @staticmethod
     @retry(
         stop=stop_after_attempt(1000),
         wait=wait_random_exponential(multiplier=0.25, max=60),
         retry=retry_if_exception_type(AsyncRetryError),
         reraise=True,
     )
-    def delete_document(index: Index, file_location: str) -> None:
+    async def delete_document(self, index: Index, file_location: str) -> None:
         try:
-            writer: IndexWriter = index.writer()
+            writer: IndexWriter = await self.writer
             writer.delete_documents("file_location", file_location)
-            writer.commit()
-            writer.wait_merging_threads()
+            await self.save_index()
         except ValueError as e:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
                 raise AsyncRetryError("Failed to acquire lock") from e
