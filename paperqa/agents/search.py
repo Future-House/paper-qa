@@ -525,7 +525,7 @@ async def process_file(
                     progress_bar_update()
 
                 if not isinstance(e, ValueError | ImpossibleParsingError):
-                    raise e
+                    raise
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
