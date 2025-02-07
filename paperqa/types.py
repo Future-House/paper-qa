@@ -591,18 +591,18 @@ class DocDetails(Doc):
                     entries={data["key"]: new_entry}
                 ).to_string("bibtex")
                 # clear out the citation, since it will be regenerated
-                if data.get("overwrite_fields_from_metadata", True):
+                if data.get("overwrite_citation_from_metadata", "").lower() in {"0", "false"}:
                     data["citation"] = None
             except Exception:
                 logger.warning(
                     "Failed to generate bibtex for"
                     f" {data.get('docname') or data.get('citation')}"
                 )
-        if not data.get("citation") and data.get("bibtex") is not None:
+        if data.get("citation") is None and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
                 data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
-        elif not data.get("citation"):
+        elif data.get("citation") is None:
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
