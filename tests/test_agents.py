@@ -260,7 +260,7 @@ async def test_get_directory_index_w_no_citations(
     results = await index.query(query="who is Frederick Bates?")
     top_result = next(iter(results[0].docs.values()))
 
-    assert top_result.citation == ""
+    assert not top_result.citation
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
