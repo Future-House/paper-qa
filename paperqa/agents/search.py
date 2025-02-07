@@ -45,7 +45,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import DocDetails
-from paperqa.utils import hexdigest
+from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
 
@@ -513,7 +513,7 @@ async def process_file(
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
                 )
-            except Exception:
+            except Exception as e:
                 # We handle any exception here because we want to save_index so we
                 # 1. can resume the build without rebuilding this file if a separate
                 # process_file invocation leads to a segfault or crash.
@@ -525,6 +525,9 @@ async def process_file(
                 await search_index.save_index()
                 if progress_bar_update:
                     progress_bar_update()
+                
+                if not(isinstance(e, ValueError) or isinstance(e, ImpossibleParsingError)):
+                    raise Exception(e)
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))

@@ -140,6 +140,7 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
 
     # 1. Try to build an index, and crash halfway through
     with (
+        pytest.raises(ExceptionGroup, match="unhandled"),
         patch.object(
             Docs, "aadd", side_effect=crashing_aadd, autospec=True
         ) as mock_aadd,
