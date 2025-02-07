@@ -346,7 +346,7 @@ class SearchIndex:
         retry=retry_if_exception_type(AsyncRetryError),
         reraise=True,
     )
-    async def delete_document(self, index: Index, file_location: str) -> None:
+    async def delete_document(self, file_location: str) -> None:
         try:
             writer: IndexWriter = await self.writer
             writer.delete_documents("file_location", file_location)
@@ -359,7 +359,7 @@ class SearchIndex:
     async def remove_from_index(self, file_location: str) -> None:
         index_files = await self.index_files
         if index_files.get(file_location):
-            await self.delete_document(await self.index, file_location)
+            await self.delete_document(file_location)
             filehash = index_files.pop(file_location)
             docs_index_dir = await self.docs_index_directory
             # TODO: since the directory is part of the filehash these
