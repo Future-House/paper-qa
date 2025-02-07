@@ -53,10 +53,7 @@ class Doc(Embeddable):
         ),
     )
     overwrite_citation_from_metadata: bool = Field(
-        default=True,
-        description=(
-            "flag to overwrite the citation from metadata"
-        )
+        default=True, description=("flag to overwrite the citation from metadata")
     )
 
     @model_validator(mode="before")
