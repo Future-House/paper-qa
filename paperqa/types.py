@@ -591,7 +591,10 @@ class DocDetails(Doc):
                     entries={data["key"]: new_entry}
                 ).to_string("bibtex")
                 # clear out the citation, since it will be regenerated
-                if data.get("overwrite_citation_from_metadata", "").lower() in {"0", "false"}:
+                if data.get("overwrite_citation_from_metadata", "").lower() in {
+                    "0",
+                    "false",
+                }:
                     data["citation"] = None
             except Exception:
                 logger.warning(
