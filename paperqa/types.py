@@ -598,11 +598,11 @@ class DocDetails(Doc):
                     "Failed to generate bibtex for"
                     f" {data.get('docname') or data.get('citation')}"
                 )
-        if data.get("citation") is None and data.get("bibtex") is not None:
+        if not data.get("citation") and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
                 data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
-        elif data.get("citation") is None:
+        elif not data.get("citation"):
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
