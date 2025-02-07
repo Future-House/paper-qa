@@ -52,6 +52,12 @@ class Doc(Embeddable):
             "flag to overwrite fields from metadata when upgrading to a DocDetails"
         ),
     )
+    overwrite_citation_from_metadata: bool = Field(
+        default=True,
+        description=(
+            "flag to overwrite the citation from metadata"
+        )
+    )
 
     @model_validator(mode="before")
     @classmethod
@@ -591,7 +597,7 @@ class DocDetails(Doc):
                     entries={data["key"]: new_entry}
                 ).to_string("bibtex")
                 # clear out the citation, since it will be regenerated
-                if data.get("overwrite_citation_from_metadata", "").lower() in {"0", "false"}:
+                if not (data.get("overwrite_citation_from_metadata", "").lower() in {"0", "false"}):
                     data["citation"] = None
             except Exception:
                 logger.warning(
