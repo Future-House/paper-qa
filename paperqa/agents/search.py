@@ -525,8 +525,8 @@ async def process_file(
                 await search_index.save_index()
                 if progress_bar_update:
                     progress_bar_update()
-                
-                if not(isinstance(e, ValueError) or isinstance(e, ImpossibleParsingError)):
+
+                if not (isinstance(e, ValueError | ImpossibleParsingError)):
                     raise Exception(e)
                 return
 
