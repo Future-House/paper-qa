@@ -613,7 +613,9 @@ class DocDetails(Doc):
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
         if not data.get("overwrite_citation_from_metadata"):
-            data["overwrite_citation_from_metadata"] = data.get("overwrite_fields_from_metadata", True)
+            data["overwrite_citation_from_metadata"] = data.get(
+                "overwrite_fields_from_metadata", True
+            )
         elif isinstance(data.get("overwrite_citation_from_metadata"), str):
             if data.get("overwrite_citation_from_metadata", "").lower() in {
                 "0",
