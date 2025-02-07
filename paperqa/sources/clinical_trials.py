@@ -171,7 +171,7 @@ def format_to_doc_details(trial_data: dict) -> DocDetails:
         citation=citation,
         other={"client_source": [CLINICAL_TRIALS_BASE]},
         overwrite_fields_from_metadata=False,
-        overwrite_citation_from_metadata=False
+        overwrite_citation_from_metadata=False,
     )
 
 
