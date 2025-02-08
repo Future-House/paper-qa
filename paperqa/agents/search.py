@@ -334,7 +334,7 @@ class SearchIndex:
             raise
 
     async def checkpoint(self) -> None:
-        """Commit all pending changes, merge threads, and reset."""
+        """Commit all pending changes, merge threads, and reset writer, as writers are not valid after commit."""
         writer: IndexWriter = await self.writer
         writer.commit()
         writer.wait_merging_threads()
