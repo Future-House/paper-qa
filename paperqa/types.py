@@ -612,15 +612,16 @@ class DocDetails(Doc):
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
-        if isinstance(data.get("overwrite_citation_from_metadata"), str):
-            if data.get("overwrite_citation_from_metadata", "").lower() in {
-                "0",
-                "false",
-            }:
-                data["overwrite_citation_from_metadata"] = False
 
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
+
+        if isinstance(data.get("overwrite_citation_from_metadata"), str) and data.get(
+            "overwrite_citation_from_metadata", ""
+        ).lower() in {"false", "0"}:
+            data |= {"overwrite_citation_from_metadata": False}
+
+        data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
