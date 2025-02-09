@@ -7,7 +7,10 @@ __all__ = [
     "LitQAv2TaskSplit",
 ]
 
+import json
 import logging
+import os
+import random
 import re
 from abc import ABC
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
@@ -16,6 +19,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never, cast
 from uuid import UUID
 
+import pandas as pd
 from aviary.core import (
     TASK_DATASET_REGISTRY,
     Environment,
@@ -31,7 +35,7 @@ from aviary.utils import (
     MultipleChoiceEvaluation,
     MultipleChoiceQuestion,
 )
-from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
+from llmclient import CommonLLMNames, EmbeddingModel, LiteLLMModel, LLMModel, LLMResult
 
 from paperqa._ldp_shims import (
     Callback,
@@ -45,8 +49,10 @@ from paperqa.litqa import (
     DEFAULT_REWARD_MAPPING,
     read_litqa_v2_from_hub,
 )
+from paperqa.prompts import lfrqa_prompt, lfrqa_system_prompt
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, PQASession
+from paperqa.utils import strip_citations
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .search import SearchIndex, maybe_get_manifest
@@ -486,4 +492,249 @@ TASK_DATASET_NAME = "litqa-v2"
 TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
     LitQAv2TaskDataset.__module__,
     LitQAv2TaskDataset.__name__,
+)
+
+
+class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
+    def __init__(
+        self,
+        qid: str,
+        question: str,
+        human_answer: str,
+        gt_doc_ids: list[str],
+        pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
+        *args,
+        **kwargs,
+    ):
+        # NOTE I'm using qid and question and
+        # maybe we could use session_id and query instead?
+        kwargs["query"] = question
+
+        # NOTE: I'm also passing this docs because they are required
+        # but don't know if/how they are used
+        kwargs["docs"] = Docs()
+        super().__init__(*args, **kwargs)
+
+        self.qid = qid
+        self.question = question
+        self.human_answer = human_answer
+        self.gt_doc_ids = gt_doc_ids
+        self.pairwise_eval_llm = pairwise_eval_llm
+
+    def extract_best_answer_index(self, text: str) -> int:
+        match = re.search(r"<rating>(\d+)</rating>", text)
+        return int(match.group(1)) if match else 0
+
+    def log_results_to_json(
+        self,
+        llm_model_name: str,
+        qid: str,
+        question: str,
+        pqa_answer: str,
+        paper_search_ids: list[int],
+        pqa_context: str,
+        human_answer: str,
+        gt_doc_ids: list[str],
+        pqa_answer_index: int,
+        winner: str,
+        result: LLMResult,
+    ):
+        were_gt_docs_found = len(set(gt_doc_ids) & set(paper_search_ids)) > 0
+        evaluation_results = {
+            "question": question,
+            "paperqa_answer": pqa_answer,
+            "human_answer": human_answer,
+            "pqa_answer_index": pqa_answer_index,
+            "winner": winner,
+            "llm_response": result.text,
+            "paper_search_ids": paper_search_ids,
+            "pqa_context": pqa_context,
+            "gt_doc_ids": gt_doc_ids,
+            "were_gt_docs_found": were_gt_docs_found,
+        }
+
+        os.makedirs(f"rag-qa-benchmarking/results_{llm_model_name}", exist_ok=True)
+        json_path = f"rag-qa-benchmarking/results_{llm_model_name}/{qid}.json"
+        with open(json_path, "w") as f:
+            json.dump(evaluation_results, f, indent=2)
+
+    def get_pairwise_eval_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.pairwise_eval_llm,
+        )
+
+    async def pairwise_evaluation(
+        self, qid: str, question: str, pqa_answer: str, human_answer: str
+    ) -> float:
+
+        paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
+
+        pairwise_eval_llm = self.get_pairwise_eval_llm()
+        pqa_answer = strip_citations(pqa_answer)
+
+        if random.random() < 0.5:  # noqa: PLR2004
+            data = {
+                "question": question,
+                "answer1": pqa_answer,
+                "answer2": human_answer,
+            }
+            pqa_answer_index = 1
+        else:
+            data = {
+                "question": question,
+                "answer1": human_answer,
+                "answer2": pqa_answer,
+            }
+            pqa_answer_index = 2
+
+        result = await pairwise_eval_llm.run_prompt(
+            prompt=lfrqa_prompt,
+            data=data,
+            system_prompt=lfrqa_system_prompt,
+        )
+
+        best_answer_index = self.extract_best_answer_index(result.text)
+        winner = (
+            "paperqa"
+            if best_answer_index == pqa_answer_index
+            else "human" if best_answer_index != 0 else "tie"
+        )
+
+        print("--------------------------------")
+        print(f"For question {question} \n")
+        print(f"PQa answer was:\n{pqa_answer} \n\n")
+        print(f"Human answer was:\n{human_answer} \n\n")
+        print(f"Winner is: {winner}\n")
+        self.log_results_to_json(
+            self._settings.llm,
+            qid,
+            question,
+            pqa_answer,
+            paper_search_ids,
+            self.state.session.context,
+            human_answer,
+            self.gt_doc_ids,
+            pqa_answer_index,
+            winner,
+            result,
+        )
+
+        return (
+            self._rewards["win"]
+            if winner == "paperqa"
+            else self._rewards["lose"] if winner == "human" else self._rewards["tie"]
+        )
+
+    async def step(
+        self, action: ToolRequestMessage
+    ) -> tuple[Messages, float, bool, bool]:
+        messages, reward, done, truncated = await super().step(action)
+        if done:
+            reward = await self.pairwise_evaluation(
+                self.qid, self.question, self.state.session.answer, self.human_answer
+            )
+        return messages, reward, done, truncated
+
+
+class LFRQATaskDataset(
+    TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin
+):
+    """Task dataset for custom evaluation of non-multiple choice questions."""
+
+    def __init__(
+        self,
+        data_path: str,
+        num_questions: int | None = None,
+        settings: Settings | dict | None = None,
+        pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
+    ):
+        if settings is None:
+            settings = Settings()
+        if isinstance(settings, dict):
+            settings = Settings(**settings)
+        self._settings = settings
+
+        if num_questions is not None:
+            self.data = pd.read_csv(data_path).head(num_questions)
+        else:
+            self.data = pd.read_csv(data_path)
+
+        self._rewards = {
+            "win": 1,
+            "tie": 0,
+            "lose": -1,
+        }
+
+        self.pai = pairwise_eval_llm
+
+    def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
+        """Create a new environment instance for the given index."""
+        row = self.data.iloc[idx]
+
+        return LFRQAPairwiseEvalEnv(
+            qid=row.qid,
+            question=row.question,
+            human_answer=row.answer,
+            settings=self._settings,
+            rewards=self._rewards,
+            gt_doc_ids=row.gold_doc_ids.strip("[]").split(","),
+            pairwise_eval_llm=self.pai,
+        )
+
+    def compute_trajectory_metrics(
+        self, trajectories: "Sequence[Trajectory]"
+    ) -> dict[str, list[float]]:
+        metrics = super().compute_trajectory_metrics(trajectories)
+
+        # Add custom metrics similar to LitQATaskDataset
+        total_paper_count: list[float] = []
+        relevant_paper_count: list[float] = []
+        evidence_count: list[float] = []
+
+        for t in trajectories:
+            split_certainties = [
+                split_certainty
+                for split_certainty in (
+                    re.split(
+                        pattern=Complete.CERTAINTY_SPLIT_REGEX_PATTERN,
+                        string=obs.content,
+                        maxsplit=1,
+                    )
+                    for obs in t.steps[-1].next_observation
+                    if (
+                        isinstance(obs, ToolResponseMessage)
+                        and obs.name == Complete.TOOL_FN_NAME
+                    )
+                )
+                if len(split_certainty) >= 4  # noqa: PLR2004
+            ]
+
+            for i, metric_list in enumerate(
+                (total_paper_count, relevant_paper_count, evidence_count),
+                start=1,
+            ):
+                metric_list.append(
+                    sum(int(sa[i]) for sa in split_certainties) / len(split_certainties)
+                    if split_certainties
+                    else 0
+                )
+
+        return metrics | {
+            "total_paper_count": total_paper_count,
+            "relevant_paper_count": relevant_paper_count,
+            "evidence_count": evidence_count,
+            "paperqa_won": [
+                int(t.steps[-1].reward == self._rewards["win"]) for t in trajectories
+            ],
+        }
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+
+# Register your custom dataset
+CUSTOM_TASK_DATASET_NAME = "lfrqa"
+TASK_DATASET_REGISTRY[CUSTOM_TASK_DATASET_NAME] = (
+    LFRQATaskDataset.__module__,
+    LFRQATaskDataset.__name__,
 )
