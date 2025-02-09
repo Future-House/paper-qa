@@ -9,7 +9,7 @@ import pathlib
 import pickle
 import warnings
 import zlib
-from collections.abc import Callable, Collection, Sequence
+from collections.abc import Callable, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -43,7 +43,7 @@ from tenacity import (
 
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
-from paperqa.types import DocDetails
+from paperqa.types import ENV_VAR_MATCH, DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
@@ -106,8 +106,6 @@ class SearchDocumentStorage(StrEnum):
             return pickle.loads(zlib.decompress(data))  # type: ignore[arg-type] # noqa: S301
         return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
 
-
-ENV_VAR_MATCH: Collection[str] = {"1", "true"}
 
 # Cache keys are a two-tuple of index name and absolute index directory
 # Cache values are a two-tuple of an opened Index instance and the count

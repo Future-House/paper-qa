@@ -40,6 +40,10 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 
+ENV_VAR_MATCH: Collection[str] = {"1", "true"}
+ENV_VAR_MISMATCH: Collection[str] = {"0", "false"}
+
+
 class Doc(Embeddable):
     model_config = ConfigDict(extra="forbid")
 
@@ -616,9 +620,11 @@ class DocDetails(Doc):
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
 
-        if isinstance(data.get("overwrite_citation_from_metadata"), str) and data.get(
-            "overwrite_citation_from_metadata", ""
-        ).lower() in {"false", "0"}:
+        if (
+            isinstance(data.get("overwrite_citation_from_metadata"), str)
+            and data.get("overwrite_citation_from_metadata", "").lower()
+            in ENV_VAR_MISMATCH
+        ):
             data |= {"overwrite_citation_from_metadata": False}
 
         data = cls.lowercase_doi_and_populate_doc_id(data)
