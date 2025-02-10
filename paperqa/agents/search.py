@@ -364,10 +364,21 @@ class SearchIndex:
 
             self.changed = True
 
+    @retry(
+        stop=stop_after_attempt(1000),
+        wait=wait_random_exponential(multiplier=0.25, max=60),
+        retry=retry_if_exception_type(AsyncRetryError),
+        reraise=True,
+    )
     async def save_index(self) -> None:
-        async with self.writer(reset=True) as writer:
-            writer.commit()
-            writer.wait_merging_threads()
+        try:
+            async with self.writer(reset=True) as writer:
+                writer.commit()
+                writer.wait_merging_threads()
+        except ValueError as e:
+            if "Failed to acquire Lockfile: LockBusy." in str(e):
+                raise AsyncRetryError("Failed to acquire lock") from e
+            raise
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
