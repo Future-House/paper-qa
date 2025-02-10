@@ -10,7 +10,7 @@ import pickle
 import warnings
 import zlib
 from collections import Counter
-from collections.abc import Callable, Collection, Sequence
+from collections.abc import AsyncIterator, Callable, Collection, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -239,12 +239,14 @@ class SearchIndex:
             self._searcher = index.searcher()
         return self._searcher
 
-    @property
-    async def writer(self) -> IndexWriter:
+    @contextlib.asynccontextmanager
+    async def writer(self, reset: bool = False) -> AsyncIterator[IndexWriter]:
         if not self._writer:
             index = await self.index
             self._writer = index.writer()
-        return self._writer
+        yield self._writer
+        if reset:
+            self._writer = None
 
     @property
     async def count(self) -> int:
@@ -304,8 +306,8 @@ class SearchIndex:
         async def _add_document() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
-                    writer: IndexWriter = await self.writer
-                    writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
+                    async with self.writer() as writer:
+                        writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
@@ -333,13 +335,6 @@ class SearchIndex:
             )
             raise
 
-    async def checkpoint(self) -> None:
-        """Commit all pending changes, merge threads, and reset writer, as writers are not valid after commit."""
-        writer: IndexWriter = await self.writer
-        writer.commit()
-        writer.wait_merging_threads()
-        self._writer = None
-
     @retry(
         stop=stop_after_attempt(1000),
         wait=wait_random_exponential(multiplier=0.25, max=60),
@@ -348,8 +343,8 @@ class SearchIndex:
     )
     async def delete_document(self, file_location: str) -> None:
         try:
-            writer: IndexWriter = await self.writer
-            writer.delete_documents("file_location", file_location)
+            async with self.writer() as writer:
+                writer.delete_documents("file_location", file_location)
             await self.save_index()
         except ValueError as e:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
@@ -371,7 +366,9 @@ class SearchIndex:
             self.changed = True
 
     async def save_index(self) -> None:
-        await self.checkpoint()
+        async with self.writer(reset=True) as writer:
+            writer.commit()
+            writer.wait_merging_threads()
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
