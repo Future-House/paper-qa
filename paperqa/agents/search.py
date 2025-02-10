@@ -9,7 +9,8 @@ import pathlib
 import pickle
 import warnings
 import zlib
-from collections.abc import Callable, Sequence
+from collections import Counter
+from collections.abc import AsyncIterator, Callable, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -150,6 +151,7 @@ class SearchIndex:
         self._schema: Schema | None = None
         self._index: Index | None = None
         self._searcher: Searcher | None = None
+        self._writer: IndexWriter | None = None
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
@@ -235,6 +237,15 @@ class SearchIndex:
             self._searcher = index.searcher()
         return self._searcher
 
+    @contextlib.asynccontextmanager
+    async def writer(self, reset: bool = False) -> AsyncIterator[IndexWriter]:
+        if not self._writer:
+            index = await self.index
+            self._writer = index.writer()
+        yield self._writer
+        if reset:
+            self._writer = None
+
     @property
     async def count(self) -> int:
         return (await self.searcher).num_docs
@@ -293,10 +304,9 @@ class SearchIndex:
         async def _add_document() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
-                    writer: IndexWriter = (await self.index).writer()
-                    writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
-                    writer.commit()
-                    writer.wait_merging_threads()
+                    async with self.writer() as writer:
+                        # Let caller handle commit to allow for batching
+                        writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
@@ -324,19 +334,17 @@ class SearchIndex:
             )
             raise
 
-    @staticmethod
     @retry(
         stop=stop_after_attempt(1000),
         wait=wait_random_exponential(multiplier=0.25, max=60),
         retry=retry_if_exception_type(AsyncRetryError),
         reraise=True,
     )
-    def delete_document(index: Index, file_location: str) -> None:
+    async def delete_document(self, file_location: str) -> None:
         try:
-            writer: IndexWriter = index.writer()
-            writer.delete_documents("file_location", file_location)
-            writer.commit()
-            writer.wait_merging_threads()
+            async with self.writer() as writer:
+                writer.delete_documents("file_location", file_location)
+            await self.save_index()
         except ValueError as e:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
                 raise AsyncRetryError("Failed to acquire lock") from e
@@ -345,7 +353,7 @@ class SearchIndex:
     async def remove_from_index(self, file_location: str) -> None:
         index_files = await self.index_files
         if index_files.get(file_location):
-            self.delete_document(await self.index, file_location)
+            await self.delete_document(file_location)
             filehash = index_files.pop(file_location)
             docs_index_dir = await self.docs_index_directory
             # TODO: since the directory is part of the filehash these
@@ -357,6 +365,9 @@ class SearchIndex:
             self.changed = True
 
     async def save_index(self) -> None:
+        async with self.writer(reset=True) as writer:
+            writer.commit()
+            writer.wait_merging_threads()
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -471,8 +482,10 @@ async def process_file(
     manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
+    processed_counter: Counter[str],
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
+
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
     )
@@ -500,16 +513,23 @@ async def process_file(
                     settings=settings,
                     **kwargs,
                 )
-            except (ValueError, ImpossibleParsingError):
+            except Exception as e:
+                # We handle any exception here because we want to save_index so we
+                # 1. can resume the build without rebuilding this file if a separate
+                # process_file invocation leads to a segfault or crash.
+                # 2. don't have deadlock issues after.
                 logger.exception(
                     f"Error parsing {file_location}, skipping index for this file."
                 )
                 await search_index.mark_failed_document(file_location)
-                # Save so we can resume the build without rebuilding this file if a
-                # separate process_file invocation leads to a segfault or crash
                 await search_index.save_index()
                 if progress_bar_update:
                     progress_bar_update()
+
+                if not isinstance(e, ValueError | ImpossibleParsingError):
+                    # ImpossibleParsingError: parsing failure, don't retry
+                    # ValueError: TODOC
+                    raise
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
@@ -529,9 +549,15 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
-            # Save so we can resume the build without rebuilding this file if a
-            # separate process_file invocation leads to a segfault or crash
-            await search_index.save_index()
+
+            processed_counter["batched_save_counter"] += 1
+            if (
+                processed_counter["batched_save_counter"]
+                == settings.agent.index.batch_size
+            ):
+                await search_index.save_index()
+                processed_counter["batched_save_counter"] = 0
+
             logger.info(f"Complete ({title}).")
 
         # Update progress bar for either a new or previously indexed file
@@ -678,6 +704,7 @@ async def get_directory_index(  # noqa: PLR0912
     )
     with progress_bar:
         async with anyio.create_task_group() as tg:
+            processed_counter: Counter[str] = Counter()
             for rel_file_path in valid_papers_rel_file_paths:
                 if index_settings.sync_with_paper_directory:
                     tg.start_soon(
@@ -687,6 +714,7 @@ async def get_directory_index(  # noqa: PLR0912
                         manifest,
                         semaphore,
                         _settings,
+                        processed_counter,
                         progress_bar_update_fn,
                     )
                 else:
