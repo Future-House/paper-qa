@@ -173,8 +173,6 @@ answer_response = (
         settings=settings,
     ),
 )
-
-print("_" * 100)
 ```
 
 After this runs, you will get an answer!
