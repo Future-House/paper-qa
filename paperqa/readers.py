@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from math import ceil
 from pathlib import Path
@@ -252,7 +253,7 @@ def chunk_code_text(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
@@ -264,7 +265,7 @@ def read_doc(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False] = ...,
@@ -276,7 +277,7 @@ def read_doc(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[True],
@@ -288,7 +289,7 @@ def read_doc(
 
 
 @overload
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[False],
@@ -299,7 +300,7 @@ def read_doc(
 ) -> tuple[list[Text], ParsedMetadata]: ...
 
 
-def read_doc(
+async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: bool = False,
@@ -311,7 +312,6 @@ def read_doc(
     """Parse a document and split into chunks.
 
     Optionally can include just the parsing as well as metadata about the parsing/chunking
-
     Args:
         path: local document path
         doc: object with document metadata
@@ -322,18 +322,29 @@ def read_doc(
         page_size_limit: optional limit on the number of characters per page
     """
     str_path = str(path)
-    parsed_text = None
 
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
-        parsed_text = parse_pdf_to_pages(path, page_size_limit=page_size_limit)
+        # TODO: Make parse_pdf_to_pages async
+        parsed_text = await asyncio.to_thread(
+            parse_pdf_to_pages, path, page_size_limit=page_size_limit
+        )
     elif str_path.endswith(".txt"):
-        parsed_text = parse_text(path, page_size_limit=page_size_limit)
+        # TODO: Make parse_text async
+        parsed_text = await asyncio.to_thread(
+            parse_text, path, page_size_limit=page_size_limit
+        )
     elif str_path.endswith(".html"):
-        parsed_text = parse_text(path, html=True, page_size_limit=page_size_limit)
+        parsed_text = await asyncio.to_thread(
+            parse_text, path, html=True, page_size_limit=page_size_limit
+        )
     else:
-        parsed_text = parse_text(
-            path, split_lines=True, use_tiktoken=False, page_size_limit=page_size_limit
+        parsed_text = await asyncio.to_thread(
+            parse_text,
+            path,
+            split_lines=True,
+            use_tiktoken=False,
+            page_size_limit=page_size_limit,
         )
 
     if parsed_text_only:
@@ -352,7 +363,9 @@ def read_doc(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap_pdf_by_page"
+            chunk_chars=chunk_chars,
+            overlap=overlap,
+            chunk_type="overlap_pdf_by_page",
         )
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
@@ -366,7 +379,9 @@ def read_doc(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap_code_by_line"
+            chunk_chars=chunk_chars,
+            overlap=overlap,
+            chunk_type="overlap_code_by_line",
         )
 
     if include_metadata:

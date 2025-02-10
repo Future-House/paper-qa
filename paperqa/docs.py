@@ -284,7 +284,7 @@ class Docs(BaseModel):
             llm_model = all_settings.get_llm()
         if citation is None:
             # Peek first chunk
-            texts = read_doc(
+            texts = await read_doc(
                 path,
                 Doc(docname="", citation="", dockey=dockey),  # Fake doc
                 chunk_chars=parse_config.chunk_size,
@@ -377,7 +377,7 @@ class Docs(BaseModel):
                 doc, **(query_kwargs | kwargs)
             )
 
-        texts = read_doc(
+        texts = await read_doc(
             path,
             doc,
             chunk_chars=parse_config.chunk_size,

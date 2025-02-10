@@ -1056,9 +1056,10 @@ def test_fileio_reader_txt(stub_data_dir: Path) -> None:
     assert "United States" in answer.answer
 
 
-def test_parser_only_reader(stub_data_dir: Path):
+@pytest.mark.asyncio
+async def test_parser_only_reader(stub_data_dir: Path):
     doc_path = stub_data_dir / "paper.pdf"
-    parsed_text = read_doc(
+    parsed_text = await read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=True,
@@ -1070,9 +1071,10 @@ def test_parser_only_reader(stub_data_dir: Path):
     )
 
 
-def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     doc_path = stub_data_dir / "paper.pdf"
-    chunk_text, metadata = read_doc(
+    chunk_text, metadata = await read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
@@ -1091,7 +1093,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
 
     doc_path = stub_data_dir / "flag_day.html"
 
-    chunk_text, metadata = read_doc(
+    chunk_text, metadata = await read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
@@ -1107,7 +1109,7 @@ def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
 
     doc_path = Path(os.path.abspath(__file__))
 
-    chunk_text, metadata = read_doc(
+    chunk_text, metadata = await read_doc(
         doc_path,
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
