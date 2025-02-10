@@ -40,8 +40,8 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 
-ENV_VAR_MATCH: Collection[str] = {"1", "true"}
-ENV_VAR_MISMATCH: Collection[str] = {"0", "false"}
+VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
+VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
 
 
 class Doc(Embeddable):
@@ -623,7 +623,7 @@ class DocDetails(Doc):
         if (
             isinstance(data.get("overwrite_citation_from_metadata"), str)
             and data.get("overwrite_citation_from_metadata", "").lower()
-            in ENV_VAR_MISMATCH
+            in VAR_MISMATCH_LOOKUP
         ):
             data |= {"overwrite_citation_from_metadata": False}
 

@@ -43,7 +43,7 @@ from tenacity import (
 
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
-from paperqa.types import ENV_VAR_MATCH, DocDetails
+from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
@@ -112,7 +112,7 @@ class SearchDocumentStorage(StrEnum):
 # of SearchIndex instances currently referencing that Index
 _OPENED_INDEX_CACHE: dict[tuple[str, str], tuple[Index, int]] = {}
 DONT_USE_OPENED_INDEX_CACHE = (
-    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in ENV_VAR_MATCH
+    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in VAR_MATCH_LOOKUP
 )
 
 
@@ -546,10 +546,10 @@ def _make_progress_bar_update(
 ) -> tuple[contextlib.AbstractContextManager, Callable[[], Any] | None]:
     # Disable should override enable
     env_var_disable = (
-        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     env_var_enable = (
-        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     try:
         is_cli = is_running_under_cli()  # pylint: disable=used-before-assignment
