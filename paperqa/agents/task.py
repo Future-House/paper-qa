@@ -499,7 +499,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
     def __init__(
         self,
         *args,
-        qid: str,
+        qid: str | UUID,
         question: str,
         human_answer: str,
         gt_doc_ids: list[str],
@@ -528,7 +528,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
     def log_results_to_json(
         self,
         llm_model_name: str,
-        qid: str,
+        qid: str | UUID,
         question: str,
         pqa_answer: str,
         paper_search_ids: list[int],
@@ -565,7 +565,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         )
 
     async def pairwise_evaluation(
-        self, qid: str, question: str, pqa_answer: str, human_answer: str
+        self, qid: str | UUID, question: str, pqa_answer: str, human_answer: str
     ) -> float:
 
         paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
