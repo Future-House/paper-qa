@@ -249,6 +249,11 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
         # note: this title comes from the manifest, so we know it worked
         assert top_result.title == "Frederick Bates (Wikipedia article)"
 
+        assert "wikipedia article" in top_result.citation.lower(), (
+            "Other tests check we can override citation,"
+            " so here we check here it's actually populated"
+        )
+
 
 @pytest.mark.asyncio
 async def test_get_directory_index_w_no_citations(
