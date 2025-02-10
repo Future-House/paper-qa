@@ -524,10 +524,9 @@ async def process_file(
                 if progress_bar_update:
                     progress_bar_update()
 
-                # TODOC: We silence ValueError because ...
-                # We silence ImpossibleParsingError because we won't be able to
-                # parse the file if it failed one time
                 if not isinstance(e, ValueError | ImpossibleParsingError):
+                    # ImpossibleParsingError: parsing failure, don't retry
+                    # ValueError: TODOC
                     raise
                 return
 
