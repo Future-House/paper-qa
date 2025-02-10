@@ -24,7 +24,7 @@ def llm_parse_json(text: str) -> dict:
     # including escaped quotes and other escaped characters.
     # https://regex101.com/r/VFcDmB/1
     pattern = r'"(?:[^"\\]|\\.)*"'
-    ptext = re.sub(pattern, escape_newlines, ptext).replace("\\", "\\\\")
+    ptext = re.sub(pattern, escape_newlines, ptext)
     try:
         return json.loads(ptext)
     except json.JSONDecodeError as e:
