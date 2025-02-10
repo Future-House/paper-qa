@@ -224,7 +224,3 @@ async def evaluate() -> None:
 if __name__ == "__main__":
     asyncio.run(evaluate())
 ```
-
-## Conclusion
-
-This tutorial has walked through the complete process of preparing and using the LFRQA dataset for benchmarking RAG systems. By following these steps, you'll have a fully functional setup for testing question-answering capabilities against a diverse set of scientific questions. The framework allows for flexible testing with different dataset sizes, making it suitable for both quick prototyping and comprehensive evaluations.
