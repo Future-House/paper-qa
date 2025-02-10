@@ -192,13 +192,19 @@ def parse_clinical_trial(json_data: dict[str, Any]) -> str:
         "=" * 25,
         f"NCT Number: {identification.get('nctId', 'Not provided')}",
         f"Title: {identification.get('briefTitle', 'Not provided')}",
-        f"Organization: {identification.get('organization', {}).get('fullName', 'Not provided')}",
+        (
+            "Organization:"
+            f" {identification.get('organization', {}).get('fullName', 'Not provided')}"
+        ),
         # Status Information
         "\nSTUDY STATUS",
         "=" * 13,
         f"Overall Status: {status.get('overallStatus', 'Not provided')}",
         f"Start Date: {status.get('startDateStruct', {}).get('date', 'Not provided')}",
-        f"Completion Date: {status.get('completionDateStruct', {}).get('date', 'Not provided')}",
+        (
+            "Completion Date:"
+            f" {status.get('completionDateStruct', {}).get('date', 'Not provided')}"
+        ),
         # Study Description
         "\nSTUDY DESCRIPTION",
         "=" * 17,
@@ -208,7 +214,10 @@ def parse_clinical_trial(json_data: dict[str, Any]) -> str:
         "=" * 13,
         f"Study Type: {design.get('studyType', 'Not provided')}",
         f"Phase: {', '.join(design.get('phases', ['Not provided']))}",
-        f"Enrollment: {design.get('enrollmentInfo', {}).get('count', 'Not provided')} participants",
+        (
+            "Enrollment:"
+            f" {design.get('enrollmentInfo', {}).get('count', 'Not provided')} participants"
+        ),
         # Eligibility
         "\nELIGIBILITY CRITERIA",
         "=" * 19,

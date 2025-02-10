@@ -234,7 +234,8 @@ class PQASession(BaseModel):
 class Answer(PQASession):
     def __init__(self, *args, **kwargs):
         warnings.warn(
-            "The 'Answer' class is deprecated and will be removed in future versions. Use 'PQASession' instead.",
+            "The 'Answer' class is deprecated and will be removed in future versions."
+            " Use 'PQASession' instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -665,7 +666,7 @@ class DocDetails(Doc):
     def is_hydration_needed(
         self,
         exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS,
-        inclusion: Collection[str] = [],
+        inclusion: Collection[str] = (),
     ) -> bool:
         """Determine if we have unfilled attributes."""
         if inclusion:

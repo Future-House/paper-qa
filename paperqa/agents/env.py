@@ -154,8 +154,8 @@ def make_clinical_trial_status(
 
 # SEE: https://regex101.com/r/L0L5MH/1
 CLINICAL_STATUS_SEARCH_REGEX_PATTERN: str = (
-    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial Count=(\d+)\s"
-    r"\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
+    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial"
+    r" Count=(\d+)\s\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
 )
 
 

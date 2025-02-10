@@ -1061,6 +1061,39 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
     ), "No clinical trials were put into contexts"
 
 
+@pytest.mark.asyncio
+async def test_search_pagination(agent_test_settings: Settings) -> None:
+    """Test that pagination works correctly in SearchIndex.query()."""
+    index = await get_directory_index(settings=agent_test_settings)
+
+    page_size = 1
+
+    page1_results = await index.query(query="test", top_n=page_size, offset=0)
+    page2_results = await index.query(query="test", top_n=page_size, offset=page_size)
+    page1and2_results = await index.query(query="test", top_n=2 * page_size, offset=0)
+
+    assert (
+        page1_results == page1and2_results[:page_size]
+    ), "First page should match start of all results"
+    assert (
+        page2_results == page1and2_results[page_size : page_size * 2]
+    ), "Second page should match second slice of all results"
+
+
+@pytest.mark.asyncio
+async def test_empty_index_without_index_rebuild(agent_test_settings: Settings):
+    """Test that empty index and `rebuild_index=False` lead to a RuntimeError."""
+    agent_test_settings.agent = AgentSettings(index=IndexSettings())  # empty index
+    agent_test_settings.agent.rebuild_index = False
+    with pytest.raises(RuntimeError, match=r"Index .* was empty, please rebuild it."):
+        await agent_query(
+            query="Are COVID-19 vaccines effective?",
+            settings=agent_test_settings,
+            agent_type=FAKE_AGENT_TYPE,
+            force_index_rebuild=False,
+        )
+
+
 class TestClinicalTrialSearchTool:
     @pytest.mark.asyncio
     async def test_continuation(self) -> None:

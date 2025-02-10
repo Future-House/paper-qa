@@ -174,6 +174,7 @@ def test_matches_filter_criteria(doc_class, doc_data, filter_criteria, expected_
 def test_citation_prompt_current_year():
     expected_year_text = f"the current year is {get_year()}"
 
-    assert (
-        expected_year_text in citation_prompt
-    ), f"Citation prompt should contain '{expected_year_text}' but got: {citation_prompt}"
+    assert expected_year_text in citation_prompt, (
+        f"Citation prompt should contain '{expected_year_text}' but got:"
+        f" {citation_prompt}"
+    )

@@ -277,7 +277,10 @@ class NumpyVectorStore(VectorStore):
 class QdrantVectorStore(VectorStore):
     client: Any = Field(
         default=None,
-        description="Instance of `qdrant_client.AsyncQdrantClient`. Defaults to an in-memory instance.",
+        description=(
+            "Instance of `qdrant_client.AsyncQdrantClient`. Defaults to an in-memory"
+            " instance."
+        ),
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
@@ -322,7 +325,8 @@ class QdrantVectorStore(VectorStore):
 
         if self.client and not isinstance(self.client, AsyncQdrantClient):
             raise TypeError(
-                f"'client' should be an instance of AsyncQdrantClient. Got `{type(self.client)}`"
+                "'client' should be an instance of AsyncQdrantClient. Got"
+                f" `{type(self.client)}`"
             )
 
         if not self.client:
