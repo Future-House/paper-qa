@@ -102,7 +102,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         self._rewards = rewards
 
     async def validate_sources(
-        self, manifest_or_index: dict[str, DocDetails] | SearchIndex | None = None
+        self, manifest_or_index: dict[Any, dict[Any, Any]] | SearchIndex | None = None
     ) -> None:
         """Validate the sources can be found in the input manifest or index."""
         if not self.sources:
@@ -498,12 +498,12 @@ TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
 class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
     def __init__(
         self,
+        *args,
         qid: str,
         question: str,
         human_answer: str,
         gt_doc_ids: list[str],
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
-        *args,
         **kwargs,
     ):
         # NOTE I'm using qid and question and
