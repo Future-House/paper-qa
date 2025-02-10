@@ -164,7 +164,9 @@ settings.agent.index.manifest_file = "manifest.csv"
 
 settings.parsing.use_doc_details = False
 settings.parsing.defer_embedding = True
-settings.agent.index.concurrency = 30000
+
+settings.agent.index.concurrency = 10000
+settings.agent.index.batch_size = 10000
 
 answer_response = (
     ask(
@@ -187,7 +189,6 @@ import asyncio
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
-
 from paperqa import Settings
 from paperqa.agents.task import LFRQATaskDataset
 
@@ -201,12 +202,10 @@ async def evaluate() -> None:
     settings.agent.index.index_directory = (
         "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
     )
-    settings.agent.index.manifest_file = "manifest.csv"
-
-    settings.parsing.use_doc_details = False
 
     dataset = LFRQATaskDataset(
         data_path="data/rag-qa-benchmarking/lfrqa/questions.csv",
+        num_questions=4,
         settings=settings,
     )
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
