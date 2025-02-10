@@ -496,8 +496,8 @@ wheels = [
 
 [[package]]
 name = "fh-llm-client"
-version = "0.0.12.dev6+g6d49735"
-source = { git = "https://github.com/Future-House/llm-client.git?rev=main#6d49735e44faa84ad24651fc738250cc7ba5bb6d" }
+version = "0.0.12.dev7+g3831881"
+source = { git = "https://github.com/Future-House/llm-client.git?rev=main#3831881f72bc3e726d9d856ea3fa764a015b2f58" }
 dependencies = [
     { name = "coredis" },
     { name = "fhaviary" },
@@ -1068,8 +1068,8 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.22.0"
-source = { registry = "https://pypi.org/simple" }
+version = "0.22.1.dev16+g0cef2fa"
+source = { git = "https://github.com/Future-House/ldp.git?rev=update-llmclient#0cef2fa1ffbd6f68d0c0f3d4aa90fdfe6d660622" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
@@ -1084,10 +1084,6 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/bd/b4/e351973340eaf02c92fb90801bf7ceba256b7ce3adda41f3c723b6240c0f/ldp-0.22.0.tar.gz", hash = "sha256:1a60f7211dfb515b7b690b0864f7e958785afaf9f9dd72e91e556f4ed0018cdc", size = 434177 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/0d/c2a6e860091201576c84447a9f9faadcd58bb6e38fbd4c2ca9612141ad82/ldp-0.22.0-py3-none-any.whl", hash = "sha256:79494741783dbbc97e335ca56ecad24fece6a77c20d17be78e9a70c883811361", size = 134913 },
 ]
 
 [[package]]
@@ -1654,6 +1650,7 @@ wheels = [
 
 [[package]]
 name = "paper-qa"
+version = "5.11.1.dev19+g2eac706"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
