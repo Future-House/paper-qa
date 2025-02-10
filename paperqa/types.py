@@ -421,7 +421,8 @@ class DocDetails(Doc):
             data["doc_id"] = encode_id(uuid4())
 
         if "dockey" in data.get(
-            "overwrite_ids_from_metadata", DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
+            "fields_to_overwrite_from_metadata",
+            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
         ):
             data["dockey"] = data["doc_id"]
 
@@ -517,7 +518,10 @@ class DocDetails(Doc):
         for field, old_field in overwrite_fields.items():
             if data.get(field) and (
                 field
-                in data.get("fields_to_over", DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA)
+                in data.get(
+                    "fields_to_overwrite_from_metadata",
+                    DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+                )
             ):
                 data[old_field] = data[field]
         return data
@@ -530,7 +534,7 @@ class DocDetails(Doc):
 
         Missing values, 'unknown' keys, and incomplete bibtex entries are regenerated.
 
-        When overwrite_ids_from_metadata:
+        When fields_to_overwrite_from_metadata:
             If bibtex is regenerated, the citation field is also regenerated.
 
             Otherwise we keep the citation field as is.
@@ -544,7 +548,8 @@ class DocDetails(Doc):
                 data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
             )
             if "docname" in data.get(
-                "overwrite_ids_from_metadata", DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
+                "fields_to_overwrite_from_metadata",
+                DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
             ):
                 data["docname"] = data["key"]
 
@@ -608,7 +613,8 @@ class DocDetails(Doc):
                 ).to_string("bibtex")
                 # clear out the citation, since it will be regenerated
                 if "citation" in data.get(
-                    "fields_to_over", DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
+                    "fields_to_overwrite_from_metadata",
+                    DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
                 ):
                     data["citation"] = None
             except Exception:
@@ -630,8 +636,10 @@ class DocDetails(Doc):
 
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
-        if isinstance(data.get("fields_to_over"), str):
-            data["fields_to_over"] = set(data.get("fields_to_over", "").split(","))
+        if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
+            data["fields_to_overwrite_from_metadata"] = set(
+                data.get("fields_to_overwrite_from_metadata", "").split(",")
+            )
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
