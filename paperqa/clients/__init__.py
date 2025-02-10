@@ -226,5 +226,5 @@ class DocMetadataClient:
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
         prior_doc = doc.model_dump()
-        prior_doc["fields_to_overwrite_from_metadata"] = {}
+        prior_doc["fields_to_overwrite_from_metadata"] = set()
         return DocDetails(**(prior_doc | extra_fields))
