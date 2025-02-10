@@ -419,10 +419,12 @@ class SearchIndex:
 def fetch_kwargs_from_manifest(
     file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
 ) -> dict[Any, Any]:
-    manifest_entry: dict[Any, Any] = manifest.get(file_location, {}) or manifest.get(
-        manifest_fallback_location, {}
+    manifest_entry: dict[Any, Any] | None = manifest.get(file_location) or manifest.get(
+        manifest_fallback_location
     )
-    return manifest_entry
+    if manifest_entry:
+        return DocDetails(**manifest_entry).model_dump()
+    return {}
 
 
 async def maybe_get_manifest(
