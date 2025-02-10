@@ -637,9 +637,10 @@ class DocDetails(Doc):
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
         if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
-            data["fields_to_overwrite_from_metadata"] = set(
-                data.get("fields_to_overwrite_from_metadata", "").split(",")
-            )
+            data["fields_to_overwrite_from_metadata"] = {
+                s.strip()
+                for s in data.get("fields_to_overwrite_from_metadata", "").split(",")
+            }
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
