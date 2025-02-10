@@ -170,7 +170,7 @@ def format_to_doc_details(trial_data: dict) -> DocDetails:
         year=year or None,
         citation=citation,
         other={"client_source": [CLINICAL_TRIALS_BASE]},
-        overwrite_fields_from_metadata=False,
+        overwrite_ids_from_metadata=False,
         overwrite_citation_from_metadata=False,
     )
 
@@ -312,7 +312,7 @@ async def add_clinical_trials_to_docs(
         year=datetime.now().year,
         citation=f"Clinical Trials Search via ClinicalTrials.gov: {query}",
         other={"client_source": [CLINICAL_TRIALS_BASE]},
-        overwrite_fields_from_metadata=False,
+        overwrite_ids_from_metadata=False,
         overwrite_citation_from_metadata=False,
     )
 
