@@ -1322,7 +1322,6 @@ def test_docdetails_deserialization() -> None:
         "docname": "Stub",
         "embedding": None,
         "formatted_citation": "stub",
-        "overwrite_ids_from_metadata": True,
     }
     deepcopy_deserialize_to_doc = deepcopy(deserialize_to_doc)
     doc = Doc(**deserialize_to_doc)
@@ -1336,7 +1335,6 @@ def test_docdetails_deserialization() -> None:
     for key, value in {
         "docname": "unknownauthorsUnknownyearunknowntitle",
         "citation": "Unknown authors. Unknown title. Unknown journal, Unknown year.",
-        "overwrite_ids_from_metadata": True,
         "key": "unknownauthorsUnknownyearunknowntitle",
         "bibtex": (
             '@article{unknownauthorsUnknownyearunknowntitle,\n    author = "authors,'

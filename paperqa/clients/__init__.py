@@ -210,19 +210,21 @@ class DocMetadataClient:
         )
 
         if doc_details := await self.query(**kwargs):
-            if doc.overwrite_ids_from_metadata:
-                return extra_doc + doc_details
 
             # hard overwrite the details from the prior object
-            doc_details.dockey = doc.dockey
-            doc_details.doc_id = doc.dockey
-            doc_details.docname = doc.docname
-            doc_details.key = doc.docname
-            doc_details.citation = doc.citation
+            if "dockey" in doc.fields_to_overwrite_from_metadata:
+                doc_details.dockey = doc.dockey
+            if "doc_id" in doc.fields_to_overwrite_from_metadata:
+                doc_details.doc_id = doc.dockey
+            if "docname" in doc.fields_to_overwrite_from_metadata:
+                doc_details.docname = doc.docname
+            if "key" in doc.fields_to_overwrite_from_metadata:
+                doc_details.key = doc.docname
+            if "citation" in doc.fields_to_overwrite_from_metadata:
+                doc_details.citation = doc.citation
             return extra_doc + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
         prior_doc = doc.model_dump()
-        prior_doc["overwrite_ids_from_metadata"] = False
-        prior_doc["overwrite_citation_from_metadata"] = False
+        prior_doc["fields_to_overwrite_from_metadata"] = {}
         return DocDetails(**(prior_doc | extra_fields))
