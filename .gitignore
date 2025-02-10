@@ -265,6 +265,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Data directories
+data/
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -308,7 +311,3 @@ tests/example2.*
 
 # Client data
 paperqa/clients/client_data/retractions.csv
-
-# Benchmark for rag-qa-arena
-lotte/
-rag-qa-benchmarking/

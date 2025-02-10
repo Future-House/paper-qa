@@ -13,13 +13,13 @@ First, we need to obtain the annotated dataset from the official repository:
 git clone <https://github.com/awslabs/rag-qa-arena>
 
 # Create a new directory for the dataset
-mkdir rag-qa-benchmarking
+mkdir data/rag-qa-benchmarking
 
 # Move the science annotations file to our working directory
-mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./rag-qa-benchmarking/
+mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./data/rag-qa-benchmarking/
 
 # Clean up the repository folder
-rm -rf rag-qa-arena
+rm -rf data/rag-qa-arena
 ```
 
 ## Step 2: Download the Robust-QA Documents
@@ -28,17 +28,17 @@ LFRQA is built upon **Robust-QA**, so we must download the relevant documents:
 
 ```bash
 # Download the Lotte dataset, which includes the required documents
-curl <https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz> --output lotte.tar.gz
+curl <https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz> --output data/lotte.tar.gz
 
 # Extract the dataset
-tar -xvzf lotte.tar.gz
+tar -xvzf data/lotte.tar.gz
 
 # Move the science test collection to our dataset folder
-cp lotte/science/test/collection.tsv ./rag-qa-benchmarking/science_test_collection.tsv
+cp data/lotte/science/test/collection.tsv ./data/rag-qa-benchmarking/science_test_collection.tsv
 
 # Clean up unnecessary files
-rm lotte.tar.gz
-rm -rf lotte
+rm data/lotte.tar.gz
+rm -rf data/lotte
 ```
 
 For more details, refer to the original paper: [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998).
@@ -53,12 +53,12 @@ import pandas as pd
 
 # Load questions and answers dataset
 questions = pd.read_json(
-    "rag-qa-benchmarking/annotations_science_with_citation.jsonl", lines=True
+    "data/rag-qa-benchmarking/annotations_science_with_citation.jsonl", lines=True
 )
 
 # Load documents dataset
 docs = pd.read_csv(
-    "rag-qa-benchmarking/science_test_collection.tsv",
+    "data/rag-qa-benchmarking/science_test_collection.tsv",
     sep="\\t",
     header=None,
 )
@@ -87,7 +87,7 @@ We now create the document directory and store each document as a separate text 
 If you’re using the whole dataset, this may take a while.
 
 ```python
-papers_directory = "rag-qa-benchmarking/lfrqa"
+papers_directory = "data/rag-qa-benchmarking/lfrqa"
 os.makedirs(f"{papers_directory}/science_docs_for_paperqa/files", exist_ok=True)
 
 for i, row in partial_docs.iterrows():
@@ -155,10 +155,10 @@ from paperqa import Settings, ask
 settings = Settings()
 settings.agent.index.name = "lfrqa_science_index"
 settings.agent.index.paper_directory = (
-    "rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
+    "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
 )
 settings.agent.index.index_directory = (
-    "rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
+    "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
 )
 
 settings.agent.index.manifest_file = "manifest.csv"
@@ -197,17 +197,17 @@ async def evaluate() -> None:
     settings = Settings()
     settings.agent.index.name = "lfrqa_science_index"
     settings.agent.index.paper_directory = (
-        "rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
+        "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
     )
     settings.agent.index.index_directory = (
-        "rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
+        "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
     )
     settings.agent.index.manifest_file = "manifest.csv"
 
     settings.parsing.use_doc_details = False
 
     dataset = LFRQATaskDataset(
-        data_path="rag-qa-benchmarking/lfrqa/questions.csv",
+        data_path="data/rag-qa-benchmarking/lfrqa/questions.csv",
         settings=settings,
     )
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
