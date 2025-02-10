@@ -418,27 +418,26 @@ class SearchIndex:
 
 def fetch_kwargs_from_manifest(
     file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
-) -> dict[str, Any]:
-    manifest_entry: DocDetails | None = manifest.get(file_location) or manifest.get(
-        manifest_fallback_location
+) -> dict[Any, Any]:
+    manifest_entry: dict[Any, Any] = manifest.get(file_location, {}) or manifest.get(
+        manifest_fallback_location, {}
     )
-    if manifest_entry:
-        return manifest_entry.model_dump()
-    return {}
+    return manifest_entry
 
 
 async def maybe_get_manifest(
     filename: anyio.Path | None = None,
-) -> dict[str, DocDetails]:
+) -> dict[Any, dict[Any, Any]]:
     if not filename:
         return {}
     if filename.suffix == ".csv":
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
-            records = [DocDetails(**r) for r in csv.DictReader(content.splitlines())]
             file_loc_to_records = {
-                str(r.file_location): r for r in records if r.file_location
+                str(r.get("file_location")): r
+                for r in csv.DictReader(content.splitlines())
+                if r.get("file_location")
             }
             if not file_loc_to_records:
                 raise ValueError(  # noqa: TRY301
@@ -446,7 +445,7 @@ async def maybe_get_manifest(
                     f" file {filename}."
                 )
             logger.debug(
-                f"Found manifest file at {filename}, read {len(records)} records"
+                f"Found manifest file at {filename}, read {len(file_loc_to_records)} records"
                 f" from it, which maps to {len(file_loc_to_records)} locations."
             )
         except FileNotFoundError:
