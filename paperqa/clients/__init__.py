@@ -201,7 +201,7 @@ class DocMetadataClient:
         # note we have some extra fields which may have come from reading the doc text,
         # but aren't in the doc object, we add them here too.
         extra_fields = {
-            k: v for k, v in kwargs.items() if k in {"title", "authors", "doi"}
+            k: v for k, v in kwargs.items() if k in set(DocDetails.model_fields)
         }
         # abuse our doc_details object to be an int if it's empty
         # our __add__ operation supports int by doing nothing
@@ -210,7 +210,7 @@ class DocMetadataClient:
         )
 
         if doc_details := await self.query(**kwargs):
-            if doc.overwrite_fields_from_metadata:
+            if doc.overwrite_ids_from_metadata:
                 return extra_doc + doc_details
 
             # hard overwrite the details from the prior object
@@ -223,5 +223,6 @@ class DocMetadataClient:
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
         prior_doc = doc.model_dump()
-        prior_doc["overwrite_fields_from_metadata"] = False
+        prior_doc["overwrite_ids_from_metadata"] = False
+        prior_doc["overwrite_citation_from_metadata"] = False
         return DocDetails(**(prior_doc | extra_fields))

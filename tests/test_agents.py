@@ -242,9 +242,30 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
 
         results = await index.query(query="who is Frederick Bates?")
         top_result = next(iter(results[0].docs.values()))
-        assert top_result.dockey == md5sum(abs_paper_dir / "bates.txt")
+
+        # note: we get every possible field from the manifest constructed in maybe_get_manifest,
+        # and then DocDetails construction sets the dockey to the doc_id.
+        assert top_result.dockey == top_result.doc_id
         # note: this title comes from the manifest, so we know it worked
         assert top_result.title == "Frederick Bates (Wikipedia article)"
+
+        assert "wikipedia article" in top_result.citation.lower(), (
+            "Other tests check we can override citation,"
+            " so here we check here it's actually populated"
+        )
+
+
+@pytest.mark.asyncio
+async def test_get_directory_index_w_no_citations(
+    agent_test_settings: Settings,
+) -> None:
+    agent_test_settings.agent.index.manifest_file = "stub_manifest_nocitation.csv"
+    index = await get_directory_index(settings=agent_test_settings)
+
+    results = await index.query(query="who is Frederick Bates?")
+    top_result = next(iter(results[0].docs.values()))
+
+    assert not top_result.citation
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
