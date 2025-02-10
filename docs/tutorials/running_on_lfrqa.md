@@ -59,10 +59,9 @@ questions = pd.read_json(
 # Load documents dataset
 docs = pd.read_csv(
     "data/rag-qa-benchmarking/science_test_collection.tsv",
-    sep="\\t",
-    header=None,
+    sep="\t",
+    names=["doc_id", "doc_text"],
 )
-docs.columns = ["doc_id", "doc_text"]
 ```
 
 ## Step 4: Select the Documents to Use
