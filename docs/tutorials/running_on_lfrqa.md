@@ -10,16 +10,16 @@ First, we need to obtain the annotated dataset from the official repository:
 
 ```bash
 # Clone the RAG-QA Arena repository
-!git clone <https://github.com/awslabs/rag-qa-arena>
+git clone <https://github.com/awslabs/rag-qa-arena>
 
 # Create a new directory for the dataset
-!mkdir rag-qa-benchmarking
+mkdir rag-qa-benchmarking
 
 # Move the science annotations file to our working directory
-!mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./rag-qa-benchmarking/
+mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./rag-qa-benchmarking/
 
 # Clean up the repository folder
-!rm -rf rag-qa-arena
+rm -rf rag-qa-arena
 ```
 
 ## Step 2: Download the Robust-QA Documents
@@ -28,17 +28,17 @@ LFRQA is built upon **Robust-QA**, so we must download the relevant documents:
 
 ```bash
 # Download the Lotte dataset, which includes the required documents
-!curl <https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz> --output lotte.tar.gz
+curl <https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz> --output lotte.tar.gz
 
 # Extract the dataset
-!tar -xvzf lotte.tar.gz
+tar -xvzf lotte.tar.gz
 
 # Move the science test collection to our dataset folder
-!cp lotte/science/test/collection.tsv ./rag-qa-benchmarking/science_test_collection.tsv
+cp lotte/science/test/collection.tsv ./rag-qa-benchmarking/science_test_collection.tsv
 
 # Clean up unnecessary files
-!rm lotte.tar.gz
-!rm -rf lotte
+rm lotte.tar.gz
+rm -rf lotte
 ```
 
 For more details, refer to the original paper: [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998).
