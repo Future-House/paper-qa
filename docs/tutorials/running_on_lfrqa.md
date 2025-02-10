@@ -4,7 +4,7 @@
 
 The **LFRQA dataset** was introduced in the paper [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use.
 
-## Step 1: Download the Annotations
+## Download the Annotations
 
 First, we need to obtain the annotated dataset from the official repository:
 
@@ -22,7 +22,7 @@ mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./data/rag-qa-bench
 rm -rf data/rag-qa-arena
 ```
 
-## Step 2: Download the Robust-QA Documents
+## Download the Robust-QA Documents
 
 LFRQA is built upon **Robust-QA**, so we must download the relevant documents:
 
@@ -43,7 +43,7 @@ rm -rf data/lotte
 
 For more details, refer to the original paper: [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998).
 
-## Step 3: Load the Data
+## Load the Data
 
 We now load both the questions and documents into a usable format:
 
@@ -64,7 +64,7 @@ docs = pd.read_csv(
 )
 ```
 
-## Step 4: Select the Documents to Use
+## Select the Documents to Use
 
 If needed, we can limit the number of documents used. RobustQA consists on 1.7M documents, so the index will take a long time to build.
 
@@ -79,7 +79,7 @@ partial_docs = docs.head(amount_of_docs_to_use)
 print(f"Using {amount_of_docs_to_use} out of {len(docs)} documents")
 ```
 
-## Step 5: Prepare the Document Files
+## Prepare the Document Files
 
 We now create the document directory and store each document as a separate text file. This is because of how paperqa builds the index.
 
@@ -105,7 +105,7 @@ for i, row in partial_docs.iterrows():
         print(f"Progress: {progress:.2%}")
 ```
 
-## Step 6: Create the Manifest File
+## Create the Manifest File
 
 The **manifest file** keeps track of document metadata for the dataset. It is also necessary so that paperqa doesn’t try to get metadata using llm calls.
 
@@ -123,7 +123,7 @@ manifest.to_csv(
 )
 ```
 
-## Step 7: Filter and Save Questions
+## Filter and Save Questions
 
 Finally, we filter the question set to ensure we only include questions that reference the selected documents:
 
@@ -136,7 +136,7 @@ partial_questions = questions[
 partial_questions.to_csv(f"{papers_directory}/questions.csv", index=False)
 ```
 
-## Step 8: Index the documents
+## Index the documents
 
 Copy the following to a file and run it. Feel free to adjust the concurrency as you like.
 
@@ -178,7 +178,7 @@ answer_response = (
 
 After this runs, you will get an answer!
 
-## Step 9: Benchmark!
+## Benchmark!
 
 After you have built the index, you are ready to run the benchmark.
 
@@ -224,3 +224,11 @@ async def evaluate() -> None:
 if __name__ == "__main__":
     asyncio.run(evaluate())
 ```
+
+After running this, you will get a result like this:
+
+```
+{'reward': 0.5, 'truncation_rate': 0.0, 'avg_value': 0.0, 'num_steps': 4.0, 'failures': 0.0, 'total_paper_count': 8.5, 'relevant_paper_count': 5.0, 'evidence_count': 6.0, 'paperqa_won': 0.89}
+```
+
+you can also see each question in the folder `data/rag-qa-benchmarking/results[MODEL_NAME]` and analyze the results yourself.
