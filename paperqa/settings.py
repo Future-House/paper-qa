@@ -408,6 +408,11 @@ class IndexSettings(BaseModel):
         default=5,  # low default for folks without S2/Crossref keys
         description="Number of concurrent filesystem reads for indexing",
     )
+    batch_size: int = Field(
+        default=1,
+        ge=1,
+        description="Number of files to process before committing to the index.",
+    )
     sync_with_paper_directory: bool = Field(
         default=True,
         description=(
@@ -522,6 +527,14 @@ class AgentSettings(BaseModel):
         frozen=True,
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
+
+    rebuild_index: bool = Field(
+        default=True,
+        description=(
+            "Flag to rebuild the index at the start of agent runners, default is True"
+            " for CLI users to ensure all source PDFs are pulled in."
+        ),
+    )
 
     callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,

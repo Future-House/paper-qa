@@ -161,10 +161,11 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
             ) as mock_aadd,
         ):
             index = await get_directory_index(settings=agent_test_settings)
+
+    assert len(await index.index_files) == num_source_files
     assert (
-        mock_aadd.await_count <= crash_threshold
-    ), "Should have been able to resume build"
-    assert len(await index.index_files) > crash_threshold
+        mock_aadd.await_count < num_source_files
+    ), "Should not rebuild the whole index"
 
 
 @pytest.mark.asyncio
@@ -1101,6 +1102,20 @@ async def test_search_pagination(agent_test_settings: Settings) -> None:
     ), "Second page should match second slice of all results"
 
 
+@pytest.mark.asyncio
+async def test_empty_index_without_index_rebuild(agent_test_settings: Settings):
+    """Test that empty index and `rebuild_index=False` lead to a RuntimeError."""
+    agent_test_settings.agent = AgentSettings(index=IndexSettings())  # empty index
+    agent_test_settings.agent.rebuild_index = False
+    with pytest.raises(RuntimeError, match=r"Index .* was empty, please rebuild it."):
+        await agent_query(
+            query="Are COVID-19 vaccines effective?",
+            settings=agent_test_settings,
+            agent_type=FAKE_AGENT_TYPE,
+            force_index_rebuild=False,
+        )
+
+
 class TestClinicalTrialSearchTool:
     @pytest.mark.asyncio
     async def test_continuation(self) -> None:
@@ -1124,3 +1139,39 @@ class TestClinicalTrialSearchTool:
         # Check continuation of the search
         result = await tool.clinical_trials_search("Covid-19 vaccines", state)
         assert len(state.docs.docs) > trial_count, "Search was unable to continue"
+
+
+@pytest.mark.asyncio
+async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
+
+    high_concurrency_settings = agent_test_settings.model_copy(deep=True)
+    high_concurrency_settings.agent.index.name = "high_concurrency"
+    high_concurrency_settings.agent.index.concurrency = 3
+    high_concurrency_settings.agent.index.batch_size = 3
+    with patch.object(
+        SearchIndex, "save_index", side_effect=SearchIndex.save_index, autospec=True
+    ) as mock_save_index:
+        start_time = time.perf_counter()
+        await get_directory_index(settings=high_concurrency_settings)
+        high_concurrency_duration = time.perf_counter() - start_time
+    high_batch_save_count = mock_save_index.call_count
+
+    low_concurrency_settings = agent_test_settings.model_copy(deep=True)
+    low_concurrency_settings.agent.index.name = "low_concurrency"
+    low_concurrency_settings.agent.index.concurrency = 1
+    low_concurrency_settings.agent.index.batch_size = 1
+    with patch.object(
+        SearchIndex, "save_index", side_effect=SearchIndex.save_index, autospec=True
+    ) as mock_save_index:
+        start_time = time.perf_counter()
+        await get_directory_index(settings=low_concurrency_settings)
+        low_concurrency_duration = time.perf_counter() - start_time
+    low_batch_save_count = mock_save_index.call_count
+
+    assert high_concurrency_duration * 1.1 < low_concurrency_duration, (
+        f"Expected high concurrency to be faster, but took {high_concurrency_duration:.2f}s "
+        f"compared to {low_concurrency_duration:.2f}s"
+    )
+    assert (
+        high_batch_save_count < low_batch_save_count
+    ), f"Expected fewer save_index with high batch size, but got {high_batch_save_count} vs {low_batch_save_count}"
