@@ -61,10 +61,6 @@ class Doc(Embeddable):
         default_factory=lambda: set(DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA),
         description="fields from metadata to overwrite when upgrading to a DocDetails",
     )
-    overwrite_citation_from_metadata: bool = Field(
-        default=True,
-        description="flag to overwrite the citation from metadata when upgrading to a DocDetails",
-    )
 
     @model_validator(mode="before")
     @classmethod
