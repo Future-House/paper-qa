@@ -401,6 +401,7 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
+        # SEE:https://regex101.com/r/DoLMoa/1
         return re.sub(r'[*\[\]:(){}~^><+"\\]', "", query)
 
     async def query(
