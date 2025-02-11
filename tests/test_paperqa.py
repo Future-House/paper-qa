@@ -25,6 +25,7 @@ from llmclient import (
     LLMResult,
     SparseEmbeddingModel,
 )
+from llmclient.llms import rate_limited
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -761,18 +762,6 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
-    # ASK: Because acompletion_iter is @rate_limited in LiteLLMModel, we need to mock it here.
-    # I accept ideas on how to handle this better
-    def mock_rate_limited(func):
-        async def wrapper(self, *args, **kwargs):  # noqa: RUF029
-            async def mock_rate_limited_generator():
-                async for item in func(self, *args, **kwargs):
-                    yield item
-
-            return mock_rate_limited_generator()
-
-        return wrapper
-
     class StubLLMModel(LLMModel):
         name: str = "myllm"
 
@@ -793,7 +782,7 @@ def test_custom_llm(stub_data_dir: Path) -> None:
                 )
             ]
 
-        @mock_rate_limited
+        @rate_limited
         async def acompletion_iter(
             self, messages: list[Message], **kwargs
         ) -> AsyncIterable[LLMResult]:
@@ -805,6 +794,10 @@ def test_custom_llm(stub_data_dir: Path) -> None:
                 prompt_count=1,
                 completion_count=1,
             )
+
+        async def check_rate_limit(self, token_count: float, **kwargs) -> None:
+            # Implements a dummy rate limit checker.
+            return
 
     docs = Docs()
     docs.add(
