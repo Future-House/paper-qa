@@ -298,7 +298,7 @@ class Docs(BaseModel):
                     content=parse_config.citation_prompt.format(text=texts[0].text)
                 ),
             ]
-            result = await llm_model.call_single(  ""
+            result = await llm_model.call_single(
                 messages=messages,
             )
             citation = cast(str, result.text)
@@ -324,7 +324,7 @@ class Docs(BaseModel):
                     ),
                 ),
             ]
-            result = await llm_model.call_single(  ""
+            result = await llm_model.call_single(
                 messages=messages,
             )
             # This code below tries to isolate the JSON
@@ -725,7 +725,7 @@ class Docs(BaseModel):
                         content=prompt_config.pre.format(question=session.question),
                     ),
                 ]
-                pre = await llm_model.call_single(  ""
+                pre = await llm_model.call_single(
                     messages=messages,
                     callbacks=callbacks,
                     name="pre",
@@ -787,7 +787,7 @@ class Docs(BaseModel):
                     Message(role="system", content=prompt_config.system),
                     Message(role="user", content=prompt_config.qa.format(**data)),
                 ]
-                answer_result = await llm_model.call_single(  ""
+                answer_result = await llm_model.call_single(
                     messages=messages,
                     callbacks=callbacks,
                     name="answer",

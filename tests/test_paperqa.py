@@ -438,7 +438,7 @@ async def test_chain_completion() -> None:
     messages = [
         Message(content="The duck says"),
     ]
-    completion = await llm.call_single(  
+    completion = await llm.call_single(
         messages=messages,
         callbacks=[accum],
     )
@@ -447,7 +447,7 @@ async def test_chain_completion() -> None:
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
 
-    completion = await llm.call_single(  
+    completion = await llm.call_single(
         messages=messages,
     )
     assert completion.seconds_to_first_token == 0
@@ -469,7 +469,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     messages = [
         Message(content="The duck says"),
     ]
-    completion = await llm.call_single(  
+    completion = await llm.call_single(
         messages=messages,
         callbacks=[accum],
     )
@@ -480,7 +480,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await llm.call_single(  
+    completion = await llm.call_single(
         messages=messages,
     )
     assert completion.seconds_to_first_token == 0

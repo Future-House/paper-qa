@@ -84,7 +84,7 @@ async def map_fxn_summary(
             Message(role="system", content=system_prompt.format(**data)),
             Message(role="user", content=message_prompt.format(**data)),
         ]
-        llm_result = await summary_llm_model.call_single(  ""
+        llm_result = await summary_llm_model.call_single(
             messages=messages,
             callbacks=callbacks,
             name="evidence:" + text.name,
