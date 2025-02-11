@@ -791,8 +791,8 @@ def test_custom_llm(stub_data_dir: Path) -> None:
             )
 
         async def check_rate_limit(
-            self, token_count: float, **kwargs
-        ) -> None:  # noqa: ARG002
+            self, token_count: float, **kwargs  # noqa: ARG002
+        ) -> None:
             # Implements a dummy rate limit checker.
             return
 
