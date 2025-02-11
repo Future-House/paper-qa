@@ -440,7 +440,7 @@ def fetch_kwargs_from_manifest(
 
 async def maybe_get_manifest(
     filename: anyio.Path | None = None,
-) -> dict[Any, dict[Any, Any]]:
+) -> dict[str, dict[str, Any]]:
     if not filename:
         return {}
     if filename.suffix == ".csv":
