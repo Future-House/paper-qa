@@ -10,7 +10,7 @@ First, we need to obtain the annotated dataset from the official repository:
 
 ```bash
 # Clone the RAG-QA Arena repository
-git clone <https://github.com/awslabs/rag-qa-arena>
+git clone https://github.com/awslabs/rag-qa-arena
 
 # Create a new directory for the dataset
 mkdir data/rag-qa-benchmarking
@@ -28,7 +28,7 @@ LFRQA is built upon **Robust-QA**, so we must download the relevant documents:
 
 ```bash
 # Download the Lotte dataset, which includes the required documents
-curl <https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz> --output data/lotte.tar.gz
+curl https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz --output data/lotte.tar.gz
 
 # Extract the dataset
 tar -xvzf data/lotte.tar.gz
@@ -75,7 +75,6 @@ Setting the proportion will take only that fraction of the documents, and the qu
 ```python
 proportion_to_use = 1 / 100
 amount_of_docs_to_use = int(len(docs) * proportion_to_use)
-partial_docs = docs.head(amount_of_docs_to_use)
 print(f"Using {amount_of_docs_to_use} out of {len(docs)} documents")
 ```
 
@@ -86,15 +85,16 @@ We now create the document directory and store each document as a separate text 
 If you’re using the whole dataset, this may take a while.
 
 ```python
-papers_directory = "data/rag-qa-benchmarking/lfrqa"
-os.makedirs(f"{papers_directory}/science_docs_for_paperqa/files", exist_ok=True)
+partial_docs = docs.head(amount_of_docs_to_use)
+lfrqa_dir = "data/rag-qa-benchmarking/lfrqa"
+os.makedirs(f"{lfrqa_dir}/science_docs_for_paperqa/files", exist_ok=True)
 
 for i, row in partial_docs.iterrows():
     doc_id = row["doc_id"]
     doc_text = row["doc_text"]
 
     with open(
-        f"{papers_directory}/science_docs_for_paperqa/files/{doc_id}.txt",
+        f"{lfrqa_dir}/science_docs_for_paperqa/files/{doc_id}.txt",
         "w",
         encoding="utf-8",
     ) as f:
@@ -118,9 +118,7 @@ manifest["key"] = manifest["doc_id"]
 manifest["docname"] = manifest["doc_id"]
 manifest["citation"] = "_"
 manifest.drop(columns=["doc_id", "doc_text"], inplace=True)
-manifest.to_csv(
-    f"{papers_directory}/science_docs_for_paperqa/manifest.csv", index=False
-)
+manifest.to_csv(f"{lfrqa_dir}/science_docs_for_paperqa/manifest.csv", index=False)
 ```
 
 ## Filter and Save Questions
@@ -133,7 +131,7 @@ partial_questions = questions[
         lambda ids: all(id < amount_of_docs_to_use for id in ids)
     )
 ]
-partial_questions.to_csv(f"{papers_directory}/questions.csv", index=False)
+partial_questions.to_csv(f"{lfrqa_dir}/questions.csv", index=False)
 ```
 
 ## Index the documents
