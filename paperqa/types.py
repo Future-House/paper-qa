@@ -42,7 +42,6 @@ logger = logging.getLogger(__name__)
 
 VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
 VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
-
 DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
     "key",
     "doc_id",
@@ -515,15 +514,13 @@ class DocDetails(Doc):
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}
-        for field, old_field in overwrite_fields.items():
-            if data.get(field) and (
-                field
-                in data.get(
-                    "fields_to_overwrite_from_metadata",
-                    DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
-                )
-            ):
-                data[old_field] = data[field]
+        fields_to_overwrite = data.get(
+            "fields_to_overwrite_from_metadata",
+            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        )
+        for field in overwrite_fields.keys() & fields_to_overwrite:
+            if data.get(field):
+                data[overwrite_fields[field]] = data[field]
         return data
 
     @classmethod
