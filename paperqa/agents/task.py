@@ -511,12 +511,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         ) = None,
         **kwargs,
     ):
-        # NOTE I'm using qid and question and
-        # maybe we could use session_id and query instead?
         kwargs["query"] = question
-
-        # NOTE: I'm also passing this docs because they are required
-        # but don't know if/how they are used
         kwargs["docs"] = Docs()
         super().__init__(*args, **kwargs)
 
