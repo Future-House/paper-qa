@@ -430,7 +430,7 @@ class SearchIndex:
 def fetch_kwargs_from_manifest(
     file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
 ) -> dict[str, Any]:
-    manifest_entry: dict[Any, Any] | None = manifest.get(file_location) or manifest.get(
+    manifest_entry: dict[str, Any] | None = manifest.get(file_location) or manifest.get(
         manifest_fallback_location
     )
     if manifest_entry:
