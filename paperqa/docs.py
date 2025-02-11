@@ -354,7 +354,7 @@ class Docs(BaseModel):
                 )
         # see if we can upgrade to DocDetails
         # if not, we can progress with a normal Doc
-        # if "overwrite_fields_from_metadata" is used:
+        # if "fields_to_overwrite_from_metadata" is used:
         # will map "docname" to "key", and "dockey" to "doc_id"
         if (title or doi) and parse_config.use_doc_details:
             if kwargs.get("metadata_client"):

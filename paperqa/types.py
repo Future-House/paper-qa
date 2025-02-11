@@ -40,17 +40,26 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 
+VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
+VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
+DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
+    "key",
+    "doc_id",
+    "docname",
+    "dockey",
+    "citation",
+}
+
+
 class Doc(Embeddable):
     model_config = ConfigDict(extra="forbid")
 
     docname: str
     dockey: DocKey
     citation: str
-    overwrite_fields_from_metadata: bool = Field(
-        default=True,
-        description=(
-            "flag to overwrite fields from metadata when upgrading to a DocDetails"
-        ),
+    fields_to_overwrite_from_metadata: set[str] = Field(
+        default_factory=lambda: set(DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA),
+        description="fields from metadata to overwrite when upgrading to a DocDetails",
     )
 
     @model_validator(mode="before")
@@ -410,7 +419,10 @@ class DocDetails(Doc):
         else:
             data["doc_id"] = encode_id(uuid4())
 
-        if data.get("overwrite_fields_from_metadata", True):
+        if "dockey" in data.get(
+            "fields_to_overwrite_from_metadata",
+            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        ):
             data["dockey"] = data["doc_id"]
 
         return data
@@ -502,10 +514,13 @@ class DocDetails(Doc):
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}
-        if data.get("overwrite_fields_from_metadata", True):
-            for field, old_field in overwrite_fields.items():
-                if data.get(field):
-                    data[old_field] = data[field]
+        fields_to_overwrite = data.get(
+            "fields_to_overwrite_from_metadata",
+            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        )
+        for field in overwrite_fields.keys() & fields_to_overwrite:
+            if data.get(field):
+                data[overwrite_fields[field]] = data[field]
         return data
 
     @classmethod
@@ -516,7 +531,7 @@ class DocDetails(Doc):
 
         Missing values, 'unknown' keys, and incomplete bibtex entries are regenerated.
 
-        When overwrite_fields_from_metadata:
+        When fields_to_overwrite_from_metadata:
             If bibtex is regenerated, the citation field is also regenerated.
 
             Otherwise we keep the citation field as is.
@@ -529,7 +544,10 @@ class DocDetails(Doc):
                 data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]
                 data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
             )
-            if data.get("overwrite_fields_from_metadata", True):
+            if "docname" in data.get(
+                "fields_to_overwrite_from_metadata",
+                DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+            ):
                 data["docname"] = data["key"]
 
         # even if we have a bibtex, it may not be complete, thus we need to add to it
@@ -591,26 +609,35 @@ class DocDetails(Doc):
                     entries={data["key"]: new_entry}
                 ).to_string("bibtex")
                 # clear out the citation, since it will be regenerated
-                if data.get("overwrite_fields_from_metadata", True):
+                if "citation" in data.get(
+                    "fields_to_overwrite_from_metadata",
+                    DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+                ):
                     data["citation"] = None
             except Exception:
                 logger.warning(
                     "Failed to generate bibtex for"
                     f" {data.get('docname') or data.get('citation')}"
                 )
-        if not data.get("citation") and data.get("bibtex") is not None:
+        if data.get("citation") is None and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
                 data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
-        elif not data.get("citation"):
+        elif data.get("citation") is None:
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
+
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
+        if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
+            data["fields_to_overwrite_from_metadata"] = {
+                s.strip()
+                for s in data.get("fields_to_overwrite_from_metadata", "").split(",")
+            }
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
