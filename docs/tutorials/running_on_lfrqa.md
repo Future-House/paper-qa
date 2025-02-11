@@ -209,7 +209,7 @@ async def evaluate() -> None:
     settings = Settings(
         agent=AgentSettings(
             index=IndexSettings(
-                name="lfrqa_science_index_1",
+                name="lfrqa_science_index",
                 paper_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa",
                 index_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index",
             )
