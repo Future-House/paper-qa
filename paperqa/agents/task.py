@@ -496,6 +496,8 @@ TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
 
 
 class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
+    """Environment to evaluate paperqa's vs human's answers on Long Form RAG QA questions."""
+
     def __init__(
         self,
         *args,
