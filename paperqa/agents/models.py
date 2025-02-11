@@ -80,12 +80,12 @@ class AnswerResponse(BaseModel):
         model = (
             LiteLLMModel(name=llm_model) if isinstance(llm_model, str) else llm_model
         )
-        prompt = "{question}\n\n{answer}"
+        prompt_template = "{question}\n\n{answer}"
         messages = [
             Message(role="system", content=sys_prompt),
             Message(
                 role="user",
-                content=prompt.format(
+                content=prompt_template.format(
                     question=self.session.question, answer=self.session.answer
                 ),
             ),
