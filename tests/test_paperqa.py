@@ -797,7 +797,8 @@ def test_custom_llm(stub_data_dir: Path) -> None:
 
         async def check_rate_limit(self, token_count: float, **kwargs) -> None:
             # Implements a dummy rate limit checker.
-            return
+            del token_count
+            del kwargs
 
     docs = Docs()
     docs.add(
