@@ -615,15 +615,15 @@ class Docs(BaseModel):
             else matches
         )
 
-        prompt_details = None
+        prompt_templates = None
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
-                prompt_details = (
+                prompt_templates = (
                     prompt_config.summary_json,
                     prompt_config.summary_json_system,
                 )
             else:
-                prompt_details = (
+                prompt_templates = (
                     prompt_config.summary,
                     prompt_config.system,
                 )
@@ -636,7 +636,7 @@ class Docs(BaseModel):
                         text=m,
                         question=session.question,
                         summary_llm_model=summary_llm_model,
-                        prompt_details=prompt_details,
+                        prompt_templates=prompt_templates,
                         extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
                             "citation": f"{m.name}: {m.doc.formatted_citation}",
