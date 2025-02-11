@@ -53,12 +53,15 @@ import pandas as pd
 
 # Load questions and answers dataset
 questions = pd.read_json(
-    "data/rag-qa-benchmarking/annotations_science_with_citation.jsonl", lines=True
+    os.path.join(
+        "data", "rag-qa-benchmarking", "annotations_science_with_citation.jsonl"
+    ),
+    lines=True,
 )
 
 # Load documents dataset
 docs = pd.read_csv(
-    "data/rag-qa-benchmarking/science_test_collection.tsv",
+    os.path.join("data", "rag-qa-benchmarking", "science_test_collection.tsv"),
     sep="\t",
     names=["doc_id", "doc_text"],
 )
@@ -86,15 +89,19 @@ If you’re using the whole dataset, this may take a while.
 
 ```python
 partial_docs = docs.head(amount_of_docs_to_use)
-lfrqa_dir = "data/rag-qa-benchmarking/lfrqa"
-os.makedirs(f"{lfrqa_dir}/science_docs_for_paperqa/files", exist_ok=True)
+papers_directory = os.path.join("data", "rag-qa-benchmarking", "lfrqa")
+os.makedirs(
+    os.path.join(papers_directory, "science_docs_for_paperqa", "files"), exist_ok=True
+)
 
 for i, row in partial_docs.iterrows():
     doc_id = row["doc_id"]
     doc_text = row["doc_text"]
 
     with open(
-        f"{lfrqa_dir}/science_docs_for_paperqa/files/{doc_id}.txt",
+        os.path.join(
+            papers_directory, "science_docs_for_paperqa", "files", f"{doc_id}.txt"
+        ),
         "w",
         encoding="utf-8",
     ) as f:
@@ -118,7 +125,10 @@ manifest["key"] = manifest["doc_id"]
 manifest["docname"] = manifest["doc_id"]
 manifest["citation"] = "_"
 manifest.drop(columns=["doc_id", "doc_text"], inplace=True)
-manifest.to_csv(f"{lfrqa_dir}/science_docs_for_paperqa/manifest.csv", index=False)
+manifest.to_csv(
+    os.path.join(papers_directory, "science_docs_for_paperqa", "manifest.csv"),
+    index=False,
+)
 ```
 
 ## Filter and Save Questions
@@ -131,7 +141,10 @@ partial_questions = questions[
         lambda ids: all(id < amount_of_docs_to_use for id in ids)
     )
 ]
-partial_questions.to_csv(f"{lfrqa_dir}/questions.csv", index=False)
+partial_questions.to_csv(
+    os.path.join(papers_directory, "questions.csv"),
+    index=False,
+)
 ```
 
 ## Index the documents
