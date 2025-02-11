@@ -662,13 +662,9 @@ class LFRQATaskDataset(
         else:
             self.data = pd.read_csv(data_path)
 
-        self._rewards = {
-            "win": 1,
-            "tie": 0,
-            "lose": -1,
-        }
+        self._rewards = {"win": 1, "tie": 0, "lose": -1}
 
-        self.pai = pairwise_eval_llm
+        self.pairwise_eval_llm = pairwise_eval_llm
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         """Create a new environment instance for the given index."""
@@ -681,7 +677,7 @@ class LFRQATaskDataset(
             settings=self._settings,
             rewards=self._rewards,
             gt_doc_ids=row.gold_doc_ids.strip("[]").split(","),
-            pairwise_eval_llm=self.pai,
+            pairwise_eval_llm=self.pairwise_eval_llm,
         )
 
     def compute_trajectory_metrics(
@@ -726,7 +722,7 @@ class LFRQATaskDataset(
             "total_paper_count": total_paper_count,
             "relevant_paper_count": relevant_paper_count,
             "evidence_count": evidence_count,
-            "paperqa_won": [
+            "paperqa_beat_human": [
                 int(t.steps[-1].reward == self._rewards["win"]) for t in trajectories
             ],
         }

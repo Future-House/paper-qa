@@ -148,24 +148,24 @@ If you want to use the index we built with the whole dataset, you can get it her
 
 ```python
 from paperqa import Settings, ask
+from paperqa.settings import AgentSettings, IndexSettings, ParsingSettings
 
-settings = Settings()
-settings.agent.index.name = "lfrqa_science_index"
-settings.agent.index.paper_directory = (
-    "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
+settings = Settings(
+    agent=AgentSettings(
+        index=IndexSettings(
+            name="lfrqa_science_index",
+            paper_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa",
+            index_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index",
+            manifest_file="manifest.csv",
+            concurrency=10_000,
+            batch_size=10_000,
+        )
+    ),
+    parsing=ParsingSettings(
+        use_doc_details=False,
+        defer_embedding=True,
+    ),
 )
-settings.agent.index.index_directory = (
-    "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
-)
-
-settings.agent.index.manifest_file = "manifest.csv"
-
-settings.parsing.use_doc_details = False
-settings.parsing.defer_embedding = True
-
-settings.agent.index.concurrency = 10000
-settings.agent.index.batch_size = 10000
-
 answer_response = (
     ask(
         "$5^n+n$ is never prime?",
@@ -188,19 +188,20 @@ from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 from paperqa import Settings
+from paperqa.settings import AgentSettings, IndexSettings
 from paperqa.agents.task import LFRQATaskDataset
 
 
 async def evaluate() -> None:
-    settings = Settings()
-    settings.agent.index.name = "lfrqa_science_index"
-    settings.agent.index.paper_directory = (
-        "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa"
+    settings = Settings(
+        agent=AgentSettings(
+            index=IndexSettings(
+                name="lfrqa_science_index_1",
+                paper_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa",
+                index_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index",
+            )
+        )
     )
-    settings.agent.index.index_directory = (
-        "data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index"
-    )
-
     dataset = LFRQATaskDataset(
         data_path="data/rag-qa-benchmarking/lfrqa/questions.csv",
         num_questions=4,
@@ -226,7 +227,7 @@ if __name__ == "__main__":
 After running this, you will get a result like this:
 
 ```
-{'reward': 0.5, 'truncation_rate': 0.0, 'avg_value': 0.0, 'num_steps': 4.0, 'failures': 0.0, 'total_paper_count': 8.5, 'relevant_paper_count': 5.0, 'evidence_count': 6.0, 'paperqa_won': 0.89}
+{'reward': 0.5, 'truncation_rate': 0.0, 'avg_value': 0.0, 'num_steps': 4.0, 'failures': 0.0, 'total_paper_count': 8.5, 'relevant_paper_count': 5.0, 'evidence_count': 6.0, 'paperqa_beat_human': 0.89}
 ```
 
 you can also see each question in the folder `data/rag-qa-benchmarking/results[MODEL_NAME]` and analyze the results yourself.
