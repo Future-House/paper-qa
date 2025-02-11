@@ -20,14 +20,10 @@ def llm_parse_json(text: str) -> dict:
     def escape_newlines(match: re.Match) -> str:
         return match.group(0).replace("\n", "\\n")
 
-    def escape_double_backslashes(match: re.Match) -> str:
-        return match.group(0).replace("\\", "\\\\")
-
     # Match anything between double quotes
     # including escaped quotes and other escaped characters.
     # https://regex101.com/r/VFcDmB/1
     pattern = r'"(?:[^"\\]|\\.)*"'
-    ptext = re.sub(pattern, escape_double_backslashes, ptext)
     ptext = re.sub(pattern, escape_newlines, ptext)
     try:
         return json.loads(ptext)
