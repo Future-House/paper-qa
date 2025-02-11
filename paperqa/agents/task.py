@@ -7,9 +7,7 @@ __all__ = [
     "LitQAv2TaskSplit",
 ]
 
-import json
 import logging
-import os
 import random
 import re
 from abc import ABC
@@ -35,7 +33,7 @@ from aviary.utils import (
     MultipleChoiceEvaluation,
     MultipleChoiceQuestion,
 )
-from llmclient import CommonLLMNames, EmbeddingModel, LiteLLMModel, LLMModel, LLMResult
+from llmclient import CommonLLMNames, EmbeddingModel, LiteLLMModel, LLMModel
 
 from paperqa._ldp_shims import (
     Callback,
@@ -80,7 +78,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         sources: str | list[str] | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation], Awaitable] | None
+            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
         ) = None,
         **env_kwargs,
     ):
@@ -162,6 +160,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         )
         if evaluation_callback := self._evaluation_callback:
             await evaluation_callback(evaluation)
+
         return messages, reward + self._rewards[evaluation.value], done, truncated
 
     def __deepcopy__(self, memo) -> Self:
@@ -504,6 +503,9 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         human_answer: str,
         gt_doc_ids: list[str],
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
+        evaluation_callback: (
+            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
+        ) = None,
         **kwargs,
     ):
         # NOTE I'm using qid and question and
@@ -520,50 +522,15 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         self.human_answer = human_answer
         self.gt_doc_ids = gt_doc_ids
         self.pairwise_eval_llm = pairwise_eval_llm
+        self._evaluation_callback = evaluation_callback
 
     def extract_best_answer_index(self, text: str) -> int:
         match = re.search(r"<rating>(\d+)</rating>", text)
         return int(match.group(1)) if match else 0
 
-    def log_results_to_json(
-        self,
-        llm_model_name: str,
-        qid: str | UUID,
-        question: str,
-        pqa_answer: str,
-        paper_search_ids: list[int],
-        pqa_context: str,
-        human_answer: str,
-        gt_doc_ids: list[str],
-        pqa_answer_index: int,
-        winner: str,
-        result: LLMResult,
-    ) -> None:
-        were_gt_docs_found = len(set(gt_doc_ids) & set(paper_search_ids)) > 0
-        evaluation_results = {
-            "question": question,
-            "paperqa_answer": pqa_answer,
-            "human_answer": human_answer,
-            "pqa_answer_index": pqa_answer_index,
-            "winner": winner,
-            "llm_response": result.text,
-            "paper_search_ids": paper_search_ids,
-            "pqa_context": pqa_context,
-            "gt_doc_ids": gt_doc_ids,
-            "were_gt_docs_found": were_gt_docs_found,
-        }
-
-        results_dir = os.path.join(
-            "data/rag-qa-benchmarking", f"results_{llm_model_name}"
-        )
-        os.makedirs(results_dir, exist_ok=True)
-        json_path = os.path.join(results_dir, f"{qid}.json")
-        with open(json_path, "w") as f:
-            json.dump(evaluation_results, f, indent=2)
-
     async def pairwise_evaluation(
         self, qid: str | UUID, question: str, pqa_answer: str, human_answer: str
-    ) -> float:
+    ) -> dict:
 
         paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
 
@@ -590,35 +557,42 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             else "human" if best_answer_index != 0 else "tie"
         )
 
-        self.log_results_to_json(
-            self._settings.llm,
-            qid,
-            question,
-            pqa_answer,
-            paper_search_ids,
-            self.state.session.context,
-            human_answer,
-            self.gt_doc_ids,
-            pqa_answer_index,
-            winner,
-            result,
-        )
-
-        return (
-            self._rewards["win"]
-            if winner == "paperqa"
-            else self._rewards["lose"] if winner == "human" else self._rewards["tie"]
-        )
+        return {
+            "llm": self._settings.llm,
+            "qid": qid,
+            "question": question,
+            "pqa_answer": pqa_answer,
+            "paper_search_ids": paper_search_ids,
+            "pqa_context": self.state.session.context,
+            "human_answer": human_answer,
+            "gt_doc_ids": self.gt_doc_ids,
+            "pqa_answer_index": pqa_answer_index,
+            "winner": winner,
+            "complete_evaluator_response": result.text,
+            "reward": (
+                self._rewards["win"]
+                if winner == "paperqa"
+                else (
+                    self._rewards["lose"] if winner == "human" else self._rewards["tie"]
+                )
+            ),
+        }
 
     async def step(
         self, action: ToolRequestMessage
     ) -> tuple[Messages, float, bool, bool]:
         messages, reward, done, truncated = await super().step(action)
-        if done:
-            reward = await self.pairwise_evaluation(
-                self.qid, self.question, self.state.session.answer, self.human_answer
-            )
-        return messages, reward, done, truncated
+        if not done:
+            return messages, reward, done, truncated
+
+        evaluation = await self.pairwise_evaluation(
+            self.qid, self.question, self.state.session.answer, self.human_answer
+        )
+
+        if evaluation_callback := self._evaluation_callback:
+            await evaluation_callback(evaluation)
+
+        return messages, evaluation["reward"], done, truncated
 
 
 class LFRQATaskDataset(
@@ -632,6 +606,9 @@ class LFRQATaskDataset(
         num_questions: int | None = None,
         settings: Settings | dict | None = None,
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
+        evaluation_callback: (
+            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
+        ) = None,
     ):
         if settings is None:
             settings = Settings()
@@ -647,6 +624,7 @@ class LFRQATaskDataset(
         self._rewards = {"win": 1, "tie": 0, "lose": -1}
 
         self.pairwise_eval_llm = pairwise_eval_llm
+        self._evaluation_callback = evaluation_callback
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         """Create a new environment instance for the given index."""
@@ -660,6 +638,7 @@ class LFRQATaskDataset(
             rewards=self._rewards,
             gt_doc_ids=row.gold_doc_ids.strip("[]").split(","),
             pairwise_eval_llm=self.pairwise_eval_llm,
+            evaluation_callback=self._evaluation_callback,
         )
 
     def compute_trajectory_metrics(
