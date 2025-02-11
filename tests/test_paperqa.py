@@ -424,6 +424,29 @@ def test_llm_parse_json_newlines() -> None:
     }
 
 
+def test_llm_parse_json_double_backslashes() -> None:
+    """Make sure that newlines in json are preserved and escaped."""
+    example = textwrap.dedent(
+        '{\n  "summary": "The excerpt demonstrates a proof that a polynomial'
+        "\\( P(n) = 3n^5 + 5n^3 + 7n \\) is divisible by 15 for all \\( n \\)."
+        "The proof uses modular arithmetic to show divisibility by both 3 and 5,"
+        "leveraging Fermat's Little Theorem. However, the excerpt does not address"
+        "the question of whether \\( 5^n + n \\) is never prime, as it focuses on"
+        'divisibility properties of a different polynomial.",\n  "relevance_score": 3\n}'
+    )
+    assert llm_parse_json(example) == {
+        "summary": (
+            "The excerpt demonstrates a proof that a polynomial"
+            "\\( P(n) = 3n^5 + 5n^3 + 7n \\) is divisible by 15 for all \\( n \\)."
+            "The proof uses modular arithmetic to show divisibility by both 3 and 5,"
+            "leveraging Fermat's Little Theorem. However, the excerpt does not address"
+            "the question of whether \\( 5^n + n \\) is never prime, as it focuses on"
+            "divisibility properties of a different polynomial."
+        ),
+        "relevance_score": 3,
+    }
+
+
 @pytest.mark.asyncio
 async def test_chain_completion() -> None:
     s = Settings(llm="babbage-002", temperature=0.2)
