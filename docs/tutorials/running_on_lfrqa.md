@@ -13,6 +13,7 @@ First, we need to obtain the annotated dataset from the official repository:
 git clone https://github.com/awslabs/rag-qa-arena
 
 # Create a new directory for the dataset
+mkdir data
 mkdir data/rag-qa-benchmarking
 
 # Move the science annotations file to our working directory
@@ -123,7 +124,7 @@ manifest["doi"] = ""
 manifest["title"] = manifest["doc_id"]
 manifest["key"] = manifest["doc_id"]
 manifest["docname"] = manifest["doc_id"]
-manifest["citation"] = "_"
+manifest["citation"] = ""
 manifest.drop(columns=["doc_id", "doc_text"], inplace=True)
 manifest.to_csv(
     os.path.join(lfrqa_directory, "science_docs_for_paperqa", "manifest.csv"),
@@ -147,6 +148,12 @@ partial_questions.to_csv(
 )
 ```
 
+## Install paperqa
+
+```bash
+pip install paper-qa
+```
+
 ## Index the documents
 
 Copy the following to a file and run it. Feel free to adjust the concurrency as you like.
@@ -157,7 +164,7 @@ You don’t need any api keys for building the index, but you do need them to an
 
 This process is quick for small portions of the whole document’s dataset, but can take ~3hs for the whole of it.
 
-If you want to use the index we built with the whole dataset, you can get it here. Make sure you put it in the correct folder and change the index name to `"lfrqa_science_index_complete"`
+If you want to use the index we built with the whole dataset, you can get it here.
 
 ```python
 from paperqa import Settings, ask
@@ -194,6 +201,8 @@ After this runs, you will get an answer!
 After you have built the index, you are ready to run the benchmark.
 
 Copy the following into a file `gradable.py` and run it. You can also use the parameter num_questions in `LFRQATaskDataset` so you can make quick tests.
+
+To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
 
 ```python
 import asyncio
