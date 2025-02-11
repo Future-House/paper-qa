@@ -401,7 +401,7 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        return re.sub(r'[*\[\]:(){}!~^><+"\\]', "", query)
+        return re.sub(r'[*\[\]:(){}~^><+"\\]', "", query)
 
     async def query(
         self,
