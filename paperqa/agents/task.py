@@ -575,20 +575,12 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         pairwise_eval_llm = self.get_pairwise_eval_llm()
         pqa_answer = strip_citations(pqa_answer)
 
-        if random.random() < 0.5:  # noqa: PLR2004
-            data = {
-                "question": question,
-                "answer1": pqa_answer,
-                "answer2": human_answer,
-            }
-            pqa_answer_index = 1
-        else:
-            data = {
-                "question": question,
-                "answer1": human_answer,
-                "answer2": pqa_answer,
-            }
-            pqa_answer_index = 2
+        pqa_answer_index = 1 if random.random() < 0.5 else 2  # noqa: PLR2004
+        data = {
+            "question": question,
+            "answer1": pqa_answer if pqa_answer_index == 1 else human_answer,
+            "answer2": human_answer if pqa_answer_index == 1 else pqa_answer,
+        }
 
         result = await pairwise_eval_llm.run_prompt(
             prompt=lfrqa_prompt,
