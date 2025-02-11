@@ -376,17 +376,20 @@ def test_extract_score() -> None:
 
 
 @pytest.mark.parametrize(
-    "example",
+    ("example", "expected"),
     [
-        """Sure here is the json you asked for!
+        (
+            """Sure here is the json you asked for!
 
     {
     "example": "json"
     }
 
     Did you like it?""",
-        '{"example": "json"}',
-        """
+            {"example": "json"},
+        ),
+        (
+            """
 ```json
 {
     "example": "json"
@@ -394,17 +397,23 @@ def test_extract_score() -> None:
 ```
 
 I have written the json you asked for.""",
-        """
+            {"example": "json"},
+        ),
+        (
+            """
 
 {
     "example": "json"
 }
 
 """,
+            {"example": "json"},
+        ),
+        ('{"example": "\\json"}', {"example": "\\json"}),
     ],
 )
-def test_llm_parse_json(example: str) -> None:
-    assert llm_parse_json(example) == {"example": "json"}
+def test_llm_parse_json(example: str, expected: dict) -> None:
+    assert llm_parse_json(example) == expected
 
 
 def test_llm_parse_json_newlines() -> None:
@@ -421,29 +430,6 @@ def test_llm_parse_json_newlines() -> None:
     assert llm_parse_json(example) == {
         "summary": "A line\n\nAnother line",
         "relevance_score": 7,
-    }
-
-
-def test_llm_parse_json_double_backslashes() -> None:
-    """Make sure that newlines in json are preserved and escaped."""
-    example = textwrap.dedent(
-        '{\n  "summary": "The excerpt demonstrates a proof that a polynomial'
-        "\\( P(n) = 3n^5 + 5n^3 + 7n \\) is divisible by 15 for all \\( n \\)."
-        "The proof uses modular arithmetic to show divisibility by both 3 and 5,"
-        "leveraging Fermat's Little Theorem. However, the excerpt does not address"
-        "the question of whether \\( 5^n + n \\) is never prime, as it focuses on"
-        'divisibility properties of a different polynomial.",\n  "relevance_score": 3\n}'
-    )
-    assert llm_parse_json(example) == {
-        "summary": (
-            "The excerpt demonstrates a proof that a polynomial"
-            "\\( P(n) = 3n^5 + 5n^3 + 7n \\) is divisible by 15 for all \\( n \\)."
-            "The proof uses modular arithmetic to show divisibility by both 3 and 5,"
-            "leveraging Fermat's Little Theorem. However, the excerpt does not address"
-            "the question of whether \\( 5^n + n \\) is never prime, as it focuses on"
-            "divisibility properties of a different polynomial."
-        ),
-        "relevance_score": 3,
     }
 
 
