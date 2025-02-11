@@ -96,7 +96,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         self._rewards = rewards
 
     async def validate_sources(
-        self, manifest_or_index: dict[str, DocDetails] | SearchIndex | None = None
+        self, manifest_or_index: dict[Any, dict[Any, Any]] | SearchIndex | None = None
     ) -> None:
         """Validate the sources can be found in the input manifest or index."""
         if not self.sources:
