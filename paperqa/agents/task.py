@@ -159,6 +159,8 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             self.state.session.answer
         )
         if evaluation_callback := self._evaluation_callback:
+            if not isinstance(evaluation, MultipleChoiceEvaluation):
+                raise ValueError("evaluation has to be a MultipleChoiceEvaluation")
             await evaluation_callback(evaluation)
 
         return messages, reward + self._rewards[evaluation.value], done, truncated
