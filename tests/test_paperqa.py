@@ -435,11 +435,10 @@ async def test_chain_completion() -> None:
 
     llm = s.get_llm()
 
-    prompt = "The {animal} says"
     messages = [
-        Message(content=prompt.format(animal="duck")),
+        Message(content="The duck says"),
     ]
-    completion = await llm.call_single(  # run_prompt is deprecated
+    completion = await llm.call_single(  
         messages=messages,
         callbacks=[accum],
     )
@@ -448,7 +447,7 @@ async def test_chain_completion() -> None:
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
 
-    completion = await llm.call_single(  # run_prompt is deprecated
+    completion = await llm.call_single(  
         messages=messages,
     )
     assert completion.seconds_to_first_token == 0
@@ -467,11 +466,10 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
         outputs.append(x)
 
     llm = anthropic_settings.get_llm()
-    prompt = "The {animal} says"
     messages = [
-        Message(role="user", content=prompt.format(animal="duck")),
+        Message(content="The duck says"),
     ]
-    completion = await llm.call_single(  # run_prompt is deprecated
+    completion = await llm.call_single(  
         messages=messages,
         callbacks=[accum],
     )
@@ -482,7 +480,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await llm.call_single(  # run_prompt is deprecated
+    completion = await llm.call_single(  
         messages=messages,
     )
     assert completion.seconds_to_first_token == 0

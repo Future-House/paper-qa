@@ -90,7 +90,7 @@ class AnswerResponse(BaseModel):
                 ),
             ),
         ]
-        result = await model.call_single(  # run_prompt is deprecated
+        result = await model.call_single(  ""
             messages=messages,
         )
         return cast(str, result.text).strip()

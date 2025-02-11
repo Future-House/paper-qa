@@ -64,7 +64,7 @@ async def litellm_get_search_query(
     messages = [
         Message(content=search_prompt.format(question=question, count=count)),
     ]
-    result = await model.call_single(  # run_prompt is deprecated
+    result = await model.call_single(  ""
         messages=messages,
     )
     search_query = cast(str, result.text)
