@@ -193,7 +193,7 @@ lfrqa_system_prompt = (
     "I am not sure which one is better."
 )
 
-lfrqa_prompt = (
+lfrqa_prompt_template = (
     "Query is in the <query></query> tags. Answer 1 is in <answer 1></answer 1>,"
     "and Answer 2 is in <answer 2></answer 2>.\n"
     "<query> {question} </query>\n"

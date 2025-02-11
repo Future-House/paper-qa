@@ -49,7 +49,7 @@ from paperqa.litqa import (
     DEFAULT_REWARD_MAPPING,
     read_litqa_v2_from_hub,
 )
-from paperqa.prompts import lfrqa_prompt, lfrqa_system_prompt
+from paperqa.prompts import lfrqa_prompt_template, lfrqa_system_prompt
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, PQASession
 from paperqa.utils import strip_citations
@@ -578,7 +578,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         }
 
         result = await pairwise_eval_llm.run_prompt(
-            prompt=lfrqa_prompt,
+            prompt=lfrqa_prompt_template,
             data=data,
             system_prompt=lfrqa_system_prompt,
         )
