@@ -10,7 +10,7 @@ import pickle
 import warnings
 import zlib
 from collections import Counter
-from collections.abc import AsyncIterator, Callable, Collection, Sequence
+from collections.abc import AsyncIterator, Callable, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -44,7 +44,7 @@ from tenacity import (
 
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
-from paperqa.types import DocDetails
+from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
@@ -108,14 +108,12 @@ class SearchDocumentStorage(StrEnum):
         return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
 
 
-ENV_VAR_MATCH: Collection[str] = {"1", "true"}
-
 # Cache keys are a two-tuple of index name and absolute index directory
 # Cache values are a two-tuple of an opened Index instance and the count
 # of SearchIndex instances currently referencing that Index
 _OPENED_INDEX_CACHE: dict[tuple[str, str], tuple[Index, int]] = {}
 DONT_USE_OPENED_INDEX_CACHE = (
-    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in ENV_VAR_MATCH
+    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in VAR_MATCH_LOOKUP
 )
 
 
@@ -429,6 +427,17 @@ class SearchIndex:
         ]
 
 
+def fetch_kwargs_from_manifest(
+    file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
+) -> dict[str, Any]:
+    manifest_entry: DocDetails | None = manifest.get(file_location) or manifest.get(
+        manifest_fallback_location
+    )
+    if manifest_entry:
+        return manifest_entry.model_dump()
+    return {}
+
+
 async def maybe_get_manifest(
     filename: anyio.Path | None = None,
 ) -> dict[str, DocDetails]:
@@ -491,23 +500,17 @@ async def process_file(
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            doi, title = None, None
-            if file_location in manifest:
-                manifest_entry = manifest[file_location]
-                doi, title = manifest_entry.doi, manifest_entry.title
-            elif manifest_fallback_location in manifest:
-                # Perhaps manifest used the opposite pathing scheme
-                manifest_entry = manifest[manifest_fallback_location]
-                doi, title = manifest_entry.doi, manifest_entry.title
+            kwargs = fetch_kwargs_from_manifest(
+                file_location, manifest, manifest_fallback_location
+            )
 
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
                     path=abs_file_path,
-                    title=title,
-                    doi=doi,
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
+                    **kwargs,
                 )
             except Exception as e:
                 # We handle any exception here because we want to save_index so we
@@ -569,10 +572,10 @@ def _make_progress_bar_update(
 ) -> tuple[contextlib.AbstractContextManager, Callable[[], Any] | None]:
     # Disable should override enable
     env_var_disable = (
-        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     env_var_enable = (
-        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     try:
         is_cli = is_running_under_cli()  # pylint: disable=used-before-assignment
