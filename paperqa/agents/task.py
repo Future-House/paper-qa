@@ -603,11 +603,6 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             else "human" if best_answer_index != 0 else "tie"
         )
 
-        print("--------------------------------")
-        print(f"For question {question} \n")
-        print(f"PQa answer was:\n{pqa_answer} \n\n")
-        print(f"Human answer was:\n{human_answer} \n\n")
-        print(f"Winner is: {winner}\n")
         self.log_results_to_json(
             self._settings.llm,
             qid,
