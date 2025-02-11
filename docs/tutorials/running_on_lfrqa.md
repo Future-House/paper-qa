@@ -205,6 +205,9 @@ Copy the following into a file `gradable.py` and run it. You can also use the pa
 To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
 
 ```python
+import pandas as pd
+import os
+import json
 import asyncio
 from ldp.agent import SimpleAgent
 from ldp.alg.callbacks import MeanMetricsCallback
@@ -212,6 +215,14 @@ from ldp.alg.runners import Evaluator, EvaluatorConfig
 from paperqa import Settings
 from paperqa.settings import AgentSettings, IndexSettings
 from paperqa.agents.task import LFRQATaskDataset
+
+
+async def log_evaluation_to_json(lfrqa_question_evaluation: dict) -> None:
+    results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
+    os.makedirs(results_dir, exist_ok=True)
+    json_path = os.path.join(results_dir, f"{lfrqa_question_evaluation['qid']}.json")
+    with open(json_path, "w") as f:
+        json.dump(lfrqa_question_evaluation, f, indent=2)
 
 
 async def evaluate() -> None:
@@ -224,11 +235,16 @@ async def evaluate() -> None:
             )
         )
     )
-    dataset = LFRQATaskDataset(
-        data_path="data/rag-qa-benchmarking/lfrqa/questions.csv",
-        num_questions=4,
-        settings=settings,
+
+    data = pd.read_csv("data/rag-qa-benchmarking/lfrqa/questions.csv").to_dict(
+        orient="records"
     )
+    dataset = LFRQATaskDataset(
+        data=data,
+        settings=settings,
+        evaluation_callback=log_evaluation_to_json,
+    )
+
     metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
 
     evaluator = Evaluator(
