@@ -538,7 +538,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         pqa_answer_index: int,
         winner: str,
         result: LLMResult,
-    ):
+    ) -> None:
         were_gt_docs_found = len(set(gt_doc_ids) & set(paper_search_ids)) > 0
         evaluation_results = {
             "question": question,
