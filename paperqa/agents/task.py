@@ -522,7 +522,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         self.pairwise_eval_llm = pairwise_eval_llm
 
     def extract_best_answer_index(self, text: str) -> int:
-        match = re.search(r"<rating>(\d+)</rating>", text)
+        match = re.search(r"<rating>([\s\S]*?)</rating>", text)
         return int(match.group(1)) if match else 0
 
     def log_results_to_json(
