@@ -766,12 +766,8 @@ def test_custom_llm(stub_data_dir: Path) -> None:
         name: str = "myllm"
 
         async def acompletion(
-            self, messages: list[Message], **kwargs
+            self, messages: list[Message], **kwargs  # noqa: ARG002
         ) -> list[LLMResult]:
-            # NOTE: Here we add kwargs to the function signature to make it compatible with the superclass
-            # and avoid #type: ignore[override]
-            # and we delete kwargs to avoid ARG002 (unused argument)
-            del kwargs
             return [
                 LLMResult(
                     model=self.name,
@@ -784,9 +780,8 @@ def test_custom_llm(stub_data_dir: Path) -> None:
 
         @rate_limited
         async def acompletion_iter(
-            self, messages: list[Message], **kwargs
+            self, messages: list[Message], **kwargs  # noqa: ARG002
         ) -> AsyncIterable[LLMResult]:
-            del kwargs
             yield LLMResult(
                 model=self.name,
                 text="Echo",
@@ -795,10 +790,11 @@ def test_custom_llm(stub_data_dir: Path) -> None:
                 completion_count=1,
             )
 
-        async def check_rate_limit(self, token_count: float, **kwargs) -> None:
+        async def check_rate_limit(
+            self, token_count: float, **kwargs
+        ) -> None:  # noqa: ARG002
             # Implements a dummy rate limit checker.
-            del token_count
-            del kwargs
+            return
 
     docs = Docs()
     docs.add(
