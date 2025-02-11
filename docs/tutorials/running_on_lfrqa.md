@@ -89,9 +89,9 @@ If you’re using the whole dataset, this may take a while.
 
 ```python
 partial_docs = docs.head(amount_of_docs_to_use)
-papers_directory = os.path.join("data", "rag-qa-benchmarking", "lfrqa")
+lfrqa_directory = os.path.join("data", "rag-qa-benchmarking", "lfrqa")
 os.makedirs(
-    os.path.join(papers_directory, "science_docs_for_paperqa", "files"), exist_ok=True
+    os.path.join(lfrqa_directory, "science_docs_for_paperqa", "files"), exist_ok=True
 )
 
 for i, row in partial_docs.iterrows():
@@ -100,7 +100,7 @@ for i, row in partial_docs.iterrows():
 
     with open(
         os.path.join(
-            papers_directory, "science_docs_for_paperqa", "files", f"{doc_id}.txt"
+            lfrqa_directory, "science_docs_for_paperqa", "files", f"{doc_id}.txt"
         ),
         "w",
         encoding="utf-8",
@@ -126,7 +126,7 @@ manifest["docname"] = manifest["doc_id"]
 manifest["citation"] = "_"
 manifest.drop(columns=["doc_id", "doc_text"], inplace=True)
 manifest.to_csv(
-    os.path.join(papers_directory, "science_docs_for_paperqa", "manifest.csv"),
+    os.path.join(lfrqa_directory, "science_docs_for_paperqa", "manifest.csv"),
     index=False,
 )
 ```
@@ -142,7 +142,7 @@ partial_questions = questions[
     )
 ]
 partial_questions.to_csv(
-    os.path.join(papers_directory, "questions.csv"),
+    os.path.join(lfrqa_directory, "questions.csv"),
     index=False,
 )
 ```
@@ -244,3 +244,22 @@ After running this, you will get a result like this:
 ```
 
 you can also see each question in the folder `data/rag-qa-benchmarking/results[MODEL_NAME]` and analyze the results yourself.
+
+```python
+import glob
+import json
+
+json_files = glob.glob(
+    os.path.join("data", "rag-qa-benchmarking", "results_gpt-4o-2024-11-20", "*.json")
+)
+
+data = []
+for file in json_files:
+    with open(file) as f:
+        json_data = json.load(f)
+        json_data["qid"] = file.split("/")[-1].replace(".json", "")
+        data.append(json_data)
+
+df = pd.DataFrame(data).set_index("qid")
+df["winner"].value_counts(normalize=True)
+```
