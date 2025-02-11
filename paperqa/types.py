@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
 VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
 
-DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: set[str] = {
+DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
     "key",
     "doc_id",
     "docname",
@@ -59,7 +59,7 @@ class Doc(Embeddable):
     dockey: DocKey
     citation: str
     fields_to_overwrite_from_metadata: set[str] = Field(
-        default_factory=lambda: DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        default_factory=lambda: set(DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA),
         description="fields from metadata to overwrite when upgrading to a DocDetails",
     )
 
