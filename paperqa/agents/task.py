@@ -17,7 +17,6 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Self, assert_never, cast
 from uuid import UUID
 
-import pandas as pd
 from aviary.core import (
     TASK_DATASET_REGISTRY,
     Environment,
@@ -604,41 +603,35 @@ class LFRQATaskDataset(
 
     def __init__(
         self,
-        data_path: str,
-        num_questions: int | None = None,
+        data: list[dict],
         settings: Settings | dict | None = None,
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
         evaluation_callback: (
             Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
         ) = None,
     ):
+        self.data = data
+        self.pairwise_eval_llm = pairwise_eval_llm
+
         if settings is None:
             settings = Settings()
         if isinstance(settings, dict):
             settings = Settings(**settings)
         self._settings = settings
-
-        if num_questions is not None:
-            self.data = pd.read_csv(data_path).head(num_questions)
-        else:
-            self.data = pd.read_csv(data_path)
-
         self._rewards = {"win": 1, "tie": 0, "lose": -1}
-
-        self.pairwise_eval_llm = pairwise_eval_llm
         self._evaluation_callback = evaluation_callback
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         """Create a new environment instance for the given index."""
-        row = self.data.iloc[idx]
+        row = self.data[idx]
 
         return LFRQAPairwiseEvalEnv(
-            qid=row.qid,
-            question=row.question,
-            human_answer=row.answer,
+            qid=row["qid"],
+            question=row["question"],
+            human_answer=row["answer"],
             settings=self._settings,
             rewards=self._rewards,
-            gt_doc_ids=row.gold_doc_ids.strip("[]").split(","),
+            gt_doc_ids=row["gold_doc_ids"].strip("[]").split(","),
             pairwise_eval_llm=self.pairwise_eval_llm,
             evaluation_callback=self._evaluation_callback,
         )
