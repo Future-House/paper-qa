@@ -376,17 +376,20 @@ def test_extract_score() -> None:
 
 
 @pytest.mark.parametrize(
-    "example",
+    ("example", "expected"),
     [
-        """Sure here is the json you asked for!
+        (
+            """Sure here is the json you asked for!
 
     {
     "example": "json"
     }
 
     Did you like it?""",
-        '{"example": "json"}',
-        """
+            {"example": "json"},
+        ),
+        (
+            """
 ```json
 {
     "example": "json"
@@ -394,17 +397,23 @@ def test_extract_score() -> None:
 ```
 
 I have written the json you asked for.""",
-        """
+            {"example": "json"},
+        ),
+        (
+            """
 
 {
     "example": "json"
 }
 
 """,
+            {"example": "json"},
+        ),
+        ('{"example": "\\json"}', {"example": "\\json"}),
     ],
 )
-def test_llm_parse_json(example: str) -> None:
-    assert llm_parse_json(example) == {"example": "json"}
+def test_llm_parse_json(example: str, expected: dict) -> None:
+    assert llm_parse_json(example) == expected
 
 
 def test_llm_parse_json_newlines() -> None:
