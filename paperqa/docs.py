@@ -293,13 +293,12 @@ class Docs(BaseModel):
             )
             if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            messages = [
-                Message(
-                    content=parse_config.citation_prompt.format(text=texts[0].text)
-                ),
-            ]
             result = await llm_model.call_single(
-                messages=messages,
+                messages=[
+                    Message(
+                        content=parse_config.citation_prompt.format(text=texts[0].text)
+                    ),
+                ],
             )
             citation = cast(str, result.text)
             if (
