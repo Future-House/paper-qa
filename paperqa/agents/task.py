@@ -561,18 +561,13 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         with open(json_path, "w") as f:
             json.dump(evaluation_results, f, indent=2)
 
-    def get_pairwise_eval_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.pairwise_eval_llm,
-        )
-
     async def pairwise_evaluation(
         self, qid: str | UUID, question: str, pqa_answer: str, human_answer: str
     ) -> float:
 
         paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
 
-        pairwise_eval_llm = self.get_pairwise_eval_llm()
+        pairwise_eval_llm = LiteLLMModel(name=self.pairwise_eval_llm)
         pqa_answer = strip_citations(pqa_answer)
 
         pqa_answer_index = 1 if random.random() < 0.5 else 2  # noqa: PLR2004
