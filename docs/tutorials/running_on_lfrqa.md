@@ -268,15 +268,13 @@ After running this, you will get a result like this:
 {'reward': 0.5, 'truncation_rate': 0.0, 'avg_value': 0.0, 'num_steps': 4.0, 'failures': 0.0, 'total_paper_count': 8.5, 'relevant_paper_count': 5.0, 'evidence_count': 6.0, 'paperqa_beat_human': 0.89}
 ```
 
-you can also see each question in the folder `data/rag-qa-benchmarking/results[MODEL_NAME]` and analyze the results yourself.
+you can also see each question in the folder `data/rag-qa-benchmarking/results` and analyze the results yourself.
 
 ```python
 import glob
 import json
 
-json_files = glob.glob(
-    os.path.join("data", "rag-qa-benchmarking", "results_gpt-4o-2024-11-20", "*.json")
-)
+json_files = glob.glob(os.path.join("data", "rag-qa-benchmarking", "results", "*.json"))
 
 data = []
 for file in json_files:
