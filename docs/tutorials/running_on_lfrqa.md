@@ -154,8 +154,6 @@ pip install paper-qa
 
 Copy the following to a file and run it. Feel free to adjust the concurrency as you like.
 
-PaperQA builds the index every time a question is asked and new files are present. So running this will build the index for you.
-
 You don’t need any llm api keys for building the index, but you do need them to answer questions.
 
 Remember that this process is quick for small portions of the dataset, but can take around 3 hours for the whole dataset.
@@ -164,12 +162,13 @@ Remember that this process is quick for small portions of the dataset, but can t
 import os
 
 from paperqa import Settings, ask
+from paperqa.agents import build_index
 from paperqa.settings import AgentSettings, IndexSettings, ParsingSettings
 
 settings = Settings(
     agent=AgentSettings(
         index=IndexSettings(
-            name="lfrqa_science_index",
+            name="lfrqa_science_index0.1",
             paper_directory=os.path.join(
                 "data", "rag-qa-benchmarking", "lfrqa", "science_docs_for_paperqa"
             ),
@@ -186,12 +185,8 @@ settings = Settings(
         defer_embedding=True,
     ),
 )
-answer_response = (
-    ask(
-        "$5^n+n$ is never prime?",
-        settings=settings,
-    ),
-)
+
+build_index(settings=settings)
 ```
 
 After this runs, you will get an answer!
