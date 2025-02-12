@@ -555,11 +555,12 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         )
 
         best_answer_index = self.extract_best_answer_index(result.text)
-        winner = (
-            "paperqa"
-            if best_answer_index == pqa_answer_index
-            else "human" if best_answer_index != 0 else "tie"
-        )
+        if best_answer_index == pqa_answer_index:
+            winner, reward = "paperqa", self._rewards["win"]
+        elif best_answer_index != 0:
+            winner, reward = "human", self._rewards["lose"]
+        else:
+            winner, reward = "tie", self._rewards["tie"]
 
         return {
             "llm": self._settings.llm,
@@ -573,13 +574,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
             "pqa_answer_index": pqa_answer_index,
             "winner": winner,
             "complete_evaluator_response": result.text,
-            "reward": (
-                self._rewards["win"]
-                if winner == "paperqa"
-                else (
-                    self._rewards["lose"] if winner == "human" else self._rewards["tie"]
-                )
-            ),
+            "reward": reward,
         }
 
     async def step(
