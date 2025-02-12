@@ -163,6 +163,8 @@ You don’t need any api keys for building the index, but you do need them to an
 This process is quick for small portions of the whole document’s dataset, but can take ~3hs for the whole of it.
 
 ```python
+import os
+
 from paperqa import Settings, ask
 from paperqa.settings import AgentSettings, IndexSettings, ParsingSettings
 
@@ -170,8 +172,12 @@ settings = Settings(
     agent=AgentSettings(
         index=IndexSettings(
             name="lfrqa_science_index",
-            paper_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa",
-            index_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index",
+            paper_directory=os.path.join(
+                "data", "rag-qa-benchmarking", "lfrqa", "science_docs_for_paperqa"
+            ),
+            index_directory=os.path.join(
+                "data", "rag-qa-benchmarking", "lfrqa", "science_docs_for_paperqa_index"
+            ),
             manifest_file="manifest.csv",
             concurrency=10_000,
             batch_size=10_000,
@@ -196,9 +202,7 @@ After this runs, you will get an answer!
 
 After you have built the index, you are ready to run the benchmark.
 
-Copy the following into a file `gradable.py` and run it. You can also use the parameter num_questions in `LFRQATaskDataset` so you can make quick tests.
-
-To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
+Copy the following into a file and run it. To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
 
 ```python
 import asyncio
@@ -229,18 +233,25 @@ async def evaluate() -> None:
     settings = Settings(
         agent=AgentSettings(
             index=IndexSettings(
-                name="lfrqa_science_index_1",
-                paper_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa",
-                index_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index",
+                name="lfrqa_science_index",
+                paper_directory=os.path.join(
+                    "data", "rag-qa-benchmarking", "lfrqa", "science_docs_for_paperqa"
+                ),
+                index_directory=os.path.join(
+                    "data",
+                    "rag-qa-benchmarking",
+                    "lfrqa",
+                    "science_docs_for_paperqa_index",
+                ),
             )
         )
     )
 
     data: list[LFRQAQuestion] = [
         LFRQAQuestion(**row)
-        for row in pd.read_csv("data/rag-qa-benchmarking/lfrqa/questions.csv")[
-            ["qid", "question", "answer", "gold_doc_ids"]
-        ].to_dict(orient="records")
+        for row in pd.read_csv(
+            os.path.join("data", "rag-qa-benchmarking", "lfrqa", "questions.csv")
+        )[["qid", "question", "answer", "gold_doc_ids"]].to_dict(orient="records")
     ]
 
     dataset = LFRQATaskDataset(
