@@ -564,15 +564,15 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
 
         return {
             "llm": self._settings.llm,
+            "evaluator_llm": self.pairwise_eval_llm,
             "qid": qid,
             "question": question,
             "pqa_answer": pqa_answer,
-            "paper_search_ids": paper_search_ids,
-            "pqa_context": self.state.session.context,
             "human_answer": human_answer,
-            "gt_doc_ids": self.gt_doc_ids,
-            "pqa_answer_index": pqa_answer_index,
             "winner": winner,
+            "paper_search_ids": paper_search_ids,
+            "gt_doc_ids": self.gt_doc_ids,
+            "pqa_answer_was_answer_1": pqa_answer_index == 1,
             "complete_evaluator_response": result.text,
             "reward": reward,
         }
@@ -595,7 +595,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
 
 
 class LFRQAQuestion(BaseModel):
-    qid: str
+    qid: str | UUID
     question: str
     answer: str
     gt_doc_ids: list[int]
