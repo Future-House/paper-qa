@@ -10,11 +10,17 @@ __all__ = [
 import logging
 import random
 import re
+import sys
 from abc import ABC
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from copy import deepcopy
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, Self, assert_never, cast
+from typing import TYPE_CHECKING, Any, Generic, Self, assert_never, cast
+
+if sys.version_info >= (3, 13):
+    from typing import TypeVar
+else:
+    from typing_extensions import TypeVar  # For TypeVar.default backport
 from uuid import UUID
 
 from aviary.core import (
@@ -62,8 +68,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+TEvaluation = TypeVar("TEvaluation", default=MultipleChoiceEvaluation)
 
-class GradablePaperQAEnvironment(PaperQAEnvironment):
+
+class GradablePaperQAEnvironment(PaperQAEnvironment, Generic[TEvaluation]):
     """Extended environment that can grade answers."""
 
     def __init__(
@@ -77,9 +85,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         session_id: UUID | None = None,
         sources: str | list[str] | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
-        evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
-        ) = None,
+        evaluation_callback: Callable[[TEvaluation], Awaitable] | None = None,
         **env_kwargs,
     ):
         super().__init__(
@@ -141,12 +147,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
                 f" the corresponding query was {question!r}."
             )
 
-    async def step(
-        self, action: ToolRequestMessage
-    ) -> tuple[Messages, float, bool, bool]:
-        messages, reward, done, truncated = await super().step(action)
-        if not done or not isinstance(self._query, MultipleChoiceQuestion):
-            return messages, reward, done, truncated
+    async def _evaluate_answer(self) -> TEvaluation:
         # If the ensuring evaluation fails (e.g. due to OpenAI being down), we can:
         # - Suppress the exception and declare the evaluation as incorrect, which can
         #   negatively reward what otherwise was a good trajectory containing a correct
@@ -155,20 +156,27 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         #   incorrectly reward what otherwise was a good trajectory.
         # - Don't suppress the exception, which leads to the trajectory failing, and
         #   removes it from the learnable pool. This is the only safe default behavior.
-        evaluation, self.state.session.graded_answer = await self._query.grade(
-            self.state.session.answer
-        )
+        evaluation, self.state.session.graded_answer = await cast(
+            MultipleChoiceQuestion, self._query
+        ).grade(self.state.session.answer)
+        return evaluation  # type: ignore[return-value]
+
+    async def step(
+        self, action: ToolRequestMessage
+    ) -> tuple[Messages, float, bool, bool]:
+        messages, reward, done, truncated = await super().step(action)
+        if not done or not isinstance(self._query, MultipleChoiceQuestion):
+            return messages, reward, done, truncated
+        evaluation = await self._evaluate_answer()
         if evaluation_callback := self._evaluation_callback:
-            if not isinstance(evaluation, MultipleChoiceEvaluation):
-                raise ValueError(
-                    f"Evaluation in {type(self).__name__} must be input type"
-                    f" {MultipleChoiceEvaluation.__name__}, we received"
-                    f" type {type(evaluation).__name__}."
-                    " Other types are permissible solely for subclassing purposes."
-                )
             await evaluation_callback(evaluation)
 
-        return messages, reward + self._rewards[evaluation.value], done, truncated
+        return (
+            messages,
+            reward + self._rewards[cast(MultipleChoiceEvaluation, evaluation).value],
+            done,
+            truncated,
+        )
 
     def __deepcopy__(self, memo) -> Self:
         copy_state = deepcopy(self.state, memo)
@@ -501,7 +509,7 @@ TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
 )
 
 
-class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
+class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment[dict]):
     """Environment to evaluate paperqa's vs human's answers on Long Form RAG QA questions."""
 
     def __init__(
@@ -528,20 +536,16 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         match = re.search(r"<rating>(\d+)</rating>", text)
         return int(match.group(1)) if match else 0
 
-    async def pairwise_evaluation(
-        self, qid: str | UUID, question: str, pqa_answer: str, human_answer: str
-    ) -> dict:
-
+    async def _evaluate_answer(self) -> dict:
         paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
 
         pairwise_eval_llm = LiteLLMModel(name=self.pairwise_eval_llm)
-        pqa_answer = strip_citations(pqa_answer)
-
+        pqa_answer = strip_citations(self.state.session.answer)
         pqa_answer_index = 1 if random.random() < 0.5 else 2  # noqa: PLR2004
         data = {
-            "question": question,
-            "answer1": pqa_answer if pqa_answer_index == 1 else human_answer,
-            "answer2": human_answer if pqa_answer_index == 1 else pqa_answer,
+            "question": self.question,
+            "answer1": pqa_answer if pqa_answer_index == 1 else self.human_answer,
+            "answer2": self.human_answer if pqa_answer_index == 1 else pqa_answer,
         }
 
         result = await pairwise_eval_llm.run_prompt(
@@ -561,10 +565,10 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         return {
             "llm": self._settings.llm,
             "evaluator_llm": self.pairwise_eval_llm,
-            "qid": qid,
-            "question": question,
+            "qid": self.qid,
+            "question": self.question,
             "pqa_answer": pqa_answer,
-            "human_answer": human_answer,
+            "human_answer": self.human_answer,
             "winner": winner,
             "paper_search_ids": paper_search_ids,
             "gt_doc_ids": self.gt_doc_ids,
@@ -580,18 +584,8 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         if not done:
             return messages, reward, done, truncated
 
-        evaluation = await self.pairwise_evaluation(
-            self.qid, self.question, self.state.session.answer, self.human_answer
-        )
-
+        evaluation = await self._evaluate_answer()
         if evaluation_callback := self._evaluation_callback:
-            if not isinstance(evaluation, dict):
-                raise ValueError(
-                    f"Evaluation in {type(self).__name__} must be input type"
-                    f" dict, we received type"
-                    f" {type(evaluation).__name__}."
-                    f" {type(self).__name__} uses dict for evaluation."
-                )
             await evaluation_callback(evaluation)
 
         return messages, evaluation["reward"], done, truncated
@@ -622,9 +616,7 @@ class LFRQATaskDataset(TaskDataset[LFRQAPairwiseEvalEnv]):
         data: list[LFRQAQuestion],
         settings: Settings | dict | None = None,
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
-        evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
-        ) = None,
+        evaluation_callback: Callable[[dict], Awaitable] | None = None,
     ):
         self.data = data
         self.pairwise_eval_llm = pairwise_eval_llm
