@@ -53,16 +53,15 @@ import os
 import pandas as pd
 
 # Load questions and answers dataset
+rag_qa_benchmarking_dir = os.path.join("data", "rag-qa-benchmarking")
 questions = pd.read_json(
-    os.path.join(
-        "data", "rag-qa-benchmarking", "annotations_science_with_citation.jsonl"
-    ),
+    os.path.join(rag_qa_benchmarking_dir, "annotations_science_with_citation.jsonl"),
     lines=True,
 )
 
 # Load documents dataset
 docs = pd.read_csv(
-    os.path.join("data", "rag-qa-benchmarking", "science_test_collection.tsv"),
+    os.path.join(rag_qa_benchmarking_dir, "science_test_collection.tsv"),
     sep="\t",
     names=["doc_id", "doc_text"],
 )
@@ -90,7 +89,7 @@ If you’re using the whole dataset, this may take a while.
 
 ```python
 partial_docs = docs.head(amount_of_docs_to_use)
-lfrqa_directory = os.path.join("data", "rag-qa-benchmarking", "lfrqa")
+lfrqa_directory = os.path.join(rag_qa_benchmarking_dir, "lfrqa")
 os.makedirs(
     os.path.join(lfrqa_directory, "science_docs_for_paperqa", "files"), exist_ok=True
 )
