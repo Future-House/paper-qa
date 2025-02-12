@@ -205,21 +205,26 @@ Copy the following into a file `gradable.py` and run it. You can also use the pa
 To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
 
 ```python
-import os
-import json
 import asyncio
+import json
+import os
+
 import pandas as pd
 from ldp.agent import SimpleAgent
 from ldp.alg.runners import Evaluator, EvaluatorConfig
+
 from paperqa import Settings
+from paperqa.agents.task import LFRQAQuestion, LFRQATaskDataset
 from paperqa.settings import AgentSettings, IndexSettings
-from paperqa.agents.task import LFRQATaskDataset, LFRQAQuestion
+
+log_results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
+os.makedirs(log_results_dir, exist_ok=True)
 
 
 async def log_evaluation_to_json(lfrqa_question_evaluation: dict) -> None:
-    results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
-    os.makedirs(results_dir, exist_ok=True)
-    json_path = os.path.join(results_dir, f"{lfrqa_question_evaluation['qid']}.json")
+    json_path = os.path.join(
+        log_results_dir, f"{lfrqa_question_evaluation['qid']}.json"
+    )
     with open(json_path, "w") as f:
         json.dump(lfrqa_question_evaluation, f, indent=2)
 
@@ -241,6 +246,7 @@ async def evaluate() -> None:
             ["qid", "question", "answer", "gold_doc_ids"]
         ].to_dict(orient="records")
     ]
+
     dataset = LFRQATaskDataset(
         data=data,
         settings=settings,
