@@ -615,7 +615,7 @@ class LFRQAQuestion(BaseModel):
 
 
 class LFRQATaskDataset(
-    TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin
+    TaskDataset[LFRQAPairwiseEvalEnv]
 ):
     """Task dataset for custom evaluation of non-multiple choice questions."""
 
