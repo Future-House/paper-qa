@@ -614,9 +614,7 @@ class LFRQAQuestion(BaseModel):
         return data
 
 
-class LFRQATaskDataset(
-    TaskDataset[LFRQAPairwiseEvalEnv]
-):
+class LFRQATaskDataset(TaskDataset[LFRQAPairwiseEvalEnv]):
     """Task dataset for custom evaluation of non-multiple choice questions."""
 
     def __init__(
