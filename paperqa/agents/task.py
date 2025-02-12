@@ -510,7 +510,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         qid: str | UUID,
         question: str,
         human_answer: str,
-        gt_doc_ids: list[str],
+        gt_doc_ids: list[int],
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
         evaluation_callback: (
             Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
@@ -598,7 +598,7 @@ class LFRQAQuestion(BaseModel):
     qid: str
     question: str
     answer: str
-    gt_doc_ids: list[str]
+    gt_doc_ids: list[int]
 
     @model_validator(mode="before")
     @classmethod
@@ -607,6 +607,7 @@ class LFRQAQuestion(BaseModel):
             data["gt_doc_ids"] = data["gold_doc_ids"]
         if isinstance(data["gt_doc_ids"], str):
             data["gt_doc_ids"] = data["gt_doc_ids"].strip("[]").split(",")
+            data["gt_doc_ids"] = [int(_id) for _id in data["gt_doc_ids"]]
         return data
 
 
@@ -637,16 +638,16 @@ class LFRQATaskDataset(
 
     def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
         """Create a new environment instance for the given index."""
-        row = self.data[idx]
+        question = self.data[idx]
 
         return LFRQAPairwiseEvalEnv(
-            qid=row.qid,
-            question=row.question,
-            human_answer=row.answer,
+            qid=question.qid,
+            question=question.question,
+            human_answer=question.answer,
+            gt_doc_ids=question.gt_doc_ids,
+            pairwise_eval_llm=self.pairwise_eval_llm,
             settings=self._settings,
             rewards=self._rewards,
-            gt_doc_ids=row.gt_doc_ids,
-            pairwise_eval_llm=self.pairwise_eval_llm,
             evaluation_callback=self._evaluation_callback,
         )
 
