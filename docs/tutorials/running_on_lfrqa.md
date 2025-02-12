@@ -214,7 +214,8 @@ from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 from paperqa import Settings
 from paperqa.settings import AgentSettings, IndexSettings
-from paperqa.agents.task import LFRQATaskDataset
+from paperqa.agents.task import LFRQATaskDataset, LFRQAQuestion
+from typing import List
 
 
 async def log_evaluation_to_json(lfrqa_question_evaluation: dict) -> None:
@@ -229,16 +230,19 @@ async def evaluate() -> None:
     settings = Settings(
         agent=AgentSettings(
             index=IndexSettings(
-                name="lfrqa_science_index",
+                name="lfrqa_science_index_1",
                 paper_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa",
                 index_directory="data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa_index",
             )
         )
     )
 
-    data = pd.read_csv("data/rag-qa-benchmarking/lfrqa/questions.csv").to_dict(
-        orient="records"
-    )
+    data: List[LFRQAQuestion] = [
+        LFRQAQuestion(**row)
+        for row in pd.read_csv("data/rag-qa-benchmarking/lfrqa/questions.csv")[
+            ["qid", "question", "answer", "gold_doc_ids"]
+        ].to_dict(orient="records")
+    ]
     dataset = LFRQATaskDataset(
         data=data,
         settings=settings,

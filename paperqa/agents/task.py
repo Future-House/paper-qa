@@ -33,6 +33,7 @@ from aviary.utils import (
     MultipleChoiceQuestion,
 )
 from llmclient import CommonLLMNames, EmbeddingModel, LiteLLMModel, LLMModel
+from pydantic import BaseModel, model_validator
 
 from paperqa._ldp_shims import (
     Callback,
@@ -596,6 +597,20 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         return messages, evaluation["reward"], done, truncated
 
 
+class LFRQAQuestion(BaseModel):
+    qid: str
+    question: str
+    answer: str
+    gold_doc_ids: list[str]
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_gold_doc_ids(cls, data: dict) -> dict:
+        if isinstance(data["gold_doc_ids"], str):
+            data["gold_doc_ids"] = data["gold_doc_ids"].strip("[]").split(",")
+        return data
+
+
 class LFRQATaskDataset(
     TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin
 ):
@@ -603,7 +618,7 @@ class LFRQATaskDataset(
 
     def __init__(
         self,
-        data: list[dict],
+        data: list[LFRQAQuestion],
         settings: Settings | dict | None = None,
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
         evaluation_callback: (
@@ -626,12 +641,12 @@ class LFRQATaskDataset(
         row = self.data[idx]
 
         return LFRQAPairwiseEvalEnv(
-            qid=row["qid"],
-            question=row["question"],
-            human_answer=row["answer"],
+            qid=row.qid,
+            question=row.question,
+            human_answer=row.answer,
             settings=self._settings,
             rewards=self._rewards,
-            gt_doc_ids=row["gold_doc_ids"].strip("[]").split(","),
+            gt_doc_ids=row.gold_doc_ids,
             pairwise_eval_llm=self.pairwise_eval_llm,
             evaluation_callback=self._evaluation_callback,
         )
