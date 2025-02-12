@@ -13,8 +13,7 @@ First, we need to obtain the annotated dataset from the official repository:
 git clone https://github.com/awslabs/rag-qa-arena
 
 # Create a new directory for the dataset
-mkdir data
-mkdir data/rag-qa-benchmarking
+mkdir -p data/rag-qa-benchmarking
 
 # Move the science annotations file to our working directory
 mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./data/rag-qa-benchmarking/
