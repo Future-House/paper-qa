@@ -9,17 +9,11 @@ The **LFRQA dataset** was introduced in the paper [_LFRQA: Large-Scale Few-Shot 
 First, we need to obtain the annotated dataset from the official repository:
 
 ```bash
-# Clone the RAG-QA Arena repository
-git clone https://github.com/awslabs/rag-qa-arena
-
 # Create a new directory for the dataset
 mkdir -p data/rag-qa-benchmarking
 
-# Move the science annotations file to our working directory
-mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./data/rag-qa-benchmarking/
-
-# Clean up the repository folder
-rm -rf rag-qa-arena
+# Get the annotated questions
+curl https://raw.githubusercontent.com/awslabs/rag-qa-arena/refs/heads/main/data/annotations_science_with_citation.jsonl -o data/rag-qa-benchmarking/annotations_science_with_citation.jsonl
 ```
 
 ## Download the Robust-QA Documents
