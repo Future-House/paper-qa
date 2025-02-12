@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **LFRQA dataset** was introduced in the paper [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use.
+The **LFRQA dataset** was introduced in the paper [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use and benchmarking.
 
 ## Download the Annotations
 
@@ -28,24 +28,24 @@ LFRQA is built upon **Robust-QA**, so we must download the relevant documents:
 
 ```bash
 # Download the Lotte dataset, which includes the required documents
-curl https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz --output data/lotte.tar.gz
+curl https://downloads.cs.stanford.edu/nlp/data/colbert/colbertv2/lotte.tar.gz --output lotte.tar.gz
 
 # Extract the dataset
-tar -xvzf data/lotte.tar.gz
+tar -xvzf lotte.tar.gz
 
 # Move the science test collection to our dataset folder
-cp data/lotte/science/test/collection.tsv ./data/rag-qa-benchmarking/science_test_collection.tsv
+cp lotte/science/test/collection.tsv ./data/rag-qa-benchmarking/science_test_collection.tsv
 
 # Clean up unnecessary files
-rm data/lotte.tar.gz
-rm -rf data/lotte
+rm lotte.tar.gz
+rm -rf lotte
 ```
 
 For more details, refer to the original paper: [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998).
 
 ## Load the Data
 
-We now load both the questions and documents into a usable format:
+We now load the documents into a pandas dataframe:
 
 ```python
 import os
@@ -53,10 +53,6 @@ import pandas as pd
 
 # Load questions and answers dataset
 rag_qa_benchmarking_dir = os.path.join("data", "rag-qa-benchmarking")
-questions = pd.read_json(
-    os.path.join(rag_qa_benchmarking_dir, "annotations_science_with_citation.jsonl"),
-    lines=True,
-)
 
 # Load documents dataset
 lfrqa_docs_df = pd.read_csv(
@@ -68,11 +64,9 @@ lfrqa_docs_df = pd.read_csv(
 
 ## Select the Documents to Use
 
-If needed, we can limit the number of documents used. RobustQA consists on 1.7M documents, so the index will take a long time to build.
+RobustQA consists on 1.7M documents, so building the whole index will take around 3 hours.
 
-If you want to run a quick test, you can use a small proportion.
-
-Setting the proportion will take only that fraction of the documents, and the questions that can be answered only on that fraction of the dataset.
+If you want to run a test, you can use a portion of the dataset and the questions that can be answered only on those documents.
 
 ```python
 proportion_to_use = 1 / 100
@@ -82,9 +76,7 @@ print(f"Using {amount_of_docs_to_use} out of {len(lfrqa_docs_df)} documents")
 
 ## Prepare the Document Files
 
-We now create the document directory and store each document as a separate text file. This is because of how paperqa builds the index.
-
-If you’re using the whole dataset, this may take a while.
+We now create the document directory and store each document as a separate text file, so that paperqa can build the index.
 
 ```python
 partial_docs = lfrqa_docs_df.head(amount_of_docs_to_use)
@@ -113,7 +105,7 @@ for i, row in partial_docs.iterrows():
 
 ## Create the Manifest File
 
-The **manifest file** keeps track of document metadata for the dataset. It is also necessary so that paperqa doesn’t try to get metadata using llm calls.
+The **manifest file** keeps track of document metadata for the dataset. We need to fill some fields so that paperqa doesn’t try to get metadata using llm calls. This will make the indexing process faster.
 
 ```python
 manifest = partial_docs.copy()
@@ -132,11 +124,15 @@ manifest.to_csv(
 
 ## Filter and Save Questions
 
-Finally, we filter the question set to ensure we only include questions that reference the selected documents:
+Finally, we load the questions and filter them to ensure we only include questions that reference the selected documents:
 
 ```python
-partial_questions = questions[
-    questions.gold_doc_ids.apply(
+questions_df = pd.read_json(
+    os.path.join(rag_qa_benchmarking_dir, "annotations_science_with_citation.jsonl"),
+    lines=True,
+)
+partial_questions = questions_df[
+    questions_df.gold_doc_ids.apply(
         lambda ids: all(id < amount_of_docs_to_use for id in ids)
     )
 ]
@@ -148,6 +144,8 @@ partial_questions.to_csv(
 
 ## Install paperqa
 
+From now on, we will be using the paperqa library, so we need to install it:
+
 ```bash
 pip install paper-qa
 ```
@@ -158,9 +156,9 @@ Copy the following to a file and run it. Feel free to adjust the concurrency as 
 
 PaperQA builds the index every time a question is asked and new files are present. So running this will build the index for you.
 
-You don’t need any api keys for building the index, but you do need them to answer questions.
+You don’t need any llm api keys for building the index, but you do need them to answer questions.
 
-This process is quick for small portions of the whole document’s dataset, but can take ~3hs for the whole of it.
+Remember that this process is quick for small portions of the dataset, but can take around 3 hours for the whole dataset.
 
 ```python
 import os
