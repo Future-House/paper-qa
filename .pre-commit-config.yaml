@@ -101,5 +101,6 @@ repos:
           - tiktoken>=0.4.0 # Match pyproject.toml
           - types-setuptools
           - types-PyYAML
+          - typing-extensions  # TODO: remove when Python>=3.13
           - sentence-transformers
           - pyzotero
