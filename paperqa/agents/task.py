@@ -639,7 +639,7 @@ class LFRQATaskDataset(
         self._rewards = {"win": 1, "tie": 0, "lose": -1}
         self._evaluation_callback = evaluation_callback
 
-    def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
+    def get_new_env_by_idx(self, idx: int) -> LFRQAPairwiseEvalEnv:
         """Create a new environment instance for the given index."""
         question = self.data[idx]
 
