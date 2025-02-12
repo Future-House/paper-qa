@@ -512,9 +512,6 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         human_answer: str,
         gt_doc_ids: list[int],
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
-        evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
-        ) = None,
         **kwargs,
     ):
         kwargs["query"] = question
@@ -526,7 +523,6 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         self.human_answer = human_answer
         self.gt_doc_ids = gt_doc_ids
         self.pairwise_eval_llm = pairwise_eval_llm
-        self._evaluation_callback = evaluation_callback
 
     def extract_best_answer_index(self, text: str) -> int:
         match = re.search(r"<rating>(\d+)</rating>", text)
