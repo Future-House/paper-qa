@@ -8,6 +8,7 @@ __all__ = [
 ]
 
 import logging
+import random
 import re
 from abc import ABC
 from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
@@ -31,7 +32,8 @@ from aviary.utils import (
     MultipleChoiceEvaluation,
     MultipleChoiceQuestion,
 )
-from llmclient import EmbeddingModel, LiteLLMModel, LLMModel
+from llmclient import CommonLLMNames, EmbeddingModel, LiteLLMModel, LLMModel
+from pydantic import BaseModel, model_validator
 
 from paperqa._ldp_shims import (
     Callback,
@@ -45,8 +47,10 @@ from paperqa.litqa import (
     DEFAULT_REWARD_MAPPING,
     read_litqa_v2_from_hub,
 )
+from paperqa.prompts import lfrqa_prompt_template, lfrqa_system_prompt
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, PQASession
+from paperqa.utils import strip_citations
 
 from .env import POPULATE_FROM_SETTINGS, PaperQAEnvironment
 from .search import SearchIndex, maybe_get_manifest
@@ -74,7 +78,7 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         sources: str | list[str] | None = None,
         rewards: Mapping[str, float] = DEFAULT_REWARD_MAPPING,
         evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation], Awaitable] | None
+            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
         ) = None,
         **env_kwargs,
     ):
@@ -155,7 +159,15 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
             self.state.session.answer
         )
         if evaluation_callback := self._evaluation_callback:
+            if not isinstance(evaluation, MultipleChoiceEvaluation):
+                raise ValueError(
+                    f"Evaluation in {type(self).__name__} must be input type"
+                    f" {MultipleChoiceEvaluation.__name__}, we received"
+                    f" type {type(evaluation).__name__}."
+                    " Other types are permissible solely for subclassing purposes."
+                )
             await evaluation_callback(evaluation)
+
         return messages, reward + self._rewards[evaluation.value], done, truncated
 
     def __deepcopy__(self, memo) -> Self:
@@ -486,4 +498,166 @@ TASK_DATASET_NAME = "litqa-v2"
 TASK_DATASET_REGISTRY[TASK_DATASET_NAME] = (
     LitQAv2TaskDataset.__module__,
     LitQAv2TaskDataset.__name__,
+)
+
+
+class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
+    """Environment to evaluate paperqa's vs human's answers on Long Form RAG QA questions."""
+
+    def __init__(
+        self,
+        *args,
+        qid: str | UUID,
+        question: str,
+        human_answer: str,
+        gt_doc_ids: list[int],
+        pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
+        evaluation_callback: (
+            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
+        ) = None,
+        **kwargs,
+    ):
+        kwargs["query"] = question
+        kwargs["docs"] = Docs()
+        super().__init__(*args, **kwargs)
+
+        self.qid = qid
+        self.question = question
+        self.human_answer = human_answer
+        self.gt_doc_ids = gt_doc_ids
+        self.pairwise_eval_llm = pairwise_eval_llm
+        self._evaluation_callback = evaluation_callback
+
+    def extract_best_answer_index(self, text: str) -> int:
+        match = re.search(r"<rating>(\d+)</rating>", text)
+        return int(match.group(1)) if match else 0
+
+    async def pairwise_evaluation(
+        self, qid: str | UUID, question: str, pqa_answer: str, human_answer: str
+    ) -> dict:
+
+        paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
+
+        pairwise_eval_llm = LiteLLMModel(name=self.pairwise_eval_llm)
+        pqa_answer = strip_citations(pqa_answer)
+
+        pqa_answer_index = 1 if random.random() < 0.5 else 2  # noqa: PLR2004
+        data = {
+            "question": question,
+            "answer1": pqa_answer if pqa_answer_index == 1 else human_answer,
+            "answer2": human_answer if pqa_answer_index == 1 else pqa_answer,
+        }
+
+        result = await pairwise_eval_llm.run_prompt(
+            prompt=lfrqa_prompt_template,
+            data=data,
+            system_prompt=lfrqa_system_prompt,
+        )
+
+        best_answer_index = self.extract_best_answer_index(result.text)
+        if best_answer_index == pqa_answer_index:
+            winner, reward = "paperqa", self._rewards["win"]
+        elif best_answer_index != 0:
+            winner, reward = "human", self._rewards["lose"]
+        else:
+            winner, reward = "tie", self._rewards["tie"]
+
+        return {
+            "llm": self._settings.llm,
+            "evaluator_llm": self.pairwise_eval_llm,
+            "qid": qid,
+            "question": question,
+            "pqa_answer": pqa_answer,
+            "human_answer": human_answer,
+            "winner": winner,
+            "paper_search_ids": paper_search_ids,
+            "gt_doc_ids": self.gt_doc_ids,
+            "pqa_answer_was_answer_1": pqa_answer_index == 1,
+            "complete_evaluator_response": result.text,
+            "reward": reward,
+        }
+
+    async def step(
+        self, action: ToolRequestMessage
+    ) -> tuple[Messages, float, bool, bool]:
+        messages, reward, done, truncated = await super().step(action)
+        if not done:
+            return messages, reward, done, truncated
+
+        evaluation = await self.pairwise_evaluation(
+            self.qid, self.question, self.state.session.answer, self.human_answer
+        )
+
+        if evaluation_callback := self._evaluation_callback:
+            await evaluation_callback(evaluation)
+
+        return messages, evaluation["reward"], done, truncated
+
+
+class LFRQAQuestion(BaseModel):
+    qid: str | UUID
+    question: str
+    answer: str
+    gt_doc_ids: list[int]
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_gt_doc_ids(cls, data: dict) -> dict:
+        if data.get("gold_doc_ids") and not data.get("gt_doc_ids"):
+            data["gt_doc_ids"] = data["gold_doc_ids"]
+        if isinstance(data["gt_doc_ids"], str):
+            data["gt_doc_ids"] = data["gt_doc_ids"].strip("[]").split(",")
+            data["gt_doc_ids"] = [int(_id) for _id in data["gt_doc_ids"]]
+        return data
+
+
+class LFRQATaskDataset(
+    TaskDataset[GradablePaperQAEnvironment], ComputeTrajectoryMetricsMixin
+):
+    """Task dataset for custom evaluation of non-multiple choice questions."""
+
+    def __init__(
+        self,
+        data: list[LFRQAQuestion],
+        settings: Settings | dict | None = None,
+        pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
+        evaluation_callback: (
+            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
+        ) = None,
+    ):
+        self.data = data
+        self.pairwise_eval_llm = pairwise_eval_llm
+
+        if settings is None:
+            settings = Settings()
+        if isinstance(settings, dict):
+            settings = Settings(**settings)
+        self._settings = settings
+        self._rewards = {"win": 1, "tie": 0, "lose": -1}
+        self._evaluation_callback = evaluation_callback
+
+    def get_new_env_by_idx(self, idx: int) -> GradablePaperQAEnvironment:
+        """Create a new environment instance for the given index."""
+        question = self.data[idx]
+
+        return LFRQAPairwiseEvalEnv(
+            qid=question.qid,
+            question=question.question,
+            human_answer=question.answer,
+            gt_doc_ids=question.gt_doc_ids,
+            pairwise_eval_llm=self.pairwise_eval_llm,
+            settings=self._settings,
+            rewards=self._rewards,
+            evaluation_callback=self._evaluation_callback,
+        )
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+
+# Register your custom dataset
+CUSTOM_TASK_DATASET_NAME = "lfrqa"
+TASK_DATASET_REGISTRY[CUSTOM_TASK_DATASET_NAME] = (
+    LFRQATaskDataset.__module__,
+    LFRQATaskDataset.__name__,
 )
