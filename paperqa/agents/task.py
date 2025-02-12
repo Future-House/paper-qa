@@ -598,13 +598,15 @@ class LFRQAQuestion(BaseModel):
     qid: str
     question: str
     answer: str
-    gold_doc_ids: list[str]
+    gt_doc_ids: list[str]
 
     @model_validator(mode="before")
     @classmethod
-    def _validate_gold_doc_ids(cls, data: dict) -> dict:
-        if isinstance(data["gold_doc_ids"], str):
-            data["gold_doc_ids"] = data["gold_doc_ids"].strip("[]").split(",")
+    def _validate_gt_doc_ids(cls, data: dict) -> dict:
+        if data.get("gold_doc_ids") and not data.get("gt_doc_ids"):
+            data["gt_doc_ids"] = data["gold_doc_ids"]
+        if isinstance(data["gt_doc_ids"], str):
+            data["gt_doc_ids"] = data["gt_doc_ids"].strip("[]").split(",")
         return data
 
 
@@ -643,7 +645,7 @@ class LFRQATaskDataset(
             human_answer=row.answer,
             settings=self._settings,
             rewards=self._rewards,
-            gt_doc_ids=row.gold_doc_ids,
+            gt_doc_ids=row.gt_doc_ids,
             pairwise_eval_llm=self.pairwise_eval_llm,
             evaluation_callback=self._evaluation_callback,
         )
