@@ -162,8 +162,6 @@ You don’t need any api keys for building the index, but you do need them to an
 
 This process is quick for small portions of the whole document’s dataset, but can take ~3hs for the whole of it.
 
-If you want to use the index we built with the whole dataset, you can get it here. Make sure that you have all the docs in the `data/rag-qa-benchmarking/lfrqa/science_docs_for_paperqa/files` folder so the indexing process doesn't delete the missing ones.
-
 ```python
 from paperqa import Settings, ask
 from paperqa.settings import AgentSettings, IndexSettings, ParsingSettings
