@@ -269,7 +269,7 @@ After running this, you can find the results in the `data/rag-qa-benchmarking/re
 import glob
 import json
 
-json_files = glob.glob(os.path.join("data", "rag-qa-benchmarking", "results", "*.json"))
+json_files = glob.glob(os.path.join(rag_qa_benchmarking_dir, "results", "*.json"))
 
 data = []
 for file in json_files:
