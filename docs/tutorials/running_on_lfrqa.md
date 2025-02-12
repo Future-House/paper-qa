@@ -1,4 +1,4 @@
-# Preparing the LFRQA Dataset
+# Measuring PaperQA2 with LFRQA
 
 ## Overview
 
@@ -148,7 +148,7 @@ pip install paper-qa
 
 Copy the following to a file and run it. Feel free to adjust the concurrency as you like.
 
-You don’t need any llm api keys for building the index, but you do need them to answer questions.
+You don’t need any api keys for building this index because we don't discern any citation metadata, but you do need LLM api keys to answer questions.
 
 Remember that this process is quick for small portions of the dataset, but can take around 3 hours for the whole dataset.
 

@@ -537,6 +537,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment[dict]):
         return int(match.group(1)) if match else 0
 
     async def _evaluate_answer(self) -> dict:
+        """Pairwise evaluation of PaperQA vs Human answer."""
         paper_search_ids = [int(doc.docname) for doc in self.state.docs.docs.values()]
 
         pairwise_eval_llm = LiteLLMModel(name=self.pairwise_eval_llm)
