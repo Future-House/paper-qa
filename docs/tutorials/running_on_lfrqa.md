@@ -59,7 +59,7 @@ questions = pd.read_json(
 )
 
 # Load documents dataset
-docs = pd.read_csv(
+lfrqa_docs_df = pd.read_csv(
     os.path.join(rag_qa_benchmarking_dir, "science_test_collection.tsv"),
     sep="\t",
     names=["doc_id", "doc_text"],
@@ -76,8 +76,8 @@ Setting the proportion will take only that fraction of the documents, and the qu
 
 ```python
 proportion_to_use = 1 / 100
-amount_of_docs_to_use = int(len(docs) * proportion_to_use)
-print(f"Using {amount_of_docs_to_use} out of {len(docs)} documents")
+amount_of_docs_to_use = int(len(lfrqa_docs_df) * proportion_to_use)
+print(f"Using {amount_of_docs_to_use} out of {len(lfrqa_docs_df)} documents")
 ```
 
 ## Prepare the Document Files
@@ -87,7 +87,7 @@ We now create the document directory and store each document as a separate text 
 If you’re using the whole dataset, this may take a while.
 
 ```python
-partial_docs = docs.head(amount_of_docs_to_use)
+partial_docs = lfrqa_docs_df.head(amount_of_docs_to_use)
 lfrqa_directory = os.path.join(rag_qa_benchmarking_dir, "lfrqa")
 os.makedirs(
     os.path.join(lfrqa_directory, "science_docs_for_paperqa", "files"), exist_ok=True
@@ -122,7 +122,7 @@ manifest["doi"] = ""
 manifest["title"] = manifest["doc_id"]
 manifest["key"] = manifest["doc_id"]
 manifest["docname"] = manifest["doc_id"]
-manifest["citation"] = ""
+manifest["citation"] = "_"
 manifest.drop(columns=["doc_id", "doc_text"], inplace=True)
 manifest.to_csv(
     os.path.join(lfrqa_directory, "science_docs_for_paperqa", "manifest.csv"),
