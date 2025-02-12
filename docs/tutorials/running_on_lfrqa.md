@@ -19,7 +19,7 @@ mkdir -p data/rag-qa-benchmarking
 mv rag-qa-arena/data/annotations_science_with_citation.jsonl ./data/rag-qa-benchmarking/
 
 # Clean up the repository folder
-rm -rf data/rag-qa-arena
+rm -rf rag-qa-arena
 ```
 
 ## Download the Robust-QA Documents
