@@ -589,6 +589,13 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment):
         )
 
         if evaluation_callback := self._evaluation_callback:
+            if not isinstance(evaluation, dict):
+                raise ValueError(
+                    f"Evaluation in {type(self).__name__} must be input type"
+                    f" dict, we received type"
+                    f" {type(evaluation).__name__}."
+                    f" {type(self).__name__} uses dict for evaluation."
+                )
             await evaluation_callback(evaluation)
 
         return messages, evaluation["reward"], done, truncated
