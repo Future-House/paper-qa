@@ -76,12 +76,9 @@ async def map_fxn_summary(
     success = False
 
     if summary_llm_model and prompt_templates:
-        data = {
-            "question": question,
-            "citation": citation,
-            "text": text.text,
-            **(extra_prompt_data or {}),
-        }
+        data = {"question": question, "citation": citation, "text": text.text} | (
+            extra_prompt_data or {}
+        )
         message_prompt = prompt_templates[0]
         system_prompt = prompt_templates[1]
         messages = [
