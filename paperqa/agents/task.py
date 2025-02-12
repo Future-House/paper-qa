@@ -161,8 +161,10 @@ class GradablePaperQAEnvironment(PaperQAEnvironment):
         if evaluation_callback := self._evaluation_callback:
             if not isinstance(evaluation, MultipleChoiceEvaluation):
                 raise ValueError(
-                    f"Evaluation of has to be a {MultipleChoiceEvaluation.__name__}, not"
-                    f" {type(evaluation).__name__}."
+                    f"Evaluation in {type(self).__name__} must be input type"
+                    f" {MultipleChoiceEvaluation.__name__}, we received"
+                    f" type {type(evaluation).__name__}."
+                    " Other types are permissible solely for subclassing purposes."
                 )
             await evaluation_callback(evaluation)
 
@@ -650,53 +652,6 @@ class LFRQATaskDataset(
             pairwise_eval_llm=self.pairwise_eval_llm,
             evaluation_callback=self._evaluation_callback,
         )
-
-    def compute_trajectory_metrics(
-        self, trajectories: "Sequence[Trajectory]"
-    ) -> dict[str, list[float]]:
-        metrics = super().compute_trajectory_metrics(trajectories)
-
-        # Add custom metrics similar to LitQATaskDataset
-        total_paper_count: list[float] = []
-        relevant_paper_count: list[float] = []
-        evidence_count: list[float] = []
-
-        for t in trajectories:
-            split_certainties = [
-                split_certainty
-                for split_certainty in (
-                    re.split(
-                        pattern=Complete.CERTAINTY_SPLIT_REGEX_PATTERN,
-                        string=obs.content,
-                        maxsplit=1,
-                    )
-                    for obs in t.steps[-1].next_observation
-                    if (
-                        isinstance(obs, ToolResponseMessage)
-                        and obs.name == Complete.TOOL_FN_NAME
-                    )
-                )
-                if len(split_certainty) >= 4  # noqa: PLR2004
-            ]
-
-            for i, metric_list in enumerate(
-                (total_paper_count, relevant_paper_count, evidence_count),
-                start=1,
-            ):
-                metric_list.append(
-                    sum(int(sa[i]) for sa in split_certainties) / len(split_certainties)
-                    if split_certainties
-                    else 0
-                )
-
-        return metrics | {
-            "total_paper_count": total_paper_count,
-            "relevant_paper_count": relevant_paper_count,
-            "evidence_count": evidence_count,
-            "paperqa_beat_human": [
-                int(t.steps[-1].reward == self._rewards["win"]) for t in trajectories
-            ],
-        }
 
     def __len__(self) -> int:
         return len(self.data)
