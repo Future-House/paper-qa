@@ -205,17 +205,15 @@ Copy the following into a file `gradable.py` and run it. You can also use the pa
 To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
 
 ```python
-import pandas as pd
 import os
 import json
 import asyncio
+import pandas as pd
 from ldp.agent import SimpleAgent
-from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 from paperqa import Settings
 from paperqa.settings import AgentSettings, IndexSettings
 from paperqa.agents.task import LFRQATaskDataset, LFRQAQuestion
-from typing import List
 
 
 async def log_evaluation_to_json(lfrqa_question_evaluation: dict) -> None:
@@ -237,7 +235,7 @@ async def evaluate() -> None:
         )
     )
 
-    data: List[LFRQAQuestion] = [
+    data: list[LFRQAQuestion] = [
         LFRQAQuestion(**row)
         for row in pd.read_csv("data/rag-qa-benchmarking/lfrqa/questions.csv")[
             ["qid", "question", "answer", "gold_doc_ids"]
@@ -249,30 +247,19 @@ async def evaluate() -> None:
         evaluation_callback=log_evaluation_to_json,
     )
 
-    metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
-
     evaluator = Evaluator(
         config=EvaluatorConfig(batch_size=3),
         agent=SimpleAgent(),
         dataset=dataset,
-        callbacks=[metrics_callback],
     )
     await evaluator.evaluate()
-
-    print(metrics_callback.eval_means)
 
 
 if __name__ == "__main__":
     asyncio.run(evaluate())
 ```
 
-After running this, you will get a result like this:
-
-```
-{'reward': 0.5, 'truncation_rate': 0.0, 'avg_value': 0.0, 'num_steps': 4.0, 'failures': 0.0, 'total_paper_count': 8.5, 'relevant_paper_count': 5.0, 'evidence_count': 6.0, 'paperqa_beat_human': 0.89}
-```
-
-you can also see each question in the folder `data/rag-qa-benchmarking/results` and analyze the results yourself.
+After running this, you can find the results in the `data/rag-qa-benchmarking/results` folder. Here is an example of how to read them:
 
 ```python
 import glob
