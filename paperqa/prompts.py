@@ -117,6 +117,7 @@ CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"
 
 # Prompts for LFRQA
 lfrqa_system_prompt = (
+    # From RAG-QA Arena (https://arxiv.org/pdf/2407.13998) Table 13 and 15
     "Pairwise Evaluation: Instruction and Rubric\n"
     "We will show you a query and a pair of answers to the query. "
     "You need to provide your preference over this pair of answers.\n"
@@ -194,6 +195,7 @@ lfrqa_system_prompt = (
 )
 
 lfrqa_prompt_template = (
+    # From RAG-QA Arena (https://arxiv.org/pdf/2407.13998) Table 14
     "Query is in the <query></query> tags. Answer 1 is in <answer 1></answer 1>,"
     "and Answer 2 is in <answer 2></answer 2>.\n"
     "<query> {question} </query>\n"
