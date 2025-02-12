@@ -616,9 +616,7 @@ class LFRQATaskDataset(TaskDataset[LFRQAPairwiseEvalEnv]):
         data: list[LFRQAQuestion],
         settings: Settings | dict | None = None,
         pairwise_eval_llm: LLMModel | str = CommonLLMNames.GPT_4O.value,
-        evaluation_callback: (
-            Callable[[MultipleChoiceEvaluation | dict], Awaitable] | None
-        ) = None,
+        evaluation_callback: Callable[[dict], Awaitable] | None = None,
     ):
         self.data = data
         self.pairwise_eval_llm = pairwise_eval_llm
