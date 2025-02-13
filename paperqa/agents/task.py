@@ -552,7 +552,7 @@ class LFRQAPairwiseEvalEnv(GradablePaperQAEnvironment[dict]):
 
         result = await pairwise_eval_llm.call_single(
             messages=[
-                Message(role="system", content=lfrqa_prompt_template.format(**data)),
+                Message(role="system", content=lfrqa_prompt_template),
                 Message(role="user", content=lfrqa_system_prompt.format(**data)),
             ]
         )
