@@ -826,7 +826,7 @@ class Docs(BaseModel):
                         content=prompt_config.post.format(question=session.question),
                     ),
                 ]
-                post = await llm_model.call_single(  # is deprecated
+                post = await llm_model.call_single(
                     messages=messages,
                     callbacks=callbacks,
                     name="post",

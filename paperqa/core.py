@@ -60,7 +60,8 @@ async def map_fxn_summary(
         text: The text to parse.
         question: The question to use for summarization.
         summary_llm_model: The LLM model to use for generating summaries.
-        prompt_templates: Tuple containing templates for the user and system prompts.
+        prompt_templates: Optional two-elements tuple containing templates for the user and system prompts.
+            prompt_templates = (user_prompt_template, system_prompt_template)
         extra_prompt_data: Optional extra data to pass to the prompt template.
         parser: Optional parser function to parse LLM output into structured data.
             Should return dict with at least 'summary' field.
@@ -79,8 +80,7 @@ async def map_fxn_summary(
         data = {"question": question, "citation": citation, "text": text.text} | (
             extra_prompt_data or {}
         )
-        message_prompt = prompt_templates[0]
-        system_prompt = prompt_templates[1]
+        message_prompt, system_prompt = prompt_templates
         messages = [
             Message(role="system", content=system_prompt.format(**data)),
             Message(role="user", content=message_prompt.format(**data)),
