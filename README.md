@@ -11,47 +11,46 @@ question answering, summarization, and contradiction detection.
 
 <!--TOC-->
 
-- [Quickstart](#quickstart)
-  - [Example Output](#example-output)
-- [What is PaperQA2](#what-is-paperqa2)
-  - [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
-  - [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
-  - [PaperQA2 Algorithm](#paperqa2-algorithm)
-- [Installation](#installation)
-- [CLI Usage](#cli-usage)
-  - [Bundled Settings](#bundled-settings)
-  - [Rate Limits](#rate-limits)
-- [Library Usage](#library-usage)
-  - [Agentic Adding/Querying Documents](#agentic-addingquerying-documents)
-  - [Manual (No Agent) Adding/Querying Documents](#manual-no-agent-addingquerying-documents)
-  - [Async](#async)
-  - [Choosing Model](#choosing-model)
-    - [Locally Hosted](#locally-hosted)
-  - [Embedding Model](#embedding-model)
-    - [Specifying the Embedding Model](#specifying-the-embedding-model)
-    - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
-  - [Adjusting number of sources](#adjusting-number-of-sources)
-  - [Using Code or HTML](#using-code-or-html)
-  - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
-  - [Creating Index](#creating-index)
-    - [Manifest Files](#manifest-files)
-  - [Reusing Index](#reusing-index)
-  - [Running on LitQA v2](#running-on-litqa-v2)
-  - [Using Clients Directly](#using-clients-directly)
-- [Settings Cheatsheet](#settings-cheatsheet)
-- [Where do I get papers?](#where-do-i-get-papers)
-  - [Zotero](#zotero)
-  - [Paper Scraper](#paper-scraper)
-- [Callbacks](#callbacks)
-  - [Caching Embeddings](#caching-embeddings)
-- [Customizing Prompts](#customizing-prompts)
-  - [Pre and Post Prompts](#pre-and-post-prompts)
-- [FAQ](#faq)
-  - [How come I get different results than your papers?](#how-come-i-get-different-results-than-your-papers)
-  - [How is this different from LlamaIndex or LangChain?](#how-is-this-different-from-llamaindex-or-langchain)
-  - [Can I save or load?](#can-i-save-or-load)
-- [Reproduction](#reproduction)
-- [Citation](#citation)
+- [PaperQA2](#paperqa2)
+  - [Quickstart](#quickstart)
+    - [Example Output](#example-output)
+  - [What is PaperQA2](#what-is-paperqa2)
+    - [PaperQA2 vs PaperQA](#paperqa2-vs-paperqa)
+    - [What's New in Version 5 (aka PaperQA2)?](#whats-new-in-version-5-aka-paperqa2)
+    - [PaperQA2 Algorithm](#paperqa2-algorithm)
+  - [Installation](#installation)
+  - [CLI Usage](#cli-usage)
+    - [Bundled Settings](#bundled-settings)
+    - [Rate Limits](#rate-limits)
+  - [Library Usage](#library-usage)
+    - [Agentic Adding/Querying Documents](#agentic-addingquerying-documents)
+    - [Manual (No Agent) Adding/Querying Documents](#manual-no-agent-addingquerying-documents)
+    - [Async](#async)
+    - [Choosing Model](#choosing-model)
+      - [Locally Hosted](#locally-hosted)
+    - [Embedding Model](#embedding-model)
+      - [Specifying the Embedding Model](#specifying-the-embedding-model)
+      - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
+    - [Adjusting number of sources](#adjusting-number-of-sources)
+    - [Using Code or HTML](#using-code-or-html)
+    - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
+    - [Creating Index](#creating-index)
+      - [Manifest Files](#manifest-files)
+    - [Reusing Index](#reusing-index)
+    - [Running on LitQA v2](#running-on-litqa-v2)
+    - [Using Clients Directly](#using-clients-directly)
+  - [Settings Cheatsheet](#settings-cheatsheet)
+  - [Where do I get papers?](#where-do-i-get-papers)
+  - [Callbacks](#callbacks)
+    - [Caching Embeddings](#caching-embeddings)
+  - [Customizing Prompts](#customizing-prompts)
+    - [Pre and Post Prompts](#pre-and-post-prompts)
+  - [FAQ](#faq)
+    - [How come I get different results than your papers?](#how-come-i-get-different-results-than-your-papers)
+    - [How is this different from LlamaIndex or LangChain?](#how-is-this-different-from-llamaindex-or-langchain)
+    - [Can I save or load?](#can-i-save-or-load)
+  - [Reproduction](#reproduction)
+  - [Citation](#citation)
 
 <!--TOC-->
 
@@ -850,90 +849,7 @@ will return much faster than the first query and we'll be certain the authors ma
 
 Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
 
-### Zotero
-
-_It's been a while since we've tested this - so let us know if it runs into issues!_
-
-If you use [Zotero](https://www.zotero.org/) to organize your personal bibliography,
-you can use the `paperqa.contrib.ZoteroDB` to query papers from your library,
-which relies on [pyzotero](https://github.com/urschrei/pyzotero).
-
-Install `pyzotero` via the `zotero` extra for this feature:
-
-```bash
-pip install paper-qa[zotero]
-```
-
-First, note that PaperQA2 parses the PDFs of papers to store in the database,
-so all relevant papers should have PDFs stored inside your database.
-You can get Zotero to automatically do this by highlighting the references
-you wish to retrieve, right clicking, and selecting _"Find Available PDFs"_.
-You can also manually drag-and-drop PDFs onto each reference.
-
-To download papers, you need to get an API key for your account.
-
-1. Get your library ID, and set it as the environment variable `ZOTERO_USER_ID`.
-   - For personal libraries, this ID is given [here](https://www.zotero.org/settings/keys) at the part "_Your userID for use in API calls is XXXXXX_".
-   - For group libraries, go to your group page `https://www.zotero.org/groups/groupname`, and hover over the settings link. The ID is the integer after /groups/. (_h/t pyzotero!_)
-2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
-   - The key will need read access to the library.
-
-With this, we can download papers from our library and add them to PaperQA2:
-
-```python
-from paperqa import Docs
-from paperqa.contrib import ZoteroDB
-
-docs = Docs()
-zotero = ZoteroDB(library_type="user")  # "group" if group library
-
-for item in zotero.iterate(limit=20):
-    if item.num_pages > 30:
-        continue  # skip long papers
-    docs.add(item.pdf, docname=item.key)
-```
-
-which will download the first 20 papers in your Zotero database and add
-them to the `Docs` object.
-
-We can also do specific queries of our Zotero library and iterate over the results:
-
-```python
-for item in zotero.iterate(
-    q="large language models",
-    qmode="everything",
-    sort="date",
-    direction="desc",
-    limit=100,
-):
-    print("Adding", item.title)
-    docs.add(item.pdf, docname=item.key)
-```
-
-You can read more about the search syntax by typing `zotero.iterate?` in IPython.
-
-### Paper Scraper
-
-If you want to search for papers outside of your own collection, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
-like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
-
-```python
-from paperqa import Docs
-
-keyword_search = "bispecific antibody manufacture"
-papers = paperscraper.search_papers(keyword_search)
-docs = Docs()
-for path, data in papers.items():
-    try:
-        docs.add(path)
-    except ValueError as e:
-        # sometimes this happens if PDFs aren't downloaded or readable
-        print("Could not read", path, e)
-session = docs.query(
-    "What manufacturing challenges are unique to bispecific antibodies?"
-)
-print(session)
-```
+See detailed docs [about zotero, openreview and parsing](docs/tutorials/where_do_I_get_papers.md)
 
 ## Callbacks
 
