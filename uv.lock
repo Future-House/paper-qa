@@ -1739,7 +1739,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
-    { name = "fh-llm-client", specifier = ">=0.0.11" },
+    { name = "fh-llm-client", specifier = "<0.1.0" },
     { name = "fh-llm-client", extras = ["deepseek"], marker = "extra == 'dev'", specifier = ">=0.0.11" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
     { name = "html2text" },
