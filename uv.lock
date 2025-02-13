@@ -1654,7 +1654,7 @@ source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anyio" },
-    { name = "fh-llm-client" },
+    { name = "fh-llm-client", extra = ["deepseek"] },
     { name = "fhaviary", extra = ["llm"] },
     { name = "html2text" },
     { name = "httpx" },
@@ -1730,7 +1730,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "datasets", marker = "extra == 'datasets'" },
-    { name = "fh-llm-client", git = "https://github.com/Future-House/llm-client.git?rev=main" },
+    { name = "fh-llm-client", extras = ["deepseek"], git = "https://github.com/Future-House/llm-client.git?rev=main" },
     { name = "fh-llm-client", extras = ["deepseek"], marker = "extra == 'dev'", specifier = ">=0.0.11" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
     { name = "html2text" },
