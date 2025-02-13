@@ -7,6 +7,7 @@ import logging
 import os
 import pathlib
 import pickle
+import re
 import warnings
 import zlib
 from collections import Counter
@@ -400,9 +401,8 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~", '"'):
-            query = query.replace(replace, "")
-        return query
+        # SEE: https://regex101.com/r/DoLMoa/3
+        return re.sub(r'[*\[\]:(){}~^><+"\\]', "", query)
 
     async def query(
         self,
