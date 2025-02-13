@@ -1668,6 +1668,7 @@ dependencies = [
     { name = "tantivy" },
     { name = "tenacity" },
     { name = "tiktoken" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 
 [package.optional-dependencies]
@@ -1769,6 +1770,7 @@ requires-dist = [
     { name = "typeguard", marker = "extra == 'dev'" },
     { name = "types-pyyaml", marker = "extra == 'typing'" },
     { name = "types-setuptools", marker = "extra == 'typing'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
 
