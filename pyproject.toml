@@ -84,6 +84,9 @@ ldp = [
 local = [
     "sentence-transformers",
 ]
+openreview = [
+    "openreview-py",
+]
 qdrant = [
     "qdrant-client",
 ]
@@ -94,10 +97,6 @@ typing = [
 ]
 zotero = [
     "pyzotero",
-]
-
-openreview = [
-    "openreview-py",
 ]
 
 [project.scripts]

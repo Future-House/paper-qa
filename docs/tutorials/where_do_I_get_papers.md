@@ -1,18 +1,19 @@
-
 # Where to get papers
+
 ## OpenReview
 
 You can use papers from [https://openreview.net/](https://openreview.net/) as your database!
-Here's a helper that fetches all papers from a selected conference (like ICLR, ICML, NeurIPS) and downloads relevant papers using LLM. Install `openreview-py` with 
+Here's a helper that fetches all papers from a selected conference (like ICLR, ICML, NeurIPS) and downloads relevant papers using LLM. Install `openreview-py` with
 
 ```bash
 pip install paper-qa[openreview]
 ```
 
-and get your username and password from the website. You can put them into `.env` file under `OPENREVIEW_USERNAME` and `OPENREVIEW_PASSWORD` variables, or pass them in the code directly. 
+and get your username and password from the website. You can put them into `.env` file under `OPENREVIEW_USERNAME` and `OPENREVIEW_PASSWORD` variables, or pass them in the code directly.
 
 ```python
 from paperqa import Settings
+
 # these settings require gemini api key you can get from https://aistudio.google.com/
 # import os; os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
 # 1Mil context window helps to suggest papers
@@ -22,6 +23,7 @@ question = "What is the progress on brain activity research?"
 
 
 from paperqa.contrib.openreview_paper_helper import OpenReviewPaperHelper
+
 helper = OpenReviewPaperHelper(settings, venue_id="ICLR.cc/2025/Conference")
 # if you don't know venue_id you can find it via
 # helper.get_venues()

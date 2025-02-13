@@ -1,13 +1,15 @@
-import openreview
-import os
-import requests
-from tqdm import tqdm
-from paperqa import Settings, Docs
-from litellm import completion
 import json
-from pathlib import Path
-from typing import List, Any, Optional, Dict
 import logging
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import openreview
+import requests
+from litellm import completion
+from tqdm import tqdm
+
+from paperqa import Docs, Settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,16 +32,16 @@ class OpenReviewPaperHelper:
         )
         self.venue_id = venue_id
 
-    def get_venues(self) -> List[str]:
+    def get_venues(self) -> list[str]:
         """Get list of available venues."""
         return self.client.get_group(id="venues").members
 
-    def get_submissions(self) -> List[Any]:
+    def get_submissions(self) -> list[Any]:
         """Get all submissions for the current venue."""
         logger.info(f"Fetching submissions for venue {self.venue_id}")
         return self.client.get_all_notes(content={"venueid": self.venue_id})
 
-    def create_submission_string(self, submissions: List[Any]) -> str:
+    def create_submission_string(self, submissions: list[Any]) -> str:
         """Creates a string containing the id, title, and abstract of all submissions."""
         submission_info_string = ""
         for submission in submissions:
@@ -51,7 +53,7 @@ class OpenReviewPaperHelper:
             submission_info_string += f"{paper}\n"
         return submission_info_string
 
-    def fetch_relevant_papers(self, question: str) -> List[Any]:
+    def fetch_relevant_papers(self, question: str) -> list[Any]:
         """Get relevant papers for a given question using LLM."""
         submissions = self.get_submissions()
         submission_string = self.create_submission_string(submissions)
@@ -73,7 +75,7 @@ class OpenReviewPaperHelper:
         self.download_papers(subs)
         return {sub.id: sub for sub in subs}
 
-    def _get_relevant_papers_chunk(self, question: str, chunk: str) -> List[Any]:
+    def _get_relevant_papers_chunk(self, question: str, chunk: str) -> list[Any]:
         prompt = (
             chunk
             + "You are the helper model that aims to get up to 20 most relevant papers for the user's question. User's question:\n"
@@ -107,7 +109,7 @@ class OpenReviewPaperHelper:
         content = json.loads(response.choices[0].message.content)
         return [p["submission_id"] for p in content["suggested_papers"]]
 
-    def download_papers(self, submissions: List[Any]) -> None:
+    def download_papers(self, submissions: list[Any]) -> None:
         """Download PDFs for given submissions."""
         downloaded_papers = Path(self.settings.paper_directory).rglob("*.pdf")
         downloaded_ids = [p.stem for p in downloaded_papers]
@@ -127,11 +129,12 @@ class OpenReviewPaperHelper:
             ) as f:
                 f.write(response.content)
             return True
-        else:
-            print(f"Failed to download the PDF. Status code: {response.status_code}")
-            return False
+        print(f"Failed to download the PDF. Status code: {response.status_code}")
+        return False
 
-    def add_docs(self, subs: Dict[str, Any] = {}) -> Docs:
+    def add_docs(self, subs: dict[str, Any] | None = None) -> Docs:
+        if subs is None:
+            subs = {}
         docs = Docs()
         for doc_path in tqdm(Path(self.settings.paper_directory).rglob("*.pdf")):
             sub = subs.get(doc_path.stem)

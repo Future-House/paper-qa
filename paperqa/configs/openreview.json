@@ -1,37 +1,37 @@
 {
-    "llm": "gemini/gemini-2.0-flash-exp",
-    "llm_config": {
-        "model_name": "gemini/gemini-2.0-flash-exp",
-        "litellm_params": {
-            "model": "gemini/gemini-2.0-flash-exp",
-            "api_key": null
-        }
-    },
-    "summary_llm": "gemini/gemini-2.0-flash-exp",
-    "summary_llm_config": {
-        "model_name": "gemini/gemini-2.0-flash-exp",
-        "litellm_params": {
-            "model": "gemini/gemini-2.0-flash-exp",
-            "api_key": null
-        }
-    },
-    "embedding": "ollama/granite3-dense",
-    "paper_directory": "my_papers",
-    "verbosity": 3,
-    "agent": {
-        "agent_llm": "ollama/llama3.3",
-        "agent_llm_config": {
-            "model_name": "ollama/llama3.3",
-            "litellm_params": {
-                "model": "ollama/llama3.3",
-                "api_base": "http://localhost:11434",
-                "num_ctx": 4096
-            }
-        },
-        "return_paper_metadata": false
-    },
-    "parsing": {
-        "chunk_size": 3000000,
-        "use_doc_details": false
+  "llm": "gemini/gemini-2.0-flash-exp",
+  "llm_config": {
+    "model_name": "gemini/gemini-2.0-flash-exp",
+    "litellm_params": {
+      "model": "gemini/gemini-2.0-flash-exp",
+      "api_key": null
     }
+  },
+  "summary_llm": "gemini/gemini-2.0-flash-exp",
+  "summary_llm_config": {
+    "model_name": "gemini/gemini-2.0-flash-exp",
+    "litellm_params": {
+      "model": "gemini/gemini-2.0-flash-exp",
+      "api_key": null
+    }
+  },
+  "embedding": "ollama/granite3-dense",
+  "paper_directory": "my_papers",
+  "verbosity": 3,
+  "agent": {
+    "agent_llm": "ollama/llama3.3",
+    "agent_llm_config": {
+      "model_name": "ollama/llama3.3",
+      "litellm_params": {
+        "model": "ollama/llama3.3",
+        "api_base": "http://localhost:11434",
+        "num_ctx": 4096
+      }
+    },
+    "return_paper_metadata": false
+  },
+  "parsing": {
+    "chunk_size": 3000000,
+    "use_doc_details": false
+  }
 }
