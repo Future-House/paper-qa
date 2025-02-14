@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **LFRQA dataset** was introduced in the paper [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use and benchmarking.
+The **LFRQA dataset** was introduced in the paper [_RAG-QA Arena: Evaluating Domain Robustness for Long-Form Retrieval-Augmented Question Answering_](https://arxiv.org/pdf/2407.13998). It features **1,404 science questions** (along with other categories) that have been human-annotated with answers. This tutorial walks through the process of setting up the dataset for use and benchmarking.
 
 ## Download the Annotations
 
@@ -35,7 +35,7 @@ rm lotte.tar.gz
 rm -rf lotte
 ```
 
-For more details, refer to the original paper: [_LFRQA: Large-Scale Few-Shot Retrieval Question Answering_](https://arxiv.org/pdf/2407.13998).
+For more details, refer to the original paper: [_RAG-QA Arena: Evaluating Domain Robustness for Long-Form Retrieval-Augmented Question Answering_](https://arxiv.org/pdf/2407.13998).
 
 ## Load the Data
 
