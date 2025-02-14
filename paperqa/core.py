@@ -23,7 +23,6 @@ def llm_parse_json(text: str) -> dict:
 
     # Wrap non-JSON text in a dictionary
     if "{" not in ptext and "}" not in ptext:
-        print("WRAPPING IN DICT")
         ptext = json.dumps({"summary": ptext})
 
     # Remove any introductory/closing text and ensure {} to make it a valid JSON
@@ -42,7 +41,7 @@ def llm_parse_json(text: str) -> dict:
     ptext = re.sub(pattern, escape_double_backslashes, ptext)
     ptext = re.sub(pattern, escape_newlines, ptext)
 
-    def fraction_replacer(match):
+    def fraction_replacer(match: re.Match) -> str:
         key = match.group(1)  # The key (unchanged)
 
         # Case 1: If quoted fraction `"5/10"`
