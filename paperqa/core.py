@@ -12,7 +12,6 @@ from paperqa.utils import extract_score, strip_citations
 
 def llm_parse_json(text: str) -> dict:
     """Read LLM output and extract JSON data from it."""
-
     # Remove leading/trailing whitespaces
     ptext = text.strip()
 

@@ -1,5 +1,7 @@
-import pytest
 import textwrap
+
+import pytest
+
 from paperqa.core import llm_parse_json
 
 
