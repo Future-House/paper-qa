@@ -1413,6 +1413,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
             "don't" not in c.text.text for c in session.contexts
         ), "None of the 'don't like X' statements should be included"
 
+
 class TestLLMParseJson:
     """Tests for extracting JSON strings from LLM Response and ensuring proper formatting."""
 
@@ -1434,7 +1435,7 @@ class TestLLMParseJson:
             ),
             pytest.param(
                 "<think> Thinking </think>"
-                '```json {    "summary": "Lorem Ipsum",    "relevance_ score": 8 } ```'
+                '```json {    "summary": "Lorem Ipsum",    "relevance_ score": 8 } ```',
                 id="removing-think-tags",
             ),
             pytest.param(
