@@ -82,7 +82,7 @@ def llm_parse_json(text: str) -> dict:
         ) from e
 
     for key in list(data.keys()):
-        if re.search(r"re.?levance|score", key, re.IGNORECASE):
+        if re.search(r"relevance|score", key, re.IGNORECASE):
             data["relevance_score"] = data.pop(key)  # Renaming key
 
     # Handling float, str values for relevance_score
