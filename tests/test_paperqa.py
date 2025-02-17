@@ -410,6 +410,7 @@ I have written the json you asked for.""",
             {"example": "json"},
         ),
         ('{"example": "\\json"}', {"example": "\\json"}),
+        ('{"example": "this is a \\"json\\""}', {"example": 'this is a "json"'}),
     ],
 )
 def test_llm_parse_json(example: str, expected: dict) -> None:
