@@ -439,7 +439,7 @@ If you want to use Gemini, you will have to set your `VERTEX_PROJECT` and `VERTE
 gcloud auth application-default login
 ```
 
-Then
+and install the optional dependency paperqa[gemini]
 
 ```python
 from paperqa import Settings, ask
