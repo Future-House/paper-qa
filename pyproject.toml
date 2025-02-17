@@ -78,9 +78,6 @@ dev = [
     "typeguard",
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
-gemini = [
-    "google-auth",
-]
 ldp = [
     "ldp>=0.20",  # For bulk_evaluate_consensus
 ]
