@@ -3,7 +3,6 @@ import os
 import pathlib
 import pickle
 import re
-import textwrap
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
 from datetime import datetime, timedelta
@@ -373,64 +372,6 @@ def test_extract_score() -> None:
     )
 
     assert extract_score(sample) == 9
-
-
-@pytest.mark.parametrize(
-    ("example", "expected"),
-    [
-        (
-            """Sure here is the json you asked for!
-
-    {
-    "example": "json"
-    }
-
-    Did you like it?""",
-            {"example": "json"},
-        ),
-        (
-            """
-```json
-{
-    "example": "json"
-}
-```
-
-I have written the json you asked for.""",
-            {"example": "json"},
-        ),
-        (
-            """
-
-{
-    "example": "json"
-}
-
-""",
-            {"example": "json"},
-        ),
-        ('{"example": "\\json"}', {"example": "\\json"}),
-    ],
-)
-def test_llm_parse_json(example: str, expected: dict) -> None:
-    assert llm_parse_json(example) == expected
-
-
-def test_llm_parse_json_newlines() -> None:
-    """Make sure that newlines in json are preserved and escaped."""
-    example = textwrap.dedent(
-        """
-        {
-        "summary": "A line
-
-        Another line",
-        "relevance_score": 7
-        }"""
-    )
-    assert llm_parse_json(example) == {
-        "summary": "A line\n\nAnother line",
-        "relevance_score": 7,
-    }
 
 
 @pytest.mark.asyncio
@@ -1471,3 +1412,198 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
         assert all(
             "don't" not in c.text.text for c in session.contexts
         ), "None of the 'don't like X' statements should be included"
+
+
+class TestLLMParseJson:
+    """Tests for extracting JSON strings from LLM Response and ensuring proper formatting."""
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help\n\n"
+                '{\n"summary": "Lorem Ipsum",\n"relevance_score": 8\n}'
+                "\n\nHope this helps!",
+                id="json-newlines-no-markdown-block",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                '```json\n{\n"summary": "Lorem Ipsum",\n"relevance_score": 8\n}\n```'
+                "\n\nHope this helps!",
+                id="json-newlines-with-markdown-block",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                '```json {    "summary": "Lorem Ipsum",    "relevance_ score": 8 } ```',
+                id="removing-think-tags",
+            ),
+            pytest.param(
+                "I am here to help"
+                '{   "summary": "Lorem Ipsum",   "relevance_score": 8 }'
+                "Hope this helps!",
+                id="removing-intro-outro-text",
+            ),
+        ],
+    )
+    def test_basic_json_extraction(self, input_text: str) -> None:
+        output = {"summary": "Lorem Ipsum", "relevance_score": 8}
+        assert llm_parse_json(input_text) == output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                "<think> Thinking </think>"
+                "\n I am here to help\n\n"
+                '{\n"summary": "Lorem Ipsum\n\ndolor sit amet",\n"relevance_score": 8\n}'
+                "\nHope this helps!",
+                id="handling-newlines-in-json-values",
+            ),
+        ],
+    )
+    def test_handling_newlines(self, input_text: str) -> None:
+        output = {"summary": "Lorem Ipsum\n\ndolor sit amet", "relevance_score": 8}
+        assert llm_parse_json(input_text) == output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help"
+                '```json {   "summary": "Lorem Ipsum",   "relevance_score": 7.6 } ```'
+                "Hope this helps!",
+                id="float-relevance-score",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help"
+                '```json {   "summary": "Lorem Ipsum",   "relevance_score": "8" } ```'
+                "Hope this helps!",
+                id="string-relevance-score",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help"
+                '```json {   "summary": "Lorem Ipsum",   "relevance_score": "8/10" } ```'
+                "Hope this helps!",
+                id="string-relevance-score-fraction-1",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help"
+                '```json {   "summary": "Lorem Ipsum",   "relevance_score": "4/5" } ```'
+                "Hope this helps!",
+                id="string-relevance-score-fraction-2",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help"
+                '```json {   "summary": "Lorem Ipsum",   "relevance_score": 8/10 } ```'
+                "Hope this helps!",
+                id="non-string-relevance-score-fraction-3",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help"
+                '```json {   "summary": "Lorem Ipsum",   "relevance_score": 4/5 } ```'
+                "Hope this helps!",
+                id="non-string-relevance-score-fraction-4",
+            ),
+        ],
+    )
+    def test_relevance_score_parsing(self, input_text: str) -> None:
+        output = {"summary": "Lorem Ipsum", "relevance_score": 8}
+        assert llm_parse_json(input_text) == output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '```json {    "summary": "Lorem Ipsum",    "relevance-score": 8 } ```'
+                "Hope this helps!",
+                id="fixing-relevance-score-key-1",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help. "
+                '```json {    "summary": "Lorem Ipsum",    "relevance_ score": 8 } ```'
+                "Hope this helps!",
+                id="fixing-relevance-score-key-2",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '```json {    "summary": "Lorem Ipsum",    "score": 8 } ```'
+                "Hope this helps!",
+                id="fixing-relevance-score-key-3",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '```json {    "summary": "Lorem Ipsum",    "relevance score": 8 } ```'
+                "Hope this helps!",
+                id="fixing-relevance-score-key-4",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '```json {    "summary": "Lorem Ipsum",    "relevance": 8 } ```'
+                "Hope this helps!",
+                id="fixing-relevance-score-key-5",
+            ),
+        ],
+    )
+    def test_json_keys(self, input_text: str) -> None:
+        output = {"summary": "Lorem Ipsum", "relevance_score": 8}
+        assert llm_parse_json(input_text) == output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '{   "summary": "Lorem Ipsum",   "relevance_score": 8, }'
+                "Hope this helps!",
+                id="fixing-broken-json-formatting-in-string-comma-1",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '{   "summary": "Lorem Ipsum", ,  "relevance_score": 8 }'
+                "Hope this helps!",
+                id="fixing-broken-json-formatting-in-string-comma-2",
+            ),
+            pytest.param(
+                "<think> Thinking </think>"
+                "I am here to help."
+                '{ ,  "summary": "Lorem Ipsum",  "relevance_score": 8 }'
+                "Hope this helps!",
+                id="fixing-broken-json-formatting-in-string-comma-3",
+            ),
+        ],
+    )
+    def test_json_broken_formatting(self, input_text: str) -> None:
+        output = {"summary": "Lorem Ipsum", "relevance_score": 8}
+        assert llm_parse_json(input_text) == output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                "<think> Thinking </think>" "Lorem Ipsum. Hope this helps!",
+                id="non-json-string-with-think-tags",
+            ),
+            pytest.param(
+                "Lorem Ipsum. Hope this helps!",
+                id="non-json-string-no-think-tags",
+            ),
+        ],
+    )
+    def test_fallback_non_json(self, input_text: str) -> None:
+        output = {"summary": "Lorem Ipsum. Hope this helps!"}
+        assert llm_parse_json(input_text) == output
