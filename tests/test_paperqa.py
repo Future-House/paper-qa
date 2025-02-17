@@ -1607,3 +1607,13 @@ class TestLLMParseJson:
     def test_fallback_non_json(self, input_text: str) -> None:
         output = {"summary": "Lorem Ipsum. Hope this helps!"}
         assert llm_parse_json(input_text) == output
+
+    @pytest.mark.parametrize(
+        ("input_text", "expected_output"),
+        [
+            ('{"example": "\\json"}', {"example": "\\json"}),
+            ('{"example": "this is a \\"json\\""}', {"example": 'this is a "json"'}),
+        ],
+    )
+    def test_llm_parse_json_with_escaped_characters(self, input_text, expected_output):
+        assert llm_parse_json(input_text) == expected_output

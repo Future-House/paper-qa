@@ -31,15 +31,16 @@ def llm_parse_json(text: str) -> dict:
     def escape_newlines(match: re.Match) -> str:
         return match.group(0).replace("\n", "\\n")
 
-    def escape_double_backslashes(match: re.Match) -> str:
-        return match.group(0).replace("\\", "\\\\")
-
     # Match anything between double quotes
     # including escaped quotes and other escaped characters.
     # https://regex101.com/r/VFcDmB/1
     pattern = r'"(?:[^"\\]|\\.)*"'
-    ptext = re.sub(pattern, escape_double_backslashes, ptext)
     ptext = re.sub(pattern, escape_newlines, ptext)
+
+    # Ensure that any backslashes in the string that are not part
+    # of a valid escape sequence are properly escaped
+    # https://regex101.com/r/IzMDlI/1
+    ptext = re.sub(r'\\([^"\\/bfnrtu])', r"\\\\\1", ptext)
 
     def fraction_replacer(match: re.Match) -> str:
         key = match.group(1)  # The key (unchanged)
