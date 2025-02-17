@@ -447,7 +447,9 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm="vertex_ai/gemini-1.5-pro", summary_llm="vertex_ai/gemini-1.5-pro"
+        llm="gemini-1.5-pro",
+        summary_llm="gemini-1.5-pro",
+        agent=AgentSettings(agent_llm="gemini-1.5-pro"),
     ),
 )
 ```
