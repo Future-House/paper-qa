@@ -116,6 +116,7 @@ So we arbitrarily call version 5 and onward PaperQA2,
 and versions before it as PaperQA1 to denote the significant change in performance.
 We recognize that we are challenged at naming and counting at FutureHouse,
 so we reserve the right at any time to arbitrarily change the name to PaperCrow.
+https://github.com/Future-House/paper-qa/pull/870
 
 ### What's New in Version 5 (aka PaperQA2)?
 
@@ -428,6 +429,25 @@ answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
         llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
+    ),
+)
+```
+
+If you want to use Gemini, you will have to set your `VERTEX_PROJECT` and `VERTEX_LOCATION` and be logged in using the Google Cloud CLI. You can ensure this by executing:
+
+```bash
+gcloud auth application-default login
+```
+
+Then
+
+```python
+from paperqa import Settings, ask
+
+answer_response = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="vertex_ai/gemini-1.5-pro", summary_llm="vertex_ai/gemini-1.5-pro"
     ),
 )
 ```
