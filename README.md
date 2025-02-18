@@ -432,13 +432,7 @@ answer_response = ask(
 )
 ```
 
-If you want to use Gemini, you will have to set your `VERTEX_PROJECT` and `VERTEX_LOCATION` and be logged in using the Google Cloud CLI. You can ensure this by executing:
-
-```bash
-gcloud auth application-default login
-```
-
-and install the optional dependency `paper-qa[gemini]`
+If you want to use Gemini, you will have to set your `GEMINI_API_KEY`
 
 ```python
 from paperqa import Settings, ask

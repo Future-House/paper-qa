@@ -202,6 +202,10 @@ async def run_fake_agent(
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
 
+    for t in tools:
+        if not t.info.get_properties():
+            t.info.parameters = None
+
     question = env.state.session.question
     search_tool = next(filter(lambda x: x.info.name == PaperSearch.TOOL_FN_NAME, tools))
     gather_evidence_tool = next(
@@ -276,6 +280,10 @@ async def run_aviary_agent(
         obs, tools = await env.reset()
         if on_env_reset_callback:
             await on_env_reset_callback(env.state)
+
+        for t in tools:
+            if not t.info.get_properties():
+                t.info.parameters = None
 
         agent_state = ToolSelectorLedger(
             messages=(
