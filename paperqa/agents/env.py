@@ -46,7 +46,6 @@ def settings_to_tools(  # noqa: PLR0912
     llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
     summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
     embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
-    agent_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
 ) -> list[Tool]:
     """
     Convert a Settings into tools, confirming the complete tool is present.
@@ -56,7 +55,6 @@ def settings_to_tools(  # noqa: PLR0912
     llm_model = llm_model or settings.get_llm()
     summary_llm_model = summary_llm_model or settings.get_summary_llm()
     embedding_model = embedding_model or settings.get_embedding_model()
-    agent_llm_model = agent_llm_model or settings.get_agent_llm()
     tools: list[Tool] = []
     for tool_type in (
         [AVAILABLE_TOOL_NAME_TO_CLASS[name] for name in DEFAULT_TOOL_NAMES]
@@ -133,11 +131,6 @@ def settings_to_tools(  # noqa: PLR0912
             tools.append(tool)  # Place at the end
         else:
             tools.insert(0, tool)
-
-        if settings.set_tool_empty_params_to_none():
-            for t in tools:
-                if not t.info.get_properties():  # type: ignore[attr-defined]
-                    t.info.parameters = None  # type: ignore[assignment]
 
     return tools
 
@@ -217,7 +210,6 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         docs: Docs,
         llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
         summary_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
-        agent_llm_model: LiteLLMModel | None = POPULATE_FROM_SETTINGS,
         embedding_model: EmbeddingModel | None = POPULATE_FROM_SETTINGS,
         session_id: UUID | None = None,
         **env_kwargs,
@@ -228,7 +220,6 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self._docs = docs
         self._llm_model = llm_model
         self._summary_llm_model = summary_llm_model
-        self._agent_llm_model = agent_llm_model
         self._embedding_model = embedding_model
         self._session_id = session_id
 
@@ -238,7 +229,6 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             llm_model=self._llm_model,
             summary_llm_model=self._summary_llm_model,
             embedding_model=self._embedding_model,
-            agent_llm_model=self._agent_llm_model,
         )
 
     def make_initial_state(self) -> EnvironmentState:

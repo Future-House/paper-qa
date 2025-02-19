@@ -932,8 +932,11 @@ class Settings(BaseSettings):
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
-    def set_tool_empty_params_to_none(self):
-        return "gemini" in self.agent.agent_llm.lower()
+    def adapt_tools(self, tools):
+        if "gemini" in self.agent.agent_llm.lower():
+            for t in tools:
+                if not t.info.get_properties():
+                    t.info.parameters = None
 
 
 # Settings: already Settings

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from aviary.core import (
     MalformedMessageError,
     Message,
+    Tool,
     ToolCall,
     ToolRequestMessage,
     ToolSelector,
@@ -199,6 +200,8 @@ async def run_fake_agent(
         )
     env = env_class(query, settings, docs, **env_kwargs)
     obs, tools = await env.reset()
+    settings.adapt_tools(tools)
+
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
 
@@ -274,6 +277,8 @@ async def run_aviary_agent(
 
     async def rollout() -> AgentStatus:
         obs, tools = await env.reset()
+        settings.adapt_tools(tools)
+
         if on_env_reset_callback:
             await on_env_reset_callback(env.state)
 
@@ -333,19 +338,25 @@ class LDPRolloutCallback(Callback):
         on_env_step_callback: (
             Callable[[list[Message], float, bool, bool], Awaitable] | None
         ) = None,
+        settings: Settings | None = None,
     ):
         self.env = env
         self.on_env_reset_callback = on_env_reset_callback
         self.on_agent_action_callback = on_agent_action_callback
         self.on_env_step_callback = on_env_step_callback
+        self.settings = settings
 
     async def after_agent_get_asv(self, traj_id: str, *args) -> None:  # noqa: ARG002
         if self.on_agent_action_callback is not None:
             await self.on_agent_action_callback(*args)
 
-    async def after_env_reset(self, traj_id: str, *_) -> None:  # noqa: ARG002
+    async def after_env_reset(
+        self, traj_id: str, obs: list[Message], tools: list[Tool]  # noqa: ARG002
+    ) -> None:
         if self.on_env_reset_callback is not None:
             await self.on_env_reset_callback(self.env.state)
+        if self.settings:
+            self.settings.adapt_tools(tools)
 
     async def after_env_step(self, traj_id: str, *args) -> None:  # noqa: ARG002
         if self.on_env_step_callback is not None:
@@ -379,6 +390,7 @@ async def run_ldp_agent(
                     on_env_reset_callback,
                     on_agent_action_callback,
                     on_env_step_callback,
+                    settings,
                 )
             ],
         )
