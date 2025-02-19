@@ -91,7 +91,6 @@ repos:
           - httpx
           - pybtex
           - numpy
-          - pandas-stubs
           - pydantic~=2.0,>=2.10.1 # Match pyproject.toml
           - pydantic-settings
           - qdrant-client
