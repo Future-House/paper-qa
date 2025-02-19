@@ -37,6 +37,7 @@ question answering, summarization, and contradiction detection.
     - [Manifest Files](#manifest-files)
   - [Reusing Index](#reusing-index)
   - [Running on LitQA v2](#running-on-litqa-v2)
+    - [TODO: Do we remove this code snippet?](#todo-do-we-remove-this-code-snippet)
   - [Using Clients Directly](#using-clients-directly)
 - [Settings Cheatsheet](#settings-cheatsheet)
 - [Where do I get papers?](#where-do-i-get-papers)
@@ -704,6 +705,8 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
 
 ### Running on LitQA v2
 
+#### TODO: Do we remove this code snippet?
+
 In [`paperqa/agents/task.py`](paperqa/agents/task.py), you will find:
 
 1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
@@ -721,7 +724,7 @@ from ldp.alg.callbacks import MeanMetricsCallback
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 
 from paperqa import Settings
-from paperqa.agents.task import TASK_DATASET_NAME
+from aviary.litqa import TASK_DATASET_NAME
 
 
 async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
