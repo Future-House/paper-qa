@@ -933,6 +933,8 @@ class Settings(BaseSettings):
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
     def adjust_tools_for_agent_llm(self, tools):
+        # Google gemini/gemini-1.5-flash fails to support empty dict properties
+        # SEE: https://github.com/BerriAI/litellm/issues/7634
         if "gemini" in self.agent.agent_llm.lower():
             for t in tools:
                 if not t.info.get_properties():
