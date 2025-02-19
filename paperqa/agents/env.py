@@ -131,7 +131,6 @@ def settings_to_tools(  # noqa: PLR0912
             tools.append(tool)  # Place at the end
         else:
             tools.insert(0, tool)
-
     return tools
 
 
