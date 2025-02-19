@@ -36,7 +36,6 @@ question answering, summarization, and contradiction detection.
   - [Creating Index](#creating-index)
     - [Manifest Files](#manifest-files)
   - [Reusing Index](#reusing-index)
-  - [Running on LitQA v2](#running-on-litqa-v2)
   - [Using Clients Directly](#using-clients-directly)
 - [Settings Cheatsheet](#settings-cheatsheet)
 - [Where do I get papers?](#where-do-i-get-papers)
@@ -702,44 +701,6 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
     )
 ```
 
-### Running on LitQA v2
-
-In [`paperqa/agents/task.py`](paperqa/agents/task.py), you will find:
-
-1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
-2. `LitQAv2TaskDataset`: a task dataset designed to pull LitQA v2 from Hugging Face,
-   and create one `GradablePaperQAEnvironment` per question
-
-Here is an example of how to use them:
-
-```python
-import os
-
-from aviary.env import TaskDataset
-from ldp.agent import SimpleAgent
-from ldp.alg.callbacks import MeanMetricsCallback
-from ldp.alg.runners import Evaluator, EvaluatorConfig
-
-from paperqa import Settings
-from paperqa.agents.task import TASK_DATASET_NAME
-
-
-async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
-    settings = Settings(paper_directory=folder_of_litqa_v2_papers)
-    dataset = TaskDataset.from_name(TASK_DATASET_NAME, settings=settings)
-    metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
-
-    evaluator = Evaluator(
-        config=EvaluatorConfig(batch_size=3),
-        agent=SimpleAgent(),
-        dataset=dataset,
-        callbacks=[metrics_callback],
-    )
-    await evaluator.evaluate()
-
-    print(metrics_callback.eval_means)
-```
-
 ### Using Clients Directly
 
 One of the most powerful features of PaperQA2 is its ability to combine data from multiple metadata sources. For example, [Unpaywall](https://unpaywall.org/) can provide open access status/direct links to PDFs, [Crossref](https://www.crossref.org/) can provide bibtex, and [Semantic Scholar](https://www.semanticscholar.org/) can provide citation licenses. Here's a short demo of how to do this:
@@ -1032,6 +993,7 @@ are the question IDs
 used in the train and evaluation splits,
 as well as paper DOIs used to build the train and evaluation splits' indexes.
 The test split remains held out.
+Example on how to use LitQA for evaluation can be found in [aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
 
 ## Citation
 
