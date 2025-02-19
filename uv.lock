@@ -1041,8 +1041,8 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.22.1.dev16+g0cef2fa"
-source = { git = "https://github.com/Future-House/ldp.git?rev=update-llmclient#0cef2fa1ffbd6f68d0c0f3d4aa90fdfe6d660622" }
+version = "0.23.1.dev24+gb857991"
+source = { git = "https://github.com/Future-House/ldp.git?rev=update-llmclient#b857991e92941ff76287092787e9e75921e2eadb" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
