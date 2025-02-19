@@ -134,7 +134,7 @@ def settings_to_tools(  # noqa: PLR0912
         else:
             tools.insert(0, tool)
 
-        if "gemini" in agent_llm_model.name.lower():
+        if settings.set_tool_empty_params_to_none():
             for t in tools:
                 if not t.info.get_properties():  # type: ignore[attr-defined]
                     t.info.parameters = None  # type: ignore[assignment]

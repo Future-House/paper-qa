@@ -932,6 +932,9 @@ class Settings(BaseSettings):
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
+    def set_tool_empty_params_to_none(self):
+        return "gemini" in self.agent.agent_llm.lower()
+
 
 # Settings: already Settings
 # dict[str, Any]: serialized Settings
