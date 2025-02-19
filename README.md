@@ -704,7 +704,7 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
 
 ### Running on LitQA v2
 
-LitQA v2 can be used from [`aviary.litqa`](https://github.com/Future-House/aviary). You will find:
+LitQA v2 can be used from [`aviary.litqa`](https://github.com/Future-House/aviary/tree/main/packages/litqa). You will find:
 
 1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
 2. `LitQAv2TaskDataset`: a task dataset designed to pull LitQA v2 from Hugging Face,
