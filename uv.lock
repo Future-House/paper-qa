@@ -1601,19 +1601,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pandas-stubs"
-version = "2.2.3.241126"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-    { name = "types-pytz" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/90/86/93c545d149c3e1fe1c4c55478cc3a69859d0ea3467e1d9892e9eb28cb1e7/pandas_stubs-2.2.3.241126.tar.gz", hash = "sha256:cf819383c6d9ae7d4dabf34cd47e1e45525bb2f312e6ad2939c2c204cb708acd", size = 104204 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6f/ab/ed42acf15bab2e86e5c49fad4aa038315233c4c2d22f41b49faa4d837516/pandas_stubs-2.2.3.241126-py3-none-any.whl", hash = "sha256:74aa79c167af374fe97068acc90776c0ebec5266a6e5c69fe11e9c2cf51f2267", size = 158280 },
-]
-
-[[package]]
 name = "paper-qa"
 source = { editable = "." }
 dependencies = [
@@ -1642,7 +1629,6 @@ dev = [
     { name = "ipython" },
     { name = "ldp" },
     { name = "mypy" },
-    { name = "pandas-stubs" },
     { name = "pre-commit" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1674,7 +1660,6 @@ qdrant = [
     { name = "qdrant-client" },
 ]
 typing = [
-    { name = "pandas-stubs" },
     { name = "types-pyyaml" },
     { name = "types-setuptools" },
 ]
@@ -1700,7 +1685,6 @@ requires-dist = [
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.20" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
-    { name = "pandas-stubs", marker = "extra == 'typing'" },
     { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
     { name = "pybtex" },
@@ -2973,15 +2957,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/62/c3/400917dd37d7b8c07e9723f3046818530423e1e759a56a22133362adab00/typeguard-4.4.1.tar.gz", hash = "sha256:0d22a89d00b453b47c49875f42b6601b961757541a2e1e0ef517b6e24213c21b", size = 74959 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/53/9465dedf2d69fe26008e7732cf6e0a385e387c240869e7d54eed49782a3c/typeguard-4.4.1-py3-none-any.whl", hash = "sha256:9324ec07a27ec67fc54a9c063020ca4c0ae6abad5e9f0f9804ca59aee68c6e21", size = 35635 },
-]
-
-[[package]]
-name = "types-pytz"
-version = "2025.1.0.20250204"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b3/d2/2190c54d53c04491ad72a1df019c5dfa692e6ab6c2dba1be7b6c9d530e30/types_pytz-2025.1.0.20250204.tar.gz", hash = "sha256:00f750132769f1c65a4f7240bc84f13985b4da774bd17dfbe5d9cd442746bd49", size = 10352 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/be/50/65ffad73746f1d8b15992c030e0fd22965fd5ae2c0206dc28873343b3230/types_pytz-2025.1.0.20250204-py3-none-any.whl", hash = "sha256:32ca4a35430e8b94f6603b35beb7f56c32260ddddd4f4bb305fdf8f92358b87e", size = 10059 },
 ]
 
 [[package]]
