@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
@@ -1717,7 +1716,6 @@ requires-dist = [
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
-provides-extras = ["dev", "ldp", "local", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "paper-qa", extras = ["dev"] }]
