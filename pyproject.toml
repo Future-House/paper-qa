@@ -38,7 +38,6 @@ dependencies = [
     "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",
-    "typing-extensions; python_version <= '3.12'",  # For TypeVar default
 ]
 description = "LLM Chain for answering questions from docs"
 dynamic = ["version"]
@@ -54,14 +53,11 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-datasets = [
-    "datasets",
-]
 dev = [
     "fh-llm-client[deepseek]>=0.0.11",  # Pin to ensure DeepSeek compatibility
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[datasets,ldp,typing,zotero,local,qdrant]",
+    "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",
@@ -88,7 +84,6 @@ qdrant = [
     "qdrant-client",
 ]
 typing = [
-    "pandas-stubs",
     "types-PyYAML",
     "types-setuptools",
 ]
@@ -170,7 +165,6 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
-    "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110

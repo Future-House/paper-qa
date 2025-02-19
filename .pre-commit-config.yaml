@@ -91,7 +91,6 @@ repos:
           - httpx
           - pybtex
           - numpy
-          - pandas-stubs
           - pydantic~=2.0,>=2.10.1 # Match pyproject.toml
           - pydantic-settings
           - qdrant-client
@@ -101,6 +100,5 @@ repos:
           - tiktoken>=0.4.0 # Match pyproject.toml
           - types-setuptools
           - types-PyYAML
-          - typing-extensions # TODO: remove when Python>=3.13
           - sentence-transformers
           - pyzotero

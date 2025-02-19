@@ -49,16 +49,6 @@ jobs:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
-      - name: Login to Hugging Face Hub
-        run: uv run --no-project huggingface-cli login --token $HUGGINGFACE_HUB_ACCESS_TOKEN
-        env:
-          HUGGINGFACE_HUB_ACCESS_TOKEN: ${{ secrets.HUGGINGFACE_HUB_ACCESS_TOKEN }}
-      - name: Cache datasets
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/huggingface/datasets
-          key: ${{ runner.os }}-datasets-${{ hashFiles('paperqa') }}
-          restore-keys: ${{ runner.os }}-datasets-
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
