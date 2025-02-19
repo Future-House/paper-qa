@@ -344,6 +344,18 @@ class LDPRolloutCallback(Callback):
         self.on_agent_action_callback = on_agent_action_callback
         self.on_env_step_callback = on_env_step_callback
 
+    async def after_agent_get_asv(self, traj_id: str, *args) -> None:  # noqa: ARG002
+        if self.on_agent_action_callback is not None:
+            await self.on_agent_action_callback(*args)
+
+    async def after_env_reset(self, traj_id: str, *_) -> None:  # noqa: ARG002
+        if self.on_env_reset_callback is not None:
+            await self.on_env_reset_callback(self.env.state)
+
+    async def after_env_step(self, traj_id: str, *args) -> None:  # noqa: ARG002
+        if self.on_env_step_callback is not None:
+            await self.on_env_step_callback(*args)
+
 
 class LDPAdjustToolsForAgentCallback(Callback):
     def __init__(self, settings: Settings):
