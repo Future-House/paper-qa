@@ -498,16 +498,16 @@ deepseek = [
 
 [[package]]
 name = "fhaviary"
-version = "0.18.1"
+version = "0.18.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ef/2a/c75aafd3803bff947a5c2998aa802947d899be5e6a2cc4ca5e6cac306d4b/fhaviary-0.18.1.tar.gz", hash = "sha256:29af15448ab0d19ba18a974ffa65135fc3960bcf09c50b020a31f202d2f777e8", size = 315245 }
+sdist = { url = "https://files.pythonhosted.org/packages/ab/59/bc7004c4a0616b6e523f24652910d13969857ed47e64032147f7053b20ea/fhaviary-0.18.2.tar.gz", hash = "sha256:60cf2ac9ff3d631c5a839a0619400737a7d5d7e905a813b07b9780346b3b01c0", size = 1833892 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/53/a5/a92851811c1102c1b8fdceed4ffe92e06995e19cbbf9bd2facd60a1389e5/fhaviary-0.18.1-py3-none-any.whl", hash = "sha256:cafc5d636ec3054ff9e0862583de40022698d2d6d43c89cb8af4e52c38c9ef26", size = 53466 },
+    { url = "https://files.pythonhosted.org/packages/14/3b/2435fea2b2d6ca2a03d3d698c2725f2eb7a14d40df81b5544dee2c0c6cef/fhaviary-0.18.2-py3-none-any.whl", hash = "sha256:2ed8d820c85e7fd418dd1b7c299d53220618e3fa3da00b8c6017b4678d31c328", size = 53830 },
 ]
 
 [package.optional-dependencies]
@@ -1677,7 +1677,7 @@ requires-dist = [
     { name = "anyio" },
     { name = "fh-llm-client", specifier = "<0.1.0" },
     { name = "fh-llm-client", extras = ["deepseek"], marker = "extra == 'dev'", specifier = ">=0.0.11" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
+    { name = "fhaviary", extras = ["llm"], specifier = ">=0.18.2" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },

@@ -26,7 +26,7 @@ dependencies = [
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
     "fh-llm-client<0.1.0",  # Pin to avoid breaking changes until lfrqa is migrated
-    "fhaviary[llm]>=0.14",  # For MultipleChoiceQuestion
+    "fhaviary[llm]>=0.18.2",  # For FunctionInfo.parameters.get_properties()
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
