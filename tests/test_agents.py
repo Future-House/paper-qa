@@ -268,15 +268,16 @@ async def test_get_directory_index_w_no_citations(
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", [FAKE_AGENT_TYPE, ToolSelector, SimpleAgent])
+@pytest.mark.parametrize("llm_name", ["gpt-4o", "gemini/gemini-1.5-flash"])
 @pytest.mark.asyncio
 async def test_agent_types(
-    agent_test_settings: Settings, agent_type: str | type
+    agent_test_settings: Settings, agent_type: str | type, llm_name: str
 ) -> None:
     question = "How can you use XAI for chemical property prediction?"
 
     # make sure agent_llm is different from default, so we can correctly track tokens
     # for agent
-    agent_test_settings.agent.agent_llm = "gpt-4o"
+    agent_test_settings.agent.agent_llm = llm_name
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.summary_llm = "gpt-4o-mini"
     agent_test_settings.agent.agent_prompt += (
@@ -300,10 +301,10 @@ async def test_agent_types(
     # TODO: once LDP can track tokens, we can remove this check
     if agent_type not in {FAKE_AGENT_TYPE, SimpleAgent}:
         assert (
-            response.session.token_counts[agent_llm][0] > 1000
+            response.session.token_counts[agent_llm][0] > 500
         ), "Expected many prompt tokens"
         assert (
-            response.session.token_counts[agent_llm][1] > 50
+            response.session.token_counts[agent_llm][1] > 30
         ), "Expected many completion tokens"
         assert response.session.cost > 0, "Expected nonzero cost"
 

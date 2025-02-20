@@ -405,7 +405,13 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
+By default, PaperQA2 uses OpenAI's `gpt-4o-2024-08-06` model for:
+
+- `summary_llm`: Re-ranking and summarizing evidence passages
+- `llm`: Generating the final answer
+- `agent_llm`: Making tool selection decisions
+
+You can adjust this easily to use any model supported by `litellm`:
 
 ```python
 from paperqa import Settings, ask
@@ -418,7 +424,7 @@ answer_response = ask(
 )
 ```
 
-You can use Anthropic or any other model supported by `litellm`:
+To use Claude, make sure you set the `ANTHROPIC_API_KEY`
 
 ```python
 from paperqa import Settings, ask
@@ -426,7 +432,24 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
+        llm="claude-3-5-sonnet-20240620",
+        summary_llm="claude-3-5-sonnet-20240620",
+        agent=AgentSettings(agent_llm="claude-3-5-sonnet-20240620"),
+    ),
+)
+```
+
+Or Gemini, by setting the `GEMINI_API_KEY` from Google AI Studio
+
+```python
+from paperqa import Settings, ask
+
+answer_response = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="gemini-1.5-pro",
+        summary_llm="gemini-1.5-pro",
+        agent=AgentSettings(agent_llm="gemini-1.5-pro"),
     ),
 )
 ```
