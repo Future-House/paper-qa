@@ -1170,6 +1170,10 @@ def test_case_insensitive_matching():
     assert strings_similarity("A B c d e", "a b c f") == 0.5
 
 
+@pytest.mark.flaky(
+    reruns=3,  # pytest-xdist can lead to >1 DeprecationWarning
+    only_rerun=["AssertionError"],
+)
 def test_answer_rename(recwarn) -> None:
     # TODO: delete this test in v6
     answer = Answer(question="")
