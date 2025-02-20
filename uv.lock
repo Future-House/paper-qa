@@ -498,16 +498,16 @@ deepseek = [
 
 [[package]]
 name = "fhaviary"
-version = "0.18.2"
+version = "0.18.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ab/59/bc7004c4a0616b6e523f24652910d13969857ed47e64032147f7053b20ea/fhaviary-0.18.2.tar.gz", hash = "sha256:60cf2ac9ff3d631c5a839a0619400737a7d5d7e905a813b07b9780346b3b01c0", size = 1833892 }
+sdist = { url = "https://files.pythonhosted.org/packages/12/6d/825257a6823b05f4b125cae7540aad92ea1f012af99ab60cdee0edf13b29/fhaviary-0.18.3.tar.gz", hash = "sha256:cf9f901a155797499bbd2da9f4d302ff6a27c30629bfd103055b5930f8b47d72", size = 1835363 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/3b/2435fea2b2d6ca2a03d3d698c2725f2eb7a14d40df81b5544dee2c0c6cef/fhaviary-0.18.2-py3-none-any.whl", hash = "sha256:2ed8d820c85e7fd418dd1b7c299d53220618e3fa3da00b8c6017b4678d31c328", size = 53830 },
+    { url = "https://files.pythonhosted.org/packages/69/ff/367ca05b7a6774a49b753a5a77976351f38fe17c549ed50501adbef0aa85/fhaviary-0.18.3-py3-none-any.whl", hash = "sha256:dff759684b170e818f464762bf8db5da37e9711ef8971e8dd6f43588640dc5c8", size = 53833 },
 ]
 
 [package.optional-dependencies]
