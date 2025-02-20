@@ -776,15 +776,17 @@ class Docs(BaseModel):
             )
         else:
             with set_llm_session_ids(session.id):
-                data = {
-                    "context": context_str,
-                    "answer_length": answer_config.answer_length,
-                    "question": session.question,
-                    "example_citation": prompt_config.EXAMPLE_CITATION,
-                }
                 messages = [
                     Message(role="system", content=prompt_config.system),
-                    Message(role="user", content=prompt_config.qa.format(**data)),
+                    Message(
+                        role="user",
+                        content=prompt_config.qa.format(
+                            context=context_str,
+                            answer_length=answer_config.answer_length,
+                            question=session.question,
+                            example_citation=prompt_config.EXAMPLE_CITATION,
+                        ),
+                    ),
                 ]
                 answer_result = await llm_model.call_single(
                     messages=messages,
