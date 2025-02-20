@@ -937,8 +937,8 @@ class Settings(BaseSettings):
         # SEE: https://github.com/BerriAI/litellm/issues/7634
         if "gemini" in self.agent.agent_llm.lower():
             for t in tools:
-                if not t.info.get_properties():  # type: ignore[attr-defined]
-                    t.info.parameters = None  # type: ignore[assignment]
+                if not t.info.get_properties():
+                    t.info.parameters = None
 
 
 # Settings: already Settings
