@@ -475,8 +475,8 @@ wheels = [
 
 [[package]]
 name = "fh-llm-client"
-version = "0.0.12.dev7+g3831881"
-source = { git = "https://github.com/Future-House/llm-client.git?rev=main#3831881f72bc3e726d9d856ea3fa764a015b2f58" }
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coredis" },
     { name = "fhaviary" },
@@ -485,6 +485,10 @@ dependencies = [
     { name = "pydantic" },
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/e2/0cb5344f9ab2069ab6b68cc487514a2d2983fc7afdac215dca46e52f07b9/fh_llm_client-0.1.0.tar.gz", hash = "sha256:859da187b0e5b24545828fd88f9a16be9ca4f46a2443f6ba3665759609823725", size = 257930 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9e/df/85f485444aef44cd0cedfb92710af972c079df4b94f8805b6e6e553c826e/fh_llm_client-0.1.0-py3-none-any.whl", hash = "sha256:8bf7ad7a3a0778740c5ce327e37e118c186999ea9ead1688aa7e571e4d3fa18c", size = 33440 },
 ]
 
 [package.optional-dependencies]
@@ -1041,8 +1045,8 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.23.1.dev24+gb857991"
-source = { git = "https://github.com/Future-House/ldp.git?rev=update-llmclient#b857991e92941ff76287092787e9e75921e2eadb" }
+version = "0.24.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "dm-tree" },
@@ -1057,6 +1061,10 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/41/ff/469e5513396a998bd741be8e7af5364d59f8cd2abc268560fc363afbdea6/ldp-0.24.0.tar.gz", hash = "sha256:6b4b2e77dff33ac9615d9301a521e7fa8ddcc67a4d561c27404c6633f5bfe6db", size = 448978 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ba/0a/04561998031a734564562da4ef2d044cfd4870963cbdbd8eda3a2ae38350/ldp-0.24.0-py3-none-any.whl", hash = "sha256:b27583e19ba149cc0341bf0916d6240f6931f06882a763c120959392253da966", size = 135389 },
 ]
 
 [[package]]
@@ -1616,7 +1624,6 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "fh-llm-client", extra = ["deepseek"] },
     { name = "ipython" },
     { name = "ldp" },
     { name = "mypy" },
@@ -1667,13 +1674,12 @@ dev = [
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
-    { name = "fh-llm-client", extras = ["deepseek"], git = "https://github.com/Future-House/llm-client.git?rev=main" },
-    { name = "fh-llm-client", extras = ["deepseek"], marker = "extra == 'dev'", specifier = ">=0.0.11" },
+    { name = "fh-llm-client", extras = ["deepseek"], specifier = ">=0.1.0" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.18.2" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
-    { name = "ldp", marker = "extra == 'ldp'", git = "https://github.com/Future-House/ldp.git?rev=update-llmclient" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.24.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'" },
