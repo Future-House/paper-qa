@@ -409,7 +409,7 @@ By default, PaperQA2 uses OpenAI's `gpt-4o-2024-08-06` model for:
 
 - `summary_llm`: Re-ranking and summarizing evidence passages
 - `llm`: Generating the final answer
-- `agent_llm`: Making tool selection decisions in the agent workflow
+- `agent_llm`: Making tool selection decisions
 
 You can adjust this easily to use any model supported by `litellm`:
 
