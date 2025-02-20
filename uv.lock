@@ -1669,7 +1669,7 @@ requires-dist = [
     { name = "anyio" },
     { name = "fh-llm-client", extras = ["deepseek"], git = "https://github.com/Future-House/llm-client.git?rev=main" },
     { name = "fh-llm-client", extras = ["deepseek"], marker = "extra == 'dev'", specifier = ">=0.0.11" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.14" },
+    { name = "fhaviary", extras = ["llm"], specifier = ">=0.18.2" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },

@@ -85,7 +85,7 @@ repos:
           - PyMuPDF>=1.24.12
           - anyio
           - fh-llm-client[deepseek] @ git+https://github.com/Future-House/llm-client.git@main
-          - fhaviary[llm]>=0.14 # Match pyproject.toml
+          - fhaviary[llm]>=0.18.2 # Match pyproject.toml
           - ldp>=0.20 # Match pyproject.toml
           - html2text
           - httpx
