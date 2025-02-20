@@ -100,6 +100,9 @@ class Context(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     context: str = Field(description="Summary of the text with respect to a question.")
+    question: str | None = Field(
+        default=None, description="Question that the context is answering."
+    )
     text: Text
     score: int = 5
 
@@ -116,6 +119,14 @@ class PQASession(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
+    environment_answer_suggestions: str = Field(
+        default="",
+        description="Suggestions from the environment on how to best answer the question.",
+    )
+    agent_answer_suggestions: str = Field(
+        default="",
+        description="Suggestions from the agent on how to best answer the question.",
+    )
     has_successful_answer: bool | None = Field(
         default=None,
         description=(

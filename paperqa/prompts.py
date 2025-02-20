@@ -17,6 +17,7 @@ summary_json_prompt = (
 # 1. Lead to complete tool being called with has_successful_answer=False
 # 2. Can be used for unit testing
 CANNOT_ANSWER_PHRASE = "I cannot answer"
+
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
@@ -27,12 +28,11 @@ qa_prompt = (
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, "
     "like {example_citation}. Only cite from the context "
-    "below and only use the valid keys. Write in the style of a "
-    "Wikipedia article, with concise sentences and coherent paragraphs. "
-    "The context comes from a variety of sources and is only a summary, "
-    "so there may inaccuracies or ambiguities. If quotes are present and "
-    "relevant, use them in the answer. This answer will go directly onto "
-    "Wikipedia, so do not add any extraneous information.\n\n"
+    "above and only use the valid keys. Plan out what a complete and coherent "
+    "answer would be, then use the contexts where they suit your response. "
+    "If other sources or data are needed for a complete response, indicate "
+    "so in an XML section <meta></meta> at the end of your response. \n\n"
+    "{agent_suggestions}"
     "Answer ({answer_length}):"
 )
 
@@ -108,5 +108,5 @@ EVAL_PROMPT_TEMPLATE = (
 )
 
 CONTEXT_OUTER_PROMPT = "{context_str}\n\nValid Keys: {valid_keys}"
-CONTEXT_INNER_PROMPT_NOT_DETAILED = "{name}: {text}"
+CONTEXT_INNER_PROMPT_NOT_DETAILED = "{question}\n{name}: {text}"
 CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"

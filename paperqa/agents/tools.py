@@ -197,9 +197,11 @@ class GatherEvidence(NamedTool):
 
     async def gather_evidence(self, question: str, state: EnvironmentState) -> str:
         """
-        Gather evidence from previous papers given a specific question to increase evidence and relevant paper counts.
+        Gather evidence from existing papers given a specific question to increase evidence and relevant paper counts.
 
-        A valuable time to invoke this tool is right after another tool increases paper count.
+        A valuable time to invoke this tool is right after another tool increases paper count,
+         or you have a different question to answer using the same papers. Your state will be updated
+         with contextual summaries of the available papers, to be used in making a final answer.
         Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
         Only invoke this tool when the paper count is above zero, or this tool will be useless.
 
@@ -291,18 +293,24 @@ class GenerateAnswer(NamedTool):
     embedding_model: EmbeddingModel
     partitioning_fn: Callable[[Embeddable], int] | None = None
 
-    async def gen_answer(self, state: EnvironmentState) -> str:
+    async def gen_answer(
+        self, state: EnvironmentState, answer_suggestions: str | None = None
+    ) -> str:
         """
         Generate an answer using current evidence.
 
-        The tool may fail, indicating that better or different evidence should be found.
+        The tool may fail, indicating that better or different evidence should be found. Even if it succeeds,
+        the answer may be incomplete, improvement suggestions may be returned to help you refine your evidence.
         Aim for at least five pieces of evidence from multiple sources before invoking this tool.
         Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
 
         Args:
             state: Current state.
+            answer_suggestions: Optional suggestions to improve the answer quality.
         """
-        logger.info(f"Generating answer for '{state.session.question}'.")
+        logger.info(
+            f"Generating answer for '{state.session.question}' with suggestions: {answer_suggestions}."
+        )
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
             await asyncio.gather(
@@ -313,6 +321,8 @@ class GenerateAnswer(NamedTool):
                     ]
                 )
             )
+
+        state.session.agent_answer_suggestions = answer_suggestions or ""
 
         state.session = await state.docs.aquery(
             query=state.session,
@@ -339,8 +349,11 @@ class GenerateAnswer(NamedTool):
                     ]
                 )
             )
-
-        return f"{answer} | {status}"
+        improvements = " "
+        if state.session.environment_answer_suggestions:
+            improvements = f" | Improvement suggestions: {state.session.environment_answer_suggestions} "
+        logger.info(f"gen_answer: {answer}{improvements}| {status}")
+        return f"{answer}{improvements}| {status}"
 
     # Use to separate answer from status
     # NOTE: can match failure to answer or an actual answer

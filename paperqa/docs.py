@@ -761,6 +761,7 @@ class Docs(BaseModel):
                 name=c.text.name,
                 text=c.context,
                 citation=c.text.doc.formatted_citation,
+                question=c.question,
                 **(c.model_extra or {}),
             )
             for c in filtered_contexts
@@ -789,6 +790,7 @@ class Docs(BaseModel):
                         "answer_length": answer_config.answer_length,
                         "question": session.question,
                         "example_citation": prompt_config.EXAMPLE_CITATION,
+                        "agent_suggestions": session.agent_answer_suggestions,
                     },
                     callbacks=callbacks,
                     name="answer",
@@ -796,9 +798,19 @@ class Docs(BaseModel):
                 )
             answer_text = answer_result.text
             session.add_tokens(answer_result)
+
         # it still happens
         if prompt_config.EXAMPLE_CITATION in answer_text:
             answer_text = answer_text.replace(prompt_config.EXAMPLE_CITATION, "")
+
+        # strip out meta tags to attach to the session
+        environment_suggestions = ""
+        meta_match = re.search(r"<meta>(.*?)</meta>", answer_text, re.DOTALL)
+
+        if meta_match:
+            environment_suggestions = meta_match.group(1)
+            answer_text = re.sub(r"<meta>.*?</meta>", "", answer_text, flags=re.DOTALL)
+
         for c in filtered_contexts:
             name = c.text.name
             citation = c.text.doc.formatted_citation
@@ -837,6 +849,7 @@ class Docs(BaseModel):
 
         # now at end we modify, so we could have retried earlier
         session.answer = answer_text
+        session.environment_answer_suggestions = environment_suggestions
         session.formatted_answer = formatted_answer
         session.references = bib_str
         session.contexts = contexts

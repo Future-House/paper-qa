@@ -105,6 +105,7 @@ async def map_fxn_summary(
     return (
         Context(
             context=context,
+            question=question,
             text=Text(
                 text=text.text,
                 name=text.name,
