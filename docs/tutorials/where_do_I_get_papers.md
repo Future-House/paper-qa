@@ -3,7 +3,7 @@
 ## OpenReview
 
 You can use papers from [https://openreview.net/](https://openreview.net/) as your database!
-Here's a helper that fetches all papers from a selected conference (like ICLR, ICML, NeurIPS) and downloads relevant papers using LLM. Install `openreview-py` with 
+Here's a helper that fetches a list of all papers from a selected conference (like ICLR, ICML, NeurIPS), queries this list to find relevant papers using LLM, and downloads those relevant papers to a local directory which can be used with paper-qa on the next step. Install `openreview-py` with 
 
 ```bash
 pip install paper-qa[openreview]
@@ -15,7 +15,7 @@ and get your username and password from the website. You can put them into `.env
 from paperqa import Settings
 # these settings require gemini api key you can get from https://aistudio.google.com/
 # import os; os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
-# 1Mil context window helps to suggest papers
+# 1Mil context window helps to suggest papers. These settings are not required, but useful for an initial setup.
 settings = Settings.from_name("openreview")
 
 question = "What is the progress on brain activity research?"
@@ -30,7 +30,7 @@ helper = OpenReviewPaperHelper(settings, venue_id="ICLR.cc/2025/Conference")
 submissions = helper.fetch_relevant_papers(question)
 
 # There's also a function that saves tokens by using openreview metadata for citations
-docs = helper.add_docs(submissions)
+docs = await helper.aadd_docs(submissions)
 
 # Now you can continue asking like in the [main tutorial](../../README.md)
 session = docs.query(question, settings=settings)

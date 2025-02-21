@@ -1748,6 +1748,7 @@ local = [
 ]
 openreview = [
     { name = "openreview-py" },
+    { name = "tqdm" },
 ]
 qdrant = [
     { name = "qdrant-client" },
@@ -1808,6 +1809,7 @@ requires-dist = [
     { name = "tantivy" },
     { name = "tenacity" },
     { name = "tiktoken", specifier = ">=0.4.0" },
+    { name = "tqdm", marker = "extra == 'openreview'" },
     { name = "typeguard", marker = "extra == 'dev'" },
     { name = "types-pyyaml", marker = "extra == 'typing'" },
     { name = "types-setuptools", marker = "extra == 'typing'" },

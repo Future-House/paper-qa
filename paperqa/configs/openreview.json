@@ -19,13 +19,12 @@
     "paper_directory": "my_papers",
     "verbosity": 3,
     "agent": {
-        "agent_llm": "ollama/llama3.3",
+        "agent_llm": "gemini/gemini-2.0-flash-exp",
         "agent_llm_config": {
-            "model_name": "ollama/llama3.3",
+            "model_name": "gemini/gemini-2.0-flash-exp",
             "litellm_params": {
-                "model": "ollama/llama3.3",
-                "api_base": "http://localhost:11434",
-                "num_ctx": 4096
+                "model": "gemini/gemini-2.0-flash-exp",
+                "api_key": null
             }
         },
         "return_paper_metadata": false

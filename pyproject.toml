@@ -98,6 +98,7 @@ zotero = [
 
 openreview = [
     "openreview-py",
+    "tqdm",
 ]
 
 [project.scripts]
@@ -178,6 +179,7 @@ module = [
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
+    "openreview", # SEE: https://github.com/Future-House/paper-qa/pull/866/files#r1958975552
 ]
 
 [tool.pylint]
