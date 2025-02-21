@@ -26,7 +26,7 @@ dependencies = [
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
     "fhaviary[llm]>=0.18.2",  # For FunctionInfo.parameters.get_properties()
-    "fhlmi[deepseek]>=0.0.1",  # For new LLM client interface
+    "fhlmi",  # For new LLM client interface
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
@@ -74,7 +74,7 @@ dev = [
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 ldp = [
-    "ldp>=0.24.0",  # For new LLM client interface
+    "ldp>=0.25.0",  # For new LLM client interface
 ]
 local = [
     "sentence-transformers",
