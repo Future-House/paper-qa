@@ -37,14 +37,17 @@ class OpenReviewPaperHelper:
         self.venue_id = venue_id
 
     def get_venues(self) -> list[str]:
+    def get_venues(self) -> list[str]:
         """Get list of available venues."""
         return self.client.get_group(id="venues").members
 
+    def get_submissions(self) -> list[Any]:
     def get_submissions(self) -> list[Any]:
         """Get all submissions for the current venue."""
         logger.info(f"Fetching submissions for venue {self.venue_id}")
         return self.client.get_all_notes(content={"venueid": self.venue_id})
 
+    def create_submission_string(self, submissions: list[Any]) -> str:
     def create_submission_string(self, submissions: list[Any]) -> str:
         """Creates a string containing the id, title, and abstract of all submissions."""
         submission_info_string = ""
@@ -77,6 +80,7 @@ class OpenReviewPaperHelper:
         self.download_papers(subs)
         return {sub.id: sub for sub in subs}
 
+    def _get_relevant_papers_chunk(self, question: str, chunk: str) -> list[Any]:
     def _get_relevant_papers_chunk(self, question: str, chunk: str) -> list[Any]:
         prompt = (
             chunk
@@ -112,6 +116,7 @@ class OpenReviewPaperHelper:
         content = json.loads(response.choices[0].message.content)
         return [p["submission_id"] for p in content["suggested_papers"]]
 
+    def download_papers(self, submissions: list[Any]) -> None:
     def download_papers(self, submissions: list[Any]) -> None:
         """Download PDFs for given submissions."""
         downloaded_papers = Path(self.settings.paper_directory).rglob("*.pdf")
