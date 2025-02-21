@@ -6,16 +6,36 @@ from typing import Any
 
 import httpx
 from litellm import completion
+from pydantic import BaseModel, Field
 
 from paperqa import Docs, Settings
 
 try:
     import openreview
-except ImportError as e:
-    raise ImportError(
-        "openreview-py requires the 'zotero' extra for 'pyzotero'. Please: `pip install paper-qa[openreview]`."
-    ) from e
+except ImportError:
+    openreview = None
+
 logger = logging.getLogger(__name__)
+
+
+class PaperSuggestion(BaseModel):
+    submission_id: str = Field(..., description="The ID of the submission")
+    explanation: str = Field(
+        ..., description="Reasoning for why this paper is relevant"
+    )
+
+
+class RelevantPapersResponse(BaseModel):
+    suggested_papers: list[PaperSuggestion] = Field(
+        ..., description="List of suggested papers with their IDs and explanations"
+    )
+    reasoning_step_by_step: str = Field(
+        ..., description="Step-by-step reasoning for the selection"
+    )
+
+
+# Generate schema once at module level
+RELEVANT_PAPERS_SCHEMA = RelevantPapersResponse.model_json_schema()
 
 
 class OpenReviewPaperHelper:
@@ -28,7 +48,10 @@ class OpenReviewPaperHelper:
     ) -> None:
         self.settings = settings
         Path(settings.paper_directory).mkdir(parents=True, exist_ok=True)
-
+        if openreview is None:
+            raise ImportError(
+                "openreview requires the 'openreview-py' extra. Please run: `pip install paper-qa[openreview]`."
+            )
         self.client = openreview.api.OpenReviewClient(
             baseurl="https://api2.openreview.net",
             username=username or os.getenv("OPENREVIEW_USERNAME"),
@@ -86,28 +109,13 @@ class OpenReviewPaperHelper:
             + "User's question:\n"
         )
 
-        schema = {
-            "type": "object",
-            "properties": {
-                "suggested_papers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "submission_id": {"type": "string"},
-                            "explanation": {"type": "string"},
-                        },
-                        "required": ["submission_id", "explanation"],
-                    },
-                },
-                "reasoning_step_by_step": {"type": "string"},
-            },
-            "required": ["suggested_papers", "reasoning_step_by_step"],
-        }
         response = completion(
             model=self.settings.llm,
             messages=[{"role": "user", "content": prompt + question}],
-            response_format={"type": "json_object", "response_schema": schema},
+            response_format={
+                "type": "json_object",
+                "response_schema": RELEVANT_PAPERS_SCHEMA,
+            },
             verbose=self.settings.verbosity,
         )
 
