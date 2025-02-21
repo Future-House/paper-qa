@@ -10,7 +10,7 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Awaitable, Collection, Iterable, Iterator
+from collections.abc import Collection, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
@@ -21,7 +21,7 @@ from uuid import UUID
 import aiohttp
 import httpx
 import pymupdf
-from llmclient import configure_llm_logs
+from lmi import configure_llm_logs
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -109,17 +109,6 @@ def hexdigest(data: str | bytes) -> str:
 
 def md5sum(file_path: str | os.PathLike) -> str:
     return hexdigest(Path(file_path).read_bytes())
-
-
-async def gather_with_concurrency(n: int, coros: Iterable[Awaitable[T]]) -> list[T]:
-    # https://stackoverflow.com/a/61478547/2392535
-    semaphore = asyncio.Semaphore(n)
-
-    async def sem_coro(coro):
-        async with semaphore:
-            return await coro
-
-    return await asyncio.gather(*(sem_coro(c) for c in coros))
 
 
 def strip_citations(text: str) -> str:

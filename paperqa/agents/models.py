@@ -5,10 +5,11 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from enum import StrEnum
-from typing import Any, ClassVar, Protocol
+from typing import Any, ClassVar, Protocol, cast
 from uuid import UUID, uuid4
 
-from llmclient import LiteLLMModel, LLMModel
+from aviary.core import Message
+from lmi import LiteLLMModel, LLMModel
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -79,12 +80,20 @@ class AnswerResponse(BaseModel):
         model = (
             LiteLLMModel(name=llm_model) if isinstance(llm_model, str) else llm_model
         )
-        result = await model.run_prompt(
-            prompt="{question}\n\n{answer}",
-            data={"question": self.session.question, "answer": self.session.answer},
-            system_prompt=sys_prompt,
+        prompt_template = "{question}\n\n{answer}"
+        messages = [
+            Message(role="system", content=sys_prompt),
+            Message(
+                role="user",
+                content=prompt_template.format(
+                    question=self.session.question, answer=self.session.answer
+                ),
+            ),
+        ]
+        result = await model.call_single(
+            messages=messages,
         )
-        return result.text.strip()
+        return cast(str, result.text).strip()
 
 
 class TimerData(BaseModel):

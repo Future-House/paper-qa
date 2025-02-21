@@ -13,7 +13,7 @@ from aviary.core import (
     ToolResponseMessage,
 )
 from aviary.utils import MultipleChoiceQuestion
-from llmclient import EmbeddingModel, LiteLLMModel
+from lmi import EmbeddingModel, LiteLLMModel
 
 from paperqa.docs import Docs
 from paperqa.settings import Settings

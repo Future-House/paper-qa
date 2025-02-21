@@ -3,9 +3,11 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, cast
 
-from paperqa.llms import PromptRunner
+from aviary.core import Message
+from lmi import LLMModel
+
 from paperqa.types import Context, LLMResult, Text
 from paperqa.utils import extract_score, strip_citations
 
@@ -102,7 +104,8 @@ def llm_parse_json(text: str) -> dict:
 async def map_fxn_summary(
     text: Text,
     question: str,
-    prompt_runner: PromptRunner | None,
+    summary_llm_model: LLMModel | None,
+    prompt_templates: tuple[str, str] | None,
     extra_prompt_data: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: Sequence[Callable[[str], None]] | None = None,
@@ -115,12 +118,14 @@ async def map_fxn_summary(
 
     Args:
         text: The text to parse.
-        question: The question to use for the chain.
-        prompt_runner: The prompt runner to call - should have question, citation,
-            summary_length, and text fields.
-        extra_prompt_data: Optional extra kwargs to pass to the prompt runner's data.
-        parser: The parser to use for parsing - return empty dict on Failure to fallback to text parsing.
-        callbacks: LLM callbacks to execute in the prompt runner.
+        question: The question to use for summarization.
+        summary_llm_model: The LLM model to use for generating summaries.
+        prompt_templates: Optional two-elements tuple containing templates for the user and system prompts.
+            prompt_templates = (user_prompt_template, system_prompt_template)
+        extra_prompt_data: Optional extra data to pass to the prompt template.
+        parser: Optional parser function to parse LLM output into structured data.
+            Should return dict with at least 'summary' field.
+        callbacks: Optional sequence of callback functions to execute during LLM calls.
 
     Returns:
         The context object and LLMResult to get info about the LLM execution.
@@ -131,14 +136,21 @@ async def map_fxn_summary(
     citation = text.name + ": " + text.doc.formatted_citation
     success = False
 
-    if prompt_runner:
-        llm_result = await prompt_runner(
-            {"question": question, "citation": citation, "text": text.text}
-            | (extra_prompt_data or {}),
-            callbacks,
-            "evidence:" + text.name,
+    if summary_llm_model and prompt_templates:
+        data = {"question": question, "citation": citation, "text": text.text} | (
+            extra_prompt_data or {}
         )
-        context = llm_result.text
+        message_prompt, system_prompt = prompt_templates
+        messages = [
+            Message(role="system", content=system_prompt.format(**data)),
+            Message(role="user", content=message_prompt.format(**data)),
+        ]
+        llm_result = await summary_llm_model.call_single(
+            messages=messages,
+            callbacks=callbacks,
+            name="evidence:" + text.name,
+        )
+        context = cast(str, llm_result.text)
         result_data = parser(context) if parser else {}
         success = bool(result_data)
         if success:

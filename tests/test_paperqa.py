@@ -13,7 +13,8 @@ from typing import cast
 import httpx
 import numpy as np
 import pytest
-from llmclient import (
+from aviary.core import Message
+from lmi import (
     CommonLLMNames,
     Embeddable,
     EmbeddingModel,
@@ -23,6 +24,7 @@ from llmclient import (
     LLMResult,
     SparseEmbeddingModel,
 )
+from lmi.llms import rate_limited
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -383,10 +385,12 @@ async def test_chain_completion() -> None:
         outputs.append(x)
 
     llm = s.get_llm()
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        system_prompt=None,
+
+    messages = [
+        Message(content="The duck says"),
+    ]
+    completion = await llm.call_single(
+        messages=messages,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -394,8 +398,8 @@ async def test_chain_completion() -> None:
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
 
-    completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
+    completion = await llm.call_single(
+        messages=messages,
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -413,10 +417,11 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
         outputs.append(x)
 
     llm = anthropic_settings.get_llm()
-    completion = await llm.run_prompt(
-        prompt="The {animal} says",
-        data={"animal": "duck"},
-        system_prompt=None,
+    messages = [
+        Message(content="The duck says"),
+    ]
+    completion = await llm.call_single(
+        messages=messages,
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
@@ -426,8 +431,8 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await llm.run_prompt(
-        prompt="The {animal} says", data={"animal": "duck"}, system_prompt=None
+    completion = await llm.call_single(
+        messages=messages,
     )
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
@@ -707,18 +712,36 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
-    from llmclient import Chunk
-
     class StubLLMModel(LLMModel):
         name: str = "myllm"
 
-        async def acomplete(self, prompt: str) -> Chunk:  # noqa: ARG002
-            return Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
+        async def acompletion(
+            self, messages: list[Message], **kwargs  # noqa: ARG002
+        ) -> list[LLMResult]:
+            return [
+                LLMResult(
+                    model=self.name,
+                    text="Echo",
+                    prompt=messages,
+                    prompt_count=1,
+                    completion_count=1,
+                )
+            ]
 
-        async def acomplete_iter(
-            self, prompt: str  # noqa: ARG002
-        ) -> AsyncIterable[Chunk]:
-            yield Chunk(text="Echo", prompt_tokens=1, completion_tokens=1)
+        @rate_limited
+        async def acompletion_iter(
+            self, messages: list[Message], **kwargs  # noqa: ARG002
+        ) -> AsyncIterable[LLMResult]:
+            yield LLMResult(
+                model=self.name,
+                text="Echo",
+                prompt=messages,
+                prompt_count=1,
+                completion_count=1,
+            )
+
+        async def check_rate_limit(self, token_count: float, **kwargs) -> None:
+            """This is a dummy check."""
 
     docs = Docs()
     docs.add(
