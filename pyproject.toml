@@ -99,10 +99,6 @@ zotero = [
     "pyzotero",
 ]
 
-openreview = [
-    "openreview-py",
-]
-
 [project.scripts]
 pqa = "paperqa.agents:main"
 
