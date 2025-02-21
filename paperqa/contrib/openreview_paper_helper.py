@@ -65,7 +65,9 @@ class OpenReviewPaperHelper:
         if len(submission_string) > self.settings.parsing.chunk_size:
             chunks = [
                 submission_string[i : i + self.settings.parsing.chunk_size]
-                for i in range(0, len(submission_string), self.settings.parsing.chunk_size)
+                for i in range(
+                    0, len(submission_string), self.settings.parsing.chunk_size
+                )
             ]
         else:
             chunks = [submission_string]
@@ -127,10 +129,14 @@ class OpenReviewPaperHelper:
         response = httpx.get(pdf_link)
         SUCCESS_CODE = 200
         if response.status_code == SUCCESS_CODE:
-            with open(f"{self.settings.paper_directory}/{submission.id}.pdf", "wb") as f:
+            with open(
+                f"{self.settings.paper_directory}/{submission.id}.pdf", "wb"
+            ) as f:
                 f.write(response.content)
             return True
-        logger.warning(f"Failed to download the PDF. Status code: {response.status_code}")
+        logger.warning(
+            f"Failed to download the PDF. Status code: {response.status_code}"
+        )
         return False
 
     async def aadd_docs(self, subs: dict[str, Any] | None = None) -> Docs:

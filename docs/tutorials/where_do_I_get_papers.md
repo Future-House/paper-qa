@@ -3,7 +3,7 @@
 ## OpenReview
 
 You can use papers from [https://openreview.net/](https://openreview.net/) as your database!
-Here's a helper that fetches a list of all papers from a selected conference (like ICLR, ICML, NeurIPS), queries this list to find relevant papers using LLM, and downloads those relevant papers to a local directory which can be used with paper-qa on the next step. Install `openreview-py` with 
+Here's a helper that fetches a list of all papers from a selected conference (like ICLR, ICML, NeurIPS), queries this list to find relevant papers using LLM, and downloads those relevant papers to a local directory which can be used with paper-qa on the next step. Install `openreview-py` with
 
 ```bash
 pip install paper-qa[openreview]
