@@ -9,8 +9,8 @@ from pydoc import locate
 from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
-from aviary.core import ToolSelector
-from llmclient import (
+from aviary.core import Tool, ToolSelector
+from lmi import (
     CommonLLMNames,
     EmbeddingModel,
     LiteLLMModel,
@@ -603,12 +603,13 @@ def make_default_litellm_model_list_settings(
 ) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
     return {
+        "name": llm,
         "model_list": [
             {
                 "model_name": llm,
                 "litellm_params": {"model": llm, "temperature": temperature},
             }
-        ]
+        ],
     }
 
 
@@ -916,12 +917,12 @@ class Settings(BaseSettings):
                     )
                 )
             return agent_cls(
-                llm_model={"model": agent_llm, "temperature": self.temperature},
+                llm_model={"name": agent_llm, "temperature": self.temperature},
                 **config,
             )
         if issubclass(agent_cls, SimpleAgent):
             return agent_cls(
-                llm_model={"model": agent_llm, "temperature": self.temperature},
+                llm_model={"name": agent_llm, "temperature": self.temperature},
                 sys_prompt=agent_settings.agent_system_prompt,
                 **config,
             )
@@ -931,6 +932,14 @@ class Settings(BaseSettings):
                 agent_state_type=SimpleAgentState, **config
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
+
+    def adjust_tools_for_agent_llm(self, tools: list[Tool]) -> None:
+        # Google gemini/gemini-1.5-flash fails to support empty dict properties
+        # SEE: https://github.com/BerriAI/litellm/issues/7634
+        if "gemini" in self.agent.agent_llm.lower():
+            for t in tools:
+                if not t.info.get_properties():
+                    t.info.parameters = None
 
 
 # Settings: already Settings

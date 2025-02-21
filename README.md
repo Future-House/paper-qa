@@ -36,12 +36,9 @@ question answering, summarization, and contradiction detection.
   - [Creating Index](#creating-index)
     - [Manifest Files](#manifest-files)
   - [Reusing Index](#reusing-index)
-  - [Running on LitQA v2](#running-on-litqa-v2)
   - [Using Clients Directly](#using-clients-directly)
 - [Settings Cheatsheet](#settings-cheatsheet)
 - [Where do I get papers?](#where-do-i-get-papers)
-  - [Zotero](#zotero)
-  - [Paper Scraper](#paper-scraper)
 - [Callbacks](#callbacks)
   - [Caching Embeddings](#caching-embeddings)
 - [Customizing Prompts](#customizing-prompts)
@@ -406,7 +403,13 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
+By default, PaperQA2 uses OpenAI's `gpt-4o-2024-08-06` model for:
+
+- `summary_llm`: Re-ranking and summarizing evidence passages
+- `llm`: Generating the final answer
+- `agent_llm`: Making tool selection decisions
+
+You can adjust this easily to use any model supported by `litellm`:
 
 ```python
 from paperqa import Settings, ask
@@ -419,7 +422,7 @@ answer_response = ask(
 )
 ```
 
-You can use Anthropic or any other model supported by `litellm`:
+To use Claude, make sure you set the `ANTHROPIC_API_KEY`
 
 ```python
 from paperqa import Settings, ask
@@ -427,7 +430,24 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
+        llm="claude-3-5-sonnet-20240620",
+        summary_llm="claude-3-5-sonnet-20240620",
+        agent=AgentSettings(agent_llm="claude-3-5-sonnet-20240620"),
+    ),
+)
+```
+
+Or Gemini, by setting the `GEMINI_API_KEY` from Google AI Studio
+
+```python
+from paperqa import Settings, ask
+
+answer_response = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="gemini-1.5-pro",
+        summary_llm="gemini-1.5-pro",
+        agent=AgentSettings(agent_llm="gemini-1.5-pro"),
     ),
 )
 ```
@@ -702,44 +722,6 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
     )
 ```
 
-### Running on LitQA v2
-
-In [`paperqa/agents/task.py`](paperqa/agents/task.py), you will find:
-
-1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
-2. `LitQAv2TaskDataset`: a task dataset designed to pull LitQA v2 from Hugging Face,
-   and create one `GradablePaperQAEnvironment` per question
-
-Here is an example of how to use them:
-
-```python
-import os
-
-from aviary.env import TaskDataset
-from ldp.agent import SimpleAgent
-from ldp.alg.callbacks import MeanMetricsCallback
-from ldp.alg.runners import Evaluator, EvaluatorConfig
-
-from paperqa import Settings
-from paperqa.agents.task import TASK_DATASET_NAME
-
-
-async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
-    settings = Settings(paper_directory=folder_of_litqa_v2_papers)
-    dataset = TaskDataset.from_name(TASK_DATASET_NAME, settings=settings)
-    metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
-
-    evaluator = Evaluator(
-        config=EvaluatorConfig(batch_size=3),
-        agent=SimpleAgent(),
-        dataset=dataset,
-        callbacks=[metrics_callback],
-    )
-    await evaluator.evaluate()
-
-    print(metrics_callback.eval_means)
-```
-
 ### Using Clients Directly
 
 One of the most powerful features of PaperQA2 is its ability to combine data from multiple metadata sources. For example, [Unpaywall](https://unpaywall.org/) can provide open access status/direct links to PDFs, [Crossref](https://www.crossref.org/) can provide bibtex, and [Semantic Scholar](https://www.semanticscholar.org/) can provide citation licenses. Here's a short demo of how to do this:
@@ -850,90 +832,7 @@ will return much faster than the first query and we'll be certain the authors ma
 
 Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
 
-### Zotero
-
-_It's been a while since we've tested this - so let us know if it runs into issues!_
-
-If you use [Zotero](https://www.zotero.org/) to organize your personal bibliography,
-you can use the `paperqa.contrib.ZoteroDB` to query papers from your library,
-which relies on [pyzotero](https://github.com/urschrei/pyzotero).
-
-Install `pyzotero` via the `zotero` extra for this feature:
-
-```bash
-pip install paper-qa[zotero]
-```
-
-First, note that PaperQA2 parses the PDFs of papers to store in the database,
-so all relevant papers should have PDFs stored inside your database.
-You can get Zotero to automatically do this by highlighting the references
-you wish to retrieve, right clicking, and selecting _"Find Available PDFs"_.
-You can also manually drag-and-drop PDFs onto each reference.
-
-To download papers, you need to get an API key for your account.
-
-1. Get your library ID, and set it as the environment variable `ZOTERO_USER_ID`.
-   - For personal libraries, this ID is given [here](https://www.zotero.org/settings/keys) at the part "_Your userID for use in API calls is XXXXXX_".
-   - For group libraries, go to your group page `https://www.zotero.org/groups/groupname`, and hover over the settings link. The ID is the integer after /groups/. (_h/t pyzotero!_)
-2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
-   - The key will need read access to the library.
-
-With this, we can download papers from our library and add them to PaperQA2:
-
-```python
-from paperqa import Docs
-from paperqa.contrib import ZoteroDB
-
-docs = Docs()
-zotero = ZoteroDB(library_type="user")  # "group" if group library
-
-for item in zotero.iterate(limit=20):
-    if item.num_pages > 30:
-        continue  # skip long papers
-    docs.add(item.pdf, docname=item.key)
-```
-
-which will download the first 20 papers in your Zotero database and add
-them to the `Docs` object.
-
-We can also do specific queries of our Zotero library and iterate over the results:
-
-```python
-for item in zotero.iterate(
-    q="large language models",
-    qmode="everything",
-    sort="date",
-    direction="desc",
-    limit=100,
-):
-    print("Adding", item.title)
-    docs.add(item.pdf, docname=item.key)
-```
-
-You can read more about the search syntax by typing `zotero.iterate?` in IPython.
-
-### Paper Scraper
-
-If you want to search for papers outside of your own collection, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
-like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
-
-```python
-from paperqa import Docs
-
-keyword_search = "bispecific antibody manufacture"
-papers = paperscraper.search_papers(keyword_search)
-docs = Docs()
-for path, data in papers.items():
-    try:
-        docs.add(path)
-    except ValueError as e:
-        # sometimes this happens if PDFs aren't downloaded or readable
-        print("Could not read", path, e)
-session = docs.query(
-    "What manufacturing challenges are unique to bispecific antibodies?"
-)
-print(session)
-```
+See detailed docs [about zotero, openreview and parsing](docs/tutorials/where_do_I_get_papers.md)
 
 ## Callbacks
 
@@ -1032,6 +931,7 @@ are the question IDs
 used in the train and evaluation splits,
 as well as paper DOIs used to build the train and evaluation splits' indexes.
 The test split remains held out.
+Example on how to use LitQA for evaluation can be found in [aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
 
 ## Citation
 

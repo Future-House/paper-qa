@@ -25,8 +25,8 @@ dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
-    "fh-llm-client<0.1.0",  # Pin to avoid breaking changes until lfrqa is migrated
-    "fhaviary[llm]>=0.14",  # For MultipleChoiceQuestion
+    "fhaviary[llm]>=0.18.2",  # For FunctionInfo.parameters.get_properties()
+    "fhlmi",  # For new LLM client interface
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
@@ -38,7 +38,6 @@ dependencies = [
     "tantivy",
     "tenacity",
     "tiktoken>=0.4.0",
-    "typing-extensions; python_version <= '3.12'",  # For TypeVar default
 ]
 description = "LLM Chain for answering questions from docs"
 dynamic = ["version"]
@@ -54,14 +53,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-datasets = [
-    "datasets",
-]
 dev = [
-    "fh-llm-client[deepseek]>=0.0.11",  # Pin to ensure DeepSeek compatibility
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[datasets,ldp,typing,zotero,local,qdrant]",
+    "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.0",
     "pylint-pydantic",
@@ -79,16 +74,18 @@ dev = [
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 ldp = [
-    "ldp>=0.20",  # For bulk_evaluate_consensus
+    "ldp>=0.25.0",  # For new LLM client interface
 ]
 local = [
     "sentence-transformers",
+]
+openreview = [
+    "openreview-py",
 ]
 qdrant = [
     "qdrant-client",
 ]
 typing = [
-    "pandas-stubs",
     "types-PyYAML",
     "types-setuptools",
 ]
@@ -170,7 +167,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
-    "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
+    "openreview",  # SEE: https://github.com/Future-House/paper-qa/pull/866/files#r1958975552
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
