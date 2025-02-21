@@ -9,7 +9,7 @@ from pydoc import locate
 from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
-from aviary.core import ToolSelector
+from aviary.core import Tool, ToolSelector
 from llmclient import (
     CommonLLMNames,
     EmbeddingModel,
@@ -931,6 +931,14 @@ class Settings(BaseSettings):
                 agent_state_type=SimpleAgentState, **config
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
+
+    def adjust_tools_for_agent_llm(self, tools: list[Tool]) -> None:
+        # Google gemini/gemini-1.5-flash fails to support empty dict properties
+        # SEE: https://github.com/BerriAI/litellm/issues/7634
+        if "gemini" in self.agent.agent_llm.lower():
+            for t in tools:
+                if not t.info.get_properties():
+                    t.info.parameters = None
 
 
 # Settings: already Settings
