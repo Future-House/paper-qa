@@ -10,7 +10,7 @@ from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
 from aviary.core import Tool, ToolSelector
-from llmclient import (
+from lmi import (
     CommonLLMNames,
     EmbeddingModel,
     LiteLLMModel,

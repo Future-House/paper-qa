@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Collection, Coroutine, Sequence
 from typing import Any, cast
 
 import aiohttp
-from llmclient.utils import gather_with_concurrency
+from lmi.utils import gather_with_concurrency
 from pydantic import BaseModel, ConfigDict
 
 from paperqa.types import Doc, DocDetails

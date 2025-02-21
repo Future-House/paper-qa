@@ -13,7 +13,7 @@ from collections.abc import (
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
-from llmclient import (
+from lmi import (
     Embeddable,
     EmbeddingModel,
     EmbeddingModes,

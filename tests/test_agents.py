@@ -21,7 +21,7 @@ from aviary.core import Tool, ToolRequestMessage, ToolsAdapter, ToolSelector
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
-from llmclient import CommonLLMNames, EmbeddingModel, LiteLLMModel
+from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
 from pytest_subtests import SubTests
 from tantivy import Index
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt

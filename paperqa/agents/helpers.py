@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import cast
 
 from aviary.core import Message
-from llmclient import LiteLLMModel, LLMModel
+from lmi import LiteLLMModel, LLMModel
 from rich.table import Table
 
 from paperqa.docs import Docs

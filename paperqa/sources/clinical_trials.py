@@ -7,7 +7,7 @@ from typing import Any
 import aiohttp
 from aiohttp import ClientResponseError, ClientSession
 from aiohttp.web import HTTPBadRequest
-from llmclient.utils import gather_with_concurrency
+from lmi.utils import gather_with_concurrency
 from tenacity import (
     retry,
     retry_if_exception_type,

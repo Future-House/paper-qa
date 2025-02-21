@@ -14,14 +14,14 @@ from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
-from llmclient import (
+from lmi import (
     Embeddable,
     EmbeddingModel,
     LLMModel,
     LLMResult,
 )
-from llmclient.types import set_llm_session_ids
-from llmclient.utils import gather_with_concurrency
+from lmi.types import set_llm_session_ids
+from lmi.utils import gather_with_concurrency
 from pydantic import (
     BaseModel,
     ConfigDict,

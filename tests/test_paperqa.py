@@ -14,7 +14,7 @@ import httpx
 import numpy as np
 import pytest
 from aviary.core import Message
-from llmclient import (
+from lmi import (
     CommonLLMNames,
     Embeddable,
     EmbeddingModel,
@@ -24,7 +24,7 @@ from llmclient import (
     LLMResult,
     SparseEmbeddingModel,
 )
-from llmclient.llms import rate_limited
+from lmi.llms import rate_limited
 from pytest_subtests import SubTests
 
 from paperqa import (

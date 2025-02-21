@@ -9,7 +9,7 @@ from typing import Any, ClassVar, Protocol, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
-from llmclient import LiteLLMModel, LLMModel
+from lmi import LiteLLMModel, LLMModel
 from pydantic import (
     BaseModel,
     ConfigDict,

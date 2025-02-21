@@ -6,7 +6,7 @@ from collections.abc import Callable, Sequence
 from typing import Any, cast
 
 from aviary.core import Message
-from llmclient import LLMModel
+from lmi import LLMModel
 
 from paperqa.types import Context, LLMResult, Text
 from paperqa.utils import extract_score, strip_citations

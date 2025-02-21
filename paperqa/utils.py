@@ -21,7 +21,7 @@ from uuid import UUID
 import aiohttp
 import httpx
 import pymupdf
-from llmclient import configure_llm_logs
+from lmi import configure_llm_logs
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
