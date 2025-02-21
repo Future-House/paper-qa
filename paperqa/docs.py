@@ -8,19 +8,20 @@ import tempfile
 import urllib.request
 from collections.abc import Callable, Sequence
 from datetime import datetime
-from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
-from llmclient import (
+from aviary.core import Message
+from lmi import (
     Embeddable,
     EmbeddingModel,
     LLMModel,
     LLMResult,
 )
-from llmclient.types import set_llm_session_ids
+from lmi.types import set_llm_session_ids
+from lmi.utils import gather_with_concurrency
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -33,7 +34,6 @@ from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
 from paperqa.llms import (
     NumpyVectorStore,
-    PromptRunner,
     VectorStore,
 )
 from paperqa.paths import PAPERQA_DIR
@@ -43,7 +43,6 @@ from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
-    gather_with_concurrency,
     get_loop,
     maybe_is_html,
     maybe_is_pdf,
@@ -294,12 +293,14 @@ class Docs(BaseModel):
             )
             if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
-            result = await llm_model.run_prompt(
-                prompt=parse_config.citation_prompt,
-                data={"text": texts[0].text},
-                system_prompt=None,  # skip system because it's too hesitant to answer
+            result = await llm_model.call_single(
+                messages=[
+                    Message(
+                        content=parse_config.citation_prompt.format(text=texts[0].text)
+                    ),
+                ],
             )
-            citation = result.text
+            citation = cast(str, result.text)
             if (
                 len(citation) < 3  # noqa: PLR2004
                 or "Unknown" in citation
@@ -315,10 +316,15 @@ class Docs(BaseModel):
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
             # TODO: specify a JSON schema here when many LLM providers support this
-            result = await llm_model.run_prompt(
-                prompt=parse_config.structured_citation_prompt,
-                data={"citation": citation},
-                system_prompt=None,
+            messages = [
+                Message(
+                    content=parse_config.structured_citation_prompt.format(
+                        citation=citation
+                    ),
+                ),
+            ]
+            result = await llm_model.call_single(
+                messages=messages,
             )
             # This code below tries to isolate the JSON
             # based on observed messages from LLMs
@@ -326,7 +332,7 @@ class Docs(BaseModel):
             # the first { and last } in the response.
             # Since the anticipated structure should  not be nested,
             # we don't have to worry about nested curlies.
-            clean_text = result.text.split("{", 1)[-1].split("}", 1)[0]
+            clean_text = cast(str, result.text).split("{", 1)[-1].split("}", 1)[0]
             clean_text = "{" + clean_text + "}"
             try:
                 citation_json = json.loads(clean_text)
@@ -609,19 +615,17 @@ class Docs(BaseModel):
             else matches
         )
 
-        prompt_runner: PromptRunner | None = None
+        prompt_templates = None
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
-                prompt_runner = partial(
-                    summary_llm_model.run_prompt,
+                prompt_templates = (
                     prompt_config.summary_json,
-                    system_prompt=prompt_config.summary_json_system,
+                    prompt_config.summary_json_system,
                 )
             else:
-                prompt_runner = partial(
-                    summary_llm_model.run_prompt,
+                prompt_templates = (
                     prompt_config.summary,
-                    system_prompt=prompt_config.system,
+                    prompt_config.system,
                 )
 
         with set_llm_session_ids(session.id):
@@ -631,7 +635,8 @@ class Docs(BaseModel):
                     map_fxn_summary(
                         text=m,
                         question=session.question,
-                        prompt_runner=prompt_runner,
+                        summary_llm_model=summary_llm_model,
+                        prompt_templates=prompt_templates,
                         extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
                             "citation": f"{m.name}: {m.doc.formatted_citation}",
@@ -712,12 +717,17 @@ class Docs(BaseModel):
         pre_str = None
         if prompt_config.pre is not None:
             with set_llm_session_ids(session.id):
-                pre = await llm_model.run_prompt(
-                    prompt=prompt_config.pre,
-                    data={"question": session.question},
+                messages = [
+                    Message(role="system", content=prompt_config.system),
+                    Message(
+                        role="user",
+                        content=prompt_config.pre.format(question=session.question),
+                    ),
+                ]
+                pre = await llm_model.call_single(
+                    messages=messages,
                     callbacks=callbacks,
                     name="pre",
-                    system_prompt=prompt_config.system,
                 )
             session.add_tokens(pre)
             pre_str = pre.text
@@ -766,19 +776,24 @@ class Docs(BaseModel):
             )
         else:
             with set_llm_session_ids(session.id):
-                answer_result = await llm_model.run_prompt(
-                    prompt=prompt_config.qa,
-                    data={
-                        "context": context_str,
-                        "answer_length": answer_config.answer_length,
-                        "question": session.question,
-                        "example_citation": prompt_config.EXAMPLE_CITATION,
-                    },
+                messages = [
+                    Message(role="system", content=prompt_config.system),
+                    Message(
+                        role="user",
+                        content=prompt_config.qa.format(
+                            context=context_str,
+                            answer_length=answer_config.answer_length,
+                            question=session.question,
+                            example_citation=prompt_config.EXAMPLE_CITATION,
+                        ),
+                    ),
+                ]
+                answer_result = await llm_model.call_single(
+                    messages=messages,
                     callbacks=callbacks,
                     name="answer",
-                    system_prompt=prompt_config.system,
                 )
-            answer_text = answer_result.text
+            answer_text = cast(str, answer_result.text)
             session.add_tokens(answer_result)
         # it still happens
         if (ex_citation := prompt_config.EXAMPLE_CITATION) in answer_text:
@@ -806,14 +821,19 @@ class Docs(BaseModel):
 
         if prompt_config.post is not None:
             with set_llm_session_ids(session.id):
-                post = await llm_model.run_prompt(
-                    prompt=prompt_config.post,
-                    data=session.model_dump(),
+                messages = [
+                    Message(role="system", content=prompt_config.system),
+                    Message(
+                        role="user",
+                        content=prompt_config.post.format(question=session.question),
+                    ),
+                ]
+                post = await llm_model.call_single(
+                    messages=messages,
                     callbacks=callbacks,
                     name="post",
-                    system_prompt=prompt_config.system,
                 )
-            answer_text = post.text
+            answer_text = cast(str, post.text)
             session.add_tokens(post)
             formatted_answer = f"Question: {session.question}\n\n{post}\n"
             if bib:

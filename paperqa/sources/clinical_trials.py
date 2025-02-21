@@ -7,6 +7,7 @@ from typing import Any
 import aiohttp
 from aiohttp import ClientResponseError, ClientSession
 from aiohttp.web import HTTPBadRequest
+from lmi.utils import gather_with_concurrency
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -17,7 +18,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, Embeddable, Text
-from paperqa.utils import gather_with_concurrency, logging_filters
+from paperqa.utils import logging_filters
 
 logger = logging.getLogger(__name__)
 

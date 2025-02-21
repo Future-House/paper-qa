@@ -21,7 +21,7 @@ from aviary.core import Tool, ToolRequestMessage, ToolsAdapter, ToolSelector
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
-from llmclient import CommonLLMNames, EmbeddingModel, MultipleCompletionLLMModel
+from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
 from pytest_subtests import SubTests
 from tantivy import Index
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
@@ -361,7 +361,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     }
 
     thoughts: list[str] = []
-    orig_llm_model_call = MultipleCompletionLLMModel.call
+    orig_llm_model_call = LiteLLMModel.call
 
     async def on_agent_action(  # noqa: RUF029
         action: OpResult[ToolRequestMessage], *_
@@ -371,12 +371,10 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     async def llm_model_call(*args, **kwargs):
         # NOTE: "required" will not lead to thoughts being emitted, it has to be "auto"
         # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
-        kwargs.pop("tool_choice", MultipleCompletionLLMModel.TOOL_CHOICE_REQUIRED)
+        args = args[:-1]  # removing last element (tool_choice) from args
         return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore[misc]
 
-    with patch.object(
-        MultipleCompletionLLMModel, "call", side_effect=llm_model_call, autospec=True
-    ):
+    with patch.object(LiteLLMModel, "call", side_effect=llm_model_call, autospec=True):
         response = await agent_query(
             query,
             agent_test_settings,

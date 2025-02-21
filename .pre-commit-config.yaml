@@ -84,9 +84,9 @@ repos:
           - aiohttp>=3.10.6 # Match pyproject.toml
           - PyMuPDF>=1.24.12
           - anyio
-          - fh-llm-client[deepseek]<0.1.0 # Match pyproject.toml
+          - fhlmi>=0.0.1
           - fhaviary[llm]>=0.18.2 # Match pyproject.toml
-          - ldp>=0.20 # Match pyproject.toml
+          - ldp>=0.25.0 # Match pyproject.toml
           - html2text
           - httpx
           - pybtex

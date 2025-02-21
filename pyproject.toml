@@ -25,8 +25,8 @@ dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
-    "fh-llm-client<0.1.0",  # Pin to avoid breaking changes until lfrqa is migrated
     "fhaviary[llm]>=0.18.2",  # For FunctionInfo.parameters.get_properties()
+    "fhlmi",  # For new LLM client interface
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
@@ -54,7 +54,6 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
-    "fh-llm-client[deepseek]>=0.0.11",  # Pin to ensure DeepSeek compatibility
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
@@ -75,7 +74,7 @@ dev = [
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 ldp = [
-    "ldp>=0.20",  # For bulk_evaluate_consensus
+    "ldp>=0.25.0",  # For new LLM client interface
 ]
 local = [
     "sentence-transformers",
