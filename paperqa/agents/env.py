@@ -71,8 +71,8 @@ def settings_to_tools(  # noqa: PLR0912
                 ).paper_search
             )
             for pname in ("min_year", "max_year"):
-                tool.info.parameters.properties[pname]["description"] = cast(
-                    str, tool.info.parameters.properties[pname]["description"]
+                tool.info.get_properties()[pname]["description"] = cast(
+                    str, tool.info.get_properties()[pname]["description"]
                 ).format(current_year=get_year())
         elif issubclass(tool_type, GatherEvidence):
             gather_evidence_tool = GatherEvidence(
