@@ -410,6 +410,8 @@ By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
 Please see the [Settings Cheatsheet](#settings-cheatsheet)
 for more information on these settings.
 
+We use the [`lmi`](https://github.com/Future-House/ldp/tree/main/packages/lmi) package for our LLM interface,
+which in turn uses `litellm` to support many LLM providers.
 You can adjust this easily to use any model supported by `litellm`:
 
 ```python
