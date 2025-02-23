@@ -427,6 +427,7 @@ To use Claude, make sure you set the `ANTHROPIC_API_KEY`
 
 ```python
 from paperqa import Settings, ask
+from paperqa.settings import AgentSettings
 
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
@@ -932,6 +933,9 @@ print(session)
 To execute a function on each chunk of LLM completions, you need to provide a function that can be executed on each chunk. For example, to get a typewriter view of the completions, you can do:
 
 ```python
+from paperqa import Docs
+
+
 def typewriter(chunk: str) -> None:
     print(chunk, end="")
 
