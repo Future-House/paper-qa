@@ -271,7 +271,7 @@ and slow down your queries to accommodate.
 You can also specify them manually with any rate limit string that matches the specification in the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
-pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
+pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
 Or by adding into a `Settings` object, if calling imperatively:
@@ -282,8 +282,8 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
-        summary_llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
+        llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
+        summary_llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
     ),
 )
 ```
@@ -405,12 +405,13 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, PaperQA2 uses OpenAI's `gpt-4o-2024-08-06` model for:
+By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
+`summary_llm`, `llm`, and `agent_llm`.
+Please see the [Settings Cheatsheet](#settings-cheatsheet)
+for more information on these settings.
 
-- `summary_llm`: Re-ranking and summarizing evidence passages
-- `llm`: Generating the final answer
-- `agent_llm`: Making tool selection decisions
-
+We use the [`lmi`](https://github.com/Future-House/ldp/tree/main/packages/lmi) package for our LLM interface,
+which in turn uses `litellm` to support many LLM providers.
 You can adjust this easily to use any model supported by `litellm`:
 
 ```python
@@ -428,6 +429,7 @@ To use Claude, make sure you set the `ANTHROPIC_API_KEY`
 
 ```python
 from paperqa import Settings, ask
+from paperqa.settings import AgentSettings
 
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
@@ -769,9 +771,9 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                             |
 | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-08-06"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
+| `llm`                                        | `"gpt-4o-2024-11-20"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
-| `summary_llm`                                | `"gpt-4o-2024-08-06"`                  | Default LLM for summaries and parsing citations.                                                        |
+| `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | Default LLM for summaries and parsing citations.                                                        |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
 | `embedding`                                  | `"text-embedding-3-small"`             | Default embedding model for texts.                                                                      |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                 |
@@ -809,7 +811,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
 | `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
 | `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
-| `agent.agent_llm`                            | `"gpt-4o-2024-08-06"`                  | Model to use for agent.                                                                                 |
+| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | Model to use for agent making tool selections.                                                          |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                 |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                   |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                   |
@@ -898,10 +900,19 @@ You can read more about the search syntax by typing `zotero.iterate?` in IPython
 
 ### Paper Scraper
 
-If you want to search for papers outside of your own collection, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
+If you want to search for papers outside of your own collection, I've found an unrelated project called [`paper-scraper`](https://github.com/blackadad/paper-scraper) that looks
 like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
 
+First, install `paper-scraper`:
+
+```bash
+pip install git+https://github.com/blackadad/paper-scraper.git
+```
+
+Then run with it:
+
 ```python
+import paperscraper
 from paperqa import Docs
 
 keyword_search = "bispecific antibody manufacture"
@@ -924,6 +935,9 @@ print(session)
 To execute a function on each chunk of LLM completions, you need to provide a function that can be executed on each chunk. For example, to get a typewriter view of the completions, you can do:
 
 ```python
+from paperqa import Docs
+
+
 def typewriter(chunk: str) -> None:
     print(chunk, end="")
 
@@ -1011,16 +1025,48 @@ with open("my_docs.pkl", "rb") as f:
 ## Reproduction
 
 Contained in [docs/2024-10-16_litqa2-splits.json5](docs/2024-10-16_litqa2-splits.json5)
-are the question IDs
-(correspond with [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl))
-used in the train and evaluation splits,
-as well as paper DOIs used to build the train and evaluation splits' indexes.
-The test split remains held out.
-Example on how to use LitQA for evaluation can be found in [aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
+are the question IDs used in train, evaluation, and test splits,
+as well as paper DOIs used to build the splits' indexes.
+
+- Train and eval splits: question IDs come from
+  [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl).
+- Test split: questions IDs come from
+  [aviary-paper-data's LitQA2 question IDs](https://huggingface.co/datasets/futurehouse/aviary-paper-data).
+
+There are multiple papers slowly building PaperQA, shown below in [Citation](#citation).
+To reproduce:
+
+- `skarlinski2024language`: train and eval splits are applicable.
+  The test split remains held out.
+- `narayanan2024aviarytraininglanguageagents`: train, eval, and test splits are applicable.
+
+Example on how to use LitQA for evaluation can be found in
+[aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
 
 ## Citation
 
 Please read and cite the following papers if you use this software:
+
+```bibtex
+@article{narayanan2024aviarytraininglanguageagents,
+      title = {Aviary: training language agents on challenging scientific tasks},
+      author = {
+      Siddharth Narayanan and
+ James D. Braza and
+ Ryan-Rhys Griffiths and
+ Manu Ponnapati and
+ Albert Bou and
+ Jon Laurent and
+ Ori Kabeli and
+ Geemi Wellawatte and
+ Sam Cox and
+ Samuel G. Rodriques and
+ Andrew D. White},
+      journal = {arXiv preprent arXiv:2412.21154},
+      year = {2024},
+      url = {https://doi.org/10.48550/arXiv.2412.21154},
+}
+```
 
 ```bibtex
 @article{skarlinski2024language,
@@ -1035,8 +1081,8 @@ Please read and cite the following papers if you use this software:
  Manvitha Ponnapati and
  Samuel G. Rodriques and
  Andrew D. White},
-    year = {2024},
     journal = {arXiv preprent arXiv:2409.13740},
+    year = {2024},
     url = {https://doi.org/10.48550/arXiv.2409.13740}
 }
 ```
@@ -1052,6 +1098,7 @@ Please read and cite the following papers if you use this software:
  Samuel G. Rodriques and
  Andrew D. White},
     journal = {arXiv preprint arXiv:2312.07559},
-    year = {2023}
+    year = {2023},
+    url = {https://doi.org/10.48550/arXiv.2312.07559}
 }
 ```
