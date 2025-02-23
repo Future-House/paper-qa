@@ -363,11 +363,11 @@ wheels = [
 
 [[package]]
 name = "decorator"
-version = "5.1.1"
+version = "5.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/66/0c/8d907af351aa16b42caae42f9d6aa37b900c67308052d10fdce809f8d952/decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330", size = 35016 }
+sdist = { url = "https://files.pythonhosted.org/packages/6e/e2/33c72e8409b39389b9a69e807e40d3466a63996ba4c65caaea1d31dfde16/decorator-5.2.0.tar.gz", hash = "sha256:1cf2ab68f8c1c7eae3895d82ab0daab41294cfbe6fbdebf50b44307299980762", size = 16973 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/50/83c593b07763e1161326b3b8c6686f0f4b0f24d5526546bee538c89837d6/decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186", size = 9073 },
+    { url = "https://files.pythonhosted.org/packages/f6/0e/fc5d7660912606d43f32470cf952846a47512d3674fe9a3196f1a80a638b/decorator-5.2.0-py3-none-any.whl", hash = "sha256:f30a69c066f698c7c11fa1fa3425f684d3b4b01b494ee41e73c0a14f3de48427", size = 9149 },
 ]
 
 [[package]]
@@ -494,7 +494,7 @@ llm = [
 
 [[package]]
 name = "fhlmi"
-version = "0.0.1"
+version = "0.25.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coredis" },
@@ -505,9 +505,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/34/c0/9045e99fe802aa500014f357aec25647c4c56c4457a78866971202f7f460/fhlmi-0.0.1.tar.gz", hash = "sha256:7750f78c2d6ce2439d4edfa335d1a6fbd4d8a774d9b83588ebdd4c071d3606c4", size = 123849 }
+sdist = { url = "https://files.pythonhosted.org/packages/06/e3/1aec444837dc4ff4871dd3bcf4d67f016f228558068cfca486a790af980f/fhlmi-0.25.2.tar.gz", hash = "sha256:0f5522d3c25aa9210d87f342f1a4540cf90cb9490e0366a898ef8ee79820b272", size = 136251 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/02/b7/c37950ad9effadf55e926626b18a2161b4eec7cfc745681f8acb9300d3bd/fhlmi-0.0.1-py3-none-any.whl", hash = "sha256:fe4164ef599cd4f55bd8c8130ce38ba1bcee65e2bef3538b626994b9a2bca8d2", size = 28086 },
+    { url = "https://files.pythonhosted.org/packages/d6/33/2ebef42074cd26313c830f8555f6b9a9b922e98219674746b4ed965b73fe/fhlmi-0.25.2-py3-none-any.whl", hash = "sha256:03c2db98e294cb9b1c8696643beb05f58fa30186c71c0aeb01b6812bc7c64974", size = 36147 },
 ]
 
 [[package]]
@@ -789,11 +789,11 @@ wheels = [
 
 [[package]]
 name = "identify"
-version = "2.6.7"
+version = "2.6.8"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/83/d1/524aa3350f78bcd714d148ade6133d67d6b7de2cdbae7d99039c024c9a25/identify-2.6.7.tar.gz", hash = "sha256:3fa266b42eba321ee0b2bb0936a6a6b9e36a1351cbb69055b3082f4193035684", size = 99260 }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/fa/5eb460539e6f5252a7c5a931b53426e49258cde17e3d50685031c300a8fd/identify-2.6.8.tar.gz", hash = "sha256:61491417ea2c0c5c670484fd8abbb34de34cdae1e5f39a73ee65e48e4bb663fc", size = 99249 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/00/1fd4a117c6c93f2dcc5b7edaeaf53ea45332ef966429be566ca16c2beb94/identify-2.6.7-py2.py3-none-any.whl", hash = "sha256:155931cb617a401807b09ecec6635d6c692d180090a1cedca8ef7d58ba5b6aa0", size = 99097 },
+    { url = "https://files.pythonhosted.org/packages/78/8c/4bfcab2d8286473b8d83ea742716f4b79290172e75f91142bc1534b05b9a/identify-2.6.8-py2.py3-none-any.whl", hash = "sha256:83657f0f766a3c8d0eaea16d4ef42494b39b34629a4b3192a9d020d349b3e255", size = 99109 },
 ]
 
 [[package]]
@@ -1040,7 +1040,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.25.1"
+version = "0.25.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1057,9 +1057,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/75/dcf8b5973ff8529264ab87662703124ac57cdaec483b265c02af679fe731/ldp-0.25.1.tar.gz", hash = "sha256:2403120c0c7abec91334e90938ab48704866d45dfd9537e0791f95f76900e740", size = 575263 }
+sdist = { url = "https://files.pythonhosted.org/packages/aa/5c/43faba8aff85cdaad4477f6d407600d2852a67bb2486a83869154809c893/ldp-0.25.2.tar.gz", hash = "sha256:691c0849b53c2535090bdb7b2e3b2040806ba9920cc86d181310cb0292d9128a", size = 579570 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/09/f4a0de1bff09933adca38b1768e2cf22ba0624fbc8d2441d2f0096606f95/ldp-0.25.1-py3-none-any.whl", hash = "sha256:69ec83c3c7f62979a0beefb8378c84a3aa31501a5cbfd367d5a196d6f7960b05", size = 135338 },
+    { url = "https://files.pythonhosted.org/packages/5e/c2/228bf5719db406bec7f7bc8838c7880cafea5da69f6360bebabe0aabcaf1/ldp-0.25.2-py3-none-any.whl", hash = "sha256:c7e2d7ddd6a0508f1fceac28c5512e184748720412c850b1871789ea39e8928f", size = 135366 },
 ]
 
 [[package]]
@@ -1528,7 +1528,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.63.2"
+version = "1.64.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1540,9 +1540,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e6/1c/11b520deb71f9ea54ced3c52cd6a5f7131215deba63ad07f23982e328141/openai-1.63.2.tar.gz", hash = "sha256:aeabeec984a7d2957b4928ceaa339e2ead19c61cfcf35ae62b7c363368d26360", size = 356902 }
+sdist = { url = "https://files.pythonhosted.org/packages/7b/1d/aae78d8ecc571d672c4a27794a8f248bc46437a22ddcb9c4eb6fd6616c03/openai-1.64.0.tar.gz", hash = "sha256:2861053538704d61340da56e2f176853d19f1dc5704bc306b7597155f850d57a", size = 357058 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/64/db3462b358072387b8e93e6e6a38d3c741a17b4a84171ef01d6c85c63f25/openai-1.63.2-py3-none-any.whl", hash = "sha256:1f38b27b5a40814c2b7d8759ec78110df58c4a614c25f182809ca52b080ff4d4", size = 472282 },
+    { url = "https://files.pythonhosted.org/packages/9a/1a/e62718f311daa26d208800976d7944e5ee6d503e1ea474522b2a15a904bb/openai-1.64.0-py3-none-any.whl", hash = "sha256:20f85cde9e95e9fbb416e3cb5a6d3119c0b28308afd6e3cc47bf100623dac623", size = 472289 },
 ]
 
 [[package]]
