@@ -897,10 +897,19 @@ You can read more about the search syntax by typing `zotero.iterate?` in IPython
 
 ### Paper Scraper
 
-If you want to search for papers outside of your own collection, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
+If you want to search for papers outside of your own collection, I've found an unrelated project called [`paper-scraper`](https://github.com/blackadad/paper-scraper) that looks
 like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
 
+First, install `paper-scraper`:
+
+```bash
+pip install git+https://github.com/blackadad/paper-scraper.git
+```
+
+Then run with it:
+
 ```python
+import paperscraper
 from paperqa import Docs
 
 keyword_search = "bispecific antibody manufacture"
