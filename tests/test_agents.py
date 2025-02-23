@@ -82,11 +82,11 @@ async def test_get_directory_index(
             "year",
         ], "Incorrect fields in index"
         assert not index.changed, "Expected index to not have changes at this point"
-        # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
+        # bates.txt + empty.txt + flag_day.html + gravity_hill.md + obama.txt + paper.pdf,
         # but empty.txt fails to be added
         path_to_id = await index.index_files
         assert (
-            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 5
         ), "Incorrect number of parsed index files"
 
         with subtests.test(msg="check-txt-query"):
@@ -95,6 +95,17 @@ async def test_get_directory_index(
             assert results[0].docs.keys() == {
                 md5sum((paper_dir / "bates.txt").absolute())
             }
+
+        with subtests.test(msg="check-md-query"):
+            results = await index.query(query="what is a gravity hill?", min_score=5)
+            assert results
+            first_result = results[0]
+            expected_id = md5sum((paper_dir / "gravity_hill.md").absolute())
+            assert expected_id in set(first_result.docs.keys())
+            assert all(
+                x in first_result.docs[expected_id].formatted_citation
+                for x in ("Wikipedia", "Gravity")
+            )
 
         # Check getting the same index name will not reprocess files
         with patch.object(Docs, "aadd") as mock_aadd:
@@ -202,6 +213,7 @@ EXPECTED_STUB_DATA_FILES = {
     "bates.txt",
     "empty.txt",
     "flag_day.html",
+    "gravity_hill.md",
     "obama.txt",
     "paper.pdf",
 }
