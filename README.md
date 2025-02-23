@@ -1023,16 +1023,48 @@ with open("my_docs.pkl", "rb") as f:
 ## Reproduction
 
 Contained in [docs/2024-10-16_litqa2-splits.json5](docs/2024-10-16_litqa2-splits.json5)
-are the question IDs
-(correspond with [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl))
-used in the train and evaluation splits,
-as well as paper DOIs used to build the train and evaluation splits' indexes.
-The test split remains held out.
-Example on how to use LitQA for evaluation can be found in [aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
+are the question IDs used in train, evaluation, and test splits,
+as well as paper DOIs used to build the splits' indexes.
+
+- Train and eval splits: question IDs come from
+  [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl).
+- Test split: questions IDs come from
+  [aviary-paper-data's LitQA2 question IDs](https://huggingface.co/datasets/futurehouse/aviary-paper-data).
+
+There are multiple papers slowly building PaperQA, shown below in [Citation](#citation).
+To reproduce:
+
+- `skarlinski2024language`: train and eval splits are applicable.
+  The test split remains held out.
+- `narayanan2024aviarytraininglanguageagents`: train, eval, and test splits are applicable.
+
+Example on how to use LitQA for evaluation can be found in
+[aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
 
 ## Citation
 
 Please read and cite the following papers if you use this software:
+
+```bibtex
+@article{narayanan2024aviarytraininglanguageagents,
+      title = {Aviary: training language agents on challenging scientific tasks},
+      author = {
+      Siddharth Narayanan and
+ James D. Braza and
+ Ryan-Rhys Griffiths and
+ Manu Ponnapati and
+ Albert Bou and
+ Jon Laurent and
+ Ori Kabeli and
+ Geemi Wellawatte and
+ Sam Cox and
+ Samuel G. Rodriques and
+ Andrew D. White},
+      journal = {arXiv preprent arXiv:2412.21154},
+      year = {2024},
+      url = {https://doi.org/10.48550/arXiv.2412.21154},
+}
+```
 
 ```bibtex
 @article{skarlinski2024language,
@@ -1047,8 +1079,8 @@ Please read and cite the following papers if you use this software:
  Manvitha Ponnapati and
  Samuel G. Rodriques and
  Andrew D. White},
-    year = {2024},
     journal = {arXiv preprent arXiv:2409.13740},
+    year = {2024},
     url = {https://doi.org/10.48550/arXiv.2409.13740}
 }
 ```
@@ -1064,6 +1096,7 @@ Please read and cite the following papers if you use this software:
  Samuel G. Rodriques and
  Andrew D. White},
     journal = {arXiv preprint arXiv:2312.07559},
-    year = {2023}
+    year = {2023},
+    url = {https://doi.org/10.48550/arXiv.2312.07559}
 }
 ```
