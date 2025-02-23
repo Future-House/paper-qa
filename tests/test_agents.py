@@ -57,7 +57,9 @@ from paperqa.utils import extract_thought, get_year, md5sum
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index(agent_test_settings: Settings) -> None:
+async def test_get_directory_index(
+    subtests: SubTests, agent_test_settings: Settings
+) -> None:
     # Since agent_test_settings is used by other tests, we use a tempdir so we
     # can delete files without affecting concurrent tests
     with tempfile.TemporaryDirectory() as tempdir:
@@ -86,8 +88,13 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
         assert (
             sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
         ), "Incorrect number of parsed index files"
-        results = await index.query(query="who is Frederick Bates?")
-        assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
+
+        with subtests.test(msg="check-txt-query"):
+            results = await index.query(query="who is Frederick Bates?", min_score=5)
+            assert results
+            assert results[0].docs.keys() == {
+                md5sum((paper_dir / "bates.txt").absolute())
+            }
 
         # Check getting the same index name will not reprocess files
         with patch.object(Docs, "aadd") as mock_aadd:
