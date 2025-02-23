@@ -73,8 +73,4 @@ from responses to ensure sensitive information is excluded from the cassettes.
 Please ensure cassettes are less than 1 MB
 to keep tests loading quickly.
 
-## Additional resources
-
-For more information on contributing, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file in the repository.
-
 Happy coding!

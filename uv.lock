@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
@@ -613,6 +612,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b5/79/68612ed99700e6413de42895aa725463e821a6b3be75c87fcce1b4af4c70/fsspec-2025.2.0.tar.gz", hash = "sha256:1c24b16eaa0a1798afa0337aa0db9b256718ab2a89c425371f5628d22c3b6afd", size = 292283 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e2/94/758680531a00d06e471ef649e4ec2ed6bf185356a7f9fbfbb7368a40bd49/fsspec-2025.2.0-py3-none-any.whl", hash = "sha256:9de2ad9ce1f85e1931858535bc882543171d197001a0a5eb2ddc04f1781ab95b", size = 184484 },
+]
+
+[[package]]
+name = "future"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/b2/4140c69c6a66432916b26158687e821ba631a4c9273c474343badf84d3ba/future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05", size = 1228490 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/71/ae30dadffc90b9006d77af76b393cb9dfbfc9629f339fc1574a1c52e6806/future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216", size = 491326 },
 ]
 
 [[package]]
@@ -1546,6 +1554,24 @@ wheels = [
 ]
 
 [[package]]
+name = "openreview-py"
+version = "1.46.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "deprecated" },
+    { name = "future" },
+    { name = "pycryptodome" },
+    { name = "pyjwt" },
+    { name = "pylatexenc" },
+    { name = "requests" },
+    { name = "tld" },
+    { name = "tqdm" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/90/2fe270b4c88e2400fc6330195b318498ae026c93db79f668bafbf56cac2c/openreview_py-1.46.3-py3-none-any.whl", hash = "sha256:03c8ca4ab9417ccd87ecbc1c43283ddc5b6423e2e49cba62d295539d7b464067", size = 717452 },
+]
+
+[[package]]
 name = "packaging"
 version = "24.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1649,6 +1675,9 @@ ldp = [
 local = [
     { name = "sentence-transformers" },
 ]
+openreview = [
+    { name = "openreview-py" },
+]
 qdrant = [
     { name = "qdrant-client" },
 ]
@@ -1677,6 +1706,7 @@ requires-dist = [
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
+    { name = "openreview-py", marker = "extra == 'openreview'" },
     { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
     { name = "pybtex" },
@@ -1708,7 +1738,6 @@ requires-dist = [
     { name = "types-setuptools", marker = "extra == 'typing'" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
-provides-extras = ["dev", "ldp", "local", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "paper-qa", extras = ["dev"] }]
@@ -1961,6 +1990,24 @@ wheels = [
 ]
 
 [[package]]
+name = "pycryptodome"
+version = "3.21.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/52/13b9db4a913eee948152a079fe58d035bd3d1a519584155da8e786f767e6/pycryptodome-3.21.0.tar.gz", hash = "sha256:f7787e0d469bdae763b876174cf2e6c0f7be79808af26b1da96f1a64bcf47297", size = 4818071 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a7/88/5e83de10450027c96c79dc65ac45e9d0d7a7fef334f39d3789a191f33602/pycryptodome-3.21.0-cp36-abi3-macosx_10_9_universal2.whl", hash = "sha256:2480ec2c72438430da9f601ebc12c518c093c13111a5c1644c82cdfc2e50b1e4", size = 2495937 },
+    { url = "https://files.pythonhosted.org/packages/66/e1/8f28cd8cf7f7563319819d1e172879ccce2333781ae38da61c28fe22d6ff/pycryptodome-3.21.0-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:de18954104667f565e2fbb4783b56667f30fb49c4d79b346f52a29cb198d5b6b", size = 1634629 },
+    { url = "https://files.pythonhosted.org/packages/6a/c1/f75a1aaff0c20c11df8dc8e2bf8057e7f73296af7dfd8cbb40077d1c930d/pycryptodome-3.21.0-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2de4b7263a33947ff440412339cb72b28a5a4c769b5c1ca19e33dd6cd1dcec6e", size = 2168708 },
+    { url = "https://files.pythonhosted.org/packages/ea/66/6f2b7ddb457b19f73b82053ecc83ba768680609d56dd457dbc7e902c41aa/pycryptodome-3.21.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0714206d467fc911042d01ea3a1847c847bc10884cf674c82e12915cfe1649f8", size = 2254555 },
+    { url = "https://files.pythonhosted.org/packages/2c/2b/152c330732a887a86cbf591ed69bd1b489439b5464806adb270f169ec139/pycryptodome-3.21.0-cp36-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:7d85c1b613121ed3dbaa5a97369b3b757909531a959d229406a75b912dd51dd1", size = 2294143 },
+    { url = "https://files.pythonhosted.org/packages/55/92/517c5c498c2980c1b6d6b9965dffbe31f3cd7f20f40d00ec4069559c5902/pycryptodome-3.21.0-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:8898a66425a57bcf15e25fc19c12490b87bd939800f39a03ea2de2aea5e3611a", size = 2160509 },
+    { url = "https://files.pythonhosted.org/packages/39/1f/c74288f54d80a20a78da87df1818c6464ac1041d10988bb7d982c4153fbc/pycryptodome-3.21.0-cp36-abi3-musllinux_1_2_i686.whl", hash = "sha256:932c905b71a56474bff8a9c014030bc3c882cee696b448af920399f730a650c2", size = 2329480 },
+    { url = "https://files.pythonhosted.org/packages/39/1b/d0b013bf7d1af7cf0a6a4fce13f5fe5813ab225313755367b36e714a63f8/pycryptodome-3.21.0-cp36-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:18caa8cfbc676eaaf28613637a89980ad2fd96e00c564135bf90bc3f0b34dd93", size = 2254397 },
+    { url = "https://files.pythonhosted.org/packages/14/71/4cbd3870d3e926c34706f705d6793159ac49d9a213e3ababcdade5864663/pycryptodome-3.21.0-cp36-abi3-win32.whl", hash = "sha256:280b67d20e33bb63171d55b1067f61fbd932e0b1ad976b3a184303a3dad22764", size = 1775641 },
+    { url = "https://files.pythonhosted.org/packages/43/1d/81d59d228381576b92ecede5cd7239762c14001a828bdba30d64896e9778/pycryptodome-3.21.0-cp36-abi3-win_amd64.whl", hash = "sha256:b7aa25fc0baa5b1d95b7633af4f5f1838467f1815442b22487426f94e0d66c53", size = 1812863 },
+]
+
+[[package]]
 name = "pydantic"
 version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2048,6 +2095,21 @@ sdist = { url = "https://files.pythonhosted.org/packages/7c/2d/c3338d48ea6cc0feb
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293 },
 ]
+
+[[package]]
+name = "pyjwt"
+version = "2.10.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/46/bd74733ff231675599650d3e47f361794b22ef3e3770998dda30d3b63726/pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953", size = 87785 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/ad/689f02752eeec26aed679477e80e632ef1b682313be70793d798c1d5fc8f/PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb", size = 22997 },
+]
+
+[[package]]
+name = "pylatexenc"
+version = "2.10"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/ab/34ec41718af73c00119d0351b7a2531d2ebddb51833a36448fc7b862be60/pylatexenc-2.10.tar.gz", hash = "sha256:3dd8fd84eb46dc30bee1e23eaab8d8fb5a7f507347b23e5f38ad9675c84f40d3", size = 162597 }
 
 [[package]]
 name = "pylint"
@@ -2829,6 +2891,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/bb/4513da71cac187383541facd0291c4572b03ec23c561de5811781bbd988f/tiktoken-0.9.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cc156cb314119a8bb9748257a2eaebd5cc0753b6cb491d26694ed42fc7cb3139", size = 1195649 },
     { url = "https://files.pythonhosted.org/packages/fa/5c/74e4c137530dd8504e97e3a41729b1103a4ac29036cbfd3250b11fd29451/tiktoken-0.9.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:cd69372e8c9dd761f0ab873112aba55a0e3e506332dd9f7522ca466e817b1b7a", size = 1258465 },
     { url = "https://files.pythonhosted.org/packages/de/a8/8f499c179ec900783ffe133e9aab10044481679bb9aad78436d239eee716/tiktoken-0.9.0-cp313-cp313-win_amd64.whl", hash = "sha256:5ea0edb6f83dc56d794723286215918c1cde03712cbbafa0348b33448faf5b95", size = 894669 },
+]
+
+[[package]]
+name = "tld"
+version = "0.13"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/2b/678082222bc1d2823ea8384c6806085b85226ff73885c703fe0c7143ef64/tld-0.13.tar.gz", hash = "sha256:93dde5e1c04bdf1844976eae440706379d21f4ab235b73c05d7483e074fb5629", size = 446824 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ea/75/779ddeaf4d847ba0021ad99d1b615a853f2a5762bd5d118273c7f7673c38/tld-0.13-py2.py3-none-any.whl", hash = "sha256:f75b2be080f767ed17c2338a339eaa4fab5792586319ca819119da252f9f3749", size = 263789 },
 ]
 
 [[package]]
