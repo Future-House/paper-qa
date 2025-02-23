@@ -31,7 +31,8 @@ The illusion is similar to the [Ames room](https://en.wikipedia.org/wiki/Ames_ro
 in which objects can also appear to roll against gravity.
 
 The opposite phenomenon—an uphill road that appears flat—is known in
-[bicycle racing](https://en.wikipedia.org/wiki/Cycle_sport) as a ["false flat"](https://en.wikipedia.org/wiki/Glossary_of_cycling#F).
+[bicycle racing](https://en.wikipedia.org/wiki/Cycle_sport)
+as a ["false flat"](https://en.wikipedia.org/wiki/Glossary_of_cycling#F).
 
 ## See also
 

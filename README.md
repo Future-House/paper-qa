@@ -344,7 +344,7 @@ It just removes the automation associated with an agent picking the documents to
 ```python
 from paperqa import Docs, Settings
 
-# valid extensions include .pdf, .txt, and .html
+# valid extensions include .pdf, .txt, .md, and .html
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 # Prepare the Docs object by adding a bunch of documents
@@ -390,7 +390,7 @@ from paperqa import Docs
 
 async def main() -> None:
     docs = Docs()
-    # valid extensions include .pdf, .txt, and .html
+    # valid extensions include .pdf, .txt, .md, and .html
     for doc in ("myfile.pdf", "myotherfile.pdf"):
         await docs.aadd(doc)
 
