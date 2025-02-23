@@ -53,7 +53,7 @@ from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, PQASession, Text
-from paperqa.utils import extract_thought, get_year, md5sum
+from paperqa.utils import encode_id, extract_thought, get_year, md5sum
 
 
 @pytest.mark.asyncio
@@ -103,11 +103,20 @@ async def test_get_directory_index(
             assert results
             first_result = results[0]
             target_doc_path = (paper_dir / "gravity_hill.md").absolute()
-            expected_id = md5sum(target_doc_path)
-            assert expected_id in set(first_result.docs.keys()), (
-                f"Expected to find {target_doc_path.name!r}, got citations"
-                f" {[d.formatted_citation for d in first_result.docs.values()]}."
-            )
+            expected_ids = {
+                md5sum(target_doc_path),  # What we actually expect
+                encode_id(
+                    "10.2307/j.ctt5vkfh7.11"  # Crossref may match this Gravity Hill poem, lol
+                ),
+            }
+            for expected_id in expected_ids:
+                if expected_id in set(first_result.docs.keys()):
+                    break
+            else:
+                raise AssertionError(
+                    f"Failed to match an ID in {expected_ids}, got citations"
+                    f" {[d.formatted_citation for d in first_result.docs.values()]}."
+                )
             assert all(
                 x in first_result.docs[expected_id].formatted_citation
                 for x in ("Wikipedia", "Gravity")
