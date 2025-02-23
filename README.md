@@ -271,7 +271,7 @@ and slow down your queries to accommodate.
 You can also specify them manually with any rate limit string that matches the specification in the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
-pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
+pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
 Or by adding into a `Settings` object, if calling imperatively:
@@ -282,8 +282,8 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
-        summary_llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
+        llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
+        summary_llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
     ),
 )
 ```
@@ -405,11 +405,10 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, PaperQA2 uses OpenAI's `gpt-4o-2024-08-06` model for:
-
-- `summary_llm`: Re-ranking and summarizing evidence passages
-- `llm`: Generating the final answer
-- `agent_llm`: Making tool selection decisions
+By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
+`summary_llm`, `llm`, and `agent_llm`.
+Please see the [Settings Cheatsheet](#settings-cheatsheet)
+for more information on these settings.
 
 You can adjust this easily to use any model supported by `litellm`:
 
@@ -769,9 +768,9 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                             |
 | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-08-06"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
+| `llm`                                        | `"gpt-4o-2024-11-20"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
-| `summary_llm`                                | `"gpt-4o-2024-08-06"`                  | Default LLM for summaries and parsing citations.                                                        |
+| `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | Default LLM for summaries and parsing citations.                                                        |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
 | `embedding`                                  | `"text-embedding-3-small"`             | Default embedding model for texts.                                                                      |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                 |
@@ -809,7 +808,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
 | `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
 | `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
-| `agent.agent_llm`                            | `"gpt-4o-2024-08-06"`                  | Model to use for agent.                                                                                 |
+| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | Model to use for agent making tool selections.                                                          |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                 |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                   |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                   |
