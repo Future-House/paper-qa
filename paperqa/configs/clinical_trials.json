@@ -7,7 +7,7 @@
   "agent": {
     "tool_names": [
       "gather_evidence",
-      "search_papers",
+      "paper_search",
       "gen_answer",
       "clinical_trials_search",
       "complete"
