@@ -13,22 +13,19 @@ and get your username and password from the website. You can put them into `.env
 
 ```python
 from paperqa import Settings
+from paperqa.contrib.openreview_paper_helper import OpenReviewPaperHelper
 
 # these settings require gemini api key you can get from https://aistudio.google.com/
 # import os; os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
 # 1Mil context window helps to suggest papers. These settings are not required, but useful for an initial setup.
 settings = Settings.from_name("openreview")
-
-question = "What is the progress on brain activity research?"
-
-
-from paperqa.contrib.openreview_paper_helper import OpenReviewPaperHelper
-
 helper = OpenReviewPaperHelper(settings, venue_id="ICLR.cc/2025/Conference")
 # if you don't know venue_id you can find it via
 # helper.get_venues()
 
 # Now we can query LLM to select relevant papers and download PDFs
+question = "What is the progress on brain activity research?"
+
 submissions = helper.fetch_relevant_papers(question)
 
 # There's also a function that saves tokens by using openreview metadata for citations

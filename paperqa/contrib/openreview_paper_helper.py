@@ -133,8 +133,7 @@ class OpenReviewPaperHelper:
         pdf_link = f"https://openreview.net/{submission.content['pdf']['value']}"
         async with httpx.AsyncClient() as client:
             response = await client.get(pdf_link)
-        SUCCESS_CODE = 200
-        if response.status_code == SUCCESS_CODE:
+        if response.status_code == httpx.codes.OK.value:
             async with await anyio.open_file(
                 f"{self.settings.paper_directory}/{submission.id}.pdf", "wb"
             ) as f:
@@ -145,8 +144,11 @@ class OpenReviewPaperHelper:
         )
         return False
 
-    async def aadd_docs(self, subs: dict[str, Any] | None = None) -> Docs:
-        docs = Docs()
+    async def aadd_docs(
+        self, subs: dict[str, Any] | None = None, docs: Docs | None = None
+    ) -> Docs:
+        if docs is None:
+            docs = Docs()
         for doc_path in Path(self.settings.paper_directory).rglob("*.pdf"):
             sub = subs.get(doc_path.stem) if subs is not None else None
             if sub:
