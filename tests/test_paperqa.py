@@ -25,6 +25,7 @@ from lmi import (
     SparseEmbeddingModel,
 )
 from lmi.llms import rate_limited
+from lmi.utils import VCR_DEFAULT_MATCH_ON
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -55,7 +56,6 @@ from paperqa.utils import (
     strings_similarity,
     strip_citations,
 )
-from tests.conftest import VCR_DEFAULT_MATCH_ON
 
 THIS_MODULE = pathlib.Path(__file__)
 

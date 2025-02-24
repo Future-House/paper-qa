@@ -53,11 +53,13 @@ from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, PQASession, Text
-from paperqa.utils import extract_thought, get_year, md5sum
+from paperqa.utils import encode_id, extract_thought, get_year, md5sum
 
 
 @pytest.mark.asyncio
-async def test_get_directory_index(agent_test_settings: Settings) -> None:
+async def test_get_directory_index(
+    subtests: SubTests, agent_test_settings: Settings
+) -> None:
     # Since agent_test_settings is used by other tests, we use a tempdir so we
     # can delete files without affecting concurrent tests
     with tempfile.TemporaryDirectory() as tempdir:
@@ -80,14 +82,45 @@ async def test_get_directory_index(agent_test_settings: Settings) -> None:
             "year",
         ], "Incorrect fields in index"
         assert not index.changed, "Expected index to not have changes at this point"
-        # paper.pdf + empty.txt + flag_day.html + bates.txt + obama.txt,
+        # bates.txt + empty.txt + flag_day.html + gravity_hill.md + obama.txt + paper.pdf,
         # but empty.txt fails to be added
         path_to_id = await index.index_files
         assert (
-            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 4
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 5
         ), "Incorrect number of parsed index files"
-        results = await index.query(query="who is Frederick Bates?")
-        assert results[0].docs.keys() == {md5sum((paper_dir / "bates.txt").absolute())}
+
+        with subtests.test(msg="check-txt-query"):
+            results = await index.query(query="who is Frederick Bates?", min_score=5)
+            assert results
+            target_doc_path = (paper_dir / "bates.txt").absolute()
+            assert results[0].docs.keys() == {md5sum(target_doc_path)}, (
+                f"Expected to find {target_doc_path.name!r}, got citations"
+                f" {[d.formatted_citation for d in results[0].docs.values()]}."
+            )
+
+        with subtests.test(msg="check-md-query"):
+            results = await index.query(query="what is a gravity hill?", min_score=5)
+            assert results
+            first_result = results[0]
+            target_doc_path = (paper_dir / "gravity_hill.md").absolute()
+            expected_ids = {
+                md5sum(target_doc_path),  # What we actually expect
+                encode_id(
+                    "10.2307/j.ctt5vkfh7.11"  # Crossref may match this Gravity Hill poem, lol
+                ),
+            }
+            for expected_id in expected_ids:
+                if expected_id in set(first_result.docs.keys()):
+                    break
+            else:
+                raise AssertionError(
+                    f"Failed to match an ID in {expected_ids}, got citations"
+                    f" {[d.formatted_citation for d in first_result.docs.values()]}."
+                )
+            assert all(
+                x in first_result.docs[expected_id].formatted_citation
+                for x in ("Wikipedia", "Gravity")
+            )
 
         # Check getting the same index name will not reprocess files
         with patch.object(Docs, "aadd") as mock_aadd:
@@ -195,6 +228,7 @@ EXPECTED_STUB_DATA_FILES = {
     "bates.txt",
     "empty.txt",
     "flag_day.html",
+    "gravity_hill.md",
     "obama.txt",
     "paper.pdf",
 }
