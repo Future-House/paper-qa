@@ -197,12 +197,13 @@ import json
 import os
 
 import pandas as pd
+from aviary.envs.lfrqa import LFRQAQuestion, LFRQATaskDataset
 from ldp.agent import SimpleAgent
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 
 from paperqa import Settings
-from paperqa.agents.task import LFRQAQuestion, LFRQATaskDataset
 from paperqa.settings import AgentSettings, IndexSettings
+
 
 log_results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
 os.makedirs(log_results_dir, exist_ok=True)
