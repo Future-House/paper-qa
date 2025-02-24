@@ -4,8 +4,10 @@ import os
 from pathlib import Path
 from typing import Any
 
+import anyio
 import httpx
-from litellm import completion
+from aviary.core import Message
+from lmi import LiteLLMModel
 from pydantic import BaseModel, Field
 
 from paperqa import Docs, Settings
@@ -19,22 +21,19 @@ logger = logging.getLogger(__name__)
 
 
 class PaperSuggestion(BaseModel):
-    submission_id: str = Field(..., description="The ID of the submission")
-    explanation: str = Field(
-        ..., description="Reasoning for why this paper is relevant"
-    )
+    submission_id: str = Field(description="The ID of the submission")
+    explanation: str = Field(description="Reasoning for why this paper is relevant")
 
 
 class RelevantPapersResponse(BaseModel):
     suggested_papers: list[PaperSuggestion] = Field(
-        ..., description="List of suggested papers with their IDs and explanations"
+        description="List of suggested papers with their IDs and explanations"
     )
     reasoning_step_by_step: str = Field(
-        ..., description="Step-by-step reasoning for the selection"
+        description="Step-by-step reasoning for the selection"
     )
 
 
-# Generate schema once at module level
 RELEVANT_PAPERS_SCHEMA = RelevantPapersResponse.model_json_schema()
 
 
@@ -58,6 +57,9 @@ class OpenReviewPaperHelper:
             password=password or os.getenv("OPENREVIEW_PASSWORD"),
         )
         self.venue_id = venue_id
+        self.llm_model = LiteLLMModel(
+            name=self.settings.llm, config=self.settings.llm_config
+        )
 
     def get_venues(self) -> list[str]:
         """Get list of available venues."""
@@ -80,7 +82,7 @@ class OpenReviewPaperHelper:
             submission_info_string += f"{paper}\n"
         return submission_info_string
 
-    def fetch_relevant_papers(self, question: str) -> dict[str, Any]:
+    async def fetch_relevant_papers(self, question: str) -> dict[str, Any]:
         """Get relevant papers for a given question using LLM."""
         submissions = self.get_submissions()
         submission_string = self.create_submission_string(submissions)
@@ -97,53 +99,49 @@ class OpenReviewPaperHelper:
         relevant_papers = []
         for chunk in chunks:
             logger.info(f"Fetching relevant papers for question: {question}")
-            relevant_papers += self._get_relevant_papers_chunk(question, chunk)
+            relevant_papers += await self._get_relevant_papers_chunk(question, chunk)
         subs = [s for s in submissions if s.id in set(relevant_papers)]
-        self.download_papers(subs)
+        await self.download_papers(subs)
         return {sub.id: sub for sub in subs}
 
-    def _get_relevant_papers_chunk(self, question: str, chunk: str) -> list[Any]:
+    async def _get_relevant_papers_chunk(self, question: str, chunk: str) -> list[Any]:
         prompt = (
             chunk
             + "You are the helper model that aims to get up to 20 most relevant papers for the user's question. "
             + "User's question:\n"
         )
 
-        response = completion(
-            model=self.settings.llm,
-            messages=[{"role": "user", "content": prompt + question}],
-            response_format={
-                "type": "json_object",
-                "response_schema": RELEVANT_PAPERS_SCHEMA,
-            },
-            verbose=self.settings.verbosity,
+        response = await self.llm_model.call_single(
+            messages=[Message(role="user", content=prompt + question)],
+            output_type=RELEVANT_PAPERS_SCHEMA,
         )
 
-        content = json.loads(response.choices[0].message.content)
+        content = json.loads(str(response.text))
         return [p["submission_id"] for p in content["suggested_papers"]]
 
-    def download_papers(self, submissions: list[Any]) -> None:
+    async def download_papers(self, submissions: list[Any]) -> None:
         """Download PDFs for given submissions."""
         downloaded_papers = Path(self.settings.paper_directory).rglob("*.pdf")
         downloaded_ids = [p.stem for p in downloaded_papers]
         logger.info("Downloading PDFs for relevant papers.")
         for submission in submissions:
             if submission.id not in downloaded_ids:
-                self._download_pdf(submission)
+                await self._download_pdf(submission)
 
-    def _download_pdf(self, submission: Any) -> bool:
+    async def _download_pdf(self, submission: Any) -> bool:
         """Download a single PDF."""
         pdf_link = f"https://openreview.net/{submission.content['pdf']['value']}"
-        response = httpx.get(pdf_link)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(pdf_link)
         SUCCESS_CODE = 200
         if response.status_code == SUCCESS_CODE:
-            with open(
+            async with await anyio.open_file(
                 f"{self.settings.paper_directory}/{submission.id}.pdf", "wb"
             ) as f:
-                f.write(response.content)
+                await f.write(response.content)
             return True
         logger.warning(
-            f"Failed to download the PDF. Status code: {response.status_code}"
+            f"Failed to download the PDF. Status code: {response.status_code}, text: {response.text}"
         )
         return False
 
