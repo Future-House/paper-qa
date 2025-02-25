@@ -50,6 +50,7 @@ from paperqa.readers import read_doc
 from paperqa.utils import (
     extract_score,
     get_citenames,
+    maybe_get_date,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -1644,3 +1645,11 @@ class TestLLMParseJson:
     )
     def test_llm_parse_json_with_escaped_characters(self, input_text, expected_output):
         assert llm_parse_json(input_text) == expected_output
+
+
+def test_maybe_get_date():
+    assert maybe_get_date("2023-01-01") == datetime(2023, 1, 1)
+    assert maybe_get_date("2023-01-31 14:30:00") == datetime(2023, 1, 31, 14, 30)
+    assert maybe_get_date(datetime(2023, 1, 1)) == datetime(2023, 1, 1)
+    assert maybe_get_date("foo") is None
+    assert maybe_get_date("") is None
