@@ -30,6 +30,7 @@ from paperqa.utils import (
     encode_id,
     format_bibtex,
     get_citenames,
+    maybe_get_date,
 )
 from paperqa.version import __version__ as pqa_version
 
@@ -585,8 +586,8 @@ class DocDetails(Doc):
                 "pages": data.get("pages"),
                 "month": (
                     None
-                    if not data.get("publication_date")
-                    else data["publication_date"].strftime("%b")
+                    if not (maybe_date := maybe_get_date(data.get("publication_date")))
+                    else maybe_date.strftime("%b")
                 ),
                 "doi": data.get("doi"),
                 "url": data.get("doi_url"),
