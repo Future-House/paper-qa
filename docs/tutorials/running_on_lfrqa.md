@@ -189,7 +189,7 @@ After this runs, you will get an answer!
 
 After you have built the index, you are ready to run the benchmark.
 
-Copy the following into a file and run it. To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
+Copy the following into a file and run it. To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) and [`fhaviary[lfrqa]`](https://github.com/Future-House/aviary/blob/main/packages/lfrqa/README.md#installation) packages installed.
 
 ```python
 import asyncio
