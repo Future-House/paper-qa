@@ -565,11 +565,11 @@ def maybe_get_date(date: str | datetime | None) -> datetime | None:
     if isinstance(date, str):
         # Try common date formats in sequence
         formats = [
-            "%Y-%m-%d",  # ISO format: 2023-01-31
-            "%Y-%m-%d %H:%M:%S",  # ISO with time: 2023-01-31 14:30:00
             "%Y-%m-%dT%H:%M:%S%z",  # ISO with timezone: 2023-01-31T14:30:00+0000
-            "%b %d, %Y",  # Month day, year: Jan 31, 2023
+            "%Y-%m-%d %H:%M:%S",  # ISO with time: 2023-01-31 14:30:00
             "%B %d, %Y",  # Full month day, year: January 31, 2023
+            "%b %d, %Y",  # Month day, year: Jan 31, 2023
+            "%Y-%m-%d",  # ISO format: 2023-01-31
         ]
 
         for fmt in formats:
