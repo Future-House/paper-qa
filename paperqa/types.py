@@ -125,6 +125,7 @@ class PQASession(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
+    answer_reasoning: str = ""
     has_successful_answer: bool | None = Field(
         default=None,
         description=(
