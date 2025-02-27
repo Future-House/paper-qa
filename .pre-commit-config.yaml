@@ -35,6 +35,13 @@ repos:
     rev: v3.4.2
     hooks:
       - id: prettier
+  - repo: https://github.com/mwouts/jupytext
+    rev: v1.16.7
+    hooks:
+      - id: jupytext
+        args: [--sync, --pipe, black]
+        additional_dependencies: [black]
+        files: ^docs/.*\.ipynb$
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.24.2
     hooks:
@@ -71,6 +78,12 @@ repos:
     rev: 1.19.1
     hooks:
       - id: blacken-docs
+        exclude: \.md$ # markdown files are being blackened by jupytext
+  - repo: https://github.com/srstevenson/nb-clean
+    rev: 4.0.1
+    hooks:
+      - id: nb-clean
+        args: [--preserve-cell-outputs, --remove-empty-cells]
   - repo: https://github.com/jsh9/markdown-toc-creator
     rev: 0.0.10
     hooks:
