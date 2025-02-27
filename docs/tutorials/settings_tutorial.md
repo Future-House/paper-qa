@@ -5,17 +5,14 @@
 This tutorial aims to show how to use the `Settings` class to configure `PaperQA`.
 Firstly, we will be using `OpenAI` and `Anthropic` models, so we need to set the `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` environment variables.
 We will use both models to make it clear when `paperqa` agent is using either one or the other.
-We use `python-dotenv` to load the environment variables from a `.env` file. 
+We use `python-dotenv` to load the environment variables from a `.env` file.
 Hence, our first step is to create a `.env` file and install the required packages.
 
 ```bash
 echo "OPENAI_API_KEY=<your-openai-api-key>" > .env
 echo "ANTHROPIC_API_KEY=<your-anthropic-api-key>" >> .env
 
-uv pip install -q nest-asyncio
-uv pip install -q python-dotenv
-uv pip install -q fhlmi
-uv pip install -q "paper-qa[local]"
+!uv pip install -q nest-asyncio python-dotenv fhlmi "paper-qa[local]" aiohttp
 ```
 
 ```python
@@ -47,21 +44,24 @@ os.makedirs("papers", exist_ok=True)
 
 # Download the paper from arXiv and save it to the `papers` directory
 url = "https://arxiv.org/pdf/2407.01603"
-response = requests.get(url, timeout=60)
-with open("papers/2407.01603.pdf", "wb") as f:
-    f.write(response.content)
+async with aiohttp.ClientSession() as session:
+    async with session.get(url, timeout=60) as response:
+        content = await response.read()
+        with open("papers/2407.01603.pdf", "wb") as f:
+            f.write(content)
 ```
 
-The `Settings` class is used to configure the PaperQA settings. 
+The `Settings` class is used to configure the PaperQA settings.
 Official documentation can be found [here](https://github.com/Future-House/paper-qa?tab=readme-ov-file#settings-cheatsheet) and the open source code can be found [here](https://github.com/Future-House/paper-qa/blob/main/paperqa/settings.py).
 
-Here is a basic example of how to use the `Settings` class. We will be unnecessarily verbose for the sake of clarity. Please notice that most of the settings are optional and the defaults are good for most cases. Refer to the [descriptions of each setting]((https://github.com/Future-House/paper-qa/blob/main/paperqa/settings.py)) for more information.
+Here is a basic example of how to use the `Settings` class. We will be unnecessarily verbose for the sake of clarity. Please notice that most of the settings are optional and the defaults are good for most cases. Refer to the [descriptions of each setting](<(https://github.com/Future-House/paper-qa/blob/main/paperqa/settings.py)>) for more information.
 
 Within this `Settings` object, I'd like to discuss specifically how the llms are configured and how `paperqa` looks for papers.
 
 A common source of confusion is that multiple `llms` are used in paperqa. We have `llm`, `summary_llm`, `agent_llm`, and `embedding`. Hence, if `llm` is set to an `Anthropic` model, `summary_llm` and `agent_llm` will still require a `OPENAI_API_KEY`, since `OpenAI` models are the default.
 
 Among the objects that use `llms` in `paperqa`, we have `llm`, `summary_llm`, `agent_llm`, and `embedding`:
+
 - `llm`: Main LLM used by the agent to reason about the question, extract metadata from documents, etc.
 - `summary_llm`: LLM used to summarize the papers.
 - `agent_llm`: LLM used to answer questions and select tools.
@@ -71,7 +71,14 @@ Let's see some examples around this concept. First, we define the settings with 
 
 ```python
 import pathlib
-from paperqa.settings import Settings, AnswerSettings, ParsingSettings, PromptSettings, AgentSettings, IndexSettings
+from paperqa.settings import (
+    Settings,
+    AnswerSettings,
+    ParsingSettings,
+    PromptSettings,
+    AgentSettings,
+    IndexSettings,
+)
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
@@ -97,7 +104,7 @@ settings = Settings(
                     "model": llm_openai,
                     "temperature": 0.1,
                     "max_tokens": 512,
-                }
+                },
             }
         ],
         "rate_limit": {
@@ -156,7 +163,7 @@ settings = Settings(
                     "model_name": llm_openai,
                     "litellm_params": {
                         "model": llm_openai,
-                    }
+                    },
                 }
             ],
             "rate_limit": {
@@ -169,7 +176,7 @@ settings = Settings(
         index=IndexSettings(
             paper_directory=pathlib.Path.cwd().joinpath("papers"),
             index_directory=pathlib.Path.cwd().joinpath("papers/index"),
-        )
+        ),
     ),
 )
 ```
@@ -180,20 +187,25 @@ We also set settings.verbosity to 1, which will print the agent configuration. F
 
 ```python
 from paperqa import ask
-response = ask("What are the most relevant language models used for chemistry?", settings=settings)
+
+response = ask(
+    "What are the most relevant language models used for chemistry?", settings=settings
+)
 ```
 
 Which probably worked fine. Let's now try to remove `OPENAI_API_KEY` and run again the same question with the same settings.
 
 ```python
-os.environ['OPENAI_API_KEY'] = "sk-invalid-key"
+os.environ["OPENAI_API_KEY"] = "sk-invalid-key"
 print(f"Current environment variables:")
 print(f"OPENAI_API_KEY: {os.environ['OPENAI_API_KEY']}")
 print(f"ANTHROPIC_API_KEY: {os.environ['ANTHROPIC_API_KEY']}")
 ```
 
 ```python
-response = ask("What are the most relevant language models used for chemistry?", settings=settings)
+response = ask(
+    "What are the most relevant language models used for chemistry?", settings=settings
+)
 ```
 
 It would obviously fail. We don't have a valid `OPENAI_API_KEY`, so the agent will not be able to use `OpenAI` models. Let's change it to an `Anthropic` model and see if it works.
@@ -208,7 +220,7 @@ settings.llm_config = {
                 "model": llm_anthropic,
                 "temperature": 0.1,
                 "max_tokens": 512,
-            }
+            },
         }
     ],
     "rate_limit": {
@@ -229,13 +241,15 @@ settings.agent = AgentSettings(
         },
     },
     index=IndexSettings(
-            paper_directory=pathlib.Path.cwd().joinpath("papers"),
-            index_directory=pathlib.Path.cwd().joinpath("papers/index"),
-        )
+        paper_directory=pathlib.Path.cwd().joinpath("papers"),
+        index_directory=pathlib.Path.cwd().joinpath("papers/index"),
+    ),
 )
 # settings.embedding = "st-multi-qa-MiniLM-L6-cos-v1"
 settings.embedding = "hybrid-st-multi-qa-MiniLM-L6-cos-v1"
-response = ask("What are the most relevant language models used for chemistry?", settings=settings)
+response = ask(
+    "What are the most relevant language models used for chemistry?", settings=settings
+)
 ```
 
 Now the agent is able to use `Anthropic` models only and although we don't have a valid `OPENAI_API_KEY`, the question is answered because the agent will not use `OpenAI` models. See that we also changed the `embedding` because it was using `text-embedding-3-small` by default, which is a `OpenAI` model. `Paperqa` implements a few embedding models. Please refer to the [documentation](https://github.com/Future-House/paper-qa?tab=readme-ov-file#embedding-model) for more information.
@@ -271,12 +285,14 @@ print("3. References cited:")
 print(f"{response.session.references}\n")
 ```
 
-Lastly, `PQASession.session.contexts` contains the contexts used to generate the answer. Each context has a score, which is the similarity between the question and the context. 
+Lastly, `PQASession.session.contexts` contains the contexts used to generate the answer. Each context has a score, which is the similarity between the question and the context.
 `Paperqa` uses this score to choose what contexts is more relevant to answer the question.
 
 ```python
 print("4. Contexts used to generate the answer:")
-print("These are the relevant text passages that were retrieved and used to formulate the answer:")
+print(
+    "These are the relevant text passages that were retrieved and used to formulate the answer:"
+)
 for i, ctx in enumerate(response.session.contexts, 1):
     print(f"\nContext {i}:")
     print(f"Source: {ctx.text.name}")
