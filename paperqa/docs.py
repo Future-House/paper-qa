@@ -844,7 +844,7 @@ class Docs(BaseModel):
 
         # now at end we modify, so we could have retried earlier
         session.answer = answer_text
-        session.answer_reasoning = answer_reasoning or ""
+        session.answer_reasoning = answer_reasoning
         session.formatted_answer = formatted_answer
         session.references = bib_str
         session.contexts = contexts

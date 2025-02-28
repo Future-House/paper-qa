@@ -582,7 +582,7 @@ def test_llmresult_callback(docs_fixture: Docs) -> None:
         ),
     ],
 )
-# @pytest.mark.vcr
+@pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
 def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
     settings = Settings(
         llm=llm,
