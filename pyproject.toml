@@ -79,6 +79,9 @@ ldp = [
 local = [
     "sentence-transformers",
 ]
+openreview = [
+    "openreview-py",
+]
 qdrant = [
     "qdrant-client",
 ]
@@ -164,6 +167,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
+    "openreview",
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
