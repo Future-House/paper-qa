@@ -387,7 +387,7 @@ class IndexSettings(BaseModel):
         ),
     )
     index_directory: str | os.PathLike = Field(
-        default=pqa_directory("indexes"),
+        default_factory=lambda: pqa_directory("indexes"),
         description=(
             "Directory to store the PQA built search index, configuration, and"
             " answer indexes."
@@ -666,7 +666,7 @@ class Settings(BaseSettings):
         frozen=True,
     )
     index_directory: str | os.PathLike | None = Field(
-        default=pqa_directory("indexes"),
+        default_factory=lambda: pqa_directory("indexes"),
         description=(
             "Directory to store the PQA generated search index, configuration, and"
             " answer indexes."
