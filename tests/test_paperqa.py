@@ -557,7 +557,7 @@ def test_llmresult_callback(docs_fixture: Docs) -> None:
 
 
 @pytest.mark.parametrize(
-    "llm, llm_settings",
+    ("llm", "llm_settings"),
     [
         pytest.param(
             "deepseek/deepseek-reasoner",
@@ -748,7 +748,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
     class StubLLMModel(LLMModel):
-        name: str = "myllm"
+        name: str = "custom/myllm"
 
         async def acompletion(
             self, messages: list[Message], **kwargs  # noqa: ARG002
