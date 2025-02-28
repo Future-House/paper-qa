@@ -774,6 +774,7 @@ class Docs(BaseModel):
             answer_text = (
                 f"{CANNOT_ANSWER_PHRASE} this question due to insufficient information."
             )
+            answer_reasoning = None
         else:
             with set_llm_session_ids(session.id):
                 messages = [
@@ -794,6 +795,7 @@ class Docs(BaseModel):
                     name="answer",
                 )
             answer_text = cast(str, answer_result.text)
+            answer_reasoning = answer_result.reasoning_content
             session.add_tokens(answer_result)
         # it still happens
         if (ex_citation := prompt_config.EXAMPLE_CITATION) in answer_text:
@@ -834,6 +836,7 @@ class Docs(BaseModel):
                     name="post",
                 )
             answer_text = cast(str, post.text)
+            answer_reasoning = post.reasoning_content
             session.add_tokens(post)
             formatted_answer = f"Question: {session.question}\n\n{post}\n"
             if bib:
@@ -841,6 +844,7 @@ class Docs(BaseModel):
 
         # now at end we modify, so we could have retried earlier
         session.answer = answer_text
+        session.answer_reasoning = answer_reasoning
         session.formatted_answer = formatted_answer
         session.references = bib_str
         session.contexts = contexts

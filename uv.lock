@@ -493,7 +493,7 @@ llm = [
 
 [[package]]
 name = "fhlmi"
-version = "0.25.2"
+version = "0.25.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coredis" },
@@ -504,9 +504,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/e3/1aec444837dc4ff4871dd3bcf4d67f016f228558068cfca486a790af980f/fhlmi-0.25.2.tar.gz", hash = "sha256:0f5522d3c25aa9210d87f342f1a4540cf90cb9490e0366a898ef8ee79820b272", size = 136251 }
+sdist = { url = "https://files.pythonhosted.org/packages/da/53/898553ccc5e276a98baba4d4d5fb68319c3727da9279399c2875e2dcc079/fhlmi-0.25.4.tar.gz", hash = "sha256:60211af8600491ad1e5e080ec427d726dbad129b0c4512d5e8c1b1a66e4d28a6", size = 146626 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d6/33/2ebef42074cd26313c830f8555f6b9a9b922e98219674746b4ed965b73fe/fhlmi-0.25.2-py3-none-any.whl", hash = "sha256:03c2db98e294cb9b1c8696643beb05f58fa30186c71c0aeb01b6812bc7c64974", size = 36147 },
+    { url = "https://files.pythonhosted.org/packages/2a/76/d0afd0c219b03423c5502788feda1ffe4c59bfd83f68d6d3e37a596eaf77/fhlmi-0.25.4-py3-none-any.whl", hash = "sha256:81374a66472995497bf061d0bb1252e7b0e59668c6bde41235a665b99c8d0dce", size = 37854 },
 ]
 
 [[package]]
@@ -1048,7 +1048,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "0.25.2"
+version = "0.25.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1065,9 +1065,9 @@ dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
     { name = "usearch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/aa/5c/43faba8aff85cdaad4477f6d407600d2852a67bb2486a83869154809c893/ldp-0.25.2.tar.gz", hash = "sha256:691c0849b53c2535090bdb7b2e3b2040806ba9920cc86d181310cb0292d9128a", size = 579570 }
+sdist = { url = "https://files.pythonhosted.org/packages/02/09/806196b129d1deddb8ea5076120b1f97710c07b43c5c66387629ef40de85/ldp-0.25.4.tar.gz", hash = "sha256:4a1a303ad94dcb02345fe73992d6c24bc4805348c66527b6c92b3cecc524137b", size = 587740 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/c2/228bf5719db406bec7f7bc8838c7880cafea5da69f6360bebabe0aabcaf1/ldp-0.25.2-py3-none-any.whl", hash = "sha256:c7e2d7ddd6a0508f1fceac28c5512e184748720412c850b1871789ea39e8928f", size = 135366 },
+    { url = "https://files.pythonhosted.org/packages/e0/b9/5d7957cec5c6ef4dd79fa19a59b330102d465819b671c4dd3b1efd41e501/ldp-0.25.4-py3-none-any.whl", hash = "sha256:42115a55f9ee54725c8238cc4239b7a7874ced072416efca86b5d4efa34d7726", size = 135376 },
 ]
 
 [[package]]
@@ -1699,7 +1699,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.18.2" },
-    { name = "fhlmi" },
+    { name = "fhlmi", specifier = ">=0.25.4" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },

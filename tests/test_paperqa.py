@@ -557,6 +557,41 @@ def test_llmresult_callback(docs_fixture: Docs) -> None:
     assert my_results[0].session_id
 
 
+@pytest.mark.parametrize(
+    ("llm", "llm_settings"),
+    [
+        pytest.param(
+            "deepseek/deepseek-reasoner",
+            {
+                "model_list": [
+                    {
+                        "model_name": "deepseek/deepseek-reasoner",
+                        "litellm_params": {
+                            "model": "deepseek/deepseek-reasoner",
+                            "api_base": "https://api.deepseek.com/v1",
+                        },
+                    }
+                ]
+            },
+            id="deepseek-reasoner",
+        ),
+        pytest.param(
+            "openrouter/deepseek/deepseek-r1",
+            {},
+            id="openrouter-deepseek",
+        ),
+    ],
+)
+@pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
+def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
+    settings = Settings(
+        llm=llm,
+        llm_settings=llm_settings,
+    )
+    response = docs_fixture.query("What is XAI?", settings=settings)
+    assert response.answer_reasoning
+
+
 def test_duplicate(stub_data_dir: Path) -> None:
     """Check Docs doesn't store duplicates, while checking nonduplicate docs are stored."""
     docs = Docs()
@@ -714,7 +749,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
 
 def test_custom_llm(stub_data_dir: Path) -> None:
     class StubLLMModel(LLMModel):
-        name: str = "myllm"
+        name: str = "custom/myllm"
 
         async def acompletion(
             self, messages: list[Message], **kwargs  # noqa: ARG002
@@ -1472,6 +1507,12 @@ class TestLLMParseJson:
                 "Hope this helps!",
                 id="removing-intro-outro-text",
             ),
+            pytest.param(
+                "I am here to help"
+                '{\n   "summary": "Lorem Ipsum",\n   "relevance_score": "8" \n}'
+                "Hope this helps!",
+                id="with-newlines-and-quotes",
+            ),
         ],
     )
     def test_basic_json_extraction(self, input_text: str) -> None:
@@ -1645,6 +1686,24 @@ class TestLLMParseJson:
     )
     def test_llm_parse_json_with_escaped_characters(self, input_text, expected_output):
         assert llm_parse_json(input_text) == expected_output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                '{\n  "summary": "An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).",\n'
+                '  "relevance_score": "8"\n}'
+            ),
+        ],
+    )
+    def test_llm_subquotes_and_newlines(self, input_text: str) -> None:
+        output = {
+            "summary": (
+                'An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).'
+            ),
+            "relevance_score": 8,
+        }
+        assert llm_parse_json(input_text) == output
 
 
 def test_maybe_get_date():

@@ -23,6 +23,13 @@ def llm_parse_json(text: str) -> dict:
     # fetches from markdown ```json if present
     ptext = ptext.split("```json")[-1].split("```")[0]
 
+    # Fix specific case with raw fractions in relevance_score
+    ptext = re.sub(
+        r'"relevance_score"\s*:\s*(\d+)/(\d+)',
+        lambda m: f'"relevance_score": {round(int(m.group(1)) / int(m.group(2)) * 10)}',
+        ptext,
+    )
+
     # Wrap non-JSON text in a dictionary
     if "{" not in ptext and "}" not in ptext:
         ptext = json.dumps({"summary": ptext})
@@ -74,16 +81,35 @@ def llm_parse_json(text: str) -> dict:
     ptext = re.sub(r",\s*}", "}", ptext)  # Remove trailing commas before closing brace
     ptext = re.sub(r"\{\s*,", "{", ptext)  # Remove leading commas inside object
 
-    # Handling incorrect key names for "relevance_score"
+    # Try to parse the JSON normally first
     try:
         data = json.loads(ptext)
     except json.JSONDecodeError as e:
+        # If normal parsing fails, try to handle nested quotes case
+        if "summary" in ptext and '"relevance_score"' in ptext:
+            try:
+                # Extract summary and relevance_score directly using regex
+                summary_match = re.search(
+                    r'"summary"\s*:\s*"(.*?)",\s*"relevance_score"', ptext, re.DOTALL
+                )
+                score_match = re.search(r'"relevance_score"\s*:\s*"?(\d+)"?', ptext)
+
+                if summary_match and score_match:
+                    return {
+                        "summary": summary_match.group(1).replace(r"\'", "'"),
+                        "relevance_score": int(score_match.group(1)),
+                    }
+            except Exception:  # noqa: S110
+                # Continue to the standard error if regex approach fails
+                pass
+
         raise ValueError(
             f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
             " supporting JSON output or our parsing technique could use some work. Try"
             " a different model or specify `Settings(prompts={'use_json': False})`"
         ) from e
 
+    # Handling incorrect key names for "relevance_score"
     for key in list(data.keys()):
         if re.search(r"relevance|score", key, re.IGNORECASE):
             data["relevance_score"] = data.pop(key)  # Renaming key
