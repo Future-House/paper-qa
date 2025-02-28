@@ -407,6 +407,9 @@ By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
 `summary_llm`, `llm`, and `agent_llm`.
 Please see the [Settings Cheatsheet](#settings-cheatsheet)
 for more information on these settings.
+PaperQA2 also defaults to using OpenAI's `text-embedding-3-small` model for the `embedding` setting.
+If you don't have an OpenAI API key, you can use a different embedding model.
+More information about embedding models can be found [in the "Embedding Model" section](#embedding-model).
 
 We use the [`lmi`](https://github.com/Future-House/ldp/tree/main/packages/lmi) package for our LLM interface,
 which in turn uses `litellm` to support many LLM providers.
@@ -423,7 +426,9 @@ answer_response = ask(
 )
 ```
 
-To use Claude, make sure you set the `ANTHROPIC_API_KEY`
+To use Claude, make sure you set the `ANTHROPIC_API_KEY` environment variable.
+In this example, we also use a different embedding model.
+Please make sure to `pip install paper-qa[local]` to use a local embedding model.
 
 ```python
 from paperqa import Settings, ask
@@ -435,7 +440,7 @@ answer_response = ask(
         llm="claude-3-5-sonnet-20240620",
         summary_llm="claude-3-5-sonnet-20240620",
         agent=AgentSettings(agent_llm="claude-3-5-sonnet-20240620"),
-        embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1",
+        embedding="st-multi-qa-MiniLM-L6-cos-v1",
     ),
 )
 ```
