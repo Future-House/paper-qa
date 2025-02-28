@@ -50,6 +50,7 @@ from paperqa.readers import read_doc
 from paperqa.utils import (
     extract_score,
     get_citenames,
+    maybe_get_date,
     maybe_is_html,
     maybe_is_text,
     name_in_text,
@@ -1506,6 +1507,12 @@ class TestLLMParseJson:
                 "Hope this helps!",
                 id="removing-intro-outro-text",
             ),
+            pytest.param(
+                "I am here to help"
+                '{\n   "summary": "Lorem Ipsum",\n   "relevance_score": "8" \n}'
+                "Hope this helps!",
+                id="with-newlines-and-quotes",
+            ),
         ],
     )
     def test_basic_json_extraction(self, input_text: str) -> None:
@@ -1679,3 +1686,29 @@ class TestLLMParseJson:
     )
     def test_llm_parse_json_with_escaped_characters(self, input_text, expected_output):
         assert llm_parse_json(input_text) == expected_output
+
+    @pytest.mark.parametrize(
+        "input_text",
+        [
+            pytest.param(
+                '{\n  "summary": "An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).",\n'
+                '  "relevance_score": "8"\n}'
+            ),
+        ],
+    )
+    def test_llm_subquotes_and_newlines(self, input_text: str) -> None:
+        output = {
+            "summary": (
+                'An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).'
+            ),
+            "relevance_score": 8,
+        }
+        assert llm_parse_json(input_text) == output
+
+
+def test_maybe_get_date():
+    assert maybe_get_date("2023-01-01") == datetime(2023, 1, 1)
+    assert maybe_get_date("2023-01-31 14:30:00") == datetime(2023, 1, 31, 14, 30)
+    assert maybe_get_date(datetime(2023, 1, 1)) == datetime(2023, 1, 1)
+    assert maybe_get_date("foo") is None
+    assert maybe_get_date("") is None

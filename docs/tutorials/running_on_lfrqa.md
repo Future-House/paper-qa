@@ -189,7 +189,7 @@ After this runs, you will get an answer!
 
 After you have built the index, you are ready to run the benchmark.
 
-Copy the following into a file and run it. To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) package installed.
+Copy the following into a file and run it. To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) and [`fhaviary[lfrqa]`](https://github.com/Future-House/aviary/blob/main/packages/lfrqa/README.md#installation) packages installed.
 
 ```python
 import asyncio
@@ -197,12 +197,13 @@ import json
 import os
 
 import pandas as pd
+from aviary.envs.lfrqa import LFRQAQuestion, LFRQATaskDataset
 from ldp.agent import SimpleAgent
 from ldp.alg.runners import Evaluator, EvaluatorConfig
 
 from paperqa import Settings
-from paperqa.agents.task import LFRQAQuestion, LFRQATaskDataset
 from paperqa.settings import AgentSettings, IndexSettings
+
 
 log_results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
 os.makedirs(log_results_dir, exist_ok=True)
