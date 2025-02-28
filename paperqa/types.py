@@ -126,6 +126,13 @@ class PQASession(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
+    answer_reasoning: str | None = Field(
+        default=None,
+        description=(
+            "Optional reasoning from the LLM. If the LLM does not support reasoning,"
+            " it will be None."
+        ),
+    )
     has_successful_answer: bool | None = Field(
         default=None,
         description=(
