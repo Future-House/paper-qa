@@ -1,10 +1,11 @@
 ---
 jupyter:
   jupytext:
+    formats: ipynb,md
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: "1.3"
+      format_version: '1.3'
       jupytext_version: 1.16.7
   kernelspec:
     display_name: test
@@ -14,6 +15,8 @@ jupyter:
 
 # Setup
 
+> This tutorial is available as a Jupyter notebook [here](https://github.com/Future-House/paper-qa/blob/main/docs/tutorials/settings_tutorial.ipynb).
+
 This tutorial aims to show how to use the `Settings` class to configure `PaperQA`.
 Firstly, we will be using `OpenAI` and `Anthropic` models, so we need to set the `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` environment variables.
 We will use both models to make it clear when `paperqa` agent is using either one or the other.
@@ -21,10 +24,14 @@ We use `python-dotenv` to load the environment variables from a `.env` file.
 Hence, our first step is to create a `.env` file and install the required packages.
 
 ```python
-!echo "OPENAI_API_KEY=<your-openai-api-key>" > .env
-!echo "ANTHROPIC_API_KEY=<your-anthropic-api-key>" >> .env
+# fmt: off
+# Create .env file with OpenAI API key
+# Replace <your-openai-api-key> and <your-anthropic-api-key> with your actual API keys
+!echo "OPENAI_API_KEY=<your-openai-api-key>" > .env # fmt: skip
+!echo "ANTHROPIC_API_KEY=<your-anthropic-api-key>" >> .env # fmt: skip
 
 !uv pip install -q nest-asyncio python-dotenv aiohttp fhlmi "paper-qa[local]"
+# fmt: on
 ```
 
 ```python
@@ -61,7 +68,6 @@ async with aiohttp.ClientSession() as session, session.get(url, timeout=60) as r
     content = await response.read()
     with open("papers/2407.01603.pdf", "wb") as f:
         f.write(content)
-
 ```
 
 The `Settings` class is used to configure the PaperQA settings.
@@ -99,7 +105,14 @@ from paperqa.prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
-from paperqa.settings import AgentSettings, AnswerSettings, IndexSettings, ParsingSettings, PromptSettings, Settings
+from paperqa.settings import (
+    AgentSettings,
+    AnswerSettings,
+    IndexSettings,
+    ParsingSettings,
+    PromptSettings,
+    Settings,
+)
 
 settings = Settings(
     llm=llm_openai,
@@ -110,8 +123,8 @@ settings = Settings(
                 "litellm_params": {
                     "model": llm_openai,
                     "temperature": 0.1,
-                    "max_tokens": 512,
-                }
+                    "max_tokens": 4096,
+                },
             }
         ],
         "rate_limit": {
@@ -170,7 +183,7 @@ settings = Settings(
                     "model_name": llm_openai,
                     "litellm_params": {
                         "model": llm_openai,
-                    }
+                    },
                 }
             ],
             "rate_limit": {
@@ -183,7 +196,7 @@ settings = Settings(
         index=IndexSettings(
             paper_directory=pathlib.Path.cwd().joinpath("papers"),
             index_directory=pathlib.Path.cwd().joinpath("papers/index"),
-        )
+        ),
     ),
 )
 ```
@@ -195,7 +208,9 @@ We also set settings.verbosity to 1, which will print the agent configuration. F
 ```python
 from paperqa import ask
 
-response = ask("What are the most relevant language models used for chemistry?", settings=settings)
+response = ask(
+    "What are the most relevant language models used for chemistry?", settings=settings
+)
 ```
 
 Which probably worked fine. Let's now try to remove `OPENAI_API_KEY` and run again the same question with the same settings.
@@ -208,7 +223,9 @@ print(f"ANTHROPIC_API_KEY: {os.environ['ANTHROPIC_API_KEY']}")
 ```
 
 ```python
-response = ask("What are the most relevant language models used for chemistry?", settings=settings)
+response = ask(
+    "What are the most relevant language models used for chemistry?", settings=settings
+)
 ```
 
 It would obviously fail. We don't have a valid `OPENAI_API_KEY`, so the agent will not be able to use `OpenAI` models. Let's change it to an `Anthropic` model and see if it works.
@@ -223,7 +240,7 @@ settings.llm_config = {
                 "model": llm_anthropic,
                 "temperature": 0.1,
                 "max_tokens": 512,
-            }
+            },
         }
     ],
     "rate_limit": {
@@ -244,13 +261,15 @@ settings.agent = AgentSettings(
         },
     },
     index=IndexSettings(
-            paper_directory=pathlib.Path.cwd().joinpath("papers"),
-            index_directory=pathlib.Path.cwd().joinpath("papers/index"),
-        )
+        paper_directory=pathlib.Path.cwd().joinpath("papers"),
+        index_directory=pathlib.Path.cwd().joinpath("papers/index"),
+    ),
 )
 # settings.embedding = "st-multi-qa-MiniLM-L6-cos-v1"
 settings.embedding = "hybrid-st-multi-qa-MiniLM-L6-cos-v1"
-response = ask("What are the most relevant language models used for chemistry?", settings=settings)
+response = ask(
+    "What are the most relevant language models used for chemistry?", settings=settings
+)
 ```
 
 Now the agent is able to use `Anthropic` models only and although we don't have a valid `OPENAI_API_KEY`, the question is answered because the agent will not use `OpenAI` models. See that we also changed the `embedding` because it was using `text-embedding-3-small` by default, which is a `OpenAI` model. `Paperqa` implements a few embedding models. Please refer to the [documentation](https://github.com/Future-House/paper-qa?tab=readme-ov-file#embedding-model) for more information.
@@ -259,7 +278,7 @@ Notice that we redefined `settings.agent.paper_directory` and `settings.agent.in
 
 # The output
 
-`Paperqa` returns a `PQASession` object, which contains not only the answer but also all the information gatheres to answer the questions. We recommend printing the `PQASession` object (`print(response)`) to understand the information it contains.
+`Paperqa` returns a `PQASession` object, which contains not only the answer but also all the information gatheres to answer the questions. We recommend printing the `PQASession` object (`print(response.session)`) to understand the information it contains. Let's check the `PQASession` object:
 
 ```python
 print(response.session)
@@ -291,7 +310,9 @@ Lastly, `PQASession.session.contexts` contains the contexts used to generate the
 
 ```python
 print("4. Contexts used to generate the answer:")
-print("These are the relevant text passages that were retrieved and used to formulate the answer:")
+print(
+    "These are the relevant text passages that were retrieved and used to formulate the answer:"
+)
 for i, ctx in enumerate(response.session.contexts, 1):
     print(f"\nContext {i}:")
     print(f"Source: {ctx.text.name}")
