@@ -440,6 +440,7 @@ answer_response = ask(
         llm="claude-3-5-sonnet-20240620",
         summary_llm="claude-3-5-sonnet-20240620",
         agent=AgentSettings(agent_llm="claude-3-5-sonnet-20240620"),
+        # SEE: https://huggingface.co/sentence-transformers/multi-qa-MiniLM-L6-cos-v1
         embedding="st-multi-qa-MiniLM-L6-cos-v1",
     ),
 )
