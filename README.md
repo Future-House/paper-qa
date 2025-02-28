@@ -435,6 +435,7 @@ answer_response = ask(
         llm="claude-3-5-sonnet-20240620",
         summary_llm="claude-3-5-sonnet-20240620",
         agent=AgentSettings(agent_llm="claude-3-5-sonnet-20240620"),
+        embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1",
     ),
 )
 ```
@@ -443,13 +444,15 @@ Or Gemini, by setting the `GEMINI_API_KEY` from Google AI Studio
 
 ```python
 from paperqa import Settings, ask
+from paperqa.settings import AgentSettings
 
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm="gemini-1.5-pro",
-        summary_llm="gemini-1.5-pro",
-        agent=AgentSettings(agent_llm="gemini-1.5-pro"),
+        llm="gemini/gemini-2.0-flash",
+        summary_llm="gemini/gemini-2.0-flash",
+        agent=AgentSettings(agent_llm="gemini/gemini-2.0-flash"),
+        embedding="gemini/text-embedding-004",
     ),
 )
 ```
