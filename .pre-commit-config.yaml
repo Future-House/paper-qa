@@ -42,6 +42,7 @@ repos:
     rev: v3.4.2
     hooks:
       - id: prettier
+        exclude: ^docs/.*\.md$
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.24.2
     hooks:
