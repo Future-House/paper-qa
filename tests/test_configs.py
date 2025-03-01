@@ -1,3 +1,5 @@
+import os
+import pathlib
 import warnings
 from unittest.mock import patch
 
@@ -58,10 +60,26 @@ def test_get_settings_missing_file() -> None:
         get_settings("missing_config")
 
 
-def test_settings_default_instantiation() -> None:
-    settings = Settings()
-    assert "gpt-" in settings.llm
-    assert settings.answer.evidence_k == 10
+HOME_DIR = str(pathlib.Path.home())
+
+
+def test_settings_default_instantiation(tmpdir, subtests: SubTests) -> None:
+    default_settings = Settings()
+    assert "gpt-" in default_settings.llm
+    assert default_settings.answer.evidence_k == 10
+    assert HOME_DIR in str(default_settings.agent.index.index_directory)
+    assert ".pqa" in str(default_settings.agent.index.index_directory)
+
+    with subtests.test(msg="alternate-pqa-home"):
+        assert HOME_DIR not in str(tmpdir), "Later assertion requires this to pass"
+        with patch.dict(os.environ, values={"PQA_HOME": str(tmpdir)}):
+            alt_home_settings = Settings()
+        assert (
+            alt_home_settings.agent.index.index_directory
+            != default_settings.agent.index.index_directory
+        )
+        assert HOME_DIR not in str(alt_home_settings.agent.index.index_directory)
+        assert ".pqa" in str(alt_home_settings.agent.index.index_directory)
 
 
 def test_index_naming(subtests: SubTests) -> None:

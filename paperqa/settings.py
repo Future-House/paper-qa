@@ -24,6 +24,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 from paperqa._ldp_shims import (
@@ -387,7 +388,7 @@ class IndexSettings(BaseModel):
         ),
     )
     index_directory: str | os.PathLike = Field(
-        default=pqa_directory("indexes"),
+        default_factory=lambda: pqa_directory("indexes"),
         description=(
             "Directory to store the PQA built search index, configuration, and"
             " answer indexes."
@@ -666,7 +667,7 @@ class Settings(BaseSettings):
         frozen=True,
     )
     index_directory: str | os.PathLike | None = Field(
-        default=pqa_directory("indexes"),
+        default_factory=lambda: pqa_directory("indexes"),
         description=(
             "Directory to store the PQA generated search index, configuration, and"
             " answer indexes."
@@ -709,15 +710,16 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
-        for deprecated_field_name, new_name in (
-            ("index_absolute_directory", "use_absolute_paper_directory"),
-            ("index_directory", "index_directory"),
-            ("index_recursively", "recurse_subdirectories"),
-            ("manifest_file", "manifest_file"),
-            ("paper_directory", "paper_directory"),
+        for deprecated_field_name, new_name, is_factory in (
+            ("index_absolute_directory", "use_absolute_paper_directory", False),
+            ("index_directory", "index_directory", True),
+            ("index_recursively", "recurse_subdirectories", False),
+            ("manifest_file", "manifest_file", False),
+            ("paper_directory", "paper_directory", False),
         ):
             value = getattr(self, deprecated_field_name)
-            if value != type(self).model_fields[deprecated_field_name].default:
+            finfo: FieldInfo = type(self).model_fields[deprecated_field_name]
+            if value != (finfo.default_factory() if is_factory else finfo.default):  # type: ignore[call-arg,misc]
                 warnings.warn(
                     f"The {deprecated_field_name!r} field has been moved to"
                     f" {AgentSettings.__name__},"
