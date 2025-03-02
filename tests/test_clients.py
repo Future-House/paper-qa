@@ -117,9 +117,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
         client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 client_list,
             ),
         )
@@ -234,9 +232,7 @@ async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
         client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 client_list,
             ),
         )
@@ -394,9 +390,7 @@ async def test_crossref_journalquality_fields_filtering() -> None:
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
         )
@@ -422,9 +416,7 @@ async def test_crossref_journalquality_fields_filtering() -> None:
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
         )
@@ -550,11 +542,8 @@ async def test_ensure_sequential_run(caplog) -> None:
         client = DocMetadataClient(
             session=session,
             clients=cast(
-                Sequence[
-                    Collection[
-                        type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                    ]
-                ],
+                "Sequence[Collection[type[MetadataPostProcessor[Any] |"
+                " MetadataProvider[Any]]]]",
                 [[CrossrefProvider], [SemanticScholarProvider]],
             ),
         )
@@ -576,7 +565,9 @@ async def test_ensure_sequential_run(caplog) -> None:
         non_clobbered_details = await client.query(
             doi="10.1063/1.4938384",
         )
-        assert set(cast(DocDetails, non_clobbered_details).other["client_source"]) == {
+        assert set(
+            cast("DocDetails", non_clobbered_details).other["client_source"]
+        ) == {
             "crossref",
             "semantic_scholar",
         }, "Sources should stack, even if sequentially called"
@@ -592,11 +583,8 @@ async def test_ensure_sequential_run_early_stop(caplog) -> None:
         client = DocMetadataClient(
             session=session,
             clients=cast(
-                Sequence[
-                    Collection[
-                        type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                    ]
-                ],
+                "Sequence[Collection[type[MetadataPostProcessor[Any] |"
+                " MetadataProvider[Any]]]]",
                 [[SemanticScholarProvider], [CrossrefProvider]],
             ),
         )
@@ -632,9 +620,7 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, retract_processor],
             ),
         )

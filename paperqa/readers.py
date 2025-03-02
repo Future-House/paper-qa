@@ -205,9 +205,9 @@ def chunk_text(
         texts.append(
             Text(
                 text=(
-                    enc.decode(cast(list[int], split))
+                    enc.decode(cast("list[int]", split))
                     if use_tiktoken
-                    else cast(str, split)
+                    else cast("str", split)
                 ),
                 name=f"{doc.docname} chunk {i + 1}",
                 doc=doc,

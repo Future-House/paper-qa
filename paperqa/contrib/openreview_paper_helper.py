@@ -49,7 +49,8 @@ class OpenReviewPaperHelper:
         Path(settings.paper_directory).mkdir(parents=True, exist_ok=True)
         if openreview is None:
             raise ImportError(
-                "openreview requires the 'openreview-py' extra. Please run: `pip install paper-qa[openreview]`."
+                "openreview requires the 'openreview-py' extra. Please run: `pip"
+                " install paper-qa[openreview]`."
             )
         self.client = openreview.api.OpenReviewClient(
             baseurl="https://api2.openreview.net",
@@ -107,8 +108,8 @@ class OpenReviewPaperHelper:
     async def _get_relevant_papers_chunk(self, question: str, chunk: str) -> list[Any]:
         prompt = (
             chunk
-            + "You are the helper model that aims to get up to 20 most relevant papers for the user's question. "
-            + "User's question:\n"
+            + "You are the helper model that aims to get up to 20 most relevant papers"
+            " for the user's question. " + "User's question:\n"
         )
 
         response = await self.llm_model.call_single(
@@ -140,7 +141,8 @@ class OpenReviewPaperHelper:
                 await f.write(response.content)
             return True
         logger.warning(
-            f"Failed to download the PDF. Status code: {response.status_code}, text: {response.text}"
+            f"Failed to download the PDF. Status code: {response.status_code}, text:"
+            f" {response.text}"
         )
         return False
 

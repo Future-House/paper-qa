@@ -371,7 +371,7 @@ class QdrantVectorStore(VectorStore):
 
         if texts_list and not await self._collection_exists():
             params = models.VectorParams(
-                size=len(cast(Sized, texts_list[0].embedding)),
+                size=len(cast("Sized", texts_list[0].embedding)),
                 distance=models.Distance.COSINE,
             )
 

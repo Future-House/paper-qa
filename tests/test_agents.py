@@ -151,7 +151,7 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
     num_source_files = len(
         [
             x
-            for x in cast(Path, index_settings.paper_directory).iterdir()
+            for x in cast("Path", index_settings.paper_directory).iterdir()
             if x.suffix != ".csv"
         ]
     )
@@ -238,7 +238,7 @@ EXPECTED_STUB_DATA_FILES = {
 async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> None:
     # Set the paper_directory to be a relative path as starting point to confirm this
     # won't trip us up, and set the manifest file too
-    abs_paper_dir = cast(Path, agent_test_settings.agent.index.paper_directory)
+    abs_paper_dir = cast("Path", agent_test_settings.agent.index.paper_directory)
     agent_test_settings.agent.index.paper_directory = abs_paper_dir.relative_to(
         Path.cwd()
     )
@@ -356,11 +356,11 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
             " and you have already tried to answer several times,"
             " you can terminate by calling the {complete_tool_name} tool."
             " The current status of evidence/papers/cost is "
-            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Started 0
+            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Started 0  # noqa: E501
             "\n\nTool request message '' for tool calls: paper_search(query='XAI for"
             " chemical property prediction', min_year='2018', max_year='2024')"
             f" [id={memory_id}]\n\nTool response message '"
-            f"{make_status(total_paper_count=2, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Found 2
+            f"{make_status(total_paper_count=2, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Found 2  # noqa: E501
             f"' for tool call ID {memory_id} of tool 'paper_search'"
         ),
         input=(
@@ -1034,9 +1034,10 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     low_batch_save_count = mock_save_index.call_count
 
     assert high_concurrency_duration * 1.1 < low_concurrency_duration, (
-        f"Expected high concurrency to be faster, but took {high_concurrency_duration:.2f}s "
-        f"compared to {low_concurrency_duration:.2f}s"
+        "Expected high concurrency to be faster, but took"
+        f" {high_concurrency_duration:.2f}s compared to {low_concurrency_duration:.2f}s"
     )
-    assert (
-        high_batch_save_count < low_batch_save_count
-    ), f"Expected fewer save_index with high batch size, but got {high_batch_save_count} vs {low_batch_save_count}"
+    assert high_batch_save_count < low_batch_save_count, (
+        "Expected fewer save_index with high batch size, but got"
+        f" {high_batch_save_count} vs {low_batch_save_count}"
+    )

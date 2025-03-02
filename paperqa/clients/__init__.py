@@ -193,7 +193,7 @@ class DocMetadataClient:
     ) -> list[DocDetails]:
         return await gather_with_concurrency(
             concurrency,
-            [cast(Awaitable[DocDetails], self.query(**kwargs)) for kwargs in queries],
+            [cast("Awaitable[DocDetails]", self.query(**kwargs)) for kwargs in queries],
         )
 
     async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
