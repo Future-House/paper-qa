@@ -173,13 +173,21 @@ From now on, we will be using the paperqa library, so we need to install it:
 
 ## Index the Documents
 
-The next cell will build an index for the LFRQA documents. The index we create is a **Tantivy index**, which is a fast, full-text search engine library written in Rust. Tantivy is designed to handle large datasets efficiently, making it ideal for searching through a vast collection of papers or documents.
+Now we will build an index for the LFRQA documents. The index is a **Tantivy index**, which is a fast, full-text search engine library written in Rust. Tantivy is designed to handle large datasets efficiently, making it ideal for searching through a vast collection of papers or documents.
 
-Feel free to adjust the concurrency settings as you like. You don’t need any API keys for building this index because we don't discern any citation metadata, but you do need LLM API keys to answer questions.
+Feel free to adjust the concurrency settings as you like. Because we defined a manifest, we don’t need any API keys for building this index because we don't discern any citation metadata, but you do need LLM API keys to answer questions.
 
 Remember that this process is quick for small portions of the dataset, but can take around 3 hours for the whole dataset.
 
-To avoid concurrency problems we recommend copying it to a new file and running it.
+```python
+import nest_asyncio
+
+nest_asyncio.apply()
+```
+
+We add the line above to handle async code within a notebook.
+
+However, to improve compatibility and speed up the indexing process, we strongly recommend running the following code in a separate `.py` file
 
 ```python
 import os
@@ -216,10 +224,14 @@ After this runs, you will have an index ready to use!
 
 
 ## Benchmark!
-After you have built the index, you are ready to run the benchmark.
+After you have built the index, you are ready to run the benchmark. We advice running this in a separate `.py` file.
 
-Copy the following into a file and run it. To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) and [`fhaviary[lfrqa]`](https://github.com/Future-House/aviary/blob/main/packages/lfrqa/README.md#installation) packages installed.
+To run this, you will need to have the [`ldp`](https://github.com/Future-House/ldp) and [`fhaviary[lfrqa]`](https://github.com/Future-House/aviary/blob/main/packages/lfrqa/README.md#installation) packages installed.
 
+
+```python
+!pip install ldp "fhaviary[lfrqa]"
+```
 
 ```python
 import asyncio
