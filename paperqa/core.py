@@ -176,7 +176,7 @@ async def map_fxn_summary(
             callbacks=callbacks,
             name="evidence:" + text.name,
         )
-        context = cast(str, llm_result.text)
+        context = cast("str", llm_result.text)
         result_data = parser(context) if parser else {}
         success = bool(result_data)
         if success:

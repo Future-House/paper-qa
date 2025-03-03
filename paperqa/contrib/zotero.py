@@ -249,7 +249,7 @@ class ZoteroDB(zotero.Zotero):
 
                 if no_pdf or is_duplicate:
                     continue
-                pdf = cast(Path, pdf)
+                pdf = cast("Path", pdf)
                 title = item["data"].get("title", "")
                 if len(items) >= start:
                     yield ZoteroPaper(

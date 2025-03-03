@@ -946,7 +946,8 @@ async def test_partly_embedded_texts(defer_embeddings: bool) -> None:
     assert len(docs.texts_index.texts_hashes) == len(texts_to_add)
 
 
-# some of the stored requests will be identical on method, scheme, host, port, path, and query (if defined)
+# some of the stored requests will be identical on
+# method, scheme, host, port, path, and query (if defined)
 # body will always be different between requests
 # adding body so that vcr correctly match the right request with its response.
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
@@ -1419,7 +1420,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     await docs._build_texts_index(settings.get_embedding_model())
 
     partitioned_texts, _ = cast(
-        tuple[Sequence[Text], list[float]],
+        "tuple[Sequence[Text], list[float]]",
         await docs.texts_index.partitioned_similarity_search(
             "What do I like?",
             k=4,
@@ -1429,7 +1430,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     )
 
     default_texts, _ = cast(
-        tuple[Sequence[Text], list[float]],
+        "tuple[Sequence[Text], list[float]]",
         await docs.texts_index.similarity_search(
             "What do I like?", k=4, embedding_model=settings.get_embedding_model()
         ),
@@ -1523,10 +1524,8 @@ class TestLLMParseJson:
         "input_text",
         [
             pytest.param(
-                "<think> Thinking </think>"
-                "\n I am here to help\n\n"
-                '{\n"summary": "Lorem Ipsum\n\ndolor sit amet",\n"relevance_score": 8\n}'
-                "\nHope this helps!",
+                '<think> Thinking </think>\n I am here to help\n\n{\n"summary": "Lorem'
+                ' Ipsum\n\ndolor sit amet",\n"relevance_score": 8\n}\nHope this helps!',
                 id="handling-newlines-in-json-values",
             ),
         ],
@@ -1553,10 +1552,8 @@ class TestLLMParseJson:
                 id="string-relevance-score",
             ),
             pytest.param(
-                "<think> Thinking </think>"
-                "I am here to help"
-                '```json {   "summary": "Lorem Ipsum",   "relevance_score": "8/10" } ```'
-                "Hope this helps!",
+                '<think> Thinking </think>I am here to help```json {   "summary":'
+                ' "Lorem Ipsum",   "relevance_score": "8/10" } ```Hope this helps!',
                 id="string-relevance-score-fraction-1",
             ),
             pytest.param(
@@ -1664,7 +1661,7 @@ class TestLLMParseJson:
         "input_text",
         [
             pytest.param(
-                "<think> Thinking </think>" "Lorem Ipsum. Hope this helps!",
+                "<think> Thinking </think>Lorem Ipsum. Hope this helps!",
                 id="non-json-string-with-think-tags",
             ),
             pytest.param(
@@ -1691,15 +1688,16 @@ class TestLLMParseJson:
         "input_text",
         [
             pytest.param(
-                '{\n  "summary": "An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).",\n'
-                '  "relevance_score": "8"\n}'
+                '{\n  "summary": "An excerpt with "quoted stuff" or "maybe more." More'
+                ' stuff (with parenthesis).",\n  "relevance_score": "8"\n}'
             ),
         ],
     )
     def test_llm_subquotes_and_newlines(self, input_text: str) -> None:
         output = {
             "summary": (
-                'An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).'
+                'An excerpt with "quoted stuff" or "maybe more." More stuff (with'
+                " parenthesis)."
             ),
             "relevance_score": 8,
         }

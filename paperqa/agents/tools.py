@@ -70,7 +70,7 @@ class EnvironmentState(BaseModel):
     @property
     def status(self) -> str:
         if self.status_fn is not None:
-            return self.status_fn(cast(Self, self))
+            return self.status_fn(cast("Self", self))
         return default_status(self)
 
     def get_relevant_contexts(self) -> list[Context]:
@@ -162,7 +162,7 @@ class PaperSearch(NamedTool):
         all_doc_details: list[DocDetails] = []
         for r in results:
             # there's only one doc per result, so just take the first one
-            this_doc_details = cast(DocDetails, next(iter(r.docs.values())))
+            this_doc_details = cast("DocDetails", next(iter(r.docs.values())))
             all_doc_details.append(this_doc_details)
             await state.docs.aadd_texts(
                 texts=r.texts,

@@ -300,7 +300,7 @@ class Docs(BaseModel):
                     ),
                 ],
             )
-            citation = cast(str, result.text)
+            citation = cast("str", result.text)
             if (
                 len(citation) < 3  # noqa: PLR2004
                 or "Unknown" in citation
@@ -332,7 +332,7 @@ class Docs(BaseModel):
             # the first { and last } in the response.
             # Since the anticipated structure should  not be nested,
             # we don't have to worry about nested curlies.
-            clean_text = cast(str, result.text).split("{", 1)[-1].split("}", 1)[0]
+            clean_text = cast("str", result.text).split("{", 1)[-1].split("}", 1)[0]
             clean_text = "{" + clean_text + "}"
             try:
                 citation_json = json.loads(clean_text)
@@ -389,7 +389,8 @@ class Docs(BaseModel):
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
                 not parse_config.disable_doc_valid_check
-                # Use the first few text chunks to avoid potential issues with title page parsing in the first chunk
+                # Use the first few text chunks to avoid potential issues with
+                # title page parsing in the first chunk
                 and not maybe_is_text("".join(text.text for text in texts[:5]))
             )
         ):
@@ -521,7 +522,7 @@ class Docs(BaseModel):
         await self._build_texts_index(embedding_model)
         _k = k + len(self.deleted_dockeys)
         matches: list[Text] = cast(
-            list[Text],
+            "list[Text]",
             (
                 await self.texts_index.max_marginal_relevance_search(
                     query,
@@ -794,7 +795,7 @@ class Docs(BaseModel):
                     callbacks=callbacks,
                     name="answer",
                 )
-            answer_text = cast(str, answer_result.text)
+            answer_text = cast("str", answer_result.text)
             answer_reasoning = answer_result.reasoning_content
             session.add_tokens(answer_result)
         # it still happens
@@ -835,7 +836,7 @@ class Docs(BaseModel):
                     callbacks=callbacks,
                     name="post",
                 )
-            answer_text = cast(str, post.text)
+            answer_text = cast("str", post.text)
             answer_reasoning = post.reasoning_content
             session.add_tokens(post)
             formatted_answer = f"Question: {session.question}\n\n{post}\n"

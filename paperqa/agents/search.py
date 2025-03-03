@@ -469,8 +469,9 @@ async def maybe_get_manifest(
                     f" file {filename}."
                 )
             logger.debug(
-                f"Found manifest file at {filename}, read {len(file_loc_to_records)} records"
-                f" from it, which maps to {len(file_loc_to_records)} locations."
+                f"Found manifest file at {filename}, read"
+                f" {len(file_loc_to_records)} records from it, which maps to"
+                f" {len(file_loc_to_records)} locations."
             )
         except FileNotFoundError:
             logger.warning(f"Manifest file at {filename} could not be found.")

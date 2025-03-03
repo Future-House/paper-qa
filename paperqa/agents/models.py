@@ -93,7 +93,7 @@ class AnswerResponse(BaseModel):
         result = await model.call_single(
             messages=messages,
         )
-        return cast(str, result.text).strip()
+        return cast("str", result.text).strip()
 
 
 class TimerData(BaseModel):

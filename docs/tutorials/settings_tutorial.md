@@ -25,7 +25,7 @@ Hence, our first step is to create a `.env` file and install the required packag
 
 ```python
 # fmt: off
-# Create .env file with OpenAI API key
+# Create .env file with OpenAI API and Anthropic API keys
 # Replace <your-openai-api-key> and <your-anthropic-api-key> with your actual API keys
 !echo "OPENAI_API_KEY=<your-openai-api-key>" > .env # fmt: skip
 !echo "ANTHROPIC_API_KEY=<your-anthropic-api-key>" >> .env # fmt: skip
@@ -47,8 +47,12 @@ load_dotenv(".env")
 
 ```python
 print("You have set the following environment variables:")
-print(f"OPENAI_API_KEY: {os.environ['OPENAI_API_KEY']}")
-print(f"ANTHROPIC_API_KEY: {os.environ['ANTHROPIC_API_KEY']}")
+print(
+    f"OPENAI_API_KEY:    {'is set' if os.environ['OPENAI_API_KEY'] else 'is not set'}"
+)
+print(
+    f"ANTHROPIC_API_KEY: {'is set' if os.environ['ANTHROPIC_API_KEY'] else 'is not set'}"
+)
 ```
 
 We will use the `lmi` package to get the model names and the `.papers` directory to save documents we will use.
@@ -216,10 +220,14 @@ response = ask(
 Which probably worked fine. Let's now try to remove `OPENAI_API_KEY` and run again the same question with the same settings.
 
 ```python
-os.environ["OPENAI_API_KEY"] = "sk-invalid-key"
-print("Current environment variables:")
-print(f"OPENAI_API_KEY: {os.environ['OPENAI_API_KEY']}")
-print(f"ANTHROPIC_API_KEY: {os.environ['ANTHROPIC_API_KEY']}")
+os.environ["OPENAI_API_KEY"] = ""
+print("You have set the following environment variables:")
+print(
+    f"OPENAI_API_KEY:    {'is set' if os.environ['OPENAI_API_KEY'] else 'is not set'}"
+)
+print(
+    f"ANTHROPIC_API_KEY: {'is set' if os.environ['ANTHROPIC_API_KEY'] else 'is not set'}"
+)
 ```
 
 ```python
@@ -265,16 +273,42 @@ settings.agent = AgentSettings(
         index_directory=pathlib.Path.cwd().joinpath("papers/index"),
     ),
 )
-# settings.embedding = "st-multi-qa-MiniLM-L6-cos-v1"
-settings.embedding = "hybrid-st-multi-qa-MiniLM-L6-cos-v1"
+settings.embedding = "st-multi-qa-MiniLM-L6-cos-v1"
 response = ask(
     "What are the most relevant language models used for chemistry?", settings=settings
 )
 ```
 
+<!-- #region -->
 Now the agent is able to use `Anthropic` models only and although we don't have a valid `OPENAI_API_KEY`, the question is answered because the agent will not use `OpenAI` models. See that we also changed the `embedding` because it was using `text-embedding-3-small` by default, which is a `OpenAI` model. `Paperqa` implements a few embedding models. Please refer to the [documentation](https://github.com/Future-House/paper-qa?tab=readme-ov-file#embedding-model) for more information.
 
 Notice that we redefined `settings.agent.paper_directory` and `settings.agent.index` settings. `Paperqa` actually uses the setting from `settings.agent`. However, for convenience, we implemented an alias in `settings.paper_directory` and `settings.index_directory`.
+
+In addition, notice that this is a very verbose example for the sake of clarity. We could have just set only the llms names and used default settings for the rest:
+
+```python
+llm_anthropic_config = {
+    "model_list": [{
+            "model_name": llm_anthropic,
+    }]
+}
+
+settings.llm = llm_anthropic
+settings.llm_config = llm_anthropic_config
+settings.summary_llm = llm_anthropic
+settings.summary_llm_config = llm_anthropic_config
+settings.agent = AgentSettings(
+    agent_llm=llm_anthropic,
+    agent_llm_config=llm_anthropic_config,
+    index=IndexSettings(
+        paper_directory=pathlib.Path.cwd().joinpath("papers"),
+        index_directory=pathlib.Path.cwd().joinpath("papers/index"),
+    ),
+)
+settings.embedding = "st-multi-qa-MiniLM-L6-cos-v1"
+```
+
+<!-- #endregion -->
 
 # The output
 
