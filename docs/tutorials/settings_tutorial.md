@@ -18,8 +18,9 @@ jupyter:
 > This tutorial is available as a Jupyter notebook [here](https://github.com/Future-House/paper-qa/blob/main/docs/tutorials/settings_tutorial.ipynb).
 
 This tutorial aims to show how to use the `Settings` class to configure `PaperQA`.
-Firstly, we will be using `OpenAI` and `Anthropic` models, so we need to set the `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` environment variables.
+Firstly, we will be using `OpenAI` and then `Anthropic` models.
 We will use both models to make it clear when `paperqa` agent is using either one or the other.
+Therefore, we need to set the `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` environment variables.
 We use `python-dotenv` to load the environment variables from a `.env` file.
 Hence, our first step is to create a `.env` file and install the required packages.
 
@@ -48,10 +49,10 @@ load_dotenv(".env")
 ```python
 print("You have set the following environment variables:")
 print(
-    f"OPENAI_API_KEY:    {"is set" if os.environ['OPENAI_API_KEY'] else "is not set"}"
+    f"OPENAI_API_KEY:    {'is set' if os.environ['OPENAI_API_KEY'] else 'is not set'}"
 )
 print(
-    f"ANTHROPIC_API_KEY: {"is set" if os.environ['ANTHROPIC_API_KEY'] else "is not set"}"
+    f"ANTHROPIC_API_KEY: {'is set' if os.environ['ANTHROPIC_API_KEY'] else 'is not set'}"
 )
 ```
 
