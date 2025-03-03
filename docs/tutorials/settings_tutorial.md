@@ -48,10 +48,10 @@ load_dotenv(".env")
 ```python
 print("You have set the following environment variables:")
 print(
-    f"OPENAI_API_KEY:    {"is set" if os.environ['OPENAI_API_KEY'] else "is not set"}"
+    f"OPENAI_API_KEY:    {'is set' if os.environ['OPENAI_API_KEY'] else 'is not set'}"
 )
 print(
-    f"ANTHROPIC_API_KEY: {"is set" if os.environ['ANTHROPIC_API_KEY'] else "is not set"}"
+    f"ANTHROPIC_API_KEY: {'is set' if os.environ['ANTHROPIC_API_KEY'] else 'is not set'}"
 )
 ```
 
@@ -223,10 +223,10 @@ Which probably worked fine. Let's now try to remove `OPENAI_API_KEY` and run aga
 os.environ["OPENAI_API_KEY"] = ""
 print("You have set the following environment variables:")
 print(
-    f"OPENAI_API_KEY:    {"is set" if os.environ['OPENAI_API_KEY'] else "is not set"}"
+    f"OPENAI_API_KEY:    {'is set' if os.environ['OPENAI_API_KEY'] else 'is not set'}"
 )
 print(
-    f"ANTHROPIC_API_KEY: {"is set" if os.environ['ANTHROPIC_API_KEY'] else "is not set"}"
+    f"ANTHROPIC_API_KEY: {'is set' if os.environ['ANTHROPIC_API_KEY'] else 'is not set'}"
 )
 ```
 
