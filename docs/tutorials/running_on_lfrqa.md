@@ -236,6 +236,7 @@ To run this, you will need to have the [`ldp`](https://github.com/Future-House/l
 ```python
 import asyncio
 import json
+import logging
 import os
 
 import pandas as pd
@@ -245,6 +246,8 @@ from ldp.alg.runners import Evaluator, EvaluatorConfig
 
 from paperqa import Settings
 from paperqa.settings import AgentSettings, IndexSettings
+
+logging.basicConfig(level=logging.ERROR)
 
 log_results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
 os.makedirs(log_results_dir, exist_ok=True)
