@@ -806,7 +806,7 @@ class Settings(BaseSettings):
                 importlib.resources.files("paperqa.configs") / f"{config_name}.json"
             )
             if pkg_config_path.is_file():
-                json_path = cast(pathlib.Path, pkg_config_path)
+                json_path = cast("pathlib.Path", pkg_config_path)
         except FileNotFoundError as e:
             raise FileNotFoundError(
                 f"No configuration file found for {config_name}"
@@ -889,7 +889,7 @@ class Settings(BaseSettings):
             )
 
         # TODO: support general agents
-        agent_cls = cast(type[Agent], locate(agent_type))
+        agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
         if issubclass(agent_cls, ReActAgent | MemoryAgent):

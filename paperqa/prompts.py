@@ -1,5 +1,7 @@
 from datetime import datetime
 
+# ruff: noqa: E501
+
 summary_prompt = (
     "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
     " {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly"
@@ -82,7 +84,7 @@ Provide a summary of the relevant information that could help answer the questio
 }}
 
 where `summary` is relevant information from the text - {summary_length} words. `relevance_score` is an integer 1-10 for the relevance of `summary` to the question.
-"""  # noqa: E501
+"""
 
 env_system_prompt = (
     # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215

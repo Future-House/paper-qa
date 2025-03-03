@@ -72,7 +72,7 @@ def settings_to_tools(  # noqa: PLR0912
             )
             for pname in ("min_year", "max_year"):
                 tool.info.get_properties()[pname]["description"] = cast(
-                    str, tool.info.get_properties()[pname]["description"]
+                    "str", tool.info.get_properties()[pname]["description"]
                 ).format(current_year=get_year())
         elif issubclass(tool_type, GatherEvidence):
             gather_evidence_tool = GatherEvidence(
@@ -297,7 +297,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self.state.record_action(action)
 
         response_messages = cast(
-            list[Message],
+            "list[Message]",
             await self.exec_tool_calls(
                 action,
                 concurrency=False,  # PQA tools aren't yet concurrency safe
