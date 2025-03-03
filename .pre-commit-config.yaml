@@ -27,13 +27,6 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-  - repo: https://github.com/mwouts/jupytext
-    rev: v1.16.7
-    hooks:
-      - id: jupytext
-        args: [--sync, --pipe, black]
-        additional_dependencies: [black]
-        files: ^docs/.*\.ipynb$
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 25.1.0
     hooks:
@@ -85,6 +78,13 @@ repos:
     hooks:
       - id: nb-clean
         args: [--preserve-cell-outputs, --remove-empty-cells]
+  - repo: https://github.com/mwouts/jupytext
+    rev: v1.16.7
+    hooks:
+      - id: jupytext
+        args: [--to, md, --pipe, black]
+        additional_dependencies: [black]
+        files: ^docs/.*\.ipynb$
   - repo: https://github.com/jsh9/markdown-toc-creator
     rev: 0.0.10
     hooks:
