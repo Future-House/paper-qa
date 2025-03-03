@@ -19,8 +19,10 @@ We use [`uv`](https://github.com/astral-sh/uv) for our local development.
 If you prefer to use `pip` for installing the package in development mode, you can do so by running:
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
+
+Where the `dev` extra includes development dependencies such as `pytest`.
 
 ## Running tests and other tooling
 
