@@ -17,7 +17,13 @@ from uuid import uuid4
 
 import ldp.agent
 import pytest
-from aviary.core import Tool, ToolRequestMessage, ToolsAdapter, ToolSelector
+from aviary.core import (
+    Environment,
+    Tool,
+    ToolRequestMessage,
+    ToolsAdapter,
+    ToolSelector,
+)
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
@@ -29,6 +35,7 @@ from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import (
     CLINICAL_STATUS_SEARCH_REGEX_PATTERN,
+    PaperQAEnvironment,
     clinical_trial_status,
     settings_to_tools,
 )
@@ -1041,3 +1048,22 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
         "Expected fewer save_index with high batch size, but got"
         f" {high_batch_save_count} vs {low_batch_save_count}"
     )
+
+
+def test_env_from_name(subtests: SubTests) -> None:
+    assert "paperqa" in Environment.available()
+
+    with subtests.test(msg="only-task"):
+        env = Environment.from_name(  # type: ignore[var-annotated]
+            "paperqa", "How can you use XAI for chemical property prediction?"
+        )
+        assert isinstance(env, PaperQAEnvironment)
+
+    with subtests.test(msg="env-kwargs"):
+        env = Environment.from_name(
+            "paperqa",
+            query="How can you use XAI for chemical property prediction?",
+            settings=Settings(),
+            docs=Docs(),
+        )
+        assert isinstance(env, PaperQAEnvironment)

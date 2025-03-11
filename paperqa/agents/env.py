@@ -12,6 +12,7 @@ from aviary.core import (
     ToolRequestMessage,
     ToolResponseMessage,
 )
+from aviary.env import ENV_REGISTRY
 from aviary.utils import MultipleChoiceQuestion
 from lmi import EmbeddingModel, LiteLLMModel
 
@@ -222,6 +223,10 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self._embedding_model = embedding_model
         self._session_id = session_id
 
+    @classmethod
+    def from_task(cls, task: str) -> Self:
+        return cls(query=task, settings=Settings(), docs=Docs())
+
     def make_tools(self) -> list[Tool]:
         return settings_to_tools(
             settings=self._settings,
@@ -346,3 +351,6 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         # tool functions within the tools
         copy_self.tools = copy_self.make_tools()
         return copy_self
+
+
+ENV_REGISTRY["paperqa"] = "paperqa.agents.env", PaperQAEnvironment.__name__
