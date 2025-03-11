@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import logging
-import os
 import shutil
-from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
@@ -17,6 +15,10 @@ from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
 from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.utils import setup_default_logs
+
+if TYPE_CHECKING:
+    import os
+    from collections.abc import Iterator
 
 TESTS_DIR = Path(__file__).parent
 CASSETTES_DIR = TESTS_DIR / "cassettes"

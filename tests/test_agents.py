@@ -11,7 +11,7 @@ import time
 import zlib
 from functools import wraps
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
@@ -20,9 +20,7 @@ import pytest
 from aviary.core import Tool, ToolRequestMessage, ToolsAdapter, ToolSelector
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
-from ldp.graph.ops import OpResult
 from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
-from pytest_subtests import SubTests
 from tantivy import Index
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
@@ -54,6 +52,10 @@ from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAI
 from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import encode_id, extract_thought, get_year, md5sum
+
+if TYPE_CHECKING:
+    from ldp.graph.ops import OpResult
+    from pytest_subtests import SubTests
 
 
 @pytest.mark.asyncio

@@ -4,9 +4,8 @@ import argparse
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from aviary.utils import MultipleChoiceQuestion
 from pydantic_settings import CliSettingsSource
 from rich.logging import RichHandler
 
@@ -15,8 +14,12 @@ from paperqa.utils import get_loop, pqa_directory, setup_default_logs
 from paperqa.version import __version__
 
 from .main import agent_query, index_search
-from .models import AnswerResponse
 from .search import SearchIndex, get_directory_index
+
+if TYPE_CHECKING:
+    from aviary.utils import MultipleChoiceQuestion
+
+    from .models import AnswerResponse
 
 logger = logging.getLogger(__name__)
 

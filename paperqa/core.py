@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable, Sequence
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from aviary.core import Message
-from lmi import LLMModel
 
 from paperqa.types import Context, LLMResult, Text
 from paperqa.utils import extract_score, strip_citations
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from lmi import LLMModel
 
 
 def llm_parse_json(text: str) -> dict:

@@ -4,10 +4,9 @@ import logging
 import os
 import re
 import warnings
-from collections.abc import Collection, Mapping
 from copy import deepcopy
 from datetime import datetime
-from typing import Any, ClassVar, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 from uuid import UUID, uuid4
 
 import tiktoken
@@ -33,6 +32,9 @@ from paperqa.utils import (
     maybe_get_date,
 )
 from paperqa.version import __version__ as pqa_version
+
+if TYPE_CHECKING:
+    from collections.abc import Collection, Mapping
 
 # Just for clarity
 # also in case one day we want to narrow

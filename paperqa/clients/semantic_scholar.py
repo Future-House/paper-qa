@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import logging
 import os
-from collections.abc import Collection
 from datetime import datetime
 from enum import IntEnum, auto
 from http import HTTPStatus
 from itertools import starmap
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import aiohttp
 from tenacity import before_sleep_log, retry, retry_if_exception, stop_after_attempt
@@ -23,6 +22,9 @@ from paperqa.utils import (
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .crossref import doi_to_bibtex
 from .exceptions import DOINotFoundError, make_flaky_ssl_error_predicate
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
 
 logger = logging.getLogger(__name__)
 

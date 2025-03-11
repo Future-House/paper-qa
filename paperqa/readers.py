@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from math import ceil
 from pathlib import Path
-from typing import Literal, cast, overload
+from typing import TYPE_CHECKING, Literal, cast, overload
 
 import pymupdf
 import tiktoken
@@ -20,6 +19,9 @@ from paperqa.types import (
 )
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
+
+if TYPE_CHECKING:
+    import os
 
 
 def parse_pdf_to_pages(

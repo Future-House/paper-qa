@@ -3,9 +3,9 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 from urllib.parse import quote
 
-import aiohttp
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from paperqa.types import DocDetails
@@ -13,6 +13,9 @@ from paperqa.utils import _get_with_retrying, strings_similarity
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
+
+if TYPE_CHECKING:
+    import aiohttp
 
 UNPAYWALL_BASE_URL = "https://api.unpaywall.org/v2/"
 UNPAYWALL_TIMEOUT = float(os.environ.get("UNPAYWALL_TIMEOUT", "10.0"))  # seconds

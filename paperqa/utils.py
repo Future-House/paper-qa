@@ -10,12 +10,10 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Collection, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
-from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, ClassVar, TypeVar
+from typing import TYPE_CHECKING, Any, BinaryIO, ClassVar, TypeVar
 from uuid import UUID
 
 import aiohttp
@@ -33,6 +31,10 @@ from tenacity import (
     stop_after_attempt,
     wait_incrementing,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable, Iterator
+    from http import HTTPStatus
 
 logger = logging.getLogger(__name__)
 

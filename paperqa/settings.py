@@ -6,7 +6,7 @@ import warnings
 from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
-from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
 from aviary.core import Tool, ToolSelector
@@ -24,7 +24,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 from paperqa._ldp_shims import (
@@ -55,6 +54,9 @@ from paperqa.prompts import (
 )
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
+
+if TYPE_CHECKING:
+    from pydantic.fields import FieldInfo
 
 # TODO: move to actual EnvironmentState
 # when we can do so without a circular import

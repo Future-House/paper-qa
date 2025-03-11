@@ -11,7 +11,6 @@ import re
 import warnings
 import zlib
 from collections import Counter
-from collections.abc import AsyncIterator, Callable, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -48,12 +47,14 @@ from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
-from .models import SupportsPickle
-
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Callable, Sequence
+
     from tantivy import IndexWriter
 
     from paperqa.settings import MaybeSettings, Settings
+
+    from .models import SupportsPickle
 
 logger = logging.getLogger(__name__)
 

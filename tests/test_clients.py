@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Collection, Sequence
-from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
 import aiohttp
@@ -17,11 +15,16 @@ from paperqa.clients import (
     DocMetadataClient,
     SemanticScholarProvider,
 )
-from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.clients.openalex import reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
-from paperqa.types import DocDetails
+
+if TYPE_CHECKING:
+    from collections.abc import Collection, Sequence
+    from pathlib import Path
+
+    from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
+    from paperqa.types import DocDetails
 
 # Use to avoid flaky tests every time citation count changes
 CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"

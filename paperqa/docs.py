@@ -6,20 +6,13 @@ import os
 import re
 import tempfile
 import urllib.request
-from collections.abc import Callable, Sequence
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, BinaryIO, cast
+from typing import TYPE_CHECKING, Any, BinaryIO, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
-from lmi import (
-    Embeddable,
-    EmbeddingModel,
-    LLMModel,
-    LLMResult,
-)
 from lmi.types import set_llm_session_ids
 from lmi.utils import gather_with_concurrency
 from pydantic import (
@@ -50,6 +43,16 @@ from paperqa.utils import (
     md5sum,
     name_in_text,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from lmi import (
+        Embeddable,
+        EmbeddingModel,
+        LLMModel,
+        LLMResult,
+    )
 
 logger = logging.getLogger(__name__)
 

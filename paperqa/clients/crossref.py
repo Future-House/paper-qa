@@ -5,9 +5,8 @@ import copy
 import json
 import logging
 import os
-from collections.abc import Collection
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import quote
 
 import aiohttp
@@ -32,6 +31,9 @@ from paperqa.utils import (
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError, make_flaky_ssl_error_predicate
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
 
 logger = logging.getLogger(__name__)
 

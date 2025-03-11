@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import Collection
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import aiohttp
 from pydantic import (
@@ -15,9 +15,10 @@ from pydantic import (
     model_validator,
 )
 
-from paperqa.types import DocDetails
-
 from .exceptions import DOINotFoundError
+
+if TYPE_CHECKING:
+    from paperqa.types import DocDetails
 
 logger = logging.getLogger(__name__)
 

@@ -3,9 +3,8 @@ from __future__ import annotations
 import json
 import logging
 import os
-from collections.abc import Collection
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import quote
 
 import aiohttp
@@ -15,6 +14,9 @@ from paperqa.utils import BIBTEX_MAPPING, mutate_acute_accents, strings_similari
 
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
 
 OPENALEX_BASE_URL = "https://api.openalex.org"
 OPENALEX_API_REQUEST_TIMEOUT = 5.0
