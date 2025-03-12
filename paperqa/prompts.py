@@ -40,6 +40,34 @@ qa_prompt = (
     "Answer ({answer_length}):"
 )
 
+answer_iteration_prompt = (
+    "You are iterating on a prior answer, with a potentially different context:\n\n"
+    "{prior_answer}\n\n"
+    "Create a new answer only using keys and data from the included context, do not "
+    "you can not use context keys from the prior answer which are not "
+    "also included in the above context.\n\n"
+)
+
+qa_with_iteration_prompt = (
+    "Answer the question below with the context.\n\n"
+    "Context (with relevance scores):\n\n{context}\n\n----\n\n"
+    "Question: {question}\n\n"
+    "Write an answer based on the context. "
+    "If the context provides insufficient information reply "
+    f'"{CANNOT_ANSWER_PHRASE}." '
+    "For each part of your answer, indicate which sources most support "
+    "it via citation keys at the end of sentences, "
+    "like {example_citation}. Only cite from the context "
+    "below and only use the valid keys. Write in the style of a "
+    "Wikipedia article, with concise sentences and coherent paragraphs. "
+    "The context comes from a variety of sources and is only a summary, "
+    "so there may inaccuracies or ambiguities. If quotes are present and "
+    "relevant, use them in the answer. This answer will go directly onto "
+    "Wikipedia, so do not add any extraneous information.\n\n"
+    "{answer_iteration_context}"
+    "Answer ({answer_length}):"
+)
+
 select_paper_prompt = (
     "Select papers that may help answer the question below. "
     "Papers are listed as $KEY: $PAPER_INFO. "

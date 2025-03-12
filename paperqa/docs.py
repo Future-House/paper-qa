@@ -782,11 +782,18 @@ class Docs(BaseModel):
                     Message(role="system", content=prompt_config.system),
                     Message(
                         role="user",
-                        content=prompt_config.qa.format(
+                        content=prompt_config.configured_qa_prompt.format(
                             context=context_str,
                             answer_length=answer_config.answer_length,
                             question=session.question,
                             example_citation=prompt_config.EXAMPLE_CITATION,
+                            answer_iteration_context=(
+                                prompt_config.iteration_prompt.format(
+                                    prior_answer=session.answer
+                                )
+                                if session.answer
+                                else ""
+                            ),
                         ),
                     ),
                 ]

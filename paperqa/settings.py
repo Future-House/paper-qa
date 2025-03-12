@@ -42,11 +42,13 @@ from paperqa._ldp_shims import (
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
+    answer_iteration_prompt,
     citation_prompt,
     default_system_prompt,
     env_reset_prompt,
     env_system_prompt,
     qa_prompt,
+    qa_with_iteration_prompt,
     select_paper_prompt,
     structured_citation_prompt,
     summary_json_prompt,
@@ -265,6 +267,9 @@ class PromptSettings(BaseModel):
 
     summary: str = summary_prompt
     qa: str = qa_prompt
+    qa_with_iteration: str = qa_with_iteration_prompt
+    iteration_prompt: str = answer_iteration_prompt
+    use_qa_iterations: bool = True
     select: str = select_paper_prompt
     pre: str | None = Field(
         default=None,
@@ -318,6 +323,18 @@ class PromptSettings(BaseModel):
             )
         return v
 
+    @field_validator("qa_with_iteration")
+    @classmethod
+    def check_qa_with_iteration(cls, v: str) -> str:
+        if not get_formatted_variables(v).issubset(
+            get_formatted_variables(qa_with_iteration_prompt)
+        ):
+            raise ValueError(
+                "QA prompt can only have variables:"
+                f" {get_formatted_variables(qa_with_iteration_prompt)}"
+            )
+        return v
+
     @field_validator("select")
     @classmethod
     def check_select(cls, v: str) -> str:
@@ -361,6 +378,12 @@ class PromptSettings(BaseModel):
         if "name" not in fvars or "text" not in fvars:
             raise ValueError("Context inner prompt must have name and text")
         return v
+
+    @property
+    def configured_qa_prompt(self) -> str:
+        if self.use_qa_iterations:
+            return self.qa_with_iteration
+        return self.qa
 
 
 class IndexSettings(BaseModel):
