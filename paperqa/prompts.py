@@ -25,8 +25,8 @@ CANNOT_ANSWER_PHRASE = "I cannot answer"
 answer_iteration_prompt = (
     "You are iterating on a prior answer, with a potentially different context:\n\n"
     "{prior_answer}\n\n"
-    "Create a new answer only using keys and data from the included context, do not "
-    "you can not use context keys from the prior answer which are not "
+    "Create a new answer only using keys and data from the included context."
+    " You can not use context keys from the prior answer which are not "
     "also included in the above context.\n\n"
 )
 
