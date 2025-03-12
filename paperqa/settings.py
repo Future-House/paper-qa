@@ -266,7 +266,7 @@ class PromptSettings(BaseModel):
 
     summary: str = summary_prompt
     qa: str = qa_prompt
-    iteration_prompt: str | None = Field(
+    answer_iteration_prompt: str | None = Field(
         default=answer_iteration_prompt_template,
         description=(
             "Prompt to inject existing prior answers into the qa prompt to allow the model to iterate. "

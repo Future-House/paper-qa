@@ -779,8 +779,8 @@ class Docs(BaseModel):
         else:
             with set_llm_session_ids(session.id):
                 prior_answer_prompt = ""
-                if prompt_config.iteration_prompt and session.answer:
-                    prior_answer_prompt = prompt_config.iteration_prompt.format(
+                if prompt_config.answer_iteration_prompt and session.answer:
+                    prior_answer_prompt = prompt_config.answer_iteration_prompt.format(
                         prior_answer=session.answer
                     )
                 messages = [
