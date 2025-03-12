@@ -5,7 +5,8 @@ import re
 from datetime import datetime
 from typing import cast
 
-from llmclient import LiteLLMModel, LLMModel
+from aviary.core import Message
+from lmi import LiteLLMModel, LLMModel
 from rich.table import Table
 
 from paperqa.docs import Docs
@@ -60,12 +61,13 @@ async def litellm_get_search_query(
         )
     else:
         model = llm
-    result = await model.run_prompt(
-        prompt=search_prompt,
-        data={"question": question, "count": count},
-        system_prompt=None,
+    messages = [
+        Message(content=search_prompt.format(question=question, count=count)),
+    ]
+    result = await model.call_single(
+        messages=messages,
     )
-    search_query = result.text
+    search_query = cast("str", result.text)
     queries = [s for s in search_query.split("\n") if len(s) > 3]  # noqa: PLR2004
     # remove "2.", "3.", etc. -- https://regex101.com/r/W2f7F1/1
     queries = [re.sub(r"^\d+\.\s*", "", q) for q in queries]
@@ -83,8 +85,8 @@ def table_formatter(
         table.add_column("Answer", style="magenta")
         for obj, _ in objects:
             table.add_row(
-                cast(AnswerResponse, obj).session.question[:max_chars_per_column],
-                cast(AnswerResponse, obj).session.answer[:max_chars_per_column],
+                cast("AnswerResponse", obj).session.question[:max_chars_per_column],
+                cast("AnswerResponse", obj).session.answer[:max_chars_per_column],
             )
         return table
     if isinstance(example_object, Docs):
@@ -92,7 +94,7 @@ def table_formatter(
         table.add_column("Title", style="cyan")
         table.add_column("File", style="magenta")
         for obj, filename in objects:
-            docs = cast(Docs, obj)  # Assume homogeneous objects
+            docs = cast("Docs", obj)  # Assume homogeneous objects
             doc = docs.texts[0].doc
             if isinstance(doc, DocDetails) and doc.title:
                 display_name: str = doc.title  # Prefer title if available

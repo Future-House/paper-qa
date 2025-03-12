@@ -6,10 +6,10 @@ from collections.abc import Awaitable, Collection, Coroutine, Sequence
 from typing import Any, cast
 
 import aiohttp
+from lmi.utils import gather_with_concurrency
 from pydantic import BaseModel, ConfigDict
 
 from paperqa.types import Doc, DocDetails
-from paperqa.utils import gather_with_concurrency
 
 from .client_models import MetadataPostProcessor, MetadataProvider
 from .crossref import CrossrefProvider
@@ -193,7 +193,7 @@ class DocMetadataClient:
     ) -> list[DocDetails]:
         return await gather_with_concurrency(
             concurrency,
-            [cast(Awaitable[DocDetails], self.query(**kwargs)) for kwargs in queries],
+            [cast("Awaitable[DocDetails]", self.query(**kwargs)) for kwargs in queries],
         )
 
     async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
@@ -201,7 +201,7 @@ class DocMetadataClient:
         # note we have some extra fields which may have come from reading the doc text,
         # but aren't in the doc object, we add them here too.
         extra_fields = {
-            k: v for k, v in kwargs.items() if k in {"title", "authors", "doi"}
+            k: v for k, v in kwargs.items() if k in set(DocDetails.model_fields)
         }
         # abuse our doc_details object to be an int if it's empty
         # our __add__ operation supports int by doing nothing
@@ -210,18 +210,21 @@ class DocMetadataClient:
         )
 
         if doc_details := await self.query(**kwargs):
-            if doc.overwrite_fields_from_metadata:
-                return extra_doc + doc_details
 
             # hard overwrite the details from the prior object
-            doc_details.dockey = doc.dockey
-            doc_details.doc_id = doc.dockey
-            doc_details.docname = doc.docname
-            doc_details.key = doc.docname
-            doc_details.citation = doc.citation
+            if "dockey" in doc.fields_to_overwrite_from_metadata:
+                doc_details.dockey = doc.dockey
+            if "doc_id" in doc.fields_to_overwrite_from_metadata:
+                doc_details.doc_id = doc.dockey
+            if "docname" in doc.fields_to_overwrite_from_metadata:
+                doc_details.docname = doc.docname
+            if "key" in doc.fields_to_overwrite_from_metadata:
+                doc_details.key = doc.docname
+            if "citation" in doc.fields_to_overwrite_from_metadata:
+                doc_details.citation = doc.citation
             return extra_doc + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
         prior_doc = doc.model_dump()
-        prior_doc["overwrite_fields_from_metadata"] = False
+        prior_doc["fields_to_overwrite_from_metadata"] = set()
         return DocDetails(**(prior_doc | extra_fields))

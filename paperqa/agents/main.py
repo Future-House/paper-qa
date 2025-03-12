@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from aviary.core import (
     MalformedMessageError,
     Message,
+    Tool,
     ToolCall,
     ToolRequestMessage,
     ToolSelector,
@@ -120,7 +121,7 @@ async def run_agent(
     # Build the index once here, and then all tools won't need to rebuild it
     # only build if the a search tool is requested
     if PaperSearch.TOOL_FN_NAME in (settings.agent.tool_names or DEFAULT_TOOL_NAMES):
-        await get_directory_index(settings=settings)
+        await get_directory_index(settings=settings, build=settings.agent.rebuild_index)
 
     if isinstance(agent_type, str) and agent_type.lower() == FAKE_AGENT_TYPE:
         session, agent_status = await run_fake_agent(
@@ -199,6 +200,8 @@ async def run_fake_agent(
         )
     env = env_class(query, settings, docs, **env_kwargs)
     obs, tools = await env.reset()
+    settings.adjust_tools_for_agent_llm(tools)
+
     if on_env_reset_callback:
         await on_env_reset_callback(env.state)
 
@@ -274,6 +277,8 @@ async def run_aviary_agent(
 
     async def rollout() -> AgentStatus:
         obs, tools = await env.reset()
+        settings.adjust_tools_for_agent_llm(tools)
+
         if on_env_reset_callback:
             await on_env_reset_callback(env.state)
 
@@ -352,6 +357,16 @@ class LDPRolloutCallback(Callback):
             await self.on_env_step_callback(*args)
 
 
+class LDPAdjustToolsForAgentCallback(Callback):
+    def __init__(self, settings: Settings):
+        self._settings = settings
+
+    async def after_env_reset(
+        self, traj_id: str, obs: list[Message], tools: list[Tool]  # noqa: ARG002
+    ) -> None:
+        self._settings.adjust_tools_for_agent_llm(tools)
+
+
 async def run_ldp_agent(
     query: str | MultipleChoiceQuestion,
     settings: Settings,
@@ -379,7 +394,8 @@ async def run_ldp_agent(
                     on_env_reset_callback,
                     on_agent_action_callback,
                     on_env_step_callback,
-                )
+                ),
+                LDPAdjustToolsForAgentCallback(settings),
             ],
         )
         trajs = await rollout_manager.sample_trajectories(

@@ -1,0 +1,36 @@
+{
+  "llm": "gemini/gemini-2.0-flash-exp",
+  "llm_config": {
+    "model_name": "gemini/gemini-2.0-flash-exp",
+    "litellm_params": {
+      "model": "gemini/gemini-2.0-flash-exp",
+      "api_key": null
+    }
+  },
+  "summary_llm": "gemini/gemini-2.0-flash-exp",
+  "summary_llm_config": {
+    "model_name": "gemini/gemini-2.0-flash-exp",
+    "litellm_params": {
+      "model": "gemini/gemini-2.0-flash-exp",
+      "api_key": null
+    }
+  },
+  "embedding": "ollama/granite3-dense",
+  "paper_directory": "my_papers",
+  "verbosity": 3,
+  "agent": {
+    "agent_llm": "gemini/gemini-2.0-flash-exp",
+    "agent_llm_config": {
+      "model_name": "gemini/gemini-2.0-flash-exp",
+      "litellm_params": {
+        "model": "gemini/gemini-2.0-flash-exp",
+        "api_key": null
+      }
+    },
+    "return_paper_metadata": false
+  },
+  "parsing": {
+    "chunk_size": 3000000,
+    "use_doc_details": false
+  }
+}

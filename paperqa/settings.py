@@ -3,14 +3,14 @@ import importlib.resources
 import os
 import pathlib
 import warnings
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
 from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
 
 import anyio
-from aviary.core import ToolSelector
-from llmclient import (
+from aviary.core import Tool, ToolSelector
+from lmi import (
     CommonLLMNames,
     EmbeddingModel,
     LiteLLMModel,
@@ -24,6 +24,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 from paperqa._ldp_shims import (
@@ -194,7 +195,7 @@ class ParsingSettings(BaseModel):
         ),
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
-    doc_filters: list[dict] | None = Field(
+    doc_filters: Sequence[Mapping[str, Any]] | None = Field(
         default=None,
         description=(
             "Optional filters to only allow documents that match this filter. This is a"
@@ -259,6 +260,7 @@ def get_formatted_variables(s: str) -> set[str]:
 class PromptSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
+    # MLA parenthetical in-text citation, SEE: https://nwtc.libguides.com/citations/MLA#s-lg-box-707489
     EXAMPLE_CITATION: ClassVar[str] = "(Example2012Example pages 3-4)"
 
     summary: str = summary_prompt
@@ -386,7 +388,7 @@ class IndexSettings(BaseModel):
         ),
     )
     index_directory: str | os.PathLike = Field(
-        default=pqa_directory("indexes"),
+        default_factory=lambda: pqa_directory("indexes"),
         description=(
             "Directory to store the PQA built search index, configuration, and"
             " answer indexes."
@@ -406,6 +408,11 @@ class IndexSettings(BaseModel):
     concurrency: int = Field(
         default=5,  # low default for folks without S2/Crossref keys
         description="Number of concurrent filesystem reads for indexing",
+    )
+    batch_size: int = Field(
+        default=1,
+        ge=1,
+        description="Number of files to process before committing to the index.",
     )
     sync_with_paper_directory: bool = Field(
         default=True,
@@ -444,7 +451,7 @@ class AgentSettings(BaseModel):
 
     agent_llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
-        description="Model to use for agent.",
+        description="Model to use for agent making tool selections.",
     )
 
     agent_llm_config: dict | None = Field(
@@ -483,8 +490,9 @@ class AgentSettings(BaseModel):
     agent_evidence_n: int = Field(
         default=1,
         ge=1,
-        description="Top n ranked evidences shown to the "
-        "agent after the GatherEvidence tool.",
+        description=(
+            "Top n ranked evidences shown to the agent after the GatherEvidence tool."
+        ),
     )
     timeout: float = Field(
         default=500.0,
@@ -498,7 +506,7 @@ class AgentSettings(BaseModel):
         description="If set to true, run the search tool before invoking agent.",
     )
 
-    tool_names: set[str] | None = Field(
+    tool_names: set[str] | Sequence[str] | None = Field(
         default=None,
         description=(
             "Optional override on the tools to provide the agent. Leaving as the"
@@ -521,7 +529,15 @@ class AgentSettings(BaseModel):
     )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
-    callbacks: Mapping[str, list[Callable[[_EnvironmentState], Any]]] = Field(
+    rebuild_index: bool = Field(
+        default=True,
+        description=(
+            "Flag to rebuild the index at the start of agent runners, default is True"
+            " for CLI users to ensure all source PDFs are pulled in."
+        ),
+    )
+
+    callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
         default_factory=dict,
         description="""
             A mapping that associates callback names with lists of corresponding callable functions.
@@ -588,12 +604,13 @@ def make_default_litellm_model_list_settings(
 ) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
     return {
+        "name": llm,
         "model_list": [
             {
                 "model_name": llm,
                 "litellm_params": {"model": llm, "temperature": temperature},
             }
-        ]
+        ],
     }
 
 
@@ -650,7 +667,7 @@ class Settings(BaseSettings):
         frozen=True,
     )
     index_directory: str | os.PathLike | None = Field(
-        default=pqa_directory("indexes"),
+        default_factory=lambda: pqa_directory("indexes"),
         description=(
             "Directory to store the PQA generated search index, configuration, and"
             " answer indexes."
@@ -693,15 +710,16 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
-        for deprecated_field_name, new_name in (
-            ("index_absolute_directory", "use_absolute_paper_directory"),
-            ("index_directory", "index_directory"),
-            ("index_recursively", "recurse_subdirectories"),
-            ("manifest_file", "manifest_file"),
-            ("paper_directory", "paper_directory"),
+        for deprecated_field_name, new_name, is_factory in (
+            ("index_absolute_directory", "use_absolute_paper_directory", False),
+            ("index_directory", "index_directory", True),
+            ("index_recursively", "recurse_subdirectories", False),
+            ("manifest_file", "manifest_file", False),
+            ("paper_directory", "paper_directory", False),
         ):
             value = getattr(self, deprecated_field_name)
-            if value != type(self).model_fields[deprecated_field_name].default:
+            finfo: FieldInfo = type(self).model_fields[deprecated_field_name]
+            if value != (finfo.default_factory() if is_factory else finfo.default):  # type: ignore[call-arg,misc]
                 warnings.warn(
                     f"The {deprecated_field_name!r} field has been moved to"
                     f" {AgentSettings.__name__},"
@@ -788,7 +806,7 @@ class Settings(BaseSettings):
                 importlib.resources.files("paperqa.configs") / f"{config_name}.json"
             )
             if pkg_config_path.is_file():
-                json_path = cast(pathlib.Path, pkg_config_path)
+                json_path = cast("pathlib.Path", pkg_config_path)
         except FileNotFoundError as e:
             raise FileNotFoundError(
                 f"No configuration file found for {config_name}"
@@ -871,7 +889,7 @@ class Settings(BaseSettings):
             )
 
         # TODO: support general agents
-        agent_cls = cast(type[Agent], locate(agent_type))
+        agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
         if issubclass(agent_cls, ReActAgent | MemoryAgent):
@@ -901,12 +919,12 @@ class Settings(BaseSettings):
                     )
                 )
             return agent_cls(
-                llm_model={"model": agent_llm, "temperature": self.temperature},
+                llm_model={"name": agent_llm, "temperature": self.temperature},
                 **config,
             )
         if issubclass(agent_cls, SimpleAgent):
             return agent_cls(
-                llm_model={"model": agent_llm, "temperature": self.temperature},
+                llm_model={"name": agent_llm, "temperature": self.temperature},
                 sys_prompt=agent_settings.agent_system_prompt,
                 **config,
             )
@@ -916,6 +934,14 @@ class Settings(BaseSettings):
                 agent_state_type=SimpleAgentState, **config
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
+
+    def adjust_tools_for_agent_llm(self, tools: list[Tool]) -> None:
+        # Google gemini/gemini-1.5-flash fails to support empty dict properties
+        # SEE: https://github.com/BerriAI/litellm/issues/7634
+        if "gemini" in self.agent.agent_llm.lower():
+            for t in tools:
+                if not t.info.get_properties():
+                    t.info.parameters = None
 
 
 # Settings: already Settings

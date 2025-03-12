@@ -7,9 +7,11 @@ import logging
 import os
 import pathlib
 import pickle
+import re
 import warnings
 import zlib
-from collections.abc import Callable, Collection, Sequence
+from collections import Counter
+from collections.abc import AsyncIterator, Callable, Sequence
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -43,7 +45,7 @@ from tenacity import (
 
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
-from paperqa.types import DocDetails
+from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
 from .models import SupportsPickle
@@ -107,14 +109,12 @@ class SearchDocumentStorage(StrEnum):
         return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
 
 
-ENV_VAR_MATCH: Collection[str] = {"1", "true"}
-
 # Cache keys are a two-tuple of index name and absolute index directory
 # Cache values are a two-tuple of an opened Index instance and the count
 # of SearchIndex instances currently referencing that Index
 _OPENED_INDEX_CACHE: dict[tuple[str, str], tuple[Index, int]] = {}
 DONT_USE_OPENED_INDEX_CACHE = (
-    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in ENV_VAR_MATCH
+    os.environ.get("PQA_INDEX_DONT_CACHE_INDEXES", "").lower() in VAR_MATCH_LOOKUP
 )
 
 
@@ -152,6 +152,7 @@ class SearchIndex:
         self._schema: Schema | None = None
         self._index: Index | None = None
         self._searcher: Searcher | None = None
+        self._writer: IndexWriter | None = None
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
@@ -237,6 +238,15 @@ class SearchIndex:
             self._searcher = index.searcher()
         return self._searcher
 
+    @contextlib.asynccontextmanager
+    async def writer(self, reset: bool = False) -> AsyncIterator[IndexWriter]:
+        if not self._writer:
+            index = await self.index
+            self._writer = index.writer()
+        yield self._writer
+        if reset:
+            self._writer = None
+
     @property
     async def count(self) -> int:
         return (await self.searcher).num_docs
@@ -295,10 +305,9 @@ class SearchIndex:
         async def _add_document() -> None:
             if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
                 try:
-                    writer: IndexWriter = (await self.index).writer()
-                    writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
-                    writer.commit()
-                    writer.wait_merging_threads()
+                    async with self.writer() as writer:
+                        # Let caller handle commit to allow for batching
+                        writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
@@ -326,19 +335,17 @@ class SearchIndex:
             )
             raise
 
-    @staticmethod
     @retry(
         stop=stop_after_attempt(1000),
         wait=wait_random_exponential(multiplier=0.25, max=60),
         retry=retry_if_exception_type(AsyncRetryError),
         reraise=True,
     )
-    def delete_document(index: Index, file_location: str) -> None:
+    async def delete_document(self, file_location: str) -> None:
         try:
-            writer: IndexWriter = index.writer()
-            writer.delete_documents("file_location", file_location)
-            writer.commit()
-            writer.wait_merging_threads()
+            async with self.writer() as writer:
+                writer.delete_documents("file_location", file_location)
+            await self.save_index()
         except ValueError as e:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
                 raise AsyncRetryError("Failed to acquire lock") from e
@@ -347,7 +354,7 @@ class SearchIndex:
     async def remove_from_index(self, file_location: str) -> None:
         index_files = await self.index_files
         if index_files.get(file_location):
-            self.delete_document(await self.index, file_location)
+            await self.delete_document(file_location)
             filehash = index_files.pop(file_location)
             docs_index_dir = await self.docs_index_directory
             # TODO: since the directory is part of the filehash these
@@ -358,7 +365,21 @@ class SearchIndex:
 
             self.changed = True
 
+    @retry(
+        stop=stop_after_attempt(1000),
+        wait=wait_random_exponential(multiplier=0.25, max=60),
+        retry=retry_if_exception_type(AsyncRetryError),
+        reraise=True,
+    )
     async def save_index(self) -> None:
+        try:
+            async with self.writer(reset=True) as writer:
+                writer.commit()
+                writer.wait_merging_threads()
+        except ValueError as e:
+            if "Failed to acquire Lockfile: LockBusy." in str(e):
+                raise AsyncRetryError("Failed to acquire lock") from e
+            raise
         file_index_path = await self.file_index_filename
         async with await anyio.open_file(file_index_path, "wb") as f:
             await f.write(zlib.compress(pickle.dumps(await self.index_files)))
@@ -380,9 +401,8 @@ class SearchIndex:
         return None
 
     def clean_query(self, query: str) -> str:
-        for replace in ("*", "[", "]", ":", "(", ")", "{", "}", "~", '"'):
-            query = query.replace(replace, "")
-        return query
+        # SEE: https://regex101.com/r/DoLMoa/3
+        return re.sub(r'[*\[\]:(){}~^><+"\\]', "", query)
 
     async def query(
         self,
@@ -399,10 +419,12 @@ class SearchIndex:
         addresses = [
             s[1]
             for s in searcher.search(
-                index.parse_query(self.clean_query(query), query_fields), top_n
+                index.parse_query(self.clean_query(query), query_fields),
+                top_n,
+                offset=offset,
             ).hits
             if s[0] > min_score
-        ][offset : offset + top_n]
+        ]
         search_index_docs = [searcher.doc(address) for address in addresses]
         return [
             result
@@ -416,18 +438,30 @@ class SearchIndex:
         ]
 
 
+def fetch_kwargs_from_manifest(
+    file_location: str, manifest: dict[str, Any], manifest_fallback_location: str
+) -> dict[str, Any]:
+    manifest_entry: dict[str, Any] | None = manifest.get(file_location) or manifest.get(
+        manifest_fallback_location
+    )
+    if manifest_entry:
+        return DocDetails(**manifest_entry).model_dump()
+    return {}
+
+
 async def maybe_get_manifest(
     filename: anyio.Path | None = None,
-) -> dict[str, DocDetails]:
+) -> dict[str, dict[str, Any]]:
     if not filename:
         return {}
     if filename.suffix == ".csv":
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
-            records = [DocDetails(**r) for r in csv.DictReader(content.splitlines())]
             file_loc_to_records = {
-                str(r.file_location): r for r in records if r.file_location
+                str(r.get("file_location")): r
+                for r in csv.DictReader(content.splitlines())
+                if r.get("file_location")
             }
             if not file_loc_to_records:
                 raise ValueError(  # noqa: TRY301
@@ -435,8 +469,9 @@ async def maybe_get_manifest(
                     f" file {filename}."
                 )
             logger.debug(
-                f"Found manifest file at {filename}, read {len(records)} records"
-                f" from it, which maps to {len(file_loc_to_records)} locations."
+                f"Found manifest file at {filename}, read"
+                f" {len(file_loc_to_records)} records from it, which maps to"
+                f" {len(file_loc_to_records)} locations."
             )
         except FileNotFoundError:
             logger.warning(f"Manifest file at {filename} could not be found.")
@@ -459,8 +494,10 @@ async def process_file(
     manifest: dict[str, Any],
     semaphore: anyio.Semaphore,
     settings: Settings,
+    processed_counter: Counter[str],
     progress_bar_update: Callable[[], Any] | None = None,
 ) -> None:
+
     abs_file_path = (
         pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
     )
@@ -476,34 +513,35 @@ async def process_file(
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            doi, title = None, None
-            if file_location in manifest:
-                manifest_entry = manifest[file_location]
-                doi, title = manifest_entry.doi, manifest_entry.title
-            elif manifest_fallback_location in manifest:
-                # Perhaps manifest used the opposite pathing scheme
-                manifest_entry = manifest[manifest_fallback_location]
-                doi, title = manifest_entry.doi, manifest_entry.title
+            kwargs = fetch_kwargs_from_manifest(
+                file_location, manifest, manifest_fallback_location
+            )
 
             tmp_docs = Docs()
             try:
                 await tmp_docs.aadd(
                     path=abs_file_path,
-                    title=title,
-                    doi=doi,
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
+                    **kwargs,
                 )
-            except (ValueError, ImpossibleParsingError):
+            except Exception as e:
+                # We handle any exception here because we want to save_index so we
+                # 1. can resume the build without rebuilding this file if a separate
+                # process_file invocation leads to a segfault or crash.
+                # 2. don't have deadlock issues after.
                 logger.exception(
                     f"Error parsing {file_location}, skipping index for this file."
                 )
                 await search_index.mark_failed_document(file_location)
-                # Save so we can resume the build without rebuilding this file if a
-                # separate process_file invocation leads to a segfault or crash
                 await search_index.save_index()
                 if progress_bar_update:
                     progress_bar_update()
+
+                if not isinstance(e, ValueError | ImpossibleParsingError):
+                    # ImpossibleParsingError: parsing failure, don't retry
+                    # ValueError: TODOC
+                    raise
                 return
 
             this_doc = next(iter(tmp_docs.docs.values()))
@@ -523,9 +561,15 @@ async def process_file(
                 },
                 document=tmp_docs,
             )
-            # Save so we can resume the build without rebuilding this file if a
-            # separate process_file invocation leads to a segfault or crash
-            await search_index.save_index()
+
+            processed_counter["batched_save_counter"] += 1
+            if (
+                processed_counter["batched_save_counter"]
+                == settings.agent.index.batch_size
+            ):
+                await search_index.save_index()
+                processed_counter["batched_save_counter"] = 0
+
             logger.info(f"Complete ({title}).")
 
         # Update progress bar for either a new or previously indexed file
@@ -541,10 +585,10 @@ def _make_progress_bar_update(
 ) -> tuple[contextlib.AbstractContextManager, Callable[[], Any] | None]:
     # Disable should override enable
     env_var_disable = (
-        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+        os.environ.get("PQA_INDEX_DISABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     env_var_enable = (
-        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in ENV_VAR_MATCH
+        os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     try:
         is_cli = is_running_under_cli()  # pylint: disable=used-before-assignment
@@ -641,7 +685,7 @@ async def get_directory_index(  # noqa: PLR0912
             if index_settings.recurse_subdirectories
             else paper_directory.iterdir()
         )
-        if file.suffix in {".txt", ".pdf", ".html"}
+        if file.suffix in {".txt", ".pdf", ".html", ".md"}
     ]
     if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(
@@ -672,6 +716,7 @@ async def get_directory_index(  # noqa: PLR0912
     )
     with progress_bar:
         async with anyio.create_task_group() as tg:
+            processed_counter: Counter[str] = Counter()
             for rel_file_path in valid_papers_rel_file_paths:
                 if index_settings.sync_with_paper_directory:
                     tg.start_soon(
@@ -681,6 +726,7 @@ async def get_directory_index(  # noqa: PLR0912
                         manifest,
                         semaphore,
                         _settings,
+                        processed_counter,
                         progress_bar_update_fn,
                     )
                 else:

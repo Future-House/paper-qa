@@ -23,24 +23,25 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.1
+    rev: v0.9.9
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.4.2
+    rev: v3.5.2
     hooks:
       - id: prettier
+        exclude: ^docs/.*\.md$
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.24.2
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         additional_dependencies: [".[toml]"]
@@ -55,15 +56,15 @@ repos:
     hooks:
       - id: check-mailmap
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.01.10
+    rev: 2025.02.24
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.30
+    rev: 0.6.3
     hooks:
       - id: uv-lock
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.100.1
+    rev: 39.182.3
     hooks:
       - id: renovate-config-validator
         args: [--strict]
@@ -71,12 +72,25 @@ repos:
     rev: 1.19.1
     hooks:
       - id: blacken-docs
+        exclude: \.md$ # The generated markdown files are being blackened by jupytext
+  - repo: https://github.com/srstevenson/nb-clean
+    rev: 4.0.1
+    hooks:
+      - id: nb-clean
+        args: [--preserve-cell-outputs, --remove-empty-cells]
+  - repo: https://github.com/mwouts/jupytext
+    rev: v1.16.7
+    hooks:
+      - id: jupytext
+        args: [--to, md, --pipe, black]
+        additional_dependencies: [black]
+        files: ^docs/.*\.ipynb$
   - repo: https://github.com/jsh9/markdown-toc-creator
     rev: 0.0.10
     hooks:
       - id: markdown-toc-creator
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.15.0
     hooks:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
@@ -84,14 +98,13 @@ repos:
           - aiohttp>=3.10.6 # Match pyproject.toml
           - PyMuPDF>=1.24.12
           - anyio
-          - fh-llm-client>=0.0.9 # Match pyproject.toml
-          - fhaviary[llm]>=0.14 # Match pyproject.toml
-          - ldp>=0.17 # Match pyproject.toml
+          - fhlmi>=0.25.4 # Match pyproject.toml
+          - fhaviary[llm]>=0.18.2 # Match pyproject.toml
+          - ldp>=0.25.0 # Match pyproject.toml
           - html2text
           - httpx
           - pybtex
           - numpy
-          - pandas-stubs
           - pydantic~=2.0,>=2.10.1 # Match pyproject.toml
           - pydantic-settings
           - qdrant-client

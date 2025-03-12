@@ -1,6 +1,6 @@
 import warnings
 
-from llmclient import (
+from lmi import (
     EmbeddingModel,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,

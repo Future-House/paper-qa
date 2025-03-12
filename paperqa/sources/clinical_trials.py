@@ -7,6 +7,7 @@ from typing import Any
 import aiohttp
 from aiohttp import ClientResponseError, ClientSession
 from aiohttp.web import HTTPBadRequest
+from lmi.utils import gather_with_concurrency
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -17,7 +18,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, Embeddable, Text
-from paperqa.utils import gather_with_concurrency, logging_filters
+from paperqa.utils import logging_filters
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +171,7 @@ def format_to_doc_details(trial_data: dict) -> DocDetails:
         year=year or None,
         citation=citation,
         other={"client_source": [CLINICAL_TRIALS_BASE]},
-        overwrite_fields_from_metadata=False,
+        fields_to_overwrite_from_metadata=set(),
     )
 
 
@@ -191,13 +192,19 @@ def parse_clinical_trial(json_data: dict[str, Any]) -> str:
         "=" * 25,
         f"NCT Number: {identification.get('nctId', 'Not provided')}",
         f"Title: {identification.get('briefTitle', 'Not provided')}",
-        f"Organization: {identification.get('organization', {}).get('fullName', 'Not provided')}",
+        (
+            "Organization:"
+            f" {identification.get('organization', {}).get('fullName', 'Not provided')}"
+        ),
         # Status Information
         "\nSTUDY STATUS",
         "=" * 13,
         f"Overall Status: {status.get('overallStatus', 'Not provided')}",
         f"Start Date: {status.get('startDateStruct', {}).get('date', 'Not provided')}",
-        f"Completion Date: {status.get('completionDateStruct', {}).get('date', 'Not provided')}",
+        (
+            "Completion Date:"
+            f" {status.get('completionDateStruct', {}).get('date', 'Not provided')}"
+        ),
         # Study Description
         "\nSTUDY DESCRIPTION",
         "=" * 17,
@@ -207,7 +214,10 @@ def parse_clinical_trial(json_data: dict[str, Any]) -> str:
         "=" * 13,
         f"Study Type: {design.get('studyType', 'Not provided')}",
         f"Phase: {', '.join(design.get('phases', ['Not provided']))}",
-        f"Enrollment: {design.get('enrollmentInfo', {}).get('count', 'Not provided')} participants",
+        (
+            "Enrollment:"
+            f" {design.get('enrollmentInfo', {}).get('count', 'Not provided')} participants"
+        ),
         # Eligibility
         "\nELIGIBILITY CRITERIA",
         "=" * 19,
@@ -302,7 +312,7 @@ async def add_clinical_trials_to_docs(
         year=datetime.now().year,
         citation=f"Clinical Trials Search via ClinicalTrials.gov: {query}",
         other={"client_source": [CLINICAL_TRIALS_BASE]},
-        overwrite_fields_from_metadata=False,
+        fields_to_overwrite_from_metadata=set(),
     )
 
     await docs.aadd_texts(

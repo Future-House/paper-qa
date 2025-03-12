@@ -12,7 +12,7 @@ from uuid import UUID, uuid4
 
 import tiktoken
 from aviary.core import Message
-from llmclient import Embeddable, LLMResult
+from lmi import Embeddable, LLMResult
 from pybtex.database import BibliographyData, Entry, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
@@ -30,6 +30,7 @@ from paperqa.utils import (
     encode_id,
     format_bibtex,
     get_citenames,
+    maybe_get_date,
 )
 from paperqa.version import __version__ as pqa_version
 
@@ -40,17 +41,26 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 
+VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
+VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
+DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
+    "key",
+    "doc_id",
+    "docname",
+    "dockey",
+    "citation",
+}
+
+
 class Doc(Embeddable):
     model_config = ConfigDict(extra="forbid")
 
     docname: str
     dockey: DocKey
     citation: str
-    overwrite_fields_from_metadata: bool = Field(
-        default=True,
-        description=(
-            "flag to overwrite fields from metadata when upgrading to a DocDetails"
-        ),
+    fields_to_overwrite_from_metadata: set[str] = Field(
+        default_factory=lambda: set(DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA),
+        description="fields from metadata to overwrite when upgrading to a DocDetails",
     )
 
     @model_validator(mode="before")
@@ -66,7 +76,7 @@ class Doc(Embeddable):
     def formatted_citation(self) -> str:
         return self.citation
 
-    def matches_filter_criteria(self, filter_criteria: dict) -> bool:
+    def matches_filter_criteria(self, filter_criteria: Mapping[str, Any]) -> bool:
         """Returns True if the doc matches the filter criteria, False otherwise."""
         data_dict = self.model_dump()
         for key, value in filter_criteria.items():
@@ -126,6 +136,13 @@ class PQASession(BaseModel):
     agent_answer_suggestions: str = Field(
         default="",
         description="Suggestions from the agent on how to best answer the question.",
+    )
+    answer_reasoning: str | None = Field(
+        default=None,
+        description=(
+            "Optional reasoning from the LLM. If the LLM does not support reasoning,"
+            " it will be None."
+        ),
     )
     has_successful_answer: bool | None = Field(
         default=None,
@@ -245,7 +262,8 @@ class PQASession(BaseModel):
 class Answer(PQASession):
     def __init__(self, *args, **kwargs):
         warnings.warn(
-            "The 'Answer' class is deprecated and will be removed in future versions. Use 'PQASession' instead.",
+            "The 'Answer' class is deprecated and will be removed in future versions."
+            " Use 'PQASession' instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -420,7 +438,10 @@ class DocDetails(Doc):
         else:
             data["doc_id"] = encode_id(uuid4())
 
-        if data.get("overwrite_fields_from_metadata", True):
+        if "dockey" in data.get(
+            "fields_to_overwrite_from_metadata",
+            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        ):
             data["dockey"] = data["doc_id"]
 
         return data
@@ -499,7 +520,7 @@ class DocDetails(Doc):
         if authors := data.get("authors"):
             # On 10/29/2024 while indexing 19k PDFs, a provider (unclear which one)
             # returned an author of None. The vast majority of the time authors are str
-            authors = cast(list[str | None], authors)
+            authors = cast("list[str | None]", authors)
             data["authors"] = [
                 a for a in authors if a and a.lower() not in cls.AUTHOR_NAMES_TO_REMOVE
             ]
@@ -512,10 +533,13 @@ class DocDetails(Doc):
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}
-        if data.get("overwrite_fields_from_metadata", True):
-            for field, old_field in overwrite_fields.items():
-                if data.get(field):
-                    data[old_field] = data[field]
+        fields_to_overwrite = data.get(
+            "fields_to_overwrite_from_metadata",
+            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        )
+        for field in overwrite_fields.keys() & fields_to_overwrite:
+            if data.get(field):
+                data[overwrite_fields[field]] = data[field]
         return data
 
     @classmethod
@@ -526,7 +550,7 @@ class DocDetails(Doc):
 
         Missing values, 'unknown' keys, and incomplete bibtex entries are regenerated.
 
-        When overwrite_fields_from_metadata:
+        When fields_to_overwrite_from_metadata:
             If bibtex is regenerated, the citation field is also regenerated.
 
             Otherwise we keep the citation field as is.
@@ -539,7 +563,10 @@ class DocDetails(Doc):
                 data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]
                 data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
             )
-            if data.get("overwrite_fields_from_metadata", True):
+            if "docname" in data.get(
+                "fields_to_overwrite_from_metadata",
+                DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+            ):
                 data["docname"] = data["key"]
 
         # even if we have a bibtex, it may not be complete, thus we need to add to it
@@ -577,8 +604,8 @@ class DocDetails(Doc):
                 "pages": data.get("pages"),
                 "month": (
                     None
-                    if not data.get("publication_date")
-                    else data["publication_date"].strftime("%b")
+                    if not (maybe_date := maybe_get_date(data.get("publication_date")))
+                    else maybe_date.strftime("%b")
                 ),
                 "doi": data.get("doi"),
                 "url": data.get("doi_url"),
@@ -601,26 +628,35 @@ class DocDetails(Doc):
                     entries={data["key"]: new_entry}
                 ).to_string("bibtex")
                 # clear out the citation, since it will be regenerated
-                if data.get("overwrite_fields_from_metadata", True):
+                if "citation" in data.get(
+                    "fields_to_overwrite_from_metadata",
+                    DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+                ):
                     data["citation"] = None
             except Exception:
                 logger.warning(
                     "Failed to generate bibtex for"
                     f" {data.get('docname') or data.get('citation')}"
                 )
-        if not data.get("citation") and data.get("bibtex") is not None:
+        if data.get("citation") is None and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
                 data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
             )
-        elif not data.get("citation"):
+        elif data.get("citation") is None:
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
+
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
+        if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
+            data["fields_to_overwrite_from_metadata"] = {
+                s.strip()
+                for s in data.get("fields_to_overwrite_from_metadata", "").split(",")
+            }
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
@@ -676,7 +712,7 @@ class DocDetails(Doc):
     def is_hydration_needed(
         self,
         exclusion: Collection[str] = OPTIONAL_HYDRATION_FIELDS,
-        inclusion: Collection[str] = [],
+        inclusion: Collection[str] = (),
     ) -> bool:
         """Determine if we have unfilled attributes."""
         if inclusion:

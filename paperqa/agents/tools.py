@@ -11,7 +11,7 @@ from itertools import chain
 from typing import ClassVar, Self, cast
 
 from aviary.core import ToolRequestMessage
-from llmclient import Embeddable, EmbeddingModel, LiteLLMModel
+from lmi import Embeddable, EmbeddingModel, LiteLLMModel
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from paperqa.docs import Docs
@@ -70,7 +70,7 @@ class EnvironmentState(BaseModel):
     @property
     def status(self) -> str:
         if self.status_fn is not None:
-            return self.status_fn(cast(Self, self))
+            return self.status_fn(cast("Self", self))
         return default_status(self)
 
     def get_relevant_contexts(self) -> list[Context]:
@@ -162,7 +162,7 @@ class PaperSearch(NamedTool):
         all_doc_details: list[DocDetails] = []
         for r in results:
             # there's only one doc per result, so just take the first one
-            this_doc_details = cast(DocDetails, next(iter(r.docs.values())))
+            this_doc_details = cast("DocDetails", next(iter(r.docs.values())))
             all_doc_details.append(this_doc_details)
             await state.docs.aadd_texts(
                 texts=r.texts,
@@ -279,8 +279,8 @@ class GatherEvidence(NamedTool):
             )
 
         return (
-            f"Added {l1 - l0} pieces of evidence, {l1_relevant - l0_relevant} of which were"
-            f" relevant.{best_evidence}\n\n" + status
+            f"Added {l1 - l0} pieces of evidence, {l1_relevant - l0_relevant} of which"
+            f" were relevant.{best_evidence}\n\n" + status
         )
 
 
@@ -662,9 +662,9 @@ class ClinicalTrialsSearch(NamedTool):
         self.previous_searches[query] += self.search_count
         if error_message is None:
             return (
-                f"Found clinical trial search results from search {offset} to {offset + new_result_count}"
-                f" among {total_result_count} total results."
-                f" {state.status}"
+                f"Found clinical trial search results from search {offset} to"
+                f" {offset + new_result_count} among {total_result_count} total"
+                f" results. {state.status}"
             )
         return f"Error in clinical trial query syntax: {error_message}"
 

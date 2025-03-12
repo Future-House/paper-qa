@@ -12,8 +12,9 @@ from aviary.core import (
     ToolRequestMessage,
     ToolResponseMessage,
 )
+from aviary.env import ENV_REGISTRY
 from aviary.utils import MultipleChoiceQuestion
-from llmclient import EmbeddingModel, LiteLLMModel
+from lmi import EmbeddingModel, LiteLLMModel
 
 from paperqa.docs import Docs
 from paperqa.settings import Settings
@@ -71,8 +72,8 @@ def settings_to_tools(  # noqa: PLR0912
                 ).paper_search
             )
             for pname in ("min_year", "max_year"):
-                tool.info.parameters.properties[pname]["description"] = cast(
-                    str, tool.info.parameters.properties[pname]["description"]
+                tool.info.get_properties()[pname]["description"] = cast(
+                    "str", tool.info.get_properties()[pname]["description"]
                 ).format(current_year=get_year())
         elif issubclass(tool_type, GatherEvidence):
             gather_evidence_tool = GatherEvidence(
@@ -154,8 +155,8 @@ def make_clinical_trial_status(
 
 # SEE: https://regex101.com/r/L0L5MH/1
 CLINICAL_STATUS_SEARCH_REGEX_PATTERN: str = (
-    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial Count=(\d+)\s"
-    r"\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
+    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial"
+    r" Count=(\d+)\s\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
 )
 
 
@@ -221,6 +222,10 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self._summary_llm_model = summary_llm_model
         self._embedding_model = embedding_model
         self._session_id = session_id
+
+    @classmethod
+    def from_task(cls, task: str) -> Self:
+        return cls(query=task, settings=Settings(), docs=Docs())
 
     def make_tools(self) -> list[Tool]:
         return settings_to_tools(
@@ -297,7 +302,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self.state.record_action(action)
 
         response_messages = cast(
-            list[Message],
+            "list[Message]",
             await self.exec_tool_calls(
                 action,
                 concurrency=False,  # PQA tools aren't yet concurrency safe
@@ -346,3 +351,6 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         # tool functions within the tools
         copy_self.tools = copy_self.make_tools()
         return copy_self
+
+
+ENV_REGISTRY["paperqa"] = "paperqa.agents.env", PaperQAEnvironment.__name__

@@ -5,7 +5,6 @@ import threading
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import (
-    Awaitable,
     Callable,
     Iterable,
     Sequence,
@@ -14,13 +13,12 @@ from collections.abc import (
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
-from llmclient import (
+from lmi import (
     Embeddable,
     EmbeddingModel,
     EmbeddingModes,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
-    LLMResult,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
 )
@@ -45,11 +43,6 @@ try:
     qdrant_installed = True
 except ImportError:
     qdrant_installed = False
-
-PromptRunner = Callable[
-    [dict, list[Callable[[str], None]] | None, str | None],
-    Awaitable[LLMResult],
-]
 
 logger = logging.getLogger(__name__)
 
@@ -284,7 +277,10 @@ class NumpyVectorStore(VectorStore):
 class QdrantVectorStore(VectorStore):
     client: Any = Field(
         default=None,
-        description="Instance of `qdrant_client.AsyncQdrantClient`. Defaults to an in-memory instance.",
+        description=(
+            "Instance of `qdrant_client.AsyncQdrantClient`. Defaults to an in-memory"
+            " instance."
+        ),
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
@@ -329,7 +325,8 @@ class QdrantVectorStore(VectorStore):
 
         if self.client and not isinstance(self.client, AsyncQdrantClient):
             raise TypeError(
-                f"'client' should be an instance of AsyncQdrantClient. Got `{type(self.client)}`"
+                "'client' should be an instance of AsyncQdrantClient. Got"
+                f" `{type(self.client)}`"
             )
 
         if not self.client:
@@ -374,7 +371,7 @@ class QdrantVectorStore(VectorStore):
 
         if texts_list and not await self._collection_exists():
             params = models.VectorParams(
-                size=len(cast(Sized, texts_list[0].embedding)),
+                size=len(cast("Sized", texts_list[0].embedding)),
                 distance=models.Distance.COSINE,
             )
 

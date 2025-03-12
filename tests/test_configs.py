@@ -1,3 +1,5 @@
+import os
+import pathlib
 import warnings
 from unittest.mock import patch
 
@@ -5,6 +7,7 @@ import pytest
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
+from paperqa.prompts import citation_prompt
 from paperqa.settings import (
     AgentSettings,
     IndexSettings,
@@ -15,6 +18,7 @@ from paperqa.settings import (
     get_settings,
 )
 from paperqa.types import Doc, DocDetails
+from paperqa.utils import get_year
 
 
 def test_prompt_settings_validation() -> None:
@@ -56,10 +60,26 @@ def test_get_settings_missing_file() -> None:
         get_settings("missing_config")
 
 
-def test_settings_default_instantiation() -> None:
-    settings = Settings()
-    assert "gpt-" in settings.llm
-    assert settings.answer.evidence_k == 10
+HOME_DIR = str(pathlib.Path.home())
+
+
+def test_settings_default_instantiation(tmpdir, subtests: SubTests) -> None:
+    default_settings = Settings()
+    assert "gpt-" in default_settings.llm
+    assert default_settings.answer.evidence_k == 10
+    assert HOME_DIR in str(default_settings.agent.index.index_directory)
+    assert ".pqa" in str(default_settings.agent.index.index_directory)
+
+    with subtests.test(msg="alternate-pqa-home"):
+        assert HOME_DIR not in str(tmpdir), "Later assertion requires this to pass"
+        with patch.dict(os.environ, values={"PQA_HOME": str(tmpdir)}):
+            alt_home_settings = Settings()
+        assert (
+            alt_home_settings.agent.index.index_directory
+            != default_settings.agent.index.index_directory
+        )
+        assert HOME_DIR not in str(alt_home_settings.agent.index.index_directory)
+        assert ".pqa" in str(alt_home_settings.agent.index.index_directory)
 
 
 def test_index_naming(subtests: SubTests) -> None:
@@ -167,3 +187,12 @@ def test_o1_requires_temp_equals_1() -> None:
 def test_matches_filter_criteria(doc_class, doc_data, filter_criteria, expected_result):
     doc = doc_class(**doc_data)
     assert doc.matches_filter_criteria(filter_criteria) == expected_result
+
+
+def test_citation_prompt_current_year():
+    expected_year_text = f"the current year is {get_year()}"
+
+    assert expected_year_text in citation_prompt, (
+        f"Citation prompt should contain '{expected_year_text}' but got:"
+        f" {citation_prompt}"
+    )

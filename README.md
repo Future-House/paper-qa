@@ -1,7 +1,7 @@
 # PaperQA2
 
-[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/whitead/paper-qa)
-[![tests](https://github.com/whitead/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/whitead/paper-qa)
+[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Future-House/paper-qa)
+[![tests](https://github.com/Future-House/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/Future-House/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
 
 PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files,
@@ -36,12 +36,9 @@ question answering, summarization, and contradiction detection.
   - [Creating Index](#creating-index)
     - [Manifest Files](#manifest-files)
   - [Reusing Index](#reusing-index)
-  - [Running on LitQA v2](#running-on-litqa-v2)
   - [Using Clients Directly](#using-clients-directly)
 - [Settings Cheatsheet](#settings-cheatsheet)
 - [Where do I get papers?](#where-do-i-get-papers)
-  - [Zotero](#zotero)
-  - [Paper Scraper](#paper-scraper)
 - [Callbacks](#callbacks)
   - [Caching Embeddings](#caching-embeddings)
 - [Customizing Prompts](#customizing-prompts)
@@ -272,7 +269,7 @@ and slow down your queries to accommodate.
 You can also specify them manually with any rate limit string that matches the specification in the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
-pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
+pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
 ```
 
 Or by adding into a `Settings` object, if calling imperatively:
@@ -283,8 +280,8 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
-        summary_llm_config={"rate_limit": {"gpt-4o-2024-08-06": "30000 per 1 minute"}},
+        llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
+        summary_llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
     ),
 )
 ```
@@ -345,7 +342,7 @@ It just removes the automation associated with an agent picking the documents to
 ```python
 from paperqa import Docs, Settings
 
-# valid extensions include .pdf, .txt, and .html
+# valid extensions include .pdf, .txt, .md, and .html
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 # Prepare the Docs object by adding a bunch of documents
@@ -391,7 +388,7 @@ from paperqa import Docs
 
 async def main() -> None:
     docs = Docs()
-    # valid extensions include .pdf, .txt, and .html
+    # valid extensions include .pdf, .txt, .md, and .html
     for doc in ("myfile.pdf", "myotherfile.pdf"):
         await docs.aadd(doc)
 
@@ -406,7 +403,17 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, it uses OpenAI models with `gpt-4o-2024-08-06` for both the re-ranking and summary step, the `summary_llm` setting, and for the answering step, the `llm` setting. You can adjust this easily:
+By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
+`summary_llm`, `llm`, and `agent_llm`.
+Please see the [Settings Cheatsheet](#settings-cheatsheet)
+for more information on these settings.
+PaperQA2 also defaults to using OpenAI's `text-embedding-3-small` model for the `embedding` setting.
+If you don't have an OpenAI API key, you can use a different embedding model.
+More information about embedding models can be found [in the "Embedding Model" section](#embedding-model).
+
+We use the [`lmi`](https://github.com/Future-House/ldp/tree/main/packages/lmi) package for our LLM interface,
+which in turn uses `litellm` to support many LLM providers.
+You can adjust this easily to use any model supported by `litellm`:
 
 ```python
 from paperqa import Settings, ask
@@ -419,15 +426,39 @@ answer_response = ask(
 )
 ```
 
-You can use Anthropic or any other model supported by `litellm`:
+To use Claude, make sure you set the `ANTHROPIC_API_KEY` environment variable.
+In this example, we also use a different embedding model.
+Please make sure to `pip install paper-qa[local]` to use a local embedding model.
 
 ```python
 from paperqa import Settings, ask
+from paperqa.settings import AgentSettings
 
 answer_response = ask(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=Settings(
-        llm="claude-3-5-sonnet-20240620", summary_llm="claude-3-5-sonnet-20240620"
+        llm="claude-3-5-sonnet-20240620",
+        summary_llm="claude-3-5-sonnet-20240620",
+        agent=AgentSettings(agent_llm="claude-3-5-sonnet-20240620"),
+        # SEE: https://huggingface.co/sentence-transformers/multi-qa-MiniLM-L6-cos-v1
+        embedding="st-multi-qa-MiniLM-L6-cos-v1",
+    ),
+)
+```
+
+Or Gemini, by setting the `GEMINI_API_KEY` from Google AI Studio
+
+```python
+from paperqa import Settings, ask
+from paperqa.settings import AgentSettings
+
+answer_response = ask(
+    "What manufacturing challenges are unique to bispecific antibodies?",
+    settings=Settings(
+        llm="gemini/gemini-2.0-flash",
+        summary_llm="gemini/gemini-2.0-flash",
+        agent=AgentSettings(agent_llm="gemini/gemini-2.0-flash"),
+        embedding="gemini/text-embedding-004",
     ),
 )
 ```
@@ -702,44 +733,6 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
     )
 ```
 
-### Running on LitQA v2
-
-In [`paperqa/agents/task.py`](paperqa/agents/task.py), you will find:
-
-1. `GradablePaperQAEnvironment`: an environment that can grade answers given an evaluation function.
-2. `LitQAv2TaskDataset`: a task dataset designed to pull LitQA v2 from Hugging Face,
-   and create one `GradablePaperQAEnvironment` per question
-
-Here is an example of how to use them:
-
-```python
-import os
-
-from aviary.env import TaskDataset
-from ldp.agent import SimpleAgent
-from ldp.alg.callbacks import MeanMetricsCallback
-from ldp.alg.runners import Evaluator, EvaluatorConfig
-
-from paperqa import Settings
-from paperqa.agents.task import TASK_DATASET_NAME
-
-
-async def evaluate(folder_of_litqa_v2_papers: str | os.PathLike) -> None:
-    settings = Settings(paper_directory=folder_of_litqa_v2_papers)
-    dataset = TaskDataset.from_name(TASK_DATASET_NAME, settings=settings)
-    metrics_callback = MeanMetricsCallback(eval_dataset=dataset)
-
-    evaluator = Evaluator(
-        config=EvaluatorConfig(batch_size=3),
-        agent=SimpleAgent(),
-        dataset=dataset,
-        callbacks=[metrics_callback],
-    )
-    await evaluator.evaluate()
-
-    print(metrics_callback.eval_means)
-```
-
 ### Using Clients Directly
 
 One of the most powerful features of PaperQA2 is its ability to combine data from multiple metadata sources. For example, [Unpaywall](https://unpaywall.org/) can provide open access status/direct links to PDFs, [Crossref](https://www.crossref.org/) can provide bibtex, and [Semantic Scholar](https://www.semanticscholar.org/) can provide citation licenses. Here's a short demo of how to do this:
@@ -785,9 +778,9 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                             |
 | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-08-06"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
+| `llm`                                        | `"gpt-4o-2024-11-20"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
-| `summary_llm`                                | `"gpt-4o-2024-08-06"`                  | Default LLM for summaries and parsing citations.                                                        |
+| `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | Default LLM for summaries and parsing citations.                                                        |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
 | `embedding`                                  | `"text-embedding-3-small"`             | Default embedding model for texts.                                                                      |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                 |
@@ -825,7 +818,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
 | `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
 | `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
-| `agent.agent_llm`                            | `"gpt-4o-2024-08-06"`                  | Model to use for agent.                                                                                 |
+| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | Model to use for agent making tool selections.                                                          |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                 |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                   |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                   |
@@ -850,96 +843,16 @@ will return much faster than the first query and we'll be certain the authors ma
 
 Well that's a really good question! It's probably best to just download PDFs of papers you think will help answer your question and start from there.
 
-### Zotero
-
-_It's been a while since we've tested this - so let us know if it runs into issues!_
-
-If you use [Zotero](https://www.zotero.org/) to organize your personal bibliography,
-you can use the `paperqa.contrib.ZoteroDB` to query papers from your library,
-which relies on [pyzotero](https://github.com/urschrei/pyzotero).
-
-Install `pyzotero` via the `zotero` extra for this feature:
-
-```bash
-pip install paperqa[zotero]
-```
-
-First, note that PaperQA2 parses the PDFs of papers to store in the database,
-so all relevant papers should have PDFs stored inside your database.
-You can get Zotero to automatically do this by highlighting the references
-you wish to retrieve, right clicking, and selecting _"Find Available PDFs"_.
-You can also manually drag-and-drop PDFs onto each reference.
-
-To download papers, you need to get an API key for your account.
-
-1. Get your library ID, and set it as the environment variable `ZOTERO_USER_ID`.
-   - For personal libraries, this ID is given [here](https://www.zotero.org/settings/keys) at the part "_Your userID for use in API calls is XXXXXX_".
-   - For group libraries, go to your group page `https://www.zotero.org/groups/groupname`, and hover over the settings link. The ID is the integer after /groups/. (_h/t pyzotero!_)
-2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
-   - The key will need read access to the library.
-
-With this, we can download papers from our library and add them to PaperQA2:
-
-```python
-from paperqa import Docs
-from paperqa.contrib import ZoteroDB
-
-docs = Docs()
-zotero = ZoteroDB(library_type="user")  # "group" if group library
-
-for item in zotero.iterate(limit=20):
-    if item.num_pages > 30:
-        continue  # skip long papers
-    docs.add(item.pdf, docname=item.key)
-```
-
-which will download the first 20 papers in your Zotero database and add
-them to the `Docs` object.
-
-We can also do specific queries of our Zotero library and iterate over the results:
-
-```python
-for item in zotero.iterate(
-    q="large language models",
-    qmode="everything",
-    sort="date",
-    direction="desc",
-    limit=100,
-):
-    print("Adding", item.title)
-    docs.add(item.pdf, docname=item.key)
-```
-
-You can read more about the search syntax by typing `zotero.iterate?` in IPython.
-
-### Paper Scraper
-
-If you want to search for papers outside of your own collection, I've found an unrelated project called [paper-scraper](https://github.com/blackadad/paper-scraper) that looks
-like it might help. But beware, this project looks like it uses some scraping tools that may violate publisher's rights or be in a gray area of legality.
-
-```python
-from paperqa import Docs
-
-keyword_search = "bispecific antibody manufacture"
-papers = paperscraper.search_papers(keyword_search)
-docs = Docs()
-for path, data in papers.items():
-    try:
-        docs.add(path)
-    except ValueError as e:
-        # sometimes this happens if PDFs aren't downloaded or readable
-        print("Could not read", path, e)
-session = docs.query(
-    "What manufacturing challenges are unique to bispecific antibodies?"
-)
-print(session)
-```
+See detailed docs [about zotero, openreview and parsing](docs/tutorials/where_do_I_get_papers.md)
 
 ## Callbacks
 
 To execute a function on each chunk of LLM completions, you need to provide a function that can be executed on each chunk. For example, to get a typewriter view of the completions, you can do:
 
 ```python
+from paperqa import Docs
+
+
 def typewriter(chunk: str) -> None:
     print(chunk, end="")
 
@@ -1027,15 +940,48 @@ with open("my_docs.pkl", "rb") as f:
 ## Reproduction
 
 Contained in [docs/2024-10-16_litqa2-splits.json5](docs/2024-10-16_litqa2-splits.json5)
-are the question IDs
-(correspond with [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl))
-used in the train and evaluation splits,
-as well as paper DOIs used to build the train and evaluation splits' indexes.
-The test split remains held out.
+are the question IDs used in train, evaluation, and test splits,
+as well as paper DOIs used to build the splits' indexes.
+
+- Train and eval splits: question IDs come from
+  [LAB-Bench's LitQA2 question IDs](https://github.com/Future-House/LAB-Bench/blob/main/LitQA2/litqa-v2-public.jsonl).
+- Test split: questions IDs come from
+  [aviary-paper-data's LitQA2 question IDs](https://huggingface.co/datasets/futurehouse/aviary-paper-data).
+
+There are multiple papers slowly building PaperQA, shown below in [Citation](#citation).
+To reproduce:
+
+- `skarlinski2024language`: train and eval splits are applicable.
+  The test split remains held out.
+- `narayanan2024aviarytraininglanguageagents`: train, eval, and test splits are applicable.
+
+Example on how to use LitQA for evaluation can be found in
+[aviary.litqa](https://github.com/Future-House/aviary/tree/main/packages/litqa#running-litqa).
 
 ## Citation
 
 Please read and cite the following papers if you use this software:
+
+```bibtex
+@article{narayanan2024aviarytraininglanguageagents,
+      title = {Aviary: training language agents on challenging scientific tasks},
+      author = {
+      Siddharth Narayanan and
+ James D. Braza and
+ Ryan-Rhys Griffiths and
+ Manu Ponnapati and
+ Albert Bou and
+ Jon Laurent and
+ Ori Kabeli and
+ Geemi Wellawatte and
+ Sam Cox and
+ Samuel G. Rodriques and
+ Andrew D. White},
+      journal = {arXiv preprent arXiv:2412.21154},
+      year = {2024},
+      url = {https://doi.org/10.48550/arXiv.2412.21154},
+}
+```
 
 ```bibtex
 @article{skarlinski2024language,
@@ -1050,8 +996,8 @@ Please read and cite the following papers if you use this software:
  Manvitha Ponnapati and
  Samuel G. Rodriques and
  Andrew D. White},
-    year = {2024},
     journal = {arXiv preprent arXiv:2409.13740},
+    year = {2024},
     url = {https://doi.org/10.48550/arXiv.2409.13740}
 }
 ```
@@ -1067,6 +1013,7 @@ Please read and cite the following papers if you use this software:
  Samuel G. Rodriques and
  Andrew D. White},
     journal = {arXiv preprint arXiv:2312.07559},
-    year = {2023}
+    year = {2023},
+    url = {https://doi.org/10.48550/arXiv.2312.07559}
 }
 ```

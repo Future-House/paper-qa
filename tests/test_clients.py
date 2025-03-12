@@ -117,9 +117,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
         client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 client_list,
             ),
         )
@@ -234,9 +232,7 @@ async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
         client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 client_list,
             ),
         )
@@ -376,8 +372,9 @@ async def test_s2_only_fields_filtering() -> None:
         assert s2_details
         assert s2_details.authors, "Authors should be populated"
         assert set(s2_details.other["client_source"]) == {"semantic_scholar"}
-        assert s2_details.citation == (
-            "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
+        assert (
+            s2_details.citation
+            == "Andrés M Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
             " White, and P. Schwaller. Augmenting large language models with chemistry"
             " tools. ArXiv, Unknown year. URL:"
             " https://doi.org/10.48550/arxiv.2304.05376,"
@@ -393,9 +390,7 @@ async def test_crossref_journalquality_fields_filtering() -> None:
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
         )
@@ -421,15 +416,14 @@ async def test_crossref_journalquality_fields_filtering() -> None:
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
         )
         nejm_crossref_details = await crossref_client.query(
             title=(
-                "Beta-Blocker Interruption or Continuation after Myocardial Infarction"  # codespell:ignore
+                "Beta-Blocker Interruption or Continuation after Myocardial"
+                " Infarction"  # codespell:ignore
             ),
             fields=["title", "doi", "authors", "journal"],
         )
@@ -548,11 +542,8 @@ async def test_ensure_sequential_run(caplog) -> None:
         client = DocMetadataClient(
             session=session,
             clients=cast(
-                Sequence[
-                    Collection[
-                        type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                    ]
-                ],
+                "Sequence[Collection[type[MetadataPostProcessor[Any] |"
+                " MetadataProvider[Any]]]]",
                 [[CrossrefProvider], [SemanticScholarProvider]],
             ),
         )
@@ -574,7 +565,9 @@ async def test_ensure_sequential_run(caplog) -> None:
         non_clobbered_details = await client.query(
             doi="10.1063/1.4938384",
         )
-        assert set(cast(DocDetails, non_clobbered_details).other["client_source"]) == {
+        assert set(
+            cast("DocDetails", non_clobbered_details).other["client_source"]
+        ) == {
             "crossref",
             "semantic_scholar",
         }, "Sources should stack, even if sequentially called"
@@ -590,11 +583,8 @@ async def test_ensure_sequential_run_early_stop(caplog) -> None:
         client = DocMetadataClient(
             session=session,
             clients=cast(
-                Sequence[
-                    Collection[
-                        type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                    ]
-                ],
+                "Sequence[Collection[type[MetadataPostProcessor[Any] |"
+                " MetadataProvider[Any]]]]",
                 [[SemanticScholarProvider], [CrossrefProvider]],
             ),
         )
@@ -630,9 +620,7 @@ async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
         crossref_client = DocMetadataClient(
             session,
             clients=cast(
-                Collection[
-                    type[MetadataPostProcessor[Any]] | type[MetadataProvider[Any]]
-                ],
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, retract_processor],
             ),
         )

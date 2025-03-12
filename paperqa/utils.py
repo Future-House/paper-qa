@@ -10,7 +10,7 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Awaitable, Collection, Iterable, Iterator
+from collections.abc import Collection, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
@@ -21,7 +21,7 @@ from uuid import UUID
 import aiohttp
 import httpx
 import pymupdf
-from llmclient import configure_llm_logs
+from lmi import configure_llm_logs
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
@@ -109,17 +109,6 @@ def hexdigest(data: str | bytes) -> str:
 
 def md5sum(file_path: str | os.PathLike) -> str:
     return hexdigest(Path(file_path).read_bytes())
-
-
-async def gather_with_concurrency(n: int, coros: Iterable[Awaitable[T]]) -> list[T]:
-    # https://stackoverflow.com/a/61478547/2392535
-    semaphore = asyncio.Semaphore(n)
-
-    async def sem_coro(coro):
-        async with semaphore:
-            return await coro
-
-    return await asyncio.gather(*(sem_coro(c) for c in coros))
 
 
 def strip_citations(text: str) -> str:
@@ -501,7 +490,9 @@ BIBTEX_MAPPING: dict[str, str] = {
     "dataset": "misc",  # No direct equivalent, so 'misc' is used
     "component": "misc",  # No direct equivalent, so 'misc' is used
     "report": "techreport",
-    "report-series": "techreport",  # 'series' implies multiple tech reports, but each is still a 'techreport'
+    "report-series": (  # 'series' implies multiple tech reports, but each is still a 'techreport'
+        "techreport"
+    ),
     "standard": "misc",  # No direct equivalent, so 'misc' is used
     "standard-series": "misc",  # No direct equivalent, so 'misc' is used
     "edited-book": "book",  # Edited books are considered books in BibTeX
@@ -514,7 +505,9 @@ BIBTEX_MAPPING: dict[str, str] = {
     "book-section": "inbook",  # Sections in books can be considered as 'inbook'
     "book-part": "inbook",  # Parts of books can be considered as 'inbook'
     "book-track": "inbook",  # Tracks in books can be considered as 'inbook'
-    "reference-entry": "inbook",  # Entries in reference books can be considered as 'inbook'
+    "reference-entry": (  # Entries in reference books can be considered as 'inbook'
+        "inbook"
+    ),
     "dissertation": "phdthesis",  # Dissertations are usually PhD thesis
     "posted-content": "misc",  # No direct equivalent, so 'misc' is used
     "peer-review": "misc",  # No direct equivalent, so 'misc' is used
@@ -544,3 +537,45 @@ def logging_filters(
             log_with_filter = logging.getLogger(logger_name)
             for log_filter_to_remove in log_filters_to_remove:
                 log_with_filter.removeFilter(log_filter_to_remove)
+
+
+def citation_to_docname(citation: str) -> str:
+    """Create a docname that follows MLA parenthetical in-text citation."""
+    # get first name and year from citation
+    match = re.search(r"([A-Z][a-z]+)", citation)
+    if match is not None:
+        author = match.group(1)
+    else:
+        # panicking - no word??
+        raise ValueError(
+            f"Could not parse docname from citation {citation}. "
+            "Consider just passing key explicitly - e.g. docs.py "
+            "(path, citation, key='mykey')"
+        )
+    year = ""
+    match = re.search(r"(\d{4})", citation)
+    if match is not None:
+        year = match.group(1)
+    return f"{author}{year}"
+
+
+def maybe_get_date(date: str | datetime | None) -> datetime | None:
+    if not date:
+        return None
+    if isinstance(date, str):
+        # Try common date formats in sequence
+        formats = [
+            "%Y-%m-%dT%H:%M:%S%z",  # ISO with timezone: 2023-01-31T14:30:00+0000
+            "%Y-%m-%d %H:%M:%S",  # ISO with time: 2023-01-31 14:30:00
+            "%B %d, %Y",  # Full month day, year: January 31, 2023
+            "%b %d, %Y",  # Month day, year: Jan 31, 2023
+            "%Y-%m-%d",  # ISO format: 2023-01-31
+        ]
+
+        for fmt in formats:
+            try:
+                return datetime.strptime(date, fmt)
+            except ValueError:
+                continue
+        return None
+    return date
