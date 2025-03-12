@@ -48,7 +48,7 @@ from paperqa.prompts import (
     env_reset_prompt,
     env_system_prompt,
     qa_prompt,
-    qa_with_iteration_prompt,
+    qa_without_iteration_prompt,
     select_paper_prompt,
     structured_citation_prompt,
     summary_json_prompt,
@@ -267,7 +267,7 @@ class PromptSettings(BaseModel):
 
     summary: str = summary_prompt
     qa: str = qa_prompt
-    qa_with_iteration: str = qa_with_iteration_prompt
+    qa_without_iteration: str = qa_without_iteration_prompt
     iteration_prompt: str = answer_iteration_prompt
     use_qa_iterations: bool = True
     select: str = select_paper_prompt
@@ -323,15 +323,15 @@ class PromptSettings(BaseModel):
             )
         return v
 
-    @field_validator("qa_with_iteration")
+    @field_validator("qa_without_iteration")
     @classmethod
     def check_qa_with_iteration(cls, v: str) -> str:
         if not get_formatted_variables(v).issubset(
-            get_formatted_variables(qa_with_iteration_prompt)
+            get_formatted_variables(qa_without_iteration_prompt)
         ):
             raise ValueError(
                 "QA prompt can only have variables:"
-                f" {get_formatted_variables(qa_with_iteration_prompt)}"
+                f" {get_formatted_variables(qa_without_iteration_prompt)}"
             )
         return v
 
@@ -382,8 +382,8 @@ class PromptSettings(BaseModel):
     @property
     def configured_qa_prompt(self) -> str:
         if self.use_qa_iterations:
-            return self.qa_with_iteration
-        return self.qa
+            return self.qa
+        return self.qa_without_iteration
 
 
 class IndexSettings(BaseModel):

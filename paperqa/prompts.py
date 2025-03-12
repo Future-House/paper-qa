@@ -21,7 +21,7 @@ summary_json_prompt = (
 # 1. Lead to complete tool being called with has_successful_answer=False
 # 2. Can be used for unit testing
 CANNOT_ANSWER_PHRASE = "I cannot answer"
-qa_prompt = (
+qa_without_iteration_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
@@ -48,7 +48,7 @@ answer_iteration_prompt = (
     "also included in the above context.\n\n"
 )
 
-qa_with_iteration_prompt = (
+qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
