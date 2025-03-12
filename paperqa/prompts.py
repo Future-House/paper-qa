@@ -21,24 +21,6 @@ summary_json_prompt = (
 # 1. Lead to complete tool being called with has_successful_answer=False
 # 2. Can be used for unit testing
 CANNOT_ANSWER_PHRASE = "I cannot answer"
-qa_without_iteration_prompt = (
-    "Answer the question below with the context.\n\n"
-    "Context (with relevance scores):\n\n{context}\n\n----\n\n"
-    "Question: {question}\n\n"
-    "Write an answer based on the context. "
-    "If the context provides insufficient information reply "
-    f'"{CANNOT_ANSWER_PHRASE}." '
-    "For each part of your answer, indicate which sources most support "
-    "it via citation keys at the end of sentences, "
-    "like {example_citation}. Only cite from the context "
-    "below and only use the valid keys. Write in the style of a "
-    "Wikipedia article, with concise sentences and coherent paragraphs. "
-    "The context comes from a variety of sources and is only a summary, "
-    "so there may inaccuracies or ambiguities. If quotes are present and "
-    "relevant, use them in the answer. This answer will go directly onto "
-    "Wikipedia, so do not add any extraneous information.\n\n"
-    "Answer ({answer_length}):"
-)
 
 answer_iteration_prompt = (
     "You are iterating on a prior answer, with a potentially different context:\n\n"

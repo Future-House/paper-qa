@@ -539,7 +539,7 @@ def test_location_awareness(docs_fixture) -> None:
 
 
 def test_query(docs_fixture) -> None:
-    settings = Settings(prompts={"use_qa_iterations": False})
+    settings = Settings(prompts={"iteration_prompt": None})
     docs_fixture.query("Is XAI usable in chemistry?", settings=settings)
 
 
@@ -547,7 +547,7 @@ def test_query_with_iteration(docs_fixture) -> None:
     # we store these results to check that the prompts are OK
     my_results: list[LLMResult] = []
     # explicitly set the prompt to use QA iterations
-    settings = Settings(prompts={"use_qa_iterations": True})
+    settings = Settings()
     llm = settings.get_llm()
     llm.llm_result_callback = my_results.append
     prior_answer = "No, it isn't usable in chemistry."
@@ -559,7 +559,7 @@ def test_query_with_iteration(docs_fixture) -> None:
     ), "prior answer not in prompt"
     # run without a prior session to check that the flow works correctly
     docs_fixture.query(question, llm_model=llm, settings=settings)
-    assert settings.prompts.iteration_prompt[:10] not in cast(
+    assert settings.prompts.iteration_prompt[:10] not in cast(  # type: ignore[index]
         "str", my_results[-1].prompt[1].content  # type: ignore[union-attr, index]
     ), "prior answer prompt should not be inserted"
 

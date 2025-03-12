@@ -778,22 +778,21 @@ class Docs(BaseModel):
             answer_reasoning = None
         else:
             with set_llm_session_ids(session.id):
+                iteration_context = ""
+                if prompt_config.iteration_prompt and session.answer:
+                    iteration_context = prompt_config.iteration_prompt.format(
+                        prior_answer=session.answer
+                    )
                 messages = [
                     Message(role="system", content=prompt_config.system),
                     Message(
                         role="user",
-                        content=prompt_config.configured_qa_prompt.format(
+                        content=prompt_config.qa.format(
                             context=context_str,
                             answer_length=answer_config.answer_length,
                             question=session.question,
                             example_citation=prompt_config.EXAMPLE_CITATION,
-                            answer_iteration_context=(
-                                prompt_config.iteration_prompt.format(
-                                    prior_answer=session.answer
-                                )
-                                if session.answer
-                                else ""
-                            ),
+                            answer_iteration_context=iteration_context,
                         ),
                     ),
                 ]
