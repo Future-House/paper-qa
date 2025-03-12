@@ -778,6 +778,11 @@ class Docs(BaseModel):
             answer_reasoning = None
         else:
             with set_llm_session_ids(session.id):
+                prior_answer_prompt = ""
+                if prompt_config.answer_iteration_prompt and session.answer:
+                    prior_answer_prompt = prompt_config.answer_iteration_prompt.format(
+                        prior_answer=session.answer
+                    )
                 messages = [
                     Message(role="system", content=prompt_config.system),
                     Message(
@@ -787,6 +792,7 @@ class Docs(BaseModel):
                             answer_length=answer_config.answer_length,
                             question=session.question,
                             example_citation=prompt_config.EXAMPLE_CITATION,
+                            prior_answer_prompt=prior_answer_prompt,
                         ),
                     ),
                 ]

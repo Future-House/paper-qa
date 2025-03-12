@@ -42,6 +42,7 @@ from paperqa._ldp_shims import (
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
+    answer_iteration_prompt_template,
     citation_prompt,
     default_system_prompt,
     env_reset_prompt,
@@ -265,6 +266,13 @@ class PromptSettings(BaseModel):
 
     summary: str = summary_prompt
     qa: str = qa_prompt
+    answer_iteration_prompt: str | None = Field(
+        default=answer_iteration_prompt_template,
+        description=(
+            "Prompt to inject existing prior answers into the qa prompt to allow the model to iterate. "
+            "If None, then no prior answers will be injected."
+        ),
+    )
     select: str = select_paper_prompt
     pre: str | None = Field(
         default=None,

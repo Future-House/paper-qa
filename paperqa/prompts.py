@@ -21,6 +21,15 @@ summary_json_prompt = (
 # 1. Lead to complete tool being called with has_successful_answer=False
 # 2. Can be used for unit testing
 CANNOT_ANSWER_PHRASE = "I cannot answer"
+
+answer_iteration_prompt_template = (
+    "You are iterating on a prior answer, with a potentially different context:\n\n"
+    "{prior_answer}\n\n"
+    "Create a new answer only using keys and data from the included context."
+    " You can not use context keys from the prior answer which are not "
+    "also included in the above context.\n\n"
+)
+
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
@@ -37,6 +46,7 @@ qa_prompt = (
     "so there may inaccuracies or ambiguities. If quotes are present and "
     "relevant, use them in the answer. This answer will go directly onto "
     "Wikipedia, so do not add any extraneous information.\n\n"
+    "{prior_answer_prompt}"
     "Answer ({answer_length}):"
 )
 
