@@ -22,7 +22,7 @@ summary_json_prompt = (
 # 2. Can be used for unit testing
 CANNOT_ANSWER_PHRASE = "I cannot answer"
 
-answer_iteration_prompt = (
+answer_iteration_prompt_template = (
     "You are iterating on a prior answer, with a potentially different context:\n\n"
     "{prior_answer}\n\n"
     "Create a new answer only using keys and data from the included context."
@@ -46,7 +46,7 @@ qa_prompt = (
     "so there may inaccuracies or ambiguities. If quotes are present and "
     "relevant, use them in the answer. This answer will go directly onto "
     "Wikipedia, so do not add any extraneous information.\n\n"
-    "{answer_iteration_context}"
+    "{prior_answer_prompt}"
     "Answer ({answer_length}):"
 )
 

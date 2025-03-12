@@ -778,9 +778,9 @@ class Docs(BaseModel):
             answer_reasoning = None
         else:
             with set_llm_session_ids(session.id):
-                iteration_context = ""
+                prior_answer_prompt = ""
                 if prompt_config.iteration_prompt and session.answer:
-                    iteration_context = prompt_config.iteration_prompt.format(
+                    prior_answer_prompt = prompt_config.iteration_prompt.format(
                         prior_answer=session.answer
                     )
                 messages = [
@@ -792,7 +792,7 @@ class Docs(BaseModel):
                             answer_length=answer_config.answer_length,
                             question=session.question,
                             example_citation=prompt_config.EXAMPLE_CITATION,
-                            answer_iteration_context=iteration_context,
+                            prior_answer_prompt=prior_answer_prompt,
                         ),
                     ),
                 ]
