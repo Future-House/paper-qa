@@ -110,6 +110,13 @@ class Context(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     context: str = Field(description="Summary of the text with respect to a question.")
+    question: str | None = Field(
+        default=None,
+        description=(
+            "Question that the context is summarizing for. "
+            "Note this can differ from the user query."
+        ),
+    )
     text: Text
     score: int = 5
 
@@ -236,6 +243,7 @@ class PQASession(BaseModel):
         self.contexts = [
             Context(
                 context=c.context,
+                question=c.question,
                 score=c.score,
                 text=Text(
                     text="",

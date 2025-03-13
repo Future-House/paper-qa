@@ -670,10 +670,27 @@ async def test_agent_sharing_state(
 
         # now adjust to give the agent 2x pieces of evidence
         gather_evidence_tool.settings.agent.agent_evidence_n = 2
+        # also reset the question to ensure that contexts are
+        # only returned to the agent for the new question
+        new_question = "How does XAI relate to a self-explanatory model?"
         response = await gather_evidence_tool.gather_evidence(
-            session.question, state=env_state
+            new_question, state=env_state
         )
-
+        assert len({c.question for c in session.contexts}) == 2, "Expected 2 questions"
+        # now we make sure this is only for the old question
+        for context in session.contexts:
+            if context.question != new_question:
+                assert (
+                    context.context[:20] not in response
+                ), "gather_evidence should not return any contexts for the old question"
+        assert (
+            sum(
+                (1 if (context.context[:20] in response) else 0)
+                for context in session.contexts
+                if context.question == new_question
+            )
+            == 2
+        ), "gather_evidence should only return 2 contexts for the new question"
         split = re.split(
             r"(\d+) pieces of evidence, (\d+) of which were relevant",
             response,
@@ -899,6 +916,7 @@ def test_answers_are_striped() -> None:
         contexts=[
             Context(
                 context="bla",
+                question="foo",
                 text=Text(
                     name="text",
                     text="The meaning of life is 42.",
