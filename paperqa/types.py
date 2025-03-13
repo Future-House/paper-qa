@@ -113,7 +113,7 @@ class Context(BaseModel):
     question: str | None = Field(
         default=None,
         description=(
-            "Question that the context is summarzing for."
+            "Question that the context is summarizing for. "
             "Note this can differ from the user query."
         ),
     )
