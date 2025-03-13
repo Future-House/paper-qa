@@ -251,8 +251,15 @@ class GatherEvidence(NamedTool):
 
         status = state.status
         logger.info(status)
+        # only show top n contexts for this particular question to the agent
         sorted_contexts = sorted(
-            state.session.contexts, key=lambda x: x.score, reverse=True
+            [
+                c
+                for c in state.session.contexts
+                if (c.question is None or c.question == question)
+            ],
+            key=lambda x: x.score,
+            reverse=True,
         )
 
         top_contexts = "\n".join(
