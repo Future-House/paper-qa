@@ -916,6 +916,7 @@ def test_answers_are_striped() -> None:
         contexts=[
             Context(
                 context="bla",
+                question="foo",
                 text=Text(
                     name="text",
                     text="The meaning of life is 42.",
