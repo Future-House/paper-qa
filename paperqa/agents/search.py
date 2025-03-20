@@ -307,7 +307,7 @@ class SearchIndex:
                 try:
                     async with self.writer() as writer:
                         # Let caller handle commit to allow for batching
-                        writer.add_document(Document.from_dict(index_doc))  # type: ignore[call-arg]
+                        writer.add_document(Document.from_dict(index_doc))
 
                     filehash = self.filehash(index_doc["body"])
                     (await self.index_files)[index_doc["file_location"]] = filehash
