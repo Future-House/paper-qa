@@ -86,6 +86,7 @@ qdrant = [
     "qdrant-client",
 ]
 typing = [
+    "tantivy>=0.22.2",  # Pin for typing fix of Doc.from_dict
     "types-PyYAML",
     "types-setuptools",
 ]
