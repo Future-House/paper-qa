@@ -58,7 +58,7 @@ dev = [
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
-    "pydantic~=2.0",
+    "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
     "pytest-asyncio",
     "pytest-recording",
