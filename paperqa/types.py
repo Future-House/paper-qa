@@ -737,7 +737,8 @@ class DocDetails(Doc):
             PREFER_OTHER = self.publication_date <= other.publication_date
 
         merged_data = {}
-        for field in self.model_fields:
+        # pylint: disable-next=not-an-iterable  # pylint bug: https://github.com/pylint-dev/pylint/issues/10144
+        for field in type(self).model_fields:
             self_value = getattr(self, field)
             other_value = getattr(other, field)
 

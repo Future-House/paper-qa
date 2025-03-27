@@ -58,7 +58,7 @@ dev = [
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
-    "pydantic~=2.0",
+    "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
     "pytest-asyncio",
     "pytest-recording",
@@ -209,6 +209,8 @@ disable = [
     "expression-not-assigned",  # Rely on mypy func-returns-value for this
     "fixme",  # codetags are useful
     "function-redefined",  # Rely on mypy no-redef for this
+    "global-statement",  # Rely on ruff PLW0603 for this
+    "global-variable-not-assigned",  # Rely on ruff PLW0602 for this
     "import-outside-toplevel",  # Rely on ruff PLC0415 for this
     "invalid-name",  # Don't care to enforce this
     "keyword-arg-before-vararg",  # Rely on ruff B026 for this
@@ -228,6 +230,7 @@ disable = [
     "too-few-public-methods",  # Don't care to enforce this
     "too-many-ancestors",  # Don't care to enforce this
     "too-many-arguments",  # Don't care to enforce this
+    "too-many-boolean-expressions",  # Rely on ruff PLR0916 for this
     "too-many-branches",  # Rely on ruff PLR0912 for this
     "too-many-instance-attributes",  # Don't care to enforce this
     "too-many-lines",  # Don't care to enforce this
@@ -239,6 +242,7 @@ disable = [
     "undefined-loop-variable",  # Don't care to enforce this
     "ungrouped-imports",  # Rely on ruff I001 for this
     "unidiomatic-typecheck",  # Rely on ruff E721 for this
+    "unnecessary-dict-index-lookup",  # Rely on ruff PLR1733 for this
     "unreachable",  # Rely on mypy unreachable for this
     "unspecified-encoding",  # Rely on ruff PLW1514 for this
     "unspecified-encoding",  # Don't care to enforce this
@@ -266,7 +270,7 @@ min-similarity-lines = 12
 [tool.pytest.ini_options]
 # Add the specified OPTS to the set of command line arguments as if they had been
 # specified by the user.
-addopts = "--typeguard-packages=paperqa"
+addopts = "--typeguard-packages=paperqa --doctest-modules"
 # set how loops are scoped to avoid https://github.com/BerriAI/litellm/issues/5854
 asyncio_default_fixture_loop_scope = "session"
 # Sets a list of filters and actions that should be taken for matched warnings.
@@ -437,7 +441,6 @@ extend-select = [
     "RUF028",
     "RUF029",
     "RUF031",
-    "RUF035",
     "RUF036",
     "RUF037",
     "RUF038",
@@ -532,6 +535,7 @@ ignore = [
     "TC001",  # TC001, TC002, TC003: don't care to enforce type checking blocks
     "TC002",
     "TC003",
+    "TC006",  # Strings in cast don't work with PyCharm CE 2024.3.4's jump-to-definition
     "TD002",  # Don't care for TODO author
     "TD003",  # Don't care for TODO links
     "TRY003",  # Overly pedantic
