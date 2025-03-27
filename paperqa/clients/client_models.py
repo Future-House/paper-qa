@@ -14,6 +14,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from tenacity import RetryError
 
 from paperqa.types import DocDetails
 
@@ -113,6 +114,12 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
         except DOINotFoundError:
             logger.warning(
                 "Metadata not found for"
+                f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
+                f" {self.__class__.__name__}."
+            )
+        except RetryError:
+            logger.warning(
+                "Metadata service is down for"
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
                 f" {self.__class__.__name__}."
             )
