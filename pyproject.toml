@@ -266,7 +266,7 @@ min-similarity-lines = 12
 [tool.pytest.ini_options]
 # Add the specified OPTS to the set of command line arguments as if they had been
 # specified by the user.
-addopts = "--typeguard-packages=paperqa"
+addopts = "--typeguard-packages=paperqa --doctest-modules"
 # set how loops are scoped to avoid https://github.com/BerriAI/litellm/issues/5854
 asyncio_default_fixture_loop_scope = "session"
 # Sets a list of filters and actions that should be taken for matched warnings.
