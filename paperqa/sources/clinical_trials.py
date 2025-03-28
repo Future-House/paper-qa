@@ -278,7 +278,7 @@ async def add_clinical_trials_to_docs(
 
     logger.info(f"Successfully found {len(trials)} trials.")
 
-    inital_docs_size = len(docs.texts)
+    initial_docs_size = len(docs.texts)
 
     for trial in trials:
         trial_text = (
@@ -300,7 +300,7 @@ async def add_clinical_trials_to_docs(
             doc=doc_details,
             settings=settings,
         )
-    logger.info(f"Added {len(docs.texts) - inital_docs_size} trials to docs state.")
+    logger.info(f"Added {len(docs.texts) - initial_docs_size} trials to docs state.")
 
     # we add a final context stub representing the metadata surrounding this search
     # it can be used to answer questions about the search results
@@ -334,7 +334,7 @@ async def add_clinical_trials_to_docs(
     if session is None:
         await _session.close()
 
-    return (total_result_count, len(docs.texts) - inital_docs_size, None)
+    return (total_result_count, len(docs.texts) - initial_docs_size, None)
 
 
 def partition_clinical_trials_by_source(text: Embeddable) -> int:

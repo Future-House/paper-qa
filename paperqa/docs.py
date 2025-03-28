@@ -819,7 +819,7 @@ class Docs(BaseModel):
 
         if answer_config.answer_filter_extra_background:
             answer_text = re.sub(
-                r"\([Ee]xtra [Bb]ackground [Ii]nformation\)",
+                r"\([Ee]xtra [Bb]ackground [Ii]nformation\)",  # spellchecker: disable-line
                 "",
                 answer_text,
             )
