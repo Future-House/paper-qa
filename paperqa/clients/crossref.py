@@ -227,7 +227,7 @@ async def parse_crossref_to_doc_details(
     for key, value in (
         message | {"client_source": ["crossref"], "bibtex_source": [bibtex_source]}
     ).items():
-        if key not in doc_details.model_fields:
+        if key not in type(doc_details).model_fields:
             if key in doc_details.other:
                 doc_details.other[key] = [doc_details.other[key], value]
             else:
