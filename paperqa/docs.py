@@ -259,6 +259,13 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
+        warnings.warn(
+            "The synchronous `add` method is being deprecated in favor of the"
+            " asynchronous `aadd` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd(
                 path,

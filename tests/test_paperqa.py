@@ -615,16 +615,17 @@ def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None
     assert response.answer_reasoning
 
 
-def test_duplicate(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_duplicate(stub_data_dir: Path) -> None:
     """Check Docs doesn't store duplicates, while checking nonduplicate docs are stored."""
     docs = Docs()
-    assert docs.add(
+    assert await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test1",
     )
     assert (
-        docs.add(
+        await docs.aadd(
             stub_data_dir / "bates.txt",
             citation="WikiMedia Foundation, 2023, Accessed now",
             dockey="test1",
@@ -632,7 +633,7 @@ def test_duplicate(stub_data_dir: Path) -> None:
         is None
     )
     assert len(docs.docs) == 1, "Should have added only one document"
-    assert docs.add(
+    assert await docs.aadd(
         stub_data_dir / "flag_day.html",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test2",
@@ -715,10 +716,13 @@ async def test_docs_with_custom_embedding(
         assert len(docs.texts_index.texts_hashes) == 0
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
-def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
+async def test_sparse_embedding(
+    stub_data_dir: Path, vector_store: type[VectorStore]
+) -> None:
     docs = Docs(texts_index=vector_store())
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=SparseEmbeddingModel(),
@@ -737,13 +741,16 @@ def test_sparse_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
-def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) -> None:
+async def test_hybrid_embedding(
+    stub_data_dir: Path, vector_store: type[VectorStore]
+) -> None:
     emb_model = HybridEmbeddingModel(
         models=[LiteLLMEmbeddingModel(), SparseEmbeddingModel()]
     )
     docs = Docs(texts_index=vector_store())
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_model,
@@ -762,7 +769,7 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
     emb_settings = Settings(
         embedding="hybrid-text-embedding-3-small",
     )
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         embedding_model=emb_settings.get_embedding_model(),
@@ -770,7 +777,8 @@ def test_hybrid_embedding(stub_data_dir: Path, vector_store: type[VectorStore]) 
     assert any(docs.texts[0].embedding)
 
 
-def test_custom_llm(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_custom_llm(stub_data_dir: Path) -> None:
     class StubLLMModel(LLMModel):
         name: str = "custom/myllm"
 
@@ -803,7 +811,7 @@ def test_custom_llm(stub_data_dir: Path) -> None:
             """This is a dummy check."""
 
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
@@ -825,10 +833,11 @@ def test_custom_llm(stub_data_dir: Path) -> None:
     assert "Echo" in evidence[0].context
 
 
-def test_docs_pickle(stub_data_dir) -> None:
+@pytest.mark.asyncio
+async def test_docs_pickle(stub_data_dir) -> None:
     """Ensure that Docs object can be pickled and unpickled correctly."""
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "flag_day.html",
         "WikiMedia Foundation, 2023, Accessed now",
         dockey="test",
@@ -842,6 +851,7 @@ def test_docs_pickle(stub_data_dir) -> None:
     assert len(unpickled_docs.docs) == 1
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("qa_prompt", "unsure_sentinel"),
     [
@@ -853,7 +863,7 @@ def test_docs_pickle(stub_data_dir) -> None:
         ),
     ],
 )
-def test_unrelated_context(
+async def test_unrelated_context(
     agent_test_settings: Settings,
     stub_data_dir: Path,
     qa_prompt: str,
@@ -863,7 +873,9 @@ def test_unrelated_context(
     assert unsure_sentinel in qa_prompt, "Test relies on unsure sentinel in qa prompt"
 
     docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    await docs.aadd(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     session = docs.query(
         "What do scientist estimate as the planetary composition of Jupyter?",
         settings=agent_test_settings,
@@ -871,19 +883,20 @@ def test_unrelated_context(
     assert unsure_sentinel in session.answer
 
 
-def test_repeat_keys(stub_data_dir) -> None:
+@pytest.mark.asyncio
+async def test_repeat_keys(stub_data_dir) -> None:
     docs = Docs()
-    result = docs.add(
+    result = await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
     assert result
-    result = docs.add(
+    result = await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
     assert not result
     assert len(docs.docs) == 1
 
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
     )
     assert len(docs.docs) == 2
@@ -899,9 +912,13 @@ def test_can_read_normal_pdf_reader(docs_fixture) -> None:
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
-def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
-    docs.add(stub_data_dir / "paper.pdf", "Wellawatte et al, XAI Review, 2023")
+    await docs.aadd(
+        stub_data_dir / "paper.pdf",
+        "Wellawatte et al, XAI Review, 2023",
+    )
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
     assert (
@@ -913,7 +930,8 @@ def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     ), "Formatted citation should be the same when no metadata is found."
 
 
-def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     settings = Settings.from_name("debug")
     assert settings.parsing.defer_embedding, "Test relies on deferred embedding"
     settings.parsing.chunk_size = 0  # Leads to one chunk = entire text
@@ -922,7 +940,7 @@ def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     settings.summary_llm = "gpt-4o-mini"  # context window needs to fit our one chunk
 
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "paper.pdf",
         "Wellawatte et al, XAI Review, 2023",
         settings=settings,
@@ -974,9 +992,10 @@ async def test_partly_embedded_texts(defer_embeddings: bool) -> None:
 # body will always be different between requests
 # adding body so that vcr correctly match the right request with its response.
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
-def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "paper.pdf",
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
         " Models, XAI Review, 2023",
@@ -1120,11 +1139,12 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
-def test_code() -> None:
+@pytest.mark.asyncio
+async def test_code() -> None:
     settings = Settings.from_name("fast")
     docs = Docs()
     # load this script
-    docs.add(
+    await docs.aadd(
         THIS_MODULE, "test_paperqa.py", docname="test_paperqa.py", disable_check=True
     )
     assert len(docs.docs) == 1
@@ -1140,17 +1160,18 @@ def test_zotero() -> None:
         ZoteroDB()  # "group" if group library
 
 
-def test_too_much_evidence(
+@pytest.mark.asyncio
+async def test_too_much_evidence(
     stub_data_dir: Path, stub_data_dir_w_near_dupes: Path
 ) -> None:
     doc_path = stub_data_dir / "obama.txt"
     mini_settings = Settings(llm="gpt-4o-mini", summary_llm="gpt-4o-mini")
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         doc_path, "WikiMedia Foundation, 2023, Accessed now", settings=mini_settings
     )
     # add with new dockey
-    docs.add(
+    await docs.aadd(
         stub_data_dir_w_near_dupes / "obama_modified.txt",
         "WikiMedia Foundation, 2023, Accessed now",
         settings=mini_settings,
@@ -1161,7 +1182,8 @@ def test_too_much_evidence(
     docs.query("What is Barrack's greatest accomplishment?", settings=settings)
 
 
-def test_custom_prompts(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_custom_prompts(stub_data_dir: Path) -> None:
     my_qaprompt = (
         "Answer the question '{question}' using the country name alone. For example: A:"
         " United States\nA: Canada\nA: Mexico\n\n Using the"
@@ -1170,12 +1192,15 @@ def test_custom_prompts(stub_data_dir: Path) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.qa = my_qaprompt
     docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    await docs.aadd(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     answer = docs.query("What country is Frederick Bates from?", settings=settings)
     assert "United States" in answer.answer
 
 
-def test_pre_prompt(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_pre_prompt(stub_data_dir: Path) -> None:
     pre = (
         "What is water's boiling point in Fahrenheit? Please respond with a complete"
         " sentence."
@@ -1184,7 +1209,9 @@ def test_pre_prompt(stub_data_dir: Path) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.pre = pre
     docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    await docs.aadd(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     assert "212" not in docs.query("What is the boiling point of water?").answer
     assert (
         "212"
@@ -1192,19 +1219,23 @@ def test_pre_prompt(stub_data_dir: Path) -> None:
     )
 
 
-def test_post_prompt(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_post_prompt(stub_data_dir: Path) -> None:
     post = "The opposite of down is"
     settings = Settings.from_name("fast")
     settings.prompts.post = post
     docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    await docs.aadd(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     response = docs.query("What country is Bates from?", settings=settings)
     assert "up" in response.answer.lower()
 
 
-def test_external_doc_index(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_external_doc_index(stub_data_dir: Path) -> None:
     docs = Docs()
-    docs.add(
+    await docs.aadd(
         stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
     )
     # force embedding
@@ -1214,8 +1245,8 @@ def test_external_doc_index(stub_data_dir: Path) -> None:
     assert docs2.get_evidence("What is the date of flag day?").contexts
 
 
-def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
-
+@pytest.mark.asyncio
+async def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
     prompt_settings = Settings()
 
     # try bogus prompt
@@ -1231,20 +1262,25 @@ def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
     settings.prompts.context_inner = "{name} @@@@@ {text}\nFrom: {citation}"
     settings.prompts.context_outer = "{context_str}"
     docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    await docs.aadd(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     response = docs.query("What country is Bates from?", settings=settings)
     assert "@@@@@" in response.context
     assert "WikiMedia Foundation, 2023" in response.context
     assert "Valid Keys" not in response.context
 
 
-def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
     # TODO: delete this test in v6
     settings = Settings.from_name("fast")
     # NOTE: this bypasses DeprecationWarning, as the warning is done on construction
     settings.answer.evidence_detailed_citations = False
     docs = Docs()
-    docs.add(stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now")
+    await docs.aadd(
+        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
+    )
     response = docs.query("What country is Bates from?", settings=settings)
     assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
 

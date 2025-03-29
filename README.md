@@ -348,7 +348,7 @@ doc_paths = ("myfile.pdf", "myotherfile.pdf")
 # Prepare the Docs object by adding a bunch of documents
 docs = Docs()
 for doc_path in doc_paths:
-    docs.add(doc_path)
+    await docs.aadd(doc_path)
 
 # Set up how we want to query the Docs object
 settings = Settings()
@@ -561,7 +561,7 @@ from paperqa import Docs, Settings
 
 docs = Docs()
 for doc in ("myfile.pdf", "myotherfile.pdf"):
-    docs.add(doc, settings=Settings(embedding="text-embedding-large-3"))
+    await docs.aadd(doc, settings=Settings(embedding="text-embedding-large-3"))
 ```
 
 Note that PaperQA2 uses Numpy as a dense vector store.
@@ -585,7 +585,7 @@ model = HybridEmbeddingModel(
 )
 docs = Docs()
 for doc in ("myfile.pdf", "myotherfile.pdf"):
-    docs.add(doc, embedding_model=model)
+    await docs.aadd(doc, embedding_model=model)
 ```
 
 The sparse embedding (keyword) models default to having 256 dimensions, but this can be specified via the `ndim` argument.
@@ -651,7 +651,7 @@ source_files = glob.glob("**/*.js")
 docs = Docs()
 for f in source_files:
     # this assumes the file names are unique in code
-    docs.add(f, citation="File " + os.path.basename(f), docname=os.path.basename(f))
+    await docs.aadd(f, citation="File " + os.path.basename(f), docname=os.path.basename(f))
 session = docs.query("Where is the search bar in the header defined?")
 print(session)
 ```
