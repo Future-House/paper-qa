@@ -424,6 +424,13 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> bool:
+        warnings.warn(
+            "The synchronous `add_texts` method is being deprecated in favor of the"
+            " asynchronous `aadd_texts` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd_texts(
                 texts, doc, settings=settings, embedding_model=embedding_model
