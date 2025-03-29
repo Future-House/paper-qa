@@ -202,6 +202,13 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
+        warnings.warn(
+            "The synchronous `add_url` method is being deprecated in favor of the"
+            " asynchronous `aadd_url` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd_url(
                 url,
