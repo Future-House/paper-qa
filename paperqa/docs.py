@@ -6,6 +6,7 @@ import os
 import re
 import tempfile
 import urllib.request
+import warnings
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from io import BytesIO
@@ -133,6 +134,13 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
+        warnings.warn(
+            "The synchronous `add_file` method is being deprecated in favor of the"
+            " asynchronous `aadd_file` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd_file(
                 file,

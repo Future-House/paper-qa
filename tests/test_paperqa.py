@@ -13,6 +13,7 @@ from typing import cast
 import httpx
 import numpy as np
 import pytest
+import pytest_asyncio
 from aviary.core import Message
 from lmi import (
     CommonLLMNames,
@@ -61,11 +62,11 @@ from paperqa.utils import (
 THIS_MODULE = pathlib.Path(__file__)
 
 
-@pytest.fixture
-def docs_fixture(stub_data_dir: Path) -> Docs:
+@pytest_asyncio.fixture
+async def docs_fixture(stub_data_dir: Path) -> Docs:
     docs = Docs()
     with (stub_data_dir / "paper.pdf").open("rb") as f:
-        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+        await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     return docs
 
 
@@ -1024,10 +1025,11 @@ def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
 
-def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         docs = Docs()
-        docs.add_file(f, "Wellawatte et al, XAI Review, 2023")
+        await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     num_retries = 3
     for _ in range(num_retries):
         answer = docs.query("Are counterfactuals actionable? [yes/no]")
@@ -1036,13 +1038,14 @@ def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
 
-def test_fileio_reader_txt(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_fileio_reader_txt(stub_data_dir: Path) -> None:
     # can't use curie, because it has trouble with parsed HTML
     docs = Docs()
     with (stub_data_dir / "bates.txt").open("rb") as file:
         file_content = file.read()
 
-    docs.add_file(
+    await docs.aadd_file(
         BytesIO(file_content),
         "WikiMedia Foundation, 2023, Accessed now",
     )
