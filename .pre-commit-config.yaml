@@ -51,6 +51,10 @@ repos:
             paperqa/clients/client_data.*|
             tests/stub_data.*
           )$
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.30.3
+    hooks:
+      - id: typos
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
     hooks:

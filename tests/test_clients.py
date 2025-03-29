@@ -85,7 +85,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
             "source": ["semantic_scholar", "crossref"],
             "key": "bran2024augmentinglargelanguage",
             "doi": "10.1038/s42256-024-00832-8",
-            "doc_id": "0f650d59b0a2ba5a",
+            "doc_id": "0f650d59b0a2ba5a",  # spellchecker: disable-line
             "journal": "Nature Machine Intelligence",
             "authors": [
                 "Andres M. Bran",

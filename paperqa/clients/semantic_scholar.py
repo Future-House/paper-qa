@@ -53,7 +53,7 @@ SEMANTIC_SCHOLAR_BASE_URL = f"https://{SEMANTIC_SCHOLAR_HOST}"
 SEMANTIC_SCHOLAR_HEADER_KEY = "x-api-key"
 
 
-class SematicScholarSearchType(IntEnum):
+class SemanticScholarSearchType(IntEnum):
     DEFAULT = auto()
     PAPER = auto()
     PAPER_RECOMMENDATIONS = auto()
@@ -85,27 +85,27 @@ class SematicScholarSearchType(IntEnum):
             Two-tuple of URL and URL parameters.
         """
         base = SEMANTIC_SCHOLAR_BASE_URL if include_base_url else ""
-        if self == SematicScholarSearchType.DEFAULT:
+        if self == SemanticScholarSearchType.DEFAULT:
             params["query"] = query.replace("-", " ")
             params["offset"] = offset
             params["limit"] = limit
             return f"{base}/graph/v1/paper/search", params
-        if self == SematicScholarSearchType.PAPER:
+        if self == SemanticScholarSearchType.PAPER:
             return f"{base}/graph/v1/paper/{query}", params
-        if self == SematicScholarSearchType.PAPER_RECOMMENDATIONS:
+        if self == SemanticScholarSearchType.PAPER_RECOMMENDATIONS:
             return f"{base}/recommendations/v1/papers/forpaper/{query}", params
-        if self == SematicScholarSearchType.DOI:
+        if self == SemanticScholarSearchType.DOI:
             return f"{base}/graph/v1/paper/DOI:{query}", params
-        if self == SematicScholarSearchType.FUTURE_CITATIONS:
+        if self == SemanticScholarSearchType.FUTURE_CITATIONS:
             params["limit"] = limit
             return f"{base}/graph/v1/paper/{query}/citations", params
-        if self == SematicScholarSearchType.PAST_REFERENCES:
+        if self == SemanticScholarSearchType.PAST_REFERENCES:
             params["limit"] = limit
             return f"{base}/graph/v1/paper/{query}/references", params
-        if self == SematicScholarSearchType.GOOGLE:
+        if self == SemanticScholarSearchType.GOOGLE:
             params["limit"] = 1
             return f"{base}/graph/v1/paper/search", params
-        if self == SematicScholarSearchType.MATCH:
+        if self == SemanticScholarSearchType.MATCH:
             return f"{base}/graph/v1/paper/search/match", params
         raise NotImplementedError
 
@@ -231,7 +231,7 @@ async def s2_title_search(
     """Reconcile DOI from Semantic Scholar - which only checks title. So we manually check authors."""
     if authors is None:
         authors = []
-    endpoint, params = SematicScholarSearchType.MATCH.make_url_params(
+    endpoint, params = SemanticScholarSearchType.MATCH.make_url_params(
         params={"query": title, "fields": fields}
     )
 

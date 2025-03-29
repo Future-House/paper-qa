@@ -76,7 +76,7 @@ def test_get_citations() -> None:
         " hospitalization, and death. The BNT162b2 vaccine has shown effectiveness"
         " ranging from 65% to -41% for the 5-11 years age group and 76% to 46% for the"
         " 12-17 years age group, after the emergence of the Omicron variant in New York"
-        " (Dorabawila2022EffectivenessOT). Against the Delta variant, the effectiveness"
+        " (Dorabawila2022EffectivenessOT). Against the Delta variant, the effectiveness"  # spellchecker: disable-line
         " of the BNT162b2 vaccine was approximately 88% after two doses"
         " (Bernal2021EffectivenessOC pg. 1-3).\n\nVaccine effectiveness was also found"
         " to be 89% against hospitalization and 91% against emergency department or"
@@ -92,7 +92,7 @@ def test_get_citations() -> None:
         " outcomes (Bar2000Foo pg 1-3; Far2000 pg 2-5)."
     )
     ref = {
-        "Dorabawila2022EffectivenessOT",
+        "Dorabawila2022EffectivenessOT",  # spellchecker: disable-line
         "Bernal2021EffectivenessOC pg. 1-3",
         "Thompson2021EffectivenessOC pg. 3-5",
         "Goo2031Foo pg. 3-4",
