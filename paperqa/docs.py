@@ -575,6 +575,13 @@ class Docs(BaseModel):
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
+        warnings.warn(
+            "The synchronous `get_evidence` method is being deprecated in favor of the"
+            " asynchronous `aget_evidence` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aget_evidence(
                 query=query,

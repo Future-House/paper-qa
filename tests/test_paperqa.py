@@ -476,16 +476,20 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
         assert all(t not in docs.texts_index for t in docs.texts)
 
 
-def test_evidence(docs_fixture) -> None:
+@pytest.mark.asyncio
+async def test_evidence(docs_fixture) -> None:
     debug_settings = Settings.from_name("debug")
-    evidence = docs_fixture.get_evidence(
-        PQASession(question="What does XAI stand for?"),
-        settings=debug_settings,
+    evidence = (
+        await docs_fixture.aget_evidence(
+            PQASession(question="What does XAI stand for?"),
+            settings=debug_settings,
+        )
     ).contexts
     assert len(evidence) >= debug_settings.answer.evidence_k
 
 
-def test_json_evidence(docs_fixture) -> None:
+@pytest.mark.asyncio
+async def test_json_evidence(docs_fixture) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
     settings.prompts.summary_json_system = (
@@ -498,29 +502,35 @@ def test_json_evidence(docs_fixture) -> None:
         " author , and `relevance_score` is  the relevance of `summary` to answer the"
         " question (integer out of 10)."
     )
-    evidence = docs_fixture.get_evidence(
-        PQASession(question="Who wrote this article?"),
-        settings=settings,
+    evidence = (
+        await docs_fixture.aget_evidence(
+            PQASession(question="Who wrote this article?"),
+            settings=settings,
+        )
     ).contexts
     assert evidence[0].author_name
 
 
-def test_ablations(docs_fixture) -> None:
+@pytest.mark.asyncio
+async def test_ablations(docs_fixture) -> None:
     settings = Settings()
     settings.answer.evidence_skip_summary = True
     settings.answer.evidence_retrieval = False
-    contexts = docs_fixture.get_evidence(
-        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
-        " computational chemistry because it can accurately model non-linear"
-        " structure-function relationships.' on?",
-        settings=settings,
+    contexts = (
+        await docs_fixture.aget_evidence(
+            "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
+            " computational chemistry because it can accurately model non-linear"
+            " structure-function relationships.' on?",
+            settings=settings,
+        )
     ).contexts
     assert contexts[0].text.text == contexts[0].context, "summarization not ablated"
 
     assert len(contexts) == len(docs_fixture.texts), "evidence retrieval not ablated"
 
 
-def test_location_awareness(docs_fixture) -> None:
+@pytest.mark.asyncio
+async def test_location_awareness(docs_fixture) -> None:
     settings = Settings()
     settings.answer.evidence_k = 3
     settings.prompts.use_json = False
@@ -528,11 +538,13 @@ def test_location_awareness(docs_fixture) -> None:
     settings.prompts.summary = "{citation}\n\n{text}\n\n{question}{summary_length}"
     settings.answer.evidence_summary_length = ""
 
-    contexts = docs_fixture.get_evidence(
-        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
-        " computational chemistry because it can accurately model non-linear"
-        " structure-function relationships.' on?",
-        settings=settings,
+    contexts = (
+        await docs_fixture.aget_evidence(
+            "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
+            " computational chemistry because it can accurately model non-linear"
+            " structure-function relationships.' on?",
+            settings=settings,
+        )
     ).contexts
     assert "1" in "\n".join(
         [c.context for c in contexts]
@@ -565,13 +577,14 @@ def test_query_with_iteration(docs_fixture) -> None:
     ), "prior answer prompt should not be inserted"
 
 
-def test_llmresult_callback(docs_fixture: Docs) -> None:
+@pytest.mark.asyncio
+async def test_llmresult_callback(docs_fixture: Docs) -> None:
     my_results: list[LLMResult] = []
 
     settings = Settings.from_name("fast")
     summary_llm = settings.get_summary_llm()
     summary_llm.llm_result_callback = my_results.append
-    docs_fixture.get_evidence(
+    await docs_fixture.aget_evidence(
         "What is XAI?", settings=settings, summary_llm_model=summary_llm
     )
     assert my_results
@@ -819,16 +832,20 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
     )
     # ensure JSON summaries are not used
     no_json_settings = Settings(prompts={"use_json": False})
-    evidence = docs.get_evidence(
-        "Echo", summary_llm_model=StubLLMModel(), settings=no_json_settings
+    evidence = (
+        await docs.aget_evidence(
+            "Echo", summary_llm_model=StubLLMModel(), settings=no_json_settings
+        )
     ).contexts
     assert "Echo" in evidence[0].context
 
-    evidence = docs.get_evidence(
-        "Echo",
-        callbacks=[print_callback],
-        summary_llm_model=StubLLMModel(),
-        settings=no_json_settings,
+    evidence = (
+        await docs.aget_evidence(
+            "Echo",
+            callbacks=[print_callback],
+            summary_llm_model=StubLLMModel(),
+            settings=no_json_settings,
+        )
     ).contexts
     assert "Echo" in evidence[0].context
 
@@ -1239,10 +1256,10 @@ async def test_external_doc_index(stub_data_dir: Path) -> None:
         stub_data_dir / "flag_day.html", "WikiMedia Foundation, 2023, Accessed now"
     )
     # force embedding
-    _ = docs.get_evidence(query="What is the date of flag day?")
+    _ = await docs.aget_evidence(query="What is the date of flag day?")
     docs2 = Docs(texts_index=docs.texts_index)
     assert not docs2.docs
-    assert docs2.get_evidence("What is the date of flag day?").contexts
+    assert (await docs2.aget_evidence("What is the date of flag day?")).contexts
 
 
 @pytest.mark.asyncio
