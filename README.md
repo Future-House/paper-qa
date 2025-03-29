@@ -356,7 +356,7 @@ settings.llm = "claude-3-5-sonnet-20240620"
 settings.answer.answer_max_sources = 3
 
 # Query the Docs object to get an answer
-session = docs.query(
+session = await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=settings,
 )
@@ -631,7 +631,7 @@ settings = Settings()
 settings.answer.answer_max_sources = 3
 settings.answer.k = 5
 
-docs.query(
+await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?",
     settings=settings,
 )
@@ -652,7 +652,7 @@ docs = Docs()
 for f in source_files:
     # this assumes the file names are unique in code
     await docs.aadd(f, citation="File " + os.path.basename(f), docname=os.path.basename(f))
-session = docs.query("Where is the search bar in the header defined?")
+session = await docs.aquery("Where is the search bar in the header defined?")
 print(session)
 ```
 
@@ -861,7 +861,7 @@ docs = Docs()
 
 # add some docs...
 
-docs.query(
+await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?",
     callbacks=[typewriter],
 )
@@ -890,7 +890,7 @@ my_qa_prompt = (
 docs = Docs()
 settings = Settings()
 settings.prompts.qa = my_qa_prompt
-docs.query("Are covid-19 vaccines effective?", settings=settings)
+await docs.aquery("Are covid-19 vaccines effective?", settings=settings)
 ```
 
 ### Pre and Post Prompts

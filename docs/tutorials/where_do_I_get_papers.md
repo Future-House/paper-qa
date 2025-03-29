@@ -32,7 +32,7 @@ submissions = helper.fetch_relevant_papers(question)
 docs = await helper.aadd_docs(submissions)
 
 # Now you can continue asking like in the [main tutorial](../../README.md)
-session = docs.query(question, settings=settings)
+session = await docs.aquery(question, settings=settings)
 print(session.answer)
 ```
 
@@ -115,7 +115,7 @@ for path, data in papers.items():
     except ValueError as e:
         # sometimes this happens if PDFs aren't downloaded or readable
         print("Could not read", path, e)
-session = docs.query(
+session = await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?"
 )
 print(session)

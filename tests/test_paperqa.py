@@ -551,12 +551,14 @@ async def test_location_awareness(docs_fixture) -> None:
     ), "location not found in evidence"
 
 
-def test_query(docs_fixture) -> None:
+@pytest.mark.asyncio
+async def test_query(docs_fixture) -> None:
     settings = Settings(prompts={"answer_iteration_prompt": None})
-    docs_fixture.query("Is XAI usable in chemistry?", settings=settings)
+    await docs_fixture.aquery("Is XAI usable in chemistry?", settings=settings)
 
 
-def test_query_with_iteration(docs_fixture) -> None:
+@pytest.mark.asyncio
+async def test_query_with_iteration(docs_fixture) -> None:
     # we store these results to check that the prompts are OK
     my_results: list[LLMResult] = []
     # explicitly set the prompt to use QA iterations
@@ -566,12 +568,12 @@ def test_query_with_iteration(docs_fixture) -> None:
     prior_answer = "No, it isn't usable in chemistry."
     question = "Is XAI usable in chemistry?"
     prior_session = PQASession(question=question, answer=prior_answer)
-    docs_fixture.query(prior_session, llm_model=llm, settings=settings)
+    await docs_fixture.aquery(prior_session, llm_model=llm, settings=settings)
     assert prior_answer in cast(
         "str", my_results[-1].prompt[1].content  # type: ignore[union-attr, index]
     ), "prior answer not in prompt"
     # run without a prior session to check that the flow works correctly
-    docs_fixture.query(question, llm_model=llm, settings=settings)
+    await docs_fixture.aquery(question, llm_model=llm, settings=settings)
     assert settings.prompts.answer_iteration_prompt[:10] not in cast(  # type: ignore[index]
         "str", my_results[-1].prompt[1].content  # type: ignore[union-attr, index]
     ), "prior answer prompt should not be inserted"
@@ -619,12 +621,13 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
     ],
 )
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
-def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
+@pytest.mark.asyncio
+async def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
     settings = Settings(
         llm=llm,
         llm_settings=llm_settings,
     )
-    response = docs_fixture.query("What is XAI?", settings=settings)
+    response = await docs_fixture.aquery("What is XAI?", settings=settings)
     assert response.answer_reasoning
 
 
@@ -893,7 +896,7 @@ async def test_unrelated_context(
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    session = docs.query(
+    session = await docs.aquery(
         "What do scientist estimate as the planetary composition of Jupyter?",
         settings=agent_test_settings,
     )
@@ -924,8 +927,9 @@ async def test_repeat_keys(stub_data_dir) -> None:
     assert ds[1].docname == "Wiki2023a"
 
 
-def test_can_read_normal_pdf_reader(docs_fixture) -> None:
-    answer = docs_fixture.query("Are counterfactuals actionable? [yes/no]")
+@pytest.mark.asyncio
+async def test_can_read_normal_pdf_reader(docs_fixture) -> None:
+    answer = await docs_fixture.aquery("Are counterfactuals actionable? [yes/no]")
     assert "yes" in answer.answer or "Yes" in answer.answer
 
 
@@ -1054,7 +1058,7 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
 
     num_retries = 3
     for _ in range(num_retries):
-        answer = docs.query("Are counterfactuals actionable? [yes/no]")
+        answer = await docs.aquery("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
             assert f"This article has {num_citations} citations" in answer.context
             return
@@ -1068,7 +1072,7 @@ async def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     num_retries = 3
     for _ in range(num_retries):
-        answer = docs.query("Are counterfactuals actionable? [yes/no]")
+        answer = await docs.aquery("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
@@ -1085,7 +1089,7 @@ async def test_fileio_reader_txt(stub_data_dir: Path) -> None:
         BytesIO(file_content),
         "WikiMedia Foundation, 2023, Accessed now",
     )
-    answer = docs.query("What country was Frederick Bates born in?")
+    answer = await docs.aquery("What country was Frederick Bates born in?")
     assert "United States" in answer.answer
 
 
@@ -1165,7 +1169,7 @@ async def test_code() -> None:
         THIS_MODULE, "test_paperqa.py", docname="test_paperqa.py", disable_check=True
     )
     assert len(docs.docs) == 1
-    session = docs.query("What file is read in by test_code?", settings=settings)
+    session = await docs.aquery("What file is read in by test_code?", settings=settings)
     assert "test_paperqa.py" in session.answer
 
 
@@ -1196,7 +1200,7 @@ async def test_too_much_evidence(
     settings = Settings.from_name("fast")
     settings.answer.evidence_k = 10
     settings.answer.answer_max_sources = 10
-    docs.query("What is Barrack's greatest accomplishment?", settings=settings)
+    await docs.aquery("What is Barrack's greatest accomplishment?", settings=settings)
 
 
 @pytest.mark.asyncio
@@ -1212,7 +1216,9 @@ async def test_custom_prompts(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    answer = docs.query("What country is Frederick Bates from?", settings=settings)
+    answer = await docs.aquery(
+        "What country is Frederick Bates from?", settings=settings
+    )
     assert "United States" in answer.answer
 
 
@@ -1229,10 +1235,14 @@ async def test_pre_prompt(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    assert "212" not in docs.query("What is the boiling point of water?").answer
+    assert (
+        "212" not in (await docs.aquery("What is the boiling point of water?")).answer
+    )
     assert (
         "212"
-        in docs.query("What is the boiling point of water?", settings=settings).answer
+        in (
+            await docs.aquery("What is the boiling point of water?", settings=settings)
+        ).answer
     )
 
 
@@ -1245,7 +1255,7 @@ async def test_post_prompt(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    response = docs.query("What country is Bates from?", settings=settings)
+    response = await docs.aquery("What country is Bates from?", settings=settings)
     assert "up" in response.answer.lower()
 
 
@@ -1282,7 +1292,7 @@ async def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    response = docs.query("What country is Bates from?", settings=settings)
+    response = await docs.aquery("What country is Bates from?", settings=settings)
     assert "@@@@@" in response.context
     assert "WikiMedia Foundation, 2023" in response.context
     assert "Valid Keys" not in response.context
@@ -1298,7 +1308,7 @@ async def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    response = docs.query("What country is Bates from?", settings=settings)
+    response = await docs.aquery("What country is Bates from?", settings=settings)
     assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
 
 
