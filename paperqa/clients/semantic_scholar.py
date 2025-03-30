@@ -204,7 +204,7 @@ async def parse_s2_to_doc_details(
         paper_data
         | {"client_source": ["semantic_scholar"], "bibtex_source": [bibtex_source]}
     ).items():
-        if key not in doc_details.model_fields:
+        if key not in type(doc_details).model_fields:
             doc_details.other[key] = value
 
     return doc_details

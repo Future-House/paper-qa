@@ -168,7 +168,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
-    "openreview",
+    "openreview",  # SEE: https://github.com/openreview/openreview-py/issues/2551
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
@@ -281,6 +281,7 @@ filterwarnings = [
     "ignore:The `dict` method is deprecated; use `model_dump` instead",  # SEE: https://github.com/BerriAI/litellm/issues/5987
     "ignore:Use 'content=<...>' to upload raw bytes/text content:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/5986
     "ignore:builtin type (SwigPyPacked|SwigPyObject|swigvarlink) has no __module__:DeprecationWarning:importlib._bootstrap",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3931 --> https://github.com/swig/swig/issues/2881#issuecomment-2332652634
+    'ignore:There is no current event loop:DeprecationWarning:litellm.caching.llm_caching_handler',  # SEE: https://github.com/BerriAI/litellm/issues/9641
     'ignore:open_text is deprecated. Use files\(\) instead:DeprecationWarning',  # SEE: https://github.com/BerriAI/litellm/issues/5647
     'ignore:pkg_resources is deprecated as an API.:DeprecationWarning:pybtex',  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/169/replace-pkg_resources-with
 ]
