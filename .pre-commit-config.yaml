@@ -67,11 +67,6 @@ repos:
     rev: 0.6.10
     hooks:
       - id: uv-lock
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.213.4
-    hooks:
-      - id: renovate-config-validator
-        args: [--strict]
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.19.1
     hooks:
