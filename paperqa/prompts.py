@@ -30,6 +30,20 @@ answer_iteration_prompt_template = (
     "also included in the above context.\n\n"
 )
 
+CITATION_KEY_CONSTRAINTS = (
+    "## Valid citation examples: \n"
+    "- Example2024Example pages 3-4 \n"
+    "- Example2024 pages 3-4 \n"
+    "- Example2024 pages 3-4, Example2024 pages 5-6 \n"
+    "## Invalid citation examples: \n"
+    "- Example2024Example pages 3-4 and pages 4-5 \n"
+    "- Example2024Example (pages 3-4) \n"
+    "- Example2024Example pages 3-4, pages 5-6 \n"
+    "- Example2024Example et al. (2024) \n"
+    "- Example's work (pages 17–19) \n"  # noqa: RUF001
+    "- (pages 17–19) \n"  # noqa: RUF001
+)
+
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
@@ -38,14 +52,15 @@ qa_prompt = (
     "If the context provides insufficient information reply "
     f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
-    "it via citation keys at the end of sentences, "
-    "like {example_citation}. Only cite from the context "
-    "below and only use the valid keys. Write in the style of a "
-    "Wikipedia article, with concise sentences and coherent paragraphs. "
-    "The context comes from a variety of sources and is only a summary, "
-    "so there may inaccuracies or ambiguities. If quotes are present and "
-    "relevant, use them in the answer. This answer will go directly onto "
-    "Wikipedia, so do not add any extraneous information.\n\n"
+    "it via citation keys at the end of sentences, like {example_citation}. "
+    "Only cite from the context above and only use the citation keys from the context. "
+    f"{CITATION_KEY_CONSTRAINTS}"
+    "Do not concatenate citation keys, just use them as is. "
+    "Write in the style of a Wikipedia article, with concise sentences and "
+    "coherent paragraphs. The context comes from a variety of sources and is "
+    "only a summary, so there may inaccuracies or ambiguities. If quotes are "
+    "present and relevant, use them in the answer. This answer will go directly "
+    "onto Wikipedia, so do not add any extraneous information.\n\n"
     "{prior_answer_prompt}"
     "Answer ({answer_length}):"
 )

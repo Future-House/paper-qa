@@ -5436,4 +5436,202 @@ interactions:
       status:
         code: 200
         message: OK
+  - request:
+      body:
+        "{\"messages\":[{\"role\":\"system\",\"content\":\"Answer in a direct and
+        concise tone. Your audience is an expert, so be highly specific. If there are
+        ambiguous terms or acronyms, first define them.\"},{\"role\":\"user\",\"content\":\"Answer
+        the question below with the context.\\n\\nContext (with relevance scores):\\n\\nwellawatteUnknownyearaperspectiveon
+        pages 12-14: Counterfactual explanations are actionable as they provide local,
+        instance-level explanations that suggest which features can be altered to change
+        the outcome. For example, in chemistry, changing a hydrophobic functional group
+        in a molecule to a hydrophilic group can increase solubility. This actionability
+        makes counterfactuals a useful tool in explainable AI (XAI) for chemistry, as
+        they offer intuitive understanding and uncover spurious relationships in training
+        data.\\nFrom Geemi P. Wellawatte, Heta A. Gandhi, Aditi Seshadri, and Andrew
+        D. White. A perspective on explanations of molecular prediction models. Journal
+        of Chemical Theory and Computation, Unknown year. URL: https://doi.org/10.1021/acs.jctc.2c01235,
+        doi:10.1021/acs.jctc.2c01235. This article has 23 citations and is from a domain
+        leading peer-reviewed journal.\\n\\nwellawatteUnknownyearaperspectiveon pages
+        14-16: Counterfactuals are actionable as they provide specific modifications
+        to molecular structures that can lead to desired changes in properties. For
+        example, in the context of blood-brain barrier (BBB) permeation prediction,
+        counterfactual explanations suggested modifications to the carboxylic acid group
+        of a molecule, enabling it to permeate the BBB. These actionable insights align
+        with experimental findings, demonstrating how counterfactuals can guide structural
+        changes to achieve specific outcomes, such as enhancing hydrophobic interactions
+        or surface area for BBB permeability.\\nFrom Geemi P. Wellawatte, Heta A. Gandhi,
+        Aditi Seshadri, and Andrew D. White. A perspective on explanations of molecular
+        prediction models. Journal of Chemical Theory and Computation, Unknown year.
+        URL: https://doi.org/10.1021/acs.jctc.2c01235, doi:10.1021/acs.jctc.2c01235.
+        This article has 23 citations and is from a domain leading peer-reviewed journal.\\n\\nwellawatteUnknownyearaperspectiveon
+        pages 20-22: Counterfactual explanations are described as actionable in the
+        excerpt. They are represented as chemical structures, which are familiar to
+        domain experts, and are sparse, making them practical for use. The excerpt highlights
+        that counterfactuals provide minimal distance from a base molecule while contrasting
+        in chemical properties, making them useful for understanding and modifying molecular
+        predictions. Additionally, they are noted for their utility in explaining black-box
+        models and their potential to guide actionable changes in molecular design.\\nFrom
+        Geemi P. Wellawatte, Heta A. Gandhi, Aditi Seshadri, and Andrew D. White. A
+        perspective on explanations of molecular prediction models. Journal of Chemical
+        Theory and Computation, Unknown year. URL: https://doi.org/10.1021/acs.jctc.2c01235,
+        doi:10.1021/acs.jctc.2c01235. This article has 23 citations and is from a domain
+        leading peer-reviewed journal.\\n\\nwellawatteUnknownyearaperspectiveon pages
+        5-8: The excerpt discusses counterfactual explanations, highlighting that they
+        are considered 'better' explanations because they are both actionable and sparse.
+        Actionable explanations provide a set of features that can change the outcome,
+        making them useful for decision-making. This contrasts with Shapley values,
+        which are not actionable as they do not provide such a set of features. The
+        text emphasizes the importance of actionable explanations in the context of
+        human-centric evaluation and decision-making.\\nFrom Geemi P. Wellawatte, Heta
+        A. Gandhi, Aditi Seshadri, and Andrew D. White. A perspective on explanations
+        of molecular prediction models. Journal of Chemical Theory and Computation,
+        Unknown year. URL: https://doi.org/10.1021/acs.jctc.2c01235, doi:10.1021/acs.jctc.2c01235.
+        This article has 23 citations and is from a domain leading peer-reviewed journal.\\n\\nwellawatteUnknownyearaperspectiveon
+        pages 16-20: The excerpt discusses the use of counterfactuals in molecular prediction
+        models, particularly for solubility and scent prediction. Counterfactuals are
+        generated to explore local chemical space and identify structural modifications
+        that influence properties like solubility and scent. For solubility, changes
+        to ester groups, heteroatoms, and substructures like acidic/basic groups are
+        highlighted as impactful. For scent prediction, counterfactuals are used to
+        identify structural changes that alter scent classifications. These findings
+        align with experimental and chemical intuition, suggesting that counterfactuals
+        provide actionable insights for modifying molecular properties.\\nFrom Geemi
+        P. Wellawatte, Heta A. Gandhi, Aditi Seshadri, and Andrew D. White. A perspective
+        on explanations of molecular prediction models. Journal of Chemical Theory and
+        Computation, Unknown year. URL: https://doi.org/10.1021/acs.jctc.2c01235, doi:10.1021/acs.jctc.2c01235.
+        This article has 23 citations and is from a domain leading peer-reviewed journal.\\n\\nValid
+        Keys: wellawatteUnknownyearaperspectiveon pages 12-14, wellawatteUnknownyearaperspectiveon
+        pages 14-16, wellawatteUnknownyearaperspectiveon pages 20-22, wellawatteUnknownyearaperspectiveon
+        pages 5-8, wellawatteUnknownyearaperspectiveon pages 16-20\\n\\n----\\n\\nQuestion:
+        Are counterfactuals actionable? [yes/no]\\n\\nWrite an answer based on the context.
+        If the context provides insufficient information reply \\\"I cannot answer.\\\"
+        For each part of your answer, indicate which sources most support it via citation
+        keys at the end of sentences, like (Example2012Example pages 3-4). Only cite
+        from the context above and only use the citation keys from the context. ## Valid
+        citation examples: \\n- Example2024Example pages 3-4 \\n- Example2024 pages
+        3-4 \\n- Example2024 pages 3-4, Example2024 pages 5-6 \\n## Invalid citation
+        examples: \\n- Example2024Example pages 3-4 and pages 4-5 \\n- Example2024Example
+        (pages 3-4) \\n- Example2024Example pages 3-4, pages 5-6 \\n- Example2024Example
+        et al. (2024) \\n- Example's work (pages 17\u201319) \\n- (pages 17\u201319)
+        \\nDo not concatenate citation keys, just use them as is. Write in the style
+        of a Wikipedia article, with concise sentences and coherent paragraphs. The
+        context comes from a variety of sources and is only a summary, so there may
+        inaccuracies or ambiguities. If quotes are present and relevant, use them in
+        the answer. This answer will go directly onto Wikipedia, so do not add any extraneous
+        information.\\n\\nAnswer (about 200 words, but can be longer):\"}],\"model\":\"gpt-4o-2024-11-20\",\"n\":1,\"temperature\":0.0}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6716"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 1.69.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 1.69.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.12.9
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAAwAAAP//lFZNb+NGDL3nVxA6bQApiB0nm+RWt2i7KHootgX6sQuDHlESN6OZwQwn
+          jrHIfy8oyZGTTYHmYsDikHx8jxzO1xOAguviFgrToZg+2Gr9c/3+z5tu93f7sf3y6w9Xv1z8tL5I
+          Fx++6y7Mb0WpHn77hYwcvM6M74MlYe9Gs4mEQhp18X51cblaXF1eDobe12TVrQ1SrXy1PF+uqsWi
+          Wp5Pjp1nQ6m4hX9OAAC+Dr8K0dX0UNzCeXn40lNK2FJx+3QIoIje6pcCU+Ik6KQoZ6PxTsgNqP+i
+          VILx2QnFBo1ktAkwEqDRKnBr6Qx+72gPIfp7rgmsN2hLYKdhDVWW7skCPQSLDtUnwXYPKbctJWHX
+          QgpkuGEDDaHkSND7Wv9Ph6VDAYMOTIeuJUAHPovxPZXQ451GkI56yImabKHxEWoynNi7arSfwY8+
+          Aj2gcq/IwHTUc5K4/7Y2zcQ1OeFmD0liNpIj2il7KiFl0wEmiBQsGk2P0O3r6EPnt1pFdiM1Ftro
+          c4AdSzefYcsGvCMQD+xU/0SQvM1btiz7EnwcCdiPoQ3GrX/YqxcarqeY4oEG8mFrva+rbUR2sMUY
+          mSK8W6/XpxAo9jSQOCiUjjVTebjtJAFabt2IkR4CRe7JCVpo2NXs2gTo6pEvgxbYSWYNUkJNvXdJ
+          IsokAUcIUVPowSxDOUp2m1kjQe8tmWxR9Uma9N2OrMUditAf7s75ndsTRgwUtSWE78k7CNhSgsWy
+          WqxKeIPDqlpcnZ59cp/c9691r00eUsCYqITGm5wUoXfQs+N+lluJRtiqRhN8gl3HlkBnJOLYwYeO
+          0sJD9IGiMCVlndOYRakg1+lApIkrVlAhkuCo/ED0E4H6YWhl36uygzSSplHTCgJG4YFOuwdqmrF+
+          GM9aHxXXMIoztBTQjH136G/uAxrRsTnq9OfjpyDmmsDy3fN2TYaclAP49Xo9Nd1oPLTds9lX7JFC
+          pEROqNZJmgFOIHTMdh3rnEWCBnu2jFGRT4ObSmhylI7iYYbmHszpQOgb+mt5Xi2Xb+qvq2p5PvbX
+          B/fUDAqxJ+l8PTH1scNgaQ/3aPNclUVz9zSME48v76HDdXo0s4kkgW8O92R6fv9piuGYKtblHl2l
+          0kQ2QINN4ww6vbge38LTZXV9ena8KiI1OaFuKpetPTKgc15GzXVJfZ4sj09ryfo2RL9NL1yLhh2n
+          bqOieqcrKIkPxWB9PAH4PKy//GyjFSH6PshG/B0N6RaXi+UYsJg37mxe3txMVvGC9sjverEoXwm5
+          qUmQbTraoYVB01E9+84LF3PN/shwclT4t3heiz0Wz679P+FngzEUhOpNiFSzeV7zfCySPkn+69gT
+          0QPgIlG8Z0MbYYoqRk0NZju+Foq0T0L9pmHX6lXG45OhCRvCBa4uzDWa4uTx5F8AAAD//wMAgnk5
+          TTsJAAA=
+      headers:
+        CF-RAY:
+          - 929b0e93bebeeb35-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 01 Apr 2025 21:07:39 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=IZ6FAzZpJnDD3pz43Rgf_hZj2ZI_mnm5GM9mbQKNxlA-1743541659-1.0.1.1-.QBjZrAvyYs8KeabR.70Bp9kLwVx68Rc01b.WFZrHZ7fwFC48wGIXJm.GfI9XfpmtU_AgBvzYBCyY4.E7nufVXl1e3HVyuZYGh9vyHETOJE;
+            path=/; expires=Tue, 01-Apr-25 21:37:39 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=DW94zCacBHDsJWeNqvhSMXNdBblZpaB_U80ujvDFfdY-1743541659785-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        access-control-expose-headers:
+          - X-Request-ID
+        alt-svc:
+          - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "4039"
+        openai-version:
+          - "2020-10-01"
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-ratelimit-limit-requests:
+          - "50000"
+        x-ratelimit-limit-tokens:
+          - "150000000"
+        x-ratelimit-remaining-requests:
+          - "49999"
+        x-ratelimit-remaining-tokens:
+          - "149998358"
+        x-ratelimit-reset-requests:
+          - 1ms
+        x-ratelimit-reset-tokens:
+          - 0s
+        x-request-id:
+          - req_3786ae19f09bc274a7cda9938a1e4bb0
+      status:
+        code: 200
+        message: OK
 version: 1
