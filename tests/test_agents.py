@@ -972,6 +972,11 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
         "ClinicalTrials.gov" in c.text.doc.citation for c in response.session.contexts
     ), "No clinical trials were put into contexts"
 
+    name_year_regex = r"\b([A-Z][a-zA-Z]*\d{4})(?:\s+(pages\s+)?(\d+-\d+))?\b"
+    assert not re.search(
+        name_year_regex, response.session.answer
+    ), "Answer contains citation with name and year instead of citation key"
+
 
 @pytest.mark.asyncio
 async def test_search_pagination(agent_test_settings: Settings) -> None:
