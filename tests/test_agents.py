@@ -312,10 +312,12 @@ async def test_get_directory_index_w_no_citations(
 @pytest.mark.parametrize("llm_name", ["gpt-4o", "gemini/gemini-1.5-flash"])
 @pytest.mark.asyncio
 async def test_agent_types(
-    agent_test_settings: Settings, agent_type: str | type, llm_name: str
+    agent_test_settings: Settings,
+    agent_type: str | type,
+    llm_name: str,
+    subtests: SubTests,
 ) -> None:
     question = "How can you use XAI for chemical property prediction?"
-
     # make sure agent_llm is different from default, so we can correctly track tokens
     # for agent
     agent_test_settings.agent.agent_llm = llm_name
@@ -348,6 +350,17 @@ async def test_agent_types(
             response.session.token_counts[agent_llm][1] > 30
         ), "Expected many completion tokens"
         assert response.session.cost > 0, "Expected nonzero cost"
+
+    with subtests.test("Test citation formatting"):
+        citation_w_et_al = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)"
+        assert not re.search(
+            citation_w_et_al, response.session.answer
+        ), "Answer contains citation with et al. instead of citation key"
+
+        missing_pages_regex = r"\b([a-zA-Z]+\d{4}[a-zA-Z]*\s+\d+-\d+)\b"
+        assert not re.search(
+            missing_pages_regex, response.session.answer
+        ), "Answer contains citation with missing 'pages' keyword"
 
 
 @pytest.mark.asyncio
@@ -971,30 +984,6 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
     assert any(
         "ClinicalTrials.gov" in c.text.doc.citation for c in response.session.contexts
     ), "No clinical trials were put into contexts"
-
-
-@pytest.mark.asyncio
-async def test_citation_formatting(agent_test_settings):
-    docs = Docs()
-    response = await run_agent(
-        docs,
-        query="What is XAI and how does it work?",
-        settings=agent_test_settings,
-    )
-
-    name_year_regex = r"\b([A-Z][a-zA-Z]*\d{4})(?:\s+(pages\s+)?(\d+-\d+))?\b"
-    assert not re.search(
-        name_year_regex, response.session.answer
-    ), "Answer contains citation with name and year instead of citation key"
-    citation_w_et_al = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)"
-    assert not re.search(
-        citation_w_et_al, response.session.answer
-    ), "Answer contains citation with et al. instead of citation key"
-
-    missing_pages_regex = r"\b([a-zA-Z]+\d{4}[a-zA-Z]*\s+\d+-\d+)\b"
-    assert not re.search(
-        missing_pages_regex, response.session.answer
-    ), "Answer contains citation with missing 'pages' keyword"
 
 
 @pytest.mark.asyncio

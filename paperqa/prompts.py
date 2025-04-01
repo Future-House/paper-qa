@@ -30,6 +30,20 @@ answer_iteration_prompt_template = (
     "also included in the above context.\n\n"
 )
 
+CITATION_KEY_CONSTRAINTS = (
+    "## Valid citation examples: \n"
+    "- Example2024Example pages 3-4 \n"
+    "- Example2024 pages 3-4 \n"
+    "- Example2024 pages 3-4, Example2024 pages 5-6 \n"
+    "## Invalid citation examples: \n"
+    "- Example2024Example pages 3-4 and pages 4-5 \n"
+    "- Example2024Example (pages 3-4) \n"
+    "- Example2024Example pages 3-4, pages 5-6 \n"
+    "- Example2024Example et al. (2024) \n"
+    "- Example's work (pages 17–19) \n"  # noqa: RUF001
+    "- (pages 17–19) \n"  # noqa: RUF001
+)
+
 qa_prompt = (
     "Answer the question below with the context.\n\n"
     "Context (with relevance scores):\n\n{context}\n\n----\n\n"
@@ -39,13 +53,9 @@ qa_prompt = (
     f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, like {example_citation}. "
-    "You are only allowed to use this citation format. "
-    "If the citation key is 'example2012example pages 3-4', "
-    "do not use 'Example2012Example', 'Example2012 (pages 3-4)', "
-    "'Example et. al. (2012)', 'example2012example pages 3-4, pages 5-6' "
-    "or any adapted version of these citation keys "
-    "as a citation key in your answer. "
-    "Only cite from the context below and only use the citation keys from the context. "
+    "Only cite from the context above and only use the citation keys from the context. "
+    f"{CITATION_KEY_CONSTRAINTS}"
+    "Do not concatenate citation keys, just use them as is. "
     "Write in the style of a Wikipedia article, with concise sentences and "
     "coherent paragraphs. The context comes from a variety of sources and is "
     "only a summary, so there may inaccuracies or ambiguities. If quotes are "
