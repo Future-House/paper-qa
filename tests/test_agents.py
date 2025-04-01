@@ -972,10 +972,30 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
         "ClinicalTrials.gov" in c.text.doc.citation for c in response.session.contexts
     ), "No clinical trials were put into contexts"
 
+
+@pytest.mark.asyncio
+async def test_citation_formatting(agent_test_settings):
+    docs = Docs()
+    response = await run_agent(
+        docs,
+        query=("What is XAI and how does it work?"),
+        settings=agent_test_settings,
+    )
+
     name_year_regex = r"\b([A-Z][a-zA-Z]*\d{4})(?:\s+(pages\s+)?(\d+-\d+))?\b"
     assert not re.search(
         name_year_regex, response.session.answer
     ), "Answer contains citation with name and year instead of citation key"
+
+    citation_w_et_al = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)"
+    assert not re.search(
+        citation_w_et_al, response.session.answer
+    ), "Answer contains citation with et al. instead of citation key"
+
+    missing_pages_regex = r"\b([a-zA-Z]+\d{4}[a-zA-Z]*\s+\d+-\d+)\b"
+    assert not re.search(
+        missing_pages_regex, response.session.answer
+    ), "Answer contains citation with missing 'pages' keyword"
 
 
 @pytest.mark.asyncio
