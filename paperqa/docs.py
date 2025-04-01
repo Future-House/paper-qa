@@ -6,6 +6,7 @@ import os
 import re
 import tempfile
 import urllib.request
+import warnings
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from io import BytesIO
@@ -133,6 +134,13 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
+        warnings.warn(
+            "The synchronous `add_file` method is being deprecated in favor of the"
+            " asynchronous `aadd_file` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd_file(
                 file,
@@ -194,6 +202,13 @@ class Docs(BaseModel):
         llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> str | None:
+        warnings.warn(
+            "The synchronous `add_url` method is being deprecated in favor of the"
+            " asynchronous `aadd_url` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd_url(
                 url,
@@ -244,6 +259,13 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         **kwargs,
     ) -> str | None:
+        warnings.warn(
+            "The synchronous `add` method is being deprecated in favor of the"
+            " asynchronous `aadd` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd(
                 path,
@@ -409,6 +431,13 @@ class Docs(BaseModel):
         settings: MaybeSettings = None,
         embedding_model: EmbeddingModel | None = None,
     ) -> bool:
+        warnings.warn(
+            "The synchronous `add_texts` method is being deprecated in favor of the"
+            " asynchronous `aadd_texts` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aadd_texts(
                 texts, doc, settings=settings, embedding_model=embedding_model
@@ -546,6 +575,13 @@ class Docs(BaseModel):
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
+        warnings.warn(
+            "The synchronous `get_evidence` method is being deprecated in favor of the"
+            " asynchronous `aget_evidence` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aget_evidence(
                 query=query,
@@ -665,6 +701,13 @@ class Docs(BaseModel):
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
     ) -> PQASession:
+        warnings.warn(
+            "The synchronous `query` method is being deprecated in favor of the"
+            " asynchronous `aquery` method, this deprecation will conclude in"
+            " version 6.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return get_loop().run_until_complete(
             self.aquery(
                 query,
