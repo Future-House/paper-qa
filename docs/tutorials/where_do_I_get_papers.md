@@ -32,7 +32,7 @@ submissions = helper.fetch_relevant_papers(question)
 docs = await helper.aadd_docs(submissions)
 
 # Now you can continue asking like in the [main tutorial](../../README.md)
-session = docs.query(question, settings=settings)
+session = await docs.aquery(question, settings=settings)
 print(session.answer)
 ```
 
@@ -76,7 +76,7 @@ zotero = ZoteroDB(library_type="user")  # "group" if group library
 for item in zotero.iterate(limit=20):
     if item.num_pages > 30:
         continue  # skip long papers
-    docs.add(item.pdf, docname=item.key)
+    await docs.aadd(item.pdf, docname=item.key)
 ```
 
 which will download the first 20 papers in your Zotero database and add
@@ -93,7 +93,7 @@ for item in zotero.iterate(
     limit=100,
 ):
     print("Adding", item.title)
-    docs.add(item.pdf, docname=item.key)
+    await docs.aadd(item.pdf, docname=item.key)
 ```
 
 You can read more about the search syntax by typing `zotero.iterate?` in IPython.
@@ -111,11 +111,11 @@ papers = paperscraper.search_papers(keyword_search)
 docs = Docs()
 for path, data in papers.items():
     try:
-        docs.add(path)
+        await docs.aadd(path)
     except ValueError as e:
         # sometimes this happens if PDFs aren't downloaded or readable
         print("Could not read", path, e)
-session = docs.query(
+session = await docs.aquery(
     "What manufacturing challenges are unique to bispecific antibodies?"
 )
 print(session)
