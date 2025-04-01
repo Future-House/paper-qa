@@ -978,7 +978,7 @@ async def test_citation_formatting(agent_test_settings):
     docs = Docs()
     response = await run_agent(
         docs,
-        query=("What is XAI and how does it work?"),
+        query="What is XAI and how does it work?",
         settings=agent_test_settings,
     )
 
@@ -986,7 +986,6 @@ async def test_citation_formatting(agent_test_settings):
     assert not re.search(
         name_year_regex, response.session.answer
     ), "Answer contains citation with name and year instead of citation key"
-
     citation_w_et_al = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)"
     assert not re.search(
         citation_w_et_al, response.session.answer
