@@ -865,9 +865,9 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                             "type": "string",
                             "description": (
                                 "A search query, which can be a specific phrase,"
-                                " complete sentence, or general keywords, e.g."
+                                " complete sentence,\nor general keywords, e.g."
                                 " 'machine learning for immunology'. Also can be"
-                                " given search operators."
+                                "\ngiven search operators."
                             ),
                             "title": "Query",
                         },
@@ -875,7 +875,7 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                             "anyOf": [{"type": "integer"}, {"type": "null"}],
                             "description": (
                                 "Filter for minimum publication year, or None for"
-                                " no minimum year. The current year is"
+                                " no minimum year.\nThe current year is"
                                 f" {get_year()}."
                             ),
                             "title": "Min Year",
@@ -884,7 +884,7 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                             "anyOf": [{"type": "integer"}, {"type": "null"}],
                             "description": (
                                 "Filter for maximum publication year, or None for"
-                                " no maximum year. The current year is"
+                                " no maximum year.\nThe current year is"
                                 f" {get_year()}."
                             ),
                             "title": "Max Year",
@@ -906,7 +906,7 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                         "has_successful_answer": {
                             "description": (
                                 "Set True if an answer that addresses all parts of the"
-                                " task has been generated, otherwise set False to"
+                                "\ntask has been generated, otherwise set False to"
                                 " indicate unsureness."
                             ),
                             "title": "Has Successful Answer",

@@ -103,7 +103,7 @@ repos:
           - PyMuPDF>=1.24.12
           - anyio
           - fhlmi>=0.25.4 # Match pyproject.toml
-          - fhaviary[llm]>=0.18.2 # Match pyproject.toml
+          - fhaviary[llm]>=0.19 # Match pyproject.toml
           - ldp>=0.25.0 # Match pyproject.toml
           - html2text
           - httpx
