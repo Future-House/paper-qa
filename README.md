@@ -1,8 +1,10 @@
 # PaperQA2
 
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Future-House/paper-qa)
-[![tests](https://github.com/Future-House/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/Future-House/paper-qa)
 [![PyPI version](https://badge.fury.io/py/paper-qa.svg)](https://badge.fury.io/py/paper-qa)
+[![tests](https://github.com/Future-House/paper-qa/actions/workflows/tests.yml/badge.svg)](https://github.com/Future-House/paper-qa)
+![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
+![PyPI Python Versions](https://img.shields.io/pypi/pyversions/paper-qa)
 
 PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files,
 with a focus on the scientific literature.
