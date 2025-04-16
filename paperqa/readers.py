@@ -39,7 +39,13 @@ def parse_pdf_to_pages(
                     f" {file.page_count} for the PDF at path {path}, likely this PDF"
                     " file is corrupt."
                 ) from exc
-            text = page.get_text("text", sort=True)
+
+            # Extract text blocks, which are already in the correct order, from the page
+            blocks = page.get_text("blocks", sort=False)
+
+            # Concatenate text blocks into a single string
+            text = "\n".join(block[4] for block in blocks)
+
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The text in page {i} of {file.page_count} was {len(text)} chars"
