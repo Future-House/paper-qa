@@ -44,7 +44,7 @@ def parse_pdf_to_pages(
             blocks = page.get_text("blocks", sort=False)
 
             # Concatenate text blocks into a single string
-            text = "\n".join(block[4] for block in blocks)
+            text = "\n".join(block[4] for block in blocks if len(block) > 4)
 
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
