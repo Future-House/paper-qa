@@ -944,12 +944,11 @@ class Settings(BaseSettings):
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 
     def adjust_tools_for_agent_llm(self, tools: list[Tool]) -> None:
-        # Google gemini/gemini-1.5-flash fails to support empty dict properties
-        # SEE: https://github.com/BerriAI/litellm/issues/7634
-        if "gemini" in self.agent.agent_llm.lower():
-            for t in tools:
-                if not t.info.get_properties():
-                    t.info.parameters = None
+        """In-place adjust tool attributes or schemae to match agent LLM-specifics."""
+        # This was originally made for Gemini 1.5 Flash not supporting empty tool args
+        # in February 2025 (https://github.com/BerriAI/litellm/issues/7634), but then
+        # Gemini fixed this server-side by mid-April 2025,
+        # so this method is now just available for use
 
 
 # Settings: already Settings
