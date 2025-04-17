@@ -48,6 +48,7 @@ def parse_pdf_to_pages(
 
             # Concatenate text blocks into a single string
             text = "\n".join(block[BLOCK_TEXT_INDEX] for block in blocks if len(block) > BLOCK_TEXT_INDEX)
+
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The text in page {i} of {file.page_count} was {len(text)} chars"
