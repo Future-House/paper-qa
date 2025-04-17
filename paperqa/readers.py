@@ -21,6 +21,7 @@ from paperqa.types import (
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
+BLOCK_TEXT_INDEX = 4
 
 def parse_pdf_to_pages(
     path: str | os.PathLike, page_size_limit: int | None = None
@@ -39,7 +40,15 @@ def parse_pdf_to_pages(
                     f" {file.page_count} for the PDF at path {path}, likely this PDF"
                     " file is corrupt."
                 ) from exc
-            text = page.get_text("text", sort=True)
+
+            # Extract text blocks from the page
+            # Note: sort=False is important to preserve the order of text blocks
+            # as they appear in the PDF
+            blocks = page.get_text("blocks", sort=False)
+
+            # Concatenate text blocks into a single string
+            text = "\n".join(block[BLOCK_TEXT_INDEX] for block in blocks if len(block) > BLOCK_TEXT_INDEX)
+
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The text in page {i} of {file.page_count} was {len(text)} chars"
