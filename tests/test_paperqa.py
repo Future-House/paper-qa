@@ -47,8 +47,8 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import read_doc
 from paperqa.types import ChunkMetadata
+from paperqa.readers import parse_pdf_to_pages, read_doc
 from paperqa.utils import (
     extract_score,
     get_citenames,
@@ -987,6 +987,17 @@ async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     )
     assert len(docs.texts) == 1, "Should have been one chunk"
     assert docs.texts[0].embedding is None, "Should have deferred the embedding"
+
+
+def test_pdf_reader_get_text(stub_data_dir: Path) -> None:
+    filepath = stub_data_dir / "pasa.pdf"
+    parsedText = parse_pdf_to_pages(filepath)
+    assert parsedText is not None, "Parsed text should not be None"
+    assert parsedText.content is not None
+    assert len(parsedText.content) > 0, "Parsed text should not be empty"
+    assert '1' in parsedText.content, "Parsed text should contain page 1"
+    firsttext = parsedText.content['1']
+    assert "Abstract\n\nWe introduce PaSa, an advanced Paper Search\nagent powered by large language models." in firsttext
 
 
 @pytest.mark.vcr
