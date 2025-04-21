@@ -23,6 +23,7 @@ from paperqa.version import __version__ as pqa_version
 
 BLOCK_TEXT_INDEX = 4
 
+
 def parse_pdf_to_pages(
     path: str | os.PathLike, page_size_limit: int | None = None
 ) -> ParsedText:
@@ -47,7 +48,11 @@ def parse_pdf_to_pages(
             blocks = page.get_text("blocks", sort=False)
 
             # Concatenate text blocks into a single string
-            text = "\n".join(block[BLOCK_TEXT_INDEX] for block in blocks if len(block) > BLOCK_TEXT_INDEX)
+            text = "\n".join(
+                block[BLOCK_TEXT_INDEX]
+                for block in blocks
+                if len(block) > BLOCK_TEXT_INDEX
+            )
 
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(

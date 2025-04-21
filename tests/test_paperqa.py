@@ -979,9 +979,12 @@ def test_pdf_reader_get_text(stub_data_dir: Path) -> None:
     assert parsedText is not None, "Parsed text should not be None"
     assert parsedText.content is not None
     assert len(parsedText.content) > 0, "Parsed text should not be empty"
-    assert '1' in parsedText.content, "Parsed text should contain page 1"
-    firsttext = parsedText.content['1']
-    assert "Abstract\n\nWe introduce PaSa, an advanced Paper Search\nagent powered by large language models." in firsttext
+    assert "1" in parsedText.content, "Parsed text should contain page 1"
+    firsttext = parsedText.content["1"]
+    assert (
+        "Abstract\n\nWe introduce PaSa, an advanced Paper Search\nagent powered by large language models."
+        in firsttext
+    )
 
 
 @pytest.mark.vcr
