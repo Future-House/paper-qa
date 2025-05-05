@@ -54,7 +54,9 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
+    "fhlmi>=0.27",  # For LLMResult reflecting actual model
     "ipython>=8",  # Pin to keep recent
+    "litellm>=1.68",  # Pin for PydanticDeprecatedSince20 fixes
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
@@ -277,12 +279,9 @@ asyncio_default_fixture_loop_scope = "session"
 # By default all warnings emitted during the test session will be displayed in
 # a summary at the end of the test session.
 filterwarnings = [
-    "ignore:Support for class-based `config` is deprecated, use ConfigDict instead",  # SEE: https://github.com/BerriAI/litellm/issues/5648
     "ignore:The `dict` method is deprecated; use `model_dump` instead",  # SEE: https://github.com/BerriAI/litellm/issues/5987
     "ignore:Use 'content=<...>' to upload raw bytes/text content:DeprecationWarning",  # SEE: https://github.com/BerriAI/litellm/issues/5986
     "ignore:builtin type (SwigPyPacked|SwigPyObject|swigvarlink) has no __module__:DeprecationWarning:importlib._bootstrap",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3931 --> https://github.com/swig/swig/issues/2881#issuecomment-2332652634
-    'ignore:There is no current event loop:DeprecationWarning:litellm.caching.llm_caching_handler',  # SEE: https://github.com/BerriAI/litellm/issues/9641
-    'ignore:open_text is deprecated. Use files\(\) instead:DeprecationWarning',  # SEE: https://github.com/BerriAI/litellm/issues/5647
     'ignore:pkg_resources is deprecated as an API.:DeprecationWarning:pybtex',  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/169/replace-pkg_resources-with
 ]
 # List of directories that should be searched for tests when no specific directories,

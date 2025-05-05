@@ -499,7 +499,7 @@ llm = [
 
 [[package]]
 name = "fhlmi"
-version = "0.26.0"
+version = "0.27.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coredis" },
@@ -510,9 +510,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/24/71/d06073b17eaa4e79ddab54865dfa67de2807ef381f1f2110f2c2ce6457ee/fhlmi-0.26.0.tar.gz", hash = "sha256:c436a5052d8f8d668ca8df02cb0a24530d298e4999f7af9a8e3f0f10ba244790", size = 146501 }
+sdist = { url = "https://files.pythonhosted.org/packages/18/1a/d2f07e3588240b419259cfa451afe1bd4506b0cec22818145fe36d01e4ad/fhlmi-0.27.0.tar.gz", hash = "sha256:ec5a1b5e7d09ab600670886cc45d3801969d917a1bfde480e7127a01dd35a314", size = 153292 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/34/7e/00d2e6c3af36070e97e3f461d9003f5d5e964b8019d8d142ba9101169604/fhlmi-0.26.0-py3-none-any.whl", hash = "sha256:0546c5065693c79c7b7b1a9067c83c5ecda09d6de6256c0dc4cd5e89722017f8", size = 37855 },
+    { url = "https://files.pythonhosted.org/packages/fe/47/d6e07653d5792522a7ab529cbc94b528d9d1bba662c45746b7b1ae643c43/fhlmi-0.27.0-py3-none-any.whl", hash = "sha256:1e9097a6891ba2d501f58d078222ec8423bae552fc9a5d5e95be079f66432d69", size = 38842 },
 ]
 
 [[package]]
@@ -1111,7 +1111,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.65.4.post1"
+version = "1.68.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1126,7 +1126,10 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3e/d4/6a572f1b800bef68e1200879b653595791b198f1a39236b5ff6c331d1477/litellm-1.65.4.post1.tar.gz", hash = "sha256:c8c4f9388521f0edbb5693fefcbb7eb0a9227a49c5bcfd3404769dd4c476c8a3", size = 6705855 }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/22/138545b646303ca3f4841b69613c697b9d696322a1386083bb70bcbba60b/litellm-1.68.0.tar.gz", hash = "sha256:9fb24643db84dfda339b64bafca505a2eef857477afbc6e98fb56512c24dbbfa", size = 7314051 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/af/1e344bc8aee41445272e677d802b774b1f8b34bdc3bb5697ba30f0fb5d52/litellm-1.68.0-py3-none-any.whl", hash = "sha256:3bca38848b1a5236b11aa6b70afa4393b60880198c939e582273f51a542d4759", size = 7684460 },
+]
 
 [[package]]
 name = "markdown-it-py"
@@ -1682,8 +1685,10 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "fhlmi" },
     { name = "ipython" },
     { name = "ldp" },
+    { name = "litellm" },
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pydantic" },
@@ -1739,10 +1744,12 @@ requires-dist = [
     { name = "anyio" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.19" },
     { name = "fhlmi", specifier = ">=0.25.4" },
+    { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.27" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0" },
+    { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.68" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },

@@ -380,7 +380,9 @@ def test_extract_score() -> None:
 
 
 @pytest.mark.asyncio
-async def test_chain_completion() -> None:
+async def test_chain_completion(caplog) -> None:
+    caplog.set_level(level="WARNING", logger="lmi.types")
+
     s = Settings(llm="babbage-002", temperature=0.2)
     outputs = []
 
@@ -396,11 +398,12 @@ async def test_chain_completion() -> None:
     assert isinstance(first_id, UUID)
     assert completion.text
     assert completion.seconds_to_first_token > 0
-    assert completion.model == "babbage-002"
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
+    assert completion.model == "babbage-002"
     assert str(completion) == "".join(outputs)
     assert completion.cost > 0
+    assert not caplog.records
 
     # Without callbacks, we don't use streaming
     completion = await llm.call_single(messages=messages)
@@ -409,10 +412,17 @@ async def test_chain_completion() -> None:
     assert completion.text
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
-    assert completion.model == "babbage-002"
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
-    assert completion.cost > 0
+    try:
+        assert completion.model == "babbage-002"
+        assert completion.cost > 0
+    except AssertionError:
+        # Account for https://github.com/BerriAI/litellm/issues/10572
+        assert any(
+            "Could not find cost for model".lower() in r.message.lower()
+            for r in caplog.records
+        )
 
 
 @pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
