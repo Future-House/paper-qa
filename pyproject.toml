@@ -54,6 +54,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
+    "fhlmi>=0.27",  # For LLMResult reflecting actual model
     "ipython>=8",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
