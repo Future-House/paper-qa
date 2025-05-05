@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import cast
+from uuid import UUID
 
 import httpx
 import numpy as np
@@ -387,25 +388,30 @@ async def test_chain_completion() -> None:
         outputs.append(x)
 
     llm = s.get_llm()
+    messages = [Message(content="The duck says")]
 
-    messages = [
-        Message(content="The duck says"),
-    ]
-    completion = await llm.call_single(
-        messages=messages,
-        callbacks=[accum],
-    )
+    # With callbacks, we use streaming
+    completion = await llm.call_single(messages=messages, callbacks=[accum])
+    first_id = completion.id
+    assert isinstance(first_id, UUID)
+    assert completion.text
     assert completion.seconds_to_first_token > 0
+    assert completion.model == "babbage-002"
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
+    assert completion.cost > 0
 
-    completion = await llm.call_single(
-        messages=messages,
-    )
+    # Without callbacks, we don't use streaming
+    completion = await llm.call_single(messages=messages)
+    assert isinstance(completion.id, UUID)
+    assert completion.id != first_id, "Expected different response ID"
+    assert completion.text
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
-
+    assert completion.model == "babbage-002"
+    assert completion.prompt_count > 0
+    assert completion.completion_count > 0
     assert completion.cost > 0
 
 
