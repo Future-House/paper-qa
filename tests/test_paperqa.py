@@ -396,9 +396,9 @@ async def test_chain_completion() -> None:
     assert isinstance(first_id, UUID)
     assert completion.text
     assert completion.seconds_to_first_token > 0
-    assert completion.model == "babbage-002"
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
+    assert completion.model == "babbage-002"
     assert str(completion) == "".join(outputs)
     assert completion.cost > 0
 
@@ -409,9 +409,9 @@ async def test_chain_completion() -> None:
     assert completion.text
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
-    assert completion.model == "babbage-002"
     assert completion.prompt_count > 0
     assert completion.completion_count > 0
+    assert completion.model == "babbage-002"
     assert completion.cost > 0
 
 
