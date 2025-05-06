@@ -12,7 +12,7 @@ jobs:
     if: github.event_name == 'pull_request' # pre-commit-ci/lite-action only runs here
     strategy:
       matrix:
-        python-version: [3.11, 3.12] # Our min and max supported Python versions
+        python-version: [3.11, 3.13] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
         with:
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11, 3.12] # Our min and max supported Python versions
+        python-version: [3.11, 3.13] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
