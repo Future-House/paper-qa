@@ -56,6 +56,7 @@ requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = [
     "fhlmi>=0.27",  # For LLMResult reflecting actual model
+    "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68",  # Pin for PydanticDeprecatedSince20 fixes
     "mypy>=1.8",  # Pin for mutable-override
