@@ -55,6 +55,7 @@ requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = [
     "ipython>=8",  # Pin to keep recent
+    "ipykernel>=6.29",  # Pin to keep recent
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
