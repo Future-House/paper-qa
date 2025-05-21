@@ -7,14 +7,10 @@ import pytest
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
 from paperqa import Docs
+from paperqa.agents import ask, build_index, main, search_query
+from paperqa.agents.models import AnswerResponse
 from paperqa.settings import Settings
 from paperqa.utils import pqa_directory
-
-try:
-    from paperqa.agents import ask, build_index, main, search_query
-    from paperqa.agents.models import AnswerResponse
-except ImportError:
-    pytest.skip("agents module is not installed", allow_module_level=True)
 
 
 def test_can_modify_settings(capsys, stub_data_dir: Path) -> None:
@@ -58,6 +54,7 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
     response = ask(
         "How can you use XAI for chemical property prediction?", settings=settings
     )
+    assert isinstance(response, AnswerResponse)
     assert response.session.formatted_answer
 
     search_result = search_query(
@@ -65,6 +62,7 @@ def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
         "answers",
         settings,
     )
+    assert isinstance(search_result, list)
     found_answer = search_result[0][0]
     assert isinstance(found_answer, AnswerResponse)
     assert found_answer.model_dump() == response.model_dump()
@@ -86,6 +84,7 @@ def test_cli_can_build_and_search_index(
         with attempt:
             build_index(index_name, stub_data_dir, settings)
     result = search_query("XAI", index_name, settings)
+    assert isinstance(result, list)
     assert len(result) == 1
     assert isinstance(result[0][0], Docs)
     assert all(d.startswith("Wellawatte") for d in result[0][0].docnames)
