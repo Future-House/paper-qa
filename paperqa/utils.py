@@ -10,7 +10,7 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Collection, Iterable, Iterator
+from collections.abc import Awaitable, Collection, Iterable, Iterator
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
@@ -213,6 +213,14 @@ def get_loop() -> asyncio.AbstractEventLoop:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop
+
+
+def run_or_ensure(coro: Awaitable[T]) -> T | asyncio.Task[T]:
+    """Run a coroutine or convert to a future if an event loop is running."""
+    loop = get_loop()
+    if loop.is_running():  # In async contexts (e.g., Jupyter notebook), return a Task
+        return asyncio.ensure_future(coro)
+    return loop.run_until_complete(coro)
 
 
 def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:

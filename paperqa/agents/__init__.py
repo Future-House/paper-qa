@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -11,7 +12,7 @@ from pydantic_settings import CliSettingsSource
 from rich.logging import RichHandler
 
 from paperqa.settings import Settings, get_settings
-from paperqa.utils import get_loop, pqa_directory, setup_default_logs
+from paperqa.utils import pqa_directory, run_or_ensure, setup_default_logs
 from paperqa.version import __version__
 
 from .main import agent_query, index_search
@@ -98,11 +99,13 @@ def configure_cli_logging(verbosity: int | Settings = 0) -> None:
         print(f"PaperQA version: {__version__}")
 
 
-def ask(query: str | MultipleChoiceQuestion, settings: Settings) -> AnswerResponse:
+def ask(
+    query: str | MultipleChoiceQuestion, settings: Settings
+) -> AnswerResponse | asyncio.Task[AnswerResponse]:
     """Query PaperQA via an agent."""
     configure_cli_logging(settings)
-    return get_loop().run_until_complete(
-        agent_query(query, settings, agent_type=settings.agent.agent_type)
+    return run_or_ensure(
+        coro=agent_query(query, settings, agent_type=settings.agent.agent_type)
     )
 
 
@@ -110,13 +113,16 @@ def search_query(
     query: str | MultipleChoiceQuestion,
     index_name: str,
     settings: Settings,
-) -> list[tuple[AnswerResponse, str] | tuple[Any, str]]:
+) -> (
+    list[tuple[AnswerResponse, str] | tuple[Any, str]]
+    | asyncio.Task[list[tuple[AnswerResponse, str] | tuple[Any, str]]]
+):
     """Search using a pre-built PaperQA index."""
     configure_cli_logging(settings)
     if index_name == "default":
         index_name = settings.get_index_name()
-    return get_loop().run_until_complete(
-        index_search(
+    return run_or_ensure(
+        coro=index_search(
             query if isinstance(query, str) else query.question_prompt,
             index_name=index_name,
             index_directory=settings.agent.index.index_directory,
@@ -128,7 +134,7 @@ def build_index(
     index_name: str | None = None,
     directory: str | os.PathLike | None = None,
     settings: Settings | None = None,
-) -> SearchIndex:
+) -> SearchIndex | asyncio.Task[SearchIndex]:
     """Build a PaperQA search index, this will also happen automatically upon using `ask`."""
     settings = get_settings(settings)
     if index_name == "default":
@@ -138,7 +144,7 @@ def build_index(
     configure_cli_logging(settings)
     if directory:
         settings.agent.index.paper_directory = directory
-    return get_loop().run_until_complete(get_directory_index(settings=settings))
+    return run_or_ensure(coro=get_directory_index(settings=settings))
 
 
 def save_settings(settings: Settings, settings_path: str | os.PathLike) -> None:

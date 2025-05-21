@@ -63,8 +63,10 @@ and finally answer the user question with an LLM agent.
 
 ```bash
 pip install paper-qa
+mkdir my_papers
+curl -o my_papers/PaperQA2.pdf https://arxiv.org/pdf/2409.13740
 cd my_papers
-pqa ask 'How can carbon nanotubes be manufactured at a large scale?'
+pqa ask 'What is PaperQA2?'
 ```
 
 ### Example Output
@@ -181,7 +183,7 @@ Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` varia
 The fastest way to test PaperQA2 is via the CLI. First navigate to a directory with some papers and use the `pqa` cli:
 
 ```bash
-$ pqa ask 'What manufacturing challenges are unique to bispecific antibodies?'
+pqa ask 'What is PaperQA2?'
 ```
 
 You will see PaperQA2 index your local PDF files, gathering the necessary metadata for each of them (using [Crossref](https://www.crossref.org/) and [Semantic Scholar](https://www.semanticscholar.org/)),
@@ -190,13 +192,13 @@ search over that index, then break the files into chunked evidence contexts, ran
 All prior answers will be indexed and stored, you can view them by querying via the `search` subcommand, or access them yourself in your `PQA_HOME` directory, which defaults to `~/.pqa/`.
 
 ```bash
-$ pqa search -i 'answers' 'antibodies'
+pqa -i 'answers' search 'ranking and contextual summarization'
 ```
 
 PaperQA2 is highly configurable, when running from the command line, `pqa --help` shows all options and short descriptions. For example to run with a higher temperature:
 
 ```bash
-$ pqa --temperature 0.5 ask 'What manufacturing challenges are unique to bispecific antibodies?'
+pqa --temperature 0.5 ask 'What is PaperQA2?'
 ```
 
 You can view all settings with `pqa view`. Another useful thing is to change to other templated settings - for example `fast` is a setting that answers more quickly and you can see it with `pqa -s fast view`
@@ -210,13 +212,13 @@ pqa -s my_new_settings --temperature 0.5 --llm foo-bar-5 save
 and then you can use it with
 
 ```bash
-pqa -s my_new_settings ask 'What manufacturing challenges are unique to bispecific antibodies?'
+pqa -s my_new_settings ask 'What is PaperQA2?'
 ```
 
 If you run `pqa` with a command which requires a new indexing, say if you change the default chunk_size, a new index will automatically be created for you.
 
 ```bash
-pqa --parsing.chunk_size 5000 ask 'What manufacturing challenges are unique to bispecific antibodies?'
+pqa --parsing.chunk_size 5000 ask 'What is PaperQA2?'
 ```
 
 You can also use `pqa` to do full-text search with use of LLMs view the search command. For example, let's save the index from a directory and give it a name:
@@ -262,7 +264,7 @@ If you are hitting rate limits, say with the OpenAI Tier 1 plan, you can add the
 For each OpenAI tier, a pre-built setting exists to limit usage.
 
 ```bash
-pqa --settings 'tier1_limits' ask 'Are there nm scale features in thermoelectric materials?'
+pqa --settings 'tier1_limits' ask 'What is PaperQA2?'
 ```
 
 This will limit your system to use the [tier1_limits](paperqa/configs/tier1_limits.json),
@@ -271,7 +273,7 @@ and slow down your queries to accommodate.
 You can also specify them manually with any rate limit string that matches the specification in the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
-pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}}' ask 'Are there nm scale features in thermoelectric materials?'
+pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}}' ask 'What is PaperQA2?'
 ```
 
 Or by adding into a `Settings` object, if calling imperatively:
@@ -280,7 +282,7 @@ Or by adding into a `Settings` object, if calling imperatively:
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(
         llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
         summary_llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
@@ -296,7 +298,7 @@ PaperQA2's full workflow can be accessed via Python directly:
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
@@ -312,7 +314,7 @@ The answer object has the following attributes: `formatted_answer`, `answer` (an
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
@@ -323,7 +325,7 @@ answer_response = ask(
 from paperqa import Settings, agent_query
 
 answer_response = await agent_query(
-    query="What manufacturing challenges are unique to bispecific antibodies?",
+    query="What is PaperQA2?",
     settings=Settings(temperature=0.5, paper_directory="my_papers"),
 )
 ```
@@ -358,10 +360,7 @@ settings.llm = "claude-3-5-sonnet-20240620"
 settings.answer.answer_max_sources = 3
 
 # Query the Docs object to get an answer
-session = await docs.aquery(
-    "What manufacturing challenges are unique to bispecific antibodies?",
-    settings=settings,
-)
+session = await docs.aquery("What is PaperQA2?", settings=settings)
 print(session)
 ```
 
@@ -394,9 +393,7 @@ async def main() -> None:
     for doc in ("myfile.pdf", "myotherfile.pdf"):
         await docs.aadd(doc)
 
-    session = await docs.aquery(
-        "What manufacturing challenges are unique to bispecific antibodies?"
-    )
+    session = await docs.aquery("What is PaperQA2?")
     print(session)
 
 
@@ -421,7 +418,7 @@ You can adjust this easily to use any model supported by `litellm`:
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(
         llm="gpt-4o-mini", summary_llm="gpt-4o-mini", paper_directory="my_papers"
     ),
@@ -437,7 +434,7 @@ from paperqa import Settings, ask
 from paperqa.settings import AgentSettings
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(
         llm="claude-3-5-sonnet-20240620",
         summary_llm="claude-3-5-sonnet-20240620",
@@ -455,7 +452,7 @@ from paperqa import Settings, ask
 from paperqa.settings import AgentSettings
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(
         llm="gemini/gemini-2.0-flash",
         summary_llm="gemini/gemini-2.0-flash",
@@ -491,7 +488,7 @@ local_llm_config = dict(
 )
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(
         llm="my-llm-model",
         llm_config=local_llm_config,
@@ -520,7 +517,7 @@ local_llm_config = {
 }
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(
         llm="ollama/llama3.2",
         llm_config=local_llm_config,
@@ -549,7 +546,7 @@ The simplest way to specify the embedding model is via `Settings.embedding`:
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(embedding="text-embedding-3-large"),
 )
 ```
@@ -606,7 +603,7 @@ and then prefix embedding model names with `st-`:
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(embedding="st-multi-qa-MiniLM-L6-cos-v1"),
 )
 ```
@@ -617,7 +614,7 @@ or with a hybrid model
 from paperqa import Settings, ask
 
 answer_response = ask(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=Settings(embedding="hybrid-st-multi-qa-MiniLM-L6-cos-v1"),
 )
 ```
@@ -634,7 +631,7 @@ settings.answer.answer_max_sources = 3
 settings.answer.k = 5
 
 await docs.aquery(
-    "What manufacturing challenges are unique to bispecific antibodies?",
+    "What is PaperQA2?",
     settings=settings,
 )
 ```
@@ -653,7 +650,9 @@ source_files = glob.glob("**/*.js")
 docs = Docs()
 for f in source_files:
     # this assumes the file names are unique in code
-    await docs.aadd(f, citation="File " + os.path.basename(f), docname=os.path.basename(f))
+    await docs.aadd(
+        f, citation="File " + os.path.basename(f), docname=os.path.basename(f)
+    )
 session = await docs.aquery("Where is the search bar in the header defined?")
 print(session)
 ```
@@ -726,11 +725,11 @@ async def amain(folder_of_papers: str | os.PathLike) -> None:
 
     # 2. Use the settings as many times as you want with ask
     answer_response_1 = await agent_query(
-        query="What is the best way to make a vaccine?",
+        query="What is a cool retrieval augmented generation technique?",
         settings=settings,
     )
     answer_response_2 = await agent_query(
-        query="What manufacturing challenges are unique to bispecific antibodies?",
+        query="What is PaperQA2?",
         settings=settings,
     )
 ```
@@ -863,10 +862,7 @@ docs = Docs()
 
 # add some docs...
 
-await docs.aquery(
-    "What manufacturing challenges are unique to bispecific antibodies?",
-    callbacks=[typewriter],
-)
+await docs.aquery("What is PaperQA2?", callbacks=[typewriter])
 ```
 
 ### Caching Embeddings
@@ -892,7 +888,7 @@ my_qa_prompt = (
 docs = Docs()
 settings = Settings()
 settings.prompts.qa = my_qa_prompt
-await docs.aquery("Are covid-19 vaccines effective?", settings=settings)
+await docs.aquery("What is PaperQA2?", settings=settings)
 ```
 
 ### Pre and Post Prompts
