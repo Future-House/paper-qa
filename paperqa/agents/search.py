@@ -263,7 +263,9 @@ class SearchIndex:
                             zlib.decompress(content)
                         )
                     except Exception:
-                        logger.exception(f"Failed to load index file {file_index_path}.")
+                        logger.exception(
+                            f"Failed to load index file {file_index_path}."
+                        )
         return self._index_files
 
     @staticmethod
