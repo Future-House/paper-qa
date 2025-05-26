@@ -266,6 +266,7 @@ class SearchIndex:
                         logger.exception(
                             f"Failed to load index file {file_index_path}."
                         )
+                        raise
         return self._index_files
 
     @staticmethod
