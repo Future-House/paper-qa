@@ -258,9 +258,15 @@ class SearchIndex:
             if await file_index_path.exists():
                 async with await anyio.open_file(file_index_path, "rb") as f:
                     content = await f.read()
-                    self._index_files = pickle.loads(  # noqa: S301
-                        zlib.decompress(content)
-                    )
+                    try:
+                        self._index_files = pickle.loads(  # noqa: S301
+                            zlib.decompress(content)
+                        )
+                    except Exception:
+                        logger.exception(
+                            f"Failed to load index file {file_index_path}."
+                        )
+                        raise
         return self._index_files
 
     @staticmethod
