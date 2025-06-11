@@ -691,7 +691,7 @@ async def get_directory_index(  # noqa: PLR0912
             if index_settings.recurse_subdirectories
             else paper_directory.iterdir()
         )
-        if file.suffix in {".txt", ".pdf", ".html", ".md"}
+        if index_settings.files_filter(file)
     ]
     if len(valid_papers_rel_file_paths) > WARN_IF_INDEXING_MORE_THAN:
         logger.warning(

@@ -839,6 +839,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `agent.index.recurse_subdirectories`         | `True`                                 | Whether to recurse into subdirectories when indexing.                                                   |
 | `agent.index.concurrency`                    | `5`                                    | Number of concurrent filesystem reads.                                                                  |
 | `agent.index.sync_with_paper_directory`      | `True`                                 | Whether to sync index with paper directory on load.                                                     |
+| `agent.index.files_filter`                   | `lambda f: f.suffix in {...}`          | Filter function to mark files in the paper directory to index.                                          |
 
 ## Where do I get papers?
 
