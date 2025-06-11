@@ -245,7 +245,10 @@ def chunk_code_text(
             )
             text_buffer = text_buffer[chunk_chars - overlap :]
             last_line_i = line_i
-    if len(text_buffer) > overlap or not texts:
+    if (
+        len(text_buffer) > overlap  # Save meaningful amount of content as a final text
+        or not texts  # Contents were smaller than one chunk, save it anyways
+    ):
         texts.append(
             Text(
                 text=text_buffer[:chunk_chars],
