@@ -5,7 +5,7 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from enum import StrEnum
-from typing import Any, ClassVar, Protocol, cast
+from typing import Any, ClassVar, Protocol, TypeAlias, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
@@ -22,6 +22,10 @@ from paperqa.types import PQASession
 from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
+
+JSONType: TypeAlias = (
+    dict[str, "JSONType"] | list["JSONType"] | str | int | float | bool | None
+)
 
 
 class SupportsPickle(Protocol):

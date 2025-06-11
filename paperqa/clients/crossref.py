@@ -5,13 +5,14 @@ import copy
 import json
 import logging
 import os
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 from datetime import datetime
 from typing import Any
 from urllib.parse import quote
 
 import aiohttp
 from anyio import open_file
+from lmi.utils import CROSSREF_KEY_HEADER
 from tenacity import (
     before_sleep_log,
     retry,
@@ -37,7 +38,6 @@ logger = logging.getLogger(__name__)
 
 CROSSREF_HOST = "api.crossref.org"
 CROSSREF_BASE_URL = f"https://{CROSSREF_HOST}"
-CROSSREF_HEADER_KEY = "Crossref-Plus-API-Token"
 CROSSREF_API_REQUEST_TIMEOUT = 5.0
 CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
     "title": {"title"},
@@ -79,7 +79,7 @@ _ISSUED_WARNINGS = [False, False]  # 0 is API key, 1 is email
 def crossref_headers() -> dict[str, str]:
     """Crossref API key if available, otherwise nothing."""
     try:
-        return {CROSSREF_HEADER_KEY: f"Bearer {os.environ['CROSSREF_API_KEY']}"}
+        return {CROSSREF_KEY_HEADER: f"Bearer {os.environ['CROSSREF_API_KEY']}"}
     except KeyError:
         if not _ISSUED_WARNINGS[0]:
             _ISSUED_WARNINGS[0] = True
@@ -112,7 +112,7 @@ def get_crossref_mailto() -> str:
 async def doi_to_bibtex(
     doi: str,
     session: aiohttp.ClientSession,
-    missing_replacements: dict[str, str] | None = None,
+    missing_replacements: Mapping[str, str | list[str]] | None = None,
 ) -> str:
     """Get a bibtex entry from a DOI via Crossref, replacing the key if possible.
 
@@ -137,15 +137,21 @@ async def doi_to_bibtex(
     key = data.split("{")[1].split(",")[0]
     new_key = remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
     substrings_to_remove_per_field = {"author": [" and ", ","]}
-    fragments = [
-        remove_substrings(
-            bibtex_field_extract(
-                data, field, missing_replacements=missing_replacements
-            ),
-            substrings_to_remove_per_field.get(field, []),
+    fragments = []
+    for field in ("author", "year", "title"):
+        bibtex_field = bibtex_field_extract(
+            data, field, missing_replacements=missing_replacements
         )
-        for field in ("author", "year", "title")
-    ]
+        if isinstance(bibtex_field, list):
+            raise NotImplementedError(
+                f"Didn't yet handle bibtex field {field!r} being a list."
+            )
+        fragments.append(
+            remove_substrings(
+                target=bibtex_field,
+                substr_removal_list=substrings_to_remove_per_field.get(field, []),
+            )
+        )
     # replace the key if all the fragments are present
     if all(fragments):
         new_key = create_bibtex_key(
@@ -177,7 +183,7 @@ async def parse_crossref_to_doc_details(
         # since we now create the bibtex from scratch
         if query_bibtex:
             bibtex = await doi_to_bibtex(
-                message["DOI"], session, missing_replacements=fallback_data  # type: ignore[arg-type]
+                message["DOI"], session, missing_replacements=fallback_data
             )
             # track the origin of the bibtex entry for debugging
             bibtex_source = "crossref"

@@ -10,6 +10,7 @@ from itertools import starmap
 from typing import Any
 
 import aiohttp
+from lmi.utils import SEMANTIC_SCHOLAR_KEY_HEADER
 from tenacity import before_sleep_log, retry, retry_if_exception, stop_after_attempt
 
 from paperqa.types import DocDetails
@@ -50,7 +51,6 @@ SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(
 )
 SEMANTIC_SCHOLAR_HOST = "api.semanticscholar.org"
 SEMANTIC_SCHOLAR_BASE_URL = f"https://{SEMANTIC_SCHOLAR_HOST}"
-SEMANTIC_SCHOLAR_HEADER_KEY = "x-api-key"
 
 
 class SemanticScholarSearchType(IntEnum):
@@ -213,7 +213,7 @@ async def parse_s2_to_doc_details(
 def semantic_scholar_headers() -> dict[str, str]:
     """Semantic Scholar API key if available, otherwise nothing."""
     if api_key := os.environ.get("SEMANTIC_SCHOLAR_API_KEY"):
-        return {SEMANTIC_SCHOLAR_HEADER_KEY: api_key}
+        return {SEMANTIC_SCHOLAR_KEY_HEADER: api_key}
     logger.warning(
         "SEMANTIC_SCHOLAR_API_KEY environment variable not set. Semantic Scholar API"
         " rate limits may apply."
