@@ -430,6 +430,14 @@ class IndexSettings(BaseModel):
             " directory."
         ),
     )
+    files_filter: Callable[[anyio.Path], bool] = Field(
+        default=lambda f: f.suffix in {".txt", ".pdf", ".html", ".md"},
+        exclude=True,
+        description=(
+            "Filter function to apply to files in the paper directory."
+            " When the function returns True, the file will be indexed."
+        ),
+    )
 
     def get_named_index_directory(self) -> anyio.Path:
         """Get the directory where the index, when named, will be located.

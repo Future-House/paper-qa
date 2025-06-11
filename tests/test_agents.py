@@ -138,11 +138,20 @@ async def test_get_directory_index(
         # Now we actually remove (but not add!) a file from the paper directory,
         # and we still don't reprocess files
         (paper_dir / "obama.txt").unlink()
-        with patch.object(
-            Docs, "aadd", autospec=True, side_effect=Docs.aadd
-        ) as mock_aadd:
+        with (
+            patch.object(
+                Docs, "aadd", autospec=True, side_effect=Docs.aadd
+            ) as mock_aadd,
+            patch.object(
+                agent_test_settings.agent.index,
+                "files_filter",
+                lambda f: f.suffix in {".txt", ".pdf", ".md"},  # Also, exclude HTML
+            ),
+        ):
             index = await get_directory_index(settings=agent_test_settings)
-        assert len(await index.index_files) == len(path_to_id) - 1
+        # Subtract 1 for the removed obama.txt file,
+        # and another 1 for the filtered out flag_day.html
+        assert len(await index.index_files) == len(path_to_id) - 2
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
         # Note let's delete files.zip, and confirm we can't load the index
