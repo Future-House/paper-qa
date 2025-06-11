@@ -60,7 +60,7 @@ async def empty_callback(result: LLMResult) -> None:
     pass
 
 
-async def print_callback(result: LLMResult) -> None:
+async def print_callback(result: str | LLMResult) -> None:
     pass
 
 

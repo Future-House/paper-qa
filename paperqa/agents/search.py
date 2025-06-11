@@ -48,7 +48,7 @@ from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
 from paperqa.utils import ImpossibleParsingError, hexdigest
 
-from .models import SupportsPickle
+from .models import JSONType, SupportsPickle
 
 if TYPE_CHECKING:
     from tantivy import IndexWriter
@@ -101,7 +101,9 @@ class SearchDocumentStorage(StrEnum):
             return zlib.compress(pickle.dumps(data))
         return pickle.dumps(data)
 
-    def read_from_string(self, data: str | bytes) -> BaseModel | SupportsPickle:
+    def read_from_string(
+        self, data: str | bytes
+    ) -> BaseModel | SupportsPickle | JSONType:
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
             return json.loads(data)
         if self == SearchDocumentStorage.PICKLE_COMPRESSED:

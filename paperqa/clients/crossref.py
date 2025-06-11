@@ -5,7 +5,7 @@ import copy
 import json
 import logging
 import os
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 from datetime import datetime
 from typing import Any
 from urllib.parse import quote
@@ -112,7 +112,7 @@ def get_crossref_mailto() -> str:
 async def doi_to_bibtex(
     doi: str,
     session: aiohttp.ClientSession,
-    missing_replacements: dict[str, str] | None = None,
+    missing_replacements: Mapping[str, str | list[str]] | None = None,
 ) -> str:
     """Get a bibtex entry from a DOI via Crossref, replacing the key if possible.
 
@@ -137,15 +137,21 @@ async def doi_to_bibtex(
     key = data.split("{")[1].split(",")[0]
     new_key = remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
     substrings_to_remove_per_field = {"author": [" and ", ","]}
-    fragments = [
-        remove_substrings(
-            bibtex_field_extract(
-                data, field, missing_replacements=missing_replacements
-            ),
-            substrings_to_remove_per_field.get(field, []),
+    fragments = []
+    for field in ("author", "year", "title"):
+        bibtex_field = bibtex_field_extract(
+            data, field, missing_replacements=missing_replacements
         )
-        for field in ("author", "year", "title")
-    ]
+        if isinstance(bibtex_field, list):
+            raise NotImplementedError(
+                f"Didn't yet handle bibtex field {field!r} being a list."
+            )
+        fragments.append(
+            remove_substrings(
+                target=bibtex_field,
+                substr_removal_list=substrings_to_remove_per_field.get(field, []),
+            )
+        )
     # replace the key if all the fragments are present
     if all(fragments):
         new_key = create_bibtex_key(
@@ -177,7 +183,7 @@ async def parse_crossref_to_doc_details(
         # since we now create the bibtex from scratch
         if query_bibtex:
             bibtex = await doi_to_bibtex(
-                message["DOI"], session, missing_replacements=fallback_data  # type: ignore[arg-type]
+                message["DOI"], session, missing_replacements=fallback_data
             )
             # track the origin of the bibtex entry for debugging
             bibtex_source = "crossref"

@@ -323,7 +323,7 @@ SOURCE_QUALITY_MESSAGES = {
     3: "highest quality peer-reviewed journal",
 }
 
-CITATION_FALLBACK_DATA = {
+CITATION_FALLBACK_DATA: dict[str, str | list[str]] = {
     "authors": ["Unknown authors"],
     "author": "Unknown author(s)",
     "year": "Unknown year",
@@ -637,7 +637,7 @@ class DocDetails(Doc):
                 )
         if data.get("citation") is None and data.get("bibtex") is not None:
             data["citation"] = format_bibtex(
-                data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA  # type: ignore[arg-type]
+                data["bibtex"], missing_replacements=CITATION_FALLBACK_DATA
             )
         elif data.get("citation") is None:
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
