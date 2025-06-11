@@ -430,7 +430,7 @@ class IndexSettings(BaseModel):
             " directory."
         ),
     )
-    files_filter: Callable[[anyio.Path], bool] = Field(
+    files_filter: Callable[[anyio.Path | pathlib.Path], bool] = Field(
         default=lambda f: f.suffix in {".txt", ".pdf", ".html", ".md"},
         exclude=True,
         description=(

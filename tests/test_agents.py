@@ -168,7 +168,8 @@ async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> No
         [
             x
             for x in cast("Path", index_settings.paper_directory).iterdir()
-            if x.suffix != ".csv"
+            # Filter out .csv and .DS_Store files
+            if x.suffix != ".csv" and agent_test_settings.agent.index.files_filter(x)
         ]
     )
     assert (
