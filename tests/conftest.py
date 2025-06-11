@@ -10,10 +10,13 @@ from unittest.mock import patch
 
 import pytest
 from dotenv import load_dotenv
-from lmi.utils import ANTHROPIC_API_KEY_HEADER, OPENAI_API_KEY_HEADER
+from lmi.utils import (
+    ANTHROPIC_API_KEY_HEADER,
+    CROSSREF_KEY_HEADER,
+    OPENAI_API_KEY_HEADER,
+    SEMANTIC_SCHOLAR_KEY_HEADER,
+)
 
-from paperqa.clients.crossref import CROSSREF_HEADER_KEY
-from paperqa.clients.semantic_scholar import SEMANTIC_SCHOLAR_HEADER_KEY
 from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.utils import setup_default_logs
@@ -36,8 +39,8 @@ def _setup_default_logs() -> None:
 def fixture_vcr_config() -> dict[str, Any]:
     return {
         "filter_headers": [
-            CROSSREF_HEADER_KEY,
-            SEMANTIC_SCHOLAR_HEADER_KEY,
+            CROSSREF_KEY_HEADER,
+            SEMANTIC_SCHOLAR_KEY_HEADER,
             OPENAI_API_KEY_HEADER,
             ANTHROPIC_API_KEY_HEADER,
             "cookie",

@@ -12,6 +12,7 @@ from urllib.parse import quote
 
 import aiohttp
 from anyio import open_file
+from lmi.utils import CROSSREF_KEY_HEADER
 from tenacity import (
     before_sleep_log,
     retry,
@@ -37,7 +38,6 @@ logger = logging.getLogger(__name__)
 
 CROSSREF_HOST = "api.crossref.org"
 CROSSREF_BASE_URL = f"https://{CROSSREF_HOST}"
-CROSSREF_HEADER_KEY = "Crossref-Plus-API-Token"
 CROSSREF_API_REQUEST_TIMEOUT = 5.0
 CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
     "title": {"title"},
@@ -79,7 +79,7 @@ _ISSUED_WARNINGS = [False, False]  # 0 is API key, 1 is email
 def crossref_headers() -> dict[str, str]:
     """Crossref API key if available, otherwise nothing."""
     try:
-        return {CROSSREF_HEADER_KEY: f"Bearer {os.environ['CROSSREF_API_KEY']}"}
+        return {CROSSREF_KEY_HEADER: f"Bearer {os.environ['CROSSREF_API_KEY']}"}
     except KeyError:
         if not _ISSUED_WARNINGS[0]:
             _ISSUED_WARNINGS[0] = True
