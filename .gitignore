@@ -308,6 +308,7 @@ tests/*html
 tests/test_index/*
 tests/example.*
 tests/example2.*
+!tests/stub_data/.DS_Store
 
 # Client data
 paperqa/clients/client_data/retractions.csv

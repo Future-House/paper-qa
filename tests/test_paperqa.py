@@ -49,6 +49,7 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import read_doc
+from paperqa.types import ChunkMetadata
 from paperqa.utils import (
     extract_score,
     get_citenames,
@@ -1126,17 +1127,17 @@ async def test_parser_only_reader(stub_data_dir: Path):
 
 @pytest.mark.asyncio
 async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
-    doc_path = stub_data_dir / "paper.pdf"
     chunk_text, metadata = await read_doc(
-        Path(doc_path),
+        stub_data_dir / "paper.pdf",
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
     )
     assert metadata.parse_type == "pdf"
-    assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"  # type: ignore[union-attr]
-    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
-    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert isinstance(metadata.chunk_metadata, ChunkMetadata)
+    assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"
+    assert metadata.chunk_metadata.overlap == 100
+    assert metadata.chunk_metadata.chunk_chars == 3000
     assert all(len(chunk.text) <= 3000 for chunk in chunk_text)
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
     assert all(
@@ -1144,36 +1145,37 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
         for i in range(len(chunk_text) - 1)
     )
 
-    doc_path = stub_data_dir / "flag_day.html"
-
     chunk_text, metadata = await read_doc(
-        Path(doc_path),
+        stub_data_dir / "flag_day.html",
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
     )
     # NOTE the use of tiktoken changes the actual char and overlap counts
     assert metadata.parse_type == "html"
-    assert metadata.chunk_metadata.chunk_type == "overlap"  # type: ignore[union-attr]
-    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
-    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
+    assert isinstance(metadata.chunk_metadata, ChunkMetadata)
+    assert metadata.chunk_metadata.chunk_type == "overlap"
+    assert metadata.chunk_metadata.overlap == 100
+    assert metadata.chunk_metadata.chunk_chars == 3000
     assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
-    doc_path = Path(os.path.abspath(__file__))
-
-    chunk_text, metadata = await read_doc(
-        doc_path,
-        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        parsed_text_only=False,  # noqa: FURB120
-        include_metadata=True,
-    )
-    assert metadata.parse_type == "txt"
-    assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"  # type: ignore[union-attr]
-    assert metadata.chunk_metadata.overlap == 100  # type: ignore[union-attr]
-    assert metadata.chunk_metadata.chunk_chars == 3000  # type: ignore[union-attr]
-    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
-    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    for code_input in (
+        Path(__file__),  # Python gets parsed into `list[str]` content
+        stub_data_dir / ".DS_Store",  # .DS_Store gets parsed into `str` content
+    ):
+        chunk_text, metadata = await read_doc(
+            path=code_input,
+            doc=Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+            include_metadata=True,
+        )
+        assert metadata.parse_type == "txt"
+        assert isinstance(metadata.chunk_metadata, ChunkMetadata)
+        assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"
+        assert metadata.chunk_metadata.overlap == 100
+        assert metadata.chunk_metadata.chunk_chars == 3000
+        assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+        assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
 @pytest.mark.asyncio
