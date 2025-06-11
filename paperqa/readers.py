@@ -256,38 +256,22 @@ def chunk_code_text(
 async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
-    parsed_text_only: Literal[False],
-    include_metadata: Literal[False],
+    parsed_text_only: Literal[True],
+    include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
     page_size_limit: int | None = ...,
-) -> list[Text]: ...
-
-
-@overload
-async def read_doc(
-    path: str | os.PathLike,
-    doc: Doc,
-    parsed_text_only: Literal[False] = ...,
-    include_metadata: Literal[False] = ...,
-    chunk_chars: int = ...,
-    overlap: int = ...,
-    page_size_limit: int | None = ...,
-) -> list[Text]: ...
-
-
+) -> ParsedText: ...
 @overload
 async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: Literal[True],
-    include_metadata: bool = ...,
+    include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
     page_size_limit: int | None = ...,
 ) -> ParsedText: ...
-
-
 @overload
 async def read_doc(
     path: str | os.PathLike,
@@ -298,8 +282,26 @@ async def read_doc(
     overlap: int = ...,
     page_size_limit: int | None = ...,
 ) -> tuple[list[Text], ParsedMetadata]: ...
-
-
+@overload
+async def read_doc(
+    path: str | os.PathLike,
+    doc: Doc,
+    parsed_text_only: Literal[False] = ...,
+    include_metadata: Literal[False] = ...,
+    chunk_chars: int = ...,
+    overlap: int = ...,
+    page_size_limit: int | None = ...,
+) -> list[Text]: ...
+@overload
+async def read_doc(
+    path: str | os.PathLike,
+    doc: Doc,
+    *,
+    include_metadata: Literal[True],
+    chunk_chars: int = ...,
+    overlap: int = ...,
+    page_size_limit: int | None = ...,
+) -> tuple[list[Text], ParsedMetadata]: ...
 async def read_doc(
     path: str | os.PathLike,
     doc: Doc,
