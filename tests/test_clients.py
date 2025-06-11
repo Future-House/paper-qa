@@ -509,9 +509,9 @@ async def test_odd_client_requests() -> None:
 
 
 @pytest.mark.asyncio
-@patch.object(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.05)
+@patch.object(paperqa.clients.crossref, "CROSSREF_API_REQUEST_TIMEOUT", 0.001)
 @patch.object(
-    paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.05
+    paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.001
 )
 async def test_ensure_robust_to_timeouts() -> None:
     async with aiohttp.ClientSession() as session:
