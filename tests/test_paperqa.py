@@ -1160,19 +1160,22 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
     assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
-    chunk_text, metadata = await read_doc(
-        Path(__file__),
-        Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        parsed_text_only=False,  # noqa: FURB120
-        include_metadata=True,
-    )
-    assert metadata.parse_type == "txt"
-    assert isinstance(metadata.chunk_metadata, ChunkMetadata)
-    assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"
-    assert metadata.chunk_metadata.overlap == 100
-    assert metadata.chunk_metadata.chunk_chars == 3000
-    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
-    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    for code_input in (
+        Path(__file__),  # Python gets parsed into `list[str]` content
+        stub_data_dir / ".DS_Store",  # .DS_Store gets parsed into `str` content
+    ):
+        chunk_text, metadata = await read_doc(
+            path=code_input,
+            doc=Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
+            include_metadata=True,
+        )
+        assert metadata.parse_type == "txt"
+        assert isinstance(metadata.chunk_metadata, ChunkMetadata)
+        assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"
+        assert metadata.chunk_metadata.overlap == 100
+        assert metadata.chunk_metadata.chunk_chars == 3000
+        assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
+        assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
 
 
 @pytest.mark.asyncio

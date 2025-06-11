@@ -224,12 +224,16 @@ def chunk_code_text(
     texts: list[Text] = []
     last_line = 0
 
-    if not isinstance(parsed_text.content, list):
+    if not isinstance(parsed_text.content, str | list):
         raise NotImplementedError(
-            f"ParsedText.content must be a `list`, not {type(parsed_text.content)}."
+            f"Didn't yet handle ParsedText.content of type {type(parsed_text.content)}."
         )
 
-    for i, line in enumerate(parsed_text.content):
+    for i, line in enumerate(
+        [parsed_text.content]
+        if isinstance(parsed_text.content, str)
+        else parsed_text.content
+    ):
         split += line
         while len(split) > chunk_chars:
             texts.append(
