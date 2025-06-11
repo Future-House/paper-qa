@@ -222,7 +222,7 @@ def chunk_code_text(
     """Parse a document into chunks, based on line numbers (for code)."""
     text_buffer = ""
     texts: list[Text] = []
-    last_line_i = 0
+    line_i = last_line_i = 0
 
     if not isinstance(parsed_text.content, str | list):
         raise NotImplementedError(
