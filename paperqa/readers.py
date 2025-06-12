@@ -220,36 +220,39 @@ def chunk_code_text(
     parsed_text: ParsedText, doc: Doc, chunk_chars: int, overlap: int
 ) -> list[Text]:
     """Parse a document into chunks, based on line numbers (for code)."""
-    split = ""
+    text_buffer = ""
     texts: list[Text] = []
-    last_line = 0
+    line_i = last_line_i = 0
 
     if not isinstance(parsed_text.content, str | list):
         raise NotImplementedError(
             f"Didn't yet handle ParsedText.content of type {type(parsed_text.content)}."
         )
 
-    for i, line in enumerate(
+    for line_i, line in enumerate(
         [parsed_text.content]
         if isinstance(parsed_text.content, str)
         else parsed_text.content
     ):
-        split += line
-        while len(split) > chunk_chars:
+        text_buffer += line
+        while len(text_buffer) > chunk_chars:
             texts.append(
                 Text(
-                    text=split[:chunk_chars],
-                    name=f"{doc.docname} lines {last_line}-{i}",
+                    text=text_buffer[:chunk_chars],
+                    name=f"{doc.docname} lines {last_line_i}-{line_i}",
                     doc=doc,
                 )
             )
-            split = split[chunk_chars - overlap :]
-            last_line = i
-    if len(split) > overlap or not texts:
+            text_buffer = text_buffer[chunk_chars - overlap :]
+            last_line_i = line_i
+    if (
+        len(text_buffer) > overlap  # Save meaningful amount of content as a final text
+        or not texts  # Contents were smaller than one chunk, save it anyways
+    ):
         texts.append(
             Text(
-                text=split[:chunk_chars],
-                name=f"{doc.docname} lines {last_line}-{i}",
+                text=text_buffer[:chunk_chars],
+                name=f"{doc.docname} lines {last_line_i}-{line_i}",
                 doc=doc,
             )
         )

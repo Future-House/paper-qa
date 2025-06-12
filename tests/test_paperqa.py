@@ -1165,6 +1165,7 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     for code_input in (
         Path(__file__),  # Python gets parsed into `list[str]` content
         stub_data_dir / ".DS_Store",  # .DS_Store gets parsed into `str` content
+        stub_data_dir / "py.typed",  # Marker file gets parsed into empty `list` content
     ):
         chunk_text, metadata = await read_doc(
             path=code_input,
