@@ -41,7 +41,6 @@ from paperqa import (
     Settings,
     Text,
     VectorStore,
-    print_callback,
 )
 from paperqa.clients import CrossrefProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
@@ -859,10 +858,13 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
     ).contexts
     assert "Echo" in evidence[0].context
 
+    async def test_callback(result: LLMResult | str) -> None:
+        """Empty callback for testing purposes."""
+
     evidence = (
         await docs.aget_evidence(
             "Echo",
-            callbacks=[print_callback],
+            callbacks=[test_callback],
             summary_llm_model=StubLLMModel(),
             settings=no_json_settings,
         )

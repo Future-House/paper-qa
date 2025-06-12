@@ -14,7 +14,7 @@ from lmi import (
 
 from paperqa.agents import ask
 from paperqa.agents.main import agent_query
-from paperqa.docs import Docs, PQASession, print_callback
+from paperqa.docs import Docs, PQASession
 from paperqa.llms import (
     NumpyVectorStore,
     QdrantVectorStore,
@@ -55,5 +55,4 @@ __all__ = [
     "ask",
     "embedding_model_factory",
     "get_settings",
-    "print_callback",
 ]
