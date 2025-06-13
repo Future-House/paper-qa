@@ -802,6 +802,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `answer.get_evidence_if_no_contexts`         | `True`                                 | Allow lazy evidence gathering.                                                                          |
 | `parsing.chunk_size`                         | `5000`                                 | Characters per chunk (0 for no chunking).                                                               |
 | `parsing.page_size_limit`                    | `1,280,000`                            | Character limit per page.                                                                               |
+| `parsing.pdfs_use_block_parsing`             | `False`                                | Opt-in flag for block-based PDF parsing over text-based PDF parsing.                                    |
 | `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                               |
 | `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                           |
 | `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                         |

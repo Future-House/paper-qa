@@ -991,7 +991,7 @@ async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
 
 def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     filepath = stub_data_dir / "pasa.pdf"
-    parsed_text = parse_pdf_to_pages(filepath)
+    parsed_text = parse_pdf_to_pages(filepath, use_block_parsing=True)
     assert isinstance(parsed_text.content, dict)
     assert "1" in parsed_text.content, "Parsed text should contain page 1"
     assert (
