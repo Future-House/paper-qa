@@ -989,18 +989,15 @@ async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     assert docs.texts[0].embedding is None, "Should have deferred the embedding"
 
 
-def test_pdf_reader_get_text(stub_data_dir: Path) -> None:
+def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     filepath = stub_data_dir / "pasa.pdf"
-    parsedText = parse_pdf_to_pages(filepath)
-    assert parsedText is not None, "Parsed text should not be None"
-    assert parsedText.content is not None
-    assert len(parsedText.content) > 0, "Parsed text should not be empty"
-    assert "1" in parsedText.content, "Parsed text should contain page 1"
-    firsttext = parsedText.content["1"]
+    parsed_text = parse_pdf_to_pages(filepath)
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content, "Parsed text should contain page 1"
     assert (
-        "Abstract\n\nWe introduce PaSa, an advanced Paper Search\nagent powered by large language models."
-        in firsttext
-    )
+        "Abstract\n\nWe introduce PaSa, an advanced Paper Search"
+        "\nagent powered by large language models."
+    ) in parsed_text.content["1"]
 
 
 @pytest.mark.vcr
