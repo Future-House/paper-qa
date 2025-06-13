@@ -1091,7 +1091,8 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
     )
 
 
-def test_env_from_name(subtests: SubTests) -> None:
+@pytest.mark.asyncio
+async def test_env_from_name(subtests: SubTests) -> None:
     assert "paperqa" in Environment.available()
 
     with subtests.test(msg="only-task"):
@@ -1099,6 +1100,8 @@ def test_env_from_name(subtests: SubTests) -> None:
             "paperqa", "How can you use XAI for chemical property prediction?"
         )
         assert isinstance(env, PaperQAEnvironment)
+        with pytest.raises(ValueError, match="configured"):
+            await env.get_id()
 
     with subtests.test(msg="env-kwargs"):
         env = Environment.from_name(

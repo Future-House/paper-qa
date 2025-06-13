@@ -27,7 +27,7 @@ dependencies = [
     "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
-    "fhaviary[llm]>=0.19",  # For not line-wrapping tool descriptions
+    "fhaviary[llm]>=0.20",  # For Environment.get_id
     "fhlmi>=0.25.4",  # For LLM reasoning
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",

@@ -1945,7 +1945,7 @@ dev = [
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
-    { name = "fhaviary", extras = ["llm"], specifier = ">=0.19" },
+    { name = "fhaviary", extras = ["llm"], specifier = ">=0.20" },
     { name = "fhlmi", specifier = ">=0.25.4" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.27" },
     { name = "html2text" },
