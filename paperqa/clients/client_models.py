@@ -117,6 +117,12 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
                 f" {self.__class__.__name__}."
             )
+        except aiohttp.ClientResponseError:
+            logger.warning(
+                "Client response error for"
+                f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
+                f" {self.__class__.__name__}."
+            )
         except RetryError:
             logger.warning(
                 "Metadata service is down for"
