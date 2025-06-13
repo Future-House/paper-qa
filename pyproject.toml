@@ -240,7 +240,7 @@ disable = [
     "too-many-instance-attributes",  # Don't care to enforce this
     "too-many-lines",  # Don't care to enforce this
     "too-many-locals",  # Rely on ruff PLR0914 for this
-    "too-many-positional-arguments",  # Don't care to enforce this
+    "too-many-positional-arguments",  # Rely on ruff PLR0917 for this
     "too-many-public-methods",  # Rely on ruff PLR0904 for this
     "too-many-return-statements",  # Rely on ruff PLR0911 for this
     "too-many-statements",  # Rely on ruff PLR0915 for this
@@ -321,15 +321,15 @@ preview = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
+    "AIR002",
     "AIR301",
     "AIR302",
-    "AIR303",
+    "AIR311",
+    "AIR312",
     "ASYNC116",
     "B901",
     "B903",
     "B909",
-    "B911",
-    "C420",
     "CPY001",
     "DOC201",
     "DOC202",
@@ -337,7 +337,6 @@ extend-select = [
     "DOC403",
     "DOC501",
     "DOC502",
-    "DTZ901",
     "E111",
     "E112",
     "E113",
@@ -379,7 +378,6 @@ extend-select = [
     "E305",
     "E306",
     "E502",
-    "FAST003",
     "FURB101",
     "FURB103",
     "FURB110",
@@ -406,9 +404,7 @@ extend-select = [
     "FURB192",
     "LOG004",
     "LOG014",
-    "LOG015",
     "PLC0415",
-    "PLC1802",
     "PLC1901",
     "PLC2701",
     "PLC2801",
@@ -429,15 +425,12 @@ extend-select = [
     "PLW0108",
     "PLW0177",
     "PLW0244",
-    "PLW1507",
     "PLW1514",
     "PLW3201",
     "PT028",
     "PT029",
     "PT030",
     "PT031",
-    "PTH208",
-    "PTH210",
     "PYI059",
     "PYI061",
     "RUF027",
@@ -448,15 +441,10 @@ extend-select = [
     "RUF037",
     "RUF038",
     "RUF039",
-    "RUF040",
-    "RUF041",
     "RUF043",
     "RUF045",
-    "RUF046",
     "RUF047",
-    "RUF048",
     "RUF049",
-    "RUF051",
     "RUF052",
     "RUF053",
     "RUF054",
@@ -464,12 +452,10 @@ extend-select = [
     "RUF056",
     "RUF057",
     "RUF058",
-    "SIM905",
-    "TC006",
-    "TC007",
+    "RUF059",
+    "RUF102",
     "TC008",
     "UP042",
-    "UP044",
     "UP045",
     "UP046",
     "UP047",
@@ -551,6 +537,7 @@ unfixable = [
     "ERA001",  # While debugging, temporarily commenting code can be useful
     "F401",  # While debugging, unused imports can be useful
     "F841",  # While debugging, unused locals can be useful
+    "RUF059",  # While debugging, unused locals can be useful
     "TC004",  # While debugging, it can be nice to keep TYPE_CHECKING in-tact
 ]
 
