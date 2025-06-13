@@ -328,6 +328,20 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             False,  # Let caller determine truncations
         )
 
+    async def get_id(self) -> str:
+        if (
+            isinstance(self._query, str)
+            or self._query.question_id
+            == MultipleChoiceQuestion.model_fields["question_id"].default
+        ):
+            details = (
+                ", as just a question was configured"
+                if isinstance(self._query, str)
+                else ", as the default ID remains present"
+            )
+            raise ValueError(f"No question ID was configured{details}.")
+        return str(self._query.question_id)
+
     def __deepcopy__(self, memo) -> Self:
         copy_state = deepcopy(self.state, memo)
         # We don't know the side effects of deep copying a litellm.Router,
