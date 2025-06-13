@@ -30,7 +30,7 @@ jobs:
         python-version: [3.11] # Our min supported Python version
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
@@ -45,7 +45,7 @@ jobs:
         python-version: [3.11, 3.13] # Our min and max supported Python versions
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
