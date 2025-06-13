@@ -566,6 +566,13 @@ async def test_gather_evidence_rejects_empty_docs(
 async def test_agent_sharing_state(
     agent_test_settings: Settings, subtests: SubTests, callback_type: str | None
 ) -> None:
+    def files_filter(f) -> bool:
+        # Filter out pasa.pdf just to speed the test and save API costs
+        return f.name != "pasa.pdf" and IndexSettings.model_fields[
+            "files_filter"
+        ].default(f)
+
+    agent_test_settings.agent.index.files_filter = files_filter
     agent_test_settings.agent.search_count = 3  # Keep low for speed
     agent_test_settings.answer.evidence_k = 2
     agent_test_settings.answer.answer_max_sources = 1
