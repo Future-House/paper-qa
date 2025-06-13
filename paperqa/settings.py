@@ -165,6 +165,13 @@ class ParsingSettings(BaseModel):
             " (ignoring chars vs tokens difference)."
         ),
     )
+    pdfs_use_block_parsing: bool = Field(
+        default=False,
+        description=(
+            "Opt-in flag to use block-based parsing for PDFs instead of"
+            " text-based parsing, which is known to be better for some PDFs."
+        ),
+    )
     use_doc_details: bool = Field(
         default=True, description="Whether to try to get metadata details for a Doc."
     )

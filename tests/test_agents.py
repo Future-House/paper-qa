@@ -89,11 +89,11 @@ async def test_get_directory_index(
             "year",
         ], "Incorrect fields in index"
         assert not index.changed, "Expected index to not have changes at this point"
-        # bates.txt + empty.txt + flag_day.html + gravity_hill.md + obama.txt + paper.pdf,
+        # bates.txt + empty.txt + flag_day.html + gravity_hill.md + obama.txt + paper.pdf + pasa.pdf,
         # but empty.txt fails to be added
         path_to_id = await index.index_files
         assert (
-            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 5
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 6
         ), "Incorrect number of parsed index files"
 
         with subtests.test(msg="check-txt-query"):
@@ -248,6 +248,7 @@ EXPECTED_STUB_DATA_FILES = {
     "gravity_hill.md",
     "obama.txt",
     "paper.pdf",
+    "pasa.pdf",
 }
 
 
@@ -565,6 +566,13 @@ async def test_gather_evidence_rejects_empty_docs(
 async def test_agent_sharing_state(
     agent_test_settings: Settings, subtests: SubTests, callback_type: str | None
 ) -> None:
+    def files_filter(f) -> bool:
+        # Filter out pasa.pdf just to speed the test and save API costs
+        return f.name != "pasa.pdf" and IndexSettings.model_fields[
+            "files_filter"
+        ].default(f)
+
+    agent_test_settings.agent.index.files_filter = files_filter
     agent_test_settings.agent.search_count = 3  # Keep low for speed
     agent_test_settings.answer.evidence_k = 2
     agent_test_settings.answer.answer_max_sources = 1
