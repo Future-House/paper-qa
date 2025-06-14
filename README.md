@@ -628,7 +628,7 @@ from paperqa import Settings
 
 settings = Settings()
 settings.answer.answer_max_sources = 3
-settings.answer.k = 5
+settings.answer.evidence_k = 5
 
 await docs.aquery(
     "What is PaperQA2?",
