@@ -56,7 +56,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
-    "fhlmi>=0.27",  # For LLMResult reflecting actual model
+    "fhlmi>=0.28",  # For update_litellm_max_callbacks convenience
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68",  # Pin for PydanticDeprecatedSince20 fixes

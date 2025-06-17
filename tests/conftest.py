@@ -15,6 +15,7 @@ from lmi.utils import (
     CROSSREF_KEY_HEADER,
     OPENAI_API_KEY_HEADER,
     SEMANTIC_SCHOLAR_KEY_HEADER,
+    update_litellm_max_callbacks,
 )
 
 if TYPE_CHECKING:
@@ -39,6 +40,11 @@ def _setup_default_logs() -> None:
     from paperqa.utils import setup_default_logs
 
     setup_default_logs()
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _defeat_litellm_callbacks() -> None:
+    update_litellm_max_callbacks()
 
 
 @pytest.fixture(scope="session", name="vcr_config")
