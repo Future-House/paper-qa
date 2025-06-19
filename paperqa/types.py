@@ -431,14 +431,15 @@ class DocDetails(Doc):
                 if doi.startswith(url_prefix_to_remove):
                     doi = doi.replace(url_prefix_to_remove, "")
             data["doi"] = doi.lower()
-            data["doc_id"] = encode_id(doi.lower())
-        else:
+            if "doc_id" not in data or not data["doc_id"]:  # keep user defined doc_ids
+                data["doc_id"] = encode_id(doi.lower())
+        elif "doc_id" not in data or not data["doc_id"]:  # keep user defined doc_ids
             data["doc_id"] = encode_id(uuid4())
 
         if "dockey" in data.get(
             "fields_to_overwrite_from_metadata",
             DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
-        ):
+        ) and ("dockey" not in data or not data["dockey"]):
             data["dockey"] = data["doc_id"]
 
         return data

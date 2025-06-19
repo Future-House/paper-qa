@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
+
+    RETRACTION_CACHE_DAYS: int = -1  # Number of days to cache, -1 is keep forever
+
     def __init__(self, retraction_data_path: os.PathLike | str | None = None) -> None:
 
         if retraction_data_path is None:
@@ -37,6 +40,8 @@ class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         ]
 
     def _has_cache_expired(self) -> bool:
+        if self.RETRACTION_CACHE_DAYS < 0:
+            return False
         creation_time = os.path.getctime(self.retraction_data_path)
         file_creation_date = datetime.datetime.fromtimestamp(creation_time).replace(
             tzinfo=datetime.UTC
@@ -45,7 +50,7 @@ class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         current_time = datetime.datetime.now(datetime.UTC)
         time_difference = current_time - file_creation_date
 
-        return time_difference > datetime.timedelta(days=30)
+        return time_difference > datetime.timedelta(days=self.RETRACTION_CACHE_DAYS)
 
     def _is_csv_cached(self) -> bool:
         return os.path.exists(self.retraction_data_path)
@@ -71,7 +76,11 @@ class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
         if not self.doi_set:
             await self.load_data()
 
-        return doc_details + DocDetails(is_retracted=query.doi in self.doi_set)
+        return doc_details + DocDetails(
+            doc_id=doc_details.doc_id,  # ensure doc_id is preserved
+            dockey=doc_details.dockey,  # ensure dockey is preserved
+            is_retracted=query.doi in self.doi_set,
+        )
 
     def query_creator(self, doc_details: DocDetails, **kwargs) -> DOIQuery | None:
         try:

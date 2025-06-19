@@ -45,12 +45,14 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
         # remember, if both have docnames (i.e. key) they are
         # wiped and re-generated with resultant data
         return doc_details + DocDetails(
+            doc_id=doc_details.doc_id,  # ensure doc_id is preserved
+            dockey=doc_details.dockey,  # ensure dockey is preserved
             source_quality=max(
                 [
                     self.data.get(query.journal.casefold(), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
                     self.data.get("the " + query.journal.casefold(), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
                 ]
-            )
+            ),
         )
 
     def query_creator(self, doc_details: DocDetails, **kwargs) -> JournalQuery | None:
