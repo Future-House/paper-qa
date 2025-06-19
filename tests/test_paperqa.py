@@ -1578,8 +1578,8 @@ def test_docdetails_doc_id_roundtrip() -> None:
         doc_details_no_doi_with_doc_id.doi is None
     ), "DocDetails without doi should be None"
     assert (
-        doc_details_no_doi_with_doc_id.dockey == doc_details_with_doi_no_doc_id.doc_id
-    )
+        doc_details_no_doi_with_doc_id.dockey == doc_details_no_doi_with_doc_id.doc_id
+    ), "DocDetails dockey should match doc_id for the same object"
 
     # round-trip serializaiton should keep the same doc_id
     new_no_doi_with_doc_id = DocDetails(
