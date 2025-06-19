@@ -50,6 +50,7 @@ from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import parse_pdf_to_pages, read_doc
 from paperqa.types import ChunkMetadata
 from paperqa.utils import (
+    encode_id,
     extract_score,
     get_citenames,
     maybe_get_date,
@@ -1486,6 +1487,150 @@ def test_docdetails_deserialization() -> None:
     assert (
         deserialize_to_doc == deepcopy_deserialize_to_doc
     ), "Deserialization should not mutate input"
+
+
+def test_docdetails_doc_id_roundtrip() -> None:
+    """Test that DocDetails can be initialized with doc_id or doi inputs."""
+    test_doi = "10.1234/test.doi"
+    test_doi_doc_id = encode_id(test_doi.lower())
+    test_specified_doc_id = "abc123"
+    # first we test without a doc_id or doi, ensure it's still valid
+    doc_details_no_doi_no_doc_id = DocDetails(
+        docname="test_doc",
+        citation="Test Citation",
+        dockey="test_dockey",
+        embedding=None,
+        formatted_citation="Formatted Test Citation",
+    )
+
+    assert (
+        doc_details_no_doi_no_doc_id.doc_id != test_doi_doc_id
+    ), "DocDetails without doc_id should not match test_doi_doc_id"
+    assert (
+        doc_details_no_doi_no_doc_id.doi is None
+    ), "DocDetails without doi should have None doi"
+    assert doc_details_no_doi_no_doc_id.dockey == doc_details_no_doi_no_doc_id.doc_id
+
+    # now round-trip serializaiton should keep the same doc_id
+    new_no_doi_no_doc_id = DocDetails(
+        **doc_details_no_doi_no_doc_id.model_dump(exclude_none=True)
+    )
+    assert (
+        new_no_doi_no_doc_id.doc_id == doc_details_no_doi_no_doc_id.doc_id
+    ), "DocDetails without doc_id should keep the same doc_id after serialization"
+
+    # since validation runs on assignment, make sure we can assign correctly
+    doc_details_no_doi_no_doc_id.doc_id = test_specified_doc_id
+    assert (
+        doc_details_no_doi_no_doc_id.doc_id == test_specified_doc_id
+    ), "DocDetails with doc_id should match test_specified_doc_id"
+    assert doc_details_no_doi_no_doc_id.dockey == doc_details_no_doi_no_doc_id.doc_id
+
+    # now let's do this with a doi
+    doc_details_with_doi_no_doc_id = DocDetails(
+        doi=test_doi,
+        docname="test_doc",
+        citation="Test Citation",
+        dockey="test_dockey",
+        embedding=None,
+        formatted_citation="Formatted Test Citation",
+    )
+    assert (
+        doc_details_with_doi_no_doc_id.doc_id == test_doi_doc_id
+    ), "DocDetails with doc_id should not match test_doi_doc_id"
+    assert (
+        doc_details_with_doi_no_doc_id.doi == test_doi
+    ), "DocDetails with doi should match test_doi"
+    assert (
+        doc_details_with_doi_no_doc_id.dockey == doc_details_with_doi_no_doc_id.doc_id
+    )
+
+    # round-trip serializaiton should keep the same doc_id
+    new_with_doi_no_doc_id = DocDetails(
+        **doc_details_with_doi_no_doc_id.model_dump(exclude_none=True)
+    )
+    assert (
+        new_with_doi_no_doc_id.doc_id == doc_details_with_doi_no_doc_id.doc_id
+    ), "DocDetails with doc_id should keep the same doc_id after serialization"
+
+    # since validation runs on assignment, make sure we can assign correctly
+    doc_details_with_doi_no_doc_id.doc_id = test_specified_doc_id
+    assert (
+        doc_details_with_doi_no_doc_id.doc_id == test_specified_doc_id
+    ), "DocDetails with doc_id should match test_specified_doc_id"
+    assert (
+        doc_details_with_doi_no_doc_id.dockey == doc_details_with_doi_no_doc_id.doc_id
+    )
+
+    # let's specify the doc_id directly
+    doc_details_no_doi_with_doc_id = DocDetails(
+        doc_id=test_specified_doc_id,
+        docname="test_doc",
+        citation="Test Citation",
+        dockey="test_dockey",
+        embedding=None,
+        formatted_citation="Formatted Test Citation",
+    )
+    assert (
+        doc_details_no_doi_with_doc_id.doc_id == test_specified_doc_id
+    ), "DocDetails with doc_id should not match test_specified_doc_id"
+    assert (
+        doc_details_no_doi_with_doc_id.doi is None
+    ), "DocDetails without doi should be None"
+    assert (
+        doc_details_no_doi_with_doc_id.dockey == doc_details_no_doi_with_doc_id.doc_id
+    ), "DocDetails dockey should match doc_id for the same object"
+
+    # round-trip serializaiton should keep the same doc_id
+    new_no_doi_with_doc_id = DocDetails(
+        **doc_details_no_doi_with_doc_id.model_dump(exclude_none=True)
+    )
+    assert (
+        new_no_doi_with_doc_id.doc_id == doc_details_with_doi_no_doc_id.doc_id
+    ), "DocDetails with doc_id should keep the same doc_id after serialization"
+
+    # since validation runs on assignment, make sure we can assign correctly
+    new_no_doi_with_doc_id.doc_id = test_doi_doc_id
+    assert (
+        new_no_doi_with_doc_id.doc_id == test_doi_doc_id
+    ), "DocDetails with doc_id should match test_specified_doc_id"
+    assert new_no_doi_with_doc_id.dockey == new_no_doi_with_doc_id.doc_id
+
+    # now we specify both doi and doc_id, ensuring doc_id takes precedence
+    doc_details_with_doi_with_doc_id = DocDetails(
+        doc_id=test_specified_doc_id,
+        doi=test_doi,
+        docname="test_doc",
+        citation="Test Citation",
+        dockey="test_dockey",
+        embedding=None,
+        formatted_citation="Formatted Test Citation",
+    )
+    assert (
+        doc_details_with_doi_with_doc_id.doc_id == test_specified_doc_id
+    ), "DocDetails with doc_id should not match test_specified_doc_id"
+    assert (
+        doc_details_with_doi_with_doc_id.doi == test_doi
+    ), "DocDetails without doi should match test_doi"
+    assert (
+        doc_details_with_doi_with_doc_id.dockey
+        == doc_details_with_doi_with_doc_id.doc_id
+    )
+
+    # round-trip serializaiton should keep the same doc_id
+    new_with_doi_with_doc_id = DocDetails(
+        **doc_details_with_doi_with_doc_id.model_dump(exclude_none=True)
+    )
+    assert (
+        new_with_doi_with_doc_id.doc_id == doc_details_with_doi_with_doc_id.doc_id
+    ), "DocDetails with doc_id should keep the same doc_id after serialization"
+
+    # since validation runs on assignment, make sure we can assign correctly
+    new_with_doi_with_doc_id.doc_id = test_doi_doc_id
+    assert (
+        new_with_doi_with_doc_id.doc_id == test_doi_doc_id
+    ), "DocDetails with doc_id should match test_specified_doc_id"
+    assert new_with_doi_with_doc_id.dockey == new_with_doi_with_doc_id.doc_id
 
 
 @pytest.mark.vcr
