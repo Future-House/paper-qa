@@ -77,6 +77,12 @@ repos:
     hooks:
       - id: nb-clean
         args: [--preserve-cell-outputs, --remove-empty-cells]
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint
+        args: [--config=pyproject.toml, --configPointer=/tool/markdownlint]
+        exclude: docs/tutorials/
   - repo: https://github.com/mwouts/jupytext
     rev: v1.17.2
     hooks:
