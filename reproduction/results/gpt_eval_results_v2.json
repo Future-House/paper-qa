@@ -1,0 +1,12 @@
+{
+  "reward": -0.745,
+  "truncation_rate": 0.0,
+  "avg_value": 0.0,
+  "num_steps": 15.1,
+  "failures": 0.0,
+  "total_paper_count": 19.7,
+  "relevant_paper_count": 0.175,
+  "evidence_count": 0.975,
+  "correct": 0.1,
+  "correct_unsure": 0.15
+}

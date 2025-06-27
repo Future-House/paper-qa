@@ -1,0 +1,737 @@
+[
+  {
+    "question_id": "e3b5a4af-41d9-48db-becf-29a08d0ad28e",
+    "doi": "10.1128/msphere.00109-24",
+    "download_url": "https://journals.asm.org/doi/pdf/10.1128/msphere.00109-24"
+  },
+  {
+    "question_id": "39129e1c-096f-4414-bf4f-37fadbbe364c",
+    "doi": "10.1016/j.celrep.2024.113693",
+    "download_url": null
+  },
+  {
+    "question_id": "27234279-f50c-4cfc-86e2-af68364a8f94",
+    "doi": "10.1101/2022.03.19.484946",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2022/03/21/2022.03.19.484946.full.pdf"
+  },
+  {
+    "question_id": "517e7cf8-c5d2-4391-9e2a-235b79d93050",
+    "doi": "10.1101/2024.05.03.592390",
+    "download_url": null
+  },
+  {
+    "question_id": "2c05315d-6898-4667-b454-d99b7381bedb",
+    "doi": "10.1038/s41586-022-04877-w",
+    "download_url": null
+  },
+  {
+    "question_id": "5c4c602c-9624-4eae-ac44-efe4c0dd10e6",
+    "doi": "10.1073/pnas.2220578120",
+    "download_url": null
+  },
+  {
+    "question_id": "c9bdb9b5-28c1-44da-93b6-b1fc9d8bf369",
+    "doi": "10.1016/j.cell.2024.04.015",
+    "download_url": "http://www.cell.com/article/S0092867424004100/pdf"
+  },
+  {
+    "question_id": "39c985ce-70e8-48e4-bd76-744cd07cb56a",
+    "doi": "10.1093/nar/gkae252",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae252/57180459/gkae252.pdf"
+  },
+  {
+    "question_id": "a43e5166-d0e8-48f8-a113-648acac7ed59",
+    "doi": "10.1016/j.celrep.2022.111161",
+    "download_url": "http://www.cell.com/article/S2211124722009706/pdf"
+  },
+  {
+    "question_id": "7d805bb8-4c7c-431f-b068-acf5e5459985",
+    "doi": "10.1016/j.cell.2021.09.018",
+    "download_url": null
+  },
+  {
+    "question_id": "8d7fa642-ee46-4a13-8ea9-61cc2d4f4ddd",
+    "doi": "10.1093/nar/gkae105",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae105/56756517/gkae105.pdf"
+  },
+  {
+    "question_id": "487539f9-2f17-4009-aa4a-c41322445f11",
+    "doi": "10.1093/nar/gkae130",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae130/56770025/gkae130.pdf"
+  },
+  {
+    "question_id": "5049c648-b1bb-4624-8824-9d93dfb04e51",
+    "doi": "10.1016/j.cell.2023.11.007",
+    "download_url": null
+  },
+  {
+    "question_id": "a18883e9-218a-4719-8d2c-cf94d740de1a",
+    "doi": "10.1016/j.stem.2021.12.011",
+    "download_url": null
+  },
+  {
+    "question_id": "d2860d38-dfb9-4b80-905f-812c32573915",
+    "doi": "10.1126/science.abp9563",
+    "download_url": null
+  },
+  {
+    "question_id": "d65103ae-c881-4116-a0a7-1b233eb6275a",
+    "doi": "10.1016/j.chom.2024.03.010",
+    "download_url": null
+  },
+  {
+    "question_id": "7cf0fcde-fea8-420c-8531-2f2fe9e38980",
+    "doi": "10.1101/2021.07.10.451889",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2021/07/11/2021.07.10.451889.full.pdf"
+  },
+  {
+    "question_id": "da5b2a8f-ba08-4692-851f-2e0bf142a02f",
+    "doi": "10.1016/j.cell.2023.03.035",
+    "download_url": "http://www.cell.com/article/S009286742300332X/pdf"
+  },
+  {
+    "question_id": "e2fb56b7-08cd-4dc0-bc63-b45931a74fc9",
+    "doi": "10.1101/2023.02.18.528865",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/02/18/2023.02.18.528865.full.pdf"
+  },
+  {
+    "question_id": "d1307e50-3c03-4c76-81ee-2decb5de5f14",
+    "doi": "10.1126/science.adj4088",
+    "download_url": null
+  },
+  {
+    "question_id": "f5a84803-3917-43eb-801b-8dc0c5400da1",
+    "doi": "10.1101/2024.05.15.594272",
+    "download_url": null
+  },
+  {
+    "question_id": "c47dd378-dde3-4a45-9184-6abfa6163717",
+    "doi": "10.1101/2024.02.02.578660",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/02/04/2024.02.02.578660.full.pdf"
+  },
+  {
+    "question_id": "0bac8974-554c-439a-a9a2-22fa509c8d5d",
+    "doi": "10.1080/14712598.2019.1685489",
+    "download_url": "https://www.tandfonline.com/doi/pdf/10.1080/14712598.2019.1685489?needAccess=true"
+  },
+  {
+    "question_id": "aa1835b2-2b1c-4986-b7af-e174da0124b0",
+    "doi": "10.1101/2023.06.13.544831",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/06/27/2023.06.13.544831.full.pdf"
+  },
+  {
+    "question_id": "37a4d007-793e-4a89-922a-c1b05f4f82c1",
+    "doi": "10.1073/pnas.0403760101",
+    "download_url": null
+  },
+  {
+    "question_id": "c9baf8e0-c4c7-4ba3-b5c4-18e9af8b2df1",
+    "doi": "10.1101/2023.05.21.541555",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/05/22/2023.05.21.541555.full.pdf"
+  },
+  {
+    "question_id": "c9baf8e0-c4c7-4ba3-b5c4-18e9af8b2df1",
+    "doi": "10.1016/j.cell.2023.05.041",
+    "download_url": "http://www.cell.com/article/S0092867423005937/pdf"
+  },
+  {
+    "question_id": "d0f69626-66ee-4807-937d-c3a024441812",
+    "doi": "10.1016/j.isci.2023.106308",
+    "download_url": null
+  },
+  {
+    "question_id": "86f111e5-402b-4ef5-b101-8be1bf5be7c6",
+    "doi": "10.1101/2024.02.01.578450",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/02/05/2024.02.01.578450.full.pdf"
+  },
+  {
+    "question_id": "91387526-9268-4a3c-9abe-73819707d0b0",
+    "doi": "10.1128/jb.00479-21",
+    "download_url": null
+  },
+  {
+    "question_id": "5e20e26d-6192-4563-abb3-a4857e3dbc7c",
+    "doi": "10.1126/science.add1250",
+    "download_url": null
+  },
+  {
+    "question_id": "5b6d6f82-a585-4aa8-9fe6-e7d35f7cb2ae",
+    "doi": "10.1126/sciadv.add4623",
+    "download_url": "https://www.science.org/doi/pdf/10.1126/sciadv.add4623"
+  },
+  {
+    "question_id": "12321eab-6ad6-4218-8815-18bc51c14544",
+    "doi": "10.1101/2024.02.06.579151",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/02/07/2024.02.06.579151.full.pdf"
+  },
+  {
+    "question_id": "c33446f6-fbff-4186-8a51-28a17f68bd40",
+    "doi": "10.1021/acs.jctc.2c00401",
+    "download_url": "https://pubs.acs.org/doi/pdf/10.1021/acs.jctc.2c00401"
+  },
+  {
+    "question_id": "b1d5a5f5-6e89-4dfb-b60d-5a9824b015f3",
+    "doi": "10.1016/j.immuni.2022.03.018",
+    "download_url": "http://www.cell.com/article/S1074761322001418/pdf"
+  },
+  {
+    "question_id": "6aa10957-bdd9-4dab-a4e1-234a17cb87dd",
+    "doi": "10.1016/j.immuni.2022.03.018",
+    "download_url": "http://www.cell.com/article/S1074761322001418/pdf"
+  },
+  {
+    "question_id": "dbb51a1c-f9a2-4960-a93c-118957659790",
+    "doi": "10.1101/2023.08.22.554289",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/09/26/2023.08.22.554289.full.pdf"
+  },
+  {
+    "question_id": "3d40f373-59d3-4666-87bd-6db64fd7b4fb",
+    "doi": "10.1016/j.cell.2024.04.029",
+    "download_url": "http://www.cell.com/article/S0092867424004550/pdf"
+  },
+  {
+    "question_id": "85c67ef3-322c-42b4-b745-c05e07e7b8ac",
+    "doi": "10.1016/j.celrep.2024.114044",
+    "download_url": null
+  },
+  {
+    "question_id": "653635b7-3bc6-4a7b-98c7-c02038c0e928",
+    "doi": "10.1016/j.cell.2024.01.027",
+    "download_url": null
+  },
+  {
+    "question_id": "0a9d6516-95ef-4d7b-a28d-d7cde27b7b55",
+    "doi": "10.1016/j.celrep.2021.109967",
+    "download_url": "http://www.cell.com/article/S2211124721014467/pdf"
+  },
+  {
+    "question_id": "0a9d6516-95ef-4d7b-a28d-d7cde27b7b55",
+    "doi": "10.1101/2021.05.12.443709",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2021/05/14/2021.05.12.443709.full.pdf"
+  },
+  {
+    "question_id": "8d61a14b-60ef-43b0-8003-b60cb6657428",
+    "doi": "10.1038/s41587-023-01801-z",
+    "download_url": null
+  },
+  {
+    "question_id": "4d4cb121-9525-499a-9475-9b212465c72d",
+    "doi": "10.1101/2022.12.01.518682",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2022/12/02/2022.12.01.518682.full.pdf"
+  },
+  {
+    "question_id": "26691c84-514b-4712-a43e-09705d681e45",
+    "doi": "10.1101/2024.03.18.585604",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/03/22/2024.03.18.585604.full.pdf"
+  },
+  {
+    "question_id": "0e53a08c-4252-4a84-962b-5b396f9740aa",
+    "doi": "10.1038/s41587-024-02157-8",
+    "download_url": null
+  },
+  {
+    "question_id": "8ade3e3a-4792-4965-b9d9-05e528ebbfa0",
+    "doi": "10.1016/j.neuron.2021.10.036",
+    "download_url": "http://www.cell.com/article/S0896627321008667/pdf"
+  },
+  {
+    "question_id": "f5a4b449-e647-4ae0-8419-c221792482c9",
+    "doi": "10.1126/science.adk9469",
+    "download_url": null
+  },
+  {
+    "question_id": "5806ed2a-1005-44f1-8d70-332048fea8f4",
+    "doi": "10.1016/j.celrep.2022.111161",
+    "download_url": "http://www.cell.com/article/S2211124722009706/pdf"
+  },
+  {
+    "question_id": "6fff0994-6d02-470a-9d61-8e35420412b6",
+    "doi": "10.1101/2024.04.08.588603",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/10/2024.04.08.588603.full.pdf"
+  },
+  {
+    "question_id": "8266ac61-92d6-423d-8e7a-fe47b3a7e885",
+    "doi": "10.1073/pnas.2319641121",
+    "download_url": null
+  },
+  {
+    "question_id": "322454df-45a8-41b3-9b0a-4e808144023c",
+    "doi": "10.1038/s44320-024-00015-y",
+    "download_url": "https://www.embopress.org/doi/epdf/10.1038/s44320-024-00015-y"
+  },
+  {
+    "question_id": "3c9f23e2-fdd0-431b-aca7-4f9556c78f1f",
+    "doi": "10.1038/s41587-024-02157-8",
+    "download_url": null
+  },
+  {
+    "question_id": "983f1ef5-fc7d-4f4a-8f48-e704641eae12",
+    "doi": "10.1093/g3journal/jkad293",
+    "download_url": "https://academic.oup.com/g3journal/advance-article-pdf/doi/10.1093/g3journal/jkad293/54769566/jkad293.pdf"
+  },
+  {
+    "question_id": "7d2c8d44-ecf3-40d2-ab69-b6195c46ffe9",
+    "doi": "10.1242/jcs.259535",
+    "download_url": "https://journals.biologists.com/jcs/article-pdf/136/5/jcs259535/2149299/jcs259535.pdf"
+  },
+  {
+    "question_id": "dbfbae3d-62f6-4710-8d13-8ce4c8485567",
+    "doi": "10.1126/science.abl4896",
+    "download_url": null
+  },
+  {
+    "question_id": "7a42c784-7ae0-48fe-a71f-0a547b8fabb3",
+    "doi": "10.1126/sciadv.adk0171",
+    "download_url": "https://www.science.org/doi/pdf/10.1126/sciadv.adk0171"
+  },
+  {
+    "question_id": "0708b62f-9652-49eb-8ba6-28878afa7445",
+    "doi": "10.1016/j.neuron.2024.03.007",
+    "download_url": null
+  },
+  {
+    "question_id": "5b3b7d05-9e54-445c-b374-d4c6b60923b4",
+    "doi": "10.1073/pnas.2317878121",
+    "download_url": null
+  },
+  {
+    "question_id": "0b1d5537-db47-420c-984b-9b56d38e6d98",
+    "doi": "10.1016/j.crmeth.2023.100464",
+    "download_url": null
+  },
+  {
+    "question_id": "ade96656-7ed1-4e21-b009-b7a73e13bff5",
+    "doi": "10.1126/science.aba6500",
+    "download_url": null
+  },
+  {
+    "question_id": "224efcd7-3652-47f8-84dd-15b4c6fafae2",
+    "doi": "10.1101/2024.05.07.593065",
+    "download_url": null
+  },
+  {
+    "question_id": "55187fb4-e7ee-4027-b74f-cab50f328442",
+    "doi": "10.1101/2024.05.13.593822",
+    "download_url": null
+  },
+  {
+    "question_id": "25a9cf59-1c28-4ddf-b797-f43efb9349e6",
+    "doi": "10.1101/2024.04.26.591386",
+    "download_url": null
+  },
+  {
+    "question_id": "cdc80639-dc21-4337-bccc-d61d9aec6560",
+    "doi": "10.1093/genetics/iyab101",
+    "download_url": "https://academic.oup.com/genetics/article-pdf/219/1/iyab101/41279890/iyab101.pdf"
+  },
+  {
+    "question_id": "12a20d8d-cd49-47eb-9a19-6a38519ee3dc",
+    "doi": "10.1101/2024.01.31.578101",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/02/02/2024.01.31.578101.full.pdf"
+  },
+  {
+    "question_id": "4bb69c9d-2485-42d2-b8aa-aa647b407ca4",
+    "doi": "10.1101/2023.12.19.572360",
+    "download_url": null
+  },
+  {
+    "question_id": "8c833521-56c4-458d-8c65-2bbf66190cae",
+    "doi": "10.1016/j.chom.2022.02.006",
+    "download_url": null
+  },
+  {
+    "question_id": "255fd5fb-9623-4030-8bf2-253247df7c82",
+    "doi": "10.1016/j.chom.2022.02.006",
+    "download_url": null
+  },
+  {
+    "question_id": "38ada695-2c79-459b-8e68-dbed734c74f9",
+    "doi": "10.1016/j.chom.2022.02.006",
+    "download_url": null
+  },
+  {
+    "question_id": "925ffe20-b8a9-4ac4-943c-7a16966f4a4b",
+    "doi": "10.1126/science.abl6618",
+    "download_url": null
+  },
+  {
+    "question_id": "e763edaa-b112-460a-a564-d58a6685e639",
+    "doi": "10.1016/j.celrep.2022.111161",
+    "download_url": "http://www.cell.com/article/S2211124722009706/pdf"
+  },
+  {
+    "question_id": "8af900bb-5794-40db-910e-10d5857ce5bd",
+    "doi": "10.1126/science.abo0924",
+    "download_url": null
+  },
+  {
+    "question_id": "6194ebfc-2d5c-4ccc-8883-da7c471b61e6",
+    "doi": "10.1126/science.add9330",
+    "download_url": null
+  },
+  {
+    "question_id": "1f1b07d7-39ce-4665-9b70-4ab77e3c87aa",
+    "doi": "10.1126/science.add9330",
+    "download_url": null
+  },
+  {
+    "question_id": "55668039-396e-488a-b2c3-bbe840550433",
+    "doi": "10.1016/j.cell.2022.11.026",
+    "download_url": null
+  },
+  {
+    "question_id": "4f050bf3-27cd-4a14-8422-45df5e2bb079",
+    "doi": "10.1101/2024.05.07.593022",
+    "download_url": null
+  },
+  {
+    "question_id": "0eeb7ea9-fc80-4dee-9418-1c328c3ab653",
+    "doi": "10.1111/nph.19360",
+    "download_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/nph.19360"
+  },
+  {
+    "question_id": "99713efa-d1b1-4fc5-a4b1-cbae2b3a5798",
+    "doi": "10.1126/science.abb3634",
+    "download_url": null
+  },
+  {
+    "question_id": "ce6dd5f7-0706-41dd-a383-9b0d22ef00a1",
+    "doi": "10.1091/mbc.E23-03-0084",
+    "download_url": null
+  },
+  {
+    "question_id": "400786c1-e6c6-4f46-a501-86fdd048ed88",
+    "doi": "10.1111/acel.14128",
+    "download_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/acel.14128"
+  },
+  {
+    "question_id": "e820cbcf-6df1-4c1c-b985-c02f39f52781",
+    "doi": "10.1101/2022.12.20.521091",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2022/12/20/2022.12.20.521091.full.pdf"
+  },
+  {
+    "question_id": "db851865-5cbf-4d55-b6db-34f22ef5e727",
+    "doi": "10.1016/j.jbior.2020.100740",
+    "download_url": null
+  },
+  {
+    "question_id": "fe074387-3765-4020-8f5d-e395d1094121",
+    "doi": "10.1016/j.cell.2023.04.016",
+    "download_url": "http://www.cell.com/article/S0092867423004129/pdf"
+  },
+  {
+    "question_id": "ae02d0e9-edf5-4c39-a215-3cbc8f4c565d",
+    "doi": "10.1093/molbev/msad271",
+    "download_url": "https://academic.oup.com/mbe/advance-article-pdf/doi/10.1093/molbev/msad271/54153414/msad271.pdf"
+  },
+  {
+    "question_id": "fd60a0e7-ba64-49a9-843a-6f5cb17c5fa9",
+    "doi": "10.1016/j.cub.2023.11.057",
+    "download_url": "http://www.cell.com/article/S0960982223016457/pdf"
+  },
+  {
+    "question_id": "14fd2b75-76fb-4c29-a21d-c557b2bcf2ff",
+    "doi": "10.1016/j.ccell.2022.07.005",
+    "download_url": "http://www.cell.com/article/S153561082200318X/pdf"
+  },
+  {
+    "question_id": "7e7150d6-bc73-4a29-a5b3-4ef8399ed947",
+    "doi": "10.1101/2023.05.21.541555",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/05/22/2023.05.21.541555.full.pdf"
+  },
+  {
+    "question_id": "7e7150d6-bc73-4a29-a5b3-4ef8399ed947",
+    "doi": "10.1016/j.cell.2023.05.041",
+    "download_url": "http://www.cell.com/article/S0092867423005937/pdf"
+  },
+  {
+    "question_id": "58b39fab-337b-452d-b74f-84f9a188ce88",
+    "doi": "10.1016/j.febslet.2014.11.036",
+    "download_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1016/j.febslet.2014.11.036"
+  },
+  {
+    "question_id": "80e6571e-8f5d-496a-8ba3-9c9f5b783f5d",
+    "doi": "10.1016/j.immuni.2023.06.005",
+    "download_url": null
+  },
+  {
+    "question_id": "154e7b14-4ed5-4cf3-9149-0c4843fc62cc",
+    "doi": "10.1126/science.abf8761",
+    "download_url": null
+  },
+  {
+    "question_id": "a71ef7a2-31a2-460d-9ff4-32d7722353c3",
+    "doi": "10.1126/science.add5892",
+    "download_url": null
+  },
+  {
+    "question_id": "bcd2f213-c6c6-4660-af35-a7bd1c6a1170",
+    "doi": "10.1038/s41586-023-05906-y",
+    "download_url": null
+  },
+  {
+    "question_id": "941c04dc-c89d-4a90-87b0-930625268a38",
+    "doi": "10.1101/2023.11.15.567300",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/11/17/2023.11.15.567300.full.pdf"
+  },
+  {
+    "question_id": "ea4ce240-2864-4ee5-9ffc-2dbda0f8f550",
+    "doi": "10.1016/j.chom.2024.03.013",
+    "download_url": null
+  },
+  {
+    "question_id": "cff68274-4bbe-4fa0-a181-36a9af3cc0f1",
+    "doi": "10.1016/j.bpj.2021.11.1119",
+    "download_url": null
+  },
+  {
+    "question_id": "cff68274-4bbe-4fa0-a181-36a9af3cc0f1",
+    "doi": "10.1016/j.bpj.2022.02.026",
+    "download_url": null
+  },
+  {
+    "question_id": "2c262f91-52b6-421d-8341-8748f923459e",
+    "doi": "10.1016/j.bpj.2021.11.1119",
+    "download_url": null
+  },
+  {
+    "question_id": "2c262f91-52b6-421d-8341-8748f923459e",
+    "doi": "10.1016/j.bpj.2022.02.026",
+    "download_url": null
+  },
+  {
+    "question_id": "9a0b82cb-6a99-4e50-83fc-3ef2ebd277cc",
+    "doi": "10.1101/2023.12.13.571462",
+    "download_url": null
+  },
+  {
+    "question_id": "5c808548-92c4-4ae7-990c-e2df81e3c2ae",
+    "doi": "10.1242/jcs.115.4.827",
+    "download_url": null
+  },
+  {
+    "question_id": "564e715f-8d30-410b-bdb5-0dc5206589a7",
+    "doi": "10.1016/j.cub.2024.02.062",
+    "download_url": "http://www.cell.com/article/S0960982224002446/pdf"
+  },
+  {
+    "question_id": "e90ea0fc-4659-4b20-acae-75dc4b97a101",
+    "doi": "10.1073/pnas.2309656121",
+    "download_url": null
+  },
+  {
+    "question_id": "c246753c-27d2-4ae4-8630-b9b4077ba6f6",
+    "doi": "10.1101/2024.02.20.581217",
+    "download_url": null
+  },
+  {
+    "question_id": "fca26d7c-05cf-40b0-9fd6-a63ed7950909",
+    "doi": "10.1101/2023.11.29.569229",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2023/12/19/2023.11.29.569229.full.pdf"
+  },
+  {
+    "question_id": "bace5737-ba26-422a-8706-0fb1e92b689f",
+    "doi": "10.1038/s41587-024-02157-8",
+    "download_url": null
+  },
+  {
+    "question_id": "ff7328e2-4954-46a2-8ea3-d40b4df0c0ea",
+    "doi": "10.1093/nar/gkae167",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae167/56953488/gkae167.pdf"
+  },
+  {
+    "question_id": "76bcaeeb-93bd-4951-99b9-cf4613de1a37",
+    "doi": "10.1128/aem.01486-22",
+    "download_url": "https://journals.asm.org/doi/pdf/10.1128/aem.01486-22"
+  },
+  {
+    "question_id": "850f86d3-0139-43df-89fd-e606c30aaa8b",
+    "doi": "10.1016/j.immuni.2021.12.015",
+    "download_url": null
+  },
+  {
+    "question_id": "df061613-2591-4faa-be03-791c76375cb5",
+    "doi": "10.1016/j.chom.2022.07.016",
+    "download_url": "http://www.cell.com/article/S1931312822003626/pdf"
+  },
+  {
+    "question_id": "634f6745-f3b3-4cb1-9859-96ffb954b98a",
+    "doi": "10.1093/nar/gkae223",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae223/57155664/gkae223.pdf"
+  },
+  {
+    "question_id": "d1eabedb-656f-4f89-a65f-4ed89478ba9f",
+    "doi": "10.1016/j.neuron.2021.10.032",
+    "download_url": null
+  },
+  {
+    "question_id": "20980744-f9ff-4e39-a08d-106eada6900c",
+    "doi": "10.1038/s41586-022-05570-8",
+    "download_url": null
+  },
+  {
+    "question_id": "a6622141-68d6-418f-8e30-7a5eff3d4fa8",
+    "doi": "10.1021/acschembio.3c00138",
+    "download_url": null
+  },
+  {
+    "question_id": "9fe3ff3b-60cf-472d-ab1a-2bda1868f1b4",
+    "doi": "10.1101/2024.05.13.593760",
+    "download_url": null
+  },
+  {
+    "question_id": "b8ec372b-ae29-473e-96bc-86ff1ead24ea",
+    "doi": "10.1002/(sici)1097-0177(200006)218:2<235::aid-dvdy2>3.0.co;2-g",
+    "download_url": null
+  },
+  {
+    "question_id": "a45c277e-55d9-4e7f-b1de-37fc2e19daf6",
+    "doi": "10.1126/science.aaw1219",
+    "download_url": null
+  },
+  {
+    "question_id": "a8aa19cc-e4d1-4aa1-8c4e-2a518b4c99d6",
+    "doi": "10.1126/science.aaw1219",
+    "download_url": null
+  },
+  {
+    "question_id": "2c3ba95c-47d5-4798-9911-ffdb11c940e4",
+    "doi": "10.1038/s44320-024-00013-0",
+    "download_url": "https://www.embopress.org/doi/epdf/10.1038/s44320-024-00013-0"
+  },
+  {
+    "question_id": "49d2630e-9d26-4e12-89a3-3050a609abf5",
+    "doi": "10.1038/s41586-019-1506-7",
+    "download_url": null
+  },
+  {
+    "question_id": "c758f685-ba4a-4bf0-bd85-567c60ff1508",
+    "doi": "10.1073/pnas.2320421121",
+    "download_url": "https://pnas.org/doi/pdf/10.1073/pnas.2320421121"
+  },
+  {
+    "question_id": "5966d3db-5a23-4ea7-a719-2472019d94a6",
+    "doi": "10.1093/nar/gkae088",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae088/56668650/gkae088.pdf"
+  },
+  {
+    "question_id": "fd54d745-447c-4fcd-80de-463fcd3de6a4",
+    "doi": "10.1038/s44319-023-00030-4",
+    "download_url": "https://www.embopress.org/doi/epdf/10.1038/s44319-023-00030-4"
+  },
+  {
+    "question_id": "3f5bae15-bd5d-43e3-8e5e-944b1e533529",
+    "doi": "10.1093/nar/gkae069",
+    "download_url": "https://academic.oup.com/nar/article-pdf/52/8/4151/57446258/gkae069.pdf"
+  },
+  {
+    "question_id": "4d11258d-ee8c-4bc7-91a8-613c7a41f139",
+    "doi": "10.1073/pnas.2322520121",
+    "download_url": "https://pnas.org/doi/pdf/10.1073/pnas.2322520121"
+  },
+  {
+    "question_id": "178a5e56-340f-4ba8-a3e5-f024ca016f40",
+    "doi": "10.1101/2024.05.13.593833",
+    "download_url": null
+  },
+  {
+    "question_id": "c75879f4-9329-4594-8f6a-c4d421f2439f",
+    "doi": "10.1101/2024.05.13.593936",
+    "download_url": null
+  },
+  {
+    "question_id": "b2a0249b-2850-4576-8b78-8408c1e47324",
+    "doi": "10.1093/nar/gkae212",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae212/57125452/gkae212.pdf"
+  },
+  {
+    "question_id": "3d3fea17-c8ee-4005-94cb-d8798be696c3",
+    "doi": "10.1016/j.cell.2024.02.016",
+    "download_url": "http://www.cell.com/article/S009286742400182X/pdf"
+  },
+  {
+    "question_id": "ab58e166-f0b5-49ae-ac56-c38b5d6e8aad",
+    "doi": "10.1016/j.cell.2022.05.018",
+    "download_url": "https://www.cell.com/article/S0092867422006493/pdf"
+  },
+  {
+    "question_id": "a73b2c2d-a3ac-49e6-8e2e-44b4c1e6de94",
+    "doi": "10.1101/2024.05.15.594402",
+    "download_url": null
+  },
+  {
+    "question_id": "04dbe07d-8b2c-4daf-b5b2-ef0e93f1fd2a",
+    "doi": "10.1101/2024.05.14.593970",
+    "download_url": null
+  },
+  {
+    "question_id": "4a6705b5-85e5-44c1-8444-65be30192802",
+    "doi": "10.1093/nar/gkae222",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae222/57125377/gkae222.pdf"
+  },
+  {
+    "question_id": "08397294-3d99-4790-915c-b8bcb1e9e661",
+    "doi": "10.1101/2024.02.13.580051",
+    "download_url": "https://www.biorxiv.org/content/biorxiv/early/2024/02/13/2024.02.13.580051.full.pdf"
+  },
+  {
+    "question_id": "837b2489-723a-4099-9b68-c2a9ea688f4d",
+    "doi": "10.1101/2024.05.14.594155",
+    "download_url": null
+  },
+  {
+    "question_id": "745f5a0d-5f8f-405e-bb46-f37b3d1f0678",
+    "doi": "10.1101/2024.05.01.592108",
+    "download_url": null
+  },
+  {
+    "question_id": "bca1be77-208b-4d57-ac29-05aa6d58bdbf",
+    "doi": "10.1016/j.ccell.2024.03.013",
+    "download_url": null
+  },
+  {
+    "question_id": "2dc20a2f-de54-4bfe-a34f-1ba395f342cf",
+    "doi": "10.1016/j.bpj.2024.03.034",
+    "download_url": null
+  },
+  {
+    "question_id": "afb36e40-0836-4810-909e-eabfe17dcd8b",
+    "doi": "10.1093/nar/gkae102",
+    "download_url": "https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkae102/56777972/gkae102.pdf"
+  },
+  {
+    "question_id": "c6f097c9-2216-4e98-af45-8101681b38ec",
+    "doi": "10.1038/s41587-023-01801-z",
+    "download_url": null
+  },
+  {
+    "question_id": "40400348-eabb-4b25-90d1-e33589d3e5a4",
+    "doi": "10.1016/j.ccell.2021.11.002",
+    "download_url": "http://www.cell.com/article/S1535610821006024/pdf"
+  },
+  {
+    "question_id": "4949fc05-5f78-4dd0-8d9c-3dbb6004740a",
+    "doi": "10.1038/s41587-024-02174-7",
+    "download_url": null
+  },
+  {
+    "question_id": "c7b36a1c-ea80-4ae5-b2f1-3932cb16c3cf",
+    "doi": "10.1038/s41587-024-02174-7",
+    "download_url": null
+  },
+  {
+    "question_id": "ebe57888-662f-488f-ade1-c0aaffe638b1",
+    "doi": "10.1016/j.neuron.2021.08.014",
+    "download_url": "http://www.cell.com/article/S0896627321006115/pdf"
+  },
+  {
+    "question_id": "ef07d562-fc18-43c9-8201-7a189d76eeb9",
+    "doi": "10.1126/science.abi9591",
+    "download_url": "https://www.science.org/cms/asset/a024b72a-bd6a-4971-be3b-8f8c79bcc4bc/science.abi9591.v1.pdf"
+  },
+  {
+    "question_id": "8d12cb90-73c6-4cc1-9f83-0fa9fd822e92",
+    "doi": "10.1126/science.abk2432",
+    "download_url": null
+  }
+]
