@@ -607,7 +607,7 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
         "What is XAI?", settings=settings, summary_llm_model=summary_llm
     )
     assert my_results
-    assert len(my_results) >= 1, "Expected the callback to append results"
+    assert my_results, "Expected the callback to append results"
     assert my_results[0].name
     assert my_results[0].session_id
 
@@ -736,7 +736,7 @@ async def test_docs_with_custom_embedding(
             )
             assert collection_info.points_count > 0
         assert len(docs.texts_index) > 0
-        assert len(docs.texts_index.texts_hashes) > 0
+        assert docs.texts_index.texts_hashes
 
         # Clear the vector store via Docs
         docs.clear_docs()
@@ -746,7 +746,7 @@ async def test_docs_with_custom_embedding(
             assert not await docs.texts_index._collection_exists()
             assert docs.texts_index._point_ids is None
         assert len(docs.texts_index) == 0
-        assert len(docs.texts_index.texts_hashes) == 0
+        assert not docs.texts_index.texts_hashes
 
 
 @pytest.mark.asyncio
@@ -1467,8 +1467,9 @@ def test_docdetails_deserialization() -> None:
         deserialize_to_doc == deepcopy_deserialize_to_doc
     ), "Deserialization should not mutate input"
 
-    doc_details = DocDetails(**deserialize_to_doc)
-    serialized_doc_details = doc_details.model_dump(exclude_none=True)
+    serialized_doc_details = DocDetails(**deserialize_to_doc).model_dump(
+        exclude_none=True
+    )
     for key, value in {
         "docname": "unknownauthorsUnknownyearunknowntitle",
         "citation": "Unknown authors. Unknown title. Unknown journal, Unknown year.",

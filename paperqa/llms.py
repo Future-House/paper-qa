@@ -469,7 +469,7 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
                     collection_name=collection_name,
                     limit=batch_size,
                     offset=offset,
-                    with_payload=True,
+                    with_payload=True,  # noqa: FURB120
                     with_vectors=True,
                 )
                 all_points.extend(points[0])

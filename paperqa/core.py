@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 from collections.abc import Callable, Sequence
@@ -87,7 +88,9 @@ def llm_parse_json(text: str) -> dict:
     except json.JSONDecodeError as e:
         # If normal parsing fails, try to handle nested quotes case
         if "summary" in ptext and '"relevance_score"' in ptext:
-            try:
+            with contextlib.suppress(
+                Exception  # Continue to the standard error if regex approach fails
+            ):
                 # Extract summary and relevance_score directly using regex
                 summary_match = re.search(
                     r'"summary"\s*:\s*"(.*?)",\s*"relevance_score"', ptext, re.DOTALL
@@ -99,9 +102,6 @@ def llm_parse_json(text: str) -> dict:
                         "summary": summary_match.group(1).replace(r"\'", "'"),
                         "relevance_score": int(score_match.group(1)),
                     }
-            except Exception:  # noqa: S110
-                # Continue to the standard error if regex approach fails
-                pass
 
         raise ValueError(
             f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
