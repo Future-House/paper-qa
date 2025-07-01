@@ -357,7 +357,7 @@ async def read_doc(
     # start with parsing -- users may want to store this separately
     if str_path.endswith(".pdf"):
         # pymupdf is not thread-safe per docs here: https://pymupdf.readthedocs.io/en/latest/recipes-multiprocessing.html
-        parsed_text = parse_pdf_to_pages(path, **parser_kwargs)
+        parsed_text: ParsedText = parse_pdf_to_pages(path, **parser_kwargs)
     elif str_path.endswith(".txt"):
         # TODO: Make parse_text async
         parser_kwargs.pop("use_block_parsing", None)  # Not a parse_text kwarg
