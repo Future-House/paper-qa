@@ -1011,9 +1011,9 @@ async def test_search_pagination(agent_test_settings: Settings) -> None:
 
     page_size = 1
 
-    page1_results = await index.query(query="test", top_n=page_size, offset=0)
+    page1_results = await index.query(query="test", top_n=page_size)
     page2_results = await index.query(query="test", top_n=page_size, offset=page_size)
-    page1and2_results = await index.query(query="test", top_n=2 * page_size, offset=0)
+    page1and2_results = await index.query(query="test", top_n=2 * page_size)
 
     assert (
         page1_results == page1and2_results[:page_size]

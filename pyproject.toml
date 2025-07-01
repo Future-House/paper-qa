@@ -59,7 +59,7 @@ dev = [
     "fhlmi>=0.28",  # For update_litellm_max_callbacks convenience
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.68",  # Pin for PydanticDeprecatedSince20 fixes
+    "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
@@ -265,6 +265,7 @@ disable = [
     "unused-argument",  # Rely on ruff ARG002 for this
     "unused-import",  # Rely on ruff F401 for this
     "unused-variable",  # Rely on ruff F841 for this
+    "use-sequence-for-iteration",  # Rely on ruff C0208 for this
     "wrong-import-order",  # Rely on ruff I001 for this
     "wrong-import-position",  # Rely on ruff E402 for this
 ]
@@ -393,9 +394,7 @@ extend-select = [
     "FURB113",
     "FURB116",
     "FURB118",
-    "FURB122",
     "FURB131",
-    "FURB132",
     "FURB140",
     "FURB142",
     "FURB145",
@@ -403,17 +402,13 @@ extend-select = [
     "FURB152",
     "FURB154",
     "FURB156",
-    "FURB157",
-    "FURB162",
     "FURB164",
-    "FURB166",
     "FURB171",
     "FURB180",
     "FURB189",
     "FURB192",
     "LOG004",
-    "LOG014",
-    "PLC0415",
+    "PLC0207",
     "PLC1901",
     "PLC2701",
     "PLC2801",
@@ -427,23 +422,18 @@ extend-select = [
     "PLR0916",
     "PLR0917",
     "PLR1702",
-    "PLR1733",
     "PLR6104",
     "PLR6201",
     "PLR6301",
     "PLW0108",
-    "PLW0177",
     "PLW0244",
     "PLW1514",
     "PLW3201",
-    "PT028",
     "PT029",
-    "PT030",
-    "PT031",
+    "PTH211",
     "PYI059",
     "PYI061",
     "RUF027",
-    "RUF028",
     "RUF029",
     "RUF031",
     "RUF036",
@@ -453,22 +443,17 @@ extend-select = [
     "RUF043",
     "RUF045",
     "RUF047",
-    "RUF049",
     "RUF052",
-    "RUF053",
     "RUF054",
     "RUF055",
     "RUF056",
-    "RUF057",
-    "RUF058",
     "RUF059",
+    "RUF060",
+    "RUF061",
     "RUF102",
     "TC008",
     "UP042",
-    "UP045",
-    "UP046",
-    "UP047",
-    "UP049",
+    "UP050",
     "W391",
 ]
 # List of rule codes that are unsupported by Ruff, but should be preserved when

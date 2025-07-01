@@ -17,9 +17,9 @@
   "pre-commit": { enabled: true },
   packageRules: [
     {
-      // TODO: remove after fhaviary supports Python 3.13
+      // TODO: remove after fhaviary supports Python 3.14
       matchPackageNames: ["python"],
-      allowedVersions: "<=3.12",
+      allowedVersions: "<=3.13",
     },
   ],
 }

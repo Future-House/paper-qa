@@ -23,7 +23,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.13
+    rev: v0.12.1
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -32,7 +32,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.5.3
+    rev: v3.6.2
     hooks:
       - id: prettier
         exclude: ^docs/.*\.md$
@@ -60,11 +60,11 @@ repos:
     hooks:
       - id: check-mailmap
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.05.12
+    rev: 2025.06.23
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.13
+    rev: 0.7.17
     hooks:
       - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
@@ -95,7 +95,7 @@ repos:
     hooks:
       - id: markdown-toc-creator
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+    rev: v1.16.1
     hooks:
       - id: mypy
         args: [--pretty, --ignore-missing-imports]
@@ -104,7 +104,7 @@ repos:
           - PyMuPDF>=1.24.12
           - anyio
           - fhlmi>=0.28 # Match pyproject.toml
-          - fhaviary[llm]>=0.19 # Match pyproject.toml
+          - fhaviary[llm]>=0.20 # Match pyproject.toml
           - ldp>=0.25.0 # Match pyproject.toml
           - html2text
           - httpx

@@ -170,7 +170,7 @@ class VectorStore(BaseModel, ABC):
         ]
 
 
-class NumpyVectorStore(VectorStore):
+class NumpyVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
     texts: list[Embeddable] = Field(default_factory=list)
     _embeddings_matrix: np.ndarray | None = None
     _texts_filter: np.ndarray | None = None
@@ -274,7 +274,7 @@ class NumpyVectorStore(VectorStore):
         )
 
 
-class QdrantVectorStore(VectorStore):
+class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
     client: Any = Field(
         default=None,
         description=(
@@ -469,7 +469,7 @@ class QdrantVectorStore(VectorStore):
                     collection_name=collection_name,
                     limit=batch_size,
                     offset=offset,
-                    with_payload=True,
+                    with_payload=True,  # noqa: FURB120
                     with_vectors=True,
                 )
                 all_points.extend(points[0])
