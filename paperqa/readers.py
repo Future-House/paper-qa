@@ -14,6 +14,7 @@ from html2text import html2text
 from paperqa.types import (
     ChunkMetadata,
     Doc,
+    ParsedImage,
     ParsedMetadata,
     ParsedText,
     Text,
@@ -53,8 +54,8 @@ def parse_pdf_to_pages(
 ) -> ParsedText:
 
     with pymupdf.open(path) as file:
-        pages: dict[str, str] = {}
-        total_length = 0
+        content: dict[str, tuple[str, list[ParsedImage]]] = {}
+        total_length = count_images = 0
 
         for i in range(file.page_count):
             try:
@@ -90,16 +91,29 @@ def parse_pdf_to_pages(
                     f" long, which exceeds the {page_size_limit} char limit for the PDF"
                     f" at path {path}."
                 )
-            pages[str(i + 1)] = text
+            images = [
+                ParsedImage(
+                    index=img_index,
+                    data=file.extract_image(img_info["xref"])["image"],
+                    info=img_info,
+                )
+                for img_index, img_info in enumerate(
+                    # Extract images all at once using get_image_info()
+                    page.get_image_info(hashes=True, xrefs=True)
+                )
+            ]
+            content[str(i + 1)] = text, images
             total_length += len(text)
+            count_images += len(images)
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
         paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
+        count_parsed_images=count_images,
         parse_type="pdf",
     )
-    return ParsedText(content=pages, metadata=metadata)
+    return ParsedText(content=content, metadata=metadata)
 
 
 def chunk_pdf(
@@ -120,7 +134,10 @@ def chunk_pdf(
             f" {doc.dockey}, either empty or corrupted."
         )
 
-    for page_num, page_text in parsed_text.content.items():
+    for page_num, page_contents in parsed_text.content.items():
+        page_text = (
+            page_contents if isinstance(page_contents, str) else page_contents[0]
+        )
         split += page_text
         pages.append(page_num)
         # split could be so long it needs to be split

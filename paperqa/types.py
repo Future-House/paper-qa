@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import logging
 import os
 import re
@@ -20,6 +21,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    JsonValue,
     computed_field,
     field_validator,
     model_validator,
@@ -290,23 +292,51 @@ class ParsedMetadata(BaseModel):
 
     parsing_libraries: list[str]
     total_parsed_text_length: int
+    count_parsed_images: int = Field(default=0, ge=0)
     paperqa_version: str = pqa_version
     parse_type: str | None = None
     chunk_metadata: ChunkMetadata | None = None
 
 
+class ParsedImage(BaseModel):
+    """Raw image parsed from a document's page."""
+
+    index: int = Field(description="Index of the image in a given page.")
+    data: bytes = Field(
+        description="Raw image, ideally directly savable to an image file."
+    )
+    info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
+        default_factory=dict,
+        description=(
+            "Optional image metadata. This may come from image definitions sourced from"
+            " the PDF, or attributes of custom pixel maps."
+        ),
+    )
+
+    def to_base64(self) -> str:
+        """Convert the image data to a base64-encoded string."""
+        # 1. Convert raw image bytes to base64 bytes
+        # 2. Convert base64 bytes to base64 string,
+        #    using UTF-8 since base64 produces ASCII characters
+        return base64.b64encode(self.data).decode("utf-8")
+
+
 class ParsedText(BaseModel):
     """All text from a document read, before chunking."""
 
-    content: dict[str, str] | str | list[str] = Field(
+    content: (
+        dict[str, str] | str | list[str] | dict[str, tuple[str, list[ParsedImage]]]
+    ) = Field(
         description=(
             "All parsed but not further processed (e.g. not chunked) contents from a"
             " document. It may be structured, depending on the parser's implementation."
             " Thus it can take various shapes depending on the document type"
             " (e.g. PDF, HTML) and parser:"
-            "\n- `dict[str, str]` (e.g. page number -> page text) for PDFs."
+            "\n- (Legacy) `dict[str, str]` (e.g. page number -> page text) for PDFs."
             "\n- `str` for text files."
             "\n- `list[str]` for line-by-line parsings."
+            "\n- `dict[str, tuple[str, list[ParsedImage]]]` (e.g. page number"
+            " -> (page text, page images)) for PDFs."
         )
     )
     metadata: ParsedMetadata = Field(
@@ -332,7 +362,9 @@ class ParsedText(BaseModel):
             return self.content
         if isinstance(self.content, list):
             return "\n\n".join(self.content)
-        return "\n\n".join(self.content.values())
+        return "\n\n".join(
+            x[0] if not isinstance(x, str) else x for x in self.content.values()
+        )
 
 
 # We use these integer values

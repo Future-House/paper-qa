@@ -1,3 +1,4 @@
+import base64
 import contextlib
 import os
 import pathlib
@@ -998,7 +999,22 @@ def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     assert (
         "Abstract\n\nWe introduce PaSa, an advanced Paper Search"
         "\nagent powered by large language models."
-    ) in parsed_text.content["1"]
+    ) in parsed_text.content["1"][0]
+
+    # Now let's check the images in Figure 1
+    assert not isinstance(parsed_text.content["2"], str)
+    p2_text, p2_images = parsed_text.content["2"]
+    assert "Figure 1" in p2_text, "Expected Figure 1 title"
+    assert "Crawler" in p2_text, "Expected Figure 1 contents"
+    assert len(p2_images) > 10, "Figure 1 contains many images"
+    for i, image in enumerate(p2_images):
+        assert image.index == i
+        assert isinstance(image.data, bytes)
+
+        # Check the image is valid base64
+        base64_data = image.to_base64()
+        assert base64_data
+        assert base64.b64decode(base64_data, validate=True) == image.data
 
 
 @pytest.mark.vcr
@@ -1136,9 +1152,12 @@ async def test_parser_only_reader(stub_data_dir: Path):
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
     assert isinstance(parsed_text.content, dict)
-    assert parsed_text.metadata.total_parsed_text_length == sum(
-        len(t) for t in parsed_text.content.values()
-    )
+    num_chars = 0
+    for value in parsed_text.content.values():
+        assert isinstance(value, tuple)
+        num_chars += len(value[0])
+    assert parsed_text.metadata.total_parsed_text_length == num_chars
+    assert parsed_text.metadata.count_parsed_images > 1, "Expected images to be parsed"
 
 
 @pytest.mark.asyncio
@@ -1180,6 +1199,7 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
+    assert metadata.count_parsed_images > 1, "Expected images to be parsed"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
