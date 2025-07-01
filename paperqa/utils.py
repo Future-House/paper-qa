@@ -126,7 +126,7 @@ def extract_score(text: str) -> int:
     """
     # Check for N/A, not applicable, not relevant.
     # Don't check for NA, as there can be genes containing "NA"
-    last_line = text.split("\n")[-1]
+    last_line = text.rsplit("\n", maxsplit=1)[-1]
     if (
         "n/a" in last_line.lower()
         or "not applicable" in text.lower()
