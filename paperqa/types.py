@@ -242,9 +242,9 @@ class PQASession(BaseModel):
         """Filter out extra items (inplace) that do not need to be returned to the user."""
         self.contexts = [
             Context(
-                context=c.context,
-                question=c.question,
-                score=c.score,
+                # Dump all fields from the original context (including extras),
+                # but exclude 'text' so we can replace it below.
+                **c.model_dump(exclude={"text"}),
                 text=Text(
                     text="",
                     **c.text.model_dump(exclude={"text", "embedding", "doc"}),

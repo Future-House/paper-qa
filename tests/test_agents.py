@@ -960,6 +960,7 @@ def test_answers_are_striped() -> None:
                     ),
                 ),
                 score=3,
+                extra_field="extra_value",
             )
         ],
     )
@@ -969,6 +970,7 @@ def test_answers_are_striped() -> None:
     assert not response.session.contexts[0].text.text
     assert response.session.contexts[0].text.doc is not None
     assert response.session.contexts[0].text.doc.embedding is None
+    assert response.session.contexts[0].extra_field is not None  # type: ignore[attr-defined]
     # make sure it serializes
     response.model_dump_json()
 
