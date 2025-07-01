@@ -572,22 +572,23 @@ wheels = [
 
 [[package]]
 name = "fhaviary"
-version = "0.20.0"
+version = "0.21.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/04/52/33dd26bad0acf70df0b493790dfd636d6adcc4a2f326e447a6da8a14e00d/fhaviary-0.20.0.tar.gz", hash = "sha256:6ed7ed13f1496e1f41569caac41b04af23ef451c274e45ef6e12bc7361b8b7b7", size = 5739777, upload-time = "2025-06-13T19:11:21.101Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3a/7e/e9eb6341373ad577c073f18c8ceef8f3da1c739c98d9117ed69d217b6707/fhaviary-0.21.0.tar.gz", hash = "sha256:a09ccd85f51f172d201fc8a910ecb54f59a7c363c16ee1a1d33f25f8564a14e5", size = 5740782, upload-time = "2025-06-27T17:33:49.633Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/0d/a58a643bcedb7cef15daa95623511aaaa16b71dfab7b39fadda78c3c7fe3/fhaviary-0.20.0-py3-none-any.whl", hash = "sha256:5e3e4a7fa30c64b273aeb57b0f7420cb04f7411f1ae49a62989b9ed13b3f3271", size = 56929, upload-time = "2025-06-13T19:11:14.974Z" },
+    { url = "https://files.pythonhosted.org/packages/44/b2/61142527b33f7f1cd94cf0d24953b195099cfee4caa94579d0b3226c7301/fhaviary-0.21.0-py3-none-any.whl", hash = "sha256:2a01136a2cdcdfbb9be1667354513bac5f2b1677bf8231308c4af3fe3f778723", size = 57569, upload-time = "2025-06-27T17:33:46.075Z" },
 ]
 
 [package.optional-dependencies]
 llm = [
     { name = "fhlmi" },
     { name = "litellm" },
+    { name = "packaging" },
 ]
 
 [[package]]
@@ -1270,7 +1271,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.73.1"
+version = "1.70.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1285,9 +1286,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cb/2e/d1bb4ab457e17ff52854b9d07d94f430c173db933da5b366516f5376c5de/litellm-1.73.1.tar.gz", hash = "sha256:33ad55ff051bf925419619ec37f32949decdc52a6109c8c0700cfb1209696590", size = 8667338, upload-time = "2025-06-24T15:26:01.194Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/d7/d0d76ba896a1e8978550dcc76157d1c50910ba9ade4ef3981a34f01f4fa6/litellm-1.70.4.tar.gz", hash = "sha256:ef6749a091faaaf88313afe4111cdd95736e1e60f21ba894e74f7c5bab2870bd", size = 7813817, upload-time = "2025-05-23T00:05:24.47Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ca/c6/a82c14d4dabc0ced101a44d9c6b2224f4405fae03e3bff4817ae73237f0c/litellm-1.73.1-py3-none-any.whl", hash = "sha256:4a1c21c3ab3902874c4a4ea1cfd9bf4d2b470829ab6a4ee776b32f81d26bdbc6", size = 8370323, upload-time = "2025-06-24T15:25:58.686Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/8f/0b26ecb08b8282ae0fdfa2223b5df8263579c9e3c75ca96bb7fb7cbc632c/litellm-1.70.4-py3-none-any.whl", hash = "sha256:4d14d04bf5e2bd49336b4abc59193352c731ff371022e4fcf590208f41f644f7", size = 7903749, upload-time = "2025-05-23T00:05:21.017Z" },
 ]
 
 [[package]]
@@ -1954,7 +1955,7 @@ requires-dist = [
     { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0" },
-    { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.68" },
+    { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.68,<1.71" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },

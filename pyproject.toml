@@ -59,7 +59,7 @@ dev = [
     "fhlmi>=0.28",  # For update_litellm_max_callbacks convenience
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.68",  # Pin for PydanticDeprecatedSince20 fixes
+    "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[ldp,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
