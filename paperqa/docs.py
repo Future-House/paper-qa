@@ -50,7 +50,7 @@ from paperqa.utils import (
 logger = logging.getLogger(__name__)
 
 
-class Docs(BaseModel):
+class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     """A collection of documents to be used for answering questions."""
 
     model_config = ConfigDict(extra="forbid")
