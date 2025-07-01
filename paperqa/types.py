@@ -8,7 +8,8 @@ from collections.abc import Collection, Mapping
 from copy import deepcopy
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, ClassVar, cast
+from pathlib import Path
+from typing import Annotated, Any, ClassVar, cast
 from uuid import UUID, uuid4
 
 import tiktoken
@@ -19,19 +20,24 @@ from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
 from pydantic import (
     BaseModel,
+    BeforeValidator,
     ConfigDict,
     Field,
+    JsonValue,
+    PlainSerializer,
     computed_field,
     field_validator,
     model_validator,
 )
 
 from paperqa.utils import (
+    bytes_to_string,
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citation_ids,
     maybe_get_date,
+    string_to_bytes,
 )
 from paperqa.version import __version__ as pqa_version
 
@@ -392,23 +398,57 @@ class ParsedMetadata(BaseModel):
 
     parsing_libraries: list[str]
     total_parsed_text_length: int
+    count_parsed_images: int = Field(default=0, ge=0)
     paperqa_version: str = pqa_version
     parse_type: str | None = None
     chunk_metadata: ChunkMetadata | None = None
 
 
+class ParsedImage(BaseModel):
+    """Raw image parsed from a document's page."""
+
+    index: int = Field(
+        description="Index of the image in a given page, or 0 if solely an image."
+    )
+    data: Annotated[
+        bytes,
+        PlainSerializer(bytes_to_string),
+        BeforeValidator(lambda x: x if isinstance(x, bytes) else string_to_bytes(x)),
+    ] = Field(description="Raw image, ideally directly savable to a PNG image.")
+    info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
+        default_factory=dict,
+        description=(
+            "Optional image metadata. This may come from image definitions sourced from"
+            " the PDF, or attributes of custom pixel maps."
+        ),
+    )
+
+    def to_image_url(self, image_type: str = "png") -> str:
+        """Convert the image data to an RFC 2397 data URL format."""
+        return f"data:image/{image_type};base64,{bytes_to_string(self.data)}"
+
+    def save(self, path: str | os.PathLike) -> None:
+        """Save the image to the input file path."""
+        with Path(path).open("wb") as f:
+            f.write(self.data)
+
+
 class ParsedText(BaseModel):
     """All text from a document read, before chunking."""
 
-    content: dict[str, str] | str | list[str] = Field(
+    content: (
+        dict[str, str] | str | list[str] | dict[str, tuple[str, list[ParsedImage]]]
+    ) = Field(
         description=(
             "All parsed but not further processed (e.g. not chunked) contents from a"
             " document. It may be structured, depending on the parser's implementation."
             " Thus it can take various shapes depending on the document type"
             " (e.g. PDF, HTML) and parser:"
-            "\n- `dict[str, str]` (e.g. page number -> page text) for PDFs."
+            "\n- (Legacy) `dict[str, str]` (e.g. page number -> page text) for PDFs."
             "\n- `str` for text files."
             "\n- `list[str]` for line-by-line parsings."
+            "\n- `dict[str, tuple[str, list[ParsedImage]]]` (e.g. page number"
+            " -> (page text, page images)) for PDFs."
         )
     )
     metadata: ParsedMetadata = Field(
@@ -434,7 +474,9 @@ class ParsedText(BaseModel):
             return self.content
         if isinstance(self.content, list):
             return "\n\n".join(self.content)
-        return "\n\n".join(self.content.values())
+        return "\n\n".join(
+            x[0] if not isinstance(x, str) else x for x in self.content.values()
+        )
 
 
 class BibTeXSource(StrEnum):
