@@ -1152,12 +1152,31 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert metadata.chunk_metadata.chunk_type == "overlap_pdf_by_page"
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.chunk_chars == 3000
-    assert all(len(chunk.text) <= 3000 for chunk in chunk_text)
-    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    assert len(chunk_text) > 2, "Expected multiple chunks, for meaningful assertions"
+    assert all(
+        len(chunk.text) <= metadata.chunk_metadata.chunk_chars for chunk in chunk_text
+    )
+    assert (
+        metadata.total_parsed_text_length // metadata.chunk_metadata.chunk_chars
+        <= len(chunk_text)
+    )
     assert all(
         chunk_text[i].text[-100:] == chunk_text[i + 1].text[:100]
         for i in range(len(chunk_text) - 1)
     )
+    # Let's check the pages in the chunk names
+    first_page, _ = chunk_text[0].name.rsplit(" ", maxsplit=1)[-1].split("-")
+    assert first_page == "1", "First chunk should be for page 1"
+    stlast_page, last_page = chunk_text[-1].name.rsplit(" ", maxsplit=1)[-1].split("-")
+    assert (
+        int(last_page) - int(first_page) > 2
+    ), "Expected many pages, for meaningful assertions"
+    assert (
+        len(chunk_text[-1].text) < metadata.chunk_metadata.chunk_chars
+    ), "Expected last chunk to be a partial chunk, for meaningful assertions"
+    assert (
+        int(last_page) - int(stlast_page) <= 2
+    ), "Incorrect page range if last chunk is a partial chunk"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
@@ -1171,8 +1190,14 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert metadata.chunk_metadata.chunk_type == "overlap"
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.chunk_chars == 3000
-    assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
-    assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+    assert all(
+        len(chunk.text) <= metadata.chunk_metadata.chunk_chars * 1.25
+        for chunk in chunk_text
+    )
+    assert (
+        metadata.total_parsed_text_length // metadata.chunk_metadata.chunk_chars
+        <= len(chunk_text)
+    )
 
     for code_input in (
         Path(__file__),  # Python gets parsed into `list[str]` content
@@ -1189,8 +1214,14 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
         assert metadata.chunk_metadata.chunk_type == "overlap_code_by_line"
         assert metadata.chunk_metadata.overlap == 100
         assert metadata.chunk_metadata.chunk_chars == 3000
-        assert all(len(chunk.text) <= 3000 * 1.25 for chunk in chunk_text)
-        assert metadata.total_parsed_text_length // 3000 <= len(chunk_text)
+        assert all(
+            len(chunk.text) <= metadata.chunk_metadata.chunk_chars * 1.25
+            for chunk in chunk_text
+        )
+        assert (
+            metadata.total_parsed_text_length // metadata.chunk_metadata.chunk_chars
+            <= len(chunk_text)
+        )
 
 
 @pytest.mark.asyncio
