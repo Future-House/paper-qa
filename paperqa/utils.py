@@ -20,7 +20,6 @@ from uuid import UUID
 
 import aiohttp
 import httpx
-import pymupdf
 from lmi import configure_llm_logs
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
@@ -94,11 +93,6 @@ def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float
 
     # return the similarity ratio
     return len(ss1.intersection(ss2)) / len(ss1.union(ss2))
-
-
-def count_pdf_pages(file_path: str | os.PathLike) -> int:
-    with pymupdf.open(file_path) as doc:
-        return len(doc)
 
 
 def hexdigest(data: str | bytes) -> str:
@@ -478,9 +472,6 @@ def pqa_directory(name: str) -> Path:
 
 def setup_default_logs() -> None:
     """Configure logs to reasonable defaults."""
-    # Trigger PyMuPDF to use Python logging
-    # SEE: https://pymupdf.readthedocs.io/en/latest/app3.html#diagnostics
-    pymupdf.set_messages(pylogging=True)
     configure_llm_logs()
 
 

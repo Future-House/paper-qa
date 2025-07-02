@@ -96,9 +96,19 @@ class Doc(Embeddable):
 
 
 class Text(Embeddable):
-    text: str
-    name: str
-    doc: Doc | DocDetails = Field(union_mode="left_to_right")
+    """A text chunk ready for use in retrieval with a linked document."""
+
+    text: str = Field(description="Processed text content of the chunk.")
+    name: str = Field(
+        description=(
+            "Human-readable identifier for the chunk"
+            " (e.g., 'Wiki2023 chunk 1', 'sentence1')."
+        )
+    )
+    doc: Doc | DocDetails = Field(
+        union_mode="left_to_right",
+        description="Source document this text chunk originates from.",
+    )
 
     def __hash__(self) -> int:
         return hash(self.text)
@@ -286,10 +296,22 @@ class ParsedMetadata(BaseModel):
 
 
 class ParsedText(BaseModel):
-    """Parsed text (pre-chunking)."""
+    """All text from a document read, before chunking."""
 
-    content: dict | str | list[str]
-    metadata: ParsedMetadata
+    content: dict[str, str] | str | list[str] = Field(
+        description=(
+            "All parsed but not further processed (e.g. not chunked) contents from a"
+            " document. It may be structured, depending on the parser's implementation."
+            " Thus it can take various shapes depending on the document type"
+            " (e.g. PDF, HTML) and parser:"
+            "\n- `dict[str, str]` (e.g. page number -> page text) for PDFs."
+            "\n- `str` for text files."
+            "\n- `list[str]` for line-by-line parsings."
+        )
+    )
+    metadata: ParsedMetadata = Field(
+        description="Metadata on the parsing process used."
+    )
 
     def encode_content(self):
         # we tokenize using tiktoken so cuts are in reasonable places

@@ -11,7 +11,7 @@ from aviary.utils import MultipleChoiceQuestion
 from pydantic_settings import CliSettingsSource
 from rich.logging import RichHandler
 
-from paperqa.settings import Settings, get_settings
+from paperqa.settings import ParsingSettings, Settings, get_settings
 from paperqa.utils import pqa_directory, run_or_ensure, setup_default_logs
 from paperqa.version import __version__
 
@@ -93,7 +93,10 @@ def configure_cli_logging(verbosity: int | Settings = 0) -> None:
     setup_default_logs()
     set_up_rich_handler()
     if isinstance(verbosity, Settings):
+        verbosity.parsing.configure_pdf_parser()
         verbosity = verbosity.verbosity
+    else:
+        ParsingSettings.model_fields["configure_pdf_parser"].default()
     configure_log_verbosity(verbosity)
     if verbosity > 0:
         print(f"PaperQA version: {__version__}")

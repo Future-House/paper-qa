@@ -1131,6 +1131,7 @@ async def test_parser_only_reader(stub_data_dir: Path):
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=True,
+        parse_pdf=parse_pdf_to_pages,
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
@@ -1146,6 +1147,7 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
+        parse_pdf=parse_pdf_to_pages,
     )
     assert metadata.parse_type == "pdf"
     assert isinstance(metadata.chunk_metadata, ChunkMetadata)

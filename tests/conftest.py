@@ -31,15 +31,17 @@ def _load_env() -> None:
     load_dotenv()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="session")
 def _setup_default_logs() -> None:
     # Lazily import from paperqa so typeguard doesn't throw:
     # > /path/to/.venv/lib/python3.12/site-packages/typeguard/_pytest_plugin.py:93:
     # > InstrumentationWarning: typeguard cannot check these packages because they
     # > are already imported: paperqa
+    from paperqa.settings import ParsingSettings
     from paperqa.utils import setup_default_logs
 
     setup_default_logs()
+    ParsingSettings.model_fields["configure_pdf_parser"].default()
 
 
 @pytest.fixture(autouse=True, scope="session")

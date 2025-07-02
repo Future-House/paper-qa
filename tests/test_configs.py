@@ -65,10 +65,13 @@ HOME_DIR = str(pathlib.Path.home())
 
 def test_settings_default_instantiation(tmpdir, subtests: SubTests) -> None:
     default_settings = Settings()
-    assert "gpt-" in default_settings.llm
-    assert default_settings.answer.evidence_k == 10
-    assert HOME_DIR in str(default_settings.agent.index.index_directory)
-    assert ".pqa" in str(default_settings.agent.index.index_directory)
+    # Also let's check our default settings work fine with round-trip JSON serialization
+    serde_default_settings = Settings(**default_settings.model_dump(mode="json"))
+    for setting in (default_settings, serde_default_settings):
+        assert "gpt-" in setting.llm
+        assert setting.answer.evidence_k == 10
+        assert HOME_DIR in str(setting.agent.index.index_directory)
+        assert ".pqa" in str(setting.agent.index.index_directory)
 
     with subtests.test(msg="alternate-pqa-home"):
         assert HOME_DIR not in str(tmpdir), "Later assertion requires this to pass"
