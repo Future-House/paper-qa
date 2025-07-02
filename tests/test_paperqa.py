@@ -1225,8 +1225,9 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
+    assert isinstance(parsed_text.content, dict)
     assert parsed_text.metadata.total_parsed_text_length == sum(
-        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
+        len(t) for t in parsed_text.content.values()
     )
 
 
