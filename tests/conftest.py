@@ -37,9 +37,11 @@ def _setup_default_logs() -> None:
     # > /path/to/.venv/lib/python3.12/site-packages/typeguard/_pytest_plugin.py:93:
     # > InstrumentationWarning: typeguard cannot check these packages because they
     # > are already imported: paperqa
+    from paperqa.readers import setup_pymupdf_python_logging
     from paperqa.utils import setup_default_logs
 
     setup_default_logs()
+    setup_pymupdf_python_logging()
 
 
 @pytest.fixture(autouse=True, scope="session")

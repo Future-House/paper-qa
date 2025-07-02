@@ -21,6 +21,16 @@ from paperqa.types import (
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
+
+def setup_pymupdf_python_logging() -> None:
+    """
+    Configure PyMuPDF to use Python logging.
+
+    SEE: https://pymupdf.readthedocs.io/en/latest/app3.html#diagnostics
+    """
+    pymupdf.set_messages(pylogging=True)
+
+
 BLOCK_TEXT_INDEX = 4
 
 

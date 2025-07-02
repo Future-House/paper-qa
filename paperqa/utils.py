@@ -20,7 +20,6 @@ from uuid import UUID
 
 import aiohttp
 import httpx
-import pymupdf
 from lmi import configure_llm_logs
 from pybtex.database import Person, parse_string
 from pybtex.database.input.bibtex import Parser
@@ -473,9 +472,6 @@ def pqa_directory(name: str) -> Path:
 
 def setup_default_logs() -> None:
     """Configure logs to reasonable defaults."""
-    # Trigger PyMuPDF to use Python logging
-    # SEE: https://pymupdf.readthedocs.io/en/latest/app3.html#diagnostics
-    pymupdf.set_messages(pylogging=True)
     configure_llm_logs()
 
 
