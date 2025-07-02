@@ -888,6 +888,8 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                               |
 | `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                           |
 | `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                         |
+| `parsing.parse_pdf`                          | `parse_pdf_to_pages`                   | Function to parse PDF files.                                                                            |
+| `parsing.configure_pdf_parser`               | `setup_pymupdf_python_logging`         | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging. |
 | `parsing.chunking_algorithm`                 | `ChunkingOptions.SIMPLE_OVERLAP`       | Algorithm for chunking.                                                                                 |
 | `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                 |
 | `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                          |

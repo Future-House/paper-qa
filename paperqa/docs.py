@@ -299,6 +299,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 overlap=parse_config.overlap,
                 page_size_limit=parse_config.page_size_limit,
                 use_block_parsing=parse_config.pdfs_use_block_parsing,
+                parse_pdf=parse_config.parse_pdf,
             )
             if not texts:
                 raise ValueError(f"Could not read document {path}. Is it empty?")
@@ -392,6 +393,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             overlap=parse_config.overlap,
             page_size_limit=parse_config.page_size_limit,
             use_block_parsing=parse_config.pdfs_use_block_parsing,
+            parse_pdf=parse_config.parse_pdf,
         )
         # loose check to see if document was loaded
         if (

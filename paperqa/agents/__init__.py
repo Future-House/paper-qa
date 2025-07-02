@@ -11,8 +11,7 @@ from aviary.utils import MultipleChoiceQuestion
 from pydantic_settings import CliSettingsSource
 from rich.logging import RichHandler
 
-from paperqa.readers import setup_pymupdf_python_logging
-from paperqa.settings import Settings, get_settings
+from paperqa.settings import ParsingSettings, Settings, get_settings
 from paperqa.utils import pqa_directory, run_or_ensure, setup_default_logs
 from paperqa.version import __version__
 
@@ -92,10 +91,12 @@ def configure_log_verbosity(verbosity: int = 0) -> None:
 def configure_cli_logging(verbosity: int | Settings = 0) -> None:
     """Suppress loquacious loggers according to the settings' verbosity level."""
     setup_default_logs()
-    setup_pymupdf_python_logging()
     set_up_rich_handler()
     if isinstance(verbosity, Settings):
+        verbosity.parsing.configure_pdf_parser()
         verbosity = verbosity.verbosity
+    else:
+        ParsingSettings.model_fields["configure_pdf_parser"].default()
     configure_log_verbosity(verbosity)
     if verbosity > 0:
         print(f"PaperQA version: {__version__}")
