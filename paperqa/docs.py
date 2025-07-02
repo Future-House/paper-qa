@@ -233,7 +233,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
     def add(
         self,
-        path: str | Path,
+        path: str | os.PathLike,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
@@ -270,7 +270,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
     async def aadd(  # noqa: PLR0912
         self,
-        path: str | Path,
+        path: str | os.PathLike,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
