@@ -1006,7 +1006,9 @@ def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     p2_text, p2_images = parsed_text.content["2"]
     assert "Figure 1" in p2_text, "Expected Figure 1 title"
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
-    assert len(p2_images) > 10, "Figure 1 contains many images"
+    assert (
+        1 <= len(p2_images) <= 3
+    ), "Expected Figure 1 to be present within a reasonable number of images"
     for i, image in enumerate(p2_images):
         assert image.index == i
         assert isinstance(image.data, bytes)

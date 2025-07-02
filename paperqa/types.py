@@ -303,7 +303,7 @@ class ParsedImage(BaseModel):
 
     index: int = Field(description="Index of the image in a given page.")
     data: bytes = Field(
-        description="Raw image, ideally directly savable to an image file."
+        description="Raw image, ideally directly savable to a PNG image."
     )
     info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
         default_factory=dict,

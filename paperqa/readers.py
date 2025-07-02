@@ -45,12 +45,30 @@ class PDFParserFn(Protocol):
 
 
 BLOCK_TEXT_INDEX = 4
+# Attributes of pymupdf.Pixmap that contain useful metadata
+PYMUPDF_PIXMAP_ATTRS = {
+    "alpha",
+    "digest",
+    "height",
+    "irect",
+    "is_monochrome",
+    "is_unicolor",
+    "n",
+    "size",
+    "stride",
+    "width",
+    "x",
+    "xres",
+    "y",
+    "yres",
+}
 
 
 def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     use_block_parsing: bool = False,
+    image_dpi: float | None = 150,
 ) -> ParsedText:
 
     with pymupdf.open(path) as file:
@@ -91,17 +109,19 @@ def parse_pdf_to_pages(
                     f" long, which exceeds the {page_size_limit} char limit for the PDF"
                     f" at path {path}."
                 )
-            images = [
-                ParsedImage(
-                    index=img_index,
-                    data=file.extract_image(img_info["xref"])["image"],
-                    info=img_info,
+            images: list[ParsedImage] = []
+            for box_i, box in enumerate(
+                page.cluster_drawings(drawings=page.get_drawings())
+            ):
+                pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                images.append(
+                    ParsedImage(
+                        index=box_i,
+                        data=pix.tobytes(),
+                        info={"bbox": tuple(box)}
+                        | {attr: getattr(pix, attr) for attr in PYMUPDF_PIXMAP_ATTRS},
+                    )
                 )
-                for img_index, img_info in enumerate(
-                    # Extract images all at once using get_image_info()
-                    page.get_image_info(hashes=True, xrefs=True)
-                )
-            ]
             content[str(i + 1)] = text, images
             total_length += len(text)
             count_images += len(images)
