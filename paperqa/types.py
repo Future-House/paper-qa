@@ -296,7 +296,7 @@ class ParsedMetadata(BaseModel):
 
 
 class ParsedText(BaseModel):
-    """All text from a document read, before any processing such as chunking."""
+    """All text from a document read, before chunking."""
 
     content: dict[str, str] | str | list[str] = Field(
         description=(
