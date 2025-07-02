@@ -15,7 +15,7 @@ except ImportError as e:
         " `pip install paper-qa[zotero]`."
     ) from e
 from paperqa.paths import PAPERQA_DIR
-from paperqa.utils import count_pdf_pages
+from paperqa.readers import parse_pdf_to_pages
 
 
 class ZoteroPaper(BaseModel):
@@ -252,11 +252,16 @@ class ZoteroDB(zotero.Zotero):
                 pdf = cast("Path", pdf)
                 title = item["data"].get("title", "")
                 if len(items) >= start:
+                    parsed_text = parse_pdf_to_pages(pdf)
+                    assert isinstance(parsed_text.content, dict), (  # noqa: S101
+                        f"The content type coming from {parse_pdf_to_pages.__name__}"
+                        f" should be a dict, not {type(parsed_text.content)}."
+                    )
                     yield ZoteroPaper(
                         key=_get_citation_key(item),
                         title=title,
                         pdf=pdf,
-                        num_pages=count_pdf_pages(pdf),
+                        num_pages=len(parsed_text.content),
                         details=item,
                         zotero_key=item["key"],
                     )

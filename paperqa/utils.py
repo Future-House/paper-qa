@@ -96,11 +96,6 @@ def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float
     return len(ss1.intersection(ss2)) / len(ss1.union(ss2))
 
 
-def count_pdf_pages(file_path: str | os.PathLike) -> int:
-    with pymupdf.open(file_path) as doc:
-        return len(doc)
-
-
 def hexdigest(data: str | bytes) -> str:
     if isinstance(data, str):
         return hashlib.md5(data.encode("utf-8")).hexdigest()  # noqa: S324
