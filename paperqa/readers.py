@@ -4,7 +4,7 @@ import asyncio
 import os
 from math import ceil
 from pathlib import Path
-from typing import Literal, Protocol, cast, overload, runtime_checkable
+from typing import Any, Literal, Protocol, cast, overload, runtime_checkable
 
 import pymupdf
 import tiktoken
@@ -154,6 +154,16 @@ def chunk_pdf(
             f" {doc.dockey}, either empty or corrupted."
         )
 
+    def make_kwargs(lower_page: str, upper_page: str) -> dict[str, Any]:
+        images: list[ParsedImage] = []
+        for pg_num in range(int(lower_page), int(upper_page) + 1):
+            pg_contents = cast(dict, parsed_text.content)[str(pg_num)]
+            if isinstance(pg_contents, tuple):
+                images.extend(pg_contents[1])
+        # pretty formatting of pages (e.g. 1-3, 4, 5-7)
+        name = "-".join([lower_page, upper_page])
+        return {"name": f"{doc.docname} pages {name}", "images": images, "doc": doc}
+
     for page_num, page_contents in parsed_text.content.items():
         page_text = (
             page_contents if isinstance(page_contents, str) else page_contents[0]
@@ -164,21 +174,14 @@ def chunk_pdf(
         # into multiple chunks. Or it could be so short
         # that it needs to be combined with the next chunk.
         while len(split) > chunk_chars:
-            # pretty formatting of pages (e.g. 1-3, 4, 5-7)
-            pg = "-".join([pages[0], pages[-1]])
             texts.append(
-                Text(
-                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
-                )
+                Text(text=split[:chunk_chars], **make_kwargs(pages[0], pages[-1]))
             )
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
     if len(split) > overlap or not texts:
-        pg = "-".join([pages[0], pages[-1]])
-        texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
-        )
+        texts.append(Text(text=split[:chunk_chars], **make_kwargs(pages[0], pages[-1])))
     return texts
 
 

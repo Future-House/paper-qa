@@ -107,6 +107,9 @@ class Text(Embeddable):
             " (e.g., 'Wiki2023 chunk 1', 'sentence1')."
         )
     )
+    images: list[ParsedImage] = Field(
+        default_factory=list, description="Optional list of associated images."
+    )
     doc: Doc | DocDetails = Field(
         union_mode="left_to_right",
         description="Source document this text chunk originates from.",

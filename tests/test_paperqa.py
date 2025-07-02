@@ -1202,6 +1202,9 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
     assert metadata.count_parsed_images > 1, "Expected images to be parsed"
+    assert (
+        sum(len(t.images) for t in chunk_text) == metadata.count_parsed_images
+    ), "Expected chunks' images to match parsed images"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
