@@ -21,7 +21,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from paperqa.types import CITATION_FALLBACK_DATA, DocDetails
+from paperqa.types import CITATION_FALLBACK_DATA, BibTeXSource, DocDetails
 from paperqa.utils import BIBTEX_MAPPING as CROSSREF_CONTENT_TYPE_TO_BIBTEX_MAPPING
 from paperqa.utils import (
     bibtex_field_extract,
@@ -167,7 +167,7 @@ async def parse_crossref_to_doc_details(
     query_bibtex: bool = True,
 ) -> DocDetails:
 
-    bibtex_source = "self_generated"
+    bibtex_source = BibTeXSource.SELF_GENERATED.value
     bibtex = None
 
     with contextlib.suppress(DOINotFoundError):
@@ -186,7 +186,7 @@ async def parse_crossref_to_doc_details(
                 message["DOI"], session, missing_replacements=fallback_data
             )
             # track the origin of the bibtex entry for debugging
-            bibtex_source = "crossref"
+            bibtex_source = BibTeXSource.CROSSREF.value
 
     authors = [
         f"{author.get('given', '')} {author.get('family', '')}".strip()
