@@ -7,6 +7,7 @@ import warnings
 from collections.abc import Collection, Mapping
 from copy import deepcopy
 from datetime import datetime
+from enum import StrEnum
 from typing import Any, ClassVar, cast
 from uuid import UUID, uuid4
 
@@ -335,6 +336,16 @@ class ParsedText(BaseModel):
         return "\n\n".join(self.content.values())
 
 
+class BibTeXSource(StrEnum):
+    """Possible BibTeX sources."""
+
+    # This source is used when the BibTeX is incomplete or missing,
+    # and means we generated the BibTeX ourselves
+    SELF_GENERATED = "self_generated"
+    CROSSREF = "crossref"
+    SEMANTIC_SCHOLAR = "semantic_scholar"
+
+
 # We use these integer values
 # as defined in https://jfp.csc.fi/en/web/haku/kayttoohje
 # which is a recommended ranking system
@@ -597,13 +608,20 @@ class DocDetails(Doc):
                 if data.get("other"):
                     if (
                         "bibtex_source" in data["other"]
-                        and "self_generated" not in data["other"]["bibtex_source"]
+                        and BibTeXSource.SELF_GENERATED.value
+                        not in data["other"]["bibtex_source"]
                     ):
-                        data["other"]["bibtex_source"].append("self_generated")
+                        data["other"]["bibtex_source"].append(
+                            BibTeXSource.SELF_GENERATED.value
+                        )
                     else:
-                        data["other"]["bibtex_source"] = ["self_generated"]
+                        data["other"]["bibtex_source"] = [
+                            BibTeXSource.SELF_GENERATED.value
+                        ]
                 else:
-                    data["other"] = {"bibtex_source": ["self_generated"]}
+                    data["other"] = {
+                        "bibtex_source": [BibTeXSource.SELF_GENERATED.value]
+                    }
                 try:
                     existing_entry = next(
                         iter(Parser().parse_string(data["bibtex"]).entries.values())

@@ -13,7 +13,7 @@ import aiohttp
 from lmi.utils import SEMANTIC_SCHOLAR_KEY_HEADER
 from tenacity import before_sleep_log, retry, retry_if_exception, stop_after_attempt
 
-from paperqa.types import DocDetails
+from paperqa.types import BibTeXSource, DocDetails
 from paperqa.utils import (
     _get_with_retrying,
     clean_upbibtex,
@@ -151,7 +151,7 @@ async def parse_s2_to_doc_details(
     paper_data: dict[str, Any], session: aiohttp.ClientSession
 ) -> DocDetails:
 
-    bibtex_source = "self_generated"
+    bibtex_source = BibTeXSource.SELF_GENERATED.value
 
     if "data" in paper_data:
         paper_data = paper_data["data"][0]
@@ -170,11 +170,11 @@ async def parse_s2_to_doc_details(
     ):
         try:
             bibtex = await doi_to_bibtex(doi, session)
-            bibtex_source = "crossref"
+            bibtex_source = BibTeXSource.CROSSREF.value
         except DOINotFoundError:
             bibtex = None
     else:
-        bibtex_source = "semantic_scholar"
+        bibtex_source = BibTeXSource.SEMANTIC_SCHOLAR.value
 
     publication_date = None
     if paper_data.get("publicationDate"):
