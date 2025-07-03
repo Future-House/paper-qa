@@ -66,9 +66,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         return (
             self.docs == other.docs
             and len(self.texts) == len(other.texts)
-            and all(  # TODO: implement Text.__eq__
-                getattr(self_text, attr) == getattr(other_text, attr)
-                for attr in ("text", "name", "doc")
+            and all(
+                self_text == other_text
                 for self_text, other_text in zip(self.texts, other.texts, strict=True)
             )
             and self.docnames == other.docnames
