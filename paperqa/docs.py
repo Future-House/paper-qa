@@ -7,7 +7,7 @@ import re
 import tempfile
 import urllib.request
 import warnings
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Collection, Sequence
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -549,7 +549,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     def get_evidence(
         self,
         query: PQASession | str,
-        exclude_text_filter: set[str] | None = None,
+        exclude_text_filter: Collection[str | Text] | None = None,
         settings: MaybeSettings = None,
         callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
@@ -578,7 +578,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     async def aget_evidence(
         self,
         query: PQASession | str,
-        exclude_text_filter: set[str] | None = None,
+        exclude_text_filter: Collection[str | Text] | None = None,
         settings: MaybeSettings = None,
         callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
@@ -605,8 +605,11 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         if summary_llm_model is None:
             summary_llm_model = evidence_settings.get_summary_llm()
 
-        exclude_text_filter = exclude_text_filter or set()
-        exclude_text_filter |= {c.text.name for c in session.contexts}
+        # Items here can be Text.text or entire Text. Prefer using Text over Text.text,
+        # as substring lookups with Text.text can lead to unexpected matches
+        exclude_text_filter = list(exclude_text_filter or []) + [
+            c.text for c in session.contexts
+        ]
 
         _k = answer_config.evidence_k
         if exclude_text_filter:
@@ -625,7 +628,11 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             matches = self.texts
 
         if exclude_text_filter:
-            matches = [m for m in matches if m.text not in exclude_text_filter]
+            matches = [
+                m
+                for m in matches
+                if m not in exclude_text_filter and m.text not in exclude_text_filter
+            ]
 
         matches = (
             matches[: answer_config.evidence_k]
