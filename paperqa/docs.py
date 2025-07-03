@@ -18,13 +18,7 @@ from aviary.core import Message
 from lmi import Embeddable, EmbeddingModel, LLMModel
 from lmi.types import set_llm_session_ids
 from lmi.utils import gather_with_concurrency
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    ValidationInfo,
-    field_validator,
-)
+from pydantic import BaseModel, ConfigDict, Field
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
@@ -32,7 +26,6 @@ from paperqa.llms import (
     NumpyVectorStore,
     VectorStore,
 )
-from paperqa.paths import PAPERQA_DIR
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
@@ -61,9 +54,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     docnames: set[str] = Field(default_factory=set)
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = Field(default="default", description="Name of this docs collection")
-    index_path: Path | None = Field(
-        default=PAPERQA_DIR, description="Path to save index", validate_default=True
-    )
     deleted_dockeys: set[DocKey] = Field(default_factory=set)
 
     def __eq__(self, other) -> bool:
@@ -84,16 +74,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             and self.docnames == other.docnames
             and self.texts_index == other.texts_index
             and self.name == other.name
-            and self.index_path == other.index_path
             # NOTE: ignoring deleted_dockeys
         )
-
-    @field_validator("index_path")
-    @classmethod
-    def handle_default(cls, value: Path | None, info: ValidationInfo) -> Path | None:
-        if value == PAPERQA_DIR:
-            return PAPERQA_DIR / info.data["name"]
-        return value
 
     def clear_docs(self) -> None:
         self.texts = []
@@ -233,7 +215,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
     def add(
         self,
-        path: str | Path,
+        path: str | os.PathLike,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
@@ -270,7 +252,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
     async def aadd(  # noqa: PLR0912
         self,
-        path: str | Path,
+        path: str | os.PathLike,
         citation: str | None = None,
         docname: str | None = None,
         dockey: DocKey | None = None,
