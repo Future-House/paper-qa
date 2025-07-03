@@ -167,7 +167,7 @@ class PQASession(BaseModel):
     answer: str = ""
     raw_answer: str = Field(
         default="",
-        description=("Raw answer from the LLM, including context IDs."),
+        description="Raw answer from the LLM, including context IDs.",
     )
     answer_reasoning: str | None = Field(
         default=None,
