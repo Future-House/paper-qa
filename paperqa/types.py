@@ -111,8 +111,20 @@ class Text(Embeddable):
         description="Source document this text chunk originates from.",
     )
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        # We ignore the embedding since the embedding can:
+        # - Be lazily acquired, or not used (depending on settings)
+        # - Get ditched when serializing a text for an HTTP request
+        return (
+            self.name == other.name
+            and self.text == other.text
+            and self.doc == other.doc
+        )
+
     def __hash__(self) -> int:
-        return hash(self.text)
+        return hash((self.name, self.text))
 
 
 class Context(BaseModel):
