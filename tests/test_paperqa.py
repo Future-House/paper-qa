@@ -1017,12 +1017,14 @@ async def test_partly_embedded_texts(defer_embeddings: bool) -> None:
     pre_embedded_text.embedding = (
         await settings.get_embedding_model().embed_documents([pre_embedded_text.text])
     )[0]
+    # Some of these texts are partly embedded, some are not
     texts_to_add = [
         pre_embedded_text,
         Text(text="I like cats.", name="sentence2", doc=stub_doc),
     ]
+    assert texts_to_add[0] != texts_to_add[1], "Test assumes different texts"
 
-    # 1. Add texts (and some are partly embedded)
+    # 1. Add texts, noting some are partly embedded
     await docs.aadd_texts(texts=texts_to_add, doc=stub_doc)
     assert docs.texts == texts_to_add
     assert not docs.texts_index.texts
