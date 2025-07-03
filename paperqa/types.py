@@ -123,7 +123,7 @@ class Text(Embeddable):
         )
 
     def __hash__(self) -> int:
-        return hash(self.text)
+        return hash((self.name, self.text))
 
 
 class Context(BaseModel):
