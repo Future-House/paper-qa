@@ -734,17 +734,17 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         }
         name_bib = {}
 
-        for parentheical in re.findall(r"\(([^)]*)\)", formatted_without_references):
+        for parenthetical in re.findall(r"\(([^)]*)\)", formatted_without_references):
 
             # now we replace eligible parentheticals with the deduped names
             deduped_names = {
-                id_to_name_map.get(key, "") for key in get_citation_keys(parentheical)
+                id_to_name_map.get(key, "") for key in get_citation_keys(parenthetical)
             }
 
             # replace the parenthetical with the deduped names
             if deduped_names:
                 formatted_without_references = formatted_without_references.replace(
-                    parentheical,
+                    parenthetical,
                     f"{', '.join(deduped_names)}",
                 )
                 for deduped_name in deduped_names:

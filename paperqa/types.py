@@ -110,6 +110,7 @@ class Context(BaseModel):
 
     id: str = Field(
         description="Unique identifier for the context. Auto-generated if not provided.",
+        init=False,
     )
 
     context: str = Field(description="Summary of the text with respect to a question.")
