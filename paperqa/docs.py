@@ -32,7 +32,7 @@ from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
-    get_citation_keys,
+    get_citation_ids,
     get_loop,
     maybe_is_html,
     maybe_is_pdf,
@@ -717,7 +717,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
             # now we replace eligible parentheticals with the deduped names
             deduped_names = {
-                id_to_name_map.get(key, "") for key in get_citation_keys(parenthetical)
+                id_to_name_map.get(key, "") for key in get_citation_ids(parenthetical)
             }
 
             # replace the parenthetical with the deduped names
@@ -738,7 +738,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         )
 
         # strip out any leftover hallucinated citations
-        included_keys = get_citation_keys(answer)
+        included_keys = get_citation_ids(answer)
         for hallucinated_key in set(included_keys) - set(id_to_name_map):
             formatted_without_references = formatted_without_references.replace(
                 hallucinated_key, ""

@@ -150,7 +150,7 @@ def extract_score(text: str) -> int:
     return 5
 
 
-def get_citation_keys(text: str) -> set[str]:
+def get_citation_ids(text: str) -> set[str]:
     return set(re.findall(r"\bpqac-[a-zA-Z0-9]{8}\b", text))
 
 
