@@ -29,7 +29,6 @@ from paperqa.utils import (
     create_bibtex_key,
     encode_id,
     format_bibtex,
-    get_citenames,
     maybe_get_date,
 )
 from paperqa.version import __version__ as pqa_version
@@ -109,6 +108,10 @@ class Context(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
+    id: str = Field(
+        description="Unique identifier for the context. Auto-generated if not provided.",
+    )
+
     context: str = Field(description="Summary of the text with respect to a question.")
     question: str | None = Field(
         default=None,
@@ -120,9 +123,27 @@ class Context(BaseModel):
     text: Text
     score: int = 5
 
+    CONTENT_ENCODING_LENGTH: ClassVar[int] = 500
+    CONTENT_ID_HASHSIZE: ClassVar[int] = 8
+    # pqac stands for "paper qa context"
+    REFERENCE_TEMPLATE: ClassVar[str] = "pqac-{id}"
+
     def __str__(self) -> str:
         """Return the context as a string."""
         return self.context
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_id(cls, data: Any) -> Any:
+        if not data.get("id"):
+            content = (
+                data.get("question", "")
+                + data.get("context", "")[: cls.CONTENT_ENCODING_LENGTH]
+            )
+            data["id"] = cls.REFERENCE_TEMPLATE.format(
+                id=encode_id(content or str(uuid4()), maxsize=cls.CONTENT_ID_HASHSIZE)
+            )
+        return data
 
 
 class PQASession(BaseModel):
@@ -133,6 +154,10 @@ class PQASession(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     question: str
     answer: str = ""
+    raw_answer: str = Field(
+        default="",
+        description=("Raw answer from the LLM, including context IDs."),
+    )
     answer_reasoning: str | None = Field(
         default=None,
         description=(
@@ -198,7 +223,7 @@ class PQASession(BaseModel):
     @property
     def used_contexts(self) -> set[str]:
         """Return the used contexts."""
-        return get_citenames(self.formatted_answer)
+        return {c.id for c in self.contexts if c.id in self.raw_answer}
 
     def get_citation(self, name: str) -> str:
         """Return the formatted citation for the given docname."""

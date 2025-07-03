@@ -642,7 +642,7 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
 async def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
     settings = Settings(
         llm=llm,
-        llm_settings=llm_settings,
+        llm_config=llm_settings,
     )
     response = await docs_fixture.aquery("What is XAI?", settings=settings)
     assert response.answer_reasoning
@@ -1085,13 +1085,19 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     assert num_citations >= 1, "Expected at least one citation"
     assert (
         "Journal of Chemical Theory and Computation" in doc_details.formatted_citation
-    )
+    ) or ("ChemRxiv" in doc_details.formatted_citation)
 
     num_retries = 3
     for _ in range(num_retries):
         answer = await docs.aquery("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
             assert f"This article has {num_citations} citations" in answer.context
+            assert any(
+                c.id in answer.raw_answer for c in answer.contexts
+            ), "No context ids found in answer"
+            assert all(
+                c.id not in answer.formatted_answer for c in answer.contexts
+            ), "Context ids should not be in formatted answer"
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 

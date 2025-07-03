@@ -156,6 +156,7 @@ def extract_score(text: str) -> int:
     return 5
 
 
+# no longer used, but kept for backwards compatibility
 def get_citenames(text: str) -> set[str]:
     # Combined regex for identifying citations (see unit tests for examples)
     citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
@@ -174,6 +175,10 @@ def get_citenames(text: str) -> set[str]:
             c = c.strip()
             values.append(c)
     return set(values)
+
+
+def get_citation_keys(text: str) -> set[str]:
+    return set(re.findall(r"\bpqac-[a-zA-Z0-9]{8}\b", text))
 
 
 def extract_doi(reference: str) -> str:
