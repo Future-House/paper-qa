@@ -1,6 +1,6 @@
 {
-  "llm": "text-completion-openai/babbage-002",
-  "summary_llm": "text-completion-openai/babbage-002",
+  "llm": "claude-3-haiku-20240307",
+  "summary_llm": "claude-3-haiku-20240307",
   "answer": {
     "evidence_k": 2,
     "evidence_summary_length": "25 to 50 words",
