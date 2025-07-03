@@ -1512,7 +1512,7 @@ def test_docdetails_deserialization() -> None:
             ' Unknown",\n    title = "Unknown title",\n    year = "Unknown year",\n   '
             ' journal = "Unknown journal"\n}\n'
         ),
-        "other": {},
+        "other": {"bibtex_source": ["self_generated"]},
         "formatted_citation": (
             "Unknown authors. Unknown title. Unknown journal, Unknown year."
         ),
