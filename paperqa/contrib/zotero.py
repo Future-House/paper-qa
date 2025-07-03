@@ -15,7 +15,7 @@ except ImportError as e:
         " `pip install paper-qa[zotero]`."
     ) from e
 from paperqa.paths import PAPERQA_DIR
-from paperqa.utils import count_pdf_pages
+from paperqa.readers import PDFParserFn, parse_pdf_to_pages
 
 
 class ZoteroPaper(BaseModel):
@@ -72,6 +72,7 @@ class ZoteroDB(zotero.Zotero):
         library_id: str | None = None,
         api_key: str | None = None,
         storage: str | os.PathLike | None = None,
+        parse_pdf: PDFParserFn = parse_pdf_to_pages,
         **kwargs,
     ):
         self.logger = logging.getLogger("ZoteroDB")
@@ -105,6 +106,7 @@ class ZoteroDB(zotero.Zotero):
 
         self.logger.info(f"Using cache location: {storage}")
         self.storage = Path(storage)
+        self._parse_pdf = parse_pdf
 
         super().__init__(
             library_type=library_type, library_id=library_id, api_key=api_key, **kwargs
@@ -252,11 +254,18 @@ class ZoteroDB(zotero.Zotero):
                 pdf = cast("Path", pdf)
                 title = item["data"].get("title", "")
                 if len(items) >= start:
+                    parsed_text = self._parse_pdf(pdf)
+                    if not isinstance(parsed_text.content, dict):
+                        raise ValueError(
+                            "The content type coming from the PDF parser"
+                            f" should be a dict, not {type(parsed_text.content)},"
+                            " did you misspecify the PDF parsing function?"
+                        )
                     yield ZoteroPaper(
                         key=_get_citation_key(item),
                         title=title,
                         pdf=pdf,
-                        num_pages=count_pdf_pages(pdf),
+                        num_pages=len(parsed_text.content),
                         details=item,
                         zotero_key=item["key"],
                     )

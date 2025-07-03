@@ -54,6 +54,11 @@ from paperqa.prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
+from paperqa.readers import (
+    PDFParserFn,
+    parse_pdf_to_pages,
+    setup_pymupdf_python_logging,
+)
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
 
@@ -151,7 +156,7 @@ class ChunkingOptions(StrEnum):
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     chunk_size: int = Field(
         default=5000,
@@ -201,6 +206,17 @@ class ParsingSettings(BaseModel):
             "Whether to embed documents immediately as they are added, or defer until"
             " summarization."
         ),
+    )
+    parse_pdf: PDFParserFn = Field(
+        default=parse_pdf_to_pages, description="Function to parse PDF.", exclude=True
+    )
+    configure_pdf_parser: Callable[[], Any] = Field(
+        default=setup_pymupdf_python_logging,
+        description=(
+            "Callable to configure the PDF parser within parse_pdf,"
+            " useful for behaviors such as enabling logging."
+        ),
+        exclude=True,
     )
     chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
     doc_filters: Sequence[Mapping[str, Any]] | None = Field(
