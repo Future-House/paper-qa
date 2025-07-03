@@ -25,23 +25,22 @@ CANNOT_ANSWER_PHRASE = "I cannot answer"
 answer_iteration_prompt_template = (
     "You are iterating on a prior answer, with a potentially different context:\n\n"
     "{prior_answer}\n\n"
-    "Create a new answer only using keys and data from the included context."
+    "Create a new answer only using context keys and data from the included context."
     " You can not use context keys from the prior answer which are not "
     "also included in the above context.\n\n"
 )
 
 CITATION_KEY_CONSTRAINTS = (
-    "## Valid citation examples: \n"
-    "- Example2024Example pages 3-4 \n"
-    "- Example2024 pages 3-4 \n"
-    "- Example2024 pages 3-4, Example2024 pages 5-6 \n"
+    "## Valid citation examples, only use comma/space delimited parentheticals: \n"
+    "- (pqac-d79ef6fa, pqac-0f650d59) \n"
+    "- (pqac-d79ef6fa) \n"
     "## Invalid citation examples: \n"
-    "- Example2024Example pages 3-4 and pages 4-5 \n"
-    "- Example2024Example (pages 3-4) \n"
-    "- Example2024Example pages 3-4, pages 5-6 \n"
-    "- Example2024Example et al. (2024) \n"
-    "- Example's work (pages 17–19) \n"  # noqa: RUF001
-    "- (pages 17–19) \n"  # noqa: RUF001
+    "- (pqac-d79ef6fa and pqac-0f650d59) \n"
+    "- (pqac-d79ef6fa;pqac-0f650d59) \n"
+    "- (pqac-d79ef6fa-pqac-0f650d59) \n"
+    "- pqac-d79ef6fa and pqac-0f650d59 \n"
+    "- Example's work (pqac-d79ef6fa) \n"
+    "- (pages pqac-d79ef6fa) \n"
 )
 
 qa_prompt = (
@@ -56,11 +55,9 @@ qa_prompt = (
     "Only cite from the context above and only use the citation keys from the context. "
     f"{CITATION_KEY_CONSTRAINTS}"
     "Do not concatenate citation keys, just use them as is. "
-    "Write in the style of a Wikipedia article, with concise sentences and "
-    "coherent paragraphs. The context comes from a variety of sources and is "
-    "only a summary, so there may inaccuracies or ambiguities. If quotes are "
-    "present and relevant, use them in the answer. This answer will go directly "
-    "onto Wikipedia, so do not add any extraneous information.\n\n"
+    "Write in the style of a scientific article, with concise sentences and "
+    "coherent paragraphs. This answer will be used directly, "
+    "so do not add any extraneous information.\n\n"
     "{prior_answer_prompt}"
     "Answer ({answer_length}):"
 )

@@ -150,24 +150,8 @@ def extract_score(text: str) -> int:
     return 5
 
 
-def get_citenames(text: str) -> set[str]:
-    # Combined regex for identifying citations (see unit tests for examples)
-    citation_regex = r"\b[\w\-]+\set\sal\.\s\([0-9]{4}\)|\((?:[^\)]*?[a-zA-Z][^\)]*?[0-9]{4}[^\)]*?)\)"
-    results = re.findall(citation_regex, text, flags=re.MULTILINE)
-    # now find None patterns
-    none_citation_regex = r"(\(None[a-f]{0,1} pages [0-9]{1,10}-[0-9]{1,10}\))"
-    none_results = re.findall(none_citation_regex, text, flags=re.MULTILINE)
-    results.extend(none_results)
-    values = []
-    for citation in results:
-        citation = citation.strip("() ")
-        for c in re.split(r",|;", citation):
-            if c == "Extra background information":
-                continue
-            # remove leading/trailing spaces
-            c = c.strip()
-            values.append(c)
-    return set(values)
+def get_citation_ids(text: str) -> set[str]:
+    return set(re.findall(r"\bpqac-[a-zA-Z0-9]{8}\b", text))
 
 
 def extract_doi(reference: str) -> str:
