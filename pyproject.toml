@@ -113,7 +113,12 @@ preview = true
 check-filenames = true
 check-hidden = true
 ignore-words-list = "aadd,astroid,ser,ECT"
-skip = "docs/2024-10-16_litqa2-splits.json5"
+skip = [
+    "docs/2024-10-16_litqa2-splits.json5",
+    "paperqa/clients/client_data/*",
+    "tests/cassettes/*",
+    "tests/stub_data/*",
+]
 
 [tool.markdownlint]
 no-inline-html = false
