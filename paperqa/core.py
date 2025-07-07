@@ -209,9 +209,12 @@ async def map_fxn_summary(
             context=context,
             question=question,
             text=Text(
-                text=text.text,
-                name=text.name,
+                # Embeddings enable the retrieval of Texts to make Contexts.
+                # Once we already have Contexts, we filter them by score
+                # (and not the underlying Text's embeddings),
+                # so embeddings can be safely dropped from the deepcopy
                 doc=text.doc.model_dump(exclude={"embedding"}),
+                **text.model_dump(exclude={"embedding", "doc"}),
             ),
             score=score,  # pylint: disable=possibly-used-before-assignment
             **extras,
