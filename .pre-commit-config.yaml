@@ -45,12 +45,6 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: [".[toml]"]
-        exclude: |
-          (?x)^(
-            tests/cassettes.*|
-            paperqa/clients/client_data.*|
-            tests/stub_data.*
-          )$
   - repo: https://github.com/crate-ci/typos
     rev: v1.32.0
     hooks:
