@@ -421,8 +421,8 @@ class Answer(PQASession):
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""
 
-    chunk_chars: int
-    overlap: int
+    chunk_chars: int = Field(description="Chunk size (chars), or 0 for no chunking.")
+    overlap: int = Field(description="Chunk overlap (chars), or 0 for no overlap.")
     chunk_type: str
 
 
