@@ -467,6 +467,9 @@ async def test_evidence(docs_fixture) -> None:
         )
     ).contexts
     assert len(evidence) >= debug_settings.answer.evidence_k
+    assert len({e.context for e in evidence}) == len(
+        evidence
+    ), "Expected unique contexts"
 
 
 @pytest.mark.asyncio
