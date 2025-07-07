@@ -1,0 +1,44 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+
+[project]
+authors = [
+    {email = "hello@futurehouse.org", name = "FutureHouse technical staff"},
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
+    "paper-qa",
+]
+description = "PaperQA readers implemented using PyMuPDF"
+dynamic = ["version"]
+license = {file = "LICENSE"}
+maintainers = [
+    {email = "jamesbraza@gmail.com", name = "James Braza"},
+    {email = "michael.skarlinski@gmail.com", name = "Michael Skarlinski"},
+    {email = "white.d.andrew@gmail.com", name = "Andrew White"},
+]
+name = "paper-qa-pymupdf"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.ruff]
+extend = "../../pyproject.toml"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+root = "../.."
+version_file = "src/paperqa_pymupdf/version.py"
