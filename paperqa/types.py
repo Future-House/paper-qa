@@ -301,7 +301,7 @@ class PQASession(BaseModel):
                 **c.model_dump(exclude={"text"}),
                 text=Text(
                     text="",
-                    # Similar to the explanation in `map_fxn_summary`'s internal's
+                    # Similar to the explanation in `map_fxn_summary`'s internals
                     # on why we drop embeddings, drop embeddings here too because
                     # embeddings aren't displayed to front end users
                     doc=c.text.doc.model_dump(exclude={"embedding"}),
