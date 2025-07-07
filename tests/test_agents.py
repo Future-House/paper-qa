@@ -105,6 +105,14 @@ async def test_get_directory_index(
                 f" {[d.formatted_citation for d in results[0].docs.values()]}."
             )
 
+            # Check single quoted text in the query doesn't crash us
+            results = await index.query(query="Who is 'Bates'")
+            assert results
+
+            # Check possessive in the query doesn't crash us
+            results = await index.query(query="What is Bates' first name")
+            assert results
+
         with subtests.test(msg="check-md-query"):
             results = await index.query(query="what is a gravity hill?", min_score=5)
             assert results
