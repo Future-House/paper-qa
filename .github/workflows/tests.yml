@@ -36,7 +36,7 @@ jobs:
       - run: uv python pin ${{ matrix.python-version }}
       - uses: hynek/build-and-inspect-python-package@v2
       - run: uv sync --python-preference=only-managed
-      - run: uv run pylint paperqa
+      - run: uv run pylint src
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
   test:
     runs-on: ubuntu-latest

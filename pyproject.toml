@@ -115,7 +115,7 @@ check-hidden = true
 ignore-words-list = "aadd,astroid,ser,ECT"
 skip = [
     "docs/2024-10-16_litqa2-splits.json5",
-    "paperqa/clients/client_data/*",
+    "src/paperqa/clients/client_data/*",
     "tests/cassettes/*",
     "tests/stub_data/*",
 ]
@@ -571,10 +571,10 @@ convention = "google"
 paperqa = ["configs/**json"]
 
 [tool.setuptools.packages.find]
-include = ["paperqa*"]
+where = ["src"]
 
 [tool.setuptools_scm]
-version_file = "paperqa/version.py"
+version_file = "src/paperqa/version.py"
 
 [tool.tomlsort]
 all = true
@@ -592,7 +592,7 @@ aadd = "aadd"
 
 [tool.typos.files]
 extend-exclude = [
-    "paperqa/clients/client_data/journal_quality.csv",
+    "src/paperqa/clients/client_data/journal_quality.csv",
     "tests/cassettes/**",
     "tests/stub_data/**",
 ]
