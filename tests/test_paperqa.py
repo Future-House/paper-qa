@@ -457,7 +457,7 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_evidence(docs_fixture) -> None:
+async def test_evidence(docs_fixture: Docs) -> None:
     debug_settings = Settings.from_name("debug")
     evidence = (
         await docs_fixture.aget_evidence(
@@ -466,6 +466,20 @@ async def test_evidence(docs_fixture) -> None:
         )
     ).contexts
     assert len(evidence) >= debug_settings.answer.evidence_k
+    texts = {c.text for c in evidence}
+    assert texts, "Below assertions require at least one text to be used"
+
+    # Okay, let's see what happens if we re-gather
+    # while excluding the Texts used in the prior evidence
+    other_evidence = (
+        await docs_fixture.aget_evidence(
+            PQASession(question="What does XAI stand for?"),
+            exclude_text_filter=texts,
+            settings=debug_settings,
+        )
+    ).contexts
+    other_texts = {c.text for c in other_evidence}
+    assert texts.isdisjoint(other_texts)
 
 
 @pytest.mark.asyncio
