@@ -32,7 +32,6 @@ from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
-    get_citation_ids,
     get_loop,
     maybe_is_html,
     maybe_is_pdf,
@@ -702,57 +701,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             )
         )
 
-    @staticmethod
-    def format_answers(session: PQASession, answer: str) -> tuple[str, str, str]:
-        """Format the answer for display with and without references/question."""
-        formatted_without_references = f"{answer}"
-
-        id_to_name_map = {c.id: c.text.name for c in session.contexts}
-        name_to_citation_map = {
-            c.text.name: c.text.doc.formatted_citation for c in session.contexts
-        }
-        name_bib = {}
-
-        for parenthetical in re.findall(r"\(([^)]*)\)", formatted_without_references):
-
-            # now we replace eligible parentheticals with the deduped names
-            deduped_names = {
-                id_to_name_map.get(key, "") for key in get_citation_ids(parenthetical)
-            }
-
-            # replace the parenthetical with the deduped names
-            if deduped_names:
-                formatted_without_references = formatted_without_references.replace(
-                    parenthetical,
-                    f"{', '.join(deduped_names)}",
-                )
-                for deduped_name in deduped_names:
-                    if (
-                        deduped_name in name_to_citation_map
-                        and deduped_name not in name_bib
-                    ):
-                        name_bib[deduped_name] = name_to_citation_map[deduped_name]
-
-        bib = "\n\n".join(
-            [f"{i + 1}. ({k}): {c}" for i, (k, c) in enumerate(name_bib.items())]
-        )
-
-        # strip out any leftover hallucinated citations
-        included_keys = get_citation_ids(answer)
-        for hallucinated_key in set(included_keys) - set(id_to_name_map):
-            formatted_without_references = formatted_without_references.replace(
-                hallucinated_key, ""
-            )
-
-        formatted_with_references = (
-            f"Question: {session.question}\n\n{formatted_without_references}"
-        )
-
-        if bib:
-            formatted_with_references += f"\n\nReferences\n\n{bib}\n"
-
-        return formatted_without_references, formatted_with_references, bib
-
     async def aquery(  # noqa: PLR0912
         self,
         query: PQASession | str,
@@ -889,13 +837,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 answer_text,
             )
 
-        formatted_without_references, formatted_with_references, bib = (
-            self.format_answers(
-                session,
-                answer_text,
-            )
-        )
-
         if prompt_config.post is not None:
             with set_llm_session_ids(session.id):
                 messages = [
@@ -913,17 +854,14 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             answer_text = cast("str", post.text)
             answer_reasoning = post.reasoning_content
             session.add_tokens(post)
-            formatted_without_references, formatted_with_references, bib = (
-                self.format_answers(session, f"{answer_text}\n\n{post.text}")
-            )
+            answer_text = f"{answer_text}\n\n{post.text}"
 
         # now at end we modify, so we could have retried earlier
-        session.answer = formatted_without_references
         session.raw_answer = answer_text
         session.answer_reasoning = answer_reasoning
-        session.formatted_answer = formatted_with_references
-        session.references = bib
         session.contexts = contexts
         session.context = context_str
+
+        session.populate_formatted_answers_and_bib_from_raw_answer()
 
         return session

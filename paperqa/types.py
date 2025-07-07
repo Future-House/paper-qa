@@ -30,6 +30,7 @@ from paperqa.utils import (
     create_bibtex_key,
     encode_id,
     format_bibtex,
+    get_citation_ids,
     maybe_get_date,
 )
 from paperqa.version import __version__ as pqa_version
@@ -147,8 +148,8 @@ class Context(BaseModel):
     text: Text
     score: int = 5
 
-    CONTENT_ENCODING_LENGTH: ClassVar[int] = 500
-    CONTENT_ID_HASHSIZE: ClassVar[int] = 8
+    CONTEXT_ENCODING_LENGTH: ClassVar[int] = 500  # chars
+    ID_HASH_LENGTH: ClassVar[int] = 8  # chars
     # pqac stands for "paper qa context"
     REFERENCE_TEMPLATE: ClassVar[str] = "pqac-{id}"
 
@@ -162,10 +163,10 @@ class Context(BaseModel):
         if not data.get("id"):
             content = (
                 data.get("question", "")
-                + data.get("context", "")[: cls.CONTENT_ENCODING_LENGTH]
+                + data.get("context", "")[: cls.CONTEXT_ENCODING_LENGTH]
             )
             data["id"] = cls.REFERENCE_TEMPLATE.format(
-                id=encode_id(content or str(uuid4()), maxsize=cls.CONTENT_ID_HASHSIZE)
+                id=encode_id(content or str(uuid4()), maxsize=cls.ID_HASH_LENGTH)
             )
         return data
 
@@ -302,6 +303,61 @@ class PQASession(BaseModel):
             )
             for c in self.contexts
         ]
+
+    def populate_formatted_answers_and_bib_from_raw_answer(
+        self,
+    ) -> None:
+        """Format a raw answer for display, mutating the session in place."""
+        formatted_without_references = self.raw_answer
+
+        id_to_name_map = {c.id: c.text.name for c in self.contexts}
+        name_to_citation_map = {
+            c.text.name: c.text.doc.formatted_citation for c in self.contexts
+        }
+        name_bib = {}
+
+        # https://regex101.com/r/h2Ca20/1
+        for parenthetical in re.findall(r"\(([^)]*)\)", formatted_without_references):
+
+            # now we replace eligible parentheticals with the deduped names
+            deduped_names = {
+                id_to_name_map.get(key, "") for key in get_citation_ids(parenthetical)
+            }
+
+            # replace the parenthetical with the deduped names
+            if deduped_names:
+                formatted_without_references = formatted_without_references.replace(
+                    parenthetical,
+                    f"{', '.join(deduped_names)}",
+                )
+                for deduped_name in deduped_names:
+                    if (
+                        deduped_name in name_to_citation_map
+                        and deduped_name not in name_bib
+                    ):
+                        name_bib[deduped_name] = name_to_citation_map[deduped_name]
+
+        bib = "\n\n".join(
+            [f"{i + 1}. ({k}): {c}" for i, (k, c) in enumerate(name_bib.items())]
+        )
+
+        # strip out any leftover hallucinated citations
+        included_keys = get_citation_ids(self.raw_answer)
+        for hallucinated_key in set(included_keys) - set(id_to_name_map):
+            formatted_without_references = formatted_without_references.replace(
+                hallucinated_key, ""
+            )
+
+        formatted_with_references = (
+            f"Question: {self.question}\n\n{formatted_without_references}"
+        )
+
+        if bib:
+            formatted_with_references += f"\n\nReferences\n\n{bib}\n"
+
+        self.answer = formatted_without_references
+        self.formatted_answer = formatted_with_references
+        self.references = bib
 
 
 # for backwards compatibility

@@ -284,7 +284,9 @@ def get_formatted_variables(s: str) -> set[str]:
 class PromptSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
-    # citations are inserted with Context.id as follows
+    # citations are inserted with Context.id as follows,
+    # these are translated to MLA parenthetical in-text citation styling
+    # SEE: https://nwtc.libguides.com/citations/MLA#s-lg-box-707489
     EXAMPLE_CITATION: ClassVar[str] = "(pqac-0f650d59)"
 
     summary: str = summary_prompt
