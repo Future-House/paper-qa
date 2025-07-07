@@ -970,7 +970,7 @@ from paperqa import Docs, Settings
 my_qa_prompt = (
     "Answer the question '{question}'\n"
     "Use the context below if helpful. "
-    "You can cite the context using the key like (Example2012). "
+    "You can cite the context using the key like (pqac-abcd1234). "
     "If there is insufficient context, write a poem "
     "about how you cannot answer.\n\n"
     "Context: {context}"

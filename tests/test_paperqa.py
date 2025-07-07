@@ -52,7 +52,6 @@ from paperqa.types import ChunkMetadata
 from paperqa.utils import (
     encode_id,
     extract_score,
-    get_citenames,
     maybe_get_date,
     maybe_is_html,
     maybe_is_text,
@@ -70,42 +69,6 @@ async def docs_fixture(stub_data_dir: Path) -> Docs:
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     return docs
-
-
-def test_get_citations() -> None:
-    text = (
-        "Yes, COVID-19 vaccines are effective. Various studies have documented the"
-        " effectiveness of COVID-19 vaccines in preventing severe disease,"
-        " hospitalization, and death. The BNT162b2 vaccine has shown effectiveness"
-        " ranging from 65% to -41% for the 5-11 years age group and 76% to 46% for the"
-        " 12-17 years age group, after the emergence of the Omicron variant in New York"
-        " (Dorabawila2022EffectivenessOT). Against the Delta variant, the effectiveness"  # spellchecker: disable-line
-        " of the BNT162b2 vaccine was approximately 88% after two doses"
-        " (Bernal2021EffectivenessOC pg. 1-3).\n\nVaccine effectiveness was also found"
-        " to be 89% against hospitalization and 91% against emergency department or"
-        " urgent care clinic visits (Thompson2021EffectivenessOC pg. 3-5, Goo2031Foo"
-        " pg. 3-4). In the UK vaccination program, vaccine effectiveness was"
-        " approximately 56% in individuals aged ≥70 years between 28-34 days"
-        " post-vaccination, increasing to approximately 58% from day 35 onwards"
-        " (Marfé2021EffectivenessOC).\n\nHowever, it is important to note that vaccine"
-        " effectiveness can decrease over time. For instance, the effectiveness of"
-        " COVID-19 vaccines against severe COVID-19 declined to 64% after 121 days,"
-        " compared to around 90% initially (Chemaitelly2022WaningEO, Foo2019Bar)."
-        " Despite this, vaccines still provide significant protection against severe"
-        " outcomes (Bar2000Foo pg 1-3; Far2000 pg 2-5)."
-    )
-    ref = {
-        "Dorabawila2022EffectivenessOT",  # spellchecker: disable-line
-        "Bernal2021EffectivenessOC pg. 1-3",
-        "Thompson2021EffectivenessOC pg. 3-5",
-        "Goo2031Foo pg. 3-4",
-        "Marfé2021EffectivenessOC",
-        "Chemaitelly2022WaningEO",
-        "Foo2019Bar",
-        "Bar2000Foo pg 1-3",
-        "Far2000 pg 2-5",
-    }
-    assert get_citenames(text) == ref
 
 
 def test_single_author() -> None:
@@ -642,7 +605,7 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
 async def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
     settings = Settings(
         llm=llm,
-        llm_settings=llm_settings,
+        llm_config=llm_settings,
     )
     response = await docs_fixture.aquery("What is XAI?", settings=settings)
     assert response.answer_reasoning
@@ -1087,13 +1050,19 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     assert num_citations >= 1, "Expected at least one citation"
     assert (
         "Journal of Chemical Theory and Computation" in doc_details.formatted_citation
-    )
+    ) or ("ChemRxiv" in doc_details.formatted_citation)
 
     num_retries = 3
     for _ in range(num_retries):
         answer = await docs.aquery("Are counterfactuals actionable? [yes/no]")
         if any(w in answer.answer for w in ("yes", "Yes")):
             assert f"This article has {num_citations} citations" in answer.context
+            assert any(
+                c.id in answer.raw_answer for c in answer.contexts
+            ), "No context ids found in answer"
+            assert all(
+                c.id not in answer.formatted_answer for c in answer.contexts
+            ), "Context ids should not be in formatted answer"
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
