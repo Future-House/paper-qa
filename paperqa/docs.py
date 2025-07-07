@@ -605,27 +605,31 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         if summary_llm_model is None:
             summary_llm_model = evidence_settings.get_summary_llm()
 
-        exclude_text_filter = exclude_text_filter or set()
-        exclude_text_filter |= {c.text.name for c in session.contexts}
-
-        _k = answer_config.evidence_k
-        if exclude_text_filter:
-            # Increase k to retrieve so we have enough to down-select after retrieval
-            _k += len(exclude_text_filter)
+        if exclude_text_filter is not None:
+            text_name = Text.__name__
+            warnings.warn(
+                (
+                    "The 'exclude_text_filter' argument did not work as intended"
+                    f" due to a mix-up in excluding {text_name}.name vs {text_name}."
+                    f" This bug enabled us to have 2+ contexts per {text_name}, so to"
+                    " first-class that capability and simplify our implementation,"
+                    " we're removing the 'exclude_text_filter' argument."
+                    " This deprecation will conclude in version 6"
+                ),
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
                 session.question,
-                _k,
+                answer_config.evidence_k,
                 evidence_settings,
                 embedding_model,
                 partitioning_fn=partitioning_fn,
             )
         else:
             matches = self.texts
-
-        if exclude_text_filter:
-            matches = [m for m in matches if m.text not in exclude_text_filter]
 
         matches = (
             matches[: answer_config.evidence_k]
