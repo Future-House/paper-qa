@@ -46,7 +46,7 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
-from paperqa.utils import ImpossibleParsingError, hexdigest
+from paperqa.utils import ImpossibleParsingError, clean_possessives, hexdigest
 
 from .models import JSONType, SupportsPickle
 
@@ -408,9 +408,8 @@ class SearchIndex:
                 return self.storage.read_from_string(content)
         return None
 
-    def clean_query(self, query: str) -> str:
-        # SEE: https://regex101.com/r/DoLMoa/3
-        return re.sub(r'[*\[\]:(){}~^><+"\\]', "", query)
+    # Remove these characters, SEE: https://regex101.com/r/DoLMoa/3
+    CLEAN_QUERY_REGEX: ClassVar[re.Pattern] = re.compile(r'[*\[\]:(){}~^><+"\\]')
 
     async def query(
         self,
@@ -424,13 +423,17 @@ class SearchIndex:
         query_fields = list(field_subset or self.fields)
         searcher = await self.searcher
         index = await self.index
+        cleaned_query = self.CLEAN_QUERY_REGEX.sub("", query)
+        try:
+            parsed_query = index.parse_query(cleaned_query, query_fields)
+        except ValueError:  # Rejected by tantivy
+            # Retry with more aggressive cleaning
+            parsed_query = index.parse_query(
+                clean_possessives(cleaned_query), query_fields
+            )
         addresses = [
             s[1]
-            for s in searcher.search(
-                index.parse_query(self.clean_query(query), query_fields),
-                top_n,
-                offset=offset,
-            ).hits
+            for s in searcher.search(parsed_query, top_n, offset=offset).hits
             if s[0] > min_score
         ]
         search_index_docs = [searcher.doc(address) for address in addresses]

@@ -564,3 +564,20 @@ def maybe_get_date(date: str | datetime | None) -> datetime | None:
                 continue
         return None
     return date
+
+
+def clean_possessives(text: str) -> str:
+    """Remove possessive apostrophes from text (e.g. "X's Y" to "Xs Y")."""
+    # Handle apostrophes after word characters
+    # (possessive 's or trailing apostrophes)
+    text = re.sub(
+        r"(?<=\w)'(?:s\b|(?=\s|$))",
+        lambda m: "s" if m.group().endswith("s") else "",
+        text,
+    )
+    # Remove standalone 's patterns
+    text = re.sub(r"\s+'s\b", "", text)
+    text = re.sub(r"^'s\s*", "", text)
+    # Remove standalone apostrophes
+    text = re.sub(r"\s+'\s+", " ", text)
+    return re.sub(r"(?<!\w)'\s*", "", text)

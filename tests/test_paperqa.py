@@ -50,6 +50,7 @@ from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import parse_pdf_to_pages, read_doc
 from paperqa.types import ChunkMetadata
 from paperqa.utils import (
+    clean_possessives,
     encode_id,
     extract_score,
     maybe_get_date,
@@ -1980,3 +1981,29 @@ def test_maybe_get_date():
     assert maybe_get_date(datetime(2023, 1, 1)) == datetime(2023, 1, 1)
     assert maybe_get_date("foo") is None
     assert maybe_get_date("") is None
+
+
+@pytest.mark.parametrize(
+    ("raw_text", "cleaned_text"),
+    [
+        ("name", "name"),
+        (" name", " name"),
+        ("name ", "name "),
+        (" ", " "),
+        ("Bates name", "Bates name"),
+        ("Bate's name", "Bates name"),
+        ("Bate's name Bate's name", "Bates name Bates name"),
+        ("Bates' name", "Bates name"),
+        ("X's Y", "Xs Y"),
+        ("' name", "name"),
+        (" ' name", " name"),
+        ("name ' name", "name name"),
+        ("'s name", "name"),
+        (" 's name", " name"),
+        ("s' name", "s name"),
+        ("S' name", "S name"),
+        ("Bates 's name", "Bates name"),
+    ],
+)
+def test_clean_possessives(raw_text: str, cleaned_text: str) -> None:
+    assert clean_possessives(raw_text) == cleaned_text
