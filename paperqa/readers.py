@@ -36,10 +36,7 @@ class PDFParserFn(Protocol):
     """Protocol for parsing a PDF."""
 
     def __call__(
-        self,
-        path: str | os.PathLike,
-        page_size_limit: int | None = None,
-        use_block_parsing: bool = False,
+        self, path: str | os.PathLike, page_size_limit: int | None = None, **kwargs
     ) -> ParsedText: ...
 
 
@@ -50,6 +47,7 @@ def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     use_block_parsing: bool = False,
+    **_,
 ) -> ParsedText:
 
     with pymupdf.open(path) as file:
