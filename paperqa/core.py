@@ -169,7 +169,10 @@ async def map_fxn_summary(
         message_prompt, system_prompt = prompt_templates
         messages = [
             Message(role="system", content=system_prompt.format(**data)),
-            Message(role="user", content=message_prompt.format(**data)),
+            Message.create_message(
+                text=message_prompt.format(**data),
+                images=[i.to_image_url() for i in text.images] if text.images else None,
+            ),
         ]
         llm_result = await summary_llm_model.call_single(
             messages=messages,
