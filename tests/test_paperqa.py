@@ -50,7 +50,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import parse_pdf_to_pages, read_doc
+from paperqa.readers import chunk_pdf, parse_pdf_to_pages, read_doc
 from paperqa.types import ChunkMetadata, ParsedImage
 from paperqa.utils import (
     bytes_to_string,
@@ -975,7 +975,8 @@ async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     assert docs.texts[0].embedding is None, "Should have deferred the embedding"
 
 
-def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
+@pytest.mark.asyncio
+async def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     filepath = stub_data_dir / "pasa.pdf"
     parsed_text = parse_pdf_to_pages(filepath, use_block_parsing=True)
     assert isinstance(parsed_text.content, dict)
@@ -983,7 +984,7 @@ def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     assert (
         "Abstract\n\nWe introduce PaSa, an advanced Paper Search"
         "\nagent powered by large language models."
-    ) in parsed_text.content["1"][0]
+    ) in parsed_text.content["1"][0], "Block parsing failed to handle abstract"
 
     # Now let's check the images in Figure 1
     assert not isinstance(parsed_text.content["2"], str)
@@ -1006,6 +1007,34 @@ def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
         serde_image = type(image).model_validate_json(image.model_dump_json())
         assert serde_image.index == image.index
         assert serde_image.data == image.data
+
+    doc = Doc(
+        docname="He2025",
+        dockey="stub",
+        citation=(
+            'He, Yichen, et al. "PaSa: An LLM Agent for Comprehensive Academic Paper'
+            ' Search." *arXiv*, 2025, arXiv:2501.10120v1. Accessed 2025.'
+        ),
+    )
+    texts = chunk_pdf(parsed_text, doc=doc, chunk_chars=3000, overlap=100)
+    fig_1_text = texts[1]
+    assert (
+        "Figure 1: Architecture of PaSa" in fig_1_text.text
+    ), "Expecting Figure 1 for the test to work"
+    assert fig_1_text.images, "Expecting images to test multimodality"
+    fig_1_text.text = "stub"  # Replace text to confirm multimodality works
+    docs = Docs()
+    assert await docs.aadd_texts(texts=[fig_1_text], doc=doc)
+    # Now let's gather evidence, where the answer is in one of the images
+    session = await docs.aquery(query="What actions can the Crawler take?")
+    assert session.contexts, "Expected contexts to be generated"
+    assert all(
+        c.text.text == fig_1_text.text and c.text.images == fig_1_text.images
+        for c in session.contexts
+    )
+    assert (
+        sum(x in session.answer.lower() for x in ("search", "expand", "stop")) >= 2
+    ), "Expected answer to have at least two of the three actions available"
 
 
 @pytest.mark.vcr
@@ -1305,6 +1334,37 @@ async def test_code() -> None:
     assert len(docs.docs) == 1
     session = await docs.aquery("What file is read in by test_code?", settings=settings)
     assert "test_paperqa.py" in session.answer
+
+
+@pytest.mark.asyncio
+async def test_images(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+    # We don't support image embeddings yet, so disable embedding
+    settings.answer.evidence_retrieval = False
+    settings.parsing.defer_embedding = True
+
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "sf_districts.png",
+        citation=(
+            '"File:San francisco districts.png." Wikimedia Commons.'
+            " 7 Sep 2023, 07:38 UTC."
+            " <https://commons.wikimedia.org/w/index.php?title=File:San_francisco_districts.png&oldid=799209398>"
+            " July 2025."
+        ),
+        settings=settings,
+    )
+    session = await docs.aquery(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert (
+        sum(
+            district in session.answer
+            for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
+        )
+        >= 2
+    ), "Expected at least two neighbors to be matched"
+    assert session.cost > 0
 
 
 def test_zotero() -> None:
