@@ -72,7 +72,7 @@ class AnswerResponse(BaseModel):
     ) -> PQASession:
         # This modifies in place, this is fine
         # because when a response is being constructed,
-        # we should be done with the Answer object
+        # we should be done with the PQASession object
         v.filter_content_for_user()
         return v
 

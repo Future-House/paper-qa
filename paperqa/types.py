@@ -289,7 +289,11 @@ class PQASession(BaseModel):
         }
 
     def filter_content_for_user(self) -> None:
-        """Filter out extra items (inplace) that do not need to be returned to the user."""
+        """
+        In-place filter/drop items that are irrelevant to the user.
+
+        This is mainly done to keep HTTP requests reasonably sized.
+        """
         self.contexts = [
             Context(
                 # Dump all fields from the original context (including extras),
@@ -297,8 +301,11 @@ class PQASession(BaseModel):
                 **c.model_dump(exclude={"text"}),
                 text=Text(
                     text="",
-                    **c.text.model_dump(exclude={"text", "embedding", "doc"}),
+                    # Similar to the explanation in `map_fxn_summary`'s internals
+                    # on why we drop embeddings, drop embeddings here too because
+                    # embeddings aren't displayed to front end users
                     doc=c.text.doc.model_dump(exclude={"embedding"}),
+                    **c.text.model_dump(exclude={"text", "embedding", "doc"}),
                 ),
             )
             for c in self.contexts
