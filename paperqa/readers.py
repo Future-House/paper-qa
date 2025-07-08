@@ -149,6 +149,7 @@ def parse_text(
     split_lines: bool = False,
     use_tiktoken: bool = True,
     page_size_limit: int | None = None,
+    **_,
 ) -> ParsedText:
     """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
 
@@ -390,15 +391,12 @@ async def read_doc(
         parsed_text: ParsedText = parse_pdf(path, **parser_kwargs)
     elif str_path.endswith(".txt"):
         # TODO: Make parse_text async
-        parser_kwargs.pop("use_block_parsing", None)  # Not a parse_text kwarg
         parsed_text = await asyncio.to_thread(parse_text, path, **parser_kwargs)
     elif str_path.endswith(".html"):
-        parser_kwargs.pop("use_block_parsing", None)  # Not a parse_text kwarg
         parsed_text = await asyncio.to_thread(
             parse_text, path, html=True, **parser_kwargs
         )
     else:
-        parser_kwargs.pop("use_block_parsing", None)  # Not a parse_text kwarg
         parsed_text = await asyncio.to_thread(
             parse_text, path, split_lines=True, use_tiktoken=False, **parser_kwargs
         )
