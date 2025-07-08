@@ -458,7 +458,7 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_evidence(docs_fixture) -> None:
+async def test_evidence(docs_fixture: Docs) -> None:
     debug_settings = Settings.from_name("debug")
     evidence = (
         await docs_fixture.aget_evidence(
@@ -470,6 +470,19 @@ async def test_evidence(docs_fixture) -> None:
     assert len({e.context for e in evidence}) == len(
         evidence
     ), "Expected unique contexts"
+    texts = {c.text for c in evidence}
+    assert texts, "Below assertions require at least one text to be used"
+
+    # Okay, let's check we can get other evidence using the same underlying sources
+    other_evidence = (
+        await docs_fixture.aget_evidence(
+            PQASession(question="What is an acronym for explainable AI?"),
+            settings=debug_settings,
+        )
+    ).contexts
+    assert texts.intersection(
+        {c.text for c in other_evidence}
+    ), "We should be able to reuse sources across evidence calls"
 
 
 @pytest.mark.asyncio
