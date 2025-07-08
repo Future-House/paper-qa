@@ -66,12 +66,13 @@ def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     use_block_parsing: bool = False,
+    parse_images: bool = True,
     image_dpi: float | None = 150,
     **_,
 ) -> ParsedText:
 
     with pymupdf.open(path) as file:
-        content: dict[str, tuple[str, list[ParsedImage]]] = {}
+        content: dict[str, str | tuple[str, list[ParsedImage]]] = {}
         total_length = count_images = 0
 
         for i in range(file.page_count):
@@ -109,19 +110,22 @@ def parse_pdf_to_pages(
                     f" at path {path}."
                 )
             images: list[ParsedImage] = []
-            for box_i, box in enumerate(
-                page.cluster_drawings(drawings=page.get_drawings())
-            ):
-                pix = page.get_pixmap(clip=box, dpi=image_dpi)
-                images.append(
-                    ParsedImage(
-                        index=box_i,
-                        data=pix.tobytes(),
-                        info={"bbox": tuple(box)}
-                        | {attr: getattr(pix, attr) for attr in PYMUPDF_PIXMAP_ATTRS},
+            if parse_images:
+                for box_i, box in enumerate(
+                    page.cluster_drawings(drawings=page.get_drawings())
+                ):
+                    pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                    images.append(
+                        ParsedImage(
+                            index=box_i,
+                            data=pix.tobytes(),
+                            info={"bbox": tuple(box)}
+                            | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                        )
                     )
-                )
-            content[str(i + 1)] = text, images
+                content[str(i + 1)] = text, images
+            else:
+                content[str(i + 1)] = text
             total_length += len(text)
             count_images += len(images)
 
