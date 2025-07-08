@@ -12,10 +12,8 @@ import warnings
 import zlib
 from collections import Counter
 from collections.abc import AsyncIterator, Callable, Sequence
-from datetime import datetime
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
-from uuid import UUID
 
 import anyio
 from pydantic import BaseModel
@@ -62,22 +60,6 @@ class AsyncRetryError(Exception):
     """Flags a retry for another tenacity attempt."""
 
 
-class RobustEncoder(json.JSONEncoder):
-    """JSON encoder that can handle UUID and set objects."""
-
-    def default(self, o):
-        if isinstance(o, UUID):
-            # if the obj is uuid, we simply return the value of uuid
-            return str(o)
-        if isinstance(o, set):
-            return list(o)
-        if isinstance(o, os.PathLike):
-            return str(o)
-        if isinstance(o, datetime):
-            return o.isoformat()
-        return json.JSONEncoder.default(self, o)
-
-
 class SearchDocumentStorage(StrEnum):
     """Method to serialize a document."""
 
@@ -95,7 +77,7 @@ class SearchDocumentStorage(StrEnum):
     def write_to_string(self, data: BaseModel | SupportsPickle) -> bytes:
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
             if isinstance(data, BaseModel):
-                return json.dumps(data.model_dump(), cls=RobustEncoder).encode("utf-8")
+                return data.model_dump_json().encode("utf-8")
             raise ValueError("JSON_MODEL_DUMP requires a BaseModel object.")
         if self == SearchDocumentStorage.PICKLE_COMPRESSED:
             return zlib.compress(pickle.dumps(data))
