@@ -485,7 +485,7 @@ class ParsedText(BaseModel):
             " document. It may be structured, depending on the parser's implementation."
             " Thus it can take various shapes depending on the document type"
             " (e.g. PDF, HTML) and parser:"
-            "\n- (Legacy) `dict[str, str]` (e.g. page number -> page text) for PDFs."
+            "\n- `dict[str, str]` (e.g. page number -> page text) for PDFs."
             "\n- `str` for text files."
             "\n- `list[str]` for line-by-line parsings."
             "\n- `dict[str, tuple[str, list[ParsedImage]]]` (e.g. page number"
