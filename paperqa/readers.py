@@ -67,6 +67,7 @@ def parse_pdf_to_pages(
     page_size_limit: int | None = None,
     use_block_parsing: bool = False,
     parse_images: bool = True,
+    full_page: bool = False,
     image_dpi: float | None = 150,
     **_,
 ) -> ParsedText:
@@ -111,18 +112,28 @@ def parse_pdf_to_pages(
                 )
             images: list[ParsedImage] = []
             if parse_images:
-                for box_i, box in enumerate(
-                    page.cluster_drawings(drawings=page.get_drawings())
-                ):
-                    pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                if full_page:  # Capture the entire page as one image
+                    pix = page.get_pixmap(dpi=image_dpi)
                     images.append(
                         ParsedImage(
-                            index=box_i,
+                            index=0,
                             data=pix.tobytes(),
-                            info={"bbox": tuple(box)}
-                            | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                            info={a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                         )
                     )
+                else:
+                    for box_i, box in enumerate(
+                        page.cluster_drawings(drawings=page.get_drawings())
+                    ):
+                        pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                        images.append(
+                            ParsedImage(
+                                index=box_i,
+                                data=pix.tobytes(),
+                                info={"bbox": tuple(box)}
+                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                            )
+                        )
                 content[str(i + 1)] = text, images
             else:
                 content[str(i + 1)] = text

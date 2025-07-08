@@ -1008,6 +1008,30 @@ async def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
         assert serde_image.index == image.index
         assert serde_image.data == image.data
 
+    # Let's check the full page parsing behavior
+    parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
+    assert isinstance(parsed_text_full_page.content, dict)
+    assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
+    assert "2" in parsed_text_full_page.content, "Parsed text should contain page 2"
+    for page_num in ("1", "2"):
+        page_content = parsed_text_full_page.content[page_num]
+        assert not isinstance(page_content, str), f"Page {page_num} should have images"
+        # Check each page has exactly one image
+        page_text, (full_page_image,) = page_content
+        assert page_text
+        assert full_page_image.index == 0, "Full page image should have index 0"
+        assert isinstance(full_page_image.data, bytes)
+        assert len(full_page_image.data) > 0, "Full page image should have data"
+        for attr in ("width", "height"):
+            dim = full_page_image.info[attr]
+            assert isinstance(dim, int | float)
+            assert dim > 0, "Edge length should be positive"
+
+    # Compare individual mode with full page mode
+    assert len(parsed_text_full_page.content) == len(
+        parsed_text.content
+    ), "Both modes should parse the same number of pages"
+
     doc = Doc(
         docname="He2025",
         dockey="stub",
