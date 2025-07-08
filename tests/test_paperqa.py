@@ -50,6 +50,7 @@ from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import parse_pdf_to_pages, read_doc
 from paperqa.types import ChunkMetadata
 from paperqa.utils import (
+    bytes_to_string,
     clean_possessives,
     encode_id,
     extract_score,
@@ -57,6 +58,7 @@ from paperqa.utils import (
     maybe_is_html,
     maybe_is_text,
     name_in_text,
+    string_to_bytes,
     strings_similarity,
     strip_citations,
 )
@@ -2024,3 +2026,23 @@ def test_maybe_get_date():
 )
 def test_clean_possessives(raw_text: str, cleaned_text: str) -> None:
     assert clean_possessives(raw_text) == cleaned_text
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(b"Hello, World!", id="simple-text"),
+        pytest.param(b"", id="empty-bytes"),
+        pytest.param(bytes([0, 1, 2, 255, 128, 64]), id="binary-data"),
+        pytest.param(b"Test data for base64 encoding", id="base64-validation"),
+        pytest.param("Hello 世界 🌍".encode(), id="utf8-text"),
+    ],
+)
+def test_str_bytes_conversions(value: bytes) -> None:
+    # Test round-trip conversion
+    encoded_string = bytes_to_string(value)
+    decoded_bytes = string_to_bytes(encoded_string)
+    assert decoded_bytes == value
+
+    # Validate that encoded string is valid base64
+    assert base64.b64decode(encoded_string) == value
