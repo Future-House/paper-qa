@@ -98,7 +98,8 @@ class AnswerSettings(BaseModel):
         ),
     )
     answer_length: str = Field(
-        "about 200 words, but can be longer", description="Length of final answer."
+        default="about 200 words, but can be longer",
+        description="Length of final answer.",
     )
     max_concurrent_requests: int = Field(
         default=4, description="Max concurrent requests to LLMs."
