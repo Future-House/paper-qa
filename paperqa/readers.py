@@ -6,6 +6,7 @@ from math import ceil
 from pathlib import Path
 from typing import Any, Literal, Protocol, cast, overload, runtime_checkable
 
+import anyio
 import pymupdf
 import tiktoken
 from html2text import __version__ as html2text_version
@@ -132,6 +133,20 @@ def parse_pdf_to_pages(
         parse_type="pdf",
     )
     return ParsedText(content=content, metadata=metadata)
+
+
+async def parse_image(path: str | os.PathLike, **_) -> ParsedText:
+    apath = anyio.Path(path)
+    image_data = await anyio.Path(path).read_bytes()
+    parsed_image = ParsedImage(index=0, data=image_data, info={"suffix": apath.suffix})
+    metadata = ParsedMetadata(
+        parsing_libraries=[],
+        paperqa_version=pqa_version,
+        total_parsed_text_length=0,  # No text, just an image
+        count_parsed_images=1,
+        parse_type="image",
+    )
+    return ParsedText(content={"1": ("", [parsed_image])}, metadata=metadata)
 
 
 def chunk_pdf(
@@ -342,6 +357,9 @@ def chunk_code_text(
     return texts
 
 
+IMAGE_EXTENSIONS = tuple({".png", ".jpg", ".jpeg"})
+
+
 @overload
 async def read_doc(
     path: str | os.PathLike,
@@ -397,7 +415,7 @@ async def read_doc(
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> tuple[list[Text], ParsedMetadata]: ...
-async def read_doc(
+async def read_doc(  # noqa: PLR0912
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: bool = False,
@@ -436,6 +454,8 @@ async def read_doc(
         parsed_text = await asyncio.to_thread(
             parse_text, path, html=True, **parser_kwargs
         )
+    elif str_path.endswith(IMAGE_EXTENSIONS):
+        parsed_text = await parse_image(path, **parser_kwargs)
     else:
         parsed_text = await asyncio.to_thread(
             parse_text, path, split_lines=True, use_tiktoken=False, **parser_kwargs
@@ -461,6 +481,11 @@ async def read_doc(
             overlap=overlap,
             chunk_type="overlap_pdf_by_page",
         )
+    elif str_path.endswith(IMAGE_EXTENSIONS):
+        chunked_text = chunk_pdf(
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        )
+        chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
