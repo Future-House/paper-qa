@@ -77,7 +77,7 @@ class SearchDocumentStorage(StrEnum):
     def write_to_string(self, data: BaseModel | SupportsPickle) -> bytes:
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
             if isinstance(data, BaseModel):
-                return json.dumps(data.model_dump(mode="json")).encode("utf-8")
+                return data.model_dump_json().encode("utf-8")
             raise ValueError("JSON_MODEL_DUMP requires a BaseModel object.")
         if self == SearchDocumentStorage.PICKLE_COMPRESSED:
             return zlib.compress(pickle.dumps(data))
