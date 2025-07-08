@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import contextlib
 import hashlib
 import logging
@@ -616,3 +617,18 @@ def clean_possessives(text: str) -> str:
     # Remove standalone apostrophes
     text = re.sub(r"\s+'\s+", " ", text)
     return re.sub(r"(?<!\w)'\s*", "", text)
+
+
+def bytes_to_string(value: bytes) -> str:
+    """Convert bytes to a base64-encoded string."""
+    # 1. Convert bytes to base64 bytes
+    # 2. Convert base64 bytes to base64 string,
+    #    using UTF-8 since base64 produces ASCII characters
+    return base64.b64encode(value).decode("utf-8")
+
+
+def string_to_bytes(value: str) -> bytes:
+    """Convert a base64-encoded string to bytes."""
+    # 1. Convert base64 string to base64 bytes
+    # 2. Convert base64 bytes to original bytes
+    return base64.b64decode(value.encode("utf-8"))
