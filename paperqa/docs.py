@@ -283,7 +283,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 use_block_parsing=parse_config.pdfs_use_block_parsing,
                 parse_pdf=parse_config.parse_pdf,
             )
-            if not texts:
+            if not texts or not texts[0].text.strip():
                 raise ValueError(f"Could not read document {path}. Is it empty?")
             result = await llm_model.call_single(
                 messages=[
