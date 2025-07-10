@@ -235,7 +235,13 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             embedding_model=self._embedding_model,
         )
 
-    def make_initial_state(self) -> EnvironmentState:
+    async def _reset_docs(self) -> None:
+        """Hook to reset the docs when creating the initial state."""
+        self._docs.clear_docs()
+
+    async def make_initial_state(self) -> EnvironmentState:
+        await self._reset_docs()
+
         status_fn = None
 
         if ClinicalTrialsSearch.TOOL_FN_NAME in (
@@ -264,8 +270,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         # NOTE: don't build the index here, as sometimes we asyncio.gather over this
         # method, and our current design (as of v5.0.10) could hit race conditions
         # because index building does not use file locks
-        self._docs.clear_docs()
-        self.state, self.tools = self.make_initial_state(), self.make_tools()
+        self.state, self.tools = (await self.make_initial_state()), self.make_tools()
         return (
             [
                 Message(
