@@ -531,7 +531,6 @@ def test_bad_init() -> None:
 
 
 @pytest.mark.vcr
-@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog) -> None:
     caplog.set_level(logging.DEBUG)
@@ -574,7 +573,6 @@ async def test_ensure_sequential_run(caplog) -> None:
 
 
 @pytest.mark.vcr
-@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(caplog) -> None:
     caplog.set_level(logging.DEBUG)

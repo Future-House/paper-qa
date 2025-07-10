@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import os
 import shutil
 from collections.abc import Iterator
@@ -136,22 +135,3 @@ def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[
 
     if tmp_path.exists():
         shutil.rmtree(tmp_path, ignore_errors=True)
-
-
-@pytest.fixture(name="reset_log_levels")
-def fixture_reset_log_levels(caplog) -> Iterator[None]:
-    logging.getLogger().setLevel(logging.DEBUG)
-
-    for name in logging.root.manager.loggerDict:
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.DEBUG)
-        logger.propagate = True
-
-    caplog.set_level(logging.DEBUG)
-
-    yield
-
-    for name in logging.root.manager.loggerDict:
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.NOTSET)
-        logger.propagate = True
