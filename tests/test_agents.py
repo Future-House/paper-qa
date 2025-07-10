@@ -24,7 +24,13 @@ from aviary.core import (
     ToolsAdapter,
     ToolSelector,
 )
-from ldp.agent import MemoryAgent, SimpleAgent
+from ldp.agent import Agent, MemoryAgent, SimpleAgent
+from ldp.alg import (
+    Evaluator,
+    EvaluatorConfig,
+    MeanMetricsCallback,
+    StoreTrajectoriesCallback,
+)
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
 from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
@@ -38,6 +44,11 @@ from paperqa.agents.env import (
     PaperQAEnvironment,
     clinical_trial_status,
     settings_to_tools,
+)
+from paperqa.agents.image_qa import (
+    ImageQASplits,
+    ImageQATaskDataset,
+    StoreEnvironmentsCallback,
 )
 from paperqa.agents.main import FAKE_AGENT_TYPE, run_agent
 from paperqa.agents.models import AgentStatus, AnswerResponse
@@ -58,7 +69,13 @@ from paperqa.agents.tools import (
 )
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
-from paperqa.settings import AgentSettings, IndexSettings, Settings
+from paperqa.settings import (
+    AgentSettings,
+    AnswerSettings,
+    IndexSettings,
+    ParsingSettings,
+    Settings,
+)
 from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import encode_id, extract_thought, get_year, md5sum
 
@@ -1129,3 +1146,38 @@ async def test_env_from_name(subtests: SubTests) -> None:
             docs=Docs(),
         )
         assert isinstance(env, PaperQAEnvironment)
+
+
+@pytest.mark.asyncio
+async def test_image_qa(tmp_path) -> None:
+    settings = Settings(
+        llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+        summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+        agent=AgentSettings(
+            agent_type="ldp.agent.SimpleAgent",
+            index=IndexSettings(paper_directory=tmp_path),
+            # TODO: add image support for paper_search
+            tool_names={"gather_evidence", "gen_answer", "complete", "reset"},
+            agent_evidence_n=3,  # Bumped up to collect several perspectives
+        ),
+        # We don't support image embeddings yet, so disable embedding
+        parsing=ParsingSettings(defer_embedding=True),
+        answer=AnswerSettings(evidence_retrieval=False),
+    )
+    dataset = ImageQATaskDataset(split=ImageQASplits.TABLE_QA, settings=settings)
+    t_cb = StoreTrajectoriesCallback()
+    env_cb = StoreEnvironmentsCallback()
+    m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
+    evaluator = Evaluator(
+        config=EvaluatorConfig(
+            batch_size=256,  # Use batch size greater than FigQA size and TableQA size
+            max_rollout_steps=18,  # Match aviary paper
+        ),
+        agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
+        dataset=dataset,
+        callbacks=[t_cb, env_cb, m_cb],
+    )
+    await evaluator.evaluate()
+    correct_trajs = [t for t in t_cb.eval_trajectories if t.steps[-1].reward == 1]
+    failed_trajs = [t for t in t_cb.eval_trajectories if t.failed]
+    _ = 0  # Debug here
