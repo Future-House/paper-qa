@@ -45,7 +45,7 @@ CITATION_KEY_CONSTRAINTS = (
 
 qa_prompt = (
     "Answer the question below with the context.\n\n"
-    "Context (with relevance scores):\n\n{context}\n\n----\n\n"
+    "Context:\n\n{context}\n\n----\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
     "If the context provides insufficient information reply "
