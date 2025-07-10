@@ -45,7 +45,7 @@ def _setup_default_logs() -> None:
 
 @pytest.fixture(autouse=True, scope="session")
 def _defeat_litellm_callbacks() -> None:
-    update_litellm_max_callbacks()
+    update_litellm_max_callbacks(value=2048)
 
 
 @pytest.fixture(scope="session", name="vcr_config")
