@@ -122,18 +122,44 @@ def parse_pdf_to_pages(
                         )
                     )
                 else:
+                    # Capture drawings/figures
+                    drawing_boxes: list[pymupdf.Rect] = []  # Use to dedupe tables
                     for box_i, box in enumerate(
                         page.cluster_drawings(drawings=page.get_drawings())
                     ):
+                        drawing_boxes.append(box)
                         pix = page.get_pixmap(clip=box, dpi=image_dpi)
                         images.append(
                             ParsedImage(
                                 index=box_i,
                                 data=pix.tobytes(),
-                                info={"bbox": tuple(box)}
+                                info={"bbox": tuple(box), "type": "drawing"}
                                 | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                             )
                         )
+
+                    # Capture tables
+                    for table_i, table in enumerate(
+                        t
+                        for t in page.find_tables()
+                        # Table was inside drawing or figure, skip this one
+                        if not any(pymupdf.Rect(t.bbox) in bx for bx in drawing_boxes)
+                    ):
+                        table_bbox = table.bbox
+                        pix = page.get_pixmap(clip=table_bbox, dpi=image_dpi)
+                        images.append(
+                            ParsedImage(
+                                index=table_i,
+                                data=pix.tobytes(),
+                                info={
+                                    "bbox": tuple(table_bbox),
+                                    "markdown": table.to_markdown(),
+                                    "type": "table",
+                                }
+                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                            )
+                        )
+
                 content[str(i + 1)] = text, images
             else:
                 content[str(i + 1)] = text
