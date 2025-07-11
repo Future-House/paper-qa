@@ -531,10 +531,9 @@ def test_bad_init() -> None:
 
 
 @pytest.mark.vcr
-@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
 async def test_ensure_sequential_run(caplog) -> None:
-    caplog.set_level(logging.DEBUG)
+    caplog.set_level(logging.DEBUG, logger=paperqa.clients.__name__)
     # were using a DOI that is NOT in crossref, but running the crossref client first
     # we will ensure that both are run sequentially
 
@@ -552,14 +551,18 @@ async def test_ensure_sequential_run(caplog) -> None:
             fields=["doi", "title"],
         )
         assert details, "Should find the right DOI in the second client"
-        record_indices = {"crossref": -1, "semantic_scholar": -1}
+        record_indices: dict[str, list[int]] = {"crossref": [], "semantic_scholar": []}
         for n, record in enumerate(caplog.records):
+            if not record.name.startswith(paperqa.__name__):  # Skip non-PQA logs
+                continue
             if "CrossrefProvider" in record.msg:
-                record_indices["crossref"] = n
+                record_indices["crossref"].append(n)
             if "SemanticScholarProvider" in record.msg:
-                record_indices["semantic_scholar"] = n
+                record_indices["semantic_scholar"].append(n)
+        assert record_indices["crossref"], "Crossref should run"
+        assert record_indices["semantic_scholar"], "Semantic Scholar should run"
         assert (
-            record_indices["crossref"] < record_indices["semantic_scholar"]
+            record_indices["crossref"][-1] < record_indices["semantic_scholar"][-1]
         ), "Crossref should run first"
 
         non_clobbered_details = await client.query(
@@ -574,10 +577,9 @@ async def test_ensure_sequential_run(caplog) -> None:
 
 
 @pytest.mark.vcr
-@pytest.mark.usefixtures("reset_log_levels")
 @pytest.mark.asyncio
 async def test_ensure_sequential_run_early_stop(caplog) -> None:
-    caplog.set_level(logging.DEBUG)
+    caplog.set_level(logging.DEBUG, logger=paperqa.clients.__name__)
     # now we should stop after hitting s2
     async with aiohttp.ClientSession() as session:
         client = DocMetadataClient(
@@ -593,21 +595,23 @@ async def test_ensure_sequential_run_early_stop(caplog) -> None:
             fields=["doi", "title"],
         )
         assert details, "Should find the right DOI in the second client"
-        record_indices = {"crossref": -1, "semantic_scholar": -1, "early_stop": -1}
+        record_indices: dict[str, list[int]] = {
+            "crossref": [],
+            "semantic_scholar": [],
+            "early_stop": [],
+        }
         for n, record in enumerate(caplog.records):
+            if not record.name.startswith(paperqa.__name__):  # Skip non-PQA logs
+                continue
             if "CrossrefProvider" in record.msg:
-                record_indices["crossref"] = n
+                record_indices["crossref"].append(n)
             if "SemanticScholarProvider" in record.msg:
-                record_indices["semantic_scholar"] = n
+                record_indices["semantic_scholar"].append(n)
             if "stopping early." in record.msg:
-                record_indices["early_stop"] = n
-        assert (
-            record_indices["crossref"] == -1
-        ), "Crossref should be index -1 i.e. not found"
-        assert (
-            record_indices["semantic_scholar"] != -1
-        ), "Semantic Scholar should be found"
-        assert record_indices["early_stop"] != -1, "We should stop early."
+                record_indices["early_stop"].append(n)
+        assert not record_indices["crossref"], "Crossref should not have run"
+        assert record_indices["semantic_scholar"], "Semantic Scholar should have run"
+        assert record_indices["early_stop"], "We should stop early"
 
 
 @pytest.mark.vcr
