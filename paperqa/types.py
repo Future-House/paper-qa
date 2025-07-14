@@ -817,6 +817,25 @@ class DocDetails(Doc):
         except AttributeError:
             return self.other[item]
 
+    def make_filename(self, title_limit: int | None = 48) -> str:
+        """
+        Make a filesystem-safe filename that has the doc ID appended.
+
+        Args:
+            title_limit: Character limit on the title.
+
+        Returns:
+            Filename that is filesystem safe (e.g. non-safe chars are replaced with dash).
+        """
+        if not self.title or not self.doc_id:
+            raise ValueError("Unable to create filename without both title and doc_id.")
+        # SEE: https://stackoverflow.com/a/71199182
+        encoded_title = re.sub(
+            r"[/\\?%*:|\"<>\x7F\x00-\x1F]", "-", self.title[:title_limit]
+        )
+        # SEE: https://stackoverflow.com/a/71761675
+        return "_".join((encoded_title, self.doc_id))
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def formatted_citation(self) -> str:
