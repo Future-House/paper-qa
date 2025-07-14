@@ -132,9 +132,12 @@ class Context(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
+    # Sentinel to auto-populate a field within model_validator
+    AUTOPOPULATE_VALUE: ClassVar[str] = ""
+
     id: str = Field(
+        default=AUTOPOPULATE_VALUE,
         description="Unique identifier for the context. Auto-generated if not provided.",
-        init=False,
     )
 
     context: str = Field(description="Summary of the text with respect to a question.")

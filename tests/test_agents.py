@@ -953,7 +953,7 @@ def test_answers_are_striped() -> None:
     session = PQASession(
         question="What is the meaning of life?",
         contexts=[
-            Context(  # type: ignore[call-arg]
+            Context(
                 context="bla",
                 question="foo",
                 text=Text(
