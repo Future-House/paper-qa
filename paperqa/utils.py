@@ -457,6 +457,15 @@ def pqa_directory(name: str) -> Path:
 def setup_default_logs() -> None:
     """Configure logs to reasonable defaults."""
     configure_llm_logs()
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "loggers": {
+                "openai._base_client": {"level": "WARNING"}  # For OpenAI POSTs
+            },
+        }
+    )
 
 
 def extract_thought(content: str | None) -> str:
