@@ -819,7 +819,7 @@ class DocDetails(Doc):
 
     def make_filename(self, title_limit: int | None = 48) -> str:
         """
-        Make a filesystem-safe filename that has the doc ID appended.
+        Make a filesystem-safe filename that has the doc ID appended, but no extension.
 
         Args:
             title_limit: Character limit on the title.
@@ -833,7 +833,11 @@ class DocDetails(Doc):
         encoded_title = re.sub(
             r"[/\\?%*:|\"<>\x7F\x00-\x1F]", "-", self.title[:title_limit]
         )
-        # SEE: https://stackoverflow.com/a/71761675
+        # NOTE: we append the doc ID for a few reasons:
+        # 1. Prevent collisions for identical titles
+        #    SEE: https://stackoverflow.com/a/71761675
+        # 2. Filenames shouldn't end in a period,
+        #    so append the doc ID to circumvent that gotcha
         return "_".join((encoded_title, self.doc_id))
 
     @computed_field  # type: ignore[prop-decorator]
