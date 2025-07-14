@@ -1,0 +1,450 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.addr.2015.01.008?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "b6c4e9f285bd1b0b69b98daa47fea3d29d50c658", "externalIds":
+          {"MAG": "2033425827", "DOI": "10.1016/j.addr.2015.01.008", "CorpusId": 205284104,
+          "PubMed": "25666165"}, "url": "https://www.semanticscholar.org/paper/b6c4e9f285bd1b0b69b98daa47fea3d29d50c658",
+          "title": "Pharmacokinetics, biodistribution and cell uptake of antisense oligonucleotides.",
+          "venue": "Advanced Drug Delivery Reviews", "year": 2015, "citationCount":
+          684, "influentialCitationCount": 28, "isOpenAccess": true, "openAccessPdf":
+          {"url": "https://doi.org/10.1016/j.addr.2015.01.008", "status": "HYBRID",
+          "license": "CCBYNCND"}, "publicationTypes": ["Review", "JournalArticle"],
+          "publicationDate": "2015-06-29", "journal": {"name": "Advanced drug delivery
+          reviews", "pages": "\n          46-51\n        ", "volume": "87"}, "citationStyles":
+          {"bibtex": "@Article{Geary2015PharmacokineticsBA,\n author = {R. Geary and
+          D. Norris and R. Yu and C. Bennett},\n booktitle = {Advanced Drug Delivery
+          Reviews},\n journal = {Advanced drug delivery reviews},\n pages = {\n          46-51\n        },\n
+          title = {Pharmacokinetics, biodistribution and cell uptake of antisense oligonucleotides.},\n
+          volume = {87},\n year = {2015}\n}\n"}, "authors": [{"authorId": "4084271",
+          "name": "R. Geary"}, {"authorId": "2764740", "name": "D. Norris"}, {"authorId":
+          "6086943", "name": "R. Yu"}, {"authorId": "145182233", "name": "C. Bennett"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1395"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 14 Jul 2025 20:55:53 GMT
+        Via:
+          - 1.1 44933b72098305e9c31fc50b2e6554a0.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - jb3T4ezJWsJ7qs6erKscjmsiAhbzwpndLFwb4dTLD8qWd8wKaGbkKg==
+        X-Amz-Cf-Pop:
+          - SFO53-C1
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - Nt5CGFJ1PHcEelg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1395"
+        x-amzn-Remapped-Date:
+          - Mon, 14 Jul 2025 20:55:53 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 2c72ede8-09f2-4336-9843-c67240949327
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.addr.2015.01.008?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,7,14]],"date-time":"2025-07-14T20:34:28Z","timestamp":1752525268401},"reference-count":43,"publisher":"Elsevier
+          BV","license":[{"start":{"date-parts":[[2015,6,1]],"date-time":"2015-06-01T00:00:00Z","timestamp":1433116800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2015,2,6]],"date-time":"2015-02-06T00:00:00Z","timestamp":1423180800000},"content-version":"vor","delay-in-days":0,"URL":"http:\/\/creativecommons.org\/licenses\/by-nc-nd\/4.0\/"}],"content-domain":{"domain":["elsevier.com","sciencedirect.com"],"crossmark-restriction":true},"short-container-title":["Advanced
+          Drug Delivery Reviews"],"published-print":{"date-parts":[[2015,6]]},"DOI":"10.1016\/j.addr.2015.01.008","type":"journal-article","created":{"date-parts":[[2015,2,7]],"date-time":"2015-02-07T16:40:26Z","timestamp":1423327226000},"page":"46-51","update-policy":"http:\/\/dx.doi.org\/10.1016\/elsevier_cm_policy","source":"Crossref","is-referenced-by-count":716,"special_numbering":"C","title":["Pharmacokinetics,
+          biodistribution and cell uptake of antisense oligonucleotides"],"prefix":"10.1016","volume":"87","author":[{"given":"Richard
+          S.","family":"Geary","sequence":"first","affiliation":[]},{"given":"Daniel","family":"Norris","sequence":"additional","affiliation":[]},{"given":"Rosie","family":"Yu","sequence":"additional","affiliation":[]},{"given":"C.
+          Frank","family":"Bennett","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/j.addr.2015.01.008_bb0005","series-title":"Antisense
+          Drug Technology: Principles, Strategies, and Applications","first-page":"3","article-title":"Mechanisms
+          of antisense drug action, an introduction","author":"Crooke","year":"2007"},{"key":"10.1016\/j.addr.2015.01.008_bb0010","doi-asserted-by":"crossref","first-page":"259","DOI":"10.1146\/annurev.pharmtox.010909.105654","article-title":"RNA
+          targeting therapeutics: molecular mechanisms of antisense oligonucleotides
+          as a therapeutic platform","volume":"50","author":"Bennett","year":"2010","journal-title":"Annu
+          Rev Pharmacol Toxicol."},{"key":"10.1016\/j.addr.2015.01.008_bb0015","doi-asserted-by":"crossref","first-page":"17181","DOI":"10.1074\/jbc.M311683200","article-title":"Determination
+          of the role of the human RNase H1 in the pharmacology of DNA-like antisense
+          drugs","volume":"279","author":"Wu","year":"2004","journal-title":"J Biol
+          Chem."},{"issue":"7","key":"10.1016\/j.addr.2015.01.008_bb0020","doi-asserted-by":"crossref","first-page":"599","DOI":"10.1038\/nsmb780","article-title":"Kinetic
+          analysis of the RNAi enzyme complex","volume":"11","author":"Haley","year":"2004","journal-title":"Nat
+          Struct Mol Biol"},{"key":"10.1016\/j.addr.2015.01.008_bb0025","series-title":"Antisense
+          Drug Technology: Principles, Strategies, and Applications","first-page":"183","article-title":"Basic
+          principles of the pharmacokinetics of antisense oligonucleotide drugs","author":"Levin","year":"2007"},{"key":"10.1016\/j.addr.2015.01.008_bb0030","doi-asserted-by":"crossref","first-page":"381","DOI":"10.1517\/17425250902877680","article-title":"Antisense
+          oligonucleotide pharmacokinetics and metabolism","volume":"5","author":"Geary","year":"2009","journal-title":"Expert
+          Opin Drug Metab Toxicol."},{"key":"10.1016\/j.addr.2015.01.008_bb0035","doi-asserted-by":"crossref","first-page":"169","DOI":"10.1517\/17425255.2013.737320","article-title":"Clinical
+          pharmacokinetics of second generation antisense oligonucleotides","volume":"9","author":"Yu","year":"2013","journal-title":"Expert
+          Opin Drug Metab Toxicol."},{"key":"10.1016\/j.addr.2015.01.008_bb0040","doi-asserted-by":"crossref","first-page":"269","DOI":"10.1111\/j.1365-2125.2012.04469.x","article-title":"Clinical
+          pharmacological properties of mipomersen (Kynamro), a second generation antisense
+          inhibitor of apolipoprotein B","volume":"76","author":"Crooke","year":"2013","journal-title":"Br
+          J Clin Pharmacol."},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0045","doi-asserted-by":"crossref","first-page":"460","DOI":"10.1124\/dmd.106.012401","article-title":"Cross-species
+          pharmacokinetic comparison from mouse to man of a second-generation antisense
+          oligonucleotide, ISIS 301012, targeting human apolipoprotein B-100","volume":"35","author":"Yu","year":"2007","journal-title":"Drug
+          Metab Dispos"},{"key":"10.1016\/j.addr.2015.01.008_bb0050","doi-asserted-by":"crossref","first-page":"550","DOI":"10.1016\/j.coph.2005.07.001","article-title":"Pharmacokinetics
+          and biodistribution of phosphorodiamidate morpholino antisense oligomers","volume":"5","author":"Amantana","year":"2005","journal-title":"Current
+          Opinion in Pharmacology."},{"key":"10.1016\/j.addr.2015.01.008_bb0055","series-title":"Antisense
+          Drug Technology: Principles, Strategies, and Applications","first-page":"565","article-title":"Morpholinos","author":"Iverson","year":"2007"},{"issue":"2","key":"10.1016\/j.addr.2015.01.008_bb0060","doi-asserted-by":"crossref","first-page":"65","DOI":"10.1089\/108729002760070803","article-title":"Pharmacokinetics
+          and tissue distribution of a peptide nucleic acid after intravenous administration","volume":"12","author":"McMahon","year":"2002","journal-title":"Antisense
+          Nucleic Acid Drug Dev"},{"issue":"4","key":"10.1016\/j.addr.2015.01.008_bb0065","doi-asserted-by":"crossref","first-page":"255","DOI":"10.1089\/nat.2012.0371","article-title":"Toxicological
+          and pharmacokinetic properties of chemically modified siRNAs targeting p53
+          RNA following intravenous administration","volume":"22","author":"Thompson","year":"2012","journal-title":"Nucleic
+          Acid Ther"},{"key":"10.1016\/j.addr.2015.01.008_bb0070","doi-asserted-by":"crossref","first-page":"910","DOI":"10.1016\/j.bcp.2008.11.005","article-title":"Cross-species
+          comparison of in vivo PK\/PD relationships for second-generation antisense
+          oligonucleotides targeting apolipoprotein B-100","volume":"77","author":"Yu","year":"2009","journal-title":"Biochem
+          Pharmacol."},{"key":"10.1016\/j.addr.2015.01.008_bb0075","series-title":"Antisense
+          Drug Technology: Principles, Strategies, and Applications","first-page":"305","article-title":"Pharmacokinetic\/pharmacodynamic
+          properties of phosphorothioate 2\u2032-O-(2-methoxyethyl)-modified antisense
+          oligonucleotides in animal and man","author":"Geary","year":"2007"},{"key":"10.1016\/j.addr.2015.01.008_bb0080","doi-asserted-by":"crossref","first-page":"862","DOI":"10.1038\/78475","article-title":"Reduction
+          of liver Fas expression by an antisense oligonucleotide protects mice from
+          fulminant hepatitis","volume":"18","author":"Zhang","year":"2000","journal-title":"Nat
+          Biotechnol."},{"key":"10.1016\/j.addr.2015.01.008_bb0085","doi-asserted-by":"crossref","first-page":"168","DOI":"10.2533\/chimia.1996.168","article-title":"Second
+          generation of antisense oligonucleotides: from nuclease resistance to biological
+          efficacy in animals","volume":"50","author":"Altmann","year":"1996","journal-title":"Chimia"},{"issue":"6","key":"10.1016\/j.addr.2015.01.008_bb0090","doi-asserted-by":"crossref","first-page":"369","DOI":"10.1089\/nat.2013.0443","article-title":"Characterization
+          of target mRNA reduction through in situ RNA hybridization in multiple organ
+          systems following systemic antisense treatment in animals","volume":"23","author":"Hung","year":"2013","journal-title":"Nucleic
+          Acid Ther"},{"issue":"1\u20132","key":"10.1016\/j.addr.2015.01.008_bb0095","doi-asserted-by":"crossref","first-page":"155","DOI":"10.1016\/S0303-7207(03)00008-X","article-title":"PTP1B
+          antisense-treated mice show regulation of genes involved in lipogenesis in
+          liver and fat","volume":"203","author":"Waring","year":"2003","journal-title":"Mol
+          Cell Endocrinol"},{"issue":"8","key":"10.1016\/j.addr.2015.01.008_bb0100","doi-asserted-by":"crossref","first-page":"2405","DOI":"10.2337\/diabetes.51.8.2405","article-title":"Protein
+          tyrosine phosphatase 1B reduction regulates adiposity and expression of genes
+          involved in lipogenesis","volume":"51","author":"Rondinone","year":"2002","journal-title":"Diabetes"},{"issue":"17","key":"10.1016\/j.addr.2015.01.008_bb0105","doi-asserted-by":"crossref","first-page":"11357","DOI":"10.1073\/pnas.142298199","article-title":"PTP1B
+          antisense oligonucleotide lowers PTP1B protein, normalizes blood glucose,
+          and improves insulin sensitivity in diabetic mice","volume":"99","author":"Zinker","year":"2002","journal-title":"Proc
+          Natl Acad Sci U S A"},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0110","doi-asserted-by":"crossref","first-page":"833","DOI":"10.1158\/1078-0432.CCR-07-1310","article-title":"A
+          phase I study of OGX-011, a 2\u2032-methoxyethyl phosphorothioate antisense
+          to clusterin, in combination with docetaxel in patients with advanced cancer","volume":"14","author":"Chi","year":"2008","journal-title":"Clin
+          Cancer Res"},{"issue":"24","key":"10.1016\/j.addr.2015.01.008_bb0115","doi-asserted-by":"crossref","first-page":"6150","DOI":"10.1158\/1078-0432.CCR-10-1932","article-title":"Tumor
+          survivin is downregulated by the antisense oligonucleotide LY2181308: a proof-of-concept,
+          first-in-human dose study","volume":"16","author":"Talbot","year":"2010","journal-title":"Clin
+          Cancer Res"},{"key":"10.1016\/j.addr.2015.01.008_bb0120","article-title":"Antisense
+          therapies for cancer: Bridging the pharmacogenomic divide","author":"MacLeod","year":"2014","journal-title":"Drug
+          Discov Today"},{"issue":"26","key":"10.1016\/j.addr.2015.01.008_bb0125","doi-asserted-by":"crossref","first-page":"2677","DOI":"10.1056\/NEJMoa073108","article-title":"Local
+          dystrophin restoration with antisense oligonucleotide PRO051","volume":"357","author":"van
+          Deutekom","year":"2007","journal-title":"N Engl J Med"},{"issue":"5","key":"10.1016\/j.addr.2015.01.008_bb0130","doi-asserted-by":"crossref","first-page":"637","DOI":"10.1002\/ana.23982","article-title":"Eteplirsen
+          for the treatment of Duchenne muscular dystrophy","volume":"74","author":"Mendell","year":"2013","journal-title":"Ann
+          Neurol"},{"issue":"7409","key":"10.1016\/j.addr.2015.01.008_bb0135","doi-asserted-by":"crossref","first-page":"111","DOI":"10.1038\/nature11362","article-title":"Targeting
+          nuclear RNA for in vivo correction of myotonic dystrophy","volume":"488","author":"Wheeler","year":"2012","journal-title":"Nature"},{"issue":"4","key":"10.1016\/j.addr.2015.01.008_bb0140","doi-asserted-by":"crossref","first-page":"1028","DOI":"10.2337\/diabetes.51.4.1028","article-title":"Specific
+          inhibition of PTEN expression reverses hyperglycemia in diabetic mice","volume":"51","author":"Butler","year":"2002","journal-title":"Diabetes"},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0145","doi-asserted-by":"crossref","first-page":"774","DOI":"10.1016\/j.celrep.2014.02.008","article-title":"Peripheral
+          androgen receptor gene suppression rescues disease in mouse models of spinal
+          and bulbar muscular atrophy","volume":"7","author":"Lieberman","year":"2014","journal-title":"Cell
+          Rep"},{"issue":"2","key":"10.1016\/j.addr.2015.01.008_bb0150","doi-asserted-by":"crossref","first-page":"295","DOI":"10.1016\/j.neuron.2014.03.001","article-title":"Muscle
+          expression of mutant androgen receptor accounts for systemic and motor neuron
+          disease phenotypes in spinal and bulbar muscular atrophy","volume":"82","author":"Cortes","year":"2014","journal-title":"Neuron"},{"issue":"8","key":"10.1016\/j.addr.2015.01.008_bb0155","doi-asserted-by":"crossref","first-page":"2290","DOI":"10.1172\/JCI25424","article-title":"Antisense
+          oligonucleotide therapy for neurodegenerative disease","volume":"116","author":"Smith","year":"2006","journal-title":"J
+          Clin Invest"},{"issue":"6","key":"10.1016\/j.addr.2015.01.008_bb0160","doi-asserted-by":"crossref","first-page":"1031","DOI":"10.1016\/j.neuron.2012.05.009","article-title":"Sustained
+          therapeutic reversal of Huntington''s disease by transient repression of huntingtin
+          synthesis","volume":"74","author":"Kordasiewicz","year":"2012","journal-title":"Neuron"},{"issue":"72","key":"10.1016\/j.addr.2015.01.008_bb0165","doi-asserted-by":"crossref","first-page":"72ra18","DOI":"10.1126\/scitranslmed.3001777","article-title":"Antisense
+          oligonucleotides delivered to the mouse CNS ameliorate symptoms of severe
+          spinal muscular atrophy","volume":"3","author":"Passini","year":"2011","journal-title":"Sci
+          Transl Med."},{"issue":"1","key":"10.1016\/j.addr.2015.01.008_bb0170","doi-asserted-by":"crossref","first-page":"46","DOI":"10.1124\/jpet.113.212407","article-title":"Pharmacology
+          of a central nervous system delivered 2\u2032-O-methoxyethyl-modified survival
+          of motor neuron splicing oligonucleotide in mice and nonhuman primates","volume":"350","author":"Rigo","year":"2014","journal-title":"J
+          Pharmacol Exp Ther"},{"issue":"5","key":"10.1016\/j.addr.2015.01.008_bb0175","doi-asserted-by":"crossref","first-page":"435","DOI":"10.1016\/S1474-4422(13)70061-9","article-title":"An
+          antisense oligonucleotide against SOD1 delivered intrathecally for patients
+          with SOD1 familial amyotrophic lateral sclerosis: a phase 1, randomised, first-in-man
+          study","volume":"12","author":"Miller","year":"2013","journal-title":"Lancet
+          Neurol"},{"key":"10.1016\/j.addr.2015.01.008_bb0180","series-title":"Poster
+          Presentation, 2012 AAPS Annual Meeting and Exposition, Chicago, IL, October
+          14-18","article-title":"Adult and Juvenile Monkey Pharmacokinetics (PK) of
+          a Uniformly Modi_ed 2\u2032-(2-Methoxyethyl) Antisense Oligonucleotide(ASO;
+          ISIS-SMNRx) in Development for Treatment of Spinal Muscular Atrophy (SMA)","author":"Rigo","year":"2012"},{"key":"10.1016\/j.addr.2015.01.008_bb0185","series-title":"Poster
+          Presentation, 2013 AAPS Annual Meeting and Exposition, San Antonio, TX, Nov
+          10-14","article-title":"Pharmacokinetics (PK) of an 35S-labeled Second Generation
+          Antisense Oligonucleotide (ASO) in Mice and Rats After Intracerebroventricular
+          (ICV) and\/or Intrathecal (IT) Single Dose Administration","author":"Norris","year":"2013"},{"issue":"21","key":"10.1016\/j.addr.2015.01.008_bb0190","doi-asserted-by":"crossref","first-page":"9634","DOI":"10.1093\/nar\/gkt725","article-title":"Rational
+          design of antisense oligonucleotides targeting single nucleotide polymorphisms
+          for potent and allele selective suppression of mutant Huntingtin in the CNS","volume":"41","author":"Ostergaard","year":"2013","journal-title":"Nucleic
+          Acids Res"},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0195","doi-asserted-by":"crossref","first-page":"284","DOI":"10.1016\/j.bcp.2009.04.013","article-title":"Effect
+          of dose and plasma concentration on liver uptake and pharmacologic activity
+          of a 2\u2032-methoxyethyl modified chimeric antisense oligonucleotide targeting
+          PTEN","volume":"78","author":"Geary","year":"2009","journal-title":"Biochem
+          Pharmacol"},{"issue":"12","key":"10.1016\/j.addr.2015.01.008_bb0200","doi-asserted-by":"crossref","first-page":"7819","DOI":"10.1093\/nar\/gku484","article-title":"TCP1
+          complex proteins interact with phosphorothioate oligonucleotides and can co-localize
+          in oligonucleotide-induced nuclear bodies in mammalian cells","volume":"42","author":"Liang","year":"2014","journal-title":"Nucleic
+          Acids Res"},{"issue":"11","key":"10.1016\/j.addr.2015.01.008_bb0205","doi-asserted-by":"crossref","first-page":"4795","DOI":"10.1093\/nar\/gkr089","article-title":"Mechanisms
+          of single-stranded phosphorothioate modified antisense oligonucleotide accumulation
+          in hepatocytes","volume":"39","author":"Koller","year":"2011","journal-title":"Nucleic
+          Acids Res"},{"issue":"11","key":"10.1016\/j.addr.2015.01.008_bb0210","doi-asserted-by":"crossref","first-page":"967","DOI":"10.1038\/nmat3765","article-title":"Delivery
+          materials for siRNA therapeutics","volume":"12","author":"Kanasty","year":"2013","journal-title":"Nat
+          Mater"},{"issue":"13","key":"10.1016\/j.addr.2015.01.008_bb0215","doi-asserted-by":"crossref","first-page":"8796","DOI":"10.1093\/nar\/gku531","article-title":"Targeted
+          delivery of antisense oligonucleotides to hepatocytes using triantennary N-acetyl
+          galactosamine improves potency 10-fold in mice","volume":"42","author":"Prakash","year":"2014","journal-title":"Nucleic
+          Acids Res"}],"container-title":["Advanced Drug Delivery Reviews"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0169409X15000101?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0169409X15000101?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2022,4,28]],"date-time":"2022-04-28T21:19:27Z","timestamp":1651180767000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0169409X15000101"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2015,6]]},"references-count":43,"alternative-id":["S0169409X15000101"],"URL":"https:\/\/doi.org\/10.1016\/j.addr.2015.01.008","relation":{},"ISSN":["0169-409X"],"issn-type":[{"type":"print","value":"0169-409X"}],"subject":[],"published":{"date-parts":[[2015,6]]},"assertion":[{"value":"Elsevier","name":"publisher","label":"This
+          article is maintained by"},{"value":"Pharmacokinetics, biodistribution and
+          cell uptake of antisense oligonucleotides","name":"articletitle","label":"Article
+          Title"},{"value":"Advanced Drug Delivery Reviews","name":"journaltitle","label":"Journal
+          Title"},{"value":"https:\/\/doi.org\/10.1016\/j.addr.2015.01.008","name":"articlelink","label":"CrossRef
+          DOI link to publisher maintained version"},{"value":"article","name":"content_type","label":"Content
+          Type"},{"value":"Copyright \u00a9 2015 The Authors. Published by Elsevier
+          B.V.","name":"copyright","label":"Copyright"}]}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "5116"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 14 Jul 2025 20:55:54 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.openalex.org/works/https://doi.org/10.1016%2Fj.addr.2015.01.008
+    response:
+      body:
+        string:
+          '{"id":"https://openalex.org/W2033425827","doi":"https://doi.org/10.1016/j.addr.2015.01.008","title":"Pharmacokinetics,
+          biodistribution and cell uptake of antisense oligonucleotides","display_name":"Pharmacokinetics,
+          biodistribution and cell uptake of antisense oligonucleotides","publication_year":2015,"publication_date":"2015-02-07","ids":{"openalex":"https://openalex.org/W2033425827","doi":"https://doi.org/10.1016/j.addr.2015.01.008","mag":"2033425827","pmid":"https://pubmed.ncbi.nlm.nih.gov/25666165"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.addr.2015.01.008","pdf_url":null,"source":{"id":"https://openalex.org/S114437232","display_name":"Advanced
+          Drug Delivery Reviews","issn_l":"0169-409X","issn":["0169-409X","1872-8294"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
+          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
+          BV"],"type":"journal"},"license":"cc-by-nc-nd","license_id":"https://openalex.org/licenses/cc-by-nc-nd","version":"publishedVersion","is_accepted":true,"is_published":true},"type":"review","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"hybrid","oa_url":"https://doi.org/10.1016/j.addr.2015.01.008","any_repository_has_fulltext":false},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5056554811","display_name":"Richard
+          S. Geary","orcid":"https://orcid.org/0000-0002-6308-3179"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
+          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Richard
+          S. Geary","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855 Gazelle
+          Court, Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
+          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5041113915","display_name":"Daniel
+          A. Norris","orcid":"https://orcid.org/0000-0003-2074-5862"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
+          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Daniel
+          Norris","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855 Gazelle
+          Court, Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
+          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5002446366","display_name":"Rosie
+          Z. Yu","orcid":"https://orcid.org/0000-0001-9266-7280"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
+          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Rosie
+          Yu","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855 Gazelle Court,
+          Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
+          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5083296071","display_name":"C.
+          Frank Bennett","orcid":"https://orcid.org/0000-0001-9887-6251"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
+          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"C.
+          Frank Bennett","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855
+          Gazelle Court, Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
+          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":5150,"currency":"USD","value_usd":5150},"apc_paid":{"value":5150,"currency":"USD","value_usd":5150},"fwci":7.511,"has_fulltext":false,"cited_by_count":740,"citation_normalized_percentile":{"value":0.999763,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":"87","issue":null,"first_page":"46","last_page":"51"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T10725","display_name":"RNA
+          Interference and Gene Delivery","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}},"topics":[{"id":"https://openalex.org/T10725","display_name":"RNA
+          Interference and Gene Delivery","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}},{"id":"https://openalex.org/T10432","display_name":"DNA and Nucleic
+          Acid Chemistry","score":0.9998,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}},{"id":"https://openalex.org/T10207","display_name":"Advanced biosensing
+          and bioanalysis techniques","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
+          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
+          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
+          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/biodistribution","display_name":"Biodistribution","score":0.8485062}],"concepts":[{"id":"https://openalex.org/C2777807558","wikidata":"https://www.wikidata.org/wiki/Q4914764","display_name":"Biodistribution","level":3,"score":0.8485062},{"id":"https://openalex.org/C129312508","wikidata":"https://www.wikidata.org/wiki/Q133686","display_name":"Oligonucleotide","level":3,"score":0.78847396},{"id":"https://openalex.org/C181389837","wikidata":"https://www.wikidata.org/wiki/Q461809","display_name":"Bioavailability","level":2,"score":0.6992745},{"id":"https://openalex.org/C28005876","wikidata":"https://www.wikidata.org/wiki/Q189814","display_name":"Endocytosis","level":3,"score":0.65686506},{"id":"https://openalex.org/C112705442","wikidata":"https://www.wikidata.org/wiki/Q323936","display_name":"Pharmacokinetics","level":2,"score":0.5450816},{"id":"https://openalex.org/C98274493","wikidata":"https://www.wikidata.org/wiki/Q128406","display_name":"Pharmacology","level":1,"score":0.5421454},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.53808784},{"id":"https://openalex.org/C79879829","wikidata":"https://www.wikidata.org/wiki/Q5571762","display_name":"Intracellular","level":2,"score":0.4645251},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.39695248},{"id":"https://openalex.org/C1491633281","wikidata":"https://www.wikidata.org/wiki/Q7868","display_name":"Cell","level":2,"score":0.33667707},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.308039},{"id":"https://openalex.org/C552990157","wikidata":"https://www.wikidata.org/wiki/Q7430","display_name":"DNA","level":2,"score":0.17627034},{"id":"https://openalex.org/C202751555","wikidata":"https://www.wikidata.org/wiki/Q221681","display_name":"In
+          vitro","level":2,"score":0.16757503}],"mesh":[{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
+          Antisense","qualifier_ui":"Q000493","qualifier_name":"pharmacokinetics","is_major_topic":true},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
+          Antisense","qualifier_ui":"Q000008","qualifier_name":"administration & dosage","is_major_topic":true},{"descriptor_ui":"D000818","descriptor_name":"Animals","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D001692","descriptor_name":"Biological
+          Transport","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D001798","descriptor_name":"Blood
+          Proteins","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D001798","descriptor_name":"Blood
+          Proteins","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D015195","descriptor_name":"Drug
+          Design","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D004705","descriptor_name":"Endocytosis","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D006801","descriptor_name":"Humans","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007275","descriptor_name":"Injections,
+          Intravenous","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007278","descriptor_name":"Injections,
+          Spinal","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007279","descriptor_name":"Injections,
+          Subcutaneous","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D009369","descriptor_name":"Neoplasms","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D009369","descriptor_name":"Neoplasms","qualifier_ui":"Q000188","qualifier_name":"drug
+          therapy","is_major_topic":false},{"descriptor_ui":"D009369","descriptor_name":"Neoplasms","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
+          Antisense","qualifier_ui":"Q000627","qualifier_name":"therapeutic use","is_major_topic":false},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
+          Antisense","qualifier_ui":"Q000737","qualifier_name":"chemistry","is_major_topic":false},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
+          Antisense","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D009928","descriptor_name":"Organ
+          Specificity","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D011485","descriptor_name":"Protein
+          Binding","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D013045","descriptor_name":"Species
+          Specificity","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D014018","descriptor_name":"Tissue
+          Distribution","qualifier_ui":"","qualifier_name":null,"is_major_topic":false}],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.addr.2015.01.008","pdf_url":null,"source":{"id":"https://openalex.org/S114437232","display_name":"Advanced
+          Drug Delivery Reviews","issn_l":"0169-409X","issn":["0169-409X","1872-8294"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
+          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
+          BV"],"type":"journal"},"license":"cc-by-nc-nd","license_id":"https://openalex.org/licenses/cc-by-nc-nd","version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/25666165","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
+          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
+          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.addr.2015.01.008","pdf_url":null,"source":{"id":"https://openalex.org/S114437232","display_name":"Advanced
+          Drug Delivery Reviews","issn_l":"0169-409X","issn":["0169-409X","1872-8294"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
+          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
+          BV"],"type":"journal"},"license":"cc-by-nc-nd","license_id":"https://openalex.org/licenses/cc-by-nc-nd","version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":42,"referenced_works":["https://openalex.org/W1533447420","https://openalex.org/W1600624961","https://openalex.org/W1677186713","https://openalex.org/W1738068946","https://openalex.org/W1972326561","https://openalex.org/W1988582067","https://openalex.org/W1995770815","https://openalex.org/W1997188614","https://openalex.org/W2010757394","https://openalex.org/W2018328995","https://openalex.org/W2019957038","https://openalex.org/W2026934511","https://openalex.org/W2032426626","https://openalex.org/W2044204671","https://openalex.org/W2044851147","https://openalex.org/W2050679356","https://openalex.org/W2052322311","https://openalex.org/W2061092005","https://openalex.org/W2069146205","https://openalex.org/W2081746459","https://openalex.org/W2090804804","https://openalex.org/W2095509700","https://openalex.org/W2095949497","https://openalex.org/W2112909190","https://openalex.org/W2115222513","https://openalex.org/W2116500202","https://openalex.org/W2117701024","https://openalex.org/W2120682296","https://openalex.org/W2128768698","https://openalex.org/W2130886644","https://openalex.org/W2131447660","https://openalex.org/W2149414920","https://openalex.org/W2157668743","https://openalex.org/W2167400349","https://openalex.org/W2169218609","https://openalex.org/W2171234404","https://openalex.org/W2174292614","https://openalex.org/W2497851393","https://openalex.org/W2497937268","https://openalex.org/W2504686134","https://openalex.org/W2517077698","https://openalex.org/W84014429"],"related_works":["https://openalex.org/W3148766288","https://openalex.org/W3095294796","https://openalex.org/W3032237923","https://openalex.org/W3030179994","https://openalex.org/W2385718423","https://openalex.org/W2359190752","https://openalex.org/W2046280088","https://openalex.org/W1969303838","https://openalex.org/W16113689","https://openalex.org/W1505739641"],"abstract_inverted_index":{"Pharmacokinetic":[0],"properties":[1],"of":[2,9,24,41,45,71,166,194,198,209],"oligonucleotides":[3,140,151,199,211],"are":[4,14,115],"largely":[5],"driven":[6],"by":[7,29,120,132,153,187],"chemistry":[8],"the":[10,50,72,75,100,144,157,162,195,213],"backbone":[11],"and":[12,37,60,64,82,88,109,117,124,136,184,206],"thus":[13],"sequence":[15],"independent":[16],"within":[17],"a":[18,179],"chemical":[19],"class.":[20],"Tissue":[21],"bioavailability":[22,103],"(%":[23],"administered":[25,152],"dose)":[26],"is":[27,107,129,185],"assisted":[28],"plasma":[30,58,61],"protein":[31,62],"binding":[32,63,80],"that":[33],"limits":[34],"glomerular":[35],"filtration":[36],"ultimate":[38,207],"urinary":[39],"excretion":[40],"oligonucleotides.":[42],"The":[43,164],"substitution":[44],"one":[46],"non-bridging":[47],"oxygen":[48],"with":[49,112],"more":[51],"hydrophobic":[52],"sulfur":[53],"atom":[54],"(phosphorothioate)":[55],"increases":[56],"both":[57],"stability":[59],"thus,":[65],"ultimately,":[66],"tissue":[67,86,102],"bioavailability.":[68],"Additional":[69],"modifications":[70],"sugar":[73],"at":[74],"2''":[76],"position,":[77],"increase":[78,84],"RNA":[79,90],"affinity":[81],"significantly":[83],"potency,":[85],"half-life":[87],"prolong":[89],"inhibitory":[91],"activity.":[92],"Oligonucleotides":[93],"modified":[94,149],"in":[95,161,177,204,212],"this":[96],"manner":[97],"consistently":[98],"exhibit":[99],"highest":[101,113],"(>90%).":[104],"Systemic":[105],"biodistribution":[106],"broad,":[108],"organs":[110],"typically":[111],"concentrations":[114],"liver":[116],"kidney":[118],"followed":[119],"bone":[121],"marrow,":[122],"adipocytes,":[123],"lymph":[125],"nodes.":[126],"Cell":[127],"uptake":[128,190],"predominantly":[130],"mediated":[131],"endocytosis.":[133],"Both":[134],"size":[135],"charge":[137],"for":[138],"most":[139],"prevents":[141],"distribution":[142,169],"across":[143],"blood":[145],"brain":[146],"barrier.":[147],"However,":[148],"single-strand":[150],"intrathecal":[154],"injection":[155],"into":[156],"CSF":[158],"distribute":[159],"broadly":[160],"CNS.":[163],"majority":[165],"intracellular":[167,196],"oligonucleotide":[168],"following":[170,182],"systemic":[171],"or":[172],"local":[173],"administration":[174,183],"occurs":[175],"rapidly":[176],"just":[178],"few":[180],"hours":[181],"facilitated":[186],"rapid":[188],"endocytotic":[189],"mechanisms.":[191],"Further":[192],"understanding":[193],"trafficking":[197],"may":[200],"provide":[201],"further":[202],"enhancements":[203],"design":[205],"potency":[208],"antisense":[210],"future.":[214]},"abstract_inverted_index_v3":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W2033425827","counts_by_year":[{"year":2025,"cited_by_count":29},{"year":2024,"cited_by_count":80},{"year":2023,"cited_by_count":76},{"year":2022,"cited_by_count":79},{"year":2021,"cited_by_count":94},{"year":2020,"cited_by_count":93},{"year":2019,"cited_by_count":95},{"year":2018,"cited_by_count":72},{"year":2017,"cited_by_count":63},{"year":2016,"cited_by_count":45},{"year":2015,"cited_by_count":13}],"updated_date":"2025-06-15T22:17:21.455414","created_date":"2016-06-24"}
+
+          '
+      headers:
+        Access-Control-Allow-Credentials:
+          - "true"
+        Access-Control-Allow-Headers:
+          - Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Authorization,
+            Cache-Control
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Authorization, Cache-Control
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "4321"
+        Content-Security-Policy:
+          - default-src 'self'; object-src 'none'
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 14 Jul 2025 20:55:54 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
+        Report-To:
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1752526554&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=hm2tkU1ZrBzPQs33UeWRXwEw9ERXaDFyHBRGBdQfhJY%3D"}]}'
+        Reporting-Endpoints:
+          - heroku-nel=https://nel.heroku.com/reports?ts=1752526554&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=hm2tkU1ZrBzPQs33UeWRXwEw9ERXaDFyHBRGBdQfhJY%3D
+        Server:
+          - gunicorn
+        Strict-Transport-Security:
+          - max-age=31556926; includeSubDomains
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 vegur
+        X-Api-Pool:
+          - common
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - SAMEORIGIN
+        X-Xss-Protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1016/j.addr.2015.01.008?email=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"doi":"10.1016/j.addr.2015.01.008","doi_url":"https://doi.org/10.1016/j.addr.2015.01.008","title":"Pharmacokinetics,
+          biodistribution and cell uptake of antisense oligonucleotides","genre":"journal-article","is_paratext":false,"published_date":"2015-02-07","year":2015,"journal_name":"Advanced
+          Drug Delivery Reviews","journal_issns":"0169-409X,1872-8294","journal_issn_l":"0169-409X","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Elsevier
+          BV","is_oa":true,"oa_status":"hybrid","has_repository_copy":false,"best_oa_location":{"url":"https://doi.org/10.1016/j.addr.2015.01.008","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.addr.2015.01.008","evidence":"deprecated","license":"cc-by-nc-nd","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2015-02-07","updated":"deprecated"},"first_oa_location":{"url":"https://doi.org/10.1016/j.addr.2015.01.008","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.addr.2015.01.008","evidence":"deprecated","license":"cc-by-nc-nd","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2015-02-07","updated":"deprecated"},"oa_locations":[{"url":"https://doi.org/10.1016/j.addr.2015.01.008","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.addr.2015.01.008","evidence":"deprecated","license":"cc-by-nc-nd","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2015-02-07","updated":"deprecated"}],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Richard
+          S. Geary","is_corresponding":true,"raw_affiliation_strings":["Isis Pharmaceuticals,
+          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]},{"author_position":"additional","raw_author_name":"Daniel
+          Norris","is_corresponding":false,"raw_affiliation_strings":["Isis Pharmaceuticals,
+          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]},{"author_position":"additional","raw_author_name":"Rosie
+          Yu","is_corresponding":false,"raw_affiliation_strings":["Isis Pharmaceuticals,
+          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]},{"author_position":"last","raw_author_name":"C.
+          Frank Bennett","is_corresponding":false,"raw_affiliation_strings":["Isis Pharmaceuticals,
+          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]}],"updated":"2025-05-22T18:42:22Z"}
+
+          '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "710"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 14 Jul 2025 20:55:54 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+        Report-To:
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=CtklN17S3kQDxKZbOxZ1nTjzIJsmcIkxKCcCR%2FFDwoM%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1752526554"}],"max_age":3600}'
+        Reporting-Endpoints:
+          - heroku-nel="https://nel.heroku.com/reports?s=CtklN17S3kQDxKZbOxZ1nTjzIJsmcIkxKCcCR%2FFDwoM%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1752526554"
+        Server:
+          - Heroku
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 heroku-router
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.addr.2015.01.008/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Geary_2015, title={Pharmacokinetics, biodistribution and
+          cell uptake of antisense oligonucleotides}, volume={87}, ISSN={0169-409X},
+          url={http://dx.doi.org/10.1016/j.addr.2015.01.008}, DOI={10.1016/j.addr.2015.01.008},
+          journal={Advanced Drug Delivery Reviews}, publisher={Elsevier BV}, author={Geary,
+          Richard S. and Norris, Daniel and Yu, Rosie and Bennett, C. Frank}, year={2015},
+          month=jun, pages={46\u201351} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Mon, 14 Jul 2025 20:55:54 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

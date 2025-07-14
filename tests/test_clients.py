@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from collections.abc import Collection, Sequence
+from datetime import datetime
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
@@ -220,6 +221,26 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
                 " from a peer-reviewed journal."
             ),
             "is_oa": False,
+        },
+        {
+            "bibtex_type": "article",
+            "publication_date": datetime(2015, 6, 29),
+            "year": 2015,
+            "volume": "87",
+            "pages": (
+                "46-51"  # Semantic Scholar gives back pages "\n          46-51\n        "
+            ),
+            "journal": "Advanced drug delivery reviews",
+            "url": "https://doi.org/10.1016/j.addr.2015.01.008",
+            "title": (
+                "Pharmacokinetics, biodistribution and cell uptake of antisense"
+                " oligonucleotides."
+            ),
+            "source": ["semantic_scholar", "crossref"],
+            "doi": "10.1016/j.addr.2015.01.008",
+            "doc_id": "35c80e22e6d9a7bc",
+            "dockey": "35c80e22e6d9a7bc",
+            "doi_url": "https://doi.org/10.1016/j.addr.2015.01.008",
         },
     ],
 )
