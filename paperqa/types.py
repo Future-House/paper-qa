@@ -531,7 +531,13 @@ class DocDetails(Doc):
     )
     doi: str | None = None
     doi_url: str | None = None
-    doc_id: str | None = None
+    doc_id: str | None = Field(
+        default=None,
+        description=(
+            "Unique ID for this document. Simple ways to acquire one include"
+            " hashing the DOI or a stringifying a UUID."
+        ),
+    )
     file_location: str | os.PathLike | None = None
     license: str | None = Field(
         default=None,
@@ -810,6 +816,29 @@ class DocDetails(Doc):
             return getattr(self, item)
         except AttributeError:
             return self.other[item]
+
+    def make_filename(self, title_limit: int | None = 48) -> str:
+        """
+        Make a filesystem-safe filename that has the doc ID appended, but no extension.
+
+        Args:
+            title_limit: Character limit on the title.
+
+        Returns:
+            Filename that is filesystem safe (e.g. non-safe chars are replaced with dash).
+        """
+        if not self.title or not self.doc_id:
+            raise ValueError("Unable to create filename without both title and doc_id.")
+        # SEE: https://stackoverflow.com/a/71199182
+        encoded_title = re.sub(
+            r"[/\\?%*:|\"<>\x7F\x00-\x1F]", "-", self.title[:title_limit]
+        )
+        # NOTE: we append the doc ID for a few reasons:
+        # 1. Prevent collisions for identical titles
+        #    SEE: https://stackoverflow.com/a/71761675
+        # 2. Filenames shouldn't end in a period,
+        #    so append the doc ID to circumvent that gotcha
+        return "_".join((encoded_title, self.doc_id))
 
     @computed_field  # type: ignore[prop-decorator]
     @property

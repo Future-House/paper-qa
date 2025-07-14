@@ -1551,6 +1551,7 @@ def test_docdetails_doc_id_roundtrip() -> None:
     # now let's do this with a doi
     doc_details_with_doi_no_doc_id = DocDetails(
         doi=test_doi,
+        title=r"A Stub | \emph{Stub Title}",
         docname="test_doc",
         citation="Test Citation",
         dockey="test_dockey",
@@ -1566,6 +1567,10 @@ def test_docdetails_doc_id_roundtrip() -> None:
     assert (
         doc_details_with_doi_no_doc_id.dockey == doc_details_with_doi_no_doc_id.doc_id
     )
+    assert (
+        doc_details_with_doi_no_doc_id.make_filename()
+        == "A Stub - -emph{Stub Title}_7f8a71c920c202c5"
+    )
 
     # round-trip serializaiton should keep the same doc_id
     new_with_doi_no_doc_id = DocDetails(
@@ -1574,6 +1579,10 @@ def test_docdetails_doc_id_roundtrip() -> None:
     assert (
         new_with_doi_no_doc_id.doc_id == doc_details_with_doi_no_doc_id.doc_id
     ), "DocDetails with doc_id should keep the same doc_id after serialization"
+    assert (
+        new_with_doi_no_doc_id.make_filename()
+        == "A Stub - -emph{Stub Title}_7f8a71c920c202c5"
+    )
 
     # since validation runs on assignment, make sure we can assign correctly
     doc_details_with_doi_no_doc_id.doc_id = test_specified_doc_id
