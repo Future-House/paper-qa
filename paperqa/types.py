@@ -531,7 +531,13 @@ class DocDetails(Doc):
     )
     doi: str | None = None
     doi_url: str | None = None
-    doc_id: str | None = None
+    doc_id: str | None = Field(
+        default=None,
+        description=(
+            "Unique ID for this document. Simple ways to acquire one include"
+            " hashing the DOI or a stringifying a UUID."
+        ),
+    )
     file_location: str | os.PathLike | None = None
     license: str | None = Field(
         default=None,
