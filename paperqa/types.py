@@ -162,15 +162,17 @@ class Context(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def populate_id(cls, data: Any) -> Any:
+    def populate_id(cls, data: dict[str, Any]) -> dict[str, Any]:
         if not data.get("id"):
             content = (
                 data.get("question", "")
                 + data.get("context", "")[: cls.CONTEXT_ENCODING_LENGTH]
             )
-            data["id"] = cls.REFERENCE_TEMPLATE.format(
-                id=encode_id(content or str(uuid4()), maxsize=cls.ID_HASH_LENGTH)
-            )
+            return data | {  # Avoid mutating input data
+                "id": cls.REFERENCE_TEMPLATE.format(
+                    id=encode_id(content or str(uuid4()), maxsize=cls.ID_HASH_LENGTH)
+                )
+            }
         return data
 
 
