@@ -127,14 +127,18 @@ class Text(Embeddable):
         return hash((self.name, self.text))
 
 
+# Sentinel to autopopulate a field within model_validator
+AUTOPOPULATE_VALUE = ""  # NOTE: this is falsy by design
+
+
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
     model_config = ConfigDict(extra="allow")
 
     id: str = Field(
+        default=AUTOPOPULATE_VALUE,
         description="Unique identifier for the context. Auto-generated if not provided.",
-        init=False,
     )
 
     context: str = Field(description="Summary of the text with respect to a question.")
@@ -159,15 +163,17 @@ class Context(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def populate_id(cls, data: Any) -> Any:
-        if not data.get("id"):
+    def populate_id(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if not data.get("id"):  # NOTE: this includes missing or empty strings
             content = (
                 data.get("question", "")
                 + data.get("context", "")[: cls.CONTEXT_ENCODING_LENGTH]
             )
-            data["id"] = cls.REFERENCE_TEMPLATE.format(
-                id=encode_id(content or str(uuid4()), maxsize=cls.ID_HASH_LENGTH)
-            )
+            return data | {  # Avoid mutating input data
+                "id": cls.REFERENCE_TEMPLATE.format(
+                    id=encode_id(content or str(uuid4()), maxsize=cls.ID_HASH_LENGTH)
+                )
+            }
         return data
 
 
@@ -484,9 +490,6 @@ JOURNAL_EXPECTED_DOI_LENGTHS = {
 
 class DocDetails(Doc):
     model_config = ConfigDict(validate_assignment=True, extra="ignore")
-
-    # Sentinel to auto-populate a field within model_validator
-    AUTOPOPULATE_VALUE: ClassVar[str] = ""
 
     docname: str = AUTOPOPULATE_VALUE
     dockey: DocKey = AUTOPOPULATE_VALUE
