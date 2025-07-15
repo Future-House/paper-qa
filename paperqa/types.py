@@ -621,7 +621,7 @@ class DocDetails(Doc):
     def misc_string_cleaning(data: dict[str, Any]) -> dict[str, Any]:
         """Clean strings before the enter the validation process."""
         if pages := data.get("pages"):
-            data["pages"] = pages.replace("--", "-").replace(" ", "")
+            data["pages"] = pages.replace("--", "-").replace(" ", "").strip()
         return data
 
     @staticmethod
