@@ -8,7 +8,7 @@ from collections.abc import Collection, Mapping
 from copy import deepcopy
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, ClassVar, cast
+from typing import Annotated, Any, ClassVar, cast
 from uuid import UUID, uuid4
 
 import tiktoken
@@ -21,6 +21,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    PlainSerializer,
     computed_field,
     field_validator,
     model_validator,
@@ -59,9 +60,12 @@ class Doc(Embeddable):
     docname: str
     dockey: DocKey
     citation: str
-    fields_to_overwrite_from_metadata: set[str] = Field(
-        default_factory=lambda: set(DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA),
-        description="fields from metadata to overwrite when upgrading to a DocDetails",
+    # Sort the serialization to minimize the diff of serialized objects
+    fields_to_overwrite_from_metadata: Annotated[set[str], PlainSerializer(sorted)] = (
+        Field(
+            default_factory=lambda: set(DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA),
+            description="fields from metadata to overwrite when upgrading to a DocDetails",
+        )
     )
 
     @model_validator(mode="before")
