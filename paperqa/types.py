@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import csv
 import logging
 import os
@@ -838,10 +839,18 @@ class DocDetails(Doc):
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
         if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
+            raw_value = data["fields_to_overwrite_from_metadata"]
+            if (raw_value[0], raw_value[-1]) in {("[", "]"), ("{", "}")}:
+                # If string-ified set or list, remove brackets before split
+                raw_value = raw_value[1:-1]
             data["fields_to_overwrite_from_metadata"] = {
-                s.strip()
-                for s in data.get("fields_to_overwrite_from_metadata", "").split(",")
+                s.strip("\"' ") for s in raw_value.split(",")
             }
+        for possibly_str_field in ("authors", "other"):
+            if data.get(possibly_str_field) and isinstance(
+                data[possibly_str_field], str
+            ):
+                data[possibly_str_field] = ast.literal_eval(data[possibly_str_field])
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
