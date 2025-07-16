@@ -453,7 +453,7 @@ async def maybe_get_manifest(
                 content = await file.read()
             file_loc_to_records = {
                 str(r.get("file_location")): r
-                for r in csv.DictReader(content.splitlines())
+                for r in csv.DictReader(content.splitlines(), quoting=csv.QUOTE_NOTNULL)
                 if r.get("file_location")
             }
             if not file_loc_to_records:
