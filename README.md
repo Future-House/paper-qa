@@ -760,7 +760,8 @@ The paper directory is not modified in any way, it's just read from.
 The indexing process attempts to infer paper metadata like title and DOI
 using LLM-powered text processing.
 You can avoid this point of uncertainty using a "manifest" file,
-which is a CSV containing three columns (order doesn't matter):
+which is a CSV containing `DocDetails` fields (order doesn't matter).
+For example:
 
 - `file_location`: relative path to the paper's PDF within the index directory
 - `doi`: DOI of the paper
@@ -768,6 +769,9 @@ which is a CSV containing three columns (order doesn't matter):
 
 By providing this information,
 we ensure queries to metadata providers like Crossref are accurate.
+
+To ease creating a manifest, there is a helper class method `Doc.to_csv`,
+which also works when called on `DocDetails`.
 
 ### Reusing Index
 

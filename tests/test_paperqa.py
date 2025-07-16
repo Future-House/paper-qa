@@ -1,8 +1,10 @@
 import contextlib
+import csv
 import os
 import pathlib
 import pickle
 import re
+import sys
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
 from datetime import datetime, timedelta
@@ -1473,13 +1475,15 @@ def test_docdetails_merge_with_list_fields() -> None:
     assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
 
 
-def test_docdetails_deserialization() -> None:
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="Uses `csv.QUOTE_NOTNULL`.")
+def test_docdetails_deserialization(tmp_path) -> None:
     deserialize_to_doc = {
         "citation": "stub",
         "dockey": "stub",
         "docname": "Stub",
         "embedding": None,
         "formatted_citation": "stub",
+        "fields_to_overwrite_from_metadata": {"key", "doc_id", "docname", "citation"},
     }
     deepcopy_deserialize_to_doc = deepcopy(deserialize_to_doc)
     doc = Doc(**deserialize_to_doc)
@@ -1509,6 +1513,17 @@ def test_docdetails_deserialization() -> None:
     assert (
         deserialize_to_doc == deepcopy_deserialize_to_doc
     ), "Deserialization should not mutate input"
+
+    doc_details = DocDetails(
+        **deserialize_to_doc, other={"apple": "sauce"}, authors=["Thomas Anderson"]
+    )
+    DocDetails.to_csv([doc_details], target_csv_path=Path(tmp_path) / "manifest.csv")
+    with open(tmp_path / "manifest.csv", encoding="utf-8") as f:
+        csv_deserialized = DocDetails(
+            # type ignore comments are here since mypy can't recognize pytest skip
+            **next(csv.DictReader(f.readlines(), quoting=csv.QUOTE_NOTNULL))  # type: ignore[attr-defined,unused-ignore]
+        )
+    assert doc_details == csv_deserialized, "Round-trip CSV deserialization failed"
 
 
 def test_docdetails_doc_id_roundtrip() -> None:

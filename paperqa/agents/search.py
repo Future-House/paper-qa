@@ -8,6 +8,7 @@ import os
 import pathlib
 import pickle
 import re
+import sys
 import warnings
 import zlib
 from collections import Counter
@@ -451,9 +452,12 @@ async def maybe_get_manifest(
         try:
             async with await anyio.open_file(filename, mode="r") as file:
                 content = await file.read()
+            reader_kwargs: dict[str, Any] = {}
+            if sys.version_info >= (3, 12):  # Unlocks `bool | None` fields
+                reader_kwargs["quoting"] = csv.QUOTE_NOTNULL
             file_loc_to_records = {
                 str(r.get("file_location")): r
-                for r in csv.DictReader(content.splitlines())
+                for r in csv.DictReader(content.splitlines(), **reader_kwargs)
                 if r.get("file_location")
             }
             if not file_loc_to_records:
