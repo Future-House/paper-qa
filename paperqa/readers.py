@@ -68,9 +68,15 @@ def parse_pdf_to_pages(
     use_block_parsing: bool = False,
     parse_images: bool = True,
     full_page: bool = False,
+    image_cluster_tolerance: float | tuple[float, float] = 25,
     image_dpi: float | None = 150,
     **_,
 ) -> ParsedText:
+    x_tol, y_tol = (
+        image_cluster_tolerance
+        if isinstance(image_cluster_tolerance, tuple)
+        else (image_cluster_tolerance, image_cluster_tolerance)
+    )
 
     with pymupdf.open(path) as file:
         content: dict[str, str | tuple[str, list[ParsedImage]]] = {}
@@ -123,14 +129,18 @@ def parse_pdf_to_pages(
                     )
                 else:
                     for box_i, box in enumerate(
-                        page.cluster_drawings(drawings=page.get_drawings())
+                        page.cluster_drawings(
+                            drawings=page.get_drawings(),
+                            x_tolerance=x_tol,
+                            y_tolerance=y_tol,
+                        )
                     ):
                         pix = page.get_pixmap(clip=box, dpi=image_dpi)
                         images.append(
                             ParsedImage(
                                 index=box_i,
                                 data=pix.tobytes(),
-                                info={"bbox": tuple(box)}
+                                info={"bbox": tuple(box), "type": "drawing"}
                                 | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                             )
                         )
