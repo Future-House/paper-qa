@@ -2,9 +2,15 @@ from datetime import datetime
 
 # ruff: noqa: E501
 
+text_with_tables_prompt = (
+    "{text}\n\n------------\n\nMarkdown tables from {citation}."
+    " If the markdown is garbled, refer to the images"
+    "\n\n------------\n\n{tables}"
+)
 summary_prompt = (
     "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
-    " {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly"
+    " {citation}\n\n------------\n\n{text}\n\n------------"
+    "\n\nQuestion: {question}\n\nDo not directly"
     " answer the question, instead summarize to give evidence to help answer the"
     " question. Stay detailed; report specific numbers, equations, or direct quotes"
     ' (marked with quotation marks). Reply "Not applicable" if the excerpt is'
@@ -14,7 +20,8 @@ summary_prompt = (
 )
 
 summary_json_prompt = (
-    "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\n"
+    "Excerpt from {citation}\n\n------------\n\n{text}\n\n------------"
+    "\n\nQuestion: {question}\n\n"
 )
 
 # The below "cannot answer" sentinel phrase should:
@@ -45,7 +52,7 @@ CITATION_KEY_CONSTRAINTS = (
 
 qa_prompt = (
     "Answer the question below with the context.\n\n"
-    "Context:\n\n{context}\n\n----\n\n"
+    "Context:\n\n{context}\n\n------------\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
     "If the context provides insufficient information reply "

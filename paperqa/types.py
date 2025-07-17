@@ -144,8 +144,8 @@ class Text(Embeddable):
             " (e.g., 'Wiki2023 chunk 1', 'sentence1')."
         )
     )
-    images: list[ParsedImage] = Field(
-        default_factory=list, description="Optional list of associated images."
+    media: list[ParsedMedia] = Field(
+        default_factory=list, description="Optional list of associated media."
     )
     doc: Doc | DocDetails = Field(
         union_mode="left_to_right",
@@ -439,14 +439,14 @@ class ParsedMetadata(BaseModel):
 
     parsing_libraries: list[str]
     total_parsed_text_length: int
-    count_parsed_images: int = Field(default=0, ge=0)
+    count_parsed_media: int = Field(default=0, ge=0)
     paperqa_version: str = pqa_version
     parse_type: str | None = None
     chunk_metadata: ChunkMetadata | None = None
 
 
-class ParsedImage(BaseModel):
-    """Raw image parsed from a document's page."""
+class ParsedMedia(BaseModel):
+    """Raw image or table parsed from a document's page."""
 
     index: int = Field(
         description="Index of the image in a given page, or 0 if solely an image."
@@ -456,6 +456,10 @@ class ParsedImage(BaseModel):
         PlainSerializer(bytes_to_string),
         BeforeValidator(lambda x: x if isinstance(x, bytes) else string_to_bytes(x)),
     ] = Field(description="Raw image, ideally directly savable to a PNG image.")
+    text: str | None = Field(
+        default=None,
+        description="Optional associated text content (e.g. markdown export of a table).",
+    )
     info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
         default_factory=dict,
         description=(
@@ -478,7 +482,7 @@ class ParsedText(BaseModel):
     """All text from a document read, before chunking."""
 
     content: (
-        dict[str, str] | str | list[str] | dict[str, tuple[str, list[ParsedImage]]]
+        dict[str, str] | str | list[str] | dict[str, tuple[str, list[ParsedMedia]]]
     ) = Field(
         description=(
             "All parsed but not further processed (e.g. not chunked) contents from a"

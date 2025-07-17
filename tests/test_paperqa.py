@@ -51,7 +51,7 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import chunk_pdf, parse_pdf_to_pages, read_doc
-from paperqa.types import ChunkMetadata, ParsedImage
+from paperqa.types import ChunkMetadata, ParsedMedia
 from paperqa.utils import (
     bytes_to_string,
     clean_possessives,
@@ -988,12 +988,13 @@ async def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
 
     # Now let's check the images in Figure 1
     assert not isinstance(parsed_text.content["2"], str)
-    p2_text, p2_images = parsed_text.content["2"]
+    p2_text, p2_media = parsed_text.content["2"]
     assert "Figure 1" in p2_text, "Expected Figure 1 title"
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
+    p2_images = [m for m in p2_media if m.info["type"] == "drawing"]
     assert (
         1 <= len(p2_images) <= 3
-    ), "Expected Figure 1 to be present within a reasonable number of images"
+    ), "Expected Figure 1 to be present within a reasonable number of media"
     for i, image in enumerate(p2_images):
         assert image.index == i
         assert isinstance(image.data, bytes)
@@ -1045,7 +1046,7 @@ async def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     assert (
         "Figure 1: Architecture of PaSa" in fig_1_text.text
     ), "Expecting Figure 1 for the test to work"
-    assert fig_1_text.images, "Expecting images to test multimodality"
+    assert fig_1_text.media, "Expecting media to test multimodality"
     fig_1_text.text = "stub"  # Replace text to confirm multimodality works
     docs = Docs()
     assert await docs.aadd_texts(texts=[fig_1_text], doc=doc)
@@ -1053,12 +1054,30 @@ async def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
     session = await docs.aquery(query="What actions can the Crawler take?")
     assert session.contexts, "Expected contexts to be generated"
     assert all(
-        c.text.text == fig_1_text.text and c.text.images == fig_1_text.images
+        c.text.text == fig_1_text.text and c.text.media == fig_1_text.media
         for c in session.contexts
     )
     assert (
         sum(x in session.answer.lower() for x in ("search", "expand", "stop")) >= 2
     ), "Expected answer to have at least two of the three actions available"
+
+
+def test_table_parsing(stub_data_dir: Path) -> None:
+    filepath = stub_data_dir / "influence.pdf"
+    parsed_text = parse_pdf_to_pages(filepath)
+    assert isinstance(parsed_text.content, dict)
+    assert all(
+        t and t[0] != "\n" and t[-1] != "\n" for t in parsed_text.content.values()
+    ), "Expected no leading/trailing newlines in parsed text"
+    assert "1" in parsed_text.content, "Parsed text should contain page 1"
+    all_tables = {
+        i: [m for m in pagenum_media[1] if m.info["type"] == "table"]
+        for i, pagenum_media in parsed_text.content.items()
+        if isinstance(pagenum_media, tuple)
+    }
+    assert (
+        sum(len(tables) for tables in all_tables.values()) >= 2
+    ), "Expected a few tables to be parsed"
 
 
 @pytest.mark.vcr
@@ -1209,7 +1228,7 @@ async def test_parser_only_reader(stub_data_dir: Path):
         assert isinstance(value, tuple)
         num_chars += len(value[0])
     assert parsed_text.metadata.total_parsed_text_length == num_chars
-    assert parsed_text.metadata.count_parsed_images > 1, "Expected images to be parsed"
+    assert parsed_text.metadata.count_parsed_media > 1, "Expected media to be parsed"
 
 
 @pytest.mark.asyncio
@@ -1251,10 +1270,10 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
-    assert metadata.count_parsed_images > 1, "Expected images to be parsed"
+    assert metadata.count_parsed_media > 1, "Expected media to be parsed"
     assert (
-        sum(len(t.images) for t in chunk_text) == metadata.count_parsed_images
-    ), "Expected chunks' images to match parsed images"
+        sum(len(t.media) for t in chunk_text) == metadata.count_parsed_media
+    ), "Expected chunks' media to match parsed media"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
@@ -1315,13 +1334,14 @@ async def test_read_doc_images(stub_data_dir: Path) -> None:
     assert isinstance(page_content, tuple)
     text_content, (parsed_image,) = page_content
     assert not text_content, "Expected no text content for an image"
-    assert isinstance(parsed_image, ParsedImage)
+    assert isinstance(parsed_image, ParsedMedia)
     assert parsed_image.index == 0
     assert isinstance(parsed_image.data, bytes)
     assert len(parsed_image.data) > 0
+    assert not parsed_image.text, "Expected no text content for a standalone image"
     assert parsed_image.info["suffix"] == ".png"
     assert parsed_text.metadata.parse_type == "image"
-    assert parsed_text.metadata.count_parsed_images == 1
+    assert parsed_text.metadata.count_parsed_media == 1
     assert parsed_text.metadata.total_parsed_text_length == 0
     assert parsed_text.metadata.chunk_metadata is None
 
@@ -1329,7 +1349,7 @@ async def test_read_doc_images(stub_data_dir: Path) -> None:
     (text,) = await read_doc(png_path, doc)
     assert isinstance(text, Text)
     assert text.doc == doc
-    (image,) = text.images
+    (image,) = text.media
     assert image == parsed_image
 
     # Test including metadata
@@ -1339,7 +1359,7 @@ async def test_read_doc_images(stub_data_dir: Path) -> None:
     assert len(texts) == 1
     assert texts[0] == text
     assert metadata.parse_type == "image"
-    assert metadata.count_parsed_images == 1
+    assert metadata.count_parsed_media == 1
     assert metadata.total_parsed_text_length == 0
     assert metadata.chunk_metadata is not None
     assert not metadata.chunk_metadata.chunk_chars
@@ -1358,6 +1378,34 @@ async def test_code() -> None:
     assert len(docs.docs) == 1
     session = await docs.aquery("What file is read in by test_code?", settings=settings)
     assert "test_paperqa.py" in session.answer
+
+
+@pytest.mark.asyncio
+async def test_querying_tables(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+
+    docs = Docs()
+    assert await docs.aadd(stub_data_dir / "influence.pdf", settings=settings)
+    # Now, let's modify the system so any tables housed in the Text.text get removed,
+    # and the system can only rely on table images or markdown
+    texts_with_tables = {
+        t
+        for t in docs.texts
+        if t.media and any(m.info.get("type") == "table" for m in t.media)
+    }
+    assert texts_with_tables, "Expected some texts to have parsed tables"
+    for t in texts_with_tables:
+        # Wipe text but keep embedding (for retrieval), to confirm tables get used
+        t.text = "Placeholder"
+        # Wipe non-table media (e.g. images)
+        t.media = [m for m in t.media if m.info.get("type") == "table"]
+    docs.texts = list(texts_with_tables)
+    session = await docs.aquery(
+        "What osteotomy gap (mm) has the bone volume per slice?", settings=settings
+    )
+    assert session.used_contexts
+    assert any(x in session.answer for x in ("1.0 mm", "1.0-mm"))
+    assert session.cost > 0
 
 
 @pytest.mark.asyncio
