@@ -163,9 +163,13 @@ async def map_fxn_summary(
     success = False
 
     if summary_llm_model and prompt_templates:
-        data = {"question": question, "citation": citation, "text": text.text} | (
-            extra_prompt_data or {}
-        )
+        data = {
+            "question": question,
+            "citation": citation,
+            # Strip newlines in case chunking led to blank lines,
+            # but not spaces, to preserve text alignment
+            "text": text.text.strip("\n"),
+        } | (extra_prompt_data or {})
         message_prompt, system_prompt = prompt_templates
         messages = [
             Message(role="system", content=system_prompt.format(**data)),
@@ -193,7 +197,9 @@ async def map_fxn_summary(
             except KeyError:
                 success = False
     else:
-        context = text.text
+        # Strip newlines in case chunking led to blank lines,
+        # but not spaces, to preserve text alignment
+        context = text.text.strip("\n")
         # If we don't assign scores, just default to 5.
         # why 5? Because we filter out 0s in another place
         # and 5/10 is the other default I could come up with
