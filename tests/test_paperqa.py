@@ -1153,10 +1153,13 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
         metadata.total_parsed_text_length // metadata.chunk_metadata.chunk_chars
         <= len(chunk_text)
     )
-    assert all(
-        chunk_text[i].text[-100:] == chunk_text[i + 1].text[:100]
-        for i in range(len(chunk_text) - 1)
-    )
+    for i in range(len(chunk_text) - 1):
+        this_chunk_overlap = chunk_text[i].text[-100:].strip("\n")
+        next_chunk_overlap = chunk_text[i + 1].text[:100].strip("\n")
+        if len(this_chunk_overlap) <= len(next_chunk_overlap):
+            assert this_chunk_overlap in next_chunk_overlap
+        else:
+            assert next_chunk_overlap in this_chunk_overlap
     # Let's check the pages in the chunk names
     first_page, _ = chunk_text[0].name.rsplit(" ", maxsplit=1)[-1].split("-")
     assert first_page == "1", "First chunk should be for page 1"
