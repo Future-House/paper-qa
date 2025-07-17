@@ -1145,9 +1145,10 @@ async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.chunk_chars == 3000
     assert len(chunk_text) > 2, "Expected multiple chunks, for meaningful assertions"
-    assert all(
-        len(chunk.text) <= metadata.chunk_metadata.chunk_chars for chunk in chunk_text
-    )
+    for chunk in chunk_text:
+        assert 1 <= len(chunk.text) <= metadata.chunk_metadata.chunk_chars
+        assert chunk.text[0] != "\n", "Expected no leading newlines from PDF chunks"
+        assert chunk.text[-1] != "\n", "Expected no trailing newlines from PDF chunks"
     assert (
         metadata.total_parsed_text_length // metadata.chunk_metadata.chunk_chars
         <= len(chunk_text)

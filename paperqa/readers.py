@@ -129,7 +129,9 @@ def chunk_pdf(
             pg = "-".join([pages[0], pages[-1]])
             texts.append(
                 Text(
-                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
+                    text=split[:chunk_chars].strip("\n"),
+                    name=f"{doc.docname} pages {pg}",
+                    doc=doc,
                 )
             )
             split = split[chunk_chars - overlap :]
@@ -138,7 +140,11 @@ def chunk_pdf(
     if len(split) > overlap or not texts:
         pg = "-".join([pages[0], pages[-1]])
         texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
+            Text(
+                text=split[:chunk_chars].strip("\n"),
+                name=f"{doc.docname} pages {pg}",
+                doc=doc,
+            )
         )
     return texts
 
