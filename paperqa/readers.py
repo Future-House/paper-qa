@@ -15,7 +15,7 @@ from html2text import html2text
 from paperqa.types import (
     ChunkMetadata,
     Doc,
-    ParsedImage,
+    ParsedMedia,
     ParsedMetadata,
     ParsedText,
     Text,
@@ -66,7 +66,7 @@ def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     use_block_parsing: bool = False,
-    parse_images: bool = True,
+    parse_media: bool = True,
     full_page: bool = False,
     image_cluster_tolerance: float | tuple[float, float] = 25,
     image_dpi: float | None = 150,
@@ -79,8 +79,8 @@ def parse_pdf_to_pages(
     )
 
     with pymupdf.open(path) as file:
-        content: dict[str, str | tuple[str, list[ParsedImage]]] = {}
-        total_length = count_images = 0
+        content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
+        total_length = count_media = 0
 
         for i in range(file.page_count):
             try:
@@ -116,18 +116,19 @@ def parse_pdf_to_pages(
                     f" long, which exceeds the {page_size_limit} char limit for the PDF"
                     f" at path {path}."
                 )
-            images: list[ParsedImage] = []
-            if parse_images:
+            media: list[ParsedMedia] = []
+            if parse_media:
                 if full_page:  # Capture the entire page as one image
                     pix = page.get_pixmap(dpi=image_dpi)
-                    images.append(
-                        ParsedImage(
+                    media.append(
+                        ParsedMedia(
                             index=0,
                             data=pix.tobytes(),
                             info={a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                         )
                     )
                 else:
+                    # Capture drawings/figures
                     for box_i, box in enumerate(
                         page.cluster_drawings(
                             drawings=page.get_drawings(),
@@ -136,25 +137,38 @@ def parse_pdf_to_pages(
                         )
                     ):
                         pix = page.get_pixmap(clip=box, dpi=image_dpi)
-                        images.append(
-                            ParsedImage(
+                        media.append(
+                            ParsedMedia(
                                 index=box_i,
                                 data=pix.tobytes(),
                                 info={"bbox": tuple(box), "type": "drawing"}
                                 | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                             )
                         )
-                content[str(i + 1)] = text, images
+
+                    # Capture tables
+                    for table_i, table in enumerate(t for t in page.find_tables()):
+                        pix = page.get_pixmap(clip=table.bbox, dpi=image_dpi)
+                        media.append(
+                            ParsedMedia(
+                                index=table_i,
+                                data=pix.tobytes(),
+                                text=table.to_markdown().strip(),
+                                info={"bbox": tuple(table.bbox), "type": "table"}
+                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                            )
+                        )
+                content[str(i + 1)] = text, media
             else:
                 content[str(i + 1)] = text
             total_length += len(text)
-            count_images += len(images)
+            count_media += len(media)
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
         paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
-        count_parsed_images=count_images,
+        count_parsed_media=count_media,
         parse_type="pdf",
     )
     return ParsedText(content=content, metadata=metadata)
@@ -163,15 +177,15 @@ def parse_pdf_to_pages(
 async def parse_image(path: str | os.PathLike, **_) -> ParsedText:
     apath = anyio.Path(path)
     image_data = await anyio.Path(path).read_bytes()
-    parsed_image = ParsedImage(index=0, data=image_data, info={"suffix": apath.suffix})
+    parsed_media = ParsedMedia(index=0, data=image_data, info={"suffix": apath.suffix})
     metadata = ParsedMetadata(
         parsing_libraries=[],
         paperqa_version=pqa_version,
         total_parsed_text_length=0,  # No text, just an image
-        count_parsed_images=1,
+        count_parsed_media=1,
         parse_type="image",
     )
-    return ParsedText(content={"1": ("", [parsed_image])}, metadata=metadata)
+    return ParsedText(content={"1": ("", [parsed_media])}, metadata=metadata)
 
 
 def chunk_pdf(
@@ -193,14 +207,14 @@ def chunk_pdf(
         )
 
     def make_kwargs(lower_page: str, upper_page: str) -> dict[str, Any]:
-        images: list[ParsedImage] = []
+        media: list[ParsedMedia] = []
         for pg_num in range(int(lower_page), int(upper_page) + 1):
             pg_contents = cast(dict, parsed_text.content)[str(pg_num)]
             if isinstance(pg_contents, tuple):
-                images.extend(pg_contents[1])
+                media.extend(pg_contents[1])
         # pretty formatting of pages (e.g. 1-3, 4, 5-7)
         name = "-".join([lower_page, upper_page])
-        return {"name": f"{doc.docname} pages {name}", "images": images, "doc": doc}
+        return {"name": f"{doc.docname} pages {name}", "media": media, "doc": doc}
 
     for page_num, page_contents in parsed_text.content.items():
         page_text = (
@@ -213,13 +227,21 @@ def chunk_pdf(
         # that it needs to be combined with the next chunk.
         while len(split) > chunk_chars:
             texts.append(
-                Text(text=split[:chunk_chars], **make_kwargs(pages[0], pages[-1]))
+                Text(
+                    text=split[:chunk_chars].lstrip("\n").rstrip("\n"),
+                    **make_kwargs(pages[0], pages[-1]),
+                )
             )
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
     if len(split) > overlap or not texts:
-        texts.append(Text(text=split[:chunk_chars], **make_kwargs(pages[0], pages[-1])))
+        texts.append(
+            Text(
+                text=split[:chunk_chars].lstrip("\n").rstrip("\n"),
+                **make_kwargs(pages[0], pages[-1]),
+            )
+        )
     return texts
 
 
