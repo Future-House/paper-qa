@@ -45,7 +45,9 @@ SEMANTIC_SCHOLAR_API_MAPPING: dict[str, Collection[str]] = {
     "citation_count": {"citationCount"},
     "source_quality": {"journal"},
 }
-SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT = 10.0
+SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT = float(
+    os.environ.get("SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", "10.0")
+)  # seconds
 SEMANTIC_SCHOLAR_API_FIELDS: str = ",".join(
     union_collections_to_ordered_list(SEMANTIC_SCHOLAR_API_MAPPING.values())
 )

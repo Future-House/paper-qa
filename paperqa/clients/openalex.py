@@ -17,7 +17,9 @@ from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
 
 OPENALEX_BASE_URL = "https://api.openalex.org"
-OPENALEX_API_REQUEST_TIMEOUT = 5.0
+OPENALEX_API_REQUEST_TIMEOUT = float(
+    os.environ.get("OPENALEX_API_REQUEST_TIMEOUT", "10.0")
+)  # seconds
 
 logger = logging.getLogger(__name__)
 
