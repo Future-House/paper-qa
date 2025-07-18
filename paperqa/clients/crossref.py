@@ -38,7 +38,9 @@ logger = logging.getLogger(__name__)
 
 CROSSREF_HOST = "api.crossref.org"
 CROSSREF_BASE_URL = f"https://{CROSSREF_HOST}"
-CROSSREF_API_REQUEST_TIMEOUT = 5.0
+CROSSREF_API_REQUEST_TIMEOUT = float(
+    os.environ.get("CROSSREF_API_REQUEST_TIMEOUT", "10.0")
+)  # seconds
 CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
     "title": {"title"},
     "doi": {"DOI"},
