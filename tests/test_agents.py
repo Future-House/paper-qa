@@ -11,7 +11,7 @@ import time
 import zlib
 from functools import wraps
 from pathlib import Path
-from typing import cast
+from typing import ClassVar, cast
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
@@ -23,6 +23,12 @@ from aviary.core import (
     ToolRequestMessage,
     ToolsAdapter,
     ToolSelector,
+)
+from aviary.envs.labbench import (
+    ImageQAEnvironment,
+    ImageQATaskDataset,
+    LABBenchDatasets,
+    TextQATaskDataset,
 )
 from ldp.agent import Agent, MemoryAgent, SimpleAgent
 from ldp.alg import (
@@ -45,11 +51,7 @@ from paperqa.agents.env import (
     clinical_trial_status,
     settings_to_tools,
 )
-from paperqa.agents.image_qa import (
-    ImageQASplits,
-    ImageQATaskDataset,
-    StoreEnvironmentsCallback,
-)
+from paperqa.agents.image_qa import StoreEnvironmentsCallback
 from paperqa.agents.main import FAKE_AGENT_TYPE, run_agent
 from paperqa.agents.models import AgentStatus, AnswerResponse
 from paperqa.agents.search import (
@@ -69,13 +71,7 @@ from paperqa.agents.tools import (
 )
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
-from paperqa.settings import (
-    AgentSettings,
-    AnswerSettings,
-    IndexSettings,
-    ParsingSettings,
-    Settings,
-)
+from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, PQASession, Text
 from paperqa.utils import encode_id, extract_thought, get_year, md5sum
 
@@ -1148,36 +1144,106 @@ async def test_env_from_name(subtests: SubTests) -> None:
         assert isinstance(env, PaperQAEnvironment)
 
 
+@pytest.mark.skip(reason="Manually run benchmark")
+@pytest.mark.usefixtures("extended_llm_retrying")
 @pytest.mark.asyncio
 async def test_image_qa(tmp_path) -> None:
-    settings = Settings(
-        llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
-        summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
-        agent=AgentSettings(
-            agent_type="ldp.agent.SimpleAgent",
-            index=IndexSettings(paper_directory=tmp_path),
-            # TODO: add image support for paper_search
-            tool_names={"gather_evidence", "gen_answer", "complete", "reset"},
-            agent_evidence_n=3,  # Bumped up to collect several perspectives
-        ),
-        # We don't support image embeddings yet, so disable embedding
-        parsing=ParsingSettings(defer_embedding=True, use_doc_details=False),
-        answer=AnswerSettings(evidence_retrieval=False),
+    settings = ImageQAEnvironment.make_base_settings()
+    settings.llm = settings.summary_llm = "gpt-4o-2024-05-13"  # Match LAB-Bench paper
+    settings.agent = AgentSettings(
+        agent_type="ldp.agent.SimpleAgent",
+        index=IndexSettings(paper_directory=tmp_path),
+        # TODO: add image support for paper_search
+        tool_names={"gather_evidence", "gen_answer", "complete", "reset"},
+        agent_evidence_n=3,  # Bumped up to collect several perspectives
     )
-    dataset = ImageQATaskDataset(split=ImageQASplits.TABLE_QA, settings=settings)
+    dataset = ImageQATaskDataset(dataset=LABBenchDatasets.TABLE_QA, settings=settings)
     t_cb = StoreTrajectoriesCallback()
     env_cb = StoreEnvironmentsCallback()
     m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
     evaluator = Evaluator(
         config=EvaluatorConfig(
-            batch_size=256,  # Use batch size greater than FigQA size and TableQA size
-            max_rollout_steps=18,  # Match aviary paper
+            batch_size=128,
+            max_rollout_steps=18,  # Match aviary paper's PaperQA setting
         ),
         agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
         dataset=dataset,
         callbacks=[t_cb, env_cb, m_cb],
     )
     await evaluator.evaluate()
-    correct_trajs = [t for t in t_cb.eval_trajectories if t.steps[-1].reward == 1]
-    failed_trajs = [t for t in t_cb.eval_trajectories if t.failed]
-    _ = 0  # Debug here
+
+
+class TestTextQATaskDataset:
+    PAPERS_DIR: ClassVar[Path] = Path.home() / "Documents" / "papers"
+
+    @pytest.mark.skip(reason="Manually run benchmark")
+    @pytest.mark.usefixtures("extended_llm_retrying")
+    @pytest.mark.asyncio
+    async def test_figqa_pdfs(self) -> None:
+        settings = Settings(
+            llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+            summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+            agent=AgentSettings(
+                agent_type="ldp.agent.SimpleAgent",
+                index=IndexSettings(
+                    name="figqa",
+                    paper_directory=self.PAPERS_DIR / "FigQA",
+                    manifest_file="manifest.csv",
+                ),
+                agent_evidence_n=3,  # Bumped up to collect several perspectives
+            ),
+        )
+        await get_directory_index(settings=settings)  # Build the index up front
+        dataset = TextQATaskDataset(
+            settings=settings,
+            dataset=LABBenchDatasets.FIG_QA,
+            read_data_kwargs={"seed": 42},
+        )
+        env_cb = StoreEnvironmentsCallback()
+        m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
+        evaluator = Evaluator(
+            config=EvaluatorConfig(
+                batch_size=32,
+                max_rollout_steps=18,  # Match aviary paper's PaperQA setting
+            ),
+            agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
+            dataset=dataset,
+            callbacks=[env_cb, m_cb],
+        )
+        await evaluator.evaluate()
+
+    @pytest.mark.skip(reason="Manually run benchmark")
+    @pytest.mark.usefixtures("extended_llm_retrying")
+    @pytest.mark.asyncio
+    async def test_tableqa_pdfs(self) -> None:
+        settings = Settings(
+            llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+            summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+            agent=AgentSettings(
+                agent_type="ldp.agent.SimpleAgent",
+                index=IndexSettings(
+                    name="tableqa",
+                    paper_directory=self.PAPERS_DIR / "TableQA",
+                    manifest_file="manifest.csv",
+                ),
+                agent_evidence_n=3,  # Bumped up to collect several perspectives
+            ),
+        )
+        await get_directory_index(settings=settings)  # Build the index up front
+        dataset = TextQATaskDataset(
+            settings=settings,
+            dataset=LABBenchDatasets.TABLE_QA,
+            read_data_kwargs={"seed": 42},
+        )
+        env_cb = StoreEnvironmentsCallback()
+        m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
+        evaluator = Evaluator(
+            config=EvaluatorConfig(
+                batch_size=32,
+                max_rollout_steps=18,  # Match aviary paper's PaperQA setting
+            ),
+            agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
+            dataset=dataset,
+            callbacks=[env_cb, m_cb],
+        )
+        await evaluator.evaluate()

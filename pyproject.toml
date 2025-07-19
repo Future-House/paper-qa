@@ -79,9 +79,7 @@ dev = [
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 figqa = [
-    "aviary.litqa>=0.19",  # Pin for storing question ID
-    "datasets>=3",  # Pin to keep recent
-    "pillow>=10",  # Pin to keep recent
+    "aviary.labbench @ git+https://github.com/Future-House/aviary@lab-bench#subdirectory=packages/labbench",
 ]
 ldp = [
     "ldp>=0.25.0",  # For new LLM client interface
