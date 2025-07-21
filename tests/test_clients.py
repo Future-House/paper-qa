@@ -337,6 +337,18 @@ async def test_bad_titles() -> None:
         assert details, "Should find a similar title"
 
 
+@pytest.mark.asyncio
+async def test_client_os_error() -> None:
+    """Confirm an OSError variant does not crash us."""
+    async with aiohttp.ClientSession() as session:
+        client = DocMetadataClient(session, clients=[SemanticScholarProvider])
+        with patch.object(
+            session, "get", side_effect=aiohttp.ClientOSError("Bad file descriptor")
+        ) as mock_get:
+            assert not await client.query(doi="placeholder")
+        assert mock_get.call_count == 1, "Expected the exception to have been thrown"
+
+
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_bad_dois() -> None:

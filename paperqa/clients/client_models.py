@@ -118,9 +118,9 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
                 f" {self.__class__.__name__}."
             )
         # we're suppressing this error to not fail on 403 or 500 errors from providers
-        except aiohttp.ClientResponseError:
+        except aiohttp.ClientError:
             logger.warning(
-                "Client response error for"
+                "Client error for"
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
                 f" {self.__class__.__name__}."
             )
