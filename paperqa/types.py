@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import csv
+import json
 import logging
 import os
 import re
@@ -467,6 +468,19 @@ class ParsedMedia(BaseModel):
             " the PDF, or attributes of custom pixel maps."
         ),
     )
+
+    def __hash__(self) -> int:
+        return hash((self.index, self.data, self.text, json.dumps(self.info)))
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, ParsedMedia):
+            return NotImplemented
+        return (
+            self.index == other.index
+            and self.data == other.data
+            and self.text == other.text
+            and json.dumps(self.info) == json.dumps(self.info)
+        )
 
     def to_image_url(self, image_type: str = "png") -> str:
         """Convert the image data to an RFC 2397 data URL format."""

@@ -1006,8 +1006,7 @@ async def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
 
         # Check we can round-trip serialize the image
         serde_image = type(image).model_validate_json(image.model_dump_json())
-        assert serde_image.index == image.index
-        assert serde_image.data == image.data
+        assert serde_image == image
 
     # Let's check the full page parsing behavior
     parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
