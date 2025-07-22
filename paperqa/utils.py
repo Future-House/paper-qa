@@ -411,7 +411,11 @@ def is_retryable(exc: BaseException) -> bool:
         # > aiohttp.client_exceptions.ClientConnectionResetError:
         # > Cannot write to closing transport
         return True
+    # On 7/21/2025, flaky ClientResponseError was seen with 'citations' traversals on
+    # paper ID 3516396ffa1fd32d4327e199d9b97ec67dc0439a with DOI 10.1126/science.2821624
+    # > aiohttp.client_exceptions.ClientResponseError: 403, message='Forbidden'
     return isinstance(exc, aiohttp.ClientResponseError) and exc.status in {
+        httpx.codes.FORBIDDEN.value,
         httpx.codes.INTERNAL_SERVER_ERROR.value,
         httpx.codes.GATEWAY_TIMEOUT.value,
     }
