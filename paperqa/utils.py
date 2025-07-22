@@ -10,7 +10,7 @@ import os
 import re
 import string
 import unicodedata
-from collections.abc import Awaitable, Collection, Iterable, Iterator, Mapping
+from collections.abc import Awaitable, Callable, Collection, Iterable, Iterator, Mapping
 from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
@@ -26,8 +26,8 @@ from pybtex.database.input.bibtex import Parser
 from pybtex.style.formatting import unsrtalpha
 from pybtex.style.template import FieldIsMissing
 from tenacity import (
+    AsyncRetrying,
     before_sleep_log,
-    retry,
     retry_if_exception,
     stop_after_attempt,
     wait_incrementing,
@@ -421,27 +421,41 @@ def is_retryable(exc: BaseException) -> bool:
     }
 
 
-@retry(
-    retry=retry_if_exception(is_retryable),
-    before_sleep=before_sleep_log(logger, logging.WARNING),
-    stop=stop_after_attempt(5),
-    wait=wait_incrementing(0.1, 0.1),
-)
-async def _get_with_retrying(
+async def _get_with_retrying(  # type: ignore[return]  # noqa: RET503
     url: str,
     session: aiohttp.ClientSession,
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
+    retry_predicate: Callable[[BaseException], bool] = is_retryable,
     **get_kwargs,
 ) -> dict[str, Any]:
-    """Get from a URL with retrying protection."""
-    try:
-        async with session.get(url, **get_kwargs) as response:
-            response.raise_for_status()
-            return await response.json()
-    except aiohttp.ClientResponseError as e:
-        if http_exception_mappings and e.status in http_exception_mappings:
-            raise http_exception_mappings[e.status] from e
-        raise
+    """Get from a URL with retrying protection.
+
+    Args:
+        url: Target URL for the GET request.
+        session: Session for the GET request.
+        http_exception_mappings: Optional mapping of HTTP status codes to
+            custom Exceptions to be thrown.
+        retry_predicate: Optional predicate to dictate when to retry.
+        **get_kwargs: Optional additional keyword arguments for the GET request.
+
+    Returns:
+        JSON result from the GET request.
+    """
+    async for attempt in AsyncRetrying(
+        retry=retry_if_exception(retry_predicate),
+        before_sleep=before_sleep_log(logger, logging.WARNING),
+        stop=stop_after_attempt(5),
+        wait=wait_incrementing(0.1, 0.1),
+    ):
+        with attempt:
+            try:
+                async with session.get(url, **get_kwargs) as response:
+                    response.raise_for_status()
+                    return await response.json()
+            except aiohttp.ClientResponseError as e:
+                if http_exception_mappings and e.status in http_exception_mappings:
+                    raise http_exception_mappings[e.status] from e
+                raise
 
 
 def union_collections_to_ordered_list(collections: Iterable) -> list:
