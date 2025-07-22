@@ -5,6 +5,7 @@ import os
 from collections.abc import Collection
 from datetime import datetime
 from enum import IntEnum, auto
+from functools import partial
 from http import HTTPStatus
 from itertools import starmap
 from typing import Any
@@ -17,6 +18,7 @@ from paperqa.types import BibTeXSource, DocDetails
 from paperqa.utils import (
     _get_with_retrying,
     clean_upbibtex,
+    is_retryable,
     strings_similarity,
     union_collections_to_ordered_list,
 )
@@ -124,6 +126,12 @@ async def _s2_get_with_retrying(url: str, **get_kwargs) -> dict[str, Any]:
         timeout=(
             get_kwargs.get("timeout")
             or aiohttp.ClientTimeout(SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT)
+        ),
+        # On 7/21/2025, flaky ClientResponseError was seen with 'citations' traversals on
+        # paper ID 3516396ffa1fd32d4327e199d9b97ec67dc0439a with DOI 10.1126/science.2821624
+        # > aiohttp.client_exceptions.ClientResponseError: 403, message='Forbidden'
+        retry_predicate=partial(
+            is_retryable, additional_status_codes={HTTPStatus.FORBIDDEN}
         ),
         **get_kwargs,
     )
