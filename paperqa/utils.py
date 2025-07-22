@@ -402,7 +402,10 @@ def create_bibtex_key(author: list[str], year: str | int, title: str) -> str:
     return remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
 
 
-def is_retryable(exc: BaseException) -> bool:
+def is_retryable(
+    exc: BaseException,
+    additional_status_codes: Collection[HTTPStatus | int] | None = None,
+) -> bool:
     """Check if an exception is known to be a retryable HTTP issue."""
     if isinstance(
         exc, aiohttp.ServerDisconnectedError | aiohttp.ClientConnectionResetError
@@ -411,14 +414,19 @@ def is_retryable(exc: BaseException) -> bool:
         # > aiohttp.client_exceptions.ClientConnectionResetError:
         # > Cannot write to closing transport
         return True
-    # On 7/21/2025, flaky ClientResponseError was seen with 'citations' traversals on
-    # paper ID 3516396ffa1fd32d4327e199d9b97ec67dc0439a with DOI 10.1126/science.2821624
-    # > aiohttp.client_exceptions.ClientResponseError: 403, message='Forbidden'
-    return isinstance(exc, aiohttp.ClientResponseError) and exc.status in {
-        httpx.codes.FORBIDDEN.value,
+    retry_status_codes: set[int] = {
         httpx.codes.INTERNAL_SERVER_ERROR.value,
         httpx.codes.GATEWAY_TIMEOUT.value,
     }
+    if additional_status_codes:
+        retry_status_codes.update(
+            status_code.value if isinstance(status_code, HTTPStatus) else status_code
+            for status_code in additional_status_codes
+        )
+    return (
+        isinstance(exc, aiohttp.ClientResponseError)
+        and exc.status in retry_status_codes
+    )
 
 
 async def _get_with_retrying(  # type: ignore[return]  # noqa: RET503
