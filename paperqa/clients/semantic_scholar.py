@@ -122,10 +122,11 @@ class SemanticScholarSearchType(IntEnum):
 async def _s2_get_with_retrying(url: str, **get_kwargs) -> dict[str, Any]:
     return await _get_with_retrying(
         url=url,
-        headers=get_kwargs.get("headers") or semantic_scholar_headers(),
+        headers=get_kwargs.pop("headers", {}) or semantic_scholar_headers(),
         timeout=(
-            get_kwargs.get("timeout")
-            or aiohttp.ClientTimeout(SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT)
+            get_kwargs.pop(
+                "timeout", aiohttp.ClientTimeout(SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT)
+            )
         ),
         # On 7/21/2025, flaky ClientResponseError was seen with 'citations' traversals on
         # paper ID 3516396ffa1fd32d4327e199d9b97ec67dc0439a with DOI 10.1126/science.2821624
