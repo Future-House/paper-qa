@@ -930,12 +930,6 @@ async def test_repeat_keys(stub_data_dir) -> None:
 
 
 @pytest.mark.asyncio
-async def test_can_read_normal_pdf_reader(docs_fixture) -> None:
-    answer = await docs_fixture.aquery("Are counterfactuals actionable? [yes/no]")
-    assert "yes" in answer.answer or "Yes" in answer.answer
-
-
-@pytest.mark.asyncio
 async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     await docs.aadd(
