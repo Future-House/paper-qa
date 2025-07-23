@@ -66,8 +66,8 @@ from paperqa.utils import (
 THIS_MODULE = pathlib.Path(__file__)
 
 
-@pytest_asyncio.fixture
-async def docs_fixture(stub_data_dir: Path) -> Docs:
+@pytest_asyncio.fixture(name="docs_fixture")
+async def fixture_docs_fixture(stub_data_dir: Path) -> Docs:
     docs = Docs()
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
