@@ -64,23 +64,25 @@ def fixture_vcr_config() -> dict[str, Any]:
     }
 
 
-@pytest.fixture
-def tmp_path_cleanup(tmp_path: Path) -> Iterator[Path]:
+@pytest.fixture(name="tmp_path_cleanup")
+def fixture_tmp_path_cleanup(tmp_path: Path) -> Iterator[Path]:
     yield tmp_path
     # Cleanup after the test
     if tmp_path.exists():
         shutil.rmtree(tmp_path, ignore_errors=True)
 
 
-@pytest.fixture
-def agent_home_dir(tmp_path_cleanup: str | os.PathLike) -> Iterator[str | os.PathLike]:
+@pytest.fixture(name="agent_home_dir")
+def fixture_agent_home_dir(
+    tmp_path_cleanup: str | os.PathLike,
+) -> Iterator[str | os.PathLike]:
     """Set up a unique temporary folder for the agent module."""
     with patch.dict("os.environ", {"PQA_HOME": str(tmp_path_cleanup)}):
         yield tmp_path_cleanup
 
 
-@pytest.fixture
-def agent_index_dir(agent_home_dir: Path) -> Path:
+@pytest.fixture(name="agent_index_dir")
+def fixture_agent_index_dir(agent_home_dir: Path) -> Path:
     return agent_home_dir / ".pqa" / "indexes"
 
 

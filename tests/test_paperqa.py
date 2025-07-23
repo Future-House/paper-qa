@@ -66,8 +66,8 @@ from paperqa.utils import (
 THIS_MODULE = pathlib.Path(__file__)
 
 
-@pytest_asyncio.fixture
-async def docs_fixture(stub_data_dir: Path) -> Docs:
+@pytest_asyncio.fixture(name="docs_fixture")
+async def fixture_docs_fixture(stub_data_dir: Path) -> Docs:
     docs = Docs()
     with (stub_data_dir / "paper.pdf").open("rb") as f:
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
@@ -930,12 +930,6 @@ async def test_repeat_keys(stub_data_dir) -> None:
 
 
 @pytest.mark.asyncio
-async def test_can_read_normal_pdf_reader(docs_fixture) -> None:
-    answer = await docs_fixture.aquery("Are counterfactuals actionable? [yes/no]")
-    assert "yes" in answer.answer or "Yes" in answer.answer
-
-
-@pytest.mark.asyncio
 async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
     await docs.aadd(
@@ -1088,8 +1082,8 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
+    docs = Docs()
     with (stub_data_dir / "paper.pdf").open("rb") as f:
-        docs = Docs()
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     num_retries = 3
     for _ in range(num_retries):
