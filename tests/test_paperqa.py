@@ -30,6 +30,7 @@ from lmi import (
 )
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON
+from paperqa_pymupdf import parse_pdf_to_pages
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -49,7 +50,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import parse_pdf_to_pages, read_doc
+from paperqa.readers import read_doc
 from paperqa.types import ChunkMetadata
 from paperqa.utils import (
     clean_possessives,
@@ -964,17 +965,6 @@ async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     )
     assert len(docs.texts) == 1, "Should have been one chunk"
     assert docs.texts[0].embedding is None, "Should have deferred the embedding"
-
-
-def test_parse_pdf_to_pages(stub_data_dir: Path) -> None:
-    filepath = stub_data_dir / "pasa.pdf"
-    parsed_text = parse_pdf_to_pages(filepath, use_block_parsing=True)
-    assert isinstance(parsed_text.content, dict)
-    assert "1" in parsed_text.content, "Parsed text should contain page 1"
-    assert (
-        "Abstract\n\nWe introduce PaSa, an advanced Paper Search"
-        "\nagent powered by large language models."
-    ) in parsed_text.content["1"]
 
 
 @pytest.mark.vcr

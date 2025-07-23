@@ -10,13 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - id: build
+      - id: build-paper-qa-pymupdf
         uses: hynek/build-and-inspect-python-package@v2
-      - name: Download built artifact to dist/
+        with:
+          path: packages/paper-qa-pymupdf
+          upload-name-suffix: -paper-qa-pymupdf
+      - name: Download built paper-qa-pymupdf artifact to dist/
         uses: actions/download-artifact@v4
         with:
-          name: ${{ steps.build.outputs.artifact-name }}
+          name: ${{ steps.build-paper-qa-pymupdf.outputs.artifact-name }}
           path: dist
+      - name: Clean up paper-qa-pymupdf build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
+        run: rm -r ${{ steps.build-paper-qa-pymupdf.outputs.dist }}
+      - id: build-paper-qa
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          upload-name-suffix: -paper-qa
+      - name: Download built paper-qa artifact to dist/
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.build-paper-qa.outputs.artifact-name }}
+          path: dist
+      - name: Clean up paper-qa build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
+        run: rm -r ${{ steps.build-paper-qa.outputs.dist }}
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}

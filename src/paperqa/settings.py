@@ -54,11 +54,7 @@ from paperqa.prompts import (
     summary_json_system_prompt,
     summary_prompt,
 )
-from paperqa.readers import (
-    PDFParserFn,
-    parse_pdf_to_pages,
-    setup_pymupdf_python_logging,
-)
+from paperqa.readers import PDFParserFn
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
 
@@ -154,6 +150,18 @@ class ChunkingOptions(StrEnum):
         return valid_parsing_dict.get(self.value, [])  # noqa: FURB184
 
 
+def get_default_pdf_parser() -> PDFParserFn:
+    from paperqa_pymupdf import parse_pdf_to_pages
+
+    return parse_pdf_to_pages
+
+
+def default_pdf_parser_configurator() -> None:
+    from paperqa_pymupdf import setup_pymupdf_python_logging
+
+    setup_pymupdf_python_logging()
+
+
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
@@ -209,10 +217,12 @@ class ParsingSettings(BaseModel):
         ),
     )
     parse_pdf: PDFParserFn = Field(
-        default=parse_pdf_to_pages, description="Function to parse PDF.", exclude=True
+        default_factory=get_default_pdf_parser,
+        description="Function to parse PDF.",
+        exclude=True,
     )
     configure_pdf_parser: Callable[[], Any] = Field(
-        default=setup_pymupdf_python_logging,
+        default=default_pdf_parser_configurator,
         description=(
             "Callable to configure the PDF parser within parse_pdf,"
             " useful for behaviors such as enabling logging."

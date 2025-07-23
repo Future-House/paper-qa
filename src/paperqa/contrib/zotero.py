@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import cast
 
+from paperqa_pymupdf import parse_pdf_to_pages
 from pydantic import BaseModel
 
 try:
@@ -15,7 +16,7 @@ except ImportError as e:
         " `pip install paper-qa[zotero]`."
     ) from e
 from paperqa.paths import PAPERQA_DIR
-from paperqa.readers import PDFParserFn, parse_pdf_to_pages
+from paperqa.readers import PDFParserFn
 
 
 class ZoteroPaper(BaseModel):

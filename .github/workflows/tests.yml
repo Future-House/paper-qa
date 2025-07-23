@@ -34,9 +34,27 @@ jobs:
         with:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
-      - uses: hynek/build-and-inspect-python-package@v2
+      - name: Check paper-qa-pymupdf build
+        id: build-paper-qa-pymupdf
+        if: matrix.python-version == '3.11'
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          path: packages/paper-qa-pymupdf
+          upload-name-suffix: -paper-qa-pymupdf
+      - name: Clean up paper-qa-pymupdf build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
+        if: matrix.python-version == '3.11'
+        run: rm -r ${{ steps.build-paper-qa-pymupdf.outputs.dist }}
+      - name: Check paper-qa build
+        id: build-paper-qa
+        if: matrix.python-version == '3.11'
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          upload-name-suffix: -paper-qa
+      - name: Clean up paper-qa build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
+        if: matrix.python-version == '3.11'
+        run: rm -r ${{ steps.build-paper-qa.outputs.dist }}
       - run: uv sync --python-preference=only-managed
-      - run: uv run pylint paperqa
+      - run: uv run pylint src packages
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
   test:
     runs-on: ubuntu-latest

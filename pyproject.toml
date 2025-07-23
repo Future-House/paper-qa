@@ -24,7 +24,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "PyMuPDF>=1.24.12",  # For pymupdf.set_messages addition
     "aiohttp>=3.10.6",  # TODO: remove in favor of httpx, pin for aiohttp.ClientConnectionResetError
     "anyio",
     "fhaviary[llm]>=0.20",  # For Environment.get_id
@@ -32,6 +31,7 @@ dependencies = [
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
+    "paper-qa-pymupdf",
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0,>=2.10.1",  # Pin 2.10 for typing breaks
@@ -96,6 +96,7 @@ typing = [
     "types-setuptools",
 ]
 zotero = [
+    "paper-qa-pymupdf",
     "pyzotero",
 ]
 
@@ -115,7 +116,7 @@ check-hidden = true
 ignore-words-list = "aadd,astroid,ser,ECT"
 skip = [
     "docs/2024-10-16_litqa2-splits.json5",
-    "paperqa/clients/client_data/*",
+    "src/paperqa/clients/client_data/*",
     "tests/cassettes/*",
     "tests/stub_data/*",
 ]
@@ -155,6 +156,11 @@ error_summary = false
 exclude = [
     "^\\.?venv",  # SEE: https://regex101.com/r/0rp5Br/1
 ]
+# Specifies the paths to use, after trying the paths from MYPYPATH environment variable.
+# Useful if you'd like to keep stubs in your repo, along with the config file.
+# Multiple paths are always separated with a : or , regardless of the platform.
+# User home directory and environment variables will be expanded.
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pymupdf/src"
 # Specifies the OS platform for the target program, for example darwin or win32
 # (meaning OS X or Windows, respectively). The default is the current platform
 # as revealed by Python’s sys.platform variable.
@@ -306,7 +312,7 @@ filterwarnings = [
 # files or test ids are given in the command line when executing pytest from the rootdir
 # directory. File system paths may use shell-style wildcards, including the recursive **
 # pattern.
-testpaths = ["tests"]
+testpaths = ["packages", "tests"]
 
 [tool.refurb]
 enable_all = true
@@ -571,10 +577,10 @@ convention = "google"
 paperqa = ["configs/**json"]
 
 [tool.setuptools.packages.find]
-include = ["paperqa*"]
+where = ["src"]
 
 [tool.setuptools_scm]
-version_file = "paperqa/version.py"
+version_file = "src/paperqa/version.py"
 
 [tool.tomlsort]
 all = true
@@ -592,7 +598,14 @@ aadd = "aadd"
 
 [tool.typos.files]
 extend-exclude = [
-    "paperqa/clients/client_data/journal_quality.csv",
+    "src/paperqa/clients/client_data/journal_quality.csv",
     "tests/cassettes/**",
     "tests/stub_data/**",
 ]
+
+[tool.uv.sources]
+paper-qa = {workspace = true}
+paper-qa-pymupdf = {workspace = true}
+
+[tool.uv.workspace]
+members = ["packages/*"]

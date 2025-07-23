@@ -311,4 +311,4 @@ tests/example2.*
 !tests/stub_data/.DS_Store
 
 # Client data
-paperqa/clients/client_data/retractions.csv
+src/paperqa/clients/client_data/retractions.csv

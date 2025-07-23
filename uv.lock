@@ -10,6 +10,12 @@ resolution-markers = [
     "python_full_version < '3.12' and platform_python_implementation != 'PyPy'",
 ]
 
+[manifest]
+members = [
+    "paper-qa",
+    "paper-qa-pymupdf",
+]
+
 [[package]]
 name = "absl-py"
 version = "2.3.1"
@@ -1890,10 +1896,10 @@ dependencies = [
     { name = "html2text" },
     { name = "httpx" },
     { name = "numpy" },
+    { name = "paper-qa-pymupdf" },
     { name = "pybtex" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
-    { name = "pymupdf" },
     { name = "rich" },
     { name = "setuptools" },
     { name = "tantivy" },
@@ -1909,6 +1915,7 @@ dev = [
     { name = "ldp" },
     { name = "litellm" },
     { name = "mypy" },
+    { name = "paper-qa-pymupdf" },
     { name = "pre-commit" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1949,6 +1956,7 @@ typing = [
     { name = "types-setuptools" },
 ]
 zotero = [
+    { name = "paper-qa-pymupdf" },
     { name = "pyzotero" },
 ]
 
@@ -1973,14 +1981,15 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },
-    { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'" },
+    { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
+    { name = "paper-qa-pymupdf", editable = "packages/paper-qa-pymupdf" },
+    { name = "paper-qa-pymupdf", marker = "extra == 'zotero'", editable = "packages/paper-qa-pymupdf" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0,>=2.10.1" },
     { name = "pydantic", marker = "extra == 'dev'", specifier = "~=2.11" },
     { name = "pydantic-settings" },
     { name = "pylint-pydantic", marker = "extra == 'dev'" },
-    { name = "pymupdf", specifier = ">=1.24.12" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
     { name = "pytest-recording", marker = "extra == 'dev'" },
@@ -2008,7 +2017,21 @@ requires-dist = [
 provides-extras = ["dev", "ldp", "local", "openreview", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "paper-qa", extras = ["dev"] }]
+dev = [{ name = "paper-qa", extras = ["dev"], editable = "." }]
+
+[[package]]
+name = "paper-qa-pymupdf"
+source = { editable = "packages/paper-qa-pymupdf" }
+dependencies = [
+    { name = "paper-qa" },
+    { name = "pymupdf" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "paper-qa", editable = "." },
+    { name = "pymupdf", specifier = ">=1.24.12" },
+]
 
 [[package]]
 name = "parso"
