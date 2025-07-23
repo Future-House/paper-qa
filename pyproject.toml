@@ -607,6 +607,7 @@ extend-exclude = [
 [tool.uv.sources]
 paper-qa = {workspace = true}
 paper-qa-pymupdf = {workspace = true}
+paper-qa-pypdf = {workspace = true}
 
 [tool.uv.workspace]
 members = ["packages/*"]
