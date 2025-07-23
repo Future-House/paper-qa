@@ -1082,8 +1082,8 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
+    docs = Docs()
     with (stub_data_dir / "paper.pdf").open("rb") as f:
-        docs = Docs()
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     num_retries = 3
     for _ in range(num_retries):
