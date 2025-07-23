@@ -31,7 +31,7 @@ dependencies = [
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "numpy",
-    "paper-qa-pymupdf",
+    "paper-qa-pypdf ; extra != 'pymupdf'",
     "pybtex",
     "pydantic-settings",
     "pydantic~=2.0,>=2.10.1",  # Pin 2.10 for typing breaks
@@ -61,7 +61,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[ldp,typing,zotero,local,qdrant]",
+    "paper-qa[ldp,pypdf,pymupdf,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -87,6 +87,8 @@ local = [
 openreview = [
     "openreview-py",
 ]
+pymupdf = ["paper-qa-pymupdf"]
+pypdf = ["paper-qa-pypdf"]
 qdrant = [
     "qdrant-client",
 ]

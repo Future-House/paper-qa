@@ -30,7 +30,8 @@ from lmi import (
 )
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON
-from paperqa_pymupdf import parse_pdf_to_pages
+from paperqa_pymupdf import parse_pdf_to_pages as pymupdf_parse_pdf_to_pages
+from paperqa_pypdf import parse_pdf_to_pages as pypdf_parse_pdf_to_pages
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -50,7 +51,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import read_doc
+from paperqa.readers import PDFParserFn, read_doc
 from paperqa.types import ChunkMetadata
 from paperqa.utils import (
     clean_possessives,
@@ -1099,13 +1100,16 @@ async def test_fileio_reader_txt(stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_parser_only_reader(stub_data_dir: Path):
+@pytest.mark.parametrize(
+    "pdf_parser", [pypdf_parse_pdf_to_pages, pymupdf_parse_pdf_to_pages]
+)
+async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) -> None:
     doc_path = stub_data_dir / "paper.pdf"
     parsed_text = await read_doc(
         Path(doc_path),
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=True,
-        parse_pdf=parse_pdf_to_pages,
+        parse_pdf=pdf_parser,
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
@@ -1115,13 +1119,18 @@ async def test_parser_only_reader(stub_data_dir: Path):
 
 
 @pytest.mark.asyncio
-async def test_chunk_metadata_reader(stub_data_dir: Path) -> None:
+@pytest.mark.parametrize(
+    "pdf_parser", [pypdf_parse_pdf_to_pages, pymupdf_parse_pdf_to_pages]
+)
+async def test_chunk_metadata_reader(
+    pdf_parser: PDFParserFn, stub_data_dir: Path
+) -> None:
     chunk_text, metadata = await read_doc(
         stub_data_dir / "paper.pdf",
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
-        parse_pdf=parse_pdf_to_pages,
+        parse_pdf=pdf_parser,
     )
     assert metadata.parse_type == "pdf"
     assert isinstance(metadata.chunk_metadata, ChunkMetadata)

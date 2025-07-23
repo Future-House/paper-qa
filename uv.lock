@@ -1897,7 +1897,6 @@ dependencies = [
     { name = "html2text" },
     { name = "httpx" },
     { name = "numpy" },
-    { name = "paper-qa-pymupdf" },
     { name = "pybtex" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1917,6 +1916,7 @@ dev = [
     { name = "litellm" },
     { name = "mypy" },
     { name = "paper-qa-pymupdf" },
+    { name = "paper-qa-pypdf" },
     { name = "pre-commit" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1947,6 +1947,12 @@ local = [
 ]
 openreview = [
     { name = "openreview-py" },
+]
+pymupdf = [
+    { name = "paper-qa-pymupdf" },
+]
+pypdf = [
+    { name = "paper-qa-pypdf" },
 ]
 qdrant = [
     { name = "qdrant-client" },
@@ -1982,9 +1988,11 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },
-    { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
-    { name = "paper-qa-pymupdf", editable = "packages/paper-qa-pymupdf" },
+    { name = "paper-qa", extras = ["ldp", "local", "pymupdf", "pypdf", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
+    { name = "paper-qa-pymupdf", marker = "extra == 'pymupdf'", editable = "packages/paper-qa-pymupdf" },
     { name = "paper-qa-pymupdf", marker = "extra == 'zotero'", editable = "packages/paper-qa-pymupdf" },
+    { name = "paper-qa-pypdf", marker = "extra != 'pymupdf'", editable = "packages/paper-qa-pypdf" },
+    { name = "paper-qa-pypdf", marker = "extra == 'pypdf'", editable = "packages/paper-qa-pypdf" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0,>=2.10.1" },
@@ -2015,7 +2023,7 @@ requires-dist = [
     { name = "types-setuptools", marker = "extra == 'typing'" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
-provides-extras = ["dev", "ldp", "local", "openreview", "qdrant", "typing", "zotero"]
+provides-extras = ["dev", "ldp", "local", "openreview", "pymupdf", "pypdf", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "paper-qa", extras = ["dev"], editable = "." }]
