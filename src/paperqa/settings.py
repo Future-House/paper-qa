@@ -151,13 +151,28 @@ class ChunkingOptions(StrEnum):
 
 
 def get_default_pdf_parser() -> PDFParserFn:
-    from paperqa_pymupdf import parse_pdf_to_pages
+    parse_pdf_to_pages: PDFParserFn
+
+    try:
+        from paperqa_pymupdf import parse_pdf_to_pages
+    except ImportError:
+        try:
+            from paperqa_pypdf import parse_pdf_to_pages  # type: ignore[no-redef,unused-ignore]
+        except ImportError as exc:
+            raise ImportError(
+                "To parse PDFs we need a parsing function. Please install either:"
+                " (1) paper-qa-pypdf via `pip install paper-qa[pypdf]` or"
+                " (2) paper-qa-pymupdf via `pip install paper-qa[pymupdf]`."
+            ) from exc
 
     return parse_pdf_to_pages
 
 
 def default_pdf_parser_configurator() -> None:
-    from paperqa_pymupdf import setup_pymupdf_python_logging
+    try:
+        from paperqa_pymupdf import setup_pymupdf_python_logging
+    except ImportError:
+        return
 
     setup_pymupdf_python_logging()
 

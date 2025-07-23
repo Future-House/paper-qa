@@ -14,6 +14,7 @@ resolution-markers = [
 members = [
     "paper-qa",
     "paper-qa-pymupdf",
+    "paper-qa-pypdf",
 ]
 
 [[package]]
@@ -1896,7 +1897,7 @@ dependencies = [
     { name = "html2text" },
     { name = "httpx" },
     { name = "numpy" },
-    { name = "paper-qa-pymupdf" },
+    { name = "paper-qa-pypdf" },
     { name = "pybtex" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1916,6 +1917,7 @@ dev = [
     { name = "litellm" },
     { name = "mypy" },
     { name = "paper-qa-pymupdf" },
+    { name = "paper-qa-pypdf" },
     { name = "pre-commit" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1946,6 +1948,12 @@ local = [
 ]
 openreview = [
     { name = "openreview-py" },
+]
+pymupdf = [
+    { name = "paper-qa-pymupdf" },
+]
+pypdf = [
+    { name = "paper-qa-pypdf" },
 ]
 qdrant = [
     { name = "qdrant-client" },
@@ -1981,9 +1989,11 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },
-    { name = "paper-qa", extras = ["ldp", "local", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
-    { name = "paper-qa-pymupdf", editable = "packages/paper-qa-pymupdf" },
+    { name = "paper-qa", extras = ["ldp", "local", "pymupdf", "pypdf", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
+    { name = "paper-qa-pymupdf", marker = "extra == 'pymupdf'", editable = "packages/paper-qa-pymupdf" },
     { name = "paper-qa-pymupdf", marker = "extra == 'zotero'", editable = "packages/paper-qa-pymupdf" },
+    { name = "paper-qa-pypdf", editable = "packages/paper-qa-pypdf" },
+    { name = "paper-qa-pypdf", marker = "extra == 'pypdf'", editable = "packages/paper-qa-pypdf" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.4" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0,>=2.10.1" },
@@ -2014,7 +2024,7 @@ requires-dist = [
     { name = "types-setuptools", marker = "extra == 'typing'" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
-provides-extras = ["dev", "ldp", "local", "openreview", "qdrant", "typing", "zotero"]
+provides-extras = ["dev", "ldp", "local", "openreview", "pymupdf", "pypdf", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "paper-qa", extras = ["dev"], editable = "." }]
@@ -2031,6 +2041,20 @@ dependencies = [
 requires-dist = [
     { name = "paper-qa", editable = "." },
     { name = "pymupdf", specifier = ">=1.24.12" },
+]
+
+[[package]]
+name = "paper-qa-pypdf"
+source = { editable = "packages/paper-qa-pypdf" }
+dependencies = [
+    { name = "paper-qa" },
+    { name = "pypdf" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "paper-qa", editable = "." },
+    { name = "pypdf", specifier = ">=3" },
 ]
 
 [[package]]
@@ -2572,6 +2596,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bb/22/f1129e69d94ffff626bdb5c835506b3a5b4f3d070f17ea295e12c2c6f60f/pyparsing-3.2.3.tar.gz", hash = "sha256:b9c13f1ab8b3b542f72e28f634bad4de758ab3ce4546e4301970ad6fa77c38be", size = 1088608, upload-time = "2025-03-25T05:01:28.114Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl", hash = "sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf", size = 111120, upload-time = "2025-03-25T05:01:24.908Z" },
+]
+
+[[package]]
+name = "pypdf"
+version = "5.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/5a/139b1a3ec3789cc77a7cb9d5d3bc9e97e742e6d03708baeb7719f8ad0827/pypdf-5.8.0.tar.gz", hash = "sha256:f8332f80606913e6f0ce65488a870833c9d99ccdb988c17bb6c166f7c8e140cb", size = 5029494, upload-time = "2025-07-13T12:51:35.125Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/94/05d0310bfa92c26aa50a9d2dea2c6448a1febfdfcf98fb340a99d48a3078/pypdf-5.8.0-py3-none-any.whl", hash = "sha256:bfe861285cd2f79cceecefde2d46901e4ee992a9f4b42c56548c4a6e9236a0d1", size = 309718, upload-time = "2025-07-13T12:51:33.159Z" },
 ]
 
 [[package]]

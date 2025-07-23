@@ -122,7 +122,6 @@ Here are some in no particular order:
 5. [tantivy](https://github.com/quickwit-oss/tantivy)
 6. [LiteLLM][LiteLLM general docs]
 7. [pybtex](https://pybtex.org/)
-8. [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/)
 
 ### PaperQA2 vs PaperQA
 
@@ -863,72 +862,72 @@ will return much faster than the first query and we'll be certain the authors ma
 
 ## Settings Cheatsheet
 
-| Setting                                      | Default                                        | Description                                                                                             |
-| -------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-11-20"`                          | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
-| `llm_config`                                 | `None`                                         | Optional configuration for `llm`.                                                                       |
-| `summary_llm`                                | `"gpt-4o-2024-11-20"`                          | Default LLM for summaries and parsing citations.                                                        |
-| `summary_llm_config`                         | `None`                                         | Optional configuration for `summary_llm`.                                                               |
-| `embedding`                                  | `"text-embedding-3-small"`                     | Default embedding model for texts.                                                                      |
-| `embedding_config`                           | `None`                                         | Optional configuration for `embedding`.                                                                 |
-| `temperature`                                | `0.0`                                          | Temperature for LLMs.                                                                                   |
-| `batch_size`                                 | `1`                                            | Batch size for calling LLMs.                                                                            |
-| `texts_index_mmr_lambda`                     | `1.0`                                          | Lambda for MMR in text index.                                                                           |
-| `verbosity`                                  | `0`                                            | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                         |
-| `answer.evidence_k`                          | `10`                                           | Number of evidence pieces to retrieve.                                                                  |
-| `answer.evidence_detailed_citations`         | `True`                                         | Include detailed citations in summaries.                                                                |
-| `answer.evidence_retrieval`                  | `True`                                         | Use retrieval vs processing all docs.                                                                   |
-| `answer.evidence_summary_length`             | `"about 100 words"`                            | Length of evidence summary.                                                                             |
-| `answer.evidence_skip_summary`               | `False`                                        | Whether to skip summarization.                                                                          |
-| `answer.answer_max_sources`                  | `5`                                            | Max number of sources for an answer.                                                                    |
-| `answer.max_answer_attempts`                 | `None`                                         | Max attempts to generate an answer.                                                                     |
-| `answer.answer_length`                       | `"about 200 words, but can be longer"`         | Length of final answer.                                                                                 |
-| `answer.max_concurrent_requests`             | `4`                                            | Max concurrent requests to LLMs.                                                                        |
-| `answer.answer_filter_extra_background`      | `False`                                        | Whether to cite background info from model.                                                             |
-| `answer.get_evidence_if_no_contexts`         | `True`                                         | Allow lazy evidence gathering.                                                                          |
-| `parsing.chunk_size`                         | `5000`                                         | Characters per chunk (0 for no chunking).                                                               |
-| `parsing.page_size_limit`                    | `1,280,000`                                    | Character limit per page.                                                                               |
-| `parsing.pdfs_use_block_parsing`             | `False`                                        | Opt-in flag for block-based PDF parsing over text-based PDF parsing.                                    |
-| `parsing.use_doc_details`                    | `True`                                         | Whether to get metadata details for docs.                                                               |
-| `parsing.overlap`                            | `250`                                          | Characters to overlap chunks.                                                                           |
-| `parsing.defer_embedding`                    | `False`                                        | Whether to defer embedding until summarization.                                                         |
-| `parsing.parse_pdf`                          | `paperqa_pymupdf.parse_pdf_to_pages`           | Function to parse PDF files.                                                                            |
-| `parsing.configure_pdf_parser`               | `paperqa_pymupdf.setup_pymupdf_python_logging` | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging. |
-| `parsing.chunking_algorithm`                 | `ChunkingOptions.SIMPLE_OVERLAP`               | Algorithm for chunking.                                                                                 |
-| `parsing.doc_filters`                        | `None`                                         | Optional filters for allowed documents.                                                                 |
-| `parsing.use_human_readable_clinical_trials` | `False`                                        | Parse clinical trial JSONs into readable text.                                                          |
-| `prompt.summary`                             | `summary_prompt`                               | Template for summarizing text, must contain variables matching `summary_prompt`.                        |
-| `prompt.qa`                                  | `qa_prompt`                                    | Template for QA, must contain variables matching `qa_prompt`.                                           |
-| `prompt.select`                              | `select_paper_prompt`                          | Template for selecting papers, must contain variables matching `select_paper_prompt`.                   |
-| `prompt.pre`                                 | `None`                                         | Optional pre-prompt templated with just the original question to append information before a qa prompt. |
-| `prompt.post`                                | `None`                                         | Optional post-processing prompt that can access PQASession fields.                                      |
-| `prompt.system`                              | `default_system_prompt`                        | System prompt for the model.                                                                            |
-| `prompt.use_json`                            | `True`                                         | Whether to use JSON formatting.                                                                         |
-| `prompt.summary_json`                        | `summary_json_prompt`                          | JSON-specific summary prompt.                                                                           |
-| `prompt.summary_json_system`                 | `summary_json_system_prompt`                   | System prompt for JSON summaries.                                                                       |
-| `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                         | Prompt for how to format all contexts in generate answer.                                               |
-| `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                         | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
-| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                          | Model to use for agent making tool selections.                                                          |
-| `agent.agent_llm_config`                     | `None`                                         | Optional configuration for `agent_llm`.                                                                 |
-| `agent.agent_type`                           | `"ToolSelector"`                               | Type of agent to use.                                                                                   |
-| `agent.agent_config`                         | `None`                                         | Optional kwarg for AGENT constructor.                                                                   |
-| `agent.agent_system_prompt`                  | `env_system_prompt`                            | Optional system prompt message.                                                                         |
-| `agent.agent_prompt`                         | `env_reset_prompt`                             | Agent prompt.                                                                                           |
-| `agent.return_paper_metadata`                | `False`                                        | Whether to include paper title/year in search tool results.                                             |
-| `agent.search_count`                         | `8`                                            | Search count.                                                                                           |
-| `agent.timeout`                              | `500.0`                                        | Timeout on agent execution (seconds).                                                                   |
-| `agent.should_pre_search`                    | `False`                                        | Whether to run search tool before invoking agent.                                                       |
-| `agent.tool_names`                           | `None`                                         | Optional override on tools to provide the agent.                                                        |
-| `agent.max_timesteps`                        | `None`                                         | Optional upper limit on environment steps.                                                              |
-| `agent.index.name`                           | `None`                                         | Optional name of the index.                                                                             |
-| `agent.index.paper_directory`                | `Current working directory`                    | Directory containing papers to be indexed.                                                              |
-| `agent.index.manifest_file`                  | `None`                                         | Path to manifest CSV with document attributes.                                                          |
-| `agent.index.index_directory`                | `pqa_directory("indexes")`                     | Directory to store PQA indexes.                                                                         |
-| `agent.index.use_absolute_paper_directory`   | `False`                                        | Whether to use absolute paper directory path.                                                           |
-| `agent.index.recurse_subdirectories`         | `True`                                         | Whether to recurse into subdirectories when indexing.                                                   |
-| `agent.index.concurrency`                    | `5`                                            | Number of concurrent filesystem reads.                                                                  |
-| `agent.index.sync_with_paper_directory`      | `True`                                         | Whether to sync index with paper directory on load.                                                     |
-| `agent.index.files_filter`                   | `lambda f: f.suffix in {...}`                  | Filter function to mark files in the paper directory to index.                                          |
+| Setting                                      | Default                                | Description                                                                                             |
+| -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `llm`                                        | `"gpt-4o-2024-11-20"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
+| `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
+| `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | Default LLM for summaries and parsing citations.                                                        |
+| `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
+| `embedding`                                  | `"text-embedding-3-small"`             | Default embedding model for texts.                                                                      |
+| `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                 |
+| `temperature`                                | `0.0`                                  | Temperature for LLMs.                                                                                   |
+| `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                            |
+| `texts_index_mmr_lambda`                     | `1.0`                                  | Lambda for MMR in text index.                                                                           |
+| `verbosity`                                  | `0`                                    | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                         |
+| `answer.evidence_k`                          | `10`                                   | Number of evidence pieces to retrieve.                                                                  |
+| `answer.evidence_detailed_citations`         | `True`                                 | Include detailed citations in summaries.                                                                |
+| `answer.evidence_retrieval`                  | `True`                                 | Use retrieval vs processing all docs.                                                                   |
+| `answer.evidence_summary_length`             | `"about 100 words"`                    | Length of evidence summary.                                                                             |
+| `answer.evidence_skip_summary`               | `False`                                | Whether to skip summarization.                                                                          |
+| `answer.answer_max_sources`                  | `5`                                    | Max number of sources for an answer.                                                                    |
+| `answer.max_answer_attempts`                 | `None`                                 | Max attempts to generate an answer.                                                                     |
+| `answer.answer_length`                       | `"about 200 words, but can be longer"` | Length of final answer.                                                                                 |
+| `answer.max_concurrent_requests`             | `4`                                    | Max concurrent requests to LLMs.                                                                        |
+| `answer.answer_filter_extra_background`      | `False`                                | Whether to cite background info from model.                                                             |
+| `answer.get_evidence_if_no_contexts`         | `True`                                 | Allow lazy evidence gathering.                                                                          |
+| `parsing.chunk_size`                         | `5000`                                 | Characters per chunk (0 for no chunking).                                                               |
+| `parsing.page_size_limit`                    | `1,280,000`                            | Character limit per page.                                                                               |
+| `parsing.pdfs_use_block_parsing`             | `False`                                | Opt-in flag for block-based PDF parsing over text-based PDF parsing.                                    |
+| `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                               |
+| `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                           |
+| `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                         |
+| `parsing.parse_pdf`                          | `paperqa_pypdf.parse_pdf_to_pages`     | Function to parse PDF files.                                                                            |
+| `parsing.configure_pdf_parser`               | No-op                                  | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging. |
+| `parsing.chunking_algorithm`                 | `ChunkingOptions.SIMPLE_OVERLAP`       | Algorithm for chunking.                                                                                 |
+| `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                 |
+| `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                          |
+| `prompt.summary`                             | `summary_prompt`                       | Template for summarizing text, must contain variables matching `summary_prompt`.                        |
+| `prompt.qa`                                  | `qa_prompt`                            | Template for QA, must contain variables matching `qa_prompt`.                                           |
+| `prompt.select`                              | `select_paper_prompt`                  | Template for selecting papers, must contain variables matching `select_paper_prompt`.                   |
+| `prompt.pre`                                 | `None`                                 | Optional pre-prompt templated with just the original question to append information before a qa prompt. |
+| `prompt.post`                                | `None`                                 | Optional post-processing prompt that can access PQASession fields.                                      |
+| `prompt.system`                              | `default_system_prompt`                | System prompt for the model.                                                                            |
+| `prompt.use_json`                            | `True`                                 | Whether to use JSON formatting.                                                                         |
+| `prompt.summary_json`                        | `summary_json_prompt`                  | JSON-specific summary prompt.                                                                           |
+| `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
+| `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
+| `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
+| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | Model to use for agent making tool selections.                                                          |
+| `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                 |
+| `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                   |
+| `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                   |
+| `agent.agent_system_prompt`                  | `env_system_prompt`                    | Optional system prompt message.                                                                         |
+| `agent.agent_prompt`                         | `env_reset_prompt`                     | Agent prompt.                                                                                           |
+| `agent.return_paper_metadata`                | `False`                                | Whether to include paper title/year in search tool results.                                             |
+| `agent.search_count`                         | `8`                                    | Search count.                                                                                           |
+| `agent.timeout`                              | `500.0`                                | Timeout on agent execution (seconds).                                                                   |
+| `agent.should_pre_search`                    | `False`                                | Whether to run search tool before invoking agent.                                                       |
+| `agent.tool_names`                           | `None`                                 | Optional override on tools to provide the agent.                                                        |
+| `agent.max_timesteps`                        | `None`                                 | Optional upper limit on environment steps.                                                              |
+| `agent.index.name`                           | `None`                                 | Optional name of the index.                                                                             |
+| `agent.index.paper_directory`                | `Current working directory`            | Directory containing papers to be indexed.                                                              |
+| `agent.index.manifest_file`                  | `None`                                 | Path to manifest CSV with document attributes.                                                          |
+| `agent.index.index_directory`                | `pqa_directory("indexes")`             | Directory to store PQA indexes.                                                                         |
+| `agent.index.use_absolute_paper_directory`   | `False`                                | Whether to use absolute paper directory path.                                                           |
+| `agent.index.recurse_subdirectories`         | `True`                                 | Whether to recurse into subdirectories when indexing.                                                   |
+| `agent.index.concurrency`                    | `5`                                    | Number of concurrent filesystem reads.                                                                  |
+| `agent.index.sync_with_paper_directory`      | `True`                                 | Whether to sync index with paper directory on load.                                                     |
+| `agent.index.files_filter`                   | `lambda f: f.suffix in {...}`          | Filter function to mark files in the paper directory to index.                                          |
 
 ## Where do I get papers?
 
