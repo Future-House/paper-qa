@@ -113,7 +113,7 @@ preview = true
 [tool.codespell]
 check-filenames = true
 check-hidden = true
-ignore-words-list = "aadd,astroid,ser,ECT"
+ignore-words-list = "aadd,astroid,flate,ser,ECT"
 skip = [
     "docs/2024-10-16_litqa2-splits.json5",
     "src/paperqa/clients/client_data/*",
@@ -595,6 +595,7 @@ extend-ignore-re = ["(?Rm)^.*(#|//)\\s*spellchecker:( )?disable-line$"]
 [tool.typos.default.extend-words]
 ECT = "ECT"  # Filter in clinicaltrials.gov
 aadd = "aadd"
+flate = "flate"  # FlateDecode is a valid PDF compression method
 
 [tool.typos.files]
 extend-exclude = [
