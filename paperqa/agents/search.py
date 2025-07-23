@@ -17,7 +17,7 @@ from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import anyio
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -47,7 +47,7 @@ from paperqa.settings import IndexSettings, get_settings
 from paperqa.types import VAR_MATCH_LOOKUP, DocDetails
 from paperqa.utils import ImpossibleParsingError, clean_possessives, hexdigest
 
-from .models import JSONType, SupportsPickle
+from .models import SupportsPickle
 
 if TYPE_CHECKING:
     from tantivy import IndexWriter
@@ -86,7 +86,7 @@ class SearchDocumentStorage(StrEnum):
 
     def read_from_string(
         self, data: str | bytes
-    ) -> BaseModel | SupportsPickle | JSONType:
+    ) -> BaseModel | SupportsPickle | JsonValue:
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
             return json.loads(data)
         if self == SearchDocumentStorage.PICKLE_COMPRESSED:

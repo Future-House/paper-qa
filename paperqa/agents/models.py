@@ -5,27 +5,17 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from enum import StrEnum
-from typing import Any, ClassVar, Protocol, TypeAlias, cast
+from typing import Any, ClassVar, Protocol, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
 from lmi import LiteLLMModel, LLMModel
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    ValidationInfo,
-    field_validator,
-)
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from paperqa.types import PQASession
 from paperqa.version import __version__
 
 logger = logging.getLogger(__name__)
-
-JSONType: TypeAlias = (
-    dict[str, "JSONType"] | list["JSONType"] | str | int | float | bool | None
-)
 
 
 class SupportsPickle(Protocol):
