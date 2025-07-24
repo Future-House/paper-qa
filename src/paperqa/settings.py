@@ -640,7 +640,7 @@ class AgentSettings(BaseModel):
             if value != type(self).model_fields[deprecated_field_name].default:
                 warnings.warn(
                     f"The {deprecated_field_name!r} field has been moved to"
-                    f" {AgentSettings.__name__},"
+                    f" {IndexSettings.__name__}, located at Settings.agent.index,"
                     " this deprecation will conclude in version 6.",
                     category=DeprecationWarning,
                     stacklevel=2,
@@ -789,7 +789,7 @@ class Settings(BaseSettings):
             if value != (finfo.default_factory() if is_factory else finfo.default):  # type: ignore[call-arg,misc]
                 warnings.warn(
                     f"The {deprecated_field_name!r} field has been moved to"
-                    f" {AgentSettings.__name__},"
+                    f" {IndexSettings.__name__}, located at Settings.agent.index,"
                     " this deprecation will conclude in version 6.",
                     category=DeprecationWarning,
                     stacklevel=2,
