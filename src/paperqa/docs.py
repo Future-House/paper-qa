@@ -300,10 +300,13 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
 
-        docname = citation_to_docname(citation) if docname is None else docname
-        docname = self._get_unique_name(docname)
-
-        doc = Doc(docname=docname, citation=citation, dockey=dockey)
+        doc = Doc(
+            docname=self._get_unique_name(
+                citation_to_docname(citation) if docname is None else docname
+            ),
+            citation=citation,
+            dockey=dockey,
+        )
 
         # try to extract DOI / title from the citation
         if (doi is title is None) and parse_config.use_doc_details:
@@ -402,7 +405,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 " to ignore this error."
             )
         if await self.aadd_texts(texts, doc, all_settings, embedding_model):
-            return docname
+            return doc.docname
         return None
 
     def add_texts(

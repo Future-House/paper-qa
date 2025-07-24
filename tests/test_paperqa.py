@@ -934,17 +934,17 @@ async def test_repeat_keys(stub_data_dir) -> None:
 @pytest.mark.asyncio
 async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
-    await docs.aadd(
+    docname = await docs.aadd(
         stub_data_dir / "paper.pdf",
         "Wellawatte et al, XAI Review, 2023",
     )
+    (doc_details,) = docs.docs.values()
+    assert doc_details.docname == docname, "Added name should match between details"
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
     assert (
-        next(iter(docs.docs.values())).citation == "Wellawatte et al, XAI Review, 2023"
-    )
-    assert (
-        next(iter(docs.docs.values())).formatted_citation
+        doc_details.citation
+        == doc_details.formatted_citation
         == "Wellawatte et al, XAI Review, 2023"
     ), "Formatted citation should be the same when no metadata is found."
 
@@ -1016,7 +1016,7 @@ async def test_partly_embedded_texts(defer_embeddings: bool) -> None:
 @pytest.mark.asyncio
 async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
     docs = Docs()
-    await docs.aadd(
+    docname = await docs.aadd(
         stub_data_dir / "paper.pdf",
         "Wellawatte et al, A Perspective on Explanations of Molecular Prediction"
         " Models, XAI Review, 2023",
@@ -1027,7 +1027,8 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         },  # Limit to only crossref since s2 is too flaky
         fields=["author", "journal", "citation_count"],
     )
-    doc_details = next(iter(docs.docs.values()))
+    (doc_details,) = docs.docs.values()
+    assert doc_details.docname == docname, "Added name should match between details"
     # Crossref is non-deterministic in its ordering for results
     # thus we need to capture both possible dockeys
     assert doc_details.dockey in {"d7763485f06aabde", "5300ef1d5fb960d7"}
