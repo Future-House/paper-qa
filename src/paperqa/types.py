@@ -1197,7 +1197,7 @@ class DocDetails(Doc):
         if self.publication_date and other.publication_date:
             PREFER_OTHER = self.publication_date <= other.publication_date
 
-        merged_data = {}
+        merged_data: dict[str, Any] = {}
         # pylint: disable-next=not-an-iterable  # pylint bug: https://github.com/pylint-dev/pylint/issues/10144
         for field in type(self).model_fields:
             self_value = getattr(self, field)
@@ -1237,11 +1237,11 @@ class DocDetails(Doc):
                     )
                     else other.authors
                 )
-                merged_data[field] = best_authors or None  # type: ignore[assignment]
+                merged_data[field] = best_authors or None
 
             elif field == "key" and self_value is not None and other_value is not None:
                 # if we have multiple keys, we wipe them and allow regeneration
-                merged_data[field] = None  # type: ignore[assignment]
+                merged_data[field] = None
 
             elif field in {"citation_count", "year", "publication_date"}:
                 # get the latest data
@@ -1274,7 +1274,7 @@ class DocDetails(Doc):
         # Recalculate doc_id if doi has changed
         if merged_data["doi"] != self.doi:
             merged_data["doc_id"] = (
-                encode_id(merged_data["doi"].lower()) if merged_data["doi"] else None  # type: ignore[attr-defined,assignment]
+                encode_id(merged_data["doi"].lower()) if merged_data["doi"] else None
             )
 
         # Create and return new DocDetails instance
