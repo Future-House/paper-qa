@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
+import litellm
 import pytest
 from dotenv import load_dotenv
 from lmi.utils import (
@@ -45,7 +46,12 @@ def _setup_default_logs() -> None:
 
 @pytest.fixture(autouse=True, scope="session")
 def _defeat_litellm_callbacks() -> None:
-    update_litellm_max_callbacks()
+    update_litellm_max_callbacks(value=2048)
+
+
+@pytest.fixture(name="extended_llm_retrying")
+def fixture_extended_llm_retrying() -> None:
+    litellm.num_retries = 8  # Mitigate connection-related failures
 
 
 @pytest.fixture(scope="session", name="vcr_config")
