@@ -793,7 +793,11 @@ class DocDetails(Doc):
         ),
     )
     file_location: str | os.PathLike | None = Field(
-        default=None, description="Path or location ID of the source document file."
+        default=None,
+        description=(
+            "Optional path to the stored paper (local file path"
+            " or mountable cloud path), or a database ID for the storage location."
+        ),
     )
     license: str | None = Field(
         default=None,
