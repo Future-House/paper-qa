@@ -942,9 +942,10 @@ async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
     assert doc_details.docname == docname, "Added name should match between details"
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
-    assert doc_details.citation == "Wellawatte et al, XAI Review, 2023"
     assert (
-        doc_details.formatted_citation == "Wellawatte et al, XAI Review, 2023"
+        doc_details.citation
+        == doc_details.formatted_citation
+        == "Wellawatte et al, XAI Review, 2023"
     ), "Formatted citation should be the same when no metadata is found."
 
 
