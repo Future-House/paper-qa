@@ -30,7 +30,7 @@ from pydantic import (
 )
 from typing_extensions import override
 
-from paperqa.types import Doc, Text
+from paperqa.types import AUTOPOPULATE_VALUE, Doc, Text
 
 if TYPE_CHECKING:
     from qdrant_client.http.models import Record
@@ -495,6 +495,7 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
                         docname=doc_data.get("docname", ""),
                         citation=doc_data.get("citation", ""),
                         dockey=doc_data["dockey"],
+                        content_hash=doc_data.get("content_hash", AUTOPOPULATE_VALUE),
                     )
                     docs.docnames.add(doc_data.get("docname", ""))
 

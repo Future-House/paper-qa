@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import contextlib
 import csv
 import hashlib
 import json
@@ -38,12 +39,14 @@ from pydantic import (
 )
 
 from paperqa.utils import (
+    compute_unique_doc_id,
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citation_ids,
     get_parenthetical_substrings,
     maybe_get_date,
+    md5sum,
 )
 from paperqa.version import __version__ as pqa_version
 
@@ -64,7 +67,10 @@ DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
     "docname",
     "dockey",
     "citation",
+    "content_hash",  # Metadata providers won't give this
 }
+# Sentinel to autopopulate a field within model_validator
+AUTOPOPULATE_VALUE = ""  # NOTE: this is falsy by design
 
 
 class Doc(Embeddable):
@@ -73,6 +79,13 @@ class Doc(Embeddable):
     docname: str
     dockey: DocKey
     citation: str
+    content_hash: str | None = Field(
+        default=AUTOPOPULATE_VALUE,
+        description=(
+            "Optional hash of the document's contents (to reiterate, not a file path to"
+            " the document, but the document's contents itself)."
+        ),
+    )
     # Sort the serialization to minimize the diff of serialized objects
     fields_to_overwrite_from_metadata: Annotated[set[str], PlainSerializer(sorted)] = (
         Field(
@@ -221,10 +234,6 @@ class Text(Embeddable):
             if m.info.get("enriched_description")
         )
         return "\n\n".join((self.text, *enriched_media))
-
-
-# Sentinel to autopopulate a field within model_validator
-AUTOPOPULATE_VALUE = ""  # NOTE: this is falsy by design
 
 
 class Context(BaseModel):
@@ -788,8 +797,8 @@ class DocDetails(Doc):
     doc_id: str | None = Field(
         default=None,
         description=(
-            "Unique ID for this document. Simple ways to acquire one include"
-            " hashing the DOI or a stringifying a UUID."
+            "Unique ID for this document. A simple and robust way to acquire one is"
+            " hashing the paper content's hash concatenate with the lowercased DOI."
         ),
     )
     file_location: str | os.PathLike | None = Field(
@@ -859,9 +868,9 @@ class DocDetails(Doc):
                     doi = doi.replace(url_prefix_to_remove, "")
             data["doi"] = doi.lower()
             if not data.get("doc_id"):  # keep user defined doc_ids
-                data["doc_id"] = encode_id(doi.lower())
+                data["doc_id"] = compute_unique_doc_id(doi, data.get("content_hash"))
         elif not data.get("doc_id"):  # keep user defined doc_ids
-            data["doc_id"] = encode_id(uuid4())
+            data["doc_id"] = compute_unique_doc_id(doi, data.get("content_hash"))
 
         if "dockey" in data.get(
             "fields_to_overwrite_from_metadata",
@@ -1072,6 +1081,17 @@ class DocDetails(Doc):
             data["citation"] = data.get("title") or CITATION_FALLBACK_DATA["title"]
         return data
 
+    @classmethod
+    def populate_content_hash(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if (  # Check for missing or autopopulate value, but preserve `None`
+            data.get("content_hash", AUTOPOPULATE_VALUE) == AUTOPOPULATE_VALUE
+        ):
+            data["content_hash"] = None  # Assume we don't have it
+            if data.get("file_location"):  # Try to update it
+                with contextlib.suppress(FileNotFoundError):
+                    data["content_hash"] = md5sum(data["file_location"])
+        return data
+
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
@@ -1097,6 +1117,7 @@ class DocDetails(Doc):
                 data[possibly_str_field], str
             ):
                 data[possibly_str_field] = ast.literal_eval(data[possibly_str_field])
+        data = cls.populate_content_hash(data)
         data = cls.lowercase_doi_and_populate_doc_id(data)
         data = cls.remove_invalid_authors(data)
         data = cls.misc_string_cleaning(data)
@@ -1257,6 +1278,14 @@ class DocDetails(Doc):
                     )
                 else:
                     merged_data[field] = max(self_value, other_value)
+            elif field == "content_hash" and (
+                # Hashes are both present but differ
+                (self_value and other_value and self_value != other_value)
+                # One hash is explicitly disabled (not autopopulated)
+                or (self_value is None or other_value is None)
+            ):
+                # We don't know which to pick, so just discard the value
+                merged_data[field] = None
 
             else:
                 # Prefer non-null values, default preference for 'other' object.
@@ -1271,10 +1300,13 @@ class DocDetails(Doc):
                     else self_value
                 )
 
-        # Recalculate doc_id if doi has changed
-        if merged_data["doi"] != self.doi:
-            merged_data["doc_id"] = (
-                encode_id(merged_data["doi"].lower()) if merged_data["doi"] else None
+        if (
+            merged_data["doi"] != self.doi
+            or merged_data["content_hash"] != self.content_hash
+        ):
+            # Recalculate doc_id if doi or content hash has changed
+            merged_data["doc_id"] = compute_unique_doc_id(
+                merged_data["doi"], merged_data.get("content_hash")
             )
 
         # Create and return new DocDetails instance

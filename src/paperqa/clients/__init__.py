@@ -246,6 +246,8 @@ class DocMetadataClient:
                 doc_details.key = doc.docname
             if "citation" in doc.fields_to_overwrite_from_metadata:
                 doc_details.citation = doc.citation
+            if "content_hash" in doc.fields_to_overwrite_from_metadata:
+                doc_details.content_hash = doc.content_hash
             return provided_doc_details + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields

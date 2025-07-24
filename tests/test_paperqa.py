@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, call, patch
 from uuid import UUID, uuid4
 
+import anyio
 import httpx
 import litellm
 import litellm.llms.anthropic.common_utils
@@ -987,9 +988,11 @@ async def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -
 
 
 @pytest.mark.asyncio
-async def test_duplicate(stub_data_dir: Path) -> None:
+async def test_duplicate(stub_data_dir: Path, tmp_path) -> None:
     """Check Docs doesn't store duplicates, while checking nonduplicate docs are stored."""
     docs = Docs()
+
+    # First, check adding a straight-up duplicate doc
     assert await docs.aadd(
         stub_data_dir / "bates.txt",
         citation="WikiMedia Foundation, 2023, Accessed now",
@@ -1002,16 +1005,44 @@ async def test_duplicate(stub_data_dir: Path) -> None:
             dockey="test1",
         )
         is None
-    )
+    ), "Expected duplicate add to indicate no new doc was added"
     assert len(docs.docs) == 1, "Should have added only one document"
+
+    # Next, check adding a different doc works, and also check citation inference
+    common_doi = "10.1234/flag"
     assert await docs.aadd(
-        stub_data_dir / "flag_day.html",
-        citation="WikiMedia Foundation, 2023, Accessed now",
-        dockey="test2",
+        stub_data_dir / "flag_day.html", dockey="flag_day", doi=common_doi
     )
     assert (
-        len(set(docs.docs.values())) == 2
+        len(set(docs.docs.keys())) == 2
     ), "Unique documents should be hashed as unique"
+    flag_day = docs.docs["flag_day"]
+    assert isinstance(flag_day, DocDetails)
+    assert flag_day.doi == common_doi
+    assert all(
+        x in flag_day.citation.lower() for x in ("wikipedia", "flag")
+    ), "Expected citation to be inferred"
+    assert flag_day.content_hash
+
+    # Now, check adding a different file but same metadata
+    # (emulating main text vs supplemental information)
+    # will be seen as a different doc
+    flag_day_content = await anyio.Path(stub_data_dir / "flag_day.html").read_bytes()
+    assert len(flag_day_content) >= 1000, "Expected long file to test truncation"
+    await anyio.Path(tmp_path / "flag_day.html").write_bytes(flag_day_content[:-100])
+    assert await docs.aadd(
+        tmp_path / "flag_day.html", dockey="flag_day_shorter", doi=common_doi
+    )
+    assert len(set(docs.docs.keys())) == 3, "Expected a third document to be added"
+    shorter_flag_day = docs.docs["flag_day_shorter"]
+    assert isinstance(shorter_flag_day, DocDetails)
+    assert shorter_flag_day.doi == common_doi
+    assert all(
+        x in shorter_flag_day.citation.lower() for x in ("wikipedia", "flag")
+    ), "Expected citation to be inferred"
+    assert shorter_flag_day.content_hash
+    assert flag_day.content_hash != shorter_flag_day.content_hash
+    assert flag_day.doc_id != shorter_flag_day.doc_id
 
 
 @pytest.mark.asyncio
@@ -1311,6 +1342,7 @@ async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
         "Wellawatte et al, XAI Review, 2023",
     )
     (doc_details,) = docs.docs.values()
+    assert doc_details.content_hash == "41f786fcc56d27ff0c1507153fae3774"
     assert doc_details.docname == docname, "Added name should match between details"
     # doc will be a DocDetails object, but nothing can be found
     # thus, we retain the prior citation data
@@ -1403,10 +1435,12 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
         fields=["author", "journal", "citation_count"],
     )
     (doc_details,) = docs.docs.values()
+    assert doc_details.content_hash == "41f786fcc56d27ff0c1507153fae3774"
     assert doc_details.docname == docname, "Added name should match between details"
     # Crossref is non-deterministic in its ordering for results
+    # (it can give DOI '10.1021/acs.jctc.2c01235' or DOI '10.26434/chemrxiv-2022-qfv02')
     # thus we need to capture both possible dockeys
-    assert doc_details.dockey in {"d7763485f06aabde", "5300ef1d5fb960d7"}
+    assert doc_details.dockey in {"8ce7ddba9c9dcae6", "a353fa2478475c9c"}
     assert isinstance(doc_details, DocDetails)
     # note year is unknown because citation string is only parsed for authors/title/doi
     # AND we do not request it back from the metadata sources
