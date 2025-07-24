@@ -574,7 +574,13 @@ class DocDetails(Doc):
             " hashing the DOI or a stringifying a UUID."
         ),
     )
-    file_location: str | os.PathLike | None = None
+    file_location: str | os.PathLike | None = Field(
+        default=None,
+        description=(
+            "Optional path to the stored paper, if stored locally"
+            " or in a mountable location such as a cloud bucket."
+        ),
+    )
     license: str | None = Field(
         default=None,
         description=(
