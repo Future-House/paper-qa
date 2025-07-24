@@ -1280,11 +1280,12 @@ class DocDetails(Doc):
                     merged_data[field] = max(self_value, other_value)
             elif field == "content_hash" and (
                 # Hashes are both present but differ
-                (self_value and other_value and self_value != other_value)
-                # One hash is explicitly disabled (not autopopulated)
-                or (self_value is None or other_value is None)
+                self_value
+                and other_value
+                and self_value != other_value
             ):
-                # We don't know which to pick, so just discard the value
+                # If hashes are both present but differ,
+                # we don't know which to pick, so just discard the value
                 merged_data[field] = None
 
             else:
