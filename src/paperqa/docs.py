@@ -365,6 +365,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                     metadata_clients=kwargs.pop("clients", DEFAULT_CLIENTS),
                 )
 
+            # Query here means a query to a metadata provider
             query_kwargs: dict[str, Any] = {}
 
             if doi:
