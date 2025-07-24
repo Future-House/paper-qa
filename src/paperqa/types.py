@@ -858,9 +858,9 @@ class DocDetails(Doc):
                 if doi.startswith(url_prefix_to_remove):
                     doi = doi.replace(url_prefix_to_remove, "")
             data["doi"] = doi.lower()
-            if "doc_id" not in data or not data["doc_id"]:  # keep user defined doc_ids
+            if not data.get("doc_id"):  # keep user defined doc_ids
                 data["doc_id"] = encode_id(doi.lower())
-        elif "doc_id" not in data or not data["doc_id"]:  # keep user defined doc_ids
+        elif not data.get("doc_id"):  # keep user defined doc_ids
             data["doc_id"] = encode_id(uuid4())
 
         if "dockey" in data.get(
