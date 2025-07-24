@@ -76,6 +76,14 @@ async def fixture_docs_fixture(stub_data_dir: Path) -> Docs:
     return docs
 
 
+def test_encode_id() -> None:
+    assert (
+        encode_id("10.1056/nejmoa2119451")
+        == encode_id("10.1056/NEJMOA2119451")
+        == "945f1f30b11bcae6"
+    )
+
+
 def test_single_author() -> None:
     text = "This was first proposed by (Smith 1999)."
     assert strip_citations(text) == "This was first proposed by ."
