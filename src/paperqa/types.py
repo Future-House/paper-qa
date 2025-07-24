@@ -940,11 +940,6 @@ class DocDetails(Doc):
             v is None for k, v in self.model_dump().items() if k not in exclusion
         )
 
-    def repopulate_doc_id_from_doi(self) -> None:
-        # TODO: should this be a hash of the doi?
-        if self.doi:
-            self.doc_id = encode_id(self.doi)
-
     def __add__(self, other: DocDetails | int) -> DocDetails:  # noqa: PLR0912
         """Merge two DocDetails objects together."""
         # control for usage w. Python's sum() function
