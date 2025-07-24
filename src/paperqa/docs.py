@@ -282,6 +282,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 overlap=parse_config.overlap,
                 page_size_limit=parse_config.page_size_limit,
                 use_block_parsing=parse_config.pdfs_use_block_parsing,
+                parse_images=parse_config.multimodal,
                 parse_pdf=parse_config.parse_pdf,
             )
             if not texts or not texts[0].text.strip():
@@ -381,17 +382,19 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 doc, **(query_kwargs | kwargs)
             )
 
-        texts = await read_doc(
+        texts, metadata = await read_doc(
             path,
             doc,
             chunk_chars=parse_config.chunk_size,
             overlap=parse_config.overlap,
             page_size_limit=parse_config.page_size_limit,
             use_block_parsing=parse_config.pdfs_use_block_parsing,
+            parse_images=parse_config.multimodal,
             parse_pdf=parse_config.parse_pdf,
+            include_metadata=True,
         )
         # loose check to see if document was loaded
-        if (
+        if metadata.parse_type != "image" and (
             not texts
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (

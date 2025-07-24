@@ -61,7 +61,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[ldp,pypdf,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[figqa,ldp,pypdf,pymupdf,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -77,6 +77,9 @@ dev = [
     "refurb>=2",  # Pin to keep recent
     "typeguard",
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
+]
+figqa = [
+    "aviary.labbench @ git+https://github.com/Future-House/aviary@lab-bench#subdirectory=packages/labbench",
 ]
 ldp = [
     "ldp>=0.25.0",  # For new LLM client interface
@@ -195,6 +198,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 # Per-module configuration options
 module = [
+    "datasets",  # SEE: https://github.com/huggingface/datasets/issues/3841
     "openreview",  # SEE: https://github.com/openreview/openreview-py/issues/2551
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883

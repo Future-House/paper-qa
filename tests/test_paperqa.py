@@ -1,3 +1,4 @@
+import base64
 import contextlib
 import csv
 import os
@@ -52,8 +53,9 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, read_doc
-from paperqa.types import ChunkMetadata, Context
+from paperqa.types import ChunkMetadata, Context, ParsedMedia
 from paperqa.utils import (
+    bytes_to_string,
     clean_possessives,
     encode_id,
     extract_score,
@@ -61,6 +63,7 @@ from paperqa.utils import (
     maybe_is_html,
     maybe_is_text,
     name_in_text,
+    string_to_bytes,
     strings_similarity,
     strip_citations,
 )
@@ -1193,9 +1196,13 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
-    assert parsed_text.metadata.total_parsed_text_length == sum(
-        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
-    )
+    assert isinstance(parsed_text.content, dict)
+    num_chars = 0
+    for value in parsed_text.content.values():
+        assert isinstance(value, tuple)
+        num_chars += len(value[0])
+    assert parsed_text.metadata.total_parsed_text_length == num_chars
+    assert parsed_text.metadata.count_parsed_media > 1, "Expected media to be parsed"
 
 
 @pytest.mark.asyncio
@@ -1242,6 +1249,10 @@ async def test_chunk_metadata_reader(
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
+    assert metadata.count_parsed_media > 1, "Expected media to be parsed"
+    assert (
+        sum(len(t.media) for t in chunk_text) == metadata.count_parsed_media
+    ), "Expected chunks' media to match parsed media"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
@@ -1290,6 +1301,52 @@ async def test_chunk_metadata_reader(
 
 
 @pytest.mark.asyncio
+async def test_read_doc_images(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+
+    # Test parsing only
+    parsed_text = await read_doc(png_path, doc, parsed_text_only=True)
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    page_content = parsed_text.content["1"]
+    assert isinstance(page_content, tuple)
+    text_content, (parsed_image,) = page_content
+    assert not text_content, "Expected no text content for an image"
+    assert isinstance(parsed_image, ParsedMedia)
+    assert parsed_image.index == 0
+    assert isinstance(parsed_image.data, bytes)
+    assert len(parsed_image.data) > 0
+    assert not parsed_image.text, "Expected no text content for a standalone image"
+    assert parsed_image.info["suffix"] == ".png"
+    assert parsed_text.metadata.parse_type == "image"
+    assert parsed_text.metadata.count_parsed_media == 1
+    assert parsed_text.metadata.total_parsed_text_length == 0
+    assert parsed_text.metadata.chunk_metadata is None
+
+    # Test parsing + 'chunking'
+    (text,) = await read_doc(png_path, doc)
+    assert isinstance(text, Text)
+    assert text.doc == doc
+    (image,) = text.media
+    assert image == parsed_image
+
+    # Test including metadata
+    texts_with_metadata = await read_doc(png_path, doc, include_metadata=True)
+    assert isinstance(texts_with_metadata, tuple)
+    texts, metadata = texts_with_metadata
+    assert len(texts) == 1
+    assert texts[0] == text
+    assert metadata.parse_type == "image"
+    assert metadata.count_parsed_media == 1
+    assert metadata.total_parsed_text_length == 0
+    assert metadata.chunk_metadata is not None
+    assert not metadata.chunk_metadata.chunk_chars
+    assert not metadata.chunk_metadata.overlap
+    assert metadata.chunk_metadata.chunk_type == "no_chunk"
+
+
+@pytest.mark.asyncio
 async def test_code() -> None:
     settings = Settings.from_name("fast")
     docs = Docs()
@@ -1300,6 +1357,65 @@ async def test_code() -> None:
     assert len(docs.docs) == 1
     session = await docs.aquery("What file is read in by test_code?", settings=settings)
     assert "test_paperqa.py" in session.answer
+
+
+@pytest.mark.asyncio
+async def test_querying_tables(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+
+    docs = Docs()
+    assert await docs.aadd(stub_data_dir / "influence.pdf", settings=settings)
+    # Now, let's modify the system so any tables housed in the Text.text get removed,
+    # and the system can only rely on table images or markdown
+    texts_with_tables = {
+        t
+        for t in docs.texts
+        if t.media and any(m.info.get("type") == "table" for m in t.media)
+    }
+    assert texts_with_tables, "Expected some texts to have parsed tables"
+    for t in texts_with_tables:
+        # Wipe text but keep embedding (for retrieval), to confirm tables get used
+        t.text = "Placeholder"
+        # Wipe non-table media (e.g. images)
+        t.media = [m for m in t.media if m.info.get("type") == "table"]
+    docs.texts = list(texts_with_tables)
+    session = await docs.aquery(
+        "What osteotomy gap (mm) has the bone volume per slice?", settings=settings
+    )
+    assert session.used_contexts
+    assert any(x in session.answer for x in ("1.0 mm", "1.0-mm"))
+    assert session.cost > 0
+
+
+@pytest.mark.asyncio
+async def test_images(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+    # We don't support image embeddings yet, so disable embedding
+    settings.answer.evidence_retrieval = False
+    settings.parsing.defer_embedding = True
+
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "sf_districts.png",
+        citation=(
+            '"File:San francisco districts.png." Wikimedia Commons.'
+            " 7 Sep 2023, 07:38 UTC."
+            " <https://commons.wikimedia.org/w/index.php?title=File:San_francisco_districts.png&oldid=799209398>"
+            " July 2025."
+        ),
+        settings=settings,
+    )
+    session = await docs.aquery(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert (
+        sum(
+            district in session.answer
+            for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
+        )
+        >= 2
+    ), "Expected at least two neighbors to be matched"
+    assert session.cost > 0
 
 
 def test_zotero() -> None:
@@ -2120,3 +2236,23 @@ def test_maybe_get_date():
 )
 def test_clean_possessives(raw_text: str, cleaned_text: str) -> None:
     assert clean_possessives(raw_text) == cleaned_text
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(b"Hello, World!", id="simple-text"),
+        pytest.param(b"", id="empty-bytes"),
+        pytest.param(bytes([0, 1, 2, 255, 128, 64]), id="binary-data"),
+        pytest.param(b"Test data for base64 encoding", id="base64-validation"),
+        pytest.param("Hello 世界 🌍".encode(), id="utf8-text"),
+    ],
+)
+def test_str_bytes_conversions(value: bytes) -> None:
+    # Test round-trip conversion
+    encoded_string = bytes_to_string(value)
+    decoded_bytes = string_to_bytes(encoded_string)
+    assert decoded_bytes == value
+
+    # Validate that encoded string is valid base64
+    assert base64.b64decode(encoded_string) == value
