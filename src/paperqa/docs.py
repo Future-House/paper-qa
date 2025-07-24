@@ -376,6 +376,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             doc = await metadata_client.upgrade_doc_to_doc_details(
                 doc, **(query_kwargs | kwargs)
             )
+            docname = doc.docname  # Pull out any updated docname for the return
 
         texts = await read_doc(
             path,
