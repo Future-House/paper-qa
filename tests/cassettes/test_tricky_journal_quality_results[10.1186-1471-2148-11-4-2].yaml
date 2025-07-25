@@ -1,0 +1,269 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1186%2F1471-2148-11-4?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,4,7]],"date-time":"2025-04-07T21:26:17Z","timestamp":1744061177733},"reference-count":47,"publisher":"Springer
+          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2011,1,5]],"date-time":"2011-01-05T00:00:00Z","timestamp":1294185600000},"content-version":"unspecified","delay-in-days":0,"URL":"http:\/\/www.springer.com\/tdm"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["BMC
+          Evol Biol"],"published-print":{"date-parts":[[2011,12]]},"DOI":"10.1186\/1471-2148-11-4","type":"journal-article","created":{"date-parts":[[2011,1,5]],"date-time":"2011-01-05T20:07:09Z","timestamp":1294258029000},"source":"Crossref","is-referenced-by-count":79,"title":["Phylogenomics
+          of phosphoinositide lipid kinases: perspectives on the evolution of second
+          messenger signaling and drug discovery"],"prefix":"10.1186","volume":"11","author":[{"given":"James
+          R","family":"Brown","sequence":"first","affiliation":[]},{"given":"Kurt R","family":"Auger","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2011,1,5]]},"reference":[{"key":"1613_CR1","doi-asserted-by":"publisher","first-page":"481","DOI":"10.1146\/annurev.biochem.67.1.481","volume":"67","author":"DA
+          Fruman","year":"1998","unstructured":"Fruman DA, Meyers RE, Cantley LC: Phosphoinositide
+          kinases. Annu Rev Biochem. 1998, 67: 481-507. 10.1146\/annurev.biochem.67.1.481.","journal-title":"Annu
+          Rev Biochem"},{"key":"1613_CR2","doi-asserted-by":"publisher","first-page":"606","DOI":"10.1038\/nrg1879","volume":"7","author":"JA
+          Engelman","year":"2006","unstructured":"Engelman JA, Luo J, Cantley LC: The
+          evolution of phosphatidylinositol 3-kinases as regulators of growth and metabolism.
+          Nat Rev Genet. 2006, 7: 606-619. 10.1038\/nrg1879.","journal-title":"Nat Rev
+          Genet"},{"key":"1613_CR3","doi-asserted-by":"publisher","first-page":"267","DOI":"10.1016\/S0968-0004(97)01061-X","volume":"22","author":"B
+          Vanhaesebroeck","year":"1997","unstructured":"Vanhaesebroeck B, Leevers SJ,
+          Panayotou G, Waterfield MD: Phosphoinositide 3-kinases: a conserved family
+          of signal transducers. Trends Biochem Sci. 1997, 22: 267-272. 10.1016\/S0968-0004(97)01061-X.","journal-title":"Trends
+          Biochem Sci"},{"key":"1613_CR4","doi-asserted-by":"publisher","first-page":"357","DOI":"10.1046\/j.1432-1327.1998.2530357.x","volume":"253","author":"T
+          Gehrmann","year":"1998","unstructured":"Gehrmann T, Heilmeyer LM: Phosphatidylinositol
+          4-kinases. Eur J Biochem. 1998, 253: 357-370. 10.1046\/j.1432-1327.1998.2530357.x.","journal-title":"Eur
+          J Biochem"},{"key":"1613_CR5","doi-asserted-by":"publisher","first-page":"351","DOI":"10.1016\/j.tcb.2006.05.003","volume":"16","author":"A
+          Balla","year":"2006","unstructured":"Balla A, Balla T: Phosphatidylinositol
+          4-kinases: old enzymes with emerging functions. Trends Cell Biol. 2006, 16:
+          351-361. 10.1016\/j.tcb.2006.05.003.","journal-title":"Trends Cell Biol"},{"key":"1613_CR6","doi-asserted-by":"publisher","first-page":"87","DOI":"10.1016\/j.ejphar.2004.07.014","volume":"500","author":"PA
+          Oude Weernink","year":"2004","unstructured":"Oude Weernink PA, Schmidt M,
+          Jakobs KH: Regulation and cellular roles of phosphoinositide 5-kinases. Eur
+          J Pharmacol. 2004, 500: 87-99. 10.1016\/j.ejphar.2004.07.014.","journal-title":"Eur
+          J Pharmacol"},{"key":"1613_CR7","doi-asserted-by":"publisher","first-page":"615","DOI":"10.1146\/annurev.cellbio.17.1.615","volume":"17","author":"R
+          Katso","year":"2001","unstructured":"Katso R, Okkenhaug K, Ahmadi K, White
+          S, Timms J, Waterfield MD: Cellular function of phosphoinositide 3-kinases:
+          implications for development, homeostasis, and cancer. Annu Rev Cell Dev Biol.
+          2001, 17: 615-675. 10.1146\/annurev.cellbio.17.1.615.","journal-title":"Annu
+          Rev Cell Dev Biol"},{"key":"1613_CR8","doi-asserted-by":"publisher","first-page":"554","DOI":"10.1126\/science.1096502","volume":"304","author":"Y
+          Samuels","year":"2004","unstructured":"Samuels Y, Wang Z, Bardelli A, Silliman
+          N, Ptak J, Szabo S, et al: High frequency of mutations of the PIK3CA gene
+          in human cancers. Science. 2004, 304: 554-10.1126\/science.1096502.","journal-title":"Science"},{"key":"1613_CR9","doi-asserted-by":"publisher","first-page":"4562","DOI":"10.1158\/0008-5472.CAN-04-4114","volume":"65","author":"T
+          Ikenoue","year":"2005","unstructured":"Ikenoue T, Kanai F, Hikiba Y, Obata
+          T, Tanaka Y, Imamura J, et al: Functional analysis of PIK3CA gene mutations
+          in human colorectal cancer. Cancer Res. 2005, 65: 4562-4567. 10.1158\/0008-5472.CAN-04-4114.","journal-title":"Cancer
+          Res"},{"key":"1613_CR10","doi-asserted-by":"publisher","first-page":"2146","DOI":"10.1158\/0008-5472.CAN-09-4355","volume":"70","author":"P
+          Workman","year":"2010","unstructured":"Workman P, Clarke PA, Raynaud FI, van
+          Montfort RL: Drugging the PI3 kinome: from chemical tools to drugs in the
+          clinic. Cancer Res. 2010, 70: 2146-2157. 10.1158\/0008-5472.CAN-09-4355.","journal-title":"Cancer
+          Res"},{"key":"1613_CR11","doi-asserted-by":"publisher","first-page":"550","DOI":"10.1038\/nrc2664","volume":"9","author":"JA
+          Engelman","year":"2009","unstructured":"Engelman JA: Targeting PI3K signalling
+          in cancer: opportunities, challenges and limitations. Nat Rev Cancer. 2009,
+          9: 550-562. 10.1038\/nrc2664.","journal-title":"Nat Rev Cancer"},{"key":"1613_CR12","doi-asserted-by":"publisher","first-page":"903","DOI":"10.1038\/nrd2145","volume":"5","author":"T
+          Ruckle","year":"2006","unstructured":"Ruckle T, Schwarz MK, Rommel C: PI3Kgamma
+          inhibition: towards an ''aspirin of the 21st century''?. Nat Rev Drug Discov.
+          2006, 5: 903-918. 10.1038\/nrd2145.","journal-title":"Nat Rev Drug Discov"},{"key":"1613_CR13","doi-asserted-by":"publisher","first-page":"791","DOI":"10.1042\/CS20080549","volume":"116","author":"A
+          Fougerat","year":"2009","unstructured":"Fougerat A, Gayral S, Malet N, Briand-Mesange
+          F, Breton-Douillon M, Laffargue M: Phosphoinositide 3-kinases and their role
+          in inflammation: potential clinical targets in atherosclerosis?. Clin Sci
+          (Lond). 2009, 116: 791-804. 10.1042\/CS20080549.","journal-title":"Clin Sci
+          (Lond)"},{"key":"1613_CR14","doi-asserted-by":"publisher","first-page":"375","DOI":"10.1016\/j.cell.2004.07.017","volume":"118","author":"E
+          Patrucco","year":"2004","unstructured":"Patrucco E, Notte A, Barberis L, Selvetella
+          G, Maffei A, Brancaccio M, et al: PI3Kgamma modulates the cardiac response
+          to chronic pressure overload by distinct kinase-dependent and -independent
+          effects. Cell. 2004, 118: 375-387. 10.1016\/j.cell.2004.07.017.","journal-title":"Cell"},{"key":"1613_CR15","doi-asserted-by":"publisher","first-page":"298","DOI":"10.1016\/j.chom.2009.02.001","volume":"5","author":"AW
+          Tai","year":"2009","unstructured":"Tai AW, Benita Y, Peng LF, Kim SS, Sakamoto
+          N, Xavier RJ, et al: A functional genomic screen identifies cellular cofactors
+          of hepatitis C virus replication. Cell Host Microbe. 2009, 5: 298-307. 10.1016\/j.chom.2009.02.001.","journal-title":"Cell
+          Host Microbe"},{"key":"1613_CR16","doi-asserted-by":"publisher","first-page":"799","DOI":"10.1016\/j.cell.2010.03.050","volume":"141","author":"NY
+          Hsu","year":"2010","unstructured":"Hsu NY, Ilnytska O, Belov G, Santiana M,
+          Chen YH, Takvorian PM, et al: Viral reorganization of the secretory pathway
+          generates distinct organelles for RNA replication. Cell. 2010, 141: 799-811.
+          10.1016\/j.cell.2010.03.050.","journal-title":"Cell"},{"key":"1613_CR17","doi-asserted-by":"publisher","first-page":"151","DOI":"10.1038\/nrm2334","volume":"9","author":"RH
+          Michell","year":"2008","unstructured":"Michell RH: Inositol derivatives: evolution
+          and functions. Nat Rev Mol Cell Biol. 2008, 9: 151-161. 10.1038\/nrm2334.","journal-title":"Nat
+          Rev Mol Cell Biol"},{"key":"1613_CR18","doi-asserted-by":"publisher","first-page":"453","DOI":"10.1016\/j.tibs.2008.07.002","volume":"33","author":"O
+          Lecompte","year":"2008","unstructured":"Lecompte O, Poch O, Laporte J: PtdIns5P
+          regulation through evolution: roles in membrane trafficking?. Trends Biochem
+          Sci. 2008, 33: 453-460. 10.1016\/j.tibs.2008.07.002.","journal-title":"Trends
+          Biochem Sci"},{"key":"1613_CR19","doi-asserted-by":"publisher","first-page":"39","DOI":"10.1186\/1471-2148-4-39","volume":"4","author":"JR
+          Brown","year":"2004","unstructured":"Brown JR, Koretke KK, Birkeland ML, Sanseau
+          P, Patrick DR: Evolutionary relationships of Aurora kinases: implications
+          for model organism studies and the development of anti-cancer drugs. BMC Evol
+          Biol. 2004, 4: 39-10.1186\/1471-2148-4-39.","journal-title":"BMC Evol Biol"},{"key":"1613_CR20","doi-asserted-by":"publisher","first-page":"241","DOI":"10.1016\/j.tips.2008.02.005","volume":"29","author":"D
+          Leroy","year":"2008","unstructured":"Leroy D, Doerig C: Drugging the Plasmodium
+          kinome: the benefits of academia-industry synergy. Trends Pharmacol Sci. 2008,
+          29: 241-249. 10.1016\/j.tips.2008.02.005.","journal-title":"Trends Pharmacol
+          Sci"},{"key":"1613_CR21","doi-asserted-by":"publisher","first-page":"963","DOI":"10.1016\/j.bbrc.2009.10.086","volume":"390","author":"D
+          Bahia","year":"2009","unstructured":"Bahia D, Oliveira LM, Lima FM, Oliveira
+          P, Silveira JF, Mortara RA, et al: The TryPIKinome of five human pathogenic
+          trypanosomatids: Trypanosoma brucei, Trypanosoma cruzi, Leishmania major,
+          Leishmania braziliensis and Leishmania infantum--new tools for designing specific
+          inhibitors. Biochem Biophys Res Commun. 2009, 390: 963-970. 10.1016\/j.bbrc.2009.10.086.","journal-title":"Biochem
+          Biophys Res Commun"},{"key":"1613_CR22","doi-asserted-by":"publisher","first-page":"3389","DOI":"10.1093\/nar\/25.17.3389","volume":"25","author":"SF
+          Altschul","year":"1997","unstructured":"Altschul SF, Madden TL, Schaffer AA,
+          Zhang J, Zhang Z, Miller W, et al: Gapped BLAST and PSI-BLAST: a new generation
+          of protein database search programs. Nucleic Acids Res. 1997, 25: 3389-3402.
+          10.1093\/nar\/25.17.3389.","journal-title":"Nucleic Acids Res"},{"key":"1613_CR23","doi-asserted-by":"publisher","first-page":"11558","DOI":"10.1073\/pnas.90.24.11558","volume":"90","author":"SL
+          Baldauf","year":"1993","unstructured":"Baldauf SL, Palmer JD: Animals and
+          fungi are each other''s closest relatives: congruent evidence from multiple
+          proteins. Proc Natl Acad Sci USA. 1993, 90: 11558-11562. 10.1073\/pnas.90.24.11558.","journal-title":"Proc
+          Natl Acad Sci USA"},{"key":"1613_CR24","doi-asserted-by":"publisher","first-page":"REVIEWS1026","DOI":"10.1186\/gb-2000-1-4-reviews1026","volume":"1","author":"GI
+          McFadden","year":"2000","unstructured":"McFadden GI: Mergers and acquisitions:
+          malaria and the great chloroplast heist. Genome Biol. 2000, 1: REVIEWS1026-10.1186\/gb-2000-1-4-reviews1026.","journal-title":"Genome
+          Biol"},{"key":"1613_CR25","doi-asserted-by":"publisher","first-page":"83","DOI":"10.1186\/1471-2164-11-83","volume":"11","author":"S
+          Banerjee","year":"2010","unstructured":"Banerjee S, Basu S, Sarkar S: Comparative
+          genomics reveals selective distribution and domain organization of FYVE and
+          PX domain proteins across eukaryotic lineages. BMC Genomics. 2010, 11: 83-10.1186\/1471-2164-11-83.","journal-title":"BMC
+          Genomics"},{"key":"1613_CR26","doi-asserted-by":"publisher","first-page":"265","DOI":"10.1016\/j.ijpara.2003.11.025","volume":"34","author":"J
+          Huang","year":"2004","unstructured":"Huang J, Mullapudi N, Sicheritz-Ponten
+          T, Kissinger JC: A first glimpse into the pattern and scale of gene transfer
+          in Apicomplexa. Int J Parasitol. 2004, 34: 265-274. 10.1016\/j.ijpara.2003.11.025.","journal-title":"Int
+          J Parasitol"},{"key":"1613_CR27","doi-asserted-by":"crossref","first-page":"355","DOI":"10.1038\/sj.bjc.6601894","volume":"91","author":"S
+          Bamford","year":"2004","unstructured":"Bamford S, Dawson E, Forbes S, Clements
+          J, Pettett R, Dogan A, et al: The COSMIC (Catalogue of Somatic Mutations in
+          Cancer) database and website. Br J Cancer. 2004, 91: 355-358.","journal-title":"Br
+          J Cancer"},{"key":"1613_CR28","doi-asserted-by":"publisher","first-page":"5569","DOI":"10.1073\/pnas.0701005104","volume":"104","author":"M
+          Gymnopoulos","year":"2007","unstructured":"Gymnopoulos M, Elsliger MA, Vogt
+          PK: Rare cancer-specific mutations in PIK3CA show gain of function. Proc Natl
+          Acad Sci USA. 2007, 104: 5569-5574. 10.1073\/pnas.0701005104.","journal-title":"Proc
+          Natl Acad Sci USA"},{"key":"1613_CR29","doi-asserted-by":"publisher","first-page":"153","DOI":"10.1038\/nature05610","volume":"446","author":"C
+          Greenman","year":"2007","unstructured":"Greenman C, Stephens P, Smith R, Dalgliesh
+          GL, Hunter C, Bignell G, et al: Patterns of somatic mutation in human cancer
+          genomes. Nature. 2007, 446: 153-158. 10.1038\/nature05610.","journal-title":"Nature"},{"key":"1613_CR30","doi-asserted-by":"publisher","first-page":"279","DOI":"10.1158\/1535-7163.MCT-09-0508","volume":"9","author":"Y
+          Zhang","year":"2010","unstructured":"Zhang Y, Italia MJ, Auger KR, Halsey
+          WS, Van Horn SF, Sathe GM, et al: Molecular evolutionary analysis of cancer
+          cell lines. Mol Cancer Ther. 2010, 9: 279-291. 10.1158\/1535-7163.MCT-09-0508.","journal-title":"Mol
+          Cancer Ther"},{"key":"1613_CR31","doi-asserted-by":"publisher","first-page":"733","DOI":"10.1016\/j.cell.2006.03.035","volume":"125","author":"ZA
+          Knight","year":"2006","unstructured":"Knight ZA, Gonzalez B, Feldman ME, Zunder
+          ER, Goldenberg DD, Williams O, et al: A pharmacological map of the PI3-K family
+          defines a role for p110alpha in insulin signaling. Cell. 2006, 125: 733-747.
+          10.1016\/j.cell.2006.03.035.","journal-title":"Cell"},{"key":"1613_CR32","doi-asserted-by":"publisher","first-page":"691","DOI":"10.1038\/nchembio.117","volume":"4","author":"B
+          Apsel","year":"2008","unstructured":"Apsel B, Blair JA, Gonzalez B, Nazif
+          TM, Feldman ME, Aizenstein B, et al: Targeted polypharmacology: discovery
+          of dual inhibitors of tyrosine and phosphoinositide kinases. Nat Chem Biol.
+          2008, 4: 691-699. 10.1038\/nchembio.117.","journal-title":"Nat Chem Biol"},{"key":"1613_CR33","doi-asserted-by":"publisher","first-page":"11381","DOI":"10.1073\/pnas.0906461107","volume":"107","author":"LC
+          Foukas","year":"2010","unstructured":"Foukas LC, Berenjeno IM, Gray A, Khwaja
+          A, Vanhaesebroeck B: Activity of any class IA PI3K isoform can sustain cell
+          proliferation and survival. Proc Natl Acad Sci USA. 2010, 107: 11381-11386.
+          10.1073\/pnas.0906461107.","journal-title":"Proc Natl Acad Sci USA"},{"key":"1613_CR34","unstructured":"W.H.O.
+          World malaria report. 2009, [ http:\/\/www.who.int\/malaria\/world_malaria_report_2009\/en\/index.html
+          ]"},{"key":"1613_CR35","doi-asserted-by":"publisher","first-page":"395","DOI":"10.1016\/j.pt.2010.04.012","volume":"26","author":"JC
+          Dujardin","year":"2010","unstructured":"Dujardin JC, Gonzalez-Pacanowska D,
+          Croft SL, Olesen OF, Spath GF: Collaborative actions in anti-trypanosomatid
+          chemotherapy with partners from disease endemic areas. Trends Parasitol. 2010,
+          26: 395-403. 10.1016\/j.pt.2010.04.012.","journal-title":"Trends Parasitol"},{"key":"1613_CR36","doi-asserted-by":"publisher","first-page":"4588","DOI":"10.1128\/AAC.00610-09","volume":"53","author":"V
+          Andriantsoanirina","year":"2009","unstructured":"Andriantsoanirina V, Ratsimbasoa
+          A, Bouchier C, Jahevitra M, Rabearimanana S, Radrianjafy R, et al: Plasmodium
+          falciparum drug resistance in Madagascar: facing the spread of unusual pfdhfr
+          and pfmdr-1 haplotypes and the decrease of dihydroartemisinin susceptibility.
+          Antimicrob Agents Chemother. 2009, 53: 4588-4597. 10.1128\/AAC.00610-09.","journal-title":"Antimicrob
+          Agents Chemother"},{"key":"1613_CR37","doi-asserted-by":"publisher","first-page":"e4551","DOI":"10.1371\/journal.pone.0004551","volume":"4","author":"VI
+          Carrara","year":"2009","unstructured":"Carrara VI, Zwang J, Ashley EA, Price
+          RN, Stepniewska K, Barends M, et al: Changes in the treatment responses to
+          artesunate-mefloquine on the northwestern border of Thailand during 13 years
+          of continuous deployment. PLoS ONE. 2009, 4: e4551-10.1371\/journal.pone.0004551.","journal-title":"PLoS
+          ONE"},{"key":"1613_CR38","doi-asserted-by":"publisher","first-page":"305","DOI":"10.1038\/nature09107","volume":"465","author":"FJ
+          Gamo","year":"2010","unstructured":"Gamo FJ, Sanz LM, Vidal J, de CC, Alvarez
+          E, Lavandera JL, et al: Thousands of chemical starting points for antimalarial
+          lead identification. Nature. 2010, 465: 305-310. 10.1038\/nature09107.","journal-title":"Nature"},{"key":"1613_CR39","doi-asserted-by":"publisher","first-page":"404","DOI":"10.1126\/science.1112181","volume":"309","author":"NM
+          El-Sayed","year":"2005","unstructured":"El-Sayed NM, Myler PJ, Blandin G,
+          Berriman M, Crabtree J, Aggarwal G, et al: Comparative genomics of trypanosomatid
+          parasitic protozoa. Science. 2005, 309: 404-409. 10.1126\/science.1112181.","journal-title":"Science"},{"key":"1613_CR40","doi-asserted-by":"publisher","first-page":"328","DOI":"10.1016\/S0966-842X(99)01547-4","volume":"7","author":"GI
+          McFadden","year":"1999","unstructured":"McFadden GI, Roos DS: Apicomplexan
+          plastids as drug targets. Trends Microbiol. 1999, 7: 328-333. 10.1016\/S0966-842X(99)01547-4.","journal-title":"Trends
+          Microbiol"},{"key":"1613_CR41","doi-asserted-by":"publisher","first-page":"4673","DOI":"10.1093\/nar\/22.22.4673","volume":"22","author":"JD
+          Thompson","year":"1994","unstructured":"Thompson JD, Higgins DG, Gibson TJ:
+          CLUSTAL W: improving the sensitivity of progressive multiple sequence alignment
+          through sequence weighting, position-specific gap penalties and weight matrix
+          choice. Nucleic Acids Res. 1994, 22: 4673-4680. 10.1093\/nar\/22.22.4673.","journal-title":"Nucleic
+          Acids Res"},{"key":"1613_CR42","volume-title":"PHYLIP (Phylogenetic Inference
+          Package). [3.6]","author":"J Felsentein","year":"2000","unstructured":"Felsentein
+          J: PHYLIP (Phylogenetic Inference Package). [3.6]. 2000, Seattle, Department
+          of Genetics, University of Washington, [ http:\/\/evolution.genetics.washington.edu\/phylip.html
+          ]"},{"key":"1613_CR43","doi-asserted-by":"publisher","first-page":"754","DOI":"10.1093\/bioinformatics\/17.8.754","volume":"17","author":"JP
+          Huelsenbeck","year":"2001","unstructured":"Huelsenbeck JP, Ronquist F: MRBAYES:
+          Bayesian inference of phylogenetic trees. Bioinformatics. 2001, 17: 754-755.
+          10.1093\/bioinformatics\/17.8.754.","journal-title":"Bioinformatics"},{"key":"1613_CR44","doi-asserted-by":"publisher","first-page":"1572","DOI":"10.1093\/bioinformatics\/btg180","volume":"19","author":"F
+          Ronquist","year":"2003","unstructured":"Ronquist F, Huelsenbeck JP: MrBayes
+          3: Bayesian phylogenetic inference under mixed models. Bioinformatics. 2003,
+          19: 1572-1574. 10.1093\/bioinformatics\/btg180.","journal-title":"Bioinformatics"},{"key":"1613_CR45","first-page":"357","volume":"12","author":"RD
+          Page","year":"1996","unstructured":"Page RD: TreeView: an application to display
+          phylogenetic trees on personal computers. Comput Appl Biosci. 1996, 12: 357-358.","journal-title":"Comput
+          Appl Biosci"},{"key":"1613_CR46","volume-title":"The Tree of Life Web Project","author":"DR
+          Maddison","year":"2007","unstructured":"Maddison DR, Schulz K-S: The Tree
+          of Life Web Project. 2007, [ http:\/\/tolweb.org ]"},{"key":"1613_CR47","doi-asserted-by":"publisher","first-page":"313","DOI":"10.1038\/46319","volume":"402","author":"EH
+          Walker","year":"1999","unstructured":"Walker EH, Perisic O, Ried C, Stephens
+          L, Williams RL: Structural insights into phosphoinositide 3-kinase catalysis
+          and signalling. Nature. 1999, 402: 313-320. 10.1038\/46319.","journal-title":"Nature"}],"container-title":["BMC
+          Evolutionary Biology"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1186\/1471-2148-11-4.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"http:\/\/link.springer.com\/article\/10.1186\/1471-2148-11-4\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1186\/1471-2148-11-4.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2019,6,7]],"date-time":"2019-06-07T16:12:28Z","timestamp":1559923948000},"score":1,"resource":{"primary":{"URL":"http:\/\/bmcevolbiol.biomedcentral.com\/articles\/10.1186\/1471-2148-11-4"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2011,1,5]]},"references-count":47,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2011,12]]}},"alternative-id":["1613"],"URL":"https:\/\/doi.org\/10.1186\/1471-2148-11-4","relation":{},"ISSN":["1471-2148"],"issn-type":[{"value":"1471-2148","type":"electronic"}],"subject":[],"published":{"date-parts":[[2011,1,5]]},"article-number":"4"}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "7029"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 25 Jul 2025 21:35:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1186%2F1471-2148-11-4/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Brown_2011, title={Phylogenomics of phosphoinositide lipid
+          kinases: perspectives on the evolution of second messenger signaling and drug
+          discovery}, volume={11}, ISSN={1471-2148}, url={http://dx.doi.org/10.1186/1471-2148-11-4},
+          DOI={10.1186/1471-2148-11-4}, number={1}, journal={BMC Evolutionary Biology},
+          publisher={Springer Science and Business Media LLC}, author={Brown, James
+          R and Auger, Kurt R}, year={2011}, month=jan }
+
+          "
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Fri, 25 Jul 2025 21:35:28 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

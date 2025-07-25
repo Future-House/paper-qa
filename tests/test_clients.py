@@ -711,3 +711,42 @@ async def test_arxiv_doi_is_used_when_available() -> None:
     )
     assert result, "paper should be found"
     assert result.doi == "10.48550/arxiv.1706.03762"
+
+
+@pytest.mark.vcr
+@pytest.mark.parametrize(
+    ("doi", "score"),
+    [
+        ("10.1038/s41598-018-27044-6", 1),
+        ("10.1073/pnas.1205508109", 3),
+        ("10.1186/1471-2148-11-4", 2),
+        ("10.1016/j.semcdb.2016.08.024", 1),
+        ("10.1146/annurev.pathol.4.110807.092311", 2),
+        ("10.1016/j.bbcan.2023.188947", 1),
+    ],
+)
+@pytest.mark.asyncio
+async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
+    """Test DOIs which won't be found in the journal quality data without munging.
+
+    Either their titles are non-canonical compared with the journal quality source,
+    they had a duplicate entry in the journal quality data,
+    or they have a swap like an & for and.
+
+    """
+    async with aiohttp.ClientSession() as session:
+        crossref_client = DocMetadataClient(
+            session,
+            clients=cast(
+                "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
+                [CrossrefProvider, JournalQualityPostProcessor],
+            ),
+        )
+        crossref_details = await crossref_client.query(
+            doi=doi,
+            fields=["title", "doi", "authors", "journal"],
+        )
+        assert crossref_details, "Failed to query crossref"
+        assert (
+            crossref_details.source_quality == score
+        ), "Should have source quality data"
