@@ -111,6 +111,10 @@ class AnswerSettings(BaseModel):
             " called before evidence was gathered."
         ),
     )
+    group_contexts_by_question: bool = Field(
+        default=False,
+        description=("Whether to group contexts by question when generating answers."),
+    )
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
