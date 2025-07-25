@@ -79,10 +79,10 @@ class AnswerSettings(BaseModel):
     )
     # no validator because you can set the range in a prompt
     evidence_relevance_score_cutoff: int = Field(
-        default=0,
+        default=1,
         description=(
-            "Relevance score cutoff for evidence retrieval, default is 0, meaning"
-            " only evidence with relevance score >= 0 will be used."
+            "Relevance score cutoff for evidence retrieval, default is 1, meaning"
+            " only evidence with relevance score >= 1 will be used."
         ),
     )
     evidence_summary_length: str = Field(

@@ -772,7 +772,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         filtered_contexts = [
             c
             for c in filtered_contexts
-            if c.score > answer_config.evidence_relevance_score_cutoff
+            if c.score >= answer_config.evidence_relevance_score_cutoff
         ]
 
         # shim deprecated flag
