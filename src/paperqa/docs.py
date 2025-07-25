@@ -7,6 +7,7 @@ import re
 import tempfile
 import urllib.request
 import warnings
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from io import BytesIO
@@ -29,7 +30,7 @@ from paperqa.llms import (
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
-from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
+from paperqa.types import Context, Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
     get_loop,
@@ -783,12 +784,12 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
         context_str_body = ""
         if answer_config.group_contexts_by_question:
-            contexts_by_question: dict[str, list] = {}
+            contexts_by_question: dict[str, list[Context]] = defaultdict(list)
             for c in filtered_contexts:
                 # Fallback to the main session question if not available.
+                # question attribute is optional, so if a user
+                # sets contexts externally, it may not have a question.
                 question = getattr(c, "question", session.question)
-                if question not in contexts_by_question:
-                    contexts_by_question[question] = []
                 contexts_by_question[question].append(c)
 
             context_sections = []
