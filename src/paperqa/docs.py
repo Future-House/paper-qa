@@ -768,8 +768,12 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             contexts,
             key=lambda x: (-x.score, x.text.name),
         )[: answer_config.answer_max_sources]
-        # remove any contexts with a score of 0
-        filtered_contexts = [c for c in filtered_contexts if c.score > 0]
+        # remove any contexts with a score below the cutoff
+        filtered_contexts = [
+            c
+            for c in filtered_contexts
+            if c.score >= answer_config.evidence_relevance_score_cutoff
+        ]
 
         # shim deprecated flag
         # TODO: remove in v6
