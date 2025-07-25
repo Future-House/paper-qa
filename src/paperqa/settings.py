@@ -77,6 +77,15 @@ class AnswerSettings(BaseModel):
         default=True,
         description="Whether to use retrieval instead of processing all docs.",
     )
+    # no validator because you can set the range in a prompt
+    evidence_relevance_score_cutoff: int = Field(
+        default=1,
+        ge=0,
+        description=(
+            "Relevance score cutoff for evidence retrieval, default is 1, meaning"
+            " only evidence with relevance score >= 1 will be used."
+        ),
+    )
     evidence_summary_length: str = Field(
         default="about 100 words", description="Length of evidence summary."
     )
