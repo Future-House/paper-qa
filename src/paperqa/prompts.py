@@ -77,6 +77,8 @@ select_paper_prompt = (
 citation_prompt = (
     "Provide the citation for the following text in MLA Format. "
     "Do not write an introductory sentence. "
+    "Do not fabricate a DOI such as '10.xxxx' if one cannot be found,"
+    " just leave it out of the citation. "
     f"If reporting date accessed, the current year is {datetime.now().year}\n\n"
     "{text}\n\n"
     "Citation:"
