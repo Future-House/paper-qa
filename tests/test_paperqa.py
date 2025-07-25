@@ -1,3 +1,4 @@
+import base64
 import contextlib
 import csv
 import os
@@ -52,7 +53,7 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, read_doc
-from paperqa.types import ChunkMetadata, Context
+from paperqa.types import ChunkMetadata, Context, ParsedMedia
 from paperqa.utils import (
     bytes_to_string,
     clean_possessives,
@@ -1196,9 +1197,20 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
     assert isinstance(parsed_text.content, dict)
-    assert parsed_text.metadata.total_parsed_text_length == sum(
-        len(t) for t in parsed_text.content.values()
-    )
+    if pdf_parser == pypdf_parse_pdf_to_pages:
+        assert parsed_text.metadata.total_parsed_text_length == sum(
+            len(t) for t in parsed_text.content.values()
+        )
+        if parsed_text.metadata.count_parsed_media > 1:
+            pytest.xfail("PyPDF multimodal not yet implemented")
+    elif pdf_parser == pymupdf_parse_pdf_to_pages:
+        num_chars = 0
+        for value in parsed_text.content.values():
+            assert isinstance(value, tuple)
+            num_chars += len(value[0])
+        assert parsed_text.metadata.count_parsed_media > 1
+    else:
+        raise NotImplementedError(f"Unhandled PDF parser {pdf_parser}.")
 
 
 @pytest.mark.asyncio
@@ -1245,6 +1257,16 @@ async def test_chunk_metadata_reader(
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
+    if pdf_parser == pypdf_parse_pdf_to_pages:
+        if metadata.count_parsed_media > 1:
+            pytest.xfail("PyPDF multimodal not yet implemented")
+    elif pdf_parser == pymupdf_parse_pdf_to_pages:
+        assert metadata.count_parsed_media > 1, "Expected media to be parsed"
+        assert (
+            sum(len(t.media) for t in chunk_text) == metadata.count_parsed_media
+        ), "Expected chunks' media to match parsed media"
+    else:
+        raise NotImplementedError(f"Unhandled PDF parser {pdf_parser}.")
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
@@ -1293,6 +1315,52 @@ async def test_chunk_metadata_reader(
 
 
 @pytest.mark.asyncio
+async def test_read_doc_images(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+
+    # Test parsing only
+    parsed_text = await read_doc(png_path, doc, parsed_text_only=True)
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    page_content = parsed_text.content["1"]
+    assert isinstance(page_content, tuple)
+    text_content, (parsed_image,) = page_content
+    assert not text_content, "Expected no text content for an image"
+    assert isinstance(parsed_image, ParsedMedia)
+    assert parsed_image.index == 0
+    assert isinstance(parsed_image.data, bytes)
+    assert len(parsed_image.data) > 0
+    assert not parsed_image.text, "Expected no text content for a standalone image"
+    assert parsed_image.info["suffix"] == ".png"
+    assert parsed_text.metadata.parse_type == "image"
+    assert parsed_text.metadata.count_parsed_media == 1
+    assert parsed_text.metadata.total_parsed_text_length == 0
+    assert parsed_text.metadata.chunk_metadata is None
+
+    # Test parsing + 'chunking'
+    (text,) = await read_doc(png_path, doc)
+    assert isinstance(text, Text)
+    assert text.doc == doc
+    (image,) = text.media
+    assert image == parsed_image
+
+    # Test including metadata
+    texts_with_metadata = await read_doc(png_path, doc, include_metadata=True)
+    assert isinstance(texts_with_metadata, tuple)
+    texts, metadata = texts_with_metadata
+    assert len(texts) == 1
+    assert texts[0] == text
+    assert metadata.parse_type == "image"
+    assert metadata.count_parsed_media == 1
+    assert metadata.total_parsed_text_length == 0
+    assert metadata.chunk_metadata is not None
+    assert not metadata.chunk_metadata.chunk_chars
+    assert not metadata.chunk_metadata.overlap
+    assert metadata.chunk_metadata.chunk_type == "no_chunk"
+
+
+@pytest.mark.asyncio
 async def test_code() -> None:
     settings = Settings.from_name("fast")
     docs = Docs()
@@ -1303,6 +1371,79 @@ async def test_code() -> None:
     assert len(docs.docs) == 1
     session = await docs.aquery("What file is read in by test_code?", settings=settings)
     assert "test_paperqa.py" in session.answer
+
+
+@pytest.mark.asyncio
+async def test_querying_tables(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+
+    docs = Docs()
+    assert await docs.aadd(stub_data_dir / "influence.pdf", settings=settings)
+    # Now, let's modify the system so any tables housed in the Text.text get removed,
+    # and the system can only rely on table images or markdown
+    texts_with_tables = {
+        t
+        for t in docs.texts
+        if t.media and any(m.info.get("type") == "table" for m in t.media)
+    }
+    assert texts_with_tables, "Expected some texts to have parsed tables"
+    for t in texts_with_tables:
+        # Wipe text but keep embedding (for retrieval), to confirm tables get used
+        t.text = "Placeholder"
+        # Wipe non-table media (e.g. images)
+        t.media = [m for m in t.media if m.info.get("type") == "table"]
+    docs.texts = list(texts_with_tables)
+    session = await docs.aquery(
+        "What osteotomy gap (mm) has the bone volume per slice?", settings=settings
+    )
+    assert session.used_contexts
+    used_texts = [c.text for c in session.contexts if c.id in session.used_contexts]
+    assert all(
+        [m.data for m in t.media] for t in used_texts
+    ), "Expected image data to be present in the used contexts"
+    assert any(x in session.answer for x in ("1.0 mm", "1.0-mm"))
+    assert session.cost > 0
+
+    # Filter contexts for HTTP requests, and ensure no images are present
+    session.filter_content_for_user()
+    assert session.used_contexts
+    used_texts_after_filter = [
+        c.text for c in session.contexts if c.id in session.used_contexts
+    ]
+    assert all(
+        not t.media for t in used_texts_after_filter
+    ), "Expected no media for lightweight HTTP requests"
+
+
+@pytest.mark.asyncio
+async def test_images(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+    # We don't support image embeddings yet, so disable embedding
+    settings.answer.evidence_retrieval = False
+    settings.parsing.defer_embedding = True
+
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "sf_districts.png",
+        citation=(
+            '"File:San francisco districts.png." Wikimedia Commons.'
+            " 7 Sep 2023, 07:38 UTC."
+            " <https://commons.wikimedia.org/w/index.php?title=File:San_francisco_districts.png&oldid=799209398>"
+            " July 2025."
+        ),
+        settings=settings,
+    )
+    session = await docs.aquery(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert (
+        sum(
+            district in session.answer
+            for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
+        )
+        >= 2
+    ), "Expected at least two neighbors to be matched"
+    assert session.cost > 0
 
 
 def test_zotero() -> None:

@@ -220,6 +220,13 @@ class ParsingSettings(BaseModel):
     overlap: int = Field(
         default=250, description="Number of characters to overlap chunks."
     )
+    multimodal: bool = Field(
+        default=True,
+        description=(
+            "Parse both text and images (if applicable to a given document),"
+            " or disable to parse just text."
+        ),
+    )
     citation_prompt: str = Field(
         default=citation_prompt,
         description="Prompt that tries to create citation from peeking one page.",
@@ -495,7 +502,11 @@ class IndexSettings(BaseModel):
         ),
     )
     files_filter: Callable[[anyio.Path | pathlib.Path], bool] = Field(
-        default=lambda f: f.suffix in {".txt", ".pdf", ".html", ".md"},
+        default=lambda f: (
+            f.suffix
+            # TODO: add images after embeddings are supported
+            in {".txt", ".pdf", ".html", ".md"}
+        ),
         exclude=True,
         description=(
             "Filter function to apply to files in the paper directory."
