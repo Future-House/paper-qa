@@ -885,6 +885,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `answer.max_concurrent_requests`             | `4`                                    | Max concurrent requests to LLMs.                                                                        |
 | `answer.answer_filter_extra_background`      | `False`                                | Whether to cite background info from model.                                                             |
 | `answer.get_evidence_if_no_contexts`         | `True`                                 | Allow lazy evidence gathering.                                                                          |
+| `answer.group_contexts_by_question`          | `False`                                | Groups the final contexts by the underlying `gather_evidence` question in the final context prompt.     |
 | `answer.evidence_relevance_score_cutoff`     | `1`                                    | Cutoff evidence relevance score to include in the answer context (inclusive)                            |
 | `parsing.chunk_size`                         | `5000`                                 | Characters per chunk (0 for no chunking).                                                               |
 | `parsing.page_size_limit`                    | `1,280,000`                            | Character limit per page.                                                                               |

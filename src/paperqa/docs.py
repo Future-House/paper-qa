@@ -7,6 +7,7 @@ import re
 import tempfile
 import urllib.request
 import warnings
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from io import BytesIO
@@ -29,7 +30,7 @@ from paperqa.llms import (
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
-from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
+from paperqa.types import Context, Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
     get_loop,
@@ -785,26 +786,53 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             # Only keep "\nFrom {citation}" if we are showing detailed citations
             context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
 
-        inner_context_strs = [
-            context_inner_prompt.format(
-                name=c.id,
-                text=c.context,
-                citation=c.text.doc.formatted_citation,
-                **(c.model_extra or {}),
-            )
-            for c in filtered_contexts
-        ]
+        context_str_body = ""
+        if answer_config.group_contexts_by_question:
+            contexts_by_question: dict[str, list[Context]] = defaultdict(list)
+            for c in filtered_contexts:
+                # Fallback to the main session question if not available.
+                # question attribute is optional, so if a user
+                # sets contexts externally, it may not have a question.
+                question = getattr(c, "question", session.question)
+                contexts_by_question[question].append(c)
+
+            context_sections = []
+            for question, contexts_in_group in contexts_by_question.items():
+                inner_strs = [
+                    context_inner_prompt.format(
+                        name=c.id,
+                        text=c.context,
+                        citation=c.text.doc.formatted_citation,
+                        **(c.model_extra or {}),
+                    )
+                    for c in contexts_in_group
+                ]
+                # Create a section with a question heading
+                section_header = f'Contexts related to the question: "{question}"'
+                section = f"{section_header}\n\n" + "\n\n".join(inner_strs)
+                context_sections.append(section)
+            context_str_body = "\n\n----\n\n".join(context_sections)
+        else:
+            inner_context_strs = [
+                context_inner_prompt.format(
+                    name=c.id,
+                    text=c.context,
+                    citation=c.text.doc.formatted_citation,
+                    **(c.model_extra or {}),
+                )
+                for c in filtered_contexts
+            ]
+            context_str_body = "\n\n".join(inner_context_strs)
+
         if pre_str:
-            inner_context_strs += (
-                [f"Extra background information: {pre_str}"] if pre_str else []
-            )
+            context_str_body += f"\n\nExtra background information: {pre_str}"
 
         context_str = prompt_config.context_outer.format(
-            context_str="\n\n".join(inner_context_strs),
+            context_str=context_str_body,
             valid_keys=", ".join([c.id for c in filtered_contexts]),
         )
 
-        if len(context_str) < 10:  # noqa: PLR2004
+        if len(context_str_body.strip()) < 10:  # noqa: PLR2004
             answer_text = (
                 f"{CANNOT_ANSWER_PHRASE} this question due to insufficient information."
             )
