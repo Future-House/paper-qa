@@ -113,7 +113,7 @@ class AnswerSettings(BaseModel):
     )
     group_contexts_by_question: bool = Field(
         default=False,
-        description=("Whether to group contexts by question when generating answers."),
+        description="Whether to group contexts by question when generating answers.",
     )
 
     @model_validator(mode="after")

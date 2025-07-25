@@ -807,7 +807,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 section_header = f'Contexts related to the question: "{question}"'
                 section = f"{section_header}\n\n" + "\n\n".join(inner_strs)
                 context_sections.append(section)
-            context_str_body = "\n\n---\n\n".join(context_sections)
+            context_str_body = "\n\n----\n\n".join(context_sections)
         else:
             inner_context_strs = [
                 context_inner_prompt.format(

@@ -620,7 +620,7 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
     assert "Details on how drug discovery leverages AI." in final_context_str
     assert "General facts about organic chemistry." in final_context_str
 
-    assert "\n\n---\n\n" in final_context_str
+    assert "\n\n----\n\n" in final_context_str
     q1_header_pos = final_context_str.find(
         'Contexts related to the question: "Is XAI usable in chemistry?"'
     )
@@ -630,7 +630,9 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
     context1_pos = final_context_str.find("Explanation about XAI and molecules.")
     context3_pos = final_context_str.find("General facts about organic chemistry.")
 
-    assert 0 == q1_header_pos < context1_pos
+    assert (
+        0 == q1_header_pos < context1_pos
+    ), "Expected q1 header to be first, and the context to follow."
     assert q1_header_pos < q2_header_pos
     assert q2_header_pos < context3_pos
 
