@@ -1,0 +1,127 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1073%2Fpnas.1205508109?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,7,16]],"date-time":"2025-07-16T12:53:39Z","timestamp":1752670419394},"reference-count":37,"publisher":"Proceedings
+          of the National Academy of Sciences","issue":"38","content-domain":{"domain":["www.pnas.org"],"crossmark-restriction":true},"short-container-title":["Proc.
+          Natl. Acad. Sci. U.S.A."],"published-print":{"date-parts":[[2012,9,18]]},"abstract":"<jats:p>\n            The
+          p110\u03b1 catalytic subunit (\n            <jats:italic>PIK3CA<\/jats:italic>\n            )
+          is one of the most frequently mutated genes in cancer. We have examined the
+          activation of the wild-type p110\u03b1\/p85\u03b1 and a spectrum of oncogenic
+          mutants using hydrogen\/deuterium exchange mass spectrometry (HDX-MS). We
+          find that for the wild-type enzyme, the natural transition from an inactive
+          cytosolic conformation to an activated form on membranes entails four distinct
+          events. Analysis of oncogenic mutations shows that all up-regulate the enzyme
+          by enhancing one or more of these dynamic events. We provide the first insight
+          into the activation mechanism by mutations in the linker between the adapter-binding
+          domain (ABD) and the Ras-binding domain (RBD) (G106V and G118D). These mutations,
+          which are common in endometrial cancers, enhance two of the natural activation
+          events: movement of the ABD and ABD\u2013RBD linker relative to the rest of
+          the catalytic subunit and breaking the C2\u2013iSH2 interface on binding membranes.
+          C2 domain mutants (N345K and C420R) also mimic these events, even in the absence
+          of membranes. A third event is breaking the nSH2\u2013helical domain contact
+          caused by phosphotyrosine-containing peptides binding to the enzyme, which
+          is mimicked by a helical domain mutation (E545K). Interaction of the C lobe
+          of the kinase domain with membranes is the fourth activation event, and is
+          potentiated by kinase domain mutations (e.g., H1047R). All mutations increased
+          lipid binding and basal activity, even mutants distant from the membrane surface.
+          Our results elucidate a unifying mechanism in which diverse\n            <jats:italic>PIK3CA<\/jats:italic>\n            mutations
+          stimulate lipid kinase activity by facilitating allosteric motions required
+          for catalysis on membranes.\n          <\/jats:p>","DOI":"10.1073\/pnas.1205508109","type":"journal-article","created":{"date-parts":[[2012,9,5]],"date-time":"2012-09-05T00:17:32Z","timestamp":1346804252000},"page":"15259-15264","update-policy":"http:\/\/dx.doi.org\/10.1073\/pnas.cm10313","source":"Crossref","is-referenced-by-count":261,"title":["Oncogenic
+          mutations mimic and enhance dynamic events in the natural activation of phosphoinositide
+          3-kinase p110\u03b1 (\n            <i>PIK3CA<\/i>\n            )"],"prefix":"10.1073","volume":"109","author":[{"given":"John
+          E.","family":"Burke","sequence":"first","affiliation":[{"name":"Laboratory
+          of Molecular Biology, Medical Research Council, Cambridge CB2 0QH, United
+          Kingdom"}]},{"given":"Olga","family":"Perisic","sequence":"additional","affiliation":[{"name":"Laboratory
+          of Molecular Biology, Medical Research Council, Cambridge CB2 0QH, United
+          Kingdom"}]},{"given":"Glenn R.","family":"Masson","sequence":"additional","affiliation":[{"name":"Laboratory
+          of Molecular Biology, Medical Research Council, Cambridge CB2 0QH, United
+          Kingdom"}]},{"given":"Oscar","family":"Vadas","sequence":"additional","affiliation":[{"name":"Laboratory
+          of Molecular Biology, Medical Research Council, Cambridge CB2 0QH, United
+          Kingdom"}]},{"given":"Roger L.","family":"Williams","sequence":"additional","affiliation":[{"name":"Laboratory
+          of Molecular Biology, Medical Research Council, Cambridge CB2 0QH, United
+          Kingdom"}]}],"member":"341","published-online":{"date-parts":[[2012,9,4]]},"reference":[{"key":"e_1_3_3_1_2","doi-asserted-by":"publisher","DOI":"10.1126\/science.276.5320.1848"},{"key":"e_1_3_3_2_2","doi-asserted-by":"publisher","DOI":"10.1126\/science.1096502"},{"key":"e_1_3_3_3_2","doi-asserted-by":"publisher","DOI":"10.1146\/annurev.pathol.4.110807.092311"},{"key":"e_1_3_3_4_2","doi-asserted-by":"publisher","DOI":"10.1126\/scisignal.2002165"},{"key":"e_1_3_3_5_2","doi-asserted-by":"publisher","DOI":"10.1038\/onc.2011.532"},{"key":"e_1_3_3_6_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0712169105"},{"key":"e_1_3_3_7_2","doi-asserted-by":"publisher","DOI":"10.1042\/BJ20070681"},{"key":"e_1_3_3_8_2","doi-asserted-by":"publisher","DOI":"10.1158\/1078-0432.CCR-11-2410"},{"key":"e_1_3_3_9_2","doi-asserted-by":"publisher","DOI":"10.1172\/JCI59309"},{"key":"e_1_3_3_10_2","doi-asserted-by":"publisher","DOI":"10.1128\/MCB.18.3.1379"},{"key":"e_1_3_3_11_2","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.273.46.30199"},{"key":"e_1_3_3_12_2","doi-asserted-by":"publisher","DOI":"10.1126\/science.1135394"},{"key":"e_1_3_3_13_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0908444106"},{"key":"e_1_3_3_14_2","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-11-0549"},{"key":"e_1_3_3_15_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.ccr.2009.10.016"},{"key":"e_1_3_3_16_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1009652107"},{"key":"e_1_3_3_17_2","doi-asserted-by":"publisher","DOI":"10.1038\/46319"},{"key":"e_1_3_3_18_2","doi-asserted-by":"publisher","DOI":"10.1158\/1078-0432.CCR-10-0540"},{"key":"e_1_3_3_19_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0701005104"},{"key":"e_1_3_3_20_2","doi-asserted-by":"publisher","DOI":"10.1126\/science.1150799"},{"key":"e_1_3_3_21_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0902369106"},{"key":"e_1_3_3_22_2","doi-asserted-by":"publisher","DOI":"10.1021\/ac901154s"},{"key":"e_1_3_3_23_2","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M804492200"},{"key":"e_1_3_3_24_2","doi-asserted-by":"publisher","DOI":"10.1021\/bi8000962"},{"key":"e_1_3_3_25_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.str.2011.06.003"},{"key":"e_1_3_3_26_2","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M109.021857"},{"key":"e_1_3_3_27_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.jmb.2011.09.042"},{"key":"e_1_3_3_28_2","doi-asserted-by":"publisher","DOI":"10.1038\/sj.onc.1210918"},{"key":"e_1_3_3_29_2","doi-asserted-by":"publisher","DOI":"10.1021\/bi9717340"},{"key":"e_1_3_3_30_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1107747108"},{"key":"e_1_3_3_31_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2012.01.010"},{"key":"e_1_3_3_32_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0908899107"},{"key":"e_1_3_3_33_2","doi-asserted-by":"publisher","DOI":"10.1158\/2159-8290.CD-11-0039"},{"key":"e_1_3_3_34_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2011.01.026"},{"key":"e_1_3_3_35_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.bbrc.2009.02.081"},{"key":"e_1_3_3_36_2","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-11-0445"},{"key":"e_1_3_3_37_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1108237108"}],"container-title":["Proceedings
+          of the National Academy of Sciences"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pnas.org\/doi\/pdf\/10.1073\/pnas.1205508109","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2022,4,13]],"date-time":"2022-04-13T00:33:44Z","timestamp":1649810024000},"score":1,"resource":{"primary":{"URL":"https:\/\/pnas.org\/doi\/full\/10.1073\/pnas.1205508109"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2012,9,4]]},"references-count":37,"journal-issue":{"issue":"38","published-print":{"date-parts":[[2012,9,18]]}},"alternative-id":["10.1073\/pnas.1205508109"],"URL":"https:\/\/doi.org\/10.1073\/pnas.1205508109","relation":{},"ISSN":["0027-8424","1091-6490"],"issn-type":[{"value":"0027-8424","type":"print"},{"value":"1091-6490","type":"electronic"}],"subject":[],"published":{"date-parts":[[2012,9,4]]},"assertion":[{"value":"2012-09-04","order":2,"name":"published","label":"Published","group":{"name":"publication_history","label":"Publication
+          History"}}]}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "2581"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 25 Jul 2025 21:35:26 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1073%2Fpnas.1205508109/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Burke_2012, title={Oncogenic mutations mimic and enhance
+          dynamic events in the natural activation of phosphoinositide 3-kinase p110\u03B1
+          (\n            PIK3CA\n            )}, volume={109}, ISSN={1091-6490}, url={http://dx.doi.org/10.1073/pnas.1205508109},
+          DOI={10.1073/pnas.1205508109}, number={38}, journal={Proceedings of the National
+          Academy of Sciences}, publisher={Proceedings of the National Academy of Sciences},
+          author={Burke, John E. and Perisic, Olga and Masson, Glenn R. and Vadas, Oscar
+          and Williams, Roger L.}, year={2012}, month=sep, pages={15259\u201315264}
+          }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Fri, 25 Jul 2025 21:35:26 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

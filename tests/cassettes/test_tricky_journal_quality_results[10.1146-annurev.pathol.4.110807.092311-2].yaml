@@ -1,0 +1,113 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1146%2Fannurev.pathol.4.110807.092311?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,7,25]],"date-time":"2025-07-25T10:32:43Z","timestamp":1753439563230},"reference-count":120,"publisher":"Annual
+          Reviews","issue":"1","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Annu.
+          Rev. Pathol. Mech. Dis."],"published-print":{"date-parts":[[2009,2,1]]},"abstract":"<jats:p>
+          PI3-kinase and PTEN are major positive and negative regulators, respectively,
+          of the PI3-kinase pathway, which regulates growth, survival, and proliferation.
+          These key signaling components are two of the most frequently mutated proteins
+          in human cancers, resulting in unregulated activation of PI3K signaling and
+          providing irrefutable genetic evidence of the central role of this pathway
+          in tumorigenesis. PTEN regulates PI3K signaling by dephosphorylating the lipid
+          signaling intermediate PIP<jats:sub>3<\/jats:sub>, but PTEN may have additional
+          phosphatase-independent activities, as well as other functions in the nucleus.
+          In this review, we highlight current work showing cancer-relevant complexities
+          in the regulation of PTEN and PI3K activity, potential novel functions for
+          PTEN, and feedback regulation within the pathway. The significance and complexity
+          of PI3K signaling make it an important but challenging therapeutic target
+          for cancer. <\/jats:p>","DOI":"10.1146\/annurev.pathol.4.110807.092311","type":"journal-article","created":{"date-parts":[[2008,9,3]],"date-time":"2008-09-03T18:23:28Z","timestamp":1220466208000},"page":"127-150","source":"Crossref","is-referenced-by-count":1003,"title":["PTEN
+          and the PI3-Kinase Pathway in Cancer"],"prefix":"10.1146","volume":"4","author":[{"given":"Nader","family":"Chalhoub","sequence":"first","affiliation":[{"name":"Department
+          of Developmental Neurobiology, St. Jude Children''s Research Hospital, Memphis,
+          Tennessee 38105-2794;"}]},{"given":"Suzanne J.","family":"Baker","sequence":"additional","affiliation":[{"name":"Department
+          of Developmental Neurobiology, St. Jude Children''s Research Hospital, Memphis,
+          Tennessee 38105-2794;"}]}],"member":"22","reference":[{"key":"B1","doi-asserted-by":"publisher","DOI":"10.1038\/nrg1879"},{"key":"B2","doi-asserted-by":"publisher","DOI":"10.1016\/S1097-2765(01)00191-5"},{"key":"B3","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0506925102"},{"key":"B4","doi-asserted-by":"publisher","DOI":"10.1083\/jcb.200112050"},{"key":"B5","doi-asserted-by":"publisher","DOI":"10.1016\/j.semcdb.2003.12.022"},{"key":"B6","doi-asserted-by":"publisher","DOI":"10.1126\/science.1106148"},{"key":"B7","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M406731200"},{"key":"B8","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2006.01.016"},{"key":"B9","doi-asserted-by":"publisher","DOI":"10.1038\/nrc2037"},{"key":"B10","doi-asserted-by":"publisher","DOI":"10.1111\/j.1572-0241.2005.40237.x"},{"key":"B11","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2007.06.009"},{"key":"B12","doi-asserted-by":"publisher","DOI":"10.1038\/35096075"},{"key":"B13","doi-asserted-by":"publisher","DOI":"10.1038\/nrc839"},{"key":"B14","doi-asserted-by":"publisher","DOI":"10.1016\/j.cmet.2007.10.002"},{"key":"B15","doi-asserted-by":"publisher","DOI":"10.1038\/nrm1435"},{"key":"B16","doi-asserted-by":"publisher","DOI":"10.1038\/315239a0"},{"key":"B17","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.81.7.2117"},{"key":"B18","doi-asserted-by":"publisher","DOI":"10.1016\/0092-8674(91)90411-Q"},{"key":"B19","doi-asserted-by":"publisher","DOI":"10.1016\/0092-8674(91)90409-R"},{"key":"B20","doi-asserted-by":"publisher","DOI":"10.1128\/MCB.12.3.981"},{"key":"B21","doi-asserted-by":"publisher","DOI":"10.1128\/MCB.12.4.1451"},{"key":"B22","doi-asserted-by":"publisher","DOI":"10.1126\/science.276.5320.1848"},{"key":"B23","doi-asserted-by":"publisher","DOI":"10.1126\/science.1096502"},{"key":"B24","doi-asserted-by":"publisher","DOI":"10.1016\/j.tibs.2007.05.005"},{"key":"B25","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0408864102"},{"key":"B26","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-05-2612"},{"key":"B27","doi-asserted-by":"publisher","DOI":"10.1016\/j.ccr.2005.05.014"},{"key":"B28","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0508988102"},{"key":"B29","doi-asserted-by":"publisher","DOI":"10.1038\/46319"},{"key":"B30","doi-asserted-by":"publisher","DOI":"10.1126\/science.1135394"},{"key":"B31","doi-asserted-by":"publisher","DOI":"10.1126\/science.1150799"},{"key":"B31a","doi-asserted-by":"publisher","DOI":"10.1126\/science.1146073"},{"key":"B32","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2007.03.051"},{"key":"B33","doi-asserted-by":"publisher","DOI":"10.1016\/j.canlet.2005.11.042"},{"key":"B34","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.84.14.5034"},{"key":"B35","doi-asserted-by":"publisher","DOI":"10.1111\/j.1750-3639.2003.tb00481.x"},{"key":"B36","doi-asserted-by":"publisher","DOI":"10.1002\/gcc.10087"},{"key":"B37","doi-asserted-by":"publisher","DOI":"10.1002\/ijc.20711"},{"key":"B38","doi-asserted-by":"publisher","DOI":"10.4161\/cbt.5.7.2751"},{"key":"B39","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.93.8.3636"},{"key":"B40","doi-asserted-by":"publisher","DOI":"10.1002\/ijc.2910640412"},{"key":"B41","doi-asserted-by":"publisher","DOI":"10.1038\/nature05933"},{"key":"B42","doi-asserted-by":"publisher","DOI":"10.1038\/ng0497-356"},{"key":"B43","doi-asserted-by":"publisher","DOI":"10.1126\/science.275.5308.1943"},{"key":"B44","first-page":"2124","volume":"57","author":"Li
+          DM","year":"1997","journal-title":"Cancer Res."},{"key":"B45","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.273.22.13375"},{"key":"B46","doi-asserted-by":"publisher","DOI":"10.1093\/jnci\/91.22.1922"},{"key":"B47","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.95.23.13513"},{"key":"B48","doi-asserted-by":"publisher","DOI":"10.1101\/gad.1596707"},{"key":"B49","doi-asserted-by":"publisher","DOI":"10.1146\/annurev.pathol.2.010506.091905"},{"key":"B50","doi-asserted-by":"publisher","DOI":"10.1111\/j.1349-7006.2007.00670.x"},{"key":"B51","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-05-2620"},{"key":"B52","doi-asserted-by":"publisher","DOI":"10.1158\/1078-0432.CCR-06-1375"},{"key":"B53","doi-asserted-by":"publisher","DOI":"10.1038\/ng0597-64"},{"key":"B54","doi-asserted-by":"publisher","DOI":"10.1002\/humu.10257"},{"key":"B55","doi-asserted-by":"publisher","DOI":"10.1242\/jcs.015230"},{"key":"B56","doi-asserted-by":"publisher","DOI":"10.1038\/ng.2007.39"},{"key":"B57","doi-asserted-by":"publisher","DOI":"10.1371\/journal.pbio.0000059"},{"key":"B58","doi-asserted-by":"publisher","DOI":"10.1016\/S0092-8674(00)81663-3"},{"key":"B59","doi-asserted-by":"publisher","DOI":"10.4161\/cc.5.14.3005"},{"key":"B60","first-page":"2636","volume":"7","author":"Minaguchi
+          T","year":"2001","journal-title":"Clin. Cancer Res."},{"key":"B61","doi-asserted-by":"publisher","DOI":"10.1182\/blood.V91.11.4388"},{"key":"B62","first-page":"7033","volume":"60","author":"Georgescu
+          MM","year":"2000","journal-title":"Cancer Res."},{"key":"B63","doi-asserted-by":"publisher","DOI":"10.1038\/sj.onc.1203331"},{"key":"B64","doi-asserted-by":"publisher","DOI":"10.1038\/sj.onc.1205296"},{"key":"B65","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.96.18.10182"},{"key":"B66","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0932835100"},{"key":"B67","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2006.11.039"},{"key":"B68","doi-asserted-by":"publisher","DOI":"10.1091\/mbc.e06-04-0301"},{"key":"B69","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.C400377200"},{"key":"B70","doi-asserted-by":"publisher","DOI":"10.1016\/j.ccr.2005.02.010"},{"key":"B71","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0409370102"},{"key":"B72","doi-asserted-by":"publisher","DOI":"10.1006\/geno.1999.6101"},{"key":"B73","doi-asserted-by":"publisher","DOI":"10.1200\/JCO.2000.18.3.636"},{"key":"B74","first-page":"1358","volume":"7","author":"Mora
+          J","year":"2001","journal-title":"Clin. Cancer Res."},{"key":"B75","first-page":"4100","volume":"62","author":"Hartmann
+          C","year":"2002","journal-title":"Cancer Res."},{"key":"B76","doi-asserted-by":"publisher","DOI":"10.1002\/jcb.21518"},{"key":"B77","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M605391200"},{"key":"B78","doi-asserted-by":"publisher","DOI":"10.1091\/mbc.e04-05-0369"},{"key":"B79","doi-asserted-by":"publisher","DOI":"10.1016\/S0002-9440(10)64200-9"},{"key":"B80","doi-asserted-by":"publisher","DOI":"10.1016\/S0002-9440(10)64624-X"},{"key":"B81","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-05-0124"},{"key":"B82","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M207608200"},{"key":"B83","doi-asserted-by":"publisher","DOI":"10.1091\/mbc.e06-05-0380"},{"key":"B84","doi-asserted-by":"publisher","DOI":"10.1002\/jcb.20525"},{"key":"B85","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2006.11.040"},{"key":"B86","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2006.12.023"},{"key":"B87","doi-asserted-by":"publisher","DOI":"10.1242\/jcs.022459"},{"key":"B88","doi-asserted-by":"publisher","DOI":"10.1016\/j.ccr.2005.01.009"},{"key":"B89","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2006.11.042"},{"key":"B90","doi-asserted-by":"publisher","DOI":"10.1016\/S0960-9822(00)00417-6"},{"key":"B91","doi-asserted-by":"publisher","DOI":"10.1126\/science.1092089"},{"key":"B92","doi-asserted-by":"publisher","DOI":"10.1126\/science.280.5369.1614"},{"key":"B93","doi-asserted-by":"publisher","DOI":"10.1038\/ng781"},{"key":"B94","doi-asserted-by":"crossref","first-page":"3513","DOI":"10.1242\/dev.129.14.3513","volume":"129","author":"Marino
+          S","year":"2002","journal-title":"Development"},{"key":"B95","doi-asserted-by":"publisher","DOI":"10.1126\/science.1065518"},{"key":"B96","doi-asserted-by":"publisher","DOI":"10.1038\/nature04747"},{"key":"B97","doi-asserted-by":"publisher","DOI":"10.1038\/nature04703"},{"key":"B98","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.0509939103"},{"key":"B99","doi-asserted-by":"publisher","DOI":"10.1038\/nature03918"},{"key":"B100","first-page":"6357","volume":"63","author":"Zhou
+          M","year":"2003","journal-title":"Cancer Res."},{"key":"B101","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2006.06.028"},{"key":"B102","doi-asserted-by":"publisher","DOI":"10.1016\/S1535-6108(03)00021-7"},{"key":"B103","doi-asserted-by":"publisher","DOI":"10.1016\/S0968-0004(02)02166-7"},{"key":"B104","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M401488200"},{"key":"B105","doi-asserted-by":"publisher","DOI":"10.1128\/MCB.00537-06"},{"key":"B106","doi-asserted-by":"publisher","DOI":"10.1038\/1235"},{"key":"B107","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.96.4.1563"},{"key":"B108","doi-asserted-by":"publisher","DOI":"10.1016\/S0960-9822(07)00488-5"},{"key":"B109","doi-asserted-by":"publisher","DOI":"10.1038\/nrd1902"},{"key":"B110","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.2132711100"},{"key":"B111","doi-asserted-by":"publisher","DOI":"10.1016\/j.ccr.2007.05.008"},{"key":"B112","doi-asserted-by":"publisher","DOI":"10.1038\/nature02866"},{"key":"B113","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-05-2925"},{"key":"B114","doi-asserted-by":"publisher","DOI":"10.1101\/gad.1314605"},{"key":"B115","doi-asserted-by":"publisher","DOI":"10.1101\/gad.1314405"},{"key":"B116","doi-asserted-by":"publisher","DOI":"10.1042\/BST0350245"},{"key":"B117","doi-asserted-by":"publisher","DOI":"10.1016\/j.ccr.2006.03.029"},{"key":"B118","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-06-4615"},{"key":"B119","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-06-3782"}],"container-title":["Annual
+          Review of Pathology: Mechanisms of Disease"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/www.annualreviews.org\/doi\/pdf\/10.1146\/annurev.pathol.4.110807.092311","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2021,10,16]],"date-time":"2021-10-16T04:22:37Z","timestamp":1634358157000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.annualreviews.org\/doi\/10.1146\/annurev.pathol.4.110807.092311"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2009,2,1]]},"references-count":120,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2009,2,1]]}},"alternative-id":["10.1146\/annurev.pathol.4.110807.092311"],"URL":"https:\/\/doi.org\/10.1146\/annurev.pathol.4.110807.092311","relation":{},"ISSN":["1553-4006","1553-4014"],"issn-type":[{"value":"1553-4006","type":"print"},{"value":"1553-4014","type":"electronic"}],"subject":[],"published":{"date-parts":[[2009,2,1]]}}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "3229"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 25 Jul 2025 21:35:31 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1146%2Fannurev.pathol.4.110807.092311/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Chalhoub_2009, title={PTEN and the PI3-Kinase Pathway in
+          Cancer}, volume={4}, ISSN={1553-4014}, url={http://dx.doi.org/10.1146/annurev.pathol.4.110807.092311},
+          DOI={10.1146/annurev.pathol.4.110807.092311}, number={1}, journal={Annual
+          Review of Pathology: Mechanisms of Disease}, publisher={Annual Reviews}, author={Chalhoub,
+          Nader and Baker, Suzanne J.}, year={2009}, month=feb, pages={127\u2013150}
+          }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Fri, 25 Jul 2025 21:35:31 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -1,0 +1,289 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.semcdb.2016.08.024?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,7,2]],"date-time":"2024-07-02T07:52:42Z","timestamp":1719906762338},"reference-count":81,"publisher":"Elsevier
+          BV","license":[{"start":{"date-parts":[[2017,4,1]],"date-time":"2017-04-01T00:00:00Z","timestamp":1491004800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"}],"funder":[{"DOI":"10.13039\/501100012150","name":"Shanghai
+          Leading Academic Discipline Project","doi-asserted-by":"crossref","award":["B115"],"id":[{"id":"10.13039\/501100012150","id-type":"DOI","asserted-by":"crossref"}]},{"DOI":"10.13039\/501100001809","name":"The
+          National Nature Science Foundation of China","doi-asserted-by":"crossref","award":["91230204","81270099","81320108001","81270131","81400035","81570075","81500058","81500025"],"id":[{"id":"10.13039\/501100001809","id-type":"DOI","asserted-by":"crossref"}]},{"name":"The
+          Shanghai Committee of Science and Technology","award":["12JC1402200","12431900207","11410708600"]},{"DOI":"10.13039\/501100004731","name":"Zhejiang
+          Provincial Natural Science Foundation","doi-asserted-by":"crossref","award":["Z15H010002"],"id":[{"id":"10.13039\/501100004731","id-type":"DOI","asserted-by":"crossref"}]},{"name":"Zhejiang
+          Provincial Science Technology Department Foundation","award":["WKJ-ZJ-1526"]}],"content-domain":{"domain":["elsevier.com","sciencedirect.com"],"crossmark-restriction":true},"short-container-title":["Seminars
+          in Cell &amp; Developmental Biology"],"published-print":{"date-parts":[[2017,4]]},"DOI":"10.1016\/j.semcdb.2016.08.024","type":"journal-article","created":{"date-parts":[[2016,9,3]],"date-time":"2016-09-03T06:09:21Z","timestamp":1472882961000},"page":"116-124","update-policy":"http:\/\/dx.doi.org\/10.1016\/elsevier_cm_policy","source":"Crossref","is-referenced-by-count":7,"special_numbering":"C","title":["The
+          impact of heterogeneity in phosphoinositide 3-kinase pathway in human cancer
+          and possible therapeutic treatments"],"prefix":"10.1016","volume":"64","author":[{"given":"William","family":"Wang","sequence":"first","affiliation":[]},{"given":"Jiapei","family":"Lv","sequence":"additional","affiliation":[]},{"given":"Lingyan","family":"Wang","sequence":"additional","affiliation":[]},{"given":"Xiangdong","family":"Wang","sequence":"additional","affiliation":[]},{"given":"Ling","family":"Ye","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/j.semcdb.2016.08.024_bib0005","doi-asserted-by":"crossref","first-page":"40","DOI":"10.3389\/fonc.2013.00040","article-title":"p110delta
+          PI3 kinase pathway: emerging roles in cancer","volume":"3","author":"Tzenaki","year":"2013","journal-title":"Front.
+          Oncol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0010","doi-asserted-by":"crossref","first-page":"26ra5","DOI":"10.1126\/scitranslmed.3000251","article-title":"Airway
+          PI3K pathway activation is an early and reversible event in lung cancer development","volume":"2","author":"Gustafson","year":"2010","journal-title":"Sci.
+          Trans. Med."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0015","doi-asserted-by":"crossref","first-page":"235","DOI":"10.2174\/1568009043333032","article-title":"The
+          Akt pathway: molecular targets for anti-cancer drug development","volume":"4","author":"Mitsiades","year":"2004","journal-title":"Curr.
+          Cancer Drug Targets"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0020","doi-asserted-by":"crossref","first-page":"243","DOI":"10.1016\/S0163-7258(02)00193-6","article-title":"Inhibition
+          of protein kinase B\/Akt: implications for cancer therapy","volume":"93","author":"Hill","year":"2002","journal-title":"Pharmacol.
+          Therap."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0025","doi-asserted-by":"crossref","first-page":"77","DOI":"10.1097\/01.cco.0000198021.99347.b9","article-title":"Oncogenic
+          PI3K and its role in cancer","volume":"18","author":"Samuels","year":"2006","journal-title":"Curr.
+          Opin. Oncol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0030","doi-asserted-by":"crossref","first-page":"2954","DOI":"10.1200\/JCO.2004.02.141","article-title":"The
+          biology and clinical relevance of the PTEN tumor suppressor pathway","volume":"22","author":"Sansal","year":"2004","journal-title":"J.
+          Clin. Oncol. Off. J. Am. Soc. Clin. Oncol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0035","doi-asserted-by":"crossref","first-page":"219","DOI":"10.1016\/S0955-0674(99)80029-5","article-title":"Signalling
+          through phosphoinositide 3-kinases: the lipids take centre stage","volume":"11","author":"Leevers","year":"1999","journal-title":"Curr.
+          Opin. Cell Biol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0040","doi-asserted-by":"crossref","first-page":"1309","DOI":"10.4161\/cc.4.10.2062","article-title":"The
+          negative regulation of phosphoinositide 3-kinase signaling by p85 and it''s
+          implication in cancer","volume":"4","author":"Luo","year":"2005","journal-title":"Cell
+          Cycle"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0045","doi-asserted-by":"crossref","first-page":"1","DOI":"10.1080\/07391102.2015.1127774","article-title":"Biophysical
+          aspect of phosphatidylinositol 3-kinase and role of oncogenic mutants (E542K
+          & E545K)","author":"Kalsi","year":"2016","journal-title":"J. Biomol. Struct.
+          Dyn."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0050","doi-asserted-by":"crossref","first-page":"1744","DOI":"10.1126\/science.1150799","article-title":"The
+          structure of a human p110alpha\/p85alpha complex elucidates the effects of
+          oncogenic PI3Kalpha mutations","volume":"318","author":"Huang","year":"2007","journal-title":"Science"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0055","doi-asserted-by":"crossref","first-page":"239","DOI":"10.1126\/science.1135394","article-title":"Mechanism
+          of two classes of cancer mutations in the phosphoinositide 3-kinase catalytic
+          subunit","volume":"317","author":"Miled","year":"2007","journal-title":"Science"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0060","doi-asserted-by":"crossref","first-page":"3528","DOI":"10.1111\/febs.13365","article-title":"Oncogenic
+          mutations weaken the interactions that stabilize the p110alpha-p85alpha heterodimer
+          in phosphatidylinositol 3-kinase alpha","volume":"282","author":"Echeverria","year":"2015","journal-title":"FEBS
+          J."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0065","doi-asserted-by":"crossref","first-page":"89","DOI":"10.1007\/s12551-013-0131-1","article-title":"Activation
+          of PI3Kalpha by physiological effectors and by oncogenic mutations: structural
+          and dynamic effects","volume":"6","author":"Gabelli","year":"2014","journal-title":"Biophys.
+          Rev."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0070","doi-asserted-by":"crossref","first-page":"331","DOI":"10.1038\/nature13001","article-title":"The
+          ensemble nature of allostery","volume":"508","author":"Motlagh","year":"2014","journal-title":"Nature"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0075","doi-asserted-by":"crossref","first-page":"16996","DOI":"10.1073\/pnas.0908444106","article-title":"A
+          frequent kinase domain mutation that changes the interaction between PI3Kalpha
+          and the membrane","volume":"106","author":"Mandelker","year":"2009","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0080","doi-asserted-by":"crossref","first-page":"1127","DOI":"10.1016\/j.str.2011.06.003","article-title":"Dynamics
+          of the phosphoinositide 3-kinase p110delta interaction with p85alpha and membranes
+          reveals aspects of regulation distinct from p110alpha","volume":"19","author":"Burke","year":"2011","journal-title":"Structure"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0085","doi-asserted-by":"crossref","first-page":"615","DOI":"10.1146\/annurev.cellbio.17.1.615","article-title":"Cellular
+          function of phosphoinositide 3-kinases: implications for development, homeostasis,
+          and cancer","volume":"17","author":"Katso","year":"2001","journal-title":"Annu.
+          Rev. of Cell Dev. Biol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0090","first-page":"6105","article-title":"Overexpression
+          and overactivation of Akt in thyroid carcinoma","volume":"61","author":"Ringel","year":"2001","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0095","doi-asserted-by":"crossref","first-page":"567","DOI":"10.1126\/science.277.5325.567","article-title":"Dual
+          role of phosphatidylinositol-3,4,5-trisphosphate in the activation of protein
+          kinase B","volume":"277","author":"Stokoe","year":"1997","journal-title":"Science"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0100","doi-asserted-by":"crossref","first-page":"3691","DOI":"10.1074\/jbc.M111.322677","article-title":"Identification
+          of functionally distinct TRAF proinflammatory and phosphatidylinositol 3-kinase\/mitogen-activated
+          protein kinase\/extracellular signal-regulated kinase kinase (PI3K\/MEK) transforming
+          activities emanating from RET\/PTC fusion oncoprotein","volume":"287","author":"Wixted","year":"2012","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0105","doi-asserted-by":"crossref","first-page":"163","DOI":"10.1016\/S0092-8674(02)00808-5","article-title":"mTOR
+          interacts with raptor to form a nutrient-sensitive complex that signals to
+          the cell growth machinery","volume":"110","author":"Kim","year":"2002","journal-title":"Cell"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0110","doi-asserted-by":"crossref","first-page":"1296","DOI":"10.1016\/j.cub.2004.06.054","article-title":"Rictor,
+          a novel binding partner of mTOR, defines a rapamycin-insensitive and raptor-independent
+          pathway that regulates the cytoskeleton","volume":"14","author":"Sarbassov","year":"2004","journal-title":"Curr.
+          Biol. CB"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0115","doi-asserted-by":"crossref","first-page":"217","DOI":"10.1042\/BST0370217","article-title":"A
+          complex interplay between Akt, TSC2 and the two mTOR complexes","volume":"37","author":"Huang","year":"2009","journal-title":"Biochem.
+          Soc. Trans."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0120","doi-asserted-by":"crossref","first-page":"397","DOI":"10.1016\/j.molonc.2010.05.002","article-title":"Cell
+          of origin of lung cancer","volume":"4","author":"Sutherland","year":"2010","journal-title":"Mol.
+          Oncol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0125","doi-asserted-by":"crossref","first-page":"1696","DOI":"10.4161\/cc.6.14.4492","article-title":"New
+          functions for PI3K in the control of cell division","volume":"6","author":"Kumar","year":"2007","journal-title":"Cell
+          cycle"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0130","doi-asserted-by":"crossref","first-page":"481","DOI":"10.1146\/annurev.biochem.67.1.481","article-title":"Phosphoinositide
+          kinases","volume":"67","author":"Fruman","year":"1998","journal-title":"Annu.
+          Rev. Biochem."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0135","doi-asserted-by":"crossref","first-page":"e1651","DOI":"10.1371\/journal.pone.0001651","article-title":"Gene
+          expression signature of cigarette smoking and its role in lung adenocarcinoma
+          development and survival","volume":"3","author":"Landi","year":"2008","journal-title":"PLoS
+          One"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0140","doi-asserted-by":"crossref","first-page":"9744","DOI":"10.3748\/wjg.v20.i29.9744","article-title":"p38alpha
+          MAPK pathway: a key factor in colorectal cancer therapy and chemoresistance","volume":"20","author":"Grossi","year":"2014","journal-title":"World
+          J. Gastroenterol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0145","doi-asserted-by":"crossref","first-page":"2835","DOI":"10.1073\/pnas.0813351106","article-title":"Knockin
+          of mutant PIK3CA activates multiple oncogenic pathways","volume":"106","author":"Gustin","year":"2009","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0150","doi-asserted-by":"crossref","first-page":"e0141763","DOI":"10.1371\/journal.pone.0141763","article-title":"Analysis
+          of PIK3CA mutations and activation pathways in triple negative breast cancer","volume":"10","author":"Cossu-Rocca","year":"2015","journal-title":"PLoS
+          One"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0155","doi-asserted-by":"crossref","first-page":"2961","DOI":"10.1038\/onc.2015.377","article-title":"PIK3CA(H1047R)-
+          and Her2-initiated mammary tumors escape PI3K dependency by compensatory activation
+          of MEK-ERK signaling","volume":"35","author":"Cheng","year":"2016","journal-title":"Oncogene"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0160","doi-asserted-by":"crossref","first-page":"334","DOI":"10.1158\/2159-8290.CD-13-0611","article-title":"Rapid
+          induction of apoptosis by PI3K inhibitors is dependent upon their transient
+          inhibition of RAS-ERK signaling","volume":"4","author":"Will","year":"2014","journal-title":"Cancer
+          Discov."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0165","doi-asserted-by":"crossref","first-page":"2652","DOI":"10.1073\/pnas.0712169105","article-title":"Helical
+          domain and kinase domain mutations in p110alpha of phosphatidylinositol 3-kinase
+          induce gain of function by different mechanisms","volume":"105","author":"Zhao","year":"2008","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0170","doi-asserted-by":"crossref","first-page":"7033","DOI":"10.1007\/s13277-016-4924-2","article-title":"Mutation
+          distributions and clinical correlations of PIK3CA gene mutations in breast
+          cancer","volume":"37","author":"Dirican","year":"2016","journal-title":"Tumour
+          Biol. J. Int. Soc. Oncodev. Biol. Med."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0175","doi-asserted-by":"crossref","first-page":"6255","DOI":"10.1038\/srep06255","article-title":"Prognostic
+          role of PIK3CA mutations and their association with hormone receptor expression
+          in breast cancer: a meta-analysis","volume":"4","author":"Pang","year":"2014","journal-title":"Sci.
+          Rep."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0180","doi-asserted-by":"crossref","first-page":"3989","DOI":"10.1158\/0008-5472.CAN-15-3174","article-title":"Molecular
+          insights of pathways resulting from two common PIK3CA mutations in breast
+          cancer","volume":"76","author":"Bhat-Nakshatri","year":"2016","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0185","doi-asserted-by":"crossref","first-page":"17","DOI":"10.1016\/j.sbi.2014.11.005","article-title":"Allostery
+          without a conformational change: revisiting the paradigm","volume":"30","author":"Nussinov","year":"2015","journal-title":"Curr.
+          Opin. Struct. Biol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0190","doi-asserted-by":"crossref","first-page":"647","DOI":"10.1016\/j.jmb.2012.11.041","article-title":"Impact
+          of mutations on the allosteric conformational equilibrium","volume":"425","author":"Weinkam","year":"2013","journal-title":"J.
+          Mol. Biol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0195","doi-asserted-by":"crossref","first-page":"5569","DOI":"10.1073\/pnas.0701005104","article-title":"Rare
+          cancer-specific mutations in PIK3CA show gain of function","volume":"104","author":"Gymnopoulos","year":"2007","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0200","doi-asserted-by":"crossref","first-page":"2875","DOI":"10.1158\/1078-0432.CCR-04-2142","article-title":"Frequent
+          mutation of the PIK3CA gene in ovarian and breast cancers","volume":"11","author":"Levine","year":"2005","journal-title":"Clin.
+          Cancer Res. Off. J. Am. Assoc. Cancer Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0205","doi-asserted-by":"crossref","first-page":"1477","DOI":"10.1038\/sj.onc.1208304","article-title":"PIK3CA
+          gene is frequently mutated in breast carcinomas and hepatocellular carcinomas","volume":"24","author":"Lee","year":"2005","journal-title":"Oncogene"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0210","doi-asserted-by":"crossref","first-page":"519","DOI":"10.1042\/BJ20070681","article-title":"Effects
+          of oncogenic p110alpha subunit mutations on the lipid kinase activity of phosphoinositide
+          3-kinase","volume":"409","author":"Carson","year":"2008","journal-title":"Biochem.
+          J."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0215","doi-asserted-by":"crossref","first-page":"1061","DOI":"10.1038\/nature07385","article-title":"Comprehensive
+          genomic characterization defines human glioblastoma genes and core pathways","volume":"455","author":"Cancer
+          Genome Atlas Research N","year":"2008","journal-title":"Nature"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0220","doi-asserted-by":"crossref","first-page":"3655","DOI":"10.1038\/onc.2011.532","article-title":"Regulation
+          of lipid binding underlies the activation mechanism of class IA PI3-kinases","volume":"31","author":"Hon","year":"2012","journal-title":"Oncogene"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0225","doi-asserted-by":"crossref","first-page":"5486","DOI":"10.1038\/onc.2008.244","article-title":"Class
+          I PI3K in oncogenic cellular transformation","volume":"27","author":"Zhao","year":"2008","journal-title":"Oncogene"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0230","doi-asserted-by":"crossref","first-page":"485","DOI":"10.1158\/1535-7163.MCT-11-0692","article-title":"Coexistence
+          of PIK3CA and other oncogene mutations in lung adenocarcinoma-rationale for
+          comprehensive mutation profiling","volume":"11","author":"Chaft","year":"2012","journal-title":"Mol.
+          Cancer Therap."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0235","doi-asserted-by":"crossref","first-page":"374","DOI":"10.1016\/j.lungcan.2013.12.011","article-title":"Prediction
+          for response duration to epidermal growth factor receptor-tyrosine kinase
+          inhibitors in EGFR mutated never smoker lung adenocarcinoma","volume":"83","author":"Kim","year":"2014","journal-title":"Lung
+          Cancer"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0240","doi-asserted-by":"crossref","first-page":"210","DOI":"10.1186\/s12885-016-2249-6","article-title":"Mutational
+          status of synchronous and metachronous tumor samples in patients with metastatic
+          non-small-cell lung cancer","volume":"16","author":"Quere","year":"2016","journal-title":"BMC
+          Cancer"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0245","doi-asserted-by":"crossref","first-page":"2695","DOI":"10.1172\/JCI28656","article-title":"Allelic
+          dilution obscures detection of a biologically significant resistance mutation
+          in EGFR-amplified lung cancer","volume":"116","author":"Engelman","year":"2006","journal-title":"J.
+          Clin. Invest."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0250","doi-asserted-by":"crossref","first-page":"554","DOI":"10.1126\/science.1096502","article-title":"High
+          frequency of mutations of the PIK3CA gene in human cancers","volume":"304","author":"Samuels","year":"2004","journal-title":"Science"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0255","doi-asserted-by":"crossref","first-page":"772","DOI":"10.4161\/cbt.3.8.994","article-title":"The
+          PIK3CA gene is mutated with high frequency in human breast cancers","volume":"3","author":"Bachman","year":"2004","journal-title":"Cancer
+          Biol. Ther."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0260","doi-asserted-by":"crossref","first-page":"2554","DOI":"10.1158\/0008-5472-CAN-04-3913","article-title":"PIK3CA
+          mutations correlate with hormone receptors, node metastasis, and ERBB2, and
+          are mutually exclusive with PTEN loss in human breast carcinoma","volume":"65","author":"Saal","year":"2005","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0265","doi-asserted-by":"crossref","first-page":"561","DOI":"10.1016\/j.ccr.2005.05.014","article-title":"Mutant
+          PIK3CA promotes cell growth and invasion of human cancer cells","volume":"7","author":"Samuels","year":"2005","journal-title":"Cancer
+          Cell"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0270","doi-asserted-by":"crossref","first-page":"643","DOI":"10.1038\/nrclinonc.2013.170","article-title":"Gastric
+          cancer-molecular and clinical dimensions","volume":"10","author":"Wadhwa","year":"2013","journal-title":"Nat.
+          Rev. Clin. Oncol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0275","doi-asserted-by":"crossref","first-page":"6201","DOI":"10.18632\/oncotarget.6641","article-title":"Mutations
+          in PI3K\/AKT pathway genes and amplifications of PIK3CA are associated with
+          patterns of recurrence in gastric cancers","volume":"7","author":"Fang","year":"2016","journal-title":"Oncotarget"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0280","doi-asserted-by":"crossref","first-page":"202","DOI":"10.1038\/nature13480","article-title":"Comprehensive
+          molecular characterization of gastric adenocarcinoma","volume":"513","author":"Cancer
+          Genome Atlas Research","year":"2014","journal-title":"Nature"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0285","doi-asserted-by":"crossref","first-page":"3261","DOI":"10.1038\/ncomms4261","article-title":"Transdifferentiation
+          of lung adenocarcinoma in mice with Lkb1 deficiency to squamous cell carcinoma","volume":"5","author":"Han","year":"2014","journal-title":"Nat.
+          Commun."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0290","doi-asserted-by":"crossref","first-page":"1315","DOI":"10.18632\/oncotarget.2834","article-title":"PIK3CA
+          mutations in non-small cell lung cancer (NSCLC): genetic heterogeneity, prognostic
+          impact and incidence of prior malignancies","volume":"6","author":"Scheffler","year":"2015","journal-title":"Oncotarget"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0295","doi-asserted-by":"crossref","first-page":"2758","DOI":"10.1111\/febs.12175","article-title":"Mouse
+          models of PIK3CA mutations: one mutation initiates heterogeneous mammary tumors","volume":"280","author":"Koren","year":"2013","journal-title":"FEBS
+          J."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0300","doi-asserted-by":"crossref","first-page":"2706","DOI":"10.1158\/0008-5472.CAN-10-0738","article-title":"Cooperation
+          between Pik3ca and p53 mutations in mouse mammary tumor formation","volume":"71","author":"Adams","year":"2011","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0305","doi-asserted-by":"crossref","first-page":"2366","DOI":"10.1158\/0008-5472.CAN-07-5783","article-title":"Characterization
+          of an Akt kinase inhibitor with potent pharmacodynamic and antitumor activity","volume":"68","author":"Rhodes","year":"2008","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0310","doi-asserted-by":"crossref","first-page":"1722","DOI":"10.1128\/MCB.16.4.1722","article-title":"Wortmannin
+          inactivates phosphoinositide 3-kinase by covalent modification of Lys-802,
+          a residue involved in the phosphate transfer reaction","volume":"16","author":"Wymann","year":"1996","journal-title":"Mol.
+          Cell. Biol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0315","first-page":"1135","article-title":"In
+          vitro and in vivo antitumor activity of the phosphatidylinositol-3-kinase
+          inhibitor, wortmannin","volume":"15","author":"Schultz","year":"1995","journal-title":"Anticancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0320","doi-asserted-by":"crossref","first-page":"95","DOI":"10.1042\/bj3510095","article-title":"Specificity
+          and mechanism of action of some commonly used protein kinase inhibitors","volume":"351","author":"Davies","year":"2000","journal-title":"Biochem.
+          J."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0325","first-page":"234","article-title":"Activation
+          of the PI3K\/Akt pathway and chemotherapeutic resistance","volume":"5","author":"West","year":"2002","journal-title":"Drug
+          Resist. Updates Rev. Commentaries Antimicrob. Anticancer Chemother."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0330","doi-asserted-by":"crossref","first-page":"88","DOI":"10.1097\/MPA.0b013e3182a44ab4","article-title":"Dual
+          inhibition of PI3K and mTOR signaling pathways decreases human pancreatic
+          neuroendocrine tumor metastatic progression","volume":"43","author":"Djukom","year":"2014","journal-title":"Pancreas"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0335","doi-asserted-by":"crossref","first-page":"44113","DOI":"10.1074\/jbc.M405323200","article-title":"Human
+          intestinal epithelial cell survival and anoikis: differentiation state-distinct
+          regulation and roles of protein kinase B\/Akt isoforms","volume":"279","author":"Dufour","year":"2004","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0340","doi-asserted-by":"crossref","first-page":"13402","DOI":"10.1074\/jbc.M010042200","article-title":"Phosphatidylinositol
+          3-kinase signaling inhibits DAF-16 DNA binding and function via 14-3-3-dependent
+          and 14-3-3-independent pathways","volume":"276","author":"Cahill","year":"2001","journal-title":"J.
+          Biol. Chem."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0345","doi-asserted-by":"crossref","first-page":"785","DOI":"10.1038\/378785a0","article-title":"Inhibition
+          of glycogen synthase kinase-3 by insulin mediated by protein kinase B","volume":"378","author":"Cross","year":"1995","journal-title":"Nature"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0350","doi-asserted-by":"crossref","first-page":"1","DOI":"10.1042\/BJ20150505","article-title":"TOR
+          signalling in plants","volume":"470","author":"Rexin","year":"2015","journal-title":"Biochem.
+          J."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0355","first-page":"4891","article-title":"Dual
+          mechanisms of inhibition of DNA synthesis by triciribine","volume":"50","author":"Wotring","year":"1990","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0360","doi-asserted-by":"crossref","first-page":"4394","DOI":"10.1158\/0008-5472.CAN-04-0343","article-title":"Akt\/protein
+          kinase B signaling inhibitor-2, a selective small molecule inhibitor of Akt
+          signaling with antitumor activity in cancer cells overexpressing Akt","volume":"64","author":"Yang","year":"2004","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0365","first-page":"3608","article-title":"Phase
+          I study of tricyclic nucleoside phosphate using a five-day continuous infusion
+          schedule","volume":"44","author":"Feun","year":"1984","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0370","doi-asserted-by":"crossref","first-page":"506","DOI":"10.1097\/00000421-199312000-00010","article-title":"A
+          phase II trial of tricyclic nucleoside phosphate in patients with advanced
+          squamous cell carcinoma of the cervix. A gynecologic oncology group study","volume":"16","author":"Feun","year":"1993","journal-title":"Am.
+          J. Clin. Oncol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0375","doi-asserted-by":"crossref","first-page":"487","DOI":"10.1016\/j.devcel.2007.03.020","article-title":"The
+          two TORCs and Akt","volume":"12","author":"Bhaskar","year":"2007","journal-title":"Dev.
+          Cell"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0380","first-page":"171","article-title":"American
+          Society of Clinical Oncology Clinical Practice Guideline update on chemotherapy
+          for stage IV non-small-cell lung cancer","volume":"13","author":"Azzoli","year":"2010","journal-title":"Zhongguo
+          fei ai za zhi Chin. J. Lung Cancer"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0385","doi-asserted-by":"crossref","first-page":"110","DOI":"10.1124\/mol.104.009373","article-title":"Cellular
+          and pharmacogenetics foundation of synergistic interaction of pemetrexed and
+          gemcitabine in human non-small-cell lung cancer cells","volume":"68","author":"Giovannetti","year":"2005","journal-title":"Mol.
+          Pharmacol."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0390","doi-asserted-by":"crossref","first-page":"20","DOI":"10.1136\/thorax.57.1.20","article-title":"Clinical
+          and cost effectiveness of paclitaxel, docetaxel, gemcitabine, and vinorelbine
+          in non-small cell lung cancer: a systematic review","volume":"57","author":"Clegg","year":"2002","journal-title":"Thorax"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0395","doi-asserted-by":"crossref","first-page":"206","DOI":"10.1158\/0008-5472.CAN-07-0669","article-title":"A
+          vascular targeted pan phosphoinositide 3-kinase inhibitor prodrug, SF1126,
+          with antitumor and antiangiogenic activity","volume":"68","author":"Garlich","year":"2008","journal-title":"Cancer
+          Res."},{"key":"10.1016\/j.semcdb.2016.08.024_bib0400","doi-asserted-by":"crossref","first-page":"1899","DOI":"10.1038\/sj.bjc.6602595","article-title":"The
+          Akt inhibitor KP 372-1 suppresses Akt activity and cell proliferation and
+          induces apoptosis in thyroid cancer cells","volume":"92","author":"Mandal","year":"2005","journal-title":"Br.
+          J. Cancer"},{"key":"10.1016\/j.semcdb.2016.08.024_bib0405","doi-asserted-by":"crossref","first-page":"637","DOI":"10.1158\/1535-7163.MCT-05-0453","article-title":"Inhibition
+          of Akt survival pathway by a small-molecule inhibitor in human glioblastoma","volume":"5","author":"Koul","year":"2006","journal-title":"Mol.
+          Cancer Therap."}],"container-title":["Seminars in Cell &amp; Developmental
+          Biology"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S1084952116302658?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S1084952116302658?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2020,5,17]],"date-time":"2020-05-17T04:33:33Z","timestamp":1589690013000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S1084952116302658"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2017,4]]},"references-count":81,"alternative-id":["S1084952116302658"],"URL":"https:\/\/doi.org\/10.1016\/j.semcdb.2016.08.024","relation":{},"ISSN":["1084-9521"],"issn-type":[{"value":"1084-9521","type":"print"}],"subject":[],"published":{"date-parts":[[2017,4]]},"assertion":[{"value":"Elsevier","name":"publisher","label":"This
+          article is maintained by"},{"value":"The impact of heterogeneity in phosphoinositide
+          3-kinase pathway in human cancer and possible therapeutic treatments","name":"articletitle","label":"Article
+          Title"},{"value":"Seminars in Cell & Developmental Biology","name":"journaltitle","label":"Journal
+          Title"},{"value":"https:\/\/doi.org\/10.1016\/j.semcdb.2016.08.024","name":"articlelink","label":"CrossRef
+          DOI link to publisher maintained version"},{"value":"article","name":"content_type","label":"Content
+          Type"},{"value":"\u00a9 2016 Elsevier Ltd. All rights reserved.","name":"copyright","label":"Copyright"}]}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "7933"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 25 Jul 2025 21:35:29 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.semcdb.2016.08.024/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Wang_2017, title={The impact of heterogeneity in phosphoinositide
+          3-kinase pathway in human cancer and possible therapeutic treatments}, volume={64},
+          ISSN={1084-9521}, url={http://dx.doi.org/10.1016/j.semcdb.2016.08.024}, DOI={10.1016/j.semcdb.2016.08.024},
+          journal={Seminars in Cell &amp; Developmental Biology}, publisher={Elsevier
+          BV}, author={Wang, William and Lv, Jiapei and Wang, Lingyan and Wang, Xiangdong
+          and Ye, Ling}, year={2017}, month=apr, pages={116\u2013124} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Fri, 25 Jul 2025 21:35:29 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

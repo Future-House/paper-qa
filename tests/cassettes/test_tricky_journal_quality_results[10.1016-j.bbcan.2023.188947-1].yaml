@@ -1,0 +1,201 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.bbcan.2023.188947?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,6,17]],"date-time":"2025-06-17T10:54:58Z","timestamp":1750157698314},"reference-count":44,"publisher":"Elsevier
+          BV","issue":"5","license":[{"start":{"date-parts":[[2023,9,1]],"date-time":"2023-09-01T00:00:00Z","timestamp":1693526400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2024,7,5]],"date-time":"2024-07-05T00:00:00Z","timestamp":1720137600000},"content-version":"am","delay-in-days":308,"URL":"http:\/\/www.elsevier.com\/open-access\/userlicense\/1.0\/"},{"start":{"date-parts":[[2023,9,1]],"date-time":"2023-09-01T00:00:00Z","timestamp":1693526400000},"content-version":"stm-asf","delay-in-days":0,"URL":"https:\/\/doi.org\/10.15223\/policy-017"},{"start":{"date-parts":[[2023,9,1]],"date-time":"2023-09-01T00:00:00Z","timestamp":1693526400000},"content-version":"stm-asf","delay-in-days":0,"URL":"https:\/\/doi.org\/10.15223\/policy-037"},{"start":{"date-parts":[[2023,9,1]],"date-time":"2023-09-01T00:00:00Z","timestamp":1693526400000},"content-version":"stm-asf","delay-in-days":0,"URL":"https:\/\/doi.org\/10.15223\/policy-012"},{"start":{"date-parts":[[2023,9,1]],"date-time":"2023-09-01T00:00:00Z","timestamp":1693526400000},"content-version":"stm-asf","delay-in-days":0,"URL":"https:\/\/doi.org\/10.15223\/policy-029"},{"start":{"date-parts":[[2023,9,1]],"date-time":"2023-09-01T00:00:00Z","timestamp":1693526400000},"content-version":"stm-asf","delay-in-days":0,"URL":"https:\/\/doi.org\/10.15223\/policy-004"}],"content-domain":{"domain":["elsevier.com","sciencedirect.com"],"crossmark-restriction":true},"short-container-title":["Biochimica
+          et Biophysica Acta (BBA) - Reviews on Cancer"],"published-print":{"date-parts":[[2023,9]]},"DOI":"10.1016\/j.bbcan.2023.188947","type":"journal-article","created":{"date-parts":[[2023,6,30]],"date-time":"2023-06-30T15:15:13Z","timestamp":1688138113000},"page":"188947","update-policy":"http:\/\/dx.doi.org\/10.1016\/elsevier_cm_policy","source":"Crossref","is-referenced-by-count":2,"title":["Structural
+          and mechanistic insights provided by single particle cryo-EM analysis of phosphoinositide
+          3-kinase (PI3K\u03b1)"],"prefix":"10.1016","volume":"1878","author":[{"given":"Peter
+          K.","family":"Vogt","sequence":"first","affiliation":[]},{"given":"Jonathan
+          R.","family":"Hart","sequence":"additional","affiliation":[]},{"given":"Su","family":"Yang","sequence":"additional","affiliation":[]},{"given":"Qingtong","family":"Zhou","sequence":"additional","affiliation":[]},{"given":"Dehua","family":"Yang","sequence":"additional","affiliation":[]},{"given":"Ming-Wei","family":"Wang","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"issue":"45","key":"10.1016\/j.bbcan.2023.188947_bb0005","doi-asserted-by":"crossref","DOI":"10.1073\/pnas.2109327118","article-title":"Cryo-EM
+          structures of PI3K\u03b1 reveal conformational changes during inhibition and
+          activation","volume":"118","author":"Liu","year":"2021","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"issue":"35","key":"10.1016\/j.bbcan.2023.188947_bb0010","doi-asserted-by":"crossref","DOI":"10.1126\/sciadv.abj4282","article-title":"Structure
+          of the phosphoinositide 3-kinase (PI3K) p110\u03b3-p101 complex reveals molecular
+          mechanism of GPCR activation","volume":"7","author":"Rathinaswamy","year":"2021","journal-title":"Sci.
+          Adv."},{"issue":"3","key":"10.1016\/j.bbcan.2023.188947_bb0015","doi-asserted-by":"crossref","first-page":"218","DOI":"10.1038\/s41594-022-00730-w","article-title":"Structural
+          basis of phosphatidylinositol 3-kinase C2\u03b1 function","volume":"29","author":"Lo","year":"2022","journal-title":"Nat.
+          Struct. Mol. Biol."},{"key":"10.1016\/j.bbcan.2023.188947_bb0020","doi-asserted-by":"crossref","first-page":"36","DOI":"10.1016\/j.semcancer.2019.02.002","article-title":"PIK3CA
+          in cancer: the past 30 years","volume":"59","author":"Arafeh","year":"2019","journal-title":"Semin.
+          Cancer Biol."},{"issue":"1","key":"10.1016\/j.bbcan.2023.188947_bb0025","doi-asserted-by":"crossref","first-page":"77","DOI":"10.1097\/01.cco.0000198021.99347.b9","article-title":"Oncogenic
+          PI3K and its role in cancer","volume":"18","author":"Samuels","year":"2006","journal-title":"Curr.
+          Opin. Oncol."},{"issue":"22","key":"10.1016\/j.bbcan.2023.188947_bb0030","doi-asserted-by":"crossref","first-page":"5849","DOI":"10.1016\/j.jmb.2020.09.002","article-title":"Structural
+          features that distinguish inactive and active PI3K lipid kinases","volume":"432","author":"Zhang","year":"2020","journal-title":"J.
+          Mol. Biol."},{"issue":"33","key":"10.1016\/j.bbcan.2023.188947_bb0035","doi-asserted-by":"crossref","first-page":"13541","DOI":"10.1074\/jbc.M116.772426","article-title":"Kinetic
+          and structural analyses reveal residues in phosphoinositide 3-kinase \u03b1
+          that are critical for catalysis and substrate recognition","volume":"292","author":"Maheshwari","year":"2017","journal-title":"J.
+          Biol. Chem."},{"issue":"10","key":"10.1016\/j.bbcan.2023.188947_bb0040","doi-asserted-by":"crossref","DOI":"10.1371\/journal.pcbi.1003895","article-title":"Investigating
+          the structure and dynamics of the PIK3CA wild-type and H1047R oncogenic mutant","volume":"10","author":"Gkeka","year":"2014","journal-title":"PLoS
+          Comput. Biol."},{"issue":"1","key":"10.1016\/j.bbcan.2023.188947_bb0045","doi-asserted-by":"crossref","first-page":"89","DOI":"10.1007\/s12551-013-0131-1","article-title":"Activation
+          of PI3K\u03b1 by physiological effectors and by oncogenic mutations: structural
+          and dynamic effects","volume":"6","author":"Gabelli","year":"2014","journal-title":"Biophys.
+          Rev."},{"issue":"1","key":"10.1016\/j.bbcan.2023.188947_bb0050","doi-asserted-by":"crossref","first-page":"97","DOI":"10.1016\/j.jbior.2012.09.005","article-title":"Dynamic
+          steps in receptor tyrosine kinase mediated activation of class IA phosphoinositide
+          3-kinases (PI3K) captured by H\/D exchange (HDX-MS)","volume":"53","author":"Burke","year":"2013","journal-title":"Adv.
+          Biol. Regul."},{"issue":"38","key":"10.1016\/j.bbcan.2023.188947_bb0055","doi-asserted-by":"crossref","first-page":"15259","DOI":"10.1073\/pnas.1205508109","article-title":"Oncogenic
+          mutations mimic and enhance dynamic events in the natural activation of phosphoinositide
+          3-kinase p110\u03b1 (PIK3CA)","volume":"109","author":"Burke","year":"2012","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"issue":"5857","key":"10.1016\/j.bbcan.2023.188947_bb0060","doi-asserted-by":"crossref","first-page":"1744","DOI":"10.1126\/science.1150799","article-title":"The
+          structure of a human p110alpha\/p85alpha complex elucidates the effects of
+          oncogenic PI3Kalpha mutations","volume":"318","author":"Huang","year":"2007","journal-title":"Science"},{"issue":"2","key":"10.1016\/j.bbcan.2023.188947_bb0065","doi-asserted-by":"crossref","first-page":"461","DOI":"10.1006\/jmbi.1997.1562","article-title":"Solution
+          structure of the C-terminal SH2 domain of the p85\u03b1 regulatory subunit
+          of phosphoinositide 3-kinase","volume":"276","author":"Siegal","year":"1998","journal-title":"J.
+          Mol. Biol."},{"issue":"5573","key":"10.1016\/j.bbcan.2023.188947_bb0070","doi-asserted-by":"crossref","first-page":"1655","DOI":"10.1126\/science.296.5573.1655","article-title":"The
+          phosphoinositide 3-kinase pathway","volume":"296","author":"Cantley","year":"2002","journal-title":"Science"},{"issue":"7","key":"10.1016\/j.bbcan.2023.188947_bb0075","doi-asserted-by":"crossref","first-page":"267","DOI":"10.1016\/S0968-0004(97)01061-X","article-title":"Phosphoinositide
+          3-kinases: a conserved family of signal transducers","volume":"22","author":"Vanhaesebroeck","year":"1997","journal-title":"Trends
+          Biochem. Sci."},{"issue":"1","key":"10.1016\/j.bbcan.2023.188947_bb0080","doi-asserted-by":"crossref","first-page":"20","DOI":"10.1158\/2159-8290.CD-21-1411","article-title":"Precision
+          targeting of mutant PI3K\u03b1 in Cancer by selective degradation","volume":"12","author":"Vanhaesebroeck","year":"2022","journal-title":"Cancer
+          Discov."},{"issue":"1","key":"10.1016\/j.bbcan.2023.188947_bb0085","doi-asserted-by":"crossref","first-page":"204","DOI":"10.1158\/2159-8290.CD-21-0072","article-title":"RTK-dependent
+          inducible degradation of mutant PI3K\u03b1 drives GDC-0077 (Inavolisib) efficacy","volume":"12","author":"Song","year":"2022","journal-title":"Cancer
+          Discov."},{"issue":"1","key":"10.1016\/j.bbcan.2023.188947_bb0090","doi-asserted-by":"crossref","first-page":"181","DOI":"10.1038\/s41467-023-35789-6","article-title":"Oncogenic
+          mutations of PIK3CA lead to increased membrane recruitment driven by reorientation
+          of the ABD, p85 and C-terminus","volume":"14","author":"Jenkins","year":"2023","journal-title":"Nat.
+          Commun."},{"issue":"38","key":"10.1016\/j.bbcan.2023.188947_bb0095","doi-asserted-by":"crossref","DOI":"10.1073\/pnas.2210769119","article-title":"Nanobodies
+          and chemical cross-links advance the structural and functional analysis of
+          PI3K\u03b1","volume":"119","author":"Hart","year":"2022","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"issue":"4","key":"10.1016\/j.bbcan.2023.188947_bb0100","doi-asserted-by":"crossref","first-page":"582","DOI":"10.1016\/j.str.2012.02.017","article-title":"Fabs
+          enable single particle cryoEM studies of small proteins","volume":"20","author":"Wu","year":"2012","journal-title":"Structure"},{"key":"10.1016\/j.bbcan.2023.188947_bb0105","article-title":"Nanobodies:
+          robust miniprotein binders in biomedicine","author":"Kim","year":"2023","journal-title":"Adv.
+          Drug Deliv. Rev."},{"key":"10.1016\/j.bbcan.2023.188947_bb0110","doi-asserted-by":"crossref","first-page":"332","DOI":"10.1016\/j.crstbi.2022.09.005","article-title":"Putting
+          on molecular weight: enabling cryo-EM structure determination of sub-100-kDa
+          proteins","volume":"4","author":"Wentinck","year":"2022","journal-title":"Curr.
+          Res. Struct. Biol."},{"key":"10.1016\/j.bbcan.2023.188947_bb0115","doi-asserted-by":"crossref","first-page":"117","DOI":"10.1016\/j.sbi.2020.01.003","article-title":"Nanobodies
+          to study protein conformational states","volume":"60","author":"Uchanski","year":"2020","journal-title":"Curr.
+          Opin. Struct. Biol."},{"key":"10.1016\/j.bbcan.2023.188947_bb0120","doi-asserted-by":"crossref","first-page":"157","DOI":"10.1016\/j.sbi.2017.10.005","article-title":"Combining
+          cryo-electron microscopy (cryo-EM) and cross-linking mass spectrometry (CX-MS)
+          for structural elucidation of large protein assemblies","volume":"46","author":"Schmidt","year":"2017","journal-title":"Curr.
+          Opin. Struct. Biol."},{"key":"10.1016\/j.bbcan.2023.188947_bb0125","doi-asserted-by":"crossref","first-page":"53","DOI":"10.1016\/j.ymeth.2018.05.023","article-title":"Chemical
+          cross-linking in the structural analysis of protein assemblies","volume":"144","author":"Chu","year":"2018","journal-title":"Methods"},{"issue":"5670","key":"10.1016\/j.bbcan.2023.188947_bb0130","doi-asserted-by":"crossref","first-page":"554","DOI":"10.1126\/science.1096502","article-title":"High
+          frequency of mutations of the PIK3CA gene in human cancers","volume":"304","author":"Samuels","year":"2004","journal-title":"Science"},{"issue":"40","key":"10.1016\/j.bbcan.2023.188947_bb0135","doi-asserted-by":"crossref","first-page":"16996","DOI":"10.1073\/pnas.0908444106","article-title":"A
+          frequent kinase domain mutation that changes the interaction between PI3Kalpha
+          and the membrane","volume":"106","author":"Mandelker","year":"2009","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"issue":"5835","key":"10.1016\/j.bbcan.2023.188947_bb0140","doi-asserted-by":"crossref","first-page":"239","DOI":"10.1126\/science.1135394","article-title":"Mechanism
+          of two classes of cancer mutations in the phosphoinositide 3-kinase catalytic
+          subunit","volume":"317","author":"Miled","year":"2007","journal-title":"Science"},{"issue":"14","key":"10.1016\/j.bbcan.2023.188947_bb0145","doi-asserted-by":"crossref","first-page":"15815","DOI":"10.1021\/acsomega.9b01439","article-title":"Structural
+          perturbations due to mutation (H1047R) in Phosphoinositide-3-kinase (PI3K\u03b1)
+          and its involvement in oncogenesis: an in silico insight","volume":"4","author":"Sharma","year":"2019","journal-title":"ACS
+          Omega."},{"issue":"18","key":"10.1016\/j.bbcan.2023.188947_bb0150","doi-asserted-by":"crossref","first-page":"3528","DOI":"10.1111\/febs.13365","article-title":"Oncogenic
+          mutations weaken the interactions that stabilize the p110\u03b1-p85\u03b1
+          heterodimer in phosphatidylinositol 3-kinase \u03b1","volume":"282","author":"Echeverria","year":"2015","journal-title":"FEBS
+          J."},{"issue":"32","key":"10.1016\/j.bbcan.2023.188947_bb0155","doi-asserted-by":"crossref","first-page":"3655","DOI":"10.1038\/onc.2011.532","article-title":"Regulation
+          of lipid binding underlies the activation mechanism of class IA PI3-kinases","volume":"31","author":"Hon","year":"2012","journal-title":"Oncogene"},{"issue":"2","key":"10.1016\/j.bbcan.2023.188947_bb0160","doi-asserted-by":"crossref","first-page":"237","DOI":"10.1158\/0008-5472.CAN-20-0911","article-title":"PI3K
+          driver mutations: a biophysical membrane-centric perspective","volume":"81","author":"Zhang","year":"2021","journal-title":"Cancer
+          Res."},{"issue":"9","key":"10.1016\/j.bbcan.2023.188947_bb0165","doi-asserted-by":"crossref","first-page":"1151","DOI":"10.4161\/cc.7.9.5817","article-title":"Insights
+          into the oncogenic effects of PIK3CA mutations from the structure of p110alpha\/p85alpha","volume":"7","author":"Huang","year":"2008","journal-title":"Cell
+          Cycle"},{"issue":"3","key":"10.1016\/j.bbcan.2023.188947_bb0170","doi-asserted-by":"crossref","first-page":"533","DOI":"10.1016\/j.bbapap.2009.11.020","article-title":"Somatic
+          mutations in PI3Kalpha: structural basis for enzyme activation and drug design","volume":"1804","author":"Gabelli","year":"2010","journal-title":"Biochim.
+          Biophys. Acta"},{"issue":"a1","key":"10.1016\/j.bbcan.2023.188947_bb0175","doi-asserted-by":"crossref","first-page":"C79","DOI":"10.1107\/S0108767308097456","article-title":"Structural
+          basis for the effects of PI3Kalpha oncogenic mutations","volume":"64","author":"Gabelli","year":"2008","journal-title":"Acta
+          Crystallograph. Sect. A"},{"issue":"46","key":"10.1016\/j.bbcan.2023.188947_bb0180","doi-asserted-by":"crossref","DOI":"10.1073\/pnas.2215621119","article-title":"Cryo-EM
+          structures of cancer-specific helical and kinase domain mutations of PI3K\u03b1","volume":"119","author":"Liu","year":"2022","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"issue":"Pt 4","key":"10.1016\/j.bbcan.2023.188947_bb0185","doi-asserted-by":"crossref","first-page":"615","DOI":"10.1042\/BST0370615","article-title":"Form
+          and flexibility in phosphoinositide 3-kinases","volume":"37","author":"Williams","year":"2009","journal-title":"Biochem.
+          Soc. Trans."},{"issue":"12","key":"10.1016\/j.bbcan.2023.188947_bb0190","doi-asserted-by":"crossref","first-page":"1567","DOI":"10.1515\/BC.2006.195","article-title":"Mutations
+          in the inter-SH2 domain of the regulatory subunit of phosphoinositide 3-kinase:
+          effects on catalytic subunit binding and holoenzyme function","volume":"387","author":"Elis","year":"2006","journal-title":"Biol.
+          Chem."},{"issue":"3","key":"10.1016\/j.bbcan.2023.188947_bb0195","doi-asserted-by":"crossref","first-page":"511","DOI":"10.1002\/j.1460-2075.1994.tb06289.x","article-title":"PI
+          3-kinase: structural and functional analysis of intersubunit interactions","volume":"13","author":"Dhand","year":"1994","journal-title":"EMBO
+          J."},{"issue":"5","key":"10.1016\/j.bbcan.2023.188947_bb0200","doi-asserted-by":"crossref","first-page":"583","DOI":"10.1016\/j.ccr.2013.03.021","article-title":"Gain
+          of interaction with IRS1 by p110\u03b1-helical domain mutants is crucial for
+          their oncogenic functions","volume":"23","author":"Hao","year":"2013","journal-title":"Cancer
+          Cell"},{"issue":"4","key":"10.1016\/j.bbcan.2023.188947_bb0205","doi-asserted-by":"crossref","first-page":"577","DOI":"10.1016\/j.bbrc.2009.02.081","article-title":"Functional
+          differences between two classes of oncogenic mutation in the PIK3CA gene","volume":"381","author":"Chaussade","year":"2009","journal-title":"Biochem.
+          Biophys. Res. Commun."},{"issue":"7","key":"10.1016\/j.bbcan.2023.188947_bb0210","doi-asserted-by":"crossref","first-page":"2652","DOI":"10.1073\/pnas.0712169105","article-title":"Helical
+          domain and kinase domain mutations in p110alpha of phosphatidylinositol 3-kinase
+          induce gain of function by different mechanisms","volume":"105","author":"Zhao","year":"2008","journal-title":"Proc.
+          Natl. Acad. Sci. U. S. A."},{"issue":"2","key":"10.1016\/j.bbcan.2023.188947_bb0215","doi-asserted-by":"crossref","first-page":"519","DOI":"10.1042\/BJ20070681","article-title":"Effects
+          of oncogenic p110alpha subunit mutations on the lipid kinase activity of phosphoinositide
+          3-kinase","volume":"409","author":"Carson","year":"2008","journal-title":"Biochem.
+          J."},{"issue":"11","key":"10.1016\/j.bbcan.2023.188947_bb0220","doi-asserted-by":"crossref","first-page":"2396","DOI":"10.1016\/j.bpj.2017.09.018","article-title":"Single-molecule
+          study reveals how receptor and Ras synergistically activate PI3K\u03b1 and
+          PIP3 signaling","volume":"113","author":"Buckles","year":"2017","journal-title":"Biophys.
+          J."}],"container-title":["Biochimica et Biophysica Acta (BBA) - Reviews on
+          Cancer"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0304419X23000963?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0304419X23000963?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2023,10,12]],"date-time":"2023-10-12T15:38:35Z","timestamp":1697125115000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0304419X23000963"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2023,9]]},"references-count":44,"journal-issue":{"issue":"5","published-print":{"date-parts":[[2023,9]]}},"alternative-id":["S0304419X23000963"],"URL":"https:\/\/doi.org\/10.1016\/j.bbcan.2023.188947","relation":{},"ISSN":["0304-419X"],"issn-type":[{"type":"print","value":"0304-419X"}],"subject":[],"published":{"date-parts":[[2023,9]]},"assertion":[{"value":"Elsevier","name":"publisher","label":"This
+          article is maintained by"},{"value":"Structural and mechanistic insights provided
+          by single particle cryo-EM analysis of phosphoinositide 3-kinase (PI3K\u03b1)","name":"articletitle","label":"Article
+          Title"},{"value":"Biochimica et Biophysica Acta (BBA) - Reviews on Cancer","name":"journaltitle","label":"Journal
+          Title"},{"value":"https:\/\/doi.org\/10.1016\/j.bbcan.2023.188947","name":"articlelink","label":"CrossRef
+          DOI link to publisher maintained version"},{"value":"article","name":"content_type","label":"Content
+          Type"},{"value":"\u00a9 2023 Elsevier B.V. All rights reserved.","name":"copyright","label":"Copyright"}],"article-number":"188947"}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "4912"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 25 Jul 2025 21:35:32 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.bbcan.2023.188947/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Vogt_2023, title={Structural and mechanistic insights provided
+          by single particle cryo-EM analysis of phosphoinositide 3-kinase (PI3K\u03B1)},
+          volume={1878}, ISSN={0304-419X}, url={http://dx.doi.org/10.1016/j.bbcan.2023.188947},
+          DOI={10.1016/j.bbcan.2023.188947}, number={5}, journal={Biochimica et Biophysica
+          Acta (BBA) - Reviews on Cancer}, publisher={Elsevier BV}, author={Vogt, Peter
+          K. and Hart, Jonathan R. and Yang, Su and Zhou, Qingtong and Yang, Dehua and
+          Wang, Ming-Wei}, year={2023}, month=sep, pages={188947} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Fri, 25 Jul 2025 21:35:32 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1

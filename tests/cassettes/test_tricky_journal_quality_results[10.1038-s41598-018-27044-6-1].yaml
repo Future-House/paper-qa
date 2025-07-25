@@ -1,0 +1,375 @@
+interactions:
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1038%2Fs41598-018-27044-6?mailto=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,7,2]],"date-time":"2025-07-02T10:26:15Z","timestamp":1751451975110,"version":"3.37.3"},"reference-count":64,"publisher":"Springer
+          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2018,10,19]],"date-time":"2018-10-19T00:00:00Z","timestamp":1539907200000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2018,10,19]],"date-time":"2018-10-19T00:00:00Z","timestamp":1539907200000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Sci
+          Rep"],"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Phosphoinositide
+          3-kinase alpha (PI3K\u03b1) is involved in fundamental cellular processes
+          including cell proliferation and differentiation and is frequently mutated
+          in human malignancies. One of the most common mutations is E545K, which results
+          in an amino acid substitution of opposite charge. It has been recently proposed
+          that in this oncogenic charge-reversal mutation, the interactions between
+          the protein catalytic and regulatory subunits are abrogated, resulting in
+          loss of regulation and constitutive PI3K\u03b1 activity, which can lead to
+          oncogenesis. To assess the mechanism of the PI3K\u03b1 E545K activating mutation,
+          extensive Molecular Dynamics simulations were performed to examine conformational
+          changes differing between the wild type (WT) and mutant proteins as they occur
+          in microsecond simulations. In the E545K\u00a0mutant\u00a0PI3K\u03b1, we observe
+          a spontaneous detachment of the nSH2 PI3K\u03b1 domain (regulatory subunit,
+          p85\u03b1) from the helical domain (catalytic subunit, p110\u03b1)\u00a0causing
+          significant loss of communication between the regulatory and catalytic subunits.
+          We examine the allosteric network of the two proteins and show that a cluster
+          of residues around the mutation is important for delivering communication
+          signals between the catalytic and regulatory subunits. Our results demonstrate
+          the dynamical and structural\u00a0effects induced by the p110\u03b1 E545K
+          mutation in atomic level detail and indicate a possible mechanism for the
+          loss of regulation that E545K confers on PI3K\u03b1.<\/jats:p>","DOI":"10.1038\/s41598-018-27044-6","type":"journal-article","created":{"date-parts":[[2018,10,15]],"date-time":"2018-10-15T15:11:43Z","timestamp":1539616303000},"update-policy":"https:\/\/doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":55,"title":["Insights
+          into the mechanism of the PIK3CA E545K activating mutation using MD simulations"],"prefix":"10.1038","volume":"8","author":[{"given":"Hari","family":"Leontiadou","sequence":"first","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-2136-9723","authenticated-orcid":false,"given":"Ioannis","family":"Galdadas","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0003-2973-3550","authenticated-orcid":false,"given":"Christina","family":"Athanasiou","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0001-9287-364X","authenticated-orcid":false,"given":"Zoe","family":"Cournia","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2018,10,19]]},"reference":[{"key":"27044_CR1","doi-asserted-by":"publisher","first-page":"1655","DOI":"10.1126\/science.296.5573.1655","volume":"296","author":"LC
+          Cantley","year":"2002","unstructured":"Cantley, L. C. The phosphoinositide
+          3-kinase pathway. Science 296, 1655\u20131657, https:\/\/doi.org\/10.1126\/science.296.5573.1655
+          (2002).","journal-title":"Science"},{"key":"27044_CR2","doi-asserted-by":"publisher","first-page":"5497","DOI":"10.1038\/onc.2008.245","volume":"27","author":"TL
+          Yuan","year":"2008","unstructured":"Yuan, T. L. & Cantley, L. C. PI3K pathway
+          alterations in cancer: variations on a theme. Oncogene 27, 5497\u20135510,
+          https:\/\/doi.org\/10.1038\/onc.2008.245 (2008).","journal-title":"Oncogene"},{"key":"27044_CR3","doi-asserted-by":"publisher","first-page":"554","DOI":"10.1126\/science.1096502","volume":"304","author":"Y
+          Samuels","year":"2004","unstructured":"Samuels, Y. et al. High frequency of
+          mutations of the PIK3CA gene in human cancers. Science 304, 554, https:\/\/doi.org\/10.1126\/science.1096502
+          (2004).","journal-title":"Science"},{"key":"27044_CR4","doi-asserted-by":"publisher","first-page":"4562","DOI":"10.1158\/0008-5472.CAN-04-4114","volume":"65","author":"T
+          Ikenoue","year":"2005","unstructured":"Ikenoue, T. et al. Functional analysis
+          of PIK3CA gene mutations in human colorectal cancer. Cancer Res 65, 4562\u20134567,
+          https:\/\/doi.org\/10.1158\/0008-5472.CAN-04-4114 (2005).","journal-title":"Cancer
+          Res"},{"key":"27044_CR5","doi-asserted-by":"publisher","first-page":"10992","DOI":"10.1158\/0008-5472.CAN-05-2612","volume":"65","author":"SJ
+          Isakoff","year":"2005","unstructured":"Isakoff, S. J. et al. Breast cancer-associated
+          PIK3CA mutations are oncogenic in mammary epithelial cells. Cancer Res 65,
+          10992\u201311000, https:\/\/doi.org\/10.1158\/0008-5472.CAN-05-2612 (2005).","journal-title":"Cancer
+          Res"},{"key":"27044_CR6","doi-asserted-by":"publisher","first-page":"561","DOI":"10.1016\/j.ccr.2005.05.014","volume":"7","author":"Y
+          Samuels","year":"2005","unstructured":"Samuels, Y. et al. Mutant PIK3CA promotes
+          cell growth and invasion of human cancer cells. Cancer Cell 7, 561\u2013573,
+          https:\/\/doi.org\/10.1016\/j.ccr.2005.05.014 (2005).","journal-title":"Cancer
+          Cell"},{"key":"27044_CR7","doi-asserted-by":"publisher","first-page":"1331","DOI":"10.1158\/1078-0432.CCR-10-0540","volume":"17","author":"ML
+          Rudd","year":"2011","unstructured":"Rudd, M. L. et al. A unique spectrum of
+          somatic PIK3CA (p110alpha) mutations within primary endometrial carcinomas.
+          Clin Cancer Res 17, 1331\u20131340, https:\/\/doi.org\/10.1158\/1078-0432.CCR-10-0540
+          (2011).","journal-title":"Clin Cancer Res"},{"key":"27044_CR8","doi-asserted-by":"publisher","first-page":"1566","DOI":"10.18632\/oncotarget.716","volume":"3","author":"F
+          Janku","year":"2012","unstructured":"Janku, F. et al. PIK3CA mutations in
+          advanced cancers: characteristics and outcomes. Oncotarget 3, 1566\u20131575,
+          https:\/\/doi.org\/10.18632\/oncotarget.716 (2012).","journal-title":"Oncotarget"},{"key":"27044_CR9","doi-asserted-by":"publisher","first-page":"377","DOI":"10.1016\/j.celrep.2013.12.035","volume":"6","author":"F
+          Janku","year":"2014","unstructured":"Janku, F. et al. Assessing PIK3CA and
+          PTEN in early-phase trials with PI3K\/AKT\/mTOR inhibitors. Cell Rep 6, 377\u2013387,
+          https:\/\/doi.org\/10.1016\/j.celrep.2013.12.035 (2014).","journal-title":"Cell
+          Rep"},{"key":"27044_CR10","doi-asserted-by":"publisher","first-page":"5569","DOI":"10.1073\/pnas.0701005104","volume":"104","author":"M
+          Gymnopoulos","year":"2007","unstructured":"Gymnopoulos, M., Elsliger, M. A.
+          & Vogt, P. K. Rare cancer-specific mutations in PIK3CA show gain of function.
+          Proc Natl Acad Sci USA 104, 5569\u20135574, https:\/\/doi.org\/10.1073\/pnas.0701005104
+          (2007).","journal-title":"Proc Natl Acad Sci USA"},{"key":"27044_CR11","doi-asserted-by":"publisher","DOI":"10.1038\/oncsis.2013.38","volume":"2","author":"DS
+          Meyer","year":"2013","unstructured":"Meyer, D. S. et al. Expression of PIK3CA
+          mutant E545K in the mammary gland induces heterogeneous tumors but is less
+          potent than mutant H1047R. Oncogenesis 2, e74, https:\/\/doi.org\/10.1038\/oncsis.2013.38
+          (2013).","journal-title":"Oncogenesis"},{"key":"27044_CR12","doi-asserted-by":"publisher","first-page":"53","DOI":"10.1016\/j.pharmthera.2014.09.006","volume":"146","author":"TM
+          Bauer","year":"2015","unstructured":"Bauer, T. M., Patel, M. R. & Infante,
+          J. R. Targeting PI3 kinase in cancer. Pharmacol Ther 146, 53\u201360, https:\/\/doi.org\/10.1016\/j.pharmthera.2014.09.006
+          (2015).","journal-title":"Pharmacol Ther"},{"key":"27044_CR13","doi-asserted-by":"publisher","DOI":"10.1158\/0008-5472.CAN-15-3174","author":"P
+          Bhat-Nakshatri","year":"2016","unstructured":"Bhat-Nakshatri, P. et al. Molecular
+          Insights of Pathways Resulting From Two Common PIK3CA Mutations in Breast
+          Cancer. Cancer Res. https:\/\/doi.org\/10.1158\/0008-5472.CAN-15-3174 (2016).","journal-title":"Cancer
+          Res"},{"key":"27044_CR14","doi-asserted-by":"publisher","first-page":"1744","DOI":"10.1126\/science.1150799","volume":"318","author":"CH
+          Huang","year":"2007","unstructured":"Huang, C. H. et al. The structure of
+          a human p110alpha\/p85alpha complex elucidates the effects of oncogenic PI3Kalpha
+          mutations. Science 318, 1744\u20131748, https:\/\/doi.org\/10.1126\/science.1150799
+          (2007).","journal-title":"Science"},{"key":"27044_CR15","doi-asserted-by":"crossref","unstructured":"Miller,
+          M. S. et al. Structural basis of nSH2 regulation and lipid binding in PI3Kalpha.
+          Oncotarget 5, 5198\u20135208,\u00a0https:\/\/doi.org\/10.186362\/oncotarget.2263
+          (2014).","DOI":"10.18632\/oncotarget.2263"},{"key":"27044_CR16","doi-asserted-by":"publisher","first-page":"138","DOI":"10.1021\/ml400378e","volume":"5","author":"Y
+          Zhao","year":"2014","unstructured":"Zhao, Y. et al. Crystal Structures of
+          PI3Kalpha Complexed with PI103 and Its Derivatives: New Directions for Inhibitors
+          Design. ACS Med Chem Lett 5, 138\u2013142, https:\/\/doi.org\/10.1021\/ml400378e
+          (2014).","journal-title":"ACS Med Chem Lett"},{"key":"27044_CR17","doi-asserted-by":"publisher","first-page":"531","DOI":"10.1021\/acsmedchemlett.5b00025","volume":"6","author":"H
+          Yang","year":"2015","unstructured":"Yang, H. et al. Discovery of a Potent
+          Class of PI3Kalpha Inhibitors with Unique Binding Mode via Encoded Library
+          Technology (ELT). ACS Med Chem Lett 6, 531\u2013536, https:\/\/doi.org\/10.1021\/acsmedchemlett.5b00025
+          (2015).","journal-title":"ACS Med Chem Lett"},{"key":"27044_CR18","doi-asserted-by":"publisher","first-page":"16996","DOI":"10.1073\/pnas.0908444106","volume":"106","author":"D
+          Mandelker","year":"2009","unstructured":"Mandelker, D. et al. A frequent kinase
+          domain mutation that changes the interaction between PI3Kalpha and the membrane.
+          Proc Natl Acad Sci USA 106, 16996\u201317001, https:\/\/doi.org\/10.1073\/pnas.0908444106
+          (2009).","journal-title":"Proc Natl Acad Sci USA"},{"key":"27044_CR19","doi-asserted-by":"publisher","first-page":"e1003895","DOI":"10.1371\/journal.pcbi.1003895","volume":"10","author":"P
+          Gkeka","year":"2014","unstructured":"Gkeka, P. et al. Investigating the structure
+          and dynamics of the PIK3CA wild-type and H1047R oncogenic mutant. PLoS Comput
+          Biol 10, e1003895, https:\/\/doi.org\/10.1371\/journal.pcbi.1003895 (2014).","journal-title":"PLoS
+          Comput Biol"},{"key":"27044_CR20","doi-asserted-by":"publisher","first-page":"1002","DOI":"10.1021\/jp506423e","volume":"119","author":"P
+          Gkeka","year":"2015","unstructured":"Gkeka, P., Papafotika, A., Christoforidis,
+          S. & Cournia, Z. Exploring a non-ATP pocket for potential allosteric modulation
+          of PI3Kalpha. J Phys Chem B 119, 1002\u20131016, https:\/\/doi.org\/10.1021\/jp506423e
+          (2015).","journal-title":"J Phys Chem B"},{"key":"27044_CR21","doi-asserted-by":"publisher","first-page":"2652","DOI":"10.1073\/pnas.0712169105","volume":"105","author":"L
+          Zhao","year":"2008","unstructured":"Zhao, L. & Vogt, P. K. Helical domain
+          and kinase domain mutations in p110alpha of phosphatidylinositol 3-kinase
+          induce gain of function by different mechanisms. Proc Natl Acad Sci USA 105,
+          2652\u20132657, https:\/\/doi.org\/10.1073\/pnas.0712169105 (2008).","journal-title":"Proc
+          Natl Acad Sci USA"},{"key":"27044_CR22","doi-asserted-by":"publisher","first-page":"30199","DOI":"10.1074\/jbc.273.46.30199","volume":"273","author":"J
+          Yu","year":"1998","unstructured":"Yu, J., Wjasow, C. & Backer, J. M. Regulation
+          of the p85\/p110alpha phosphatidylinositol 3\u2032-kinase. Distinct roles
+          for the n-terminal and c-terminal SH2 domains. J Biol Chem 273, 30199\u201330203,\u00a0https:\/\/doi.org\/10.1074\/jbc.273.46.30199
+          (1998).","journal-title":"J Biol Chem"},{"key":"27044_CR23","doi-asserted-by":"publisher","first-page":"1379","DOI":"10.1128\/MCB.18.3.1379","volume":"18","author":"J
+          Yu","year":"1998","unstructured":"Yu, J. et al. Regulation of the p85\/p110
+          phosphatidylinositol 3\u2032-kinase: stabilization and inhibition of the p110alpha
+          catalytic subunit by the p85 regulatory subunit. Mol Cell Biol 18, 1379\u20131387,
+          https:\/\/doi.org\/10.1128\/MCB.18.3.1379 (1998).","journal-title":"Mol Cell
+          Biol"},{"key":"27044_CR24","doi-asserted-by":"publisher","first-page":"364","DOI":"10.1038\/nsb0496-364","volume":"3","author":"RT
+          Nolte","year":"1996","unstructured":"Nolte, R. T., Eck, M. J., Schlessinger,
+          J., Shoelson, S. E. & Harrison, S. C. Crystal structure of the PI 3-kinase
+          p85 amino-terminal SH2 domain and its phosphopeptide complexes. Nat Struct
+          Biol 3, 364\u2013374,\u00a0https:\/\/doi.org\/10.1038\/nsb0496-364 (1996).","journal-title":"Nat
+          Struct Biol"},{"key":"27044_CR25","doi-asserted-by":"publisher","first-page":"239","DOI":"10.1126\/science.1135394","volume":"317","author":"N
+          Miled","year":"2007","unstructured":"Miled, N. et al. Mechanism of two classes
+          of cancer mutations in the phosphoinositide 3-kinase catalytic subunit. Science
+          317, 239\u2013242, https:\/\/doi.org\/10.1126\/science.1135394 (2007).","journal-title":"Science"},{"key":"27044_CR26","doi-asserted-by":"publisher","first-page":"206","DOI":"10.1126\/science.1146073","volume":"317","author":"JY
+          Lee","year":"2007","unstructured":"Lee, J. Y., Engelman, J. A. & Cantley,
+          L. C. Biochemistry. PI3K charges ahead. Science 317, 206\u2013207, https:\/\/doi.org\/10.1126\/science.1146073
+          (2007).","journal-title":"Science"},{"key":"27044_CR27","doi-asserted-by":"publisher","first-page":"577","DOI":"10.1016\/j.bbrc.2009.02.081","volume":"381","author":"C
+          Chaussade","year":"2009","unstructured":"Chaussade, C., Cho, K., Mawson, C.,
+          Rewcastle, G. W. & Shepherd, P. R. Functional differences between two classes
+          of oncogenic mutation in the PIK3CA gene. Biochem Biophys Res Commun 381,
+          577\u2013581, https:\/\/doi.org\/10.1016\/j.bbrc.2009.02.081 (2009).","journal-title":"Biochem
+          Biophys Res Commun"},{"key":"27044_CR28","doi-asserted-by":"publisher","first-page":"3655","DOI":"10.1038\/onc.2011.532","volume":"31","author":"WC
+          Hon","year":"2012","unstructured":"Hon, W. C., Berndt, A. & Williams, R. L.
+          Regulation of lipid binding underlies the activation mechanism of class IA
+          PI3-kinases. Oncogene 31, 3655\u20133666, https:\/\/doi.org\/10.1038\/onc.2011.532
+          (2012).","journal-title":"Oncogene"},{"key":"27044_CR29","doi-asserted-by":"publisher","first-page":"519","DOI":"10.1042\/BJ20070681","volume":"409","author":"JD
+          Carson","year":"2008","unstructured":"Carson, J. D. et al. Effects of oncogenic
+          p110alpha subunit mutations on the lipid kinase activity of phosphoinositide
+          3-kinase. Biochem J 409, 519\u2013524, https:\/\/doi.org\/10.1042\/BJ20070681
+          (2008).","journal-title":"Biochem J"},{"key":"27044_CR30","doi-asserted-by":"publisher","first-page":"15259","DOI":"10.1073\/pnas.1205508109","volume":"109","author":"JE
+          Burke","year":"2012","unstructured":"Burke, J. E., Perisic, O., Masson, G.
+          R., Vadas, O. & Williams, R. L. Oncogenic mutations mimic and enhance dynamic
+          events in the natural activation of phosphoinositide 3-kinase p110alpha (PIK3CA).
+          Proc Natl Acad Sci USA 109, 15259\u201315264, https:\/\/doi.org\/10.1073\/pnas.1205508109
+          (2012).","journal-title":"Proc Natl Acad Sci USA"},{"key":"27044_CR31","doi-asserted-by":"publisher","first-page":"5280","DOI":"10.1021\/jacs.5b01421","volume":"137","author":"KA
+          Marino","year":"2015","unstructured":"Marino, K. A., Sutto, L. & Gervasio,
+          F. L. The effect of a widespread cancer-causing mutation on the inactive to
+          active dynamics of the B-Raf kinase. J Am Chem Soc 137, 5280\u20135283, https:\/\/doi.org\/10.1021\/jacs.5b01421
+          (2015).","journal-title":"J Am Chem Soc"},{"key":"27044_CR32","doi-asserted-by":"publisher","first-page":"6734","DOI":"10.1021\/acs.biochem.5b01012","volume":"54","author":"K
+          Gao","year":"2015","unstructured":"Gao, K., He, H., Yang, M. & Yan, H. Molecular
+          dynamics simulations of the Escherichia coli HPPK apo-enzyme reveal a network
+          of conformational transitions. Biochemistry 54, 6734\u20136742, https:\/\/doi.org\/10.1021\/acs.biochem.5b01012
+          (2015).","journal-title":"Biochemistry"},{"key":"27044_CR33","doi-asserted-by":"publisher","first-page":"e1004560","DOI":"10.1371\/journal.pcbi.1004560","volume":"11","author":"RG
+          Huber","year":"2015","unstructured":"Huber, R. G., Fan, H. & Bond, P. J. The
+          Structural Basis for Activation and Inhibition of ZAP-70 Kinase Domain. PLoS
+          Comput Biol 11, e1004560, https:\/\/doi.org\/10.1371\/journal.pcbi.1004560
+          (2015).","journal-title":"PLoS Comput Biol"},{"key":"27044_CR34","doi-asserted-by":"publisher","DOI":"10.1038\/srep21191","volume":"6","author":"H
+          Liu","year":"2016","unstructured":"Liu, H. et al. A single residue substitution
+          accounts for the significant difference in thermostability between two isoforms
+          of human cytosolic creatine kinase. Sci Rep 6, 21191, https:\/\/doi.org\/10.1038\/srep21191
+          (2016).","journal-title":"Sci Rep"},{"key":"27044_CR35","doi-asserted-by":"publisher","DOI":"10.1038\/srep24439","volume":"6","author":"MA
+          Morando","year":"2016","unstructured":"Morando, M. A. et al. Conformational
+          Selection and Induced Fit Mechanisms in the Binding of an Anticancer Drug
+          to the c-Src Kinase. Sci Rep 6, 24439, https:\/\/doi.org\/10.1038\/srep24439
+          (2016).","journal-title":"Sci Rep"},{"key":"27044_CR36","doi-asserted-by":"publisher","first-page":"e0154066","DOI":"10.1371\/journal.pone.0154066","volume":"11","author":"P
+          Pisani","year":"2016","unstructured":"Pisani, P., Caporuscio, F., Carlino,
+          L. & Rastelli, G. Molecular Dynamics Simulations and Classical Multidimensional
+          Scaling Unveil New Metastable States in the Conformational Landscape of CDK2.
+          PLoS One 11, e0154066, https:\/\/doi.org\/10.1371\/journal.pone.0154066 (2016).","journal-title":"PLoS
+          One"},{"key":"27044_CR37","doi-asserted-by":"publisher","DOI":"10.1038\/srep24235","volume":"6","author":"E
+          Pucheta-Martinez","year":"2016","unstructured":"Pucheta-Martinez, E. et al.
+          An Allosteric Cross-Talk Between the Activation Loop and the ATP Binding Site
+          Regulates the Activation of Src Kinase. Sci Rep 6, 24235, https:\/\/doi.org\/10.1038\/srep24235
+          (2016).","journal-title":"Sci Rep"},{"key":"27044_CR38","doi-asserted-by":"publisher","first-page":"489","DOI":"10.1016\/j.ccr.2013.02.018","volume":"23","author":"C
+          Herbert","year":"2013","unstructured":"Herbert, C. et al. Molecular mechanism
+          of SSR128129E, an extracellularly acting, small-molecule, allosteric inhibitor
+          of FGF receptor signaling. Cancer Cell 23, 489\u2013501, https:\/\/doi.org\/10.1016\/j.ccr.2013.02.018
+          (2013).","journal-title":"Cancer Cell"},{"key":"27044_CR39","doi-asserted-by":"publisher","first-page":"3528","DOI":"10.1111\/febs.13365","volume":"282","author":"I
+          Echeverria","year":"2015","unstructured":"Echeverria, I., Liu, Y., Gabelli,
+          S. B. & Amzel, L. M. Oncogenic mutations weaken the interactions that stabilize
+          the p110alpha-p85alpha heterodimer in phosphatidylinositol 3-kinase alpha.
+          FEBS J 282, 3528\u20133542, https:\/\/doi.org\/10.1111\/febs.13365 (2015).","journal-title":"FEBS
+          J"},{"key":"27044_CR40","doi-asserted-by":"publisher","unstructured":"Kalsi,
+          N., Gopalakrishnan, C., Rajendran, V. & Purohit, R. Biophysical aspect of
+          phosphatidylinositol 3-kinase and role of oncogenic mutants (E542K & E545K).
+          J Biomol Struct Dyn, 1\u201311, https:\/\/doi.org\/10.1080\/07391102.2015.1127774
+          (2016).","DOI":"10.1080\/07391102.2015.1127774"},{"key":"27044_CR41","doi-asserted-by":"publisher","first-page":"97","DOI":"10.1016\/j.jbior.2012.09.005","volume":"53","author":"JE
+          Burke","year":"2013","unstructured":"Burke, J. E. & Williams, R. L. Dynamic
+          steps in receptor tyrosine kinase mediated activation of class IA phosphoinositide
+          3-kinases (PI3K) captured by H\/D exchange (HDX-MS). Adv Biol Regul 53, 97\u2013110,
+          https:\/\/doi.org\/10.1016\/j.jbior.2012.09.005 (2013).","journal-title":"Adv
+          Biol Regul"},{"key":"27044_CR42","doi-asserted-by":"publisher","first-page":"506","DOI":"10.1073\/pnas.0709214104","volume":"105","author":"LR
+          Masterson","year":"2008","unstructured":"Masterson, L. R., Mascioni, A., Traaseth,
+          N. J., Taylor, S. S. & Veglia, G. Allosteric cooperativity in protein kinase
+          A. Proc Natl Acad Sci USA 105, 506\u2013511, https:\/\/doi.org\/10.1073\/pnas.0709214104
+          (2008).","journal-title":"Proc Natl Acad Sci USA"},{"key":"27044_CR43","doi-asserted-by":"publisher","first-page":"E4623","DOI":"10.1073\/pnas.1418402111","volume":"111","author":"CL
+          McClendon","year":"2014","unstructured":"McClendon, C. L., Kornev, A. P.,
+          Gilson, M. K. & Taylor, S. S. Dynamic architecture of a protein kinase. Proc
+          Natl Acad Sci USA 111, E4623\u20134631, https:\/\/doi.org\/10.1073\/pnas.1418402111
+          (2014).","journal-title":"Proc Natl Acad Sci USA"},{"key":"27044_CR44","doi-asserted-by":"publisher","first-page":"628","DOI":"10.1016\/j.tibs.2015.09.002","volume":"40","author":"AP
+          Kornev","year":"2015","unstructured":"Kornev, A. P. & Taylor, S. S. Dynamics-Driven
+          Allostery in Protein Kinases. Trends Biochem Sci 40, 628\u2013647, https:\/\/doi.org\/10.1016\/j.tibs.2015.09.002
+          (2015).","journal-title":"Trends Biochem Sci"},{"key":"27044_CR45","doi-asserted-by":"publisher","DOI":"10.1038\/ncomms8588","volume":"6","author":"RD
+          Malmstrom","year":"2015","unstructured":"Malmstrom, R. D., Kornev, A. P.,
+          Taylor, S. S. & Amaro, R. E. Allostery through the computational microscope:
+          cAMP activation of a canonical signalling domain. Nat Commun 6, 7588, https:\/\/doi.org\/10.1038\/ncomms8588
+          (2015).","journal-title":"Nat Commun"},{"key":"27044_CR46","doi-asserted-by":"publisher","first-page":"e1002844","DOI":"10.1371\/journal.pcbi.1002844","volume":"8","author":"F
+          Chiappori","year":"2012","unstructured":"Chiappori, F., Merelli, I., Colombo,
+          G., Milanesi, L. & Morra, G. Molecular mechanism of allosteric communication
+          in Hsp70 revealed by molecular dynamics simulations. PLoS Comput Biol 8, e1002844,
+          https:\/\/doi.org\/10.1371\/journal.pcbi.1002844 (2012).","journal-title":"PLoS
+          Comput Biol"},{"key":"27044_CR47","doi-asserted-by":"publisher","first-page":"e1000293","DOI":"10.1371\/journal.pcbi.1000293","volume":"5","author":"MD
+          Daily","year":"2009","unstructured":"Daily, M. D. & Gray, J. J. Allosteric
+          communication occurs via networks of tertiary and quaternary motions in proteins.
+          PLoS Comput Biol 5, e1000293, https:\/\/doi.org\/10.1371\/journal.pcbi.1000293
+          (2009).","journal-title":"PLoS Comput Biol"},{"key":"27044_CR48","doi-asserted-by":"publisher","DOI":"10.1038\/ncomms12477","volume":"7","author":"BR
+          Amor","year":"2016","unstructured":"Amor, B. R., Schaub, M. T., Yaliraki,
+          S. N. & Barahona, M. Prediction of allosteric sites and mediating interactions
+          through bond-to-bond propensities. Nat Commun 7, 12477, https:\/\/doi.org\/10.1038\/ncomms12477
+          (2016).","journal-title":"Nat Commun"},{"key":"27044_CR49","doi-asserted-by":"publisher","first-page":"303","DOI":"10.1039\/c4fd00024b","volume":"169","author":"A
+          Allain","year":"2014","unstructured":"Allain, A. et al. Allosteric pathway
+          identification through network analysis: from molecular dynamics simulations
+          to interactive 2D and 3D graphs. Faraday Discuss 169, 303\u2013321, https:\/\/doi.org\/10.1039\/c4fd00024b
+          (2014).","journal-title":"Faraday Discuss"},{"key":"27044_CR50","doi-asserted-by":"publisher","first-page":"6620","DOI":"10.1073\/pnas.0810961106","volume":"106","author":"A
+          Sethi","year":"2009","unstructured":"Sethi, A., Eargle, J., Black, A. A. &
+          Luthey-Schulten, Z. Dynamical networks in tRNA:protein complexes. Proc Natl
+          Acad Sci USA 106, 6620\u20136625, https:\/\/doi.org\/10.1073\/pnas.0810961106
+          (2009).","journal-title":"Proc Natl Acad Sci USA"},{"key":"27044_CR51","doi-asserted-by":"publisher","first-page":"33","DOI":"10.1016\/0263-7855(96)00018-5","volume":"14","author":"W
+          Humphrey","year":"1996","unstructured":"Humphrey, W. & Schulten, D. A. K VMD:
+          visual molecular dynamics. J Mol Graph 14, 33\u201338, https:\/\/doi.org\/10.1016\/0263-7855(96)00018-5
+          (1996).","journal-title":"J Mol Graph"},{"key":"27044_CR52","doi-asserted-by":"publisher","first-page":"2949","DOI":"10.1021\/ct300377a","volume":"8","author":"AT
+          Vanwart","year":"2012","unstructured":"Vanwart, A. T., Eargle, J., Luthey-Schulten,
+          Z. & Amaro, R. E. Exploring residue component contributions to dynamical network
+          models of allostery. J Chem Theory Comput 8, 2949\u20132961, https:\/\/doi.org\/10.1021\/ct300377a
+          (2012).","journal-title":"J Chem Theory Comput"},{"key":"27044_CR53","doi-asserted-by":"publisher","first-page":"21544","DOI":"10.1074\/jbc.M011330200","volume":"276","author":"L
+          Pirola","year":"2001","unstructured":"Pirola, L. et al. Activation loop sequences
+          confer substrate specificity to phosphoinositide 3-kinase alpha (PI3Kalpha).
+          Functions of lipid kinase-deficient PI3Kalpha in signaling. J Biol Chem 276,
+          21544\u201321554, https:\/\/doi.org\/10.1074\/jbc.M011330200 (2001).","journal-title":"J
+          Biol Chem"},{"key":"27044_CR54","doi-asserted-by":"publisher","first-page":"964","DOI":"10.1038\/nature06522","volume":"450","author":"K
+          Henzler-Wildman","year":"2007","unstructured":"Henzler-Wildman, K. & Kern,
+          D. Dynamic personalities of proteins. Nature 450, 964\u2013972, https:\/\/doi.org\/10.1038\/nature06522
+          (2007).","journal-title":"Nature"},{"key":"27044_CR55","doi-asserted-by":"publisher","first-page":"845","DOI":"10.1093\/bioinformatics\/btt055","volume":"29","author":"S
+          Pronk","year":"2013","unstructured":"Pronk, S. et al. GROMACS 4.5: a high-throughput
+          and highly parallel open source molecular simulation toolkit. Bioinformatics
+          29, 845\u2013854, https:\/\/doi.org\/10.1093\/bioinformatics\/btt055 (2013).","journal-title":"Bioinformatics"},{"key":"27044_CR56","doi-asserted-by":"publisher","first-page":"195","DOI":"10.1002\/prot.24350","volume":"82","author":"AE
+          Aliev","year":"2014","unstructured":"Aliev, A. E. et al. Motional timescale
+          predictions by molecular dynamics simulations: case study using proline and
+          hydroxyproline sidechain dynamics. Proteins 82, 195\u2013215, https:\/\/doi.org\/10.1002\/prot.24350
+          (2014).","journal-title":"Proteins"},{"issue":"2","key":"27044_CR57","doi-asserted-by":"publisher","first-page":"926","DOI":"10.1063\/1.445869","volume":"79","author":"William
+          L. Jorgensen","year":"1983","unstructured":"Jorgensen, W. L., Chandrasekhar,
+          J., Madura, J. D., Impey, R. W. & Klein, M. L. Comparison of simple potential
+          functions for simulating liquid water J. Chem. Phys. 79,\u00a0https:\/\/doi.org\/10.1063\/1.445869
+          (1983).","journal-title":"The Journal of Chemical Physics"},{"key":"27044_CR58","doi-asserted-by":"publisher","first-page":"525","DOI":"10.1021\/ct100578z","volume":"7","author":"MHM
+          Olsson","year":"2011","unstructured":"Olsson, M. H. M., S\u00f8ndergaard,
+          C. R., Rostkowski, M. & Jensen, J. H. PROPKA3: Consistent Treatment of Internal
+          and Surface Residues in Empirical pKa Predictions. Journal of Chemical Theory
+          and Computation 7, 525\u2013537, https:\/\/doi.org\/10.1021\/ct100578z (2011).","journal-title":"Journal
+          of Chemical Theory and Computation"},{"key":"27044_CR59","doi-asserted-by":"publisher","first-page":"2284","DOI":"10.1021\/ct200133y","volume":"7","author":"CR
+          S\u00f8ndergaard","year":"2011","unstructured":"S\u00f8ndergaard, C. R., Olsson,
+          M. H. M., Rostkowski, M. & Jensen, J. H. Improved Treatment of Ligands and
+          Coupling Effects in Empirical Calculation and Rationalization of pKa Values.
+          Journal of Chemical Theory and Computation 7, 2284\u20132295, https:\/\/doi.org\/10.1021\/ct200133y
+          (2011).","journal-title":"Journal of Chemical Theory and Computation"},{"key":"27044_CR60","doi-asserted-by":"publisher","first-page":"e1003329","DOI":"10.1371\/journal.pcbi.1003329","volume":"9","author":"G
+          Scarabelli","year":"2013","unstructured":"Scarabelli, G. & Grant, B. J. Mapping
+          the structural and dynamical features of kinesin motor domains. PLoS Comput
+          Biol 9, e1003329, https:\/\/doi.org\/10.1371\/journal.pcbi.1003329 (2013).","journal-title":"PLoS
+          Comput Biol"},{"key":"27044_CR61","doi-asserted-by":"publisher","first-page":"E6776","DOI":"10.1073\/pnas.1610142113","volume":"113","author":"C
+          Guo","year":"2016","unstructured":"Guo, C. & Zhou, H.-X. Unidirectional allostery
+          in the regulatory subunit RI\u03b1 facilitates efficient deactivation of protein
+          kinase A. Proceedings of the National Academy of Sciences 113, E6776\u2013E6785,
+          https:\/\/doi.org\/10.1073\/pnas.1610142113 (2016).","journal-title":"Proceedings
+          of the National Academy of Sciences"},{"key":"27044_CR62","doi-asserted-by":"publisher","first-page":"4742","DOI":"10.1074\/jbc.M115.702605","volume":"291","author":"X-Q
+          Yao","year":"2016","unstructured":"Yao, X.-Q. et al. Dynamic Coupling and
+          Allosteric Networks in the \u03b1 Subunit of Heterotrimeric G Proteins. Journal
+          of Biological Chemistry 291, 4742\u20134753, https:\/\/doi.org\/10.1074\/jbc.M115.702605
+          (2016).","journal-title":"Journal of Biological Chemistry"},{"key":"27044_CR63","doi-asserted-by":"publisher","first-page":"1411","DOI":"10.1074\/jbc.M115.662874","volume":"291","author":"PM
+          Musille","year":"2016","unstructured":"Musille, P. M., Kossmann, B. R., Kohn,
+          J. A., Ivanov, I. & Ortlund, E. A. Unexpected Allosteric Network Contributes
+          to LRH-1 Co-regulator Selectivity. Journal of Biological Chemistry 291, 1411\u20131426,
+          https:\/\/doi.org\/10.1074\/jbc.M115.662874 (2016).","journal-title":"Journal
+          of Biological Chemistry"},{"key":"27044_CR64","doi-asserted-by":"publisher","first-page":"10982","DOI":"10.1073\/pnas.1309755110","volume":"110","author":"Y
+          Miao","year":"2013","unstructured":"Miao, Y., Nichols, S. E., Gasper, P. M.,
+          Metzger, V. T. & McCammon, J. A. Activation and dynamic network of the M2
+          muscarinic receptor. Proc Natl Acad Sci USA 110, 10982\u201310987, https:\/\/doi.org\/10.1073\/pnas.1309755110
+          (2013).","journal-title":"Proc Natl Acad Sci USA"}],"container-title":["Scientific
+          Reports"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s41598-018-27044-6.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41598-018-27044-6","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s41598-018-27044-6.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2022,12,21]],"date-time":"2022-12-21T10:36:10Z","timestamp":1671618970000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s41598-018-27044-6"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2018,10,19]]},"references-count":64,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2018,12]]}},"alternative-id":["27044"],"URL":"https:\/\/doi.org\/10.1038\/s41598-018-27044-6","relation":{},"ISSN":["2045-2322"],"issn-type":[{"type":"electronic","value":"2045-2322"}],"subject":[],"published":{"date-parts":[[2018,10,19]]},"assertion":[{"value":"13
+          June 2016","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
+          History"}},{"value":"4 May 2018","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
+          History"}},{"value":"19 October 2018","order":3,"name":"first_online","label":"First
+          Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"The
+          authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
+          Interests"}}],"article-number":"15544"}}'
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "9125"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 25 Jul 2025 21:35:24 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.crossref.org/works/10.1038%2Fs41598-018-27044-6/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Leontiadou_2018, title={Insights into the mechanism of the
+          PIK3CA E545K activating mutation using MD simulations}, volume={8}, ISSN={2045-2322},
+          url={http://dx.doi.org/10.1038/s41598-018-27044-6}, DOI={10.1038/s41598-018-27044-6},
+          number={1}, journal={Scientific Reports}, publisher={Springer Science and
+          Business Media LLC}, author={Leontiadou, Hari and Galdadas, Ioannis and Athanasiou,
+          Christina and Cournia, Zoe}, year={2018}, month=oct }
+
+          "
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Fri, 25 Jul 2025 21:35:24 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-ratelimit-interval:
+          - 1s
+        x-ratelimit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1
