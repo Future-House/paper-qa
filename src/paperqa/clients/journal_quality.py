@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
 
     # these will be deleted from any journal names before querying
-    PHRASES_TO_REMOVE: ClassVar[list[str]] = ["amp;"]
+    CASEFOLD_PHRASES_TO_REMOVE: ClassVar[list[str]] = ["amp;"]
 
     def __init__(self, journal_quality_path: os.PathLike | str | None = None) -> None:
         if journal_quality_path is None:
@@ -48,7 +48,7 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
 
         # TODO: not super scalable, but unless we need more than this we can just grugbrain
         journal_query = query.journal.casefold()
-        for phrase in self.PHRASES_TO_REMOVE:
+        for phrase in self.CASEFOLD_PHRASES_TO_REMOVE:
             journal_query = journal_query.replace(phrase, "")
 
         # docname can be blank since the validation will add it
@@ -58,11 +58,9 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
             doc_id=doc_details.doc_id,  # ensure doc_id is preserved
             dockey=doc_details.dockey,  # ensure dockey is preserved
             source_quality=max(
-                [
-                    self.data.get(journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
-                    self.data.get("the " + journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
-                    self.data.get(journal_query.replace("&", "and"), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
-                ]
+                self.data.get(journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
+                self.data.get("the " + journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
+                self.data.get(journal_query.replace("&", "and"), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
             ),
         )
 

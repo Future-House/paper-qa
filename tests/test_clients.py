@@ -727,6 +727,13 @@ async def test_arxiv_doi_is_used_when_available() -> None:
 )
 @pytest.mark.asyncio
 async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
+    """Test DOIs which won't be found in the journal quality data without munging.
+
+    Either their titles are non-canonical compared with the journal quality source,
+    they had a duplicate entry in the journal quality data,
+    or they have a swap like an & for and.
+
+    """
     async with aiohttp.ClientSession() as session:
         crossref_client = DocMetadataClient(
             session,
