@@ -1,7 +1,7 @@
 import os
 
 import pymupdf
-from paperqa.types import ParsedMetadata, ParsedText
+from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
 from paperqa.version import __version__ as pqa_version
 
@@ -16,18 +16,44 @@ def setup_pymupdf_python_logging() -> None:
 
 
 BLOCK_TEXT_INDEX = 4
+# Attributes of pymupdf.Pixmap that contain useful metadata
+PYMUPDF_PIXMAP_ATTRS = {
+    "alpha",
+    # YAGNI on "digest" because it's not JSON serializable
+    "height",
+    "irect",
+    "is_monochrome",
+    "is_unicolor",
+    "n",
+    "size",
+    "stride",
+    "width",
+    "x",
+    "xres",
+    "y",
+    "yres",
+}
 
 
 def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     use_block_parsing: bool = False,
+    parse_media: bool = True,
+    full_page: bool = False,
+    image_cluster_tolerance: float | tuple[float, float] = 25,
+    image_dpi: float | None = 150,
     **_,
 ) -> ParsedText:
+    x_tol, y_tol = (
+        image_cluster_tolerance
+        if isinstance(image_cluster_tolerance, tuple)
+        else (image_cluster_tolerance, image_cluster_tolerance)
+    )
 
     with pymupdf.open(path) as file:
-        pages: dict[str, str] = {}
-        total_length = 0
+        content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
+        total_length = count_media = 0
 
         for i in range(file.page_count):
             try:
@@ -63,13 +89,60 @@ def parse_pdf_to_pages(
                     f" long, which exceeds the {page_size_limit} char limit for the PDF"
                     f" at path {path}."
                 )
-            pages[str(i + 1)] = text
+            media: list[ParsedMedia] = []
+            if parse_media:
+                if full_page:  # Capture the entire page as one image
+                    pix = page.get_pixmap(dpi=image_dpi)
+                    media.append(
+                        ParsedMedia(
+                            index=0,
+                            data=pix.tobytes(),
+                            info={"type": "screenshot"}
+                            | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                        )
+                    )
+                else:
+                    # Capture drawings/figures
+                    for box_i, box in enumerate(
+                        page.cluster_drawings(
+                            drawings=page.get_drawings(),
+                            x_tolerance=x_tol,
+                            y_tolerance=y_tol,
+                        )
+                    ):
+                        pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                        media.append(
+                            ParsedMedia(
+                                index=box_i,
+                                data=pix.tobytes(),
+                                info={"bbox": tuple(box), "type": "drawing"}
+                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                            )
+                        )
+
+                    # Capture tables
+                    for table_i, table in enumerate(t for t in page.find_tables()):
+                        pix = page.get_pixmap(clip=table.bbox, dpi=image_dpi)
+                        media.append(
+                            ParsedMedia(
+                                index=table_i,
+                                data=pix.tobytes(),
+                                text=table.to_markdown().strip(),
+                                info={"bbox": tuple(table.bbox), "type": "table"}
+                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                            )
+                        )
+                content[str(i + 1)] = text, media
+            else:
+                content[str(i + 1)] = text
             total_length += len(text)
+            count_media += len(media)
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"{pymupdf.__name__} ({pymupdf.__version__})"],
         paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
+        count_parsed_media=count_media,
         parse_type="pdf",
     )
-    return ParsedText(content=pages, metadata=metadata)
+    return ParsedText(content=content, metadata=metadata)

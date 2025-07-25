@@ -9,8 +9,13 @@ from paperqa.version import __version__ as pqa_version
 def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
+    parse_media: bool = False,
     **_,
 ) -> ParsedText:
+    if parse_media:
+        raise NotImplementedError(
+            f"Media parsing with {pypdf.__name__} is currently unimplemented."
+        )
     with open(path, "rb") as file:
         pdf_reader = pypdf.PdfReader(file)
         pages: dict[str, str] = {}

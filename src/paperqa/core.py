@@ -9,6 +9,7 @@ from typing import Any, cast
 from aviary.core import Message
 from lmi import LLMModel
 
+from paperqa.prompts import text_with_tables_prompt_template
 from paperqa.types import Context, LLMResult, Text
 from paperqa.utils import extract_score, strip_citations
 
@@ -164,18 +165,31 @@ async def map_fxn_summary(
     citation = text.name + ": " + text.doc.formatted_citation
     success = False
 
+    # Strip newlines in case chunking led to blank lines,
+    # but not spaces, to preserve text alignment
+    cleaned_text = text.text.strip("\n")
     if summary_llm_model and prompt_templates:
+        media_text: list[str] = [m.text for m in text.media if m.text]
         data = {
             "question": question,
             "citation": citation,
-            # Strip newlines in case chunking led to blank lines,
-            # but not spaces, to preserve text alignment
-            "text": text.text.strip("\n"),
+            "text": (
+                text_with_tables_prompt_template.format(
+                    text=cleaned_text,
+                    citation=citation,
+                    tables="\n\n----\n\n".join(media_text),
+                )
+                if media_text
+                else cleaned_text
+            ),
         } | (extra_prompt_data or {})
         message_prompt, system_prompt = prompt_templates
         messages = [
             Message(role="system", content=system_prompt.format(**data)),
-            Message(role="user", content=message_prompt.format(**data)),
+            Message.create_message(
+                text=message_prompt.format(**data),
+                images=[i.to_image_url() for i in text.media] if text.media else None,
+            ),
         ]
         llm_result = await summary_llm_model.call_single(
             messages=messages,
@@ -199,9 +213,7 @@ async def map_fxn_summary(
             except KeyError:
                 success = False
     else:
-        # Strip newlines in case chunking led to blank lines,
-        # but not spaces, to preserve text alignment
-        context = text.text.strip("\n")
+        context = cleaned_text
         # If we don't assign scores, just default to 5.
         # why 5? Because we filter out 0s in another place
         # and 5/10 is the other default I could come up with
