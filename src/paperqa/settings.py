@@ -77,6 +77,15 @@ class AnswerSettings(BaseModel):
         default=True,
         description="Whether to use retrieval instead of processing all docs.",
     )
+    # no validator because you can set the range in a prompt
+    evidence_relevance_score_cutoff: int = Field(
+        default=1,
+        ge=0,
+        description=(
+            "Relevance score cutoff for evidence retrieval, default is 1, meaning"
+            " only evidence with relevance score >= 1 will be used."
+        ),
+    )
     evidence_summary_length: str = Field(
         default="about 100 words", description="Length of evidence summary."
     )
@@ -110,6 +119,10 @@ class AnswerSettings(BaseModel):
             "Opt-out flag for allowing answer generation to lazily gather evidence if"
             " called before evidence was gathered."
         ),
+    )
+    group_contexts_by_question: bool = Field(
+        default=False,
+        description="Whether to group contexts by question when generating answers.",
     )
 
     @model_validator(mode="after")

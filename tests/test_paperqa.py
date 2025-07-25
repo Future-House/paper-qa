@@ -52,7 +52,7 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, read_doc
-from paperqa.types import ChunkMetadata
+from paperqa.types import ChunkMetadata, Context
 from paperqa.utils import (
     clean_possessives,
     encode_id,
@@ -564,6 +564,77 @@ async def test_location_awareness(docs_fixture) -> None:
 async def test_query(docs_fixture) -> None:
     settings = Settings(prompts={"answer_iteration_prompt": None})
     await docs_fixture.aquery("Is XAI usable in chemistry?", settings=settings)
+
+
+@pytest.mark.asyncio
+async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
+
+    session = PQASession(question="What is the relationship between chemistry and AI?")
+
+    doc = Doc(docname="test_doc", citation="Test Doc, 2025", dockey="key1")
+    text1 = Text(text="XAI is useful for molecules.", name="t1", doc=doc)
+    text2 = Text(text="Drug discovery uses AI.", name="t2", doc=doc)
+    text3 = Text(text="Organic chemistry is a field.", name="t3", doc=doc)
+
+    session.contexts = [
+        Context(
+            text=text1,
+            context="Explanation about XAI and molecules.",
+            score=6,
+            question="Is XAI usable in chemistry?",
+        ),
+        Context(
+            text=text2,
+            context="Details on how drug discovery leverages AI.",
+            score=5,
+            question="Is XAI usable in chemistry?",
+        ),
+        Context(
+            text=text3,
+            context="General facts about organic chemistry.",
+            score=5,
+            question="What is organic chemistry?",
+        ),
+    ]
+
+    settings = Settings(
+        prompts={"answer_iteration_prompt": None},
+        answer={"group_contexts_by_question": True},
+    )
+
+    result = await docs_fixture.aquery(session, settings=settings)
+
+    final_context_str = result.context
+
+    assert (
+        'Contexts related to the question: "Is XAI usable in chemistry?"'
+        in final_context_str
+    )
+
+    assert (
+        'Contexts related to the question: "What is organic chemistry?"'
+        in final_context_str
+    )
+
+    assert "Explanation about XAI and molecules." in final_context_str
+    assert "Details on how drug discovery leverages AI." in final_context_str
+    assert "General facts about organic chemistry." in final_context_str
+
+    assert "\n\n----\n\n" in final_context_str
+    q1_header_pos = final_context_str.find(
+        'Contexts related to the question: "Is XAI usable in chemistry?"'
+    )
+    q2_header_pos = final_context_str.find(
+        'Contexts related to the question: "What is organic chemistry?"'
+    )
+    context1_pos = final_context_str.find("Explanation about XAI and molecules.")
+    context3_pos = final_context_str.find("General facts about organic chemistry.")
+
+    assert (
+        0 == q1_header_pos < context1_pos
+    ), "Expected q1 header to be first, and the context to follow."
+    assert q1_header_pos < q2_header_pos
+    assert q2_header_pos < context3_pos
 
 
 @pytest.mark.asyncio
