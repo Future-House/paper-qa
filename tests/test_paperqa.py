@@ -579,7 +579,7 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
     session.contexts = [
         Context(
             text=text1,
-            context="Explanation about XAI and molecules.",
+            context="Explanation about XAI and molecules (Smith 1999).",
             score=6,
             question="Is XAI usable in chemistry?",
         ),
@@ -599,7 +599,10 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
 
     settings = Settings(
         prompts={"answer_iteration_prompt": None},
-        answer={"group_contexts_by_question": True},
+        answer={
+            "group_contexts_by_question": True,
+            "skip_evidence_citation_strip": True,
+        },
     )
 
     result = await docs_fixture.aquery(session, settings=settings)
@@ -616,7 +619,7 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
         in final_context_str
     )
 
-    assert "Explanation about XAI and molecules." in final_context_str
+    assert "Explanation about XAI and molecules (Smith 1999)." in final_context_str
     assert "Details on how drug discovery leverages AI." in final_context_str
     assert "General facts about organic chemistry." in final_context_str
 
