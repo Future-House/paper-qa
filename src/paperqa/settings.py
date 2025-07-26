@@ -124,6 +124,10 @@ class AnswerSettings(BaseModel):
         default=False,
         description="Whether to group contexts by question when generating answers.",
     )
+    skip_evidence_citation_strip: bool = Field(
+        default=False,
+        description="Whether to skip stripping citations from evidence.",
+    )
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
