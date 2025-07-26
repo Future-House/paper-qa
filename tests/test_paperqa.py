@@ -630,7 +630,9 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
     q2_header_pos = final_context_str.find(
         'Contexts related to the question: "What is organic chemistry?"'
     )
-    context1_pos = final_context_str.find("Explanation about XAI and molecules.")
+    context1_pos = final_context_str.find(
+        "Explanation about XAI and molecules (Smith 1999)."
+    )
     context3_pos = final_context_str.find("General facts about organic chemistry.")
 
     assert (
