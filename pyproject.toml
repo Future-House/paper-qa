@@ -162,7 +162,7 @@ exclude = [
 # Useful if you'd like to keep stubs in your repo, along with the config file.
 # Multiple paths are always separated with a : or , regardless of the platform.
 # User home directory and environment variables will be expanded.
-mypy_path = "$MYPY_CONFIG_FILE_DIR/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pymupdf/src"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pypdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pymupdf/src"
 # Specifies the OS platform for the target program, for example darwin or win32
 # (meaning OS X or Windows, respectively). The default is the current platform
 # as revealed by Python’s sys.platform variable.
