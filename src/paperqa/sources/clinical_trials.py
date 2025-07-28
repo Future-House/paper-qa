@@ -48,6 +48,7 @@ class CookieWarningFilter(logging.Filter):
     stop=stop_after_attempt(3),
     wait=wait_incrementing(0.1, 0.1),
     retry=retry_if_exception_type(ClientResponseError),
+    reraise=True,
 )
 async def api_search_clinical_trials(query: str, session: ClientSession) -> dict:
 
@@ -74,6 +75,7 @@ async def api_search_clinical_trials(query: str, session: ClientSession) -> dict
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_incrementing(0.1, 0.1),
+    reraise=True,
 )
 async def api_get_clinical_trial(nct_id: str, session: ClientSession) -> dict | None:
     with logging_filters(loggers={"aiohttp.client"}, filters={CookieWarningFilter}):
