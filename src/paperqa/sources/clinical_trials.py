@@ -9,6 +9,7 @@ from aiohttp import ClientResponseError, ClientSession
 from aiohttp.web import HTTPBadRequest
 from lmi.utils import gather_with_concurrency
 from tenacity import (
+    before_sleep_log,
     retry,
     retry_if_exception_type,
     stop_after_attempt,
@@ -48,6 +49,7 @@ class CookieWarningFilter(logging.Filter):
     stop=stop_after_attempt(3),
     wait=wait_incrementing(0.1, 0.1),
     retry=retry_if_exception_type(ClientResponseError),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
     reraise=True,
 )
 async def api_search_clinical_trials(query: str, session: ClientSession) -> dict:
@@ -75,6 +77,7 @@ async def api_search_clinical_trials(query: str, session: ClientSession) -> dict
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_incrementing(0.1, 0.1),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
     reraise=True,
 )
 async def api_get_clinical_trial(nct_id: str, session: ClientSession) -> dict | None:
