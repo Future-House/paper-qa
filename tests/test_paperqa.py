@@ -1198,24 +1198,20 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=True,
         parse_pdf=pdf_parser,
+        full_page=True,  # Simple to support across many parsers
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
     assert isinstance(parsed_text.content, dict)
-    if pdf_parser == pypdf_parse_pdf_to_pages:
-        assert parsed_text.metadata.total_parsed_text_length == sum(
-            len(t) for t in parsed_text.content.values()
-        )
-        if parsed_text.metadata.count_parsed_media > 1:
-            pytest.xfail("PyPDF multimodal not yet implemented")
-    elif pdf_parser == pymupdf_parse_pdf_to_pages:
-        num_chars = 0
-        for value in parsed_text.content.values():
-            assert isinstance(value, tuple)
-            num_chars += len(value[0])
-        assert parsed_text.metadata.count_parsed_media > 1
-    else:
-        raise NotImplementedError(f"Unhandled PDF parser {pdf_parser}.")
+    num_chars = 0
+    for value in parsed_text.content.values():
+        assert isinstance(value, tuple)
+        num_chars += len(value[0])
+    assert parsed_text.metadata.count_parsed_media > 1
+    assert parsed_text.metadata.count_parsed_media == len(
+        parsed_text.content
+    ), "Full parsing should have one screenshot per page"
+    assert parsed_text.metadata.total_parsed_text_length == num_chars
 
 
 @pytest.mark.asyncio
