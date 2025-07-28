@@ -67,7 +67,7 @@ def parse_pdf_to_pages(
             total_length += len(text)
 
     metadata = ParsedMetadata(
-        parsing_libraries=[f"pymupdf ({pymupdf.__version__})"],
+        parsing_libraries=[f"{pymupdf.__name__} ({pymupdf.__version__})"],
         paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
         parse_type="pdf",
