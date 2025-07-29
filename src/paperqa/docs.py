@@ -886,7 +886,7 @@ def default_context_str_fn(
             contexts_by_question[context_question].append(c)
 
         context_sections = []
-        for question, contexts_in_group in contexts_by_question.items():
+        for context_question, contexts_in_group in contexts_by_question.items():
             inner_strs = [
                 context_inner_prompt.format(
                     name=c.id,
@@ -897,7 +897,7 @@ def default_context_str_fn(
                 for c in contexts_in_group
             ]
             # Create a section with a question heading
-            section_header = f'Contexts related to the question: "{question}"'
+            section_header = f'Contexts related to the question: "{context_question}"'
             section = f"{section_header}\n\n" + "\n\n".join(inner_strs)
             context_sections.append(section)
         context_str_body = "\n\n----\n\n".join(context_sections)
