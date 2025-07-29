@@ -882,8 +882,8 @@ def default_context_str_fn(
             # Fallback to the main session question if not available.
             # question attribute is optional, so if a user
             # sets contexts externally, it may not have a question.
-            question = getattr(c, "question", question)
-            contexts_by_question[question].append(c)
+            context_question = getattr(c, "question", question)
+            contexts_by_question[context_question].append(c)
 
         context_sections = []
         for question, contexts_in_group in contexts_by_question.items():
