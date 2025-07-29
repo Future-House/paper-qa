@@ -1056,7 +1056,7 @@ class Settings(BaseSettings):
         # so this method is now just available for use
 
     def context_serializer(
-        self, contexts: list[Context], question: str, pre_str: str | None
+        self, contexts: Sequence[Context], question: str, pre_str: str | None
     ) -> str:
         """Default function for sorting ranked contexts and inserting into a context string."""
         if self.custom_context_serializer:
