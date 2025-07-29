@@ -849,7 +849,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 def default_context_str_fn(
     settings: Settings, contexts: list[Context], question: str, pre_str: str | None
 ) -> str:
-    """Default context string function for generating a context string."""
+    """Default function for sorting ranked contexts and inserting into a context string."""
     answer_config = settings.answer
     prompt_config = settings.prompts
 
