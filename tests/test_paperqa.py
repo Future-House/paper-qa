@@ -567,6 +567,27 @@ async def test_query(docs_fixture) -> None:
 
 
 @pytest.mark.asyncio
+async def test_custom_context_str_fn(docs_fixture) -> None:
+
+    def custom_context_str_fn(
+        settings: Settings, contexts: list[Context], **kwargs  # noqa: ARG001
+    ) -> str:
+        return "TEST OVERRIDE"
+
+    settings = Settings(
+        prompts={"answer_iteration_prompt": None},
+        answer={"context_str_fn": custom_context_str_fn},
+    )
+
+    session = await docs_fixture.aquery(
+        "Is XAI usable in chemistry?", settings=settings
+    )
+    assert (
+        session.context == "TEST OVERRIDE"
+    ), "Expected custom context string to be returned."
+
+
+@pytest.mark.asyncio
 async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
 
     session = PQASession(question="What is the relationship between chemistry and AI?")

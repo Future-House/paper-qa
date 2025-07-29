@@ -6,7 +6,16 @@ import warnings
 from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
-from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
+from typing import (
+    Any,
+    ClassVar,
+    Protocol,
+    Self,
+    TypeAlias,
+    assert_never,
+    cast,
+    runtime_checkable,
+)
 
 import anyio
 from aviary.core import Tool, ToolSelector
@@ -55,6 +64,7 @@ from paperqa.prompts import (
     summary_prompt,
 )
 from paperqa.readers import PDFParserFn
+from paperqa.types import Context
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
 
@@ -63,8 +73,26 @@ from paperqa.version import __version__
 _EnvironmentState: TypeAlias = Any
 
 
+@runtime_checkable
+class ContextStrFn(Protocol):
+    """Protocol for generating a context string from settings and context."""
+
+    def __call__(
+        self, settings: "Settings", contexts: list[Context], **kwargs
+    ) -> str: ...
+
+
+def get_default_context_str_fn() -> ContextStrFn:
+    default_context_str_fn: ContextStrFn
+
+    # imported here to avoid circular imports
+    from paperqa.docs import default_context_str_fn
+
+    return default_context_str_fn
+
+
 class AnswerSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     evidence_k: int = Field(
         default=10, description="Number of evidence pieces to retrieve."
@@ -127,6 +155,11 @@ class AnswerSettings(BaseModel):
     skip_evidence_citation_strip: bool = Field(
         default=False,
         description="Whether to skip stripping citations from evidence.",
+    )
+    context_str_fn: ContextStrFn = Field(
+        default_factory=get_default_context_str_fn,
+        description="Function to turn settings and contexts into an answer context str.",
+        exclude=True,
     )
 
     @model_validator(mode="after")
