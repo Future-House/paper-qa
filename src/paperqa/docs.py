@@ -7,7 +7,6 @@ import re
 import tempfile
 import urllib.request
 import warnings
-from collections import defaultdict
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from io import BytesIO
@@ -29,8 +28,8 @@ from paperqa.llms import (
 )
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.readers import read_doc
-from paperqa.settings import MaybeSettings, Settings, get_settings
-from paperqa.types import Context, Doc, DocDetails, DocKey, PQASession, Text
+from paperqa.settings import MaybeSettings, get_settings
+from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
     get_loop,
@@ -765,8 +764,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             session.add_tokens(pre)
             pre_str = pre.text
 
-        context_str = answer_config.context_str_fn(
-            settings=query_settings,
+        context_str = query_settings.context_serializer(
             contexts=contexts,
             question=session.question,
             pre_str=pre_str,
@@ -844,79 +842,3 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         session.populate_formatted_answers_and_bib_from_raw_answer()
 
         return session
-
-
-def default_context_str_fn(
-    settings: Settings, contexts: list[Context], question: str, pre_str: str | None
-) -> str:
-    """Default function for sorting ranked contexts and inserting into a context string."""
-    answer_config = settings.answer
-    prompt_config = settings.prompts
-
-    # sort by first score, then name
-    filtered_contexts = sorted(
-        contexts,
-        key=lambda x: (-x.score, x.text.name),
-    )[: answer_config.answer_max_sources]
-    # remove any contexts with a score below the cutoff
-    filtered_contexts = [
-        c
-        for c in filtered_contexts
-        if c.score >= answer_config.evidence_relevance_score_cutoff
-    ]
-
-    # shim deprecated flag
-    # TODO: remove in v6
-    context_inner_prompt = prompt_config.context_inner
-    if (
-        not answer_config.evidence_detailed_citations
-        and "\nFrom {citation}" in context_inner_prompt
-    ):
-        # Only keep "\nFrom {citation}" if we are showing detailed citations
-        context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
-
-    context_str_body = ""
-    if answer_config.group_contexts_by_question:
-        contexts_by_question: dict[str, list[Context]] = defaultdict(list)
-        for c in filtered_contexts:
-            # Fallback to the main session question if not available.
-            # question attribute is optional, so if a user
-            # sets contexts externally, it may not have a question.
-            context_question = getattr(c, "question", question)
-            contexts_by_question[context_question].append(c)
-
-        context_sections = []
-        for context_question, contexts_in_group in contexts_by_question.items():
-            inner_strs = [
-                context_inner_prompt.format(
-                    name=c.id,
-                    text=c.context,
-                    citation=c.text.doc.formatted_citation,
-                    **(c.model_extra or {}),
-                )
-                for c in contexts_in_group
-            ]
-            # Create a section with a question heading
-            section_header = f'Contexts related to the question: "{context_question}"'
-            section = f"{section_header}\n\n" + "\n\n".join(inner_strs)
-            context_sections.append(section)
-        context_str_body = "\n\n----\n\n".join(context_sections)
-    else:
-        inner_context_strs = [
-            context_inner_prompt.format(
-                name=c.id,
-                text=c.context,
-                citation=c.text.doc.formatted_citation,
-                **(c.model_extra or {}),
-            )
-            for c in filtered_contexts
-        ]
-        context_str_body = "\n\n".join(inner_context_strs)
-
-    if pre_str:
-        context_str_body += f"\n\nExtra background information: {pre_str}"
-
-    return prompt_config.context_outer.format(
-        context_str=context_str_body,
-        valid_keys=", ".join([c.id for c in filtered_contexts]),
-    )

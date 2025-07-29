@@ -52,6 +52,7 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, read_doc
+from paperqa.settings import ContextSerializer
 from paperqa.types import ChunkMetadata, Context
 from paperqa.utils import (
     clean_possessives,
@@ -577,9 +578,11 @@ async def test_custom_context_str_fn(docs_fixture) -> None:
     ) -> str:
         return "TEST OVERRIDE"
 
+    assert isinstance(custom_context_str_fn, ContextSerializer)
+
     settings = Settings(
+        custom_context_serializer=custom_context_str_fn,
         prompts={"answer_iteration_prompt": None},
-        answer={"context_str_fn": custom_context_str_fn},
     )
 
     session = await docs_fixture.aquery(
@@ -588,6 +591,8 @@ async def test_custom_context_str_fn(docs_fixture) -> None:
     assert (
         session.context == "TEST OVERRIDE"
     ), "Expected custom context string to be returned."
+
+    assert session.contexts, "Expected contexts to be present in session."
 
 
 @pytest.mark.asyncio
