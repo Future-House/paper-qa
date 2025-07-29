@@ -135,6 +135,7 @@ async def map_fxn_summary(
     extra_prompt_data: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: Sequence[Callable[[str], None]] | None = None,
+    skip_citation_strip: bool = False,
 ) -> tuple[Context, LLMResult]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
@@ -152,6 +153,7 @@ async def map_fxn_summary(
         parser: Optional parser function to parse LLM output into structured data.
             Should return dict with at least 'summary' field.
         callbacks: Optional sequence of callback functions to execute during LLM calls.
+        skip_citation_strip: Optional skipping of citation stripping, if you want to keep in the context.
 
     Returns:
         The context object and LLMResult to get info about the LLM execution.
@@ -206,7 +208,9 @@ async def map_fxn_summary(
         score = 5
         success = True
     # remove citations that collide with our grounded citations (for the answer LLM)
-    context = strip_citations(context)
+    if not skip_citation_strip:
+        context = strip_citations(context)
+
     if not success:
         score = extract_score(context)
 
