@@ -768,8 +768,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         context_str = answer_config.context_str_fn(
             settings=query_settings,
             contexts=contexts,
-            pre_str=pre_str,
             question=session.question,
+            pre_str=pre_str,
         )
 
         if len(context_str.strip()) < 10:  # noqa: PLR2004
@@ -847,13 +847,11 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
 
 def default_context_str_fn(
-    settings: Settings, contexts: list[Context], **kwargs
+    settings: Settings, contexts: list[Context], question: str, pre_str: str | None
 ) -> str:
     """Default context string function for generating a context string."""
     answer_config = settings.answer
     prompt_config = settings.prompts
-    question = kwargs.get("question", "No question provided.")
-    pre_str = kwargs.get("pre_str", "")
 
     # sort by first score, then name
     filtered_contexts = sorted(

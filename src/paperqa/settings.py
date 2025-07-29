@@ -78,7 +78,11 @@ class ContextStrFn(Protocol):
     """Protocol for generating a context string from settings and context."""
 
     def __call__(
-        self, settings: "Settings", contexts: list[Context], **kwargs
+        self,
+        settings: "Settings",
+        contexts: list[Context],
+        question: str,
+        pre_str: str | None,
     ) -> str: ...
 
 

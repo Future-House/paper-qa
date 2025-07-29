@@ -570,7 +570,10 @@ async def test_query(docs_fixture) -> None:
 async def test_custom_context_str_fn(docs_fixture) -> None:
 
     def custom_context_str_fn(
-        settings: Settings, contexts: list[Context], **kwargs  # noqa: ARG001
+        settings: Settings,  # noqa: ARG001
+        contexts: list[Context],  # noqa: ARG001
+        question: str,  # noqa: ARG001
+        pre_str: str | None = None,  # noqa: ARG001
     ) -> str:
         return "TEST OVERRIDE"
 
