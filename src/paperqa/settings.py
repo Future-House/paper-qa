@@ -81,7 +81,7 @@ class ContextSerializer(Protocol):
     def __call__(
         self,
         settings: "Settings",
-        contexts: list[Context],
+        contexts: Sequence[Context],
         question: str,
         pre_str: str | None,
     ) -> str: ...
