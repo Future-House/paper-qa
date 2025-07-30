@@ -1,7 +1,5 @@
 from datetime import datetime
 
-# ruff: noqa: E501
-
 summary_prompt = (
     "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
     " {citation}\n\n------------\n\n{text}\n\n------------"
@@ -107,15 +105,19 @@ default_system_prompt = (
 )
 
 # NOTE: we use double curly braces here so it's not considered an f-string template
-summary_json_system_prompt = """\
-Provide a summary of the relevant information that could help answer the question based on the excerpt. Respond with the following JSON format:
-
-{{
-  "summary": "...",
-  "relevance_score": "..."
-}}
-
-where `summary` is relevant information from the text - {summary_length} words. `relevance_score` is an integer 1-10 for the relevance of `summary` to the question."""
+summary_json_system_prompt = (
+    "Provide a summary of the relevant information"
+    " that could help answer the question based on the excerpt."
+    " Your summary, combined with many others,"
+    " will be given to the model to generate an answer."
+    " Respond with the following JSON format:"
+    '\n\n{{\n  "summary": "...",\n  "relevance_score": "..."\n  "used_images"\n}}'
+    "\n\nwhere `summary` is relevant information from the text - {summary_length} words."
+    " `relevance_score` is an integer 1-10 for the relevance of `summary` to the question."
+    " `used_images` is a boolean flag indicating"
+    " if any images present in a multimodal message were used,"
+    " and if no images were present it should be false."
+)
 
 env_system_prompt = (
     # Matching https://github.com/langchain-ai/langchain/blob/langchain%3D%3D0.2.3/libs/langchain/langchain/agents/openai_functions_agent/base.py#L213-L215

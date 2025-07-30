@@ -178,6 +178,9 @@ AUTOPOPULATE_VALUE = ""  # NOTE: this is falsy by design
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
+    # We allow extras so one can extend the summary JSON prompt
+    # to have the LLM answer with more conclusions such as alternate scores
+    # or useful excerpts of text
     model_config = ConfigDict(extra="allow")
 
     id: str = Field(
