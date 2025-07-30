@@ -1143,14 +1143,14 @@ async def test_pdf_reader_match_doc_details(stub_data_dir: Path) -> None:
 
     num_retries = 3
     for _ in range(num_retries):
-        answer = await docs.aquery("Are counterfactuals actionable? [yes/no]")
-        if any(w in answer.answer for w in ("yes", "Yes")):
-            assert f"This article has {num_citations} citations" in answer.context
+        session = await docs.aquery("Are counterfactuals actionable? [yes/no]")
+        if any(w in session.answer for w in ("yes", "Yes")):
+            assert f"This article has {num_citations} citations" in session.context
             assert any(
-                c.id in answer.raw_answer for c in answer.contexts
+                c.id in session.raw_answer for c in session.contexts
             ), "No context ids found in answer"
             assert all(
-                c.id not in answer.formatted_answer for c in answer.contexts
+                c.id not in session.formatted_answer for c in session.contexts
             ), "Context ids should not be in formatted answer"
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
@@ -1163,8 +1163,8 @@ async def test_fileio_reader_pdf(stub_data_dir: Path) -> None:
         await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
     num_retries = 3
     for _ in range(num_retries):
-        answer = await docs.aquery("Are counterfactuals actionable? [yes/no]")
-        if any(w in answer.answer for w in ("yes", "Yes")):
+        session = await docs.aquery("Are counterfactuals actionable? [yes/no]")
+        if any(w in session.answer for w in ("yes", "Yes")):
             return
     raise AssertionError(f"Query was incorrect across {num_retries} retries.")
 
@@ -1180,8 +1180,8 @@ async def test_fileio_reader_txt(stub_data_dir: Path) -> None:
         BytesIO(file_content),
         "WikiMedia Foundation, 2023, Accessed now",
     )
-    answer = await docs.aquery("What country was Frederick Bates born in?")
-    assert "United States" in answer.answer
+    session = await docs.aquery("What country was Frederick Bates born in?")
+    assert "United States" in session.answer
 
 
 @pytest.mark.asyncio
@@ -1350,10 +1350,10 @@ async def test_custom_prompts(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    answer = await docs.aquery(
+    session = await docs.aquery(
         "What country is Frederick Bates from?", settings=settings
     )
-    assert "United States" in answer.answer
+    assert "United States" in session.answer
 
 
 @pytest.mark.asyncio
