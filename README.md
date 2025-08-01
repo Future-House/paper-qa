@@ -874,6 +874,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                            |
 | `texts_index_mmr_lambda`                     | `1.0`                                  | Lambda for MMR in text index.                                                                           |
 | `verbosity`                                  | `0`                                    | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                         |
+| `custom_context_serializer`                  | `None`                                 | Custom function (see typing for signature) to override the default answer context serialization.        |
 | `answer.evidence_k`                          | `10`                                   | Number of evidence pieces to retrieve.                                                                  |
 | `answer.evidence_detailed_citations`         | `True`                                 | Include detailed citations in summaries.                                                                |
 | `answer.evidence_retrieval`                  | `True`                                 | Use retrieval vs processing all docs.                                                                   |
