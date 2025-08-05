@@ -61,7 +61,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[image,ldp,pypdf,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[image,ldp,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -92,6 +92,7 @@ openreview = [
 ]
 pymupdf = ["paper-qa-pymupdf"]
 pypdf = ["paper-qa-pypdf"]
+pypdf-media = ["paper-qa-pypdf[media]"]
 qdrant = [
     "qdrant-client",
 ]
@@ -201,6 +202,7 @@ module = [
     "openreview",  # SEE: https://github.com/openreview/openreview-py/issues/2551
     "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
+    "pypdfium2",  # SEE: https://github.com/pypdfium2-team/pypdfium2/issues/367
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
 ]
 

@@ -1230,18 +1230,28 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=True,
         parse_pdf=pdf_parser,
+        full_page=True,  # Simple to support across many parsers
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
-    assert parsed_text.metadata.total_parsed_text_length == sum(
-        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
-    )
-    assert not parsed_text.metadata.count_parsed_media
+    assert isinstance(parsed_text.content, dict)
+    num_chars = 0
+    for value in parsed_text.content.values():
+        assert isinstance(value, tuple)
+        num_chars += len(value[0])
+    assert parsed_text.metadata.count_parsed_media > 1
+    assert parsed_text.metadata.count_parsed_media == len(
+        parsed_text.content
+    ), "Full parsing should have one screenshot per page"
+    assert parsed_text.metadata.total_parsed_text_length == num_chars
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "pdf_parser", [pypdf_parse_pdf_to_pages, pymupdf_parse_pdf_to_pages]
+    "pdf_parser",
+    [
+        pymupdf_parse_pdf_to_pages  # TODO: add PyPDF when it supports multiple images/page
+    ],
 )
 async def test_chunk_metadata_reader(
     pdf_parser: PDFParserFn, stub_data_dir: Path
@@ -1283,7 +1293,7 @@ async def test_chunk_metadata_reader(
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
-    assert not metadata.count_parsed_media
+    assert metadata.count_parsed_media > 1, "Expected media to be parsed"
     assert (
         sum(len(t.media) for t in chunk_text) == metadata.count_parsed_media
     ), "Expected chunks' media to match parsed media"
