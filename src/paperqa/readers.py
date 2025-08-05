@@ -4,7 +4,7 @@ import asyncio
 import os
 from math import ceil
 from pathlib import Path
-from typing import Any, Literal, Protocol, cast, overload, runtime_checkable
+from typing import Literal, Protocol, cast, overload, runtime_checkable
 
 import anyio
 import tiktoken
@@ -46,6 +46,19 @@ async def parse_image(path: str | os.PathLike, **_) -> ParsedText:
     return ParsedText(content={"1": ("", [parsed_media])}, metadata=metadata)
 
 
+def _make_chunk(
+    parsed_text: ParsedText, doc: Doc, text: str, lower_page: str, upper_page: str
+) -> Text:
+    media: list[ParsedMedia] = []
+    for pg_num in range(int(lower_page), int(upper_page) + 1):
+        pg_contents = cast(dict, parsed_text.content)[str(pg_num)]
+        if isinstance(pg_contents, tuple):
+            media.extend(pg_contents[1])
+    # pretty formatting of pages (e.g. 1-3, 4, 5-7)
+    name = "-".join([lower_page, upper_page])
+    return Text(text=text, name=f"{doc.docname} pages {name}", media=media, doc=doc)
+
+
 def chunk_pdf(
     parsed_text: ParsedText, doc: Doc, chunk_chars: int, overlap: int
 ) -> list[Text]:
@@ -64,16 +77,6 @@ def chunk_pdf(
             f" {doc.dockey}, either empty or corrupted."
         )
 
-    def make_kwargs(lower_page: str, upper_page: str) -> dict[str, Any]:
-        media: list[ParsedMedia] = []
-        for pg_num in range(int(lower_page), int(upper_page) + 1):
-            pg_contents = cast(dict, parsed_text.content)[str(pg_num)]
-            if isinstance(pg_contents, tuple):
-                media.extend(pg_contents[1])
-        # pretty formatting of pages (e.g. 1-3, 4, 5-7)
-        name = "-".join([lower_page, upper_page])
-        return {"name": f"{doc.docname} pages {name}", "media": media, "doc": doc}
-
     for page_num, page_contents in parsed_text.content.items():
         page_text = (
             page_contents if isinstance(page_contents, str) else page_contents[0]
@@ -85,13 +88,15 @@ def chunk_pdf(
         # that it needs to be combined with the next chunk.
         while len(split) > chunk_chars:
             texts.append(
-                Text(text=split[:chunk_chars], **make_kwargs(pages[0], pages[-1]))
+                _make_chunk(parsed_text, doc, split[:chunk_chars], pages[0], pages[-1])
             )
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
     if len(split) > overlap or not texts:
-        texts.append(Text(text=split[:chunk_chars], **make_kwargs(pages[0], pages[-1])))
+        texts.append(
+            _make_chunk(parsed_text, doc, split[:chunk_chars], pages[0], pages[-1])
+        )
     return texts
 
 
