@@ -212,6 +212,11 @@ max-attributes = 12
 max-line-length = 88  # Match ruff line-length
 
 [tool.pylint.main]
+# Files or directories matching the regular expression patterns are skipped.
+# The regex matches against base names, not paths. The default value ignores
+ignore-patterns = [
+    "version.py",  # setuptools-scm version files, SEE: https://github.com/pylint-dev/pylint/issues/10479
+]
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use, and will cap the count on Windows to
 # avoid hangs.
