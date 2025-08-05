@@ -1479,6 +1479,48 @@ async def test_code() -> None:
 
 
 @pytest.mark.asyncio
+async def test_querying_tables(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+
+    docs = Docs()
+    assert await docs.aadd(stub_data_dir / "influence.pdf", settings=settings)
+    # Now, let's modify the system so any tables housed in the Text.text get removed,
+    # and the system can only rely on table images or markdown
+    texts_with_tables = {
+        t
+        for t in docs.texts
+        if t.media and any(m.info.get("type") == "table" for m in t.media)
+    }
+    assert texts_with_tables, "Expected some texts to have parsed tables"
+    for t in texts_with_tables:
+        # Wipe text but keep embedding (for retrieval), to confirm tables get used
+        t.text = "Placeholder"
+        # Wipe non-table media (e.g. images)
+        t.media = [m for m in t.media if m.info.get("type") == "table"]
+    docs.texts = list(texts_with_tables)
+    session = await docs.aquery(
+        "What osteotomy gap (mm) has the bone volume per slice?", settings=settings
+    )
+    assert session.used_contexts
+    used_texts = [c.text for c in session.contexts if c.id in session.used_contexts]
+    assert all(
+        [m.data for m in t.media] for t in used_texts
+    ), "Expected image data to be present in the used contexts"
+    assert any(x in session.answer for x in ("1.0 mm", "1.0-mm"))
+    assert session.cost > 0
+
+    # Filter contexts for HTTP requests, and ensure no images are present
+    session.filter_content_for_user()
+    assert session.used_contexts
+    used_texts_after_filter = [
+        c.text for c in session.contexts if c.id in session.used_contexts
+    ]
+    assert all(
+        not t.media for t in used_texts_after_filter
+    ), "Expected no media for lightweight HTTP requests"
+
+
+@pytest.mark.asyncio
 async def test_images(stub_data_dir: Path) -> None:
     settings = Settings.from_name("fast")
     # Let's use default prompting set up, so we can get JSON summary-support
