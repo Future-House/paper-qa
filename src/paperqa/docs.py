@@ -764,7 +764,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             session.add_tokens(pre)
             pre_str = pre.text
 
-        context_str = query_settings.context_serializer(
+        context_str = await query_settings.context_serializer(
             contexts=contexts,
             question=session.question,
             pre_str=pre_str,

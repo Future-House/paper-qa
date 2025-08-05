@@ -75,10 +75,10 @@ _EnvironmentState: TypeAlias = Any
 
 
 @runtime_checkable
-class ContextSerializer(Protocol):
+class AsyncContextSerializer(Protocol):
     """Protocol for generating a context string from settings and context."""
 
-    def __call__(
+    async def __call__(
         self,
         settings: "Settings",
         contexts: Sequence[Context],
@@ -815,9 +815,12 @@ class Settings(BaseSettings):
         exclude=True,
         frozen=True,
     )
-    custom_context_serializer: ContextSerializer | None = Field(
+    custom_context_serializer: AsyncContextSerializer | None = Field(
         default=None,
-        description="Function to turn settings and contexts into an answer context str.",
+        description=(
+            "Function to turn settings and contexts into an answer context str."
+            " If not populated, the default context serializer will be used."
+        ),
         exclude=True,
     )
 
@@ -1055,12 +1058,12 @@ class Settings(BaseSettings):
         # Gemini fixed this server-side by mid-April 2025,
         # so this method is now just available for use
 
-    def context_serializer(
+    async def context_serializer(
         self, contexts: Sequence[Context], question: str, pre_str: str | None
     ) -> str:
         """Default function for sorting ranked contexts and inserting into a context string."""
         if self.custom_context_serializer:
-            return self.custom_context_serializer(
+            return await self.custom_context_serializer(
                 settings=self, contexts=contexts, question=question, pre_str=pre_str
             )
 
