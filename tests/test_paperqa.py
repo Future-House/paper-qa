@@ -1,3 +1,4 @@
+import base64
 import contextlib
 import csv
 import os
@@ -51,9 +52,9 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import PDFParserFn, read_doc
+from paperqa.readers import PDFParserFn, parse_image, read_doc
 from paperqa.settings import AsyncContextSerializer
-from paperqa.types import ChunkMetadata, Context
+from paperqa.types import ChunkMetadata, Context, ParsedMedia
 from paperqa.utils import (
     bytes_to_string,
     clean_possessives,
@@ -1227,10 +1228,10 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
     )
     assert parsed_text.metadata.parse_type == "pdf"
     assert parsed_text.metadata.chunk_metadata is None
-    assert isinstance(parsed_text.content, dict)
     assert parsed_text.metadata.total_parsed_text_length == sum(
-        len(t) for t in parsed_text.content.values()
+        len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
     )
+    assert not parsed_text.metadata.count_parsed_media
 
 
 @pytest.mark.asyncio
@@ -1277,6 +1278,10 @@ async def test_chunk_metadata_reader(
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
+    assert not metadata.count_parsed_media
+    assert (
+        sum(len(t.media) for t in chunk_text) == metadata.count_parsed_media
+    ), "Expected chunks' media to match parsed media"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
@@ -1322,6 +1327,96 @@ async def test_chunk_metadata_reader(
             metadata.total_parsed_text_length // metadata.chunk_metadata.chunk_chars
             <= len(chunk_text)
         )
+
+
+@pytest.mark.asyncio
+async def test_image_aggregation(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+
+    # Test how self-comparisons work
+    ((_, (parsed_image,)),) = cast(dict, (await parse_image(png_path)).content).values()
+    assert parsed_image == parsed_image, "Expected equality"  # noqa: PLR0124
+    assert parsed_image.to_id() == parsed_image.to_id(), "Expected same ID"
+    assert len({parsed_image, parsed_image}) == 1, "Expected shared hash"
+    assert not parsed_image.text, "Expected no text for later assertions to make sense"
+    assert (
+        parsed_image.info.get("type") != "table"
+    ), "Expected no table for later assertions to make sense"
+
+    # Test how self-comparisons work
+    ((_, (parsed_image2,)),) = cast(
+        dict, (await parse_image(png_path)).content
+    ).values()
+    assert parsed_image == parsed_image2, "Expected equality to persist across reads"
+    assert (
+        parsed_image.to_id() == parsed_image2.to_id()
+    ), "Expected ID to persist across reads"
+    assert (
+        len({parsed_image, parsed_image2}) == 1
+    ), "Expected hash to persist across reads"
+
+    # Test different read details
+    ((_, (parsed_image3,)),) = cast(
+        dict, (await parse_image(png_path)).content
+    ).values()
+    parsed_image3.text = "Golden Gate"
+    parsed_image3.info["type"] = "table"
+    assert parsed_image != parsed_image3, "Expected tables to be differentiable"
+    assert (
+        parsed_image.to_id() != parsed_image3.to_id()
+    ), "Expected ID to mismatch between tables and images"
+    assert (
+        len({parsed_image, parsed_image3}) == 2
+    ), "Expected tables to be hashed differently"
+
+
+@pytest.mark.asyncio
+async def test_read_doc_images(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+
+    # Test parsing only
+    parsed_text = await read_doc(png_path, doc, parsed_text_only=True)
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    page_content = parsed_text.content["1"]
+    assert isinstance(page_content, tuple)
+    text_content, (parsed_image,) = page_content
+    assert not text_content, "Expected no text content for an image"
+    assert isinstance(parsed_image, ParsedMedia)
+    assert parsed_image.index == 0
+    assert isinstance(parsed_image.data, bytes)
+    assert len(parsed_image.data) > 0
+    assert not parsed_image.text, "Expected no text content for a standalone image"
+    assert parsed_image.info["suffix"] == ".png"
+    image_id = parsed_image.to_id()
+    assert image_id.version == 4, "Expected a uuid4-compatible ID"
+    assert image_id == UUID("f6426bc3-382a-45a4-8677-08744044864f")
+    assert parsed_text.metadata.parse_type == "image"
+    assert parsed_text.metadata.count_parsed_media == 1
+    assert parsed_text.metadata.total_parsed_text_length == 0
+    assert parsed_text.metadata.chunk_metadata is None
+
+    # Test parsing + 'chunking'
+    (text,) = await read_doc(png_path, doc)
+    assert isinstance(text, Text)
+    assert text.doc == doc
+    (image,) = text.media
+    assert image == parsed_image
+
+    # Test including metadata
+    texts_with_metadata = await read_doc(png_path, doc, include_metadata=True)
+    assert isinstance(texts_with_metadata, tuple)
+    texts, metadata = texts_with_metadata
+    assert len(texts) == 1
+    assert texts[0] == text
+    assert metadata.parse_type == "image"
+    assert metadata.count_parsed_media == 1
+    assert metadata.total_parsed_text_length == 0
+    assert metadata.chunk_metadata is not None
+    assert not metadata.chunk_metadata.chunk_chars
+    assert not metadata.chunk_metadata.overlap
+    assert metadata.chunk_metadata.chunk_type == "no_chunk"
 
 
 @pytest.mark.asyncio
