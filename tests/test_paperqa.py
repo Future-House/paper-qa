@@ -52,6 +52,7 @@ from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, read_doc
+from paperqa.settings import AsyncContextSerializer
 from paperqa.types import ChunkMetadata, Context
 from paperqa.utils import (
     clean_possessives,
@@ -564,6 +565,32 @@ async def test_location_awareness(docs_fixture) -> None:
 async def test_query(docs_fixture) -> None:
     settings = Settings(prompts={"answer_iteration_prompt": None})
     await docs_fixture.aquery("Is XAI usable in chemistry?", settings=settings)
+
+
+@pytest.mark.asyncio
+async def test_custom_context_str_fn(docs_fixture) -> None:
+
+    async def custom_context_str_fn(  # noqa: RUF029
+        settings: Settings,  # noqa: ARG001
+        contexts: list[Context],  # noqa: ARG001
+        question: str,  # noqa: ARG001
+        pre_str: str | None = None,  # noqa: ARG001
+    ) -> str:
+        return "TEST OVERRIDE"
+
+    assert isinstance(custom_context_str_fn, AsyncContextSerializer)
+
+    settings = Settings(
+        custom_context_serializer=custom_context_str_fn,
+        prompts={"answer_iteration_prompt": None},
+    )
+
+    session = await docs_fixture.aquery(
+        "Is XAI usable in chemistry?", settings=settings
+    )
+    assert (
+        session.context == "TEST OVERRIDE"
+    ), "Expected custom context string to be returned."
 
 
 @pytest.mark.asyncio

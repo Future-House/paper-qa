@@ -3,10 +3,20 @@ import importlib.resources
 import os
 import pathlib
 import warnings
+from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
-from typing import Any, ClassVar, Self, TypeAlias, assert_never, cast
+from typing import (
+    Any,
+    ClassVar,
+    Protocol,
+    Self,
+    TypeAlias,
+    assert_never,
+    cast,
+    runtime_checkable,
+)
 
 import anyio
 from aviary.core import Tool, ToolSelector
@@ -55,6 +65,7 @@ from paperqa.prompts import (
     summary_prompt,
 )
 from paperqa.readers import PDFParserFn
+from paperqa.types import Context
 from paperqa.utils import hexdigest, pqa_directory
 from paperqa.version import __version__
 
@@ -63,8 +74,21 @@ from paperqa.version import __version__
 _EnvironmentState: TypeAlias = Any
 
 
+@runtime_checkable
+class AsyncContextSerializer(Protocol):
+    """Protocol for generating a context string from settings and context."""
+
+    async def __call__(
+        self,
+        settings: "Settings",
+        contexts: Sequence[Context],
+        question: str,
+        pre_str: str | None,
+    ) -> str: ...
+
+
 class AnswerSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     evidence_k: int = Field(
         default=10, description="Number of evidence pieces to retrieve."
@@ -791,6 +815,14 @@ class Settings(BaseSettings):
         exclude=True,
         frozen=True,
     )
+    custom_context_serializer: AsyncContextSerializer | None = Field(
+        default=None,
+        description=(
+            "Function to turn settings and contexts into an answer context str."
+            " If not populated, the default context serializer will be used."
+        ),
+        exclude=True,
+    )
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
@@ -1025,6 +1057,88 @@ class Settings(BaseSettings):
         # in February 2025 (https://github.com/BerriAI/litellm/issues/7634), but then
         # Gemini fixed this server-side by mid-April 2025,
         # so this method is now just available for use
+
+    async def context_serializer(
+        self, contexts: Sequence[Context], question: str, pre_str: str | None
+    ) -> str:
+        """Default function for sorting ranked contexts and inserting into a context string."""
+        if self.custom_context_serializer:
+            return await self.custom_context_serializer(
+                settings=self, contexts=contexts, question=question, pre_str=pre_str
+            )
+
+        answer_config = self.answer
+        prompt_config = self.prompts
+
+        # sort by first score, then name
+        filtered_contexts = sorted(
+            contexts,
+            key=lambda x: (-x.score, x.text.name),
+        )[: answer_config.answer_max_sources]
+        # remove any contexts with a score below the cutoff
+        filtered_contexts = [
+            c
+            for c in filtered_contexts
+            if c.score >= answer_config.evidence_relevance_score_cutoff
+        ]
+
+        # shim deprecated flag
+        # TODO: remove in v6
+        context_inner_prompt = prompt_config.context_inner
+        if (
+            not answer_config.evidence_detailed_citations
+            and "\nFrom {citation}" in context_inner_prompt
+        ):
+            # Only keep "\nFrom {citation}" if we are showing detailed citations
+            context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
+
+        context_str_body = ""
+        if answer_config.group_contexts_by_question:
+            contexts_by_question: dict[str, list[Context]] = defaultdict(list)
+            for c in filtered_contexts:
+                # Fallback to the main session question if not available.
+                # question attribute is optional, so if a user
+                # sets contexts externally, it may not have a question.
+                context_question = getattr(c, "question", question)
+                contexts_by_question[context_question].append(c)
+
+            context_sections = []
+            for context_question, contexts_in_group in contexts_by_question.items():
+                inner_strs = [
+                    context_inner_prompt.format(
+                        name=c.id,
+                        text=c.context,
+                        citation=c.text.doc.formatted_citation,
+                        **(c.model_extra or {}),
+                    )
+                    for c in contexts_in_group
+                ]
+                # Create a section with a question heading
+                section_header = (
+                    f'Contexts related to the question: "{context_question}"'
+                )
+                section = f"{section_header}\n\n" + "\n\n".join(inner_strs)
+                context_sections.append(section)
+            context_str_body = "\n\n----\n\n".join(context_sections)
+        else:
+            inner_context_strs = [
+                context_inner_prompt.format(
+                    name=c.id,
+                    text=c.context,
+                    citation=c.text.doc.formatted_citation,
+                    **(c.model_extra or {}),
+                )
+                for c in filtered_contexts
+            ]
+            context_str_body = "\n\n".join(inner_context_strs)
+
+        if pre_str:
+            context_str_body += f"\n\nExtra background information: {pre_str}"
+
+        return prompt_config.context_outer.format(
+            context_str=context_str_body,
+            valid_keys=", ".join([c.id for c in filtered_contexts]),
+        )
 
 
 # Settings: already Settings
