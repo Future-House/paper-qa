@@ -895,6 +895,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.pdfs_use_block_parsing`             | `False`                                | Opt-in flag for block-based PDF parsing over text-based PDF parsing.                                    |
 | `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                               |
 | `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                           |
+| `parsing.multimodal`                         | `True`                                 | Flag to parse both text and images from applicable documents.                                           |
 | `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                         |
 | `parsing.parse_pdf`                          | `paperqa_pypdf.parse_pdf_to_pages`     | Function to parse PDF files.                                                                            |
 | `parsing.configure_pdf_parser`               | No-op                                  | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging. |
