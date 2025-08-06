@@ -16,7 +16,7 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, BinaryIO, ClassVar, TypeVar
+from typing import TYPE_CHECKING, Any, BinaryIO, ClassVar, TypeVar
 from uuid import UUID
 
 import aiohttp
@@ -33,6 +33,12 @@ from tenacity import (
     stop_after_attempt,
     wait_incrementing,
 )
+
+if TYPE_CHECKING:
+    from typing import IO
+
+    from PIL._typing import StrOrBytesPath
+
 
 logger = logging.getLogger(__name__)
 
@@ -632,3 +638,22 @@ def string_to_bytes(value: str) -> bytes:
     # 1. Convert base64 string to base64 bytes
     # 2. Convert base64 bytes to original bytes
     return base64.b64decode(value.encode("utf-8"))
+
+
+def validate_image(path: StrOrBytesPath | IO[bytes]) -> None:
+    """
+    Validate that the file at the given path is a valid image.
+
+    Raises:
+        OSError: If the image file is truncated.
+    """  # noqa: DOC502
+    try:
+        from PIL import Image
+    except ImportError as exc:
+        raise ImportError(
+            "Image validation requires the 'image' extra for 'pillow'. Please:"
+            " `pip install paper-qa[image]`."
+        ) from exc
+
+    with Image.open(path) as img:
+        img.load()

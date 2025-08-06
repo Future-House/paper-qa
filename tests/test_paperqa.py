@@ -1,6 +1,8 @@
+import asyncio
 import base64
 import contextlib
 import csv
+import io
 import os
 import pathlib
 import pickle
@@ -68,6 +70,7 @@ from paperqa.utils import (
     string_to_bytes,
     strings_similarity,
     strip_citations,
+    validate_image,
 )
 
 THIS_MODULE = pathlib.Path(__file__)
@@ -1372,7 +1375,7 @@ async def test_image_aggregation(stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_read_doc_images(stub_data_dir: Path) -> None:
+async def test_read_doc_images_metadata(stub_data_dir: Path) -> None:
     png_path = stub_data_dir / "sf_districts.png"
     doc = Doc(docname="stub", citation="stub", dockey="stub")
 
@@ -1418,6 +1421,19 @@ async def test_read_doc_images(stub_data_dir: Path) -> None:
     assert not metadata.chunk_metadata.chunk_chars
     assert not metadata.chunk_metadata.overlap
     assert metadata.chunk_metadata.chunk_type == "no_chunk"
+
+
+@pytest.mark.asyncio
+async def test_read_doc_images_concurrency(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+
+    # Check we can concurrently read in the same image many times
+    bulk_texts = await asyncio.gather(*(read_doc(png_path, doc) for _ in range(10)))
+    for (text,) in bulk_texts:
+        assert text.doc == doc
+        assert len(text.media) == 1
+        validate_image(io.BytesIO(text.media[0].data))
 
 
 @pytest.mark.asyncio
@@ -1499,7 +1515,12 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
     (districts_doc,) = (d for d in docs.docs.values() if d.docname == districts_docname)
     for media in (t.media for t in docs.texts if t.doc == districts_doc and t.media):
         for m in media:
-            m.data = m.data[: len(m.data) // 2]  # Chop the image in half, breaking it
+            # Validate the image, then chop the image in half (breaking it), and
+            # confirm it's no longer valid (and that we can detect it's no longer valid)
+            validate_image(io.BytesIO(m.data))
+            m.data = m.data[: len(m.data) // 2]
+            with pytest.raises(OSError, match="truncated"):
+                validate_image(io.BytesIO(m.data))
     with pytest.raises(litellm.BadRequestError, match="unsupported image"):
         await docs.aquery(
             "What districts neighbor the Western Addition?", settings=settings

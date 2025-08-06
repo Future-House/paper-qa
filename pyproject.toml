@@ -61,7 +61,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[ldp,pypdf,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[image,ldp,pypdf,pymupdf,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -77,6 +77,9 @@ dev = [
     "refurb>=2",  # Pin to keep recent
     "typeguard",
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
+]
+image = [
+    "pillow>=10.3.0",  # Pin for py.typed
 ]
 ldp = [
     "ldp>=0.25.0",  # For new LLM client interface
