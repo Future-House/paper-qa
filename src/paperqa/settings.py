@@ -116,6 +116,13 @@ class AnswerSettings(BaseModel):
     evidence_skip_summary: bool = Field(
         default=False, description="Whether to summarization."
     )
+    evidence_text_only_fallback: bool = Field(
+        default=False,
+        description=(
+            "Opt-in flag to allow creating contexts without media (just text),"
+            " if the media is problematic for the LLM provider or network."
+        ),
+    )
     answer_max_sources: int = Field(
         default=5, description="Max number of sources to use for an answer."
     )

@@ -670,6 +670,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                         parser=llm_parse_json if prompt_config.use_json else None,
                         callbacks=callbacks,
                         skip_citation_strip=answer_config.skip_evidence_citation_strip,
+                        evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
                     )
                     for m in matches
                 ],

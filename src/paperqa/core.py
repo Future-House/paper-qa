@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
 import re
 from collections.abc import Callable, Sequence
 from typing import Any, cast
 
+import litellm
 from aviary.core import Message
 from lmi import LLMModel
 
 from paperqa.prompts import text_with_tables_prompt_template
 from paperqa.types import Context, LLMResult, Text
 from paperqa.utils import extract_score, strip_citations
+
+logger = logging.getLogger(__name__)
 
 
 def llm_parse_json(text: str) -> dict:
@@ -137,6 +141,7 @@ async def map_fxn_summary(
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: Sequence[Callable[[str], None]] | None = None,
     skip_citation_strip: bool = False,
+    evidence_text_only_fallback: bool = False,
 ) -> tuple[Context, LLMResult]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
@@ -155,6 +160,8 @@ async def map_fxn_summary(
             Should return dict with at least 'summary' field.
         callbacks: Optional sequence of callback functions to execute during LLM calls.
         skip_citation_strip: Optional skipping of citation stripping, if you want to keep in the context.
+        evidence_text_only_fallback: Opt-in flag to allow retrying context creation
+            without media in the completion.
 
     Returns:
         The context object and LLMResult to get info about the LLM execution.
@@ -164,6 +171,7 @@ async def map_fxn_summary(
     extras: dict[str, Any] = {}
     citation = text.name + ": " + text.doc.formatted_citation
     success = False
+    used_text_only_fallback = False
 
     # Strip newlines in case chunking led to blank lines,
     # but not spaces, to preserve text alignment
@@ -183,19 +191,41 @@ async def map_fxn_summary(
                 else cleaned_text
             ),
         } | (extra_prompt_data or {})
-        message_prompt, system_prompt = prompt_templates
-        messages = [
-            Message(role="system", content=system_prompt.format(**data)),
-            Message.create_message(
-                text=message_prompt.format(**data),
-                images=[i.to_image_url() for i in text.media] if text.media else None,
-            ),
-        ]
-        llm_result = await summary_llm_model.call_single(
-            messages=messages,
-            callbacks=callbacks,
-            name="evidence:" + text.name,
-        )
+        message_prompt, system_prompt = (pt.format(**data) for pt in prompt_templates)
+        try:
+            llm_result = await summary_llm_model.call_single(
+                messages=[
+                    Message(role="system", content=system_prompt),
+                    Message.create_message(
+                        text=message_prompt,
+                        images=(
+                            [i.to_image_url() for i in text.media]
+                            if text.media
+                            else None
+                        ),
+                    ),
+                ],
+                callbacks=callbacks,
+                name="evidence:" + text.name,
+            )
+        except litellm.BadRequestError as exc:
+            if not evidence_text_only_fallback:
+                raise
+            logger.warning(
+                f"LLM call to create a context failed with exception {exc!r}"
+                f" on text named {text.name!r}"
+                f" with doc name {text.doc.docname!r} and doc key {text.doc.dockey!r}."
+                f" Retrying without media."
+            )
+            llm_result = await summary_llm_model.call_single(
+                messages=[
+                    Message(role="system", content=system_prompt),
+                    Message(content=message_prompt),
+                ],
+                callbacks=callbacks,
+                name="evidence:" + text.name,
+            )
+            used_text_only_fallback = True
         context = cast("str", llm_result.text)
         result_data = parser(context) if parser else {}
         success = bool(result_data)
@@ -225,6 +255,8 @@ async def map_fxn_summary(
 
     if not success:
         score = extract_score(context)
+    if used_text_only_fallback:
+        extras["used_images"] = False
 
     return (
         Context(

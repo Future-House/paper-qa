@@ -880,6 +880,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `answer.evidence_retrieval`                  | `True`                                 | Use retrieval vs processing all docs.                                                                   |
 | `answer.evidence_summary_length`             | `"about 100 words"`                    | Length of evidence summary.                                                                             |
 | `answer.evidence_skip_summary`               | `False`                                | Whether to skip summarization.                                                                          |
+| `answer.evidence_text_only_fallback`         | `False`                                | Whether to allow context creation to retry without media present.                                       |
 | `answer.answer_max_sources`                  | `5`                                    | Max number of sources for an answer.                                                                    |
 | `answer.max_answer_attempts`                 | `None`                                 | Max attempts to generate an answer.                                                                     |
 | `answer.answer_length`                       | `"about 200 words, but can be longer"` | Length of final answer.                                                                                 |

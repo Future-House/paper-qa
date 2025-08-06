@@ -15,6 +15,7 @@ from typing import cast
 from uuid import UUID
 
 import httpx
+import litellm
 import numpy as np
 import pytest
 import pytest_asyncio
@@ -1472,6 +1473,51 @@ async def test_images(stub_data_dir: Path) -> None:
     ]
     assert contexts_used
     assert all(c.used_images for c in contexts_used)  # type: ignore[attr-defined]
+
+
+@pytest.mark.asyncio
+async def test_images_corrupt(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+    # Let's use default prompting set up, so we can get JSON summary-support
+    settings.prompts = type(settings.prompts)()
+    # We don't support image embeddings yet, so disable embedding
+    settings.answer.evidence_retrieval = False
+    settings.parsing.defer_embedding = True
+
+    docs = Docs()
+    districts_docname = await docs.aadd(
+        stub_data_dir / "sf_districts.png",
+        citation=(
+            '"File:San francisco districts.png." Wikimedia Commons.'
+            " 7 Sep 2023, 07:38 UTC."
+            " <https://commons.wikimedia.org/w/index.php?title=File:San_francisco_districts.png&oldid=799209398>"
+            " July 2025."
+        ),
+        settings=settings,
+    )
+    assert districts_docname, "Expected successful image addition"
+    (districts_doc,) = (d for d in docs.docs.values() if d.docname == districts_docname)
+    for media in (t.media for t in docs.texts if t.doc == districts_doc and t.media):
+        for m in media:
+            m.data = m.data[: len(m.data) // 2]  # Chop the image in half, breaking it
+    with pytest.raises(litellm.BadRequestError, match="unsupported image"):
+        await docs.aquery(
+            "What districts neighbor the Western Addition?", settings=settings
+        )
+    settings.answer.evidence_text_only_fallback = True
+    # The answer will be garbage, but let's make sure we didn't claim to use images
+    session = await docs.aquery(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert session.used_contexts
+    assert session.cost > 0
+    contexts_used = [
+        c
+        for c in session.contexts
+        if c.id in session.used_contexts and c.text.doc == districts_doc
+    ]
+    assert contexts_used
+    assert all(not c.used_images for c in contexts_used)  # type: ignore[attr-defined]
 
 
 def test_zotero() -> None:
