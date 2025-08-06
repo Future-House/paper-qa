@@ -380,7 +380,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 doc, **(query_kwargs | kwargs)
             )
 
-        texts = await read_doc(
+        texts, metadata = await read_doc(
             path,
             doc,
             chunk_chars=parse_config.chunk_size,
@@ -388,9 +388,10 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             page_size_limit=parse_config.page_size_limit,
             use_block_parsing=parse_config.pdfs_use_block_parsing,
             parse_pdf=parse_config.parse_pdf,
+            include_metadata=True,
         )
         # loose check to see if document was loaded
-        if (
+        if metadata.parse_type != "image" and (
             not texts
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
@@ -669,6 +670,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                         parser=llm_parse_json if prompt_config.use_json else None,
                         callbacks=callbacks,
                         skip_citation_strip=answer_config.skip_evidence_citation_strip,
+                        evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
                     )
                     for m in matches
                 ],

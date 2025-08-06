@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import os
+from collections.abc import Awaitable, Callable
 from math import ceil
 from pathlib import Path
 from typing import Literal, Protocol, cast, overload, runtime_checkable
 
+import anyio
 import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
@@ -13,6 +15,7 @@ from html2text import html2text
 from paperqa.types import (
     ChunkMetadata,
     Doc,
+    ParsedMedia,
     ParsedMetadata,
     ParsedText,
     Text,
@@ -28,6 +31,42 @@ class PDFParserFn(Protocol):
     def __call__(
         self, path: str | os.PathLike, page_size_limit: int | None = None, **kwargs
     ) -> ParsedText: ...
+
+
+async def parse_image(
+    path: str | os.PathLike, validator: Callable[[bytes], Awaitable] | None = None, **_
+) -> ParsedText:
+    apath = anyio.Path(path)
+    image_data = await anyio.Path(path).read_bytes()
+    if validator:
+        try:
+            await validator(image_data)
+        except Exception as exc:
+            raise ImpossibleParsingError(
+                f"Image validation failed for the image at path {path}."
+            ) from exc
+    parsed_media = ParsedMedia(index=0, data=image_data, info={"suffix": apath.suffix})
+    metadata = ParsedMetadata(
+        parsing_libraries=[],
+        paperqa_version=pqa_version,
+        total_parsed_text_length=0,  # No text, just an image
+        count_parsed_media=1,
+        parse_type="image",
+    )
+    return ParsedText(content={"1": ("", [parsed_media])}, metadata=metadata)
+
+
+def _make_chunk(
+    parsed_text: ParsedText, doc: Doc, text: str, lower_page: str, upper_page: str
+) -> Text:
+    media: list[ParsedMedia] = []
+    for pg_num in range(int(lower_page), int(upper_page) + 1):
+        pg_contents = cast(dict, parsed_text.content)[str(pg_num)]
+        if isinstance(pg_contents, tuple):
+            media.extend(pg_contents[1])
+    # pretty formatting of pages (e.g. 1-3, 4, 5-7)
+    name = "-".join([lower_page, upper_page])
+    return Text(text=text, name=f"{doc.docname} pages {name}", media=media, doc=doc)
 
 
 def chunk_pdf(
@@ -48,27 +87,25 @@ def chunk_pdf(
             f" {doc.dockey}, either empty or corrupted."
         )
 
-    for page_num, page_text in parsed_text.content.items():
+    for page_num, page_contents in parsed_text.content.items():
+        page_text = (
+            page_contents if isinstance(page_contents, str) else page_contents[0]
+        )
         split += page_text
         pages.append(page_num)
         # split could be so long it needs to be split
         # into multiple chunks. Or it could be so short
         # that it needs to be combined with the next chunk.
         while len(split) > chunk_chars:
-            # pretty formatting of pages (e.g. 1-3, 4, 5-7)
-            pg = "-".join([pages[0], pages[-1]])
             texts.append(
-                Text(
-                    text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc
-                )
+                _make_chunk(parsed_text, doc, split[:chunk_chars], pages[0], pages[-1])
             )
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
     if len(split) > overlap or not texts:
-        pg = "-".join([pages[0], pages[-1]])
         texts.append(
-            Text(text=split[:chunk_chars], name=f"{doc.docname} pages {pg}", doc=doc)
+            _make_chunk(parsed_text, doc, split[:chunk_chars], pages[0], pages[-1])
         )
     return texts
 
@@ -232,6 +269,9 @@ def chunk_code_text(
     return texts
 
 
+IMAGE_EXTENSIONS = tuple({".png", ".jpg", ".jpeg"})
+
+
 @overload
 async def read_doc(
     path: str | os.PathLike,
@@ -287,7 +327,7 @@ async def read_doc(
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> tuple[list[Text], ParsedMetadata]: ...
-async def read_doc(
+async def read_doc(  # noqa: PLR0912
     path: str | os.PathLike,
     doc: Doc,
     parsed_text_only: bool = False,
@@ -326,6 +366,8 @@ async def read_doc(
         parsed_text = await asyncio.to_thread(
             parse_text, path, html=True, **parser_kwargs
         )
+    elif str_path.endswith(IMAGE_EXTENSIONS):
+        parsed_text = await parse_image(path, **parser_kwargs)
     else:
         parsed_text = await asyncio.to_thread(
             parse_text, path, split_lines=True, use_tiktoken=False, **parser_kwargs
@@ -351,6 +393,11 @@ async def read_doc(
             overlap=overlap,
             chunk_type="overlap_pdf_by_page",
         )
+    elif str_path.endswith(IMAGE_EXTENSIONS):
+        chunked_text = chunk_pdf(
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        )
+        chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap

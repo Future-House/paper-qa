@@ -117,6 +117,13 @@ class AnswerSettings(BaseModel):
     evidence_skip_summary: bool = Field(
         default=False, description="Whether to summarization."
     )
+    evidence_text_only_fallback: bool = Field(
+        default=False,
+        description=(
+            "Opt-in flag to allow creating contexts without media (just text),"
+            " if the media is problematic for the LLM provider or network."
+        ),
+    )
     answer_max_sources: int = Field(
         default=5, description="Max number of sources to use for an answer."
     )
@@ -524,7 +531,11 @@ class IndexSettings(BaseModel):
         ),
     )
     files_filter: Callable[[anyio.Path | pathlib.Path], bool] = Field(
-        default=lambda f: f.suffix in {".txt", ".pdf", ".html", ".md"},
+        default=lambda f: (
+            f.suffix
+            # TODO: add images after embeddings are supported
+            in {".txt", ".pdf", ".html", ".md"}
+        ),
         exclude=True,
         description=(
             "Filter function to apply to files in the paper directory."
