@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import ast
 import csv
+import hashlib
+import json
 import logging
 import os
 import re
@@ -10,6 +12,8 @@ from collections.abc import Collection, Iterable, Mapping, Sequence
 from copy import deepcopy
 from datetime import datetime
 from enum import StrEnum
+from pathlib import Path
+from random import Random
 from typing import Annotated, Any, ClassVar, Self, cast
 from uuid import UUID, uuid4
 
@@ -21,8 +25,10 @@ from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
 from pydantic import (
     BaseModel,
+    BeforeValidator,
     ConfigDict,
     Field,
+    JsonValue,
     PlainSerializer,
     computed_field,
     field_validator,
@@ -30,11 +36,13 @@ from pydantic import (
 )
 
 from paperqa.utils import (
+    bytes_to_string,
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citation_ids,
     maybe_get_date,
+    string_to_bytes,
 )
 from paperqa.version import __version__ as pqa_version
 
@@ -139,6 +147,9 @@ class Text(Embeddable):
             " (e.g., 'Wiki2023 chunk 1', 'sentence1')."
         )
     )
+    media: list[ParsedMedia] = Field(
+        default_factory=list, description="Optional list of associated media."
+    )
     doc: Doc | DocDetails = Field(
         union_mode="left_to_right",
         description="Source document this text chunk originates from.",
@@ -167,6 +178,9 @@ AUTOPOPULATE_VALUE = ""  # NOTE: this is falsy by design
 class Context(BaseModel):
     """A class to hold the context of a question."""
 
+    # We allow extras so one can extend the summary JSON prompt
+    # to have the LLM answer with more conclusions such as alternate scores
+    # or useful excerpts of text
     model_config = ConfigDict(extra="allow")
 
     id: str = Field(
@@ -344,7 +358,8 @@ class PQASession(BaseModel):
                     # on why we drop embeddings, drop embeddings here too because
                     # embeddings aren't displayed to front end users
                     doc=c.text.doc.model_dump(exclude={"embedding"}),
-                    **c.text.model_dump(exclude={"text", "embedding", "doc"}),
+                    # We drop media since images can be quite large
+                    **c.text.model_dump(exclude={"text", "embedding", "doc", "media"}),
                 ),
             )
             for c in self.contexts
@@ -421,8 +436,8 @@ class Answer(PQASession):
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""
 
-    chunk_chars: int
-    overlap: int
+    chunk_chars: int = Field(description="Chunk size (chars), or 0 for no chunking.")
+    overlap: int = Field(description="Chunk overlap (chars), or 0 for no overlap.")
     chunk_type: str
 
 
@@ -431,15 +446,86 @@ class ParsedMetadata(BaseModel):
 
     parsing_libraries: list[str]
     total_parsed_text_length: int
+    count_parsed_media: int = Field(default=0, ge=0)
     paperqa_version: str = pqa_version
     parse_type: str | None = None
     chunk_metadata: ChunkMetadata | None = None
 
 
+class ParsedMedia(BaseModel):
+    """Raw image or table parsed from a document's page."""
+
+    index: int = Field(
+        description="Index of the image in a given page, or 0 if solely an image."
+    )
+    data: Annotated[
+        bytes,
+        PlainSerializer(bytes_to_string),
+        BeforeValidator(lambda x: x if isinstance(x, bytes) else string_to_bytes(x)),
+    ] = Field(description="Raw image, ideally directly savable to a PNG image.")
+    text: str | None = Field(
+        default=None,
+        description="Optional associated text content (e.g. markdown export of a table).",
+    )
+    info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
+        default_factory=dict,
+        description=(
+            "Optional image metadata. This may come from image definitions sourced from"
+            " the PDF, or attributes of custom pixel maps."
+        ),
+    )
+
+    def __hash__(self) -> int:
+        return hash(
+            (self.index, self.data, self.text, json.dumps(self.info, sort_keys=True))
+        )
+
+    def to_id(self) -> UUID:
+        """Convert this media to a UUID4 suitable for a database ID."""
+        # We only hash the image and text content, since we don't want
+        # minor parsing details (e.g. inconsequentially-small decimal values
+        # in bounding boxes) to change the resultant ID
+        to_hash: bytes = (
+            self.data if not self.text else self.data + self.text.encode("utf-8")
+        )
+        seed_hash = hashlib.sha256(to_hash).hexdigest()
+        seed_uint32 = int(seed_hash, 16) % (2**32)
+
+        # Convert uint32 to UUID4
+        uuid_int = Random(seed_uint32).getrandbits(128)
+        uuid_int &= ~(0xF << 76)  # Clear version bits
+        uuid_int |= 0x4 << 76  # Then set version to 4
+        uuid_int &= ~(0x3 << 62)  # Clear variant bits
+        uuid_int |= 0x2 << 62  # Then set variant to 10 for RFC 4122
+        return UUID(int=uuid_int)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, ParsedMedia):
+            return NotImplemented
+        return (
+            self.index == other.index
+            and self.data == other.data
+            and self.text == other.text
+            and json.dumps(self.info, sort_keys=True)
+            == json.dumps(other.info, sort_keys=True)
+        )
+
+    def to_image_url(self, image_type: str = "png") -> str:
+        """Convert the image data to an RFC 2397 data URL format."""
+        return f"data:image/{image_type};base64,{bytes_to_string(self.data)}"
+
+    def save(self, path: str | os.PathLike) -> None:
+        """Save the image to the input file path."""
+        with Path(path).open("wb") as f:
+            f.write(self.data)
+
+
 class ParsedText(BaseModel):
     """All text from a document read, before chunking."""
 
-    content: dict[str, str] | str | list[str] = Field(
+    content: (
+        dict[str, str] | str | list[str] | dict[str, tuple[str, list[ParsedMedia]]]
+    ) = Field(
         description=(
             "All parsed but not further processed (e.g. not chunked) contents from a"
             " document. It may be structured, depending on the parser's implementation."
@@ -448,6 +534,8 @@ class ParsedText(BaseModel):
             "\n- `dict[str, str]` (e.g. page number -> page text) for PDFs."
             "\n- `str` for text files."
             "\n- `list[str]` for line-by-line parsings."
+            "\n- `dict[str, tuple[str, list[ParsedMedia]]]` (e.g. page number"
+            " -> (page text, page images)) for PDFs."
         )
     )
     metadata: ParsedMetadata = Field(
@@ -473,7 +561,9 @@ class ParsedText(BaseModel):
             return self.content
         if isinstance(self.content, list):
             return "\n\n".join(self.content)
-        return "\n\n".join(self.content.values())
+        return "\n\n".join(
+            x[0] if not isinstance(x, str) else x for x in self.content.values()
+        )
 
 
 class BibTeXSource(StrEnum):
