@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+from collections.abc import Awaitable, Callable
 from math import ceil
 from pathlib import Path
 from typing import Literal, Protocol, cast, overload, runtime_checkable
@@ -32,9 +33,18 @@ class PDFParserFn(Protocol):
     ) -> ParsedText: ...
 
 
-async def parse_image(path: str | os.PathLike, **_) -> ParsedText:
+async def parse_image(
+    path: str | os.PathLike, validator: Callable[[bytes], Awaitable] | None = None, **_
+) -> ParsedText:
     apath = anyio.Path(path)
     image_data = await anyio.Path(path).read_bytes()
+    if validator:
+        try:
+            await validator(image_data)
+        except Exception as exc:
+            raise ImpossibleParsingError(
+                f"Image validation failed for the image at path {path}."
+            ) from exc
     parsed_media = ParsedMedia(index=0, data=image_data, info={"suffix": apath.suffix})
     metadata = ParsedMetadata(
         parsing_libraries=[],

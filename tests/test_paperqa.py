@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import cast
+from unittest.mock import MagicMock, call
 from uuid import UUID
 
 import httpx
@@ -1427,13 +1428,31 @@ async def test_read_doc_images_metadata(stub_data_dir: Path) -> None:
 async def test_read_doc_images_concurrency(stub_data_dir: Path) -> None:
     png_path = stub_data_dir / "sf_districts.png"
     doc = Doc(docname="stub", citation="stub", dockey="stub")
+    validation_mock = MagicMock()
+
+    async def validate(data: bytes) -> None:  # noqa: RUF029
+        validate_image(io.BytesIO(data))
+        validation_mock(data)
 
     # Check we can concurrently read in the same image many times
-    bulk_texts = await asyncio.gather(*(read_doc(png_path, doc) for _ in range(10)))
+    concurrent_call_count = 10
+    seen_media = set()
+    bulk_texts = await asyncio.gather(
+        *(
+            read_doc(png_path, doc, validator=validate)
+            for _ in range(concurrent_call_count)
+        )
+    )
     for (text,) in bulk_texts:
         assert text.doc == doc
         assert len(text.media) == 1
-        validate_image(io.BytesIO(text.media[0].data))
+        seen_media.add(text.media[0])
+    assert (
+        len(seen_media) == 1
+    ), "Expected the concurrent reads to all have the same parsed result"
+    validation_mock.assert_has_calls(
+        [call(next(iter(seen_media)).data)] * concurrent_call_count
+    )
 
 
 @pytest.mark.asyncio
