@@ -1,5 +1,8 @@
+import asyncio
+import base64
 import contextlib
 import csv
+import io
 import os
 import pathlib
 import pickle
@@ -11,9 +14,11 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import cast
+from unittest.mock import MagicMock, call
 from uuid import UUID
 
 import httpx
+import litellm
 import numpy as np
 import pytest
 import pytest_asyncio
@@ -51,10 +56,11 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import llm_parse_json
 from paperqa.prompts import CANNOT_ANSWER_PHRASE
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import PDFParserFn, read_doc
+from paperqa.readers import PDFParserFn, parse_image, read_doc
 from paperqa.settings import AsyncContextSerializer
-from paperqa.types import ChunkMetadata, Context
+from paperqa.types import ChunkMetadata, Context, ParsedMedia
 from paperqa.utils import (
+    bytes_to_string,
     clean_possessives,
     encode_id,
     extract_score,
@@ -62,8 +68,10 @@ from paperqa.utils import (
     maybe_is_html,
     maybe_is_text,
     name_in_text,
+    string_to_bytes,
     strings_similarity,
     strip_citations,
+    validate_image,
 )
 
 THIS_MODULE = pathlib.Path(__file__)
@@ -1228,6 +1236,7 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
     assert parsed_text.metadata.total_parsed_text_length == sum(
         len(t) for t in parsed_text.content.values()  # type: ignore[misc,union-attr]
     )
+    assert not parsed_text.metadata.count_parsed_media
 
 
 @pytest.mark.asyncio
@@ -1274,6 +1283,10 @@ async def test_chunk_metadata_reader(
     assert (
         int(last_page) - int(stlast_page) <= 2
     ), "Incorrect page range if last chunk is a partial chunk"
+    assert not metadata.count_parsed_media
+    assert (
+        sum(len(t.media) for t in chunk_text) == metadata.count_parsed_media
+    ), "Expected chunks' media to match parsed media"
 
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
@@ -1322,6 +1335,127 @@ async def test_chunk_metadata_reader(
 
 
 @pytest.mark.asyncio
+async def test_image_aggregation(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+
+    # Test how self-comparisons work
+    ((_, (parsed_image,)),) = cast(dict, (await parse_image(png_path)).content).values()
+    assert parsed_image == parsed_image, "Expected equality"  # noqa: PLR0124
+    assert parsed_image.to_id() == parsed_image.to_id(), "Expected same ID"
+    assert len({parsed_image, parsed_image}) == 1, "Expected shared hash"
+    assert not parsed_image.text, "Expected no text for later assertions to make sense"
+    assert (
+        parsed_image.info.get("type") != "table"
+    ), "Expected no table for later assertions to make sense"
+
+    # Test how self-comparisons work
+    ((_, (parsed_image2,)),) = cast(
+        dict, (await parse_image(png_path)).content
+    ).values()
+    assert parsed_image == parsed_image2, "Expected equality to persist across reads"
+    assert (
+        parsed_image.to_id() == parsed_image2.to_id()
+    ), "Expected ID to persist across reads"
+    assert (
+        len({parsed_image, parsed_image2}) == 1
+    ), "Expected hash to persist across reads"
+
+    # Test different read details
+    ((_, (parsed_image3,)),) = cast(
+        dict, (await parse_image(png_path)).content
+    ).values()
+    parsed_image3.text = "Golden Gate"
+    parsed_image3.info["type"] = "table"
+    assert parsed_image != parsed_image3, "Expected tables to be differentiable"
+    assert (
+        parsed_image.to_id() != parsed_image3.to_id()
+    ), "Expected ID to mismatch between tables and images"
+    assert (
+        len({parsed_image, parsed_image3}) == 2
+    ), "Expected tables to be hashed differently"
+
+
+@pytest.mark.asyncio
+async def test_read_doc_images_metadata(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+
+    # Test parsing only
+    parsed_text = await read_doc(png_path, doc, parsed_text_only=True)
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    page_content = parsed_text.content["1"]
+    assert isinstance(page_content, tuple)
+    text_content, (parsed_image,) = page_content
+    assert not text_content, "Expected no text content for an image"
+    assert isinstance(parsed_image, ParsedMedia)
+    assert parsed_image.index == 0
+    assert isinstance(parsed_image.data, bytes)
+    assert len(parsed_image.data) > 0
+    assert not parsed_image.text, "Expected no text content for a standalone image"
+    assert parsed_image.info["suffix"] == ".png"
+    image_id = parsed_image.to_id()
+    assert image_id.version == 4, "Expected a uuid4-compatible ID"
+    assert image_id == UUID("f6426bc3-382a-45a4-8677-08744044864f")
+    assert parsed_text.metadata.parse_type == "image"
+    assert parsed_text.metadata.count_parsed_media == 1
+    assert parsed_text.metadata.total_parsed_text_length == 0
+    assert parsed_text.metadata.chunk_metadata is None
+
+    # Test parsing + 'chunking'
+    (text,) = await read_doc(png_path, doc)
+    assert isinstance(text, Text)
+    assert text.doc == doc
+    (image,) = text.media
+    assert image == parsed_image
+
+    # Test including metadata
+    texts_with_metadata = await read_doc(png_path, doc, include_metadata=True)
+    assert isinstance(texts_with_metadata, tuple)
+    texts, metadata = texts_with_metadata
+    assert len(texts) == 1
+    assert texts[0] == text
+    assert metadata.parse_type == "image"
+    assert metadata.count_parsed_media == 1
+    assert metadata.total_parsed_text_length == 0
+    assert metadata.chunk_metadata is not None
+    assert not metadata.chunk_metadata.chunk_chars
+    assert not metadata.chunk_metadata.overlap
+    assert metadata.chunk_metadata.chunk_type == "no_chunk"
+
+
+@pytest.mark.asyncio
+async def test_read_doc_images_concurrency(stub_data_dir: Path) -> None:
+    png_path = stub_data_dir / "sf_districts.png"
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+    validation_mock = MagicMock()
+
+    async def validate(data: bytes) -> None:  # noqa: RUF029
+        validate_image(io.BytesIO(data))
+        validation_mock(data)
+
+    # Check we can concurrently read in the same image many times
+    concurrent_call_count = 10
+    seen_media = set()
+    bulk_texts = await asyncio.gather(
+        *(
+            read_doc(png_path, doc, validator=validate)
+            for _ in range(concurrent_call_count)
+        )
+    )
+    for (text,) in bulk_texts:
+        assert text.doc == doc
+        assert len(text.media) == 1
+        seen_media.add(text.media[0])
+    assert (
+        len(seen_media) == 1
+    ), "Expected the concurrent reads to all have the same parsed result"
+    validation_mock.assert_has_calls(
+        [call(next(iter(seen_media)).data)] * concurrent_call_count
+    )
+
+
+@pytest.mark.asyncio
 async def test_code() -> None:
     settings = Settings.from_name("fast")
     docs = Docs()
@@ -1332,6 +1466,98 @@ async def test_code() -> None:
     assert len(docs.docs) == 1
     session = await docs.aquery("What file is read in by test_code?", settings=settings)
     assert "test_paperqa.py" in session.answer
+
+
+@pytest.mark.asyncio
+async def test_images(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+    # Let's use default prompting set up, so we can get JSON summary-support
+    settings.prompts = type(settings.prompts)()
+    # We don't support image embeddings yet, so disable embedding
+    settings.answer.evidence_retrieval = False
+    settings.parsing.defer_embedding = True
+
+    docs = Docs()
+    districts_docname = await docs.aadd(
+        stub_data_dir / "sf_districts.png",
+        citation=(
+            '"File:San francisco districts.png." Wikimedia Commons.'
+            " 7 Sep 2023, 07:38 UTC."
+            " <https://commons.wikimedia.org/w/index.php?title=File:San_francisco_districts.png&oldid=799209398>"
+            " July 2025."
+        ),
+        settings=settings,
+    )
+    assert districts_docname, "Expected successful image addition"
+    (districts_doc,) = (d for d in docs.docs.values() if d.docname == districts_docname)
+    session = await docs.aquery(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert (
+        sum(
+            district in session.answer
+            for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
+        )
+        >= 2
+    ), "Expected at least two neighbors to be matched"
+    assert session.cost > 0
+    contexts_used = [
+        c
+        for c in session.contexts
+        if c.id in session.used_contexts and c.text.doc == districts_doc
+    ]
+    assert contexts_used
+    assert all(c.used_images for c in contexts_used)  # type: ignore[attr-defined]
+
+
+@pytest.mark.asyncio
+async def test_images_corrupt(stub_data_dir: Path) -> None:
+    settings = Settings.from_name("fast")
+    # Let's use default prompting set up, so we can get JSON summary-support
+    settings.prompts = type(settings.prompts)()
+    # We don't support image embeddings yet, so disable embedding
+    settings.answer.evidence_retrieval = False
+    settings.parsing.defer_embedding = True
+
+    docs = Docs()
+    districts_docname = await docs.aadd(
+        stub_data_dir / "sf_districts.png",
+        citation=(
+            '"File:San francisco districts.png." Wikimedia Commons.'
+            " 7 Sep 2023, 07:38 UTC."
+            " <https://commons.wikimedia.org/w/index.php?title=File:San_francisco_districts.png&oldid=799209398>"
+            " July 2025."
+        ),
+        settings=settings,
+    )
+    assert districts_docname, "Expected successful image addition"
+    (districts_doc,) = (d for d in docs.docs.values() if d.docname == districts_docname)
+    for media in (t.media for t in docs.texts if t.doc == districts_doc and t.media):
+        for m in media:
+            # Validate the image, then chop the image in half (breaking it), and
+            # confirm it's no longer valid (and that we can detect it's no longer valid)
+            validate_image(io.BytesIO(m.data))
+            m.data = m.data[: len(m.data) // 2]
+            with pytest.raises(OSError, match="truncated"):
+                validate_image(io.BytesIO(m.data))
+    with pytest.raises(litellm.BadRequestError, match="unsupported image"):
+        await docs.aquery(
+            "What districts neighbor the Western Addition?", settings=settings
+        )
+    settings.answer.evidence_text_only_fallback = True
+    # The answer will be garbage, but let's make sure we didn't claim to use images
+    session = await docs.aquery(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert session.used_contexts
+    assert session.cost > 0
+    contexts_used = [
+        c
+        for c in session.contexts
+        if c.id in session.used_contexts and c.text.doc == districts_doc
+    ]
+    assert contexts_used
+    assert all(not c.used_images for c in contexts_used)  # type: ignore[attr-defined]
 
 
 def test_zotero() -> None:
@@ -2152,3 +2378,23 @@ def test_maybe_get_date():
 )
 def test_clean_possessives(raw_text: str, cleaned_text: str) -> None:
     assert clean_possessives(raw_text) == cleaned_text
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        pytest.param(b"Hello, World!", id="simple-text"),
+        pytest.param(b"", id="empty-bytes"),
+        pytest.param(bytes([0, 1, 2, 255, 128, 64]), id="binary-data"),
+        pytest.param(b"Test data for base64 encoding", id="base64-validation"),
+        pytest.param("Hello 世界 🌍".encode(), id="utf8-text"),
+    ],
+)
+def test_str_bytes_conversions(value: bytes) -> None:
+    # Test round-trip conversion
+    encoded_string = bytes_to_string(value)
+    decoded_bytes = string_to_bytes(encoded_string)
+    assert decoded_bytes == value
+
+    # Validate that encoded string is valid base64
+    assert base64.b64decode(encoded_string) == value

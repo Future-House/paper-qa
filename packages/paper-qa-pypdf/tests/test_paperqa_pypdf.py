@@ -19,6 +19,7 @@ def test_parse_pdf_to_pages() -> None:
     parsed_text = parse_pdf_to_pages(filepath)
     assert isinstance(parsed_text.content, dict)
     assert "1" in parsed_text.content, "Parsed text should contain page 1"
+    assert isinstance(parsed_text.content["1"], str)
     matches = re.findall(
         r"Abstract\nWe introduce PaSa, an advanced Paper ?Search"
         r"\nagent powered by large language models.",
