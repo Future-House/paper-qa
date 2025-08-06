@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 import tiktoken
 from aviary.core import Message
 from lmi import Embeddable, LLMResult
-from pybtex.database import BibliographyData, Entry, Person
+from pybtex.database import BibliographyData, Entry, InvalidNameString, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
 from pydantic import (
@@ -769,8 +769,12 @@ class DocDetails(Doc):
                     existing_entry = next(
                         iter(Parser().parse_string(data["bibtex"]).entries.values())
                     )
-                except PybtexSyntaxError:
-                    logger.warning(f"Failed to parse bibtex for {data['bibtex']}.")
+                except (PybtexSyntaxError, InvalidNameString):
+                    # InvalidNameString: names like "Kyriacos, Κυριάκος, Athanasiou, Αθανασίου"
+                    logger.warning(
+                        f"Failed to parse bibtex for DOI {data.get('doi')},"
+                        f" title {data.get('title')}, and bibtex {data['bibtex']}."
+                    )
                     existing_entry = None
 
             entry_data = {
