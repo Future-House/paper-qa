@@ -242,6 +242,22 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "dockey": "35c80e22e6d9a7bc",
             "doi_url": "https://doi.org/10.1016/j.addr.2015.01.008",
         },
+        {
+            "publication_date": datetime(2014, 10, 27),
+            "year": 2014,
+            "volume": "111",
+            "pages": "E4832-E4841",
+            "journal": "Proceedings of the National Academy of Sciences",
+            "title": (
+                "Developing functional musculoskeletal tissues through hypoxia"
+                " and lysyl oxidase-induced collagen cross-linking"
+            ),
+            "source": ["semantic_scholar", "crossref"],
+            "doi": "10.1073/pnas.1414271111",
+            "doc_id": "048586195b7e92fd",
+            "dockey": "048586195b7e92fd",
+            "doi_url": "https://doi.org/10.1073/pnas.1414271111",
+        },
     ],
 )
 @pytest.mark.asyncio

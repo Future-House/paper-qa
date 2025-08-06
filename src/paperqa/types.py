@@ -769,11 +769,12 @@ class DocDetails(Doc):
                     existing_entry = next(
                         iter(Parser().parse_string(data["bibtex"]).entries.values())
                     )
-                except (PybtexSyntaxError, InvalidNameString):
+                except (PybtexSyntaxError, InvalidNameString) as exc:
                     # InvalidNameString: names like "Kyriacos, Κυριάκος, Athanasiou, Αθανασίου"
                     logger.warning(
                         f"Failed to parse bibtex for DOI {data.get('doi')},"
-                        f" title {data.get('title')}, and bibtex {data['bibtex']}."
+                        f" title {data.get('title')!r}, and bibtex {data['bibtex']}."
+                        f" Failure message: {exc!r}"
                     )
                     existing_entry = None
 
