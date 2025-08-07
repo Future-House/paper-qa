@@ -37,6 +37,7 @@ question answering, summarization, and contradiction detection.
     - [Local Embedding Models (Sentence Transformers)](#local-embedding-models-sentence-transformers)
   - [Adjusting number of sources](#adjusting-number-of-sources)
   - [Using Code or HTML](#using-code-or-html)
+  - [Multimodal Support](#multimodal-support)
   - [Using External DB/Vector DB and Caching](#using-external-dbvector-db-and-caching)
   - [Creating Index](#creating-index)
     - [Manifest Files](#manifest-files)
@@ -728,6 +729,28 @@ session = await docs.aquery("Where is the search bar in the header defined?")
 print(session)
 ```
 
+### Multimodal Support
+
+Multimodal support centers on:
+
+- Standalone images
+- Images or tables in PDFs
+
+The `Docs` object stores media via a `ParsedMedia` object.
+When chunking a document, media are not split at chunk boundaries,
+so it's possible 2+ chunks can correspond with the same media.
+This means within PaperQA each chunk
+has a one-to-many relationship between `ParsedMedia` and chunks.
+
+Depending on the source document, the same image can appear multiple times
+(e.g. each page of a PDF has a logo in the margins).
+Thus, clients should consider media databases
+to have a many-to-many relationship with chunks.
+
+When creating contextual summaries on a given chunk (a `Text`),
+the summary LLM is passed both the chunk's text and the chunk's associated media,
+but the output contextual summary itself remains text-only.
+
 ### Using External DB/Vector DB and Caching
 
 You may want to cache parsed texts and embeddings in an external database or file.
@@ -897,6 +920,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.pdfs_use_block_parsing`             | `False`                                | Opt-in flag for block-based PDF parsing over text-based PDF parsing.                                    |
 | `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                               |
 | `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                           |
+| `parsing.multimodal`                         | `True`                                 | Flag to parse both text and images from applicable documents.                                           |
 | `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                         |
 | `parsing.parse_pdf`                          | `paperqa_pypdf.parse_pdf_to_pages`     | Function to parse PDF files.                                                                            |
 | `parsing.configure_pdf_parser`               | No-op                                  | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging. |
