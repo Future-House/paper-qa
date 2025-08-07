@@ -94,14 +94,14 @@ class MetadataProvider(ABC, Generic[ClientQueryType]):
     """
 
     async def query(self, query: dict) -> DocDetails | None:
-        return await self._query(self.query_transformer(query))
+        return await self._query(self.query_factory(query))
 
     @abstractmethod
     async def _query(self, query: ClientQueryType) -> DocDetails | None:
         """Run a query against the provider."""
 
     @abstractmethod
-    def query_transformer(self, query: dict) -> ClientQueryType:
+    def query_factory(self, query: dict) -> ClientQueryType:
         """Create a query object from unstructured query data."""
 
 
@@ -109,7 +109,7 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
 
     async def query(self, query: dict) -> DocDetails | None:
         try:
-            client_query = self.query_transformer(query)
+            client_query = self.query_factory(query)
             return await self._query(client_query)
         # We allow graceful failures, i.e. return "None" for both DOI errors and timeout errors
         # DOINotFoundError means the paper doesn't exist in the source, the timeout is to prevent
@@ -153,7 +153,7 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
             TimeoutError: When the request takes too long on the client side
         """
 
-    def query_transformer(self, query: dict) -> DOIQuery | TitleAuthorQuery:
+    def query_factory(self, query: dict) -> DOIQuery | TitleAuthorQuery:
         try:
             if "doi" in query:
                 return DOIQuery(**query)
