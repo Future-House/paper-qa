@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import aiohttp
 from lmi.utils import gather_with_concurrency
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from paperqa.types import Doc, DocDetails
 
@@ -36,21 +36,33 @@ ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
 
 
 class DocMetadataTask(BaseModel):
-    """Holder for provider and processor tasks."""
+    """Simple container pairing metadata providers with processors."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    providers: Collection[MetadataProvider]
-    processors: Collection[MetadataPostProcessor]
+    providers: Collection[MetadataProvider] = Field(
+        description=(
+            "Metadata providers allotted to this task."
+            " An example would be providers for Crossref and Semantic Scholar."
+        )
+    )
+    processors: Collection[MetadataPostProcessor] = Field(
+        description=(
+            "Metadata post-processors allotted to this task."
+            " An example would be a journal quality filter."
+        )
+    )
 
     def provider_queries(
         self, query: dict
     ) -> list[Coroutine[Any, Any, DocDetails | None]]:
+        """Set up query coroutines for each contained metadata provider."""
         return [p.query(query) for p in self.providers]
 
     def processor_queries(
         self, doc_details: DocDetails, session: aiohttp.ClientSession
     ) -> list[Coroutine[Any, Any, DocDetails]]:
+        """Set up process coroutines for each contained metadata post-processor."""
         return [
             p.process(copy.copy(doc_details), session=session) for p in self.processors
         ]
@@ -78,7 +90,6 @@ class DocMetadataClient:
                 if nested, will query in order looking for termination criteria after each.
                 Will terminate early if either DocDetails.is_hydration_needed is False OR if
                 all requested fields are present in the DocDetails object.
-
         """
         self._session = session
         self.tasks: list[DocMetadataTask] = []
