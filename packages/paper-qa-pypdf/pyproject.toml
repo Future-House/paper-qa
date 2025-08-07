@@ -33,6 +33,11 @@ name = "paper-qa-pypdf"
 readme = "README.md"
 requires-python = ">=3.11"
 
+[project.optional-dependencies]
+media = [
+    "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition
+]
+
 [tool.ruff]
 extend = "../../pyproject.toml"
 
