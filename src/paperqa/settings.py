@@ -256,6 +256,13 @@ class ParsingSettings(BaseModel):
     overlap: int = Field(
         default=250, description="Number of characters to overlap chunks."
     )
+    multimodal: bool = Field(
+        default=True,
+        description=(
+            "Parse both text and images (if applicable to a given document),"
+            " or disable to parse just text."
+        ),
+    )
     citation_prompt: str = Field(
         default=citation_prompt,
         description="Prompt that tries to create citation from peeking one page.",
