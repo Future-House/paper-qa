@@ -88,18 +88,21 @@ ClientQueryType = TypeVar("ClientQueryType", bound=ClientQuery)
 
 
 class MetadataProvider(ABC, Generic[ClientQueryType]):
-    """Provide metadata from a query by any means necessary."""
+    """Provide metadata from a query by any means necessary.
+
+    An example is going from a DOI to full paper metadata using Semantic Scholar.
+    """
 
     async def query(self, query: dict) -> DocDetails | None:
         return await self._query(self.query_transformer(query))
 
     @abstractmethod
     async def _query(self, query: ClientQueryType) -> DocDetails | None:
-        pass
+        """Run a query against the provider."""
 
     @abstractmethod
     def query_transformer(self, query: dict) -> ClientQueryType:
-        pass
+        """Create a query object from unstructured query data."""
 
 
 class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
@@ -169,7 +172,6 @@ class MetadataPostProcessor(ABC, Generic[ClientQueryType]):
 
     MetadataPostProcessor should be idempotent and not order-dependent, i.e.
     all MetadataPostProcessor instances should be able to run in parallel.
-
     """
 
     async def process(self, doc_details: DocDetails, **kwargs) -> DocDetails:
