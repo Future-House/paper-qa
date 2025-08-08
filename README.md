@@ -288,7 +288,7 @@ pqa --settings <setting name> \
 
 ### Bundled Settings
 
-Inside [`paperqa/configs`](paperqa/configs) we bundle known useful settings:
+Inside [`src/paperqa/configs`](src/paperqa/configs) we bundle known useful settings:
 
 | Setting Name | Description                                                                                                                  |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
