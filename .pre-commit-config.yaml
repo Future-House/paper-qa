@@ -76,11 +76,6 @@ repos:
     hooks:
       - id: pymarkdown
         exclude: docs/tutorials/
-  - repo: https://github.com/tcort/markdown-link-check
-    rev: v3.12.2
-    hooks:
-      - id: markdown-link-check
-        args: [--quiet]
   - repo: https://github.com/mwouts/jupytext
     rev: v1.17.2
     hooks:
