@@ -59,7 +59,7 @@ You can also manually drag-and-drop PDFs onto each reference.
 To download papers, you need to get an API key for your account.
 
 1. Get your library ID, and set it as the environment variable `ZOTERO_USER_ID`.
-   - For personal libraries, this ID is given [here](https://www.zotero.org/settings/keys) at the part "_Your userID for use in API calls is XXXXXX_".
+   - For personal libraries, this ID is given [here](https://www.zotero.org/settings/security#applications) at the part "_Your userID for use in API calls is XXXXXX_".
    - For group libraries, go to your group page `https://www.zotero.org/groups/groupname`, and hover over the settings link. The ID is the integer after /groups/. (_h/t pyzotero!_)
 2. Create a new API key [here](https://www.zotero.org/settings/keys/new) and set it as the environment variable `ZOTERO_API_KEY`.
    - The key will need read access to the library.

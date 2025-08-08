@@ -75,9 +75,9 @@ async with aiohttp.ClientSession() as session, session.get(url, timeout=60) as r
 ```
 
 The `Settings` class is used to configure the PaperQA settings.
-Official documentation can be found [here](https://github.com/Future-House/paper-qa?tab=readme-ov-file#settings-cheatsheet) and the open source code can be found [here](https://github.com/Future-House/paper-qa/blob/main/paperqa/settings.py).
+Official documentation can be found [here](https://github.com/Future-House/paper-qa?tab=readme-ov-file#settings-cheatsheet) and the open source code can be found [here](https://github.com/Future-House/paper-qa/blob/main/src/paperqa/settings.py).
 
-Here is a basic example of how to use the `Settings` class. We will be unnecessarily verbose for the sake of clarity. Please notice that most of the settings are optional and the defaults are good for most cases. Refer to the [descriptions of each setting](https://github.com/Future-House/paper-qa/blob/main/paperqa/settings.py) for more information.
+Here is a basic example of how to use the `Settings` class. We will be unnecessarily verbose for the sake of clarity. Please notice that most of the settings are optional and the defaults are good for most cases. Refer to the [descriptions of each setting](https://github.com/Future-House/paper-qa/blob/main/src/paperqa/settings.py) for more information.
 
 Within this `Settings` object, I'd like to discuss specifically how the llms are configured and how `paperqa` looks for papers.
 
