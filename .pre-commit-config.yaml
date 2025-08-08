@@ -71,11 +71,10 @@ repos:
     hooks:
       - id: nb-clean
         args: [--preserve-cell-outputs, --remove-empty-cells]
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
+  - repo: https://github.com/jackdewinter/pymarkdown
+    rev: v0.9.31
     hooks:
-      - id: markdownlint
-        args: [--config=pyproject.toml, --configPointer=/tool/markdownlint]
+      - id: pymarkdown
         exclude: docs/tutorials/
   - repo: https://github.com/tcort/markdown-link-check
     rev: v3.12.2
