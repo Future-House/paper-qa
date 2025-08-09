@@ -91,7 +91,7 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
-        args: [--pretty, --ignore-missing-imports]
+        args: [--scripts-are-modules]
         additional_dependencies:
           - aiohttp>=3.10.6 # Match pyproject.toml
           - PyMuPDF>=1.24.12
@@ -105,6 +105,10 @@ repos:
           - numpy
           - pydantic~=2.11 # Match pyproject.toml
           - pydantic-settings
+          - PyPDF>=3 # Match pyproject.toml
+          - pytest
+          - pytest-asyncio
+          - pytest-subtests
           - qdrant-client
           - rich
           - tantivy>=0.22.2 # Match pyproject.toml
