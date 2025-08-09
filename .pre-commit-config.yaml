@@ -91,7 +91,7 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
-        args: [--pretty, --ignore-missing-imports]
+        args: [--scripts-are-modules]
         additional_dependencies:
           - aiohttp>=3.10.6 # Match pyproject.toml
           - PyMuPDF>=1.24.12
