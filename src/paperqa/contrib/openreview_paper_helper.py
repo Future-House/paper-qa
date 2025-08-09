@@ -47,7 +47,7 @@ class OpenReviewPaperHelper:
         password: str | None = None,
     ) -> None:
         self.settings = settings
-        Path(settings.paper_directory).mkdir(parents=True, exist_ok=True)
+        Path(settings.agent.index.paper_directory).mkdir(parents=True, exist_ok=True)
         if openreview is None:
             raise ImportError(
                 "openreview requires the 'openreview-py' extra. Please run: `pip"
@@ -122,9 +122,9 @@ class OpenReviewPaperHelper:
 
     async def download_papers(self, submissions: list[Any]) -> None:
         """Download PDFs for given submissions."""
-        downloaded_papers = Path(self.settings.paper_directory).rglob(  # noqa: ASYNC240
-            "*.pdf"
-        )
+        downloaded_papers = Path(  # noqa: ASYNC240
+            self.settings.agent.index.paper_directory
+        ).rglob("*.pdf")
         downloaded_ids = [p.stem for p in downloaded_papers]
         logger.info("Downloading PDFs for relevant papers.")
         for submission in submissions:
@@ -138,7 +138,7 @@ class OpenReviewPaperHelper:
             response = await client.get(pdf_link)
         if response.status_code == httpx.codes.OK.value:
             async with await anyio.open_file(
-                f"{self.settings.paper_directory}/{submission.id}.pdf", "wb"
+                f"{self.settings.agent.index.paper_directory}/{submission.id}.pdf", "wb"
             ) as f:
                 await f.write(response.content)
             return True
@@ -153,9 +153,9 @@ class OpenReviewPaperHelper:
     ) -> Docs:
         if docs is None:
             docs = Docs()
-        for doc_path in Path(self.settings.paper_directory).rglob(  # noqa: ASYNC240
-            "*.pdf"
-        ):
+        for doc_path in Path(  # noqa: ASYNC240
+            self.settings.agent.index.paper_directory
+        ).rglob("*.pdf"):
             sub = subs.get(doc_path.stem) if subs is not None else None
             if sub:
                 await docs.aadd(

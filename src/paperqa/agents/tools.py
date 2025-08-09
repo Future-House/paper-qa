@@ -47,10 +47,10 @@ def default_status(state: "EnvironmentState") -> str:
 class EnvironmentState(BaseModel):
     """State here contains documents and answer being populated."""
 
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(extra="forbid")
 
     docs: Docs
-    session: PQASession = Field(..., alias="answer")
+    session: PQASession
     status_fn: Callable[[Self], str] | None = Field(
         default=None,
         description=(

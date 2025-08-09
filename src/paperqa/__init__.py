@@ -1,5 +1,3 @@
-import warnings
-
 from lmi import (
     EmbeddingModel,
     HybridEmbeddingModel,
@@ -21,17 +19,10 @@ from paperqa.llms import (
     VectorStore,
 )
 from paperqa.settings import Settings, get_settings
-from paperqa.types import Answer, Context, Doc, DocDetails, Text
+from paperqa.types import Context, Doc, DocDetails, Text
 from paperqa.version import __version__
 
-# TODO: remove after refactoring all models to avoid using _* private vars
-warnings.filterwarnings(
-    "ignore", message="Valid config keys have changed in V2:", module="pydantic"
-)
-
-
 __all__ = [
-    "Answer",
     "Context",
     "Doc",
     "DocDetails",
