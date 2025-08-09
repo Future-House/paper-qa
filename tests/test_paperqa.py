@@ -40,7 +40,6 @@ from paperqa_pypdf import parse_pdf_to_pages as pypdf_parse_pdf_to_pages
 from pytest_subtests import SubTests
 
 from paperqa import (
-    Answer,
     Doc,
     DocDetails,
     Docs,
@@ -1737,37 +1736,10 @@ async def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
     assert "Valid Keys" not in response.context
 
 
-@pytest.mark.asyncio
-async def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
-    # TODO: delete this test in v6
-    settings = Settings.from_name("fast")
-    # NOTE: this bypasses DeprecationWarning, as the warning is done on construction
-    settings.answer.evidence_detailed_citations = False
-    docs = Docs()
-    await docs.aadd(
-        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
-    )
-    response = await docs.aquery("What country is Bates from?", settings=settings)
-    assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
-
-
 def test_case_insensitive_matching():
     assert strings_similarity("my test sentence", "My test sentence") == 1.0
     assert strings_similarity("a b c d e", "a b c f") == 0.5
     assert strings_similarity("A B c d e", "a b c f") == 0.5
-
-
-@pytest.mark.flaky(
-    reruns=3,  # pytest-xdist can lead to >1 DeprecationWarning
-    only_rerun=["AssertionError"],
-)
-def test_answer_rename(recwarn) -> None:
-    # TODO: delete this test in v6
-    answer = Answer(question="")
-    assert isinstance(answer, PQASession)
-    assert len(recwarn) == 1
-    warning_msg = recwarn.pop(DeprecationWarning)
-    assert "'Answer' class is deprecated" in str(warning_msg.message)
 
 
 @pytest.mark.parametrize(
