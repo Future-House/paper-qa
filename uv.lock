@@ -1619,7 +1619,6 @@ wheels = [
 name = "paper-qa"
 source = { editable = "." }
 dependencies = [
-    { name = "aiohttp" },
     { name = "anyio" },
     { name = "fhaviary", extra = ["llm"] },
     { name = "fhlmi" },
@@ -1716,7 +1715,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", specifier = ">=3.10.6" },
     { name = "anyio" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.20" },
     { name = "fhlmi", specifier = ">=0.25.4" },
