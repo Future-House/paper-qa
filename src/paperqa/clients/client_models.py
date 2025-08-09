@@ -88,25 +88,28 @@ ClientQueryType = TypeVar("ClientQueryType", bound=ClientQuery)
 
 
 class MetadataProvider(ABC, Generic[ClientQueryType]):
-    """Provide metadata from a query by any means necessary."""
+    """Provide metadata from a query by any means necessary.
+
+    An example is going from a DOI to full paper metadata using Semantic Scholar.
+    """
 
     async def query(self, query: dict) -> DocDetails | None:
-        return await self._query(self.query_transformer(query))
+        return await self._query(self.query_factory(query))
 
     @abstractmethod
     async def _query(self, query: ClientQueryType) -> DocDetails | None:
-        pass
+        """Run a query against the provider."""
 
     @abstractmethod
-    def query_transformer(self, query: dict) -> ClientQueryType:
-        pass
+    def query_factory(self, query: dict) -> ClientQueryType:
+        """Create a query object from unstructured query data."""
 
 
 class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
 
     async def query(self, query: dict) -> DocDetails | None:
         try:
-            client_query = self.query_transformer(query)
+            client_query = self.query_factory(query)
             return await self._query(client_query)
         # We allow graceful failures, i.e. return "None" for both DOI errors and timeout errors
         # DOINotFoundError means the paper doesn't exist in the source, the timeout is to prevent
@@ -150,7 +153,7 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
             TimeoutError: When the request takes too long on the client side
         """
 
-    def query_transformer(self, query: dict) -> DOIQuery | TitleAuthorQuery:
+    def query_factory(self, query: dict) -> DOIQuery | TitleAuthorQuery:
         try:
             if "doi" in query:
                 return DOIQuery(**query)
@@ -169,7 +172,6 @@ class MetadataPostProcessor(ABC, Generic[ClientQueryType]):
 
     MetadataPostProcessor should be idempotent and not order-dependent, i.e.
     all MetadataPostProcessor instances should be able to run in parallel.
-
     """
 
     async def process(self, doc_details: DocDetails, **kwargs) -> DocDetails:
