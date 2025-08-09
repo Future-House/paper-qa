@@ -127,15 +127,6 @@ skip = [
     "tests/stub_data/*",
 ]
 
-[tool.markdownlint]
-no-inline-html = false
-
-[tool.markdownlint.line-length]
-code_block_line_length = 88  # Match ruff line-length
-line_length = 120  # Match ruff max-doc-length
-stern = true
-tables = false
-
 [tool.mypy]
 # Type-checks the interior of functions without type annotations.
 check_untyped_defs = true
@@ -304,6 +295,16 @@ score = false
 [tool.pylint.similarities]
 # Minimum lines number of a similarity.
 min-similarity-lines = 12
+
+[tool.pymarkdown]
+plugins.line-length.code_block_line_length = 88  # Match ruff line-length
+plugins.line-length.enabled = true
+plugins.line-length.line_length = 120  # Match ruff max-doc-length
+plugins.line-length.stern = true
+plugins.line-length.tables = false
+plugins.no-duplicate-heading.siblings_only = true  # GitHub appends -X for duplicated headings
+plugins.no-emphasis-as-heading.enabled = false
+plugins.no-inline-html.enabled = false
 
 [tool.pytest.ini_options]
 # Add the specified OPTS to the set of command line arguments as if they had been
