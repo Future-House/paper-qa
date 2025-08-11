@@ -1,9 +1,19 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.xgen.2025.100814?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.xgen.2025.100814?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -37,58 +47,64 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:20:14 GMT
+          - Mon, 11 Aug 2025 23:07:27 GMT
         Via:
-          - 1.1 68914922a694954838e87fc9b0aa10fe.cloudfront.net (CloudFront)
+          - 1.1 fb1699c4cb8ff04b39762e99ca06e3d2.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - tVw7vgS7R3PEwQH_eKtGv7cnerORHKVBiGVGOz3Ro9bRQZSejPIxAA==
+          - ztVQD3mqEaMiN-lqlAPcv92BIUWdCm1LdzidZzDPqVwrGmHR6hpAxw==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PJrsWF5_PHcEJpQ=
+          - PKejeF4QPHcEY5Q=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1411"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 17:20:14 GMT
+          - Mon, 11 Aug 2025 23:07:27 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 6961f7c9-83ac-4dec-8d61-9bc7badb7479
+          - edd000ba-a1a5-4a9c-b94f-f73e3ba67b78
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.unpaywall.org/v2/10.1016/j.xgen.2025.100814?email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"doi":"10.1016/j.xgen.2025.100814","doi_url":"https://doi.org/10.1016/j.xgen.2025.100814","title":"High-throughput
-          screening of human genetic variants by pooled prime editing","genre":"journal-article","is_paratext":false,"published_date":"2025-03-22","year":2025,"journal_name":"Cell
-          Genomics","journal_issns":"2666-979X","journal_issn_l":"2666-979X","journal_is_oa":true,"journal_is_in_doaj":true,"publisher":"Elsevier
-          BV","is_oa":true,"oa_status":"gold","has_repository_copy":true,"best_oa_location":{"url":"https://doi.org/10.1016/j.xgen.2025.100814","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.xgen.2025.100814","evidence":"deprecated","license":"cc-by","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2025-03-22","updated":"deprecated"},"first_oa_location":{"url":"https://doi.org/10.1016/j.xgen.2025.100814","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.xgen.2025.100814","evidence":"deprecated","license":"cc-by","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2025-03-22","updated":"deprecated"},"oa_locations":[{"url":"https://doi.org/10.1016/j.xgen.2025.100814","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.xgen.2025.100814","evidence":"deprecated","license":"cc-by","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2025-03-22","updated":"deprecated"},{"url":"https://www.ncbi.nlm.nih.gov/pmc/articles/12008803","url_for_pdf":null,"url_for_landing_page":"https://www.ncbi.nlm.nih.gov/pmc/articles/12008803","evidence":"deprecated","license":"other-oa","version":"submittedVersion","host_type":"repository","is_best":false,"pmh_id":"oai:pubmedcentral.nih.gov:12008803","endpoint_id":"daaf77eacc58eec31bb","repository_institution":"PubMed
-          Central","oa_date":"2025-03-22","updated":"deprecated"}],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Michael
-          Herger","is_corresponding":true,"raw_affiliation_strings":["The Genome Function
-          Laboratory, The Francis Crick Institute, London NW1 1AT, UK."]},{"author_position":"additional","raw_author_name":"Christina
-          M. Kajba","is_corresponding":false,"raw_affiliation_strings":["The Genome
-          Function Laboratory, The Francis Crick Institute, London NW1 1AT, UK."]},{"author_position":"additional","raw_author_name":"Megan
-          Buckley","is_corresponding":false,"raw_affiliation_strings":["The Genome Function
-          Laboratory, The Francis Crick Institute, London NW1 1AT, UK."]},{"author_position":"additional","raw_author_name":"Ana
-          Cunha","is_corresponding":false,"raw_affiliation_strings":["Viral Vector Core,
-          Human Biology Facility, The Francis Crick Institute, London NW1 1AT, UK."]},{"author_position":"additional","raw_author_name":"Molly
-          Strom","is_corresponding":false,"raw_affiliation_strings":["Viral Vector Core,
-          Human Biology Facility, The Francis Crick Institute, London NW1 1AT, UK."]},{"author_position":"last","raw_author_name":"Gregory
-          M. Findlay","is_corresponding":false,"raw_affiliation_strings":["The Genome
-          Function Laboratory, The Francis Crick Institute, London NW1 1AT, UK. Electronic
-          address: greg.findlay@crick.ac.uk."]}],"updated":"2025-08-04T14:10:34Z"}
-
-          '
+        string: !!binary |
+          H4sIAK93mmgA/+1X227cNhB971cQfNZqV2vHdvSUeBHHQeKiQF23SGAIFDmSaFOkwIsdNci/dyit
+          unISt7AfcgHytpgbzzkzHGo/UGEkzWm2SrNVdrC8St/XoNP1av0EDaujbJ8mMaQIVmFY433n8uUS
+          Lamx9fI/07z0CjDpVNbNwjfWhLrpgieOWwAtdU1MRZrQMk0wGbzk5IZZybR3pOxJZ4wCQTorWyAg
+          pMcMrIqhNla9MsFqphbMYiKek1Dpio5Z5uG9p3nFlIOEdqFU0jUgCoEOTIsQF6u9xXqNGT0wS/No
+          SqZ6hWZtjNuAUuQlaNNK7ujOLZ3TLtY5ODhYPD18+tcnvkLd6ywMo7m3Ae4YpS6EYVeTZwKMuOgL
+          pHAjwZLji5HeroBhhfPMhwilNkqgv2GusNAZJ72xfcFN10/RJTiPyYUynHlpNM0/0Ec0FFOKytii
+          ExXNdVBqZ1JMC+wPNqCGh5ZFjgI0j3kCOguIESIhJTloF82cL8oeLTdg3QB/19eLrQn5GyTp+w5m
+          bjvqFvn/K3DbFFJM+EGLzkjtZ6aZhlI7HOIwSjZ6UcUvTVLoxID6DoWPCa2k/Sn9t5F+Jjreknc/
+          Zf8qsn8q8+3tbap5KVOt2lTLJq3NzbJr+XK7t90yW6MsR6u9R8n9oPL/L7vxqOAC1+xceRfKVnp/
+          n/I79ebST+/PVntUUebYoxYEnuUtUxPafA5w3hsqGKsOD4Fx/uQIgO9lZUnvbxb9LZRn+F5uxvL0
+          gY27vHthCmhLZmsT496hD1OGF0cLZtG0TujfBQu+MXa8W+PvYoA2whk2X8TLbreR09N6JnnDQJFT
+          sPU0r9xYC64zQ5OnwR1Sq0oqOYDC8y1644H0vIHxdQZyEjSPbvKGlQaff1QmIdF/Ypnm0pGNlfya
+          vNqKBQl5g8dg/K9/ZiR7fp6QP16n9DKO7ucsmBDDz0HQz6lsGiuxrGbkLCWv2VXJvkhnOwzfP58z
+          qPFr7DjwawX9j03lOTZlE3Tz2I5cSLxF5AI4oiYbYxHc6fCteiyNMnVPThjHPP8Vm2OU6snv3pr2
+          x+Gk2D1b4KWFGuchXpwTqYVi38u8kRcKBbJG4/8R7AiCcTmpEW1ajTif8VglZTwN15H35Xynjqv2
+          aLHaP8/282yV7+2/pR9/+Qfo6APpaA0AAA==
       headers:
         Access-Control-Allow-Headers:
           - origin, content-type, accept, x-requested-with
@@ -103,13 +119,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:20:14 GMT
+          - Mon, 11 Aug 2025 23:07:27 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=K7NfgoDk%2Bl4wWbOkE8K619kkd6qUuxc75pRXmOS7Dkw%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754932814"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=W4U9rVeUNPd0XqsVd0cB%2FQ5kwPN%2BS58lU4wsklw%2Bhbg%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953647"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=K7NfgoDk%2Bl4wWbOkE8K619kkd6qUuxc75pRXmOS7Dkw%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754932814"
+          - heroku-nel="https://nel.heroku.com/reports?s=W4U9rVeUNPd0XqsVd0cB%2FQ5kwPN%2BS58lU4wsklw%2Bhbg%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953647"
         Server:
           - Heroku
         Vary:
@@ -120,84 +136,75 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.openalex.org/works/https://doi.org/10.1016%2Fj.xgen.2025.100814
     response:
       body:
-        string:
-          '{"id":"https://openalex.org/W4408732759","doi":"https://doi.org/10.1016/j.xgen.2025.100814","title":"High-throughput
-          screening of human genetic variants by pooled prime editing","display_name":"High-throughput
-          screening of human genetic variants by pooled prime editing","publication_year":2025,"publication_date":"2025-03-01","ids":{"openalex":"https://openalex.org/W4408732759","doi":"https://doi.org/10.1016/j.xgen.2025.100814","pmid":"https://pubmed.ncbi.nlm.nih.gov/40120586"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.xgen.2025.100814","pdf_url":null,"source":{"id":"https://openalex.org/S4210194377","display_name":"Cell
-          Genomics","issn_l":"2666-979X","issn":["2666-979X"],"is_oa":true,"is_in_doaj":true,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
-          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
-          BV"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"type":"article","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"gold","oa_url":"https://doi.org/10.1016/j.xgen.2025.100814","any_repository_has_fulltext":false},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5067011895","display_name":"Michael
-          Herger","orcid":"https://orcid.org/0000-0002-5390-2695"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
-          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"funder","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Michael
-          Herger","raw_affiliation_strings":["The Genome Function Laboratory, The Francis
-          Crick Institute, London NW1 1AT, UK."],"affiliations":[{"raw_affiliation_string":"The
-          Genome Function Laboratory, The Francis Crick Institute, London NW1 1AT, UK.","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5003387836","display_name":"Christina
-          M. Kajba","orcid":"https://orcid.org/0000-0002-7896-0744"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
-          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"funder","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Christina
-          M Kajba","raw_affiliation_strings":["The Genome Function Laboratory, The Francis
-          Crick Institute, London NW1 1AT, UK."],"affiliations":[{"raw_affiliation_string":"The
-          Genome Function Laboratory, The Francis Crick Institute, London NW1 1AT, UK.","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5054087528","display_name":"Megan
-          Buckley","orcid":"https://orcid.org/0000-0003-4450-8474"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
-          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"funder","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Megan
-          Buckley","raw_affiliation_strings":["The Genome Function Laboratory, The Francis
-          Crick Institute, London NW1 1AT, UK."],"affiliations":[{"raw_affiliation_string":"The
-          Genome Function Laboratory, The Francis Crick Institute, London NW1 1AT, UK.","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5061084011","display_name":"Ana
-          Cunha","orcid":"https://orcid.org/0000-0002-7651-5858"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
-          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"funder","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Ana
-          Cunha","raw_affiliation_strings":["Viral Vector Core, Human Biology Facility,
-          The Francis Crick Institute, London NW1 1AT, UK."],"affiliations":[{"raw_affiliation_string":"Viral
-          Vector Core, Human Biology Facility, The Francis Crick Institute, London NW1
-          1AT, UK.","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5109336004","display_name":"Molly
-          Strom","orcid":null},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
-          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"funder","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Molly
-          Strom","raw_affiliation_strings":["Viral Vector Core, Human Biology Facility,
-          The Francis Crick Institute, London NW1 1AT, UK."],"affiliations":[{"raw_affiliation_string":"Viral
-          Vector Core, Human Biology Facility, The Francis Crick Institute, London NW1
-          1AT, UK.","institution_ids":["https://openalex.org/I2801081054"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5084597634","display_name":"Gregory
-          M. Findlay","orcid":"https://orcid.org/0000-0002-7767-8608"},"institutions":[{"id":"https://openalex.org/I2801081054","display_name":"The
-          Francis Crick Institute","ror":"https://ror.org/04tnbqb63","country_code":"GB","type":"funder","lineage":["https://openalex.org/I2801081054"]}],"countries":["GB"],"is_corresponding":false,"raw_author_name":"Gregory
-          M Findlay","raw_affiliation_strings":["The Genome Function Laboratory, The
-          Francis Crick Institute, London NW1 1AT, UK. Electronic address: greg.findlay@crick.ac.uk."],"affiliations":[{"raw_affiliation_string":"The
-          Genome Function Laboratory, The Francis Crick Institute, London NW1 1AT, UK.
-          Electronic address: greg.findlay@crick.ac.uk.","institution_ids":["https://openalex.org/I2801081054"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":8900,"currency":"USD","value_usd":8900},"apc_paid":{"value":8900,"currency":"USD","value_usd":8900},"fwci":10.785,"has_fulltext":false,"cited_by_count":3,"citation_normalized_percentile":{"value":0.999969,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":98,"max":99},"biblio":{"volume":null,"issue":null,"first_page":"100814","last_page":"100814"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T10878","display_name":"CRISPR
-          and Genetic Engineering","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},"topics":[{"id":"https://openalex.org/T10878","display_name":"CRISPR
-          and Genetic Engineering","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},{"id":"https://openalex.org/T10981","display_name":"Cytomegalovirus
-          and herpesvirus research","score":0.9912,"subfield":{"id":"https://openalex.org/subfields/2713","display_name":"Epidemiology"},"field":{"id":"https://openalex.org/fields/27","display_name":"Medicine"},"domain":{"id":"https://openalex.org/domains/4","display_name":"Health
-          Sciences"}},{"id":"https://openalex.org/T10613","display_name":"Virus-based
-          gene therapy research","score":0.9814,"subfield":{"id":"https://openalex.org/subfields/1311","display_name":"Genetics"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/high-throughput-screening","display_name":"High-Throughput
-          Screening","score":0.4500898}],"concepts":[{"id":"https://openalex.org/C157764524","wikidata":"https://www.wikidata.org/wiki/Q1383412","display_name":"Throughput","level":3,"score":0.71118003},{"id":"https://openalex.org/C184992742","wikidata":"https://www.wikidata.org/wiki/Q7243229","display_name":"Prime
-          (order theory)","level":2,"score":0.6881021},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
-          science","level":0,"score":0.4874816},{"id":"https://openalex.org/C51323132","wikidata":"https://www.wikidata.org/wiki/Q626251","display_name":"High-throughput
-          screening","level":2,"score":0.4500898},{"id":"https://openalex.org/C70721500","wikidata":"https://www.wikidata.org/wiki/Q177005","display_name":"Computational
-          biology","level":1,"score":0.44712314},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.38793534},{"id":"https://openalex.org/C54355233","wikidata":"https://www.wikidata.org/wiki/Q7162","display_name":"Genetics","level":1,"score":0.3834316},{"id":"https://openalex.org/C33923547","wikidata":"https://www.wikidata.org/wiki/Q395","display_name":"Mathematics","level":0,"score":0.1075789},{"id":"https://openalex.org/C76155785","wikidata":"https://www.wikidata.org/wiki/Q418","display_name":"Telecommunications","level":1,"score":0.08276713},{"id":"https://openalex.org/C114614502","wikidata":"https://www.wikidata.org/wiki/Q76592","display_name":"Combinatorics","level":1,"score":0.054814756},{"id":"https://openalex.org/C555944384","wikidata":"https://www.wikidata.org/wiki/Q249","display_name":"Wireless","level":2,"score":0.0}],"mesh":[],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.xgen.2025.100814","pdf_url":null,"source":{"id":"https://openalex.org/S4210194377","display_name":"Cell
-          Genomics","issn_l":"2666-979X","issn":["2666-979X"],"is_oa":true,"is_in_doaj":true,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
-          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
-          BV"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/40120586","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.xgen.2025.100814","pdf_url":null,"source":{"id":"https://openalex.org/S4210194377","display_name":"Cell
-          Genomics","issn_l":"2666-979X","issn":["2666-979X"],"is_oa":true,"is_in_doaj":true,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
-          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
-          BV"],"type":"journal"},"license":"cc-by","license_id":"https://openalex.org/licenses/cc-by","version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[],"grants":[{"funder":"https://openalex.org/F4320311904","funder_display_name":"Wellcome
-          Trust","award_id":null},{"funder":"https://openalex.org/F4320312060","funder_display_name":"Francis
-          Crick Institute","award_id":null},{"funder":"https://openalex.org/F4320319985","funder_display_name":"Cancer
-          Research UK","award_id":"CC2190"},{"funder":"https://openalex.org/F4320334626","funder_display_name":"Medical
-          Research Council","award_id":null}],"datasets":[],"versions":[],"referenced_works_count":59,"referenced_works":["https://openalex.org/W1973260880","https://openalex.org/W1999256488","https://openalex.org/W2014747507","https://openalex.org/W2031211461","https://openalex.org/W2045435533","https://openalex.org/W2051978340","https://openalex.org/W2068427957","https://openalex.org/W2101868032","https://openalex.org/W2110951885","https://openalex.org/W2174602966","https://openalex.org/W2174686320","https://openalex.org/W2252568502","https://openalex.org/W2512645103","https://openalex.org/W2774216375","https://openalex.org/W2887461405","https://openalex.org/W2889874867","https://openalex.org/W2904226822","https://openalex.org/W2909194804","https://openalex.org/W2915459742","https://openalex.org/W2954501063","https://openalex.org/W2967059818","https://openalex.org/W2981137429","https://openalex.org/W3006887898","https://openalex.org/W3062028978","https://openalex.org/W3087701445","https://openalex.org/W3098409330","https://openalex.org/W3115988811","https://openalex.org/W3121904305","https://openalex.org/W3129351841","https://openalex.org/W3131839988","https://openalex.org/W3132864675","https://openalex.org/W3161833585","https://openalex.org/W3192108213","https://openalex.org/W3199622685","https://openalex.org/W3202931255","https://openalex.org/W3206354438","https://openalex.org/W3213536168","https://openalex.org/W4210558208","https://openalex.org/W4213232054","https://openalex.org/W4226280654","https://openalex.org/W4288060326","https://openalex.org/W4303199315","https://openalex.org/W4312190539","https://openalex.org/W4316507374","https://openalex.org/W4317689970","https://openalex.org/W4367311810","https://openalex.org/W4378976943","https://openalex.org/W4385403239","https://openalex.org/W4386334048","https://openalex.org/W4386861232","https://openalex.org/W4389398607","https://openalex.org/W4390052751","https://openalex.org/W4390063959","https://openalex.org/W4392705635","https://openalex.org/W4393902863","https://openalex.org/W4399741690","https://openalex.org/W4399893117","https://openalex.org/W4404252802","https://openalex.org/W4404497408"],"related_works":["https://openalex.org/W580487332","https://openalex.org/W4391375266","https://openalex.org/W3150498631","https://openalex.org/W2768489290","https://openalex.org/W2371195977","https://openalex.org/W2354872674","https://openalex.org/W2136583354","https://openalex.org/W2097654801","https://openalex.org/W2012910004","https://openalex.org/W1519879345"],"abstract_inverted_index":null,"abstract_inverted_index_v3":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4408732759","counts_by_year":[{"year":2025,"cited_by_count":3}],"updated_date":"2025-07-18T01:03:41.562229","created_date":"2025-03-22"}
-
-          '
+        string: !!binary |
+          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
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -221,15 +228,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:20:14 GMT
+          - Mon, 11 Aug 2025 23:07:27 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754932814&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=JdBZN8CKZIppQCrDM%2FmADpXCGE1Lf4ugodDgOaKf2Sw%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953647&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=XluHWvReD9YUTUc5KSyfiDN5JJLrJUyWNLYushBFcI4%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754932814&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=JdBZN8CKZIppQCrDM%2FmADpXCGE1Lf4ugodDgOaKf2Sw%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953647&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=XluHWvReD9YUTUc5KSyfiDN5JJLrJUyWNLYushBFcI4%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -250,167 +257,149 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1016%2Fj.xgen.2025.100814?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1016%2Fj.xgen.2025.100814?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,8,7]],"date-time":"2025-08-07T16:10:01Z","timestamp":1754583001165,"version":"3.41.3"},"reference-count":60,"publisher":"Elsevier
-          BV","issue":"4","license":[{"start":{"date-parts":[[2025,4,1]],"date-time":"2025-04-01T00:00:00Z","timestamp":1743465600000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2025,4,1]],"date-time":"2025-04-01T00:00:00Z","timestamp":1743465600000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/legal\/tdmrep-license"},{"start":{"date-parts":[[2025,2,20]],"date-time":"2025-02-20T00:00:00Z","timestamp":1740009600000},"content-version":"vor","delay-in-days":0,"URL":"http:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/501100000289","name":"Cancer
-          Research UK","doi-asserted-by":"publisher","award":["CC2190"],"id":[{"id":"10.13039\/501100000289","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100010438","name":"The
-          Francis Crick Institute","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100010438","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100010269","name":"Wellcome
-          Trust","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100010269","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/501100000265","name":"Medical
-          Research Council","doi-asserted-by":"publisher","id":[{"id":"10.13039\/501100000265","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["cell.com","elsevier.com","sciencedirect.com"],"crossmark-restriction":true},"short-container-title":["Cell
-          Genomics"],"published-print":{"date-parts":[[2025,4]]},"DOI":"10.1016\/j.xgen.2025.100814","type":"journal-article","created":{"date-parts":[[2025,3,22]],"date-time":"2025-03-22T09:21:41Z","timestamp":1742635301000},"page":"100814","update-policy":"https:\/\/doi.org\/10.1016\/elsevier_cm_policy","source":"Crossref","is-referenced-by-count":2,"title":["High-throughput
-          screening of human genetic variants by pooled prime editing"],"prefix":"10.1016","volume":"5","author":[{"given":"Michael","family":"Herger","sequence":"first","affiliation":[]},{"given":"Christina
-          M.","family":"Kajba","sequence":"additional","affiliation":[]},{"given":"Megan","family":"Buckley","sequence":"additional","affiliation":[]},{"given":"Ana","family":"Cunha","sequence":"additional","affiliation":[]},{"given":"Molly","family":"Strom","sequence":"additional","affiliation":[]},{"ORCID":"https:\/\/orcid.org\/0000-0002-7767-8608","authenticated-orcid":false,"given":"Gregory
-          M.","family":"Findlay","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/j.xgen.2025.100814_bib1","doi-asserted-by":"crossref","first-page":"405","DOI":"10.1038\/gim.2015.30","article-title":"Standards
-          and guidelines for the interpretation of sequence variants: a joint consensus
-          recommendation of the American College of Medical Genetics and Genomics and
-          the Association for Molecular Pathology","volume":"17","author":"Richards","year":"2015","journal-title":"Genet.
-          Med."},{"key":"10.1016\/j.xgen.2025.100814_bib2","doi-asserted-by":"crossref","first-page":"116","DOI":"10.1016\/j.cels.2017.11.003","article-title":"Quantitative
-          Missense Variant Effect Prediction Using Large-Scale Mutagenesis Data","volume":"6","author":"Gray","year":"2018","journal-title":"Cell
-          Syst."},{"key":"10.1016\/j.xgen.2025.100814_bib3","doi-asserted-by":"crossref","first-page":"1464","DOI":"10.1126\/science.abi8207","article-title":"From
-          variant to function in human disease genetics","volume":"373","author":"Lappalainen","year":"2021","journal-title":"Science"},{"key":"10.1016\/j.xgen.2025.100814_bib4","doi-asserted-by":"crossref","first-page":"535","DOI":"10.1016\/j.cell.2018.12.015","article-title":"Predicting
-          Splicing from Primary Sequence with Deep Learning","volume":"176","author":"Jaganathan","year":"2019","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib5","doi-asserted-by":"crossref","DOI":"10.1126\/science.abn8197","article-title":"The
-          landscape of tolerated genetic variation in humans and primates","volume":"380","author":"Gao","year":"2023","journal-title":"Science"},{"key":"10.1016\/j.xgen.2025.100814_bib6","doi-asserted-by":"crossref","DOI":"10.1126\/science.adg7492","article-title":"Accurate
-          proteome-wide missense variant effect prediction with AlphaMissense","volume":"381","author":"Cheng","year":"2023","journal-title":"Science"},{"key":"10.1016\/j.xgen.2025.100814_bib7","doi-asserted-by":"crossref","first-page":"D862","DOI":"10.1093\/nar\/gkv1222","article-title":"ClinVar:
-          public archive of interpretations of clinically relevant variants","volume":"44","author":"Landrum","year":"2016","journal-title":"Nucleic
-          Acids Res."},{"key":"10.1016\/j.xgen.2025.100814_bib8","doi-asserted-by":"crossref","first-page":"1381","DOI":"10.1038\/s41436-021-01172-3","article-title":"ACMG
-          SF v3.0 list for reporting of secondary findings in clinical exome and genome
-          sequencing: a policy statement of the American College of Medical Genetics
-          and Genomics (ACMG)","volume":"23","author":"Miller","year":"2021","journal-title":"Genet.
-          Med."},{"key":"10.1016\/j.xgen.2025.100814_bib9","doi-asserted-by":"crossref","first-page":"1782","DOI":"10.1038\/nprot.2016.135","article-title":"The
-          power of multiplexed functional analysis of genetic variants","volume":"11","author":"Gasperini","year":"2016","journal-title":"Nat.
-          Protoc."},{"key":"10.1016\/j.xgen.2025.100814_bib10","doi-asserted-by":"crossref","first-page":"R187","DOI":"10.1093\/hmg\/ddab219","article-title":"Linking
-          genome variants to disease: scalable approaches to test the functional impact
-          of human mutations","volume":"30","author":"Findlay","year":"2021","journal-title":"Hum.
-          Mol. Genet."},{"key":"10.1016\/j.xgen.2025.100814_bib11","doi-asserted-by":"crossref","first-page":"3583","DOI":"10.1038\/s41467-019-11526-w","article-title":"Saturation
-          mutagenesis of twenty disease-associated regulatory elements at single base-pair
-          resolution","volume":"10","author":"Kircher","year":"2019","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib12","doi-asserted-by":"crossref","first-page":"266","DOI":"10.1186\/s13059-022-02839-z","article-title":"Saturation-scale
-          functional evidence supports clinical variant interpretation in Lynch syndrome","volume":"23","author":"Scott","year":"2022","journal-title":"Genome
-          Biol."},{"key":"10.1016\/j.xgen.2025.100814_bib13","doi-asserted-by":"crossref","first-page":"2248","DOI":"10.1016\/j.ajhg.2021.11.001","article-title":"Closing
-          the gap: Systematic integration of multiplexed functional data resolves variants
-          of uncertain significance in BRCA1, TP53, and PTEN","volume":"108","author":"Fayer","year":"2021","journal-title":"Am.
-          J. Hum. Genet."},{"key":"10.1016\/j.xgen.2025.100814_bib14","doi-asserted-by":"crossref","first-page":"217","DOI":"10.1038\/s41586-018-0461-z","article-title":"Accurate
-          classification of BRCA1 variants with saturation genome editing","volume":"562","author":"Findlay","year":"2018","journal-title":"Nature"},{"key":"10.1016\/j.xgen.2025.100814_bib15","doi-asserted-by":"crossref","first-page":"1029","DOI":"10.1016\/j.ajhg.2020.10.015","article-title":"Multiplexed
-          Functional Assessment of Genetic Variants in CARD11","volume":"107","author":"Meitlis","year":"2020","journal-title":"Am.
-          J. Hum. Genet."},{"key":"10.1016\/j.xgen.2025.100814_bib16","doi-asserted-by":"crossref","first-page":"7702","DOI":"10.1038\/s41467-023-43041-4","article-title":"Saturation
-          genome editing of DDX3X clarifies pathogenicity of germline and somatic variation","volume":"14","author":"Radford","year":"2023","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib17","doi-asserted-by":"crossref","first-page":"120","DOI":"10.1038\/nature13695","article-title":"Saturation
-          editing of genomic regions by multiplex homology-directed repair","volume":"513","author":"Findlay","year":"2014","journal-title":"Nature"},{"key":"10.1016\/j.xgen.2025.100814_bib18","doi-asserted-by":"crossref","first-page":"1064","DOI":"10.1016\/j.cell.2021.01.012","article-title":"Massively
-          parallel assessment of human variants with base editor screens","volume":"184","author":"Hanna","year":"2021","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib19","doi-asserted-by":"crossref","first-page":"1081","DOI":"10.1016\/j.cell.2021.01.041","article-title":"Functional
-          interrogation of DNA damage response variants with base editing screens","volume":"184","author":"Cuella-Martin","year":"2021","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib20","doi-asserted-by":"crossref","first-page":"149","DOI":"10.1038\/s41586-019-1711-4","article-title":"Search-and-replace
-          genome editing without double-strand breaks or donor DNA","volume":"576","author":"Anzalone","year":"2019","journal-title":"Nature"},{"key":"10.1016\/j.xgen.2025.100814_bib21","doi-asserted-by":"crossref","first-page":"288","DOI":"10.1016\/j.ccell.2022.12.009","article-title":"Base
-          editing screens map mutations affecting interferon-\u03b3 signaling in cancer","volume":"41","author":"Coelho","year":"2023","journal-title":"Cancer
-          Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib22","doi-asserted-by":"crossref","first-page":"5635","DOI":"10.1016\/j.cell.2021.09.018","article-title":"Enhanced
-          prime editing systems by manipulating cellular determinants of editing outcomes","volume":"184","author":"Chen","year":"2021","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib23","doi-asserted-by":"crossref","first-page":"3983","DOI":"10.1016\/j.cell.2023.07.039","article-title":"Phage-assisted
-          evolution and protein engineering yield compact, efficient prime editors","volume":"186","author":"Doman","year":"2023","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib24","doi-asserted-by":"crossref","first-page":"639","DOI":"10.1038\/s41586-024-07259-6","article-title":"Improving
-          prime editing with an endogenous small RNA-binding protein","volume":"628","author":"Yan","year":"2024","journal-title":"Nature"},{"key":"10.1016\/j.xgen.2025.100814_bib25","doi-asserted-by":"crossref","first-page":"402","DOI":"10.1038\/s41587-021-01039-7","article-title":"Engineered
-          pegRNAs improve prime editing efficiency","volume":"40","author":"Nelson","year":"2022","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib26","doi-asserted-by":"crossref","first-page":"885","DOI":"10.1038\/s41587-021-01201-1","article-title":"Saturation
-          variant interpretation using CRISPR prime editing","volume":"40","author":"Erwood","year":"2022","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib27","doi-asserted-by":"crossref","first-page":"4633","DOI":"10.1016\/j.molcel.2023.11.021","article-title":"High-throughput
-          PRIME-editing screens identify functional DNA variants in the human genome","volume":"83","author":"Ren","year":"2023","journal-title":"Mol.
-          Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib28","first-page":"1","article-title":"High-throughput
-          evaluation of genetic variants with prime editing sensor libraries","author":"Gould","year":"2024","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib29","doi-asserted-by":"crossref","first-page":"92","DOI":"10.1038\/s41592-024-02502-4","article-title":"A
-          benchmarked, high-efficiency prime editing platform for multiplexed dropout
-          screening","volume":"22","author":"Cirincione","year":"2025","journal-title":"Nat.
-          Methods"},{"key":"10.1016\/j.xgen.2025.100814_bib30","first-page":"1","article-title":"Saturation
-          profiling of drug-resistant genetic variants using prime editing","author":"Kim","year":"2024","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib31","article-title":"A
-          multiplex, prime editing framework for identifying drug resistance variants
-          at scale","author":"Chardon","year":"2023","journal-title":"bioRxiv"},{"key":"10.1016\/j.xgen.2025.100814_bib32","article-title":"Rewriting
-          regulatory DNA to dissect and reprogram gene expression","author":"Martyn","year":"2023","journal-title":"bioRxiv"},{"key":"10.1016\/j.xgen.2025.100814_bib33","article-title":"Prime
-          editor-based high-throughput screening reveals functional synonymous mutations
-          in the human genome","author":"Niu","year":"2024","journal-title":"bioRxiv"},{"key":"10.1016\/j.xgen.2025.100814_bib34","doi-asserted-by":"crossref","first-page":"340","DOI":"10.1038\/nature10348","article-title":"Ebola
-          virus entry requires the cholesterol transporter Niemann-Pick C1","volume":"477","author":"Carette","year":"2011","journal-title":"Nature"},{"key":"10.1016\/j.xgen.2025.100814_bib35","doi-asserted-by":"crossref","first-page":"84","DOI":"10.1126\/science.1247005","article-title":"Genome-scale
-          CRISPR-Cas9 knockout screening in human cells","volume":"343","author":"Shalem","year":"2014","journal-title":"Science"},{"key":"10.1016\/j.xgen.2025.100814_bib36","doi-asserted-by":"crossref","first-page":"1151","DOI":"10.1038\/s41587-022-01613-7","article-title":"Predicting
-          prime editing efficiency and product purity by deep learning","volume":"41","author":"Mathis","year":"2023","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib37","doi-asserted-by":"crossref","first-page":"2256","DOI":"10.1016\/j.cell.2023.03.034","article-title":"Prediction
-          of efficiencies for diverse prime editing systems in multiple cell types","volume":"186","author":"Yu","year":"2023","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib38","doi-asserted-by":"crossref","first-page":"862","DOI":"10.1038\/s41587-021-01172-3","article-title":"Base
-          editing sensor libraries for high-throughput engineering and functional analysis
-          of cancer-associated single nucleotide variants","volume":"40","author":"S\u00e1nchez-Rivera","year":"2022","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib39","doi-asserted-by":"crossref","first-page":"198","DOI":"10.1038\/s41587-020-0677-y","article-title":"Predicting
-          the efficiency of prime editing guide RNAs in human cells","volume":"39","author":"Kim","year":"2021","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib40","first-page":"1","article-title":"Machine
-          learning prediction of prime editing efficiency across diverse chromatin contexts","author":"Mathis","year":"2024","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib41","doi-asserted-by":"crossref","first-page":"56","DOI":"10.1016\/j.tibtech.2018.07.017","article-title":"Strategies
-          for the Enrichment and Selection of Genetically Modified Cells","volume":"37","author":"Ren","year":"2019","journal-title":"Trends
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib42","doi-asserted-by":"crossref","first-page":"497","DOI":"10.1038\/s41467-020-20810-z","article-title":"Universal
-          toxin-based selection for precise genome engineering in human cells","volume":"12","author":"Li","year":"2021","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib43","doi-asserted-by":"crossref","first-page":"5909","DOI":"10.1038\/s41467-022-33669-z","article-title":"Marker-free
-          co-selection for successive rounds of prime editing in human cells","volume":"13","author":"Levesque","year":"2022","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib44","doi-asserted-by":"crossref","first-page":"1479","DOI":"10.1016\/j.cell.2013.12.001","article-title":"Dynamic
-          imaging of genomic loci in living human cells by an optimized CRISPR\/Cas
-          system","volume":"155","author":"Chen","year":"2013","journal-title":"Cell"},{"key":"10.1016\/j.xgen.2025.100814_bib45","doi-asserted-by":"crossref","first-page":"5416","DOI":"10.1038\/s41467-018-07901-8","article-title":"Optimized
-          libraries for CRISPR-Cas9 genetic screens with multiple modalities","volume":"9","author":"Sanson","year":"2018","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib46","doi-asserted-by":"crossref","first-page":"489","DOI":"10.1038\/s41467-022-28137-7","article-title":"Improved
-          gRNA secondary structures allow editing of target sites resistant to CRISPR-Cas9
-          cleavage","volume":"13","author":"Riesenberg","year":"2022","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib47","doi-asserted-by":"crossref","first-page":"816","DOI":"10.1126\/science.1225829","article-title":"A
-          Programmable Dual-RNA\u2013Guided DNA Endonuclease in Adaptive Bacterial Immunity","volume":"337","author":"Jinek","year":"2012","journal-title":"Science"},{"key":"10.1016\/j.xgen.2025.100814_bib48","doi-asserted-by":"crossref","DOI":"10.3390\/cancers14153645","article-title":"SMARCB1-Deficient
-          Cancers: Novel Molecular Insights and Therapeutic Vulnerabilities","volume":"14","author":"Cooper","year":"2022","journal-title":"Cancers"},{"key":"10.1016\/j.xgen.2025.100814_bib49","doi-asserted-by":"crossref","first-page":"1092","DOI":"10.1126\/science.aac7557","article-title":"Gene
-          essentiality and synthetic lethality in haploid human cells","volume":"350","author":"Blomen","year":"2015","journal-title":"Science"},{"key":"10.1016\/j.xgen.2025.100814_bib50","doi-asserted-by":"crossref","first-page":"2966","DOI":"10.1038\/s41467-019-10849-y","article-title":"Mutations
-          in SMARCB1 and in other Coffin-Siris syndrome genes lead to various brain
-          midline defects","volume":"10","author":"Filatova","year":"2019","journal-title":"Nat.
-          Commun."},{"key":"10.1016\/j.xgen.2025.100814_bib51","doi-asserted-by":"crossref","first-page":"184","DOI":"10.1038\/nbt.3437","article-title":"Optimized
-          sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9","volume":"34","author":"Doench","year":"2016","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib52","doi-asserted-by":"crossref","first-page":"332","DOI":"10.1136\/jmg.2007.056499","article-title":"Molecular
-          characterisation of SMARCB1 and NF2 in familial and sporadic schwannomatosis","volume":"45","author":"Hadfield","year":"2008","journal-title":"J.\u00a0Med.
-          Genet."},{"key":"10.1016\/j.xgen.2025.100814_bib53","doi-asserted-by":"crossref","first-page":"373","DOI":"10.1016\/j.cancergen.2014.04.001","article-title":"SMARCB1
-          mutations in schwannomatosis and genotype correlations with rhabdoid tumors","volume":"207","author":"Smith","year":"2014","journal-title":"Cancer
-          Genet."},{"key":"10.1016\/j.xgen.2025.100814_bib54","doi-asserted-by":"crossref","first-page":"163","DOI":"10.1016\/j.ajhg.2020.12.003","article-title":"Massively
-          parallel functional testing of MSH2 missense variants conferring Lynch syndrome
-          risk","volume":"108","author":"Jia","year":"2021","journal-title":"Am. J.
-          Hum. Genet."},{"key":"10.1016\/j.xgen.2025.100814_bib55","doi-asserted-by":"crossref","first-page":"4","DOI":"10.1038\/s41698-020-0109-y","article-title":"Splicing
-          profile by capture RNA-seq identifies pathogenic germline variants in tumor
-          suppressor genes","volume":"4","author":"Landrith","year":"2020","journal-title":"npj
-          Precis. Oncol."},{"key":"10.1016\/j.xgen.2025.100814_bib56","doi-asserted-by":"crossref","first-page":"224","DOI":"10.1038\/s41587-019-0032-3","article-title":"CRISPResso2
-          provides accurate and rapid genome editing sequence analysis","volume":"37","author":"Clement","year":"2019","journal-title":"Nat.
-          Biotechnol."},{"key":"10.1016\/j.xgen.2025.100814_bib59","doi-asserted-by":"crossref","first-page":"207","DOI":"10.1186\/s13059-020-02091-3","article-title":"DiMSum:
-          an error model and pipeline for analyzing deep mutational scanning data and
-          diagnosing common experimental pathologies","volume":"21","author":"Faure","year":"2020","journal-title":"Genome
-          Biol."},{"key":"10.1016\/j.xgen.2025.100814_bib57","doi-asserted-by":"crossref","first-page":"783","DOI":"10.1038\/nmeth.3047","article-title":"Improved
-          vectors and genome-wide libraries for CRISPR screening","volume":"11","author":"Sanjana","year":"2014","journal-title":"Nat.
-          Methods"},{"key":"10.1016\/j.xgen.2025.100814_bib58","first-page":"96","article-title":"Determination
-          of Lentiviral Infectious Titer by a Novel Droplet Digital PCR Method. Hum.
-          Gene Ther","volume":"29","author":"Wang","year":"2018","journal-title":"Methods"},{"key":"10.1016\/j.xgen.2025.100814_bib60","doi-asserted-by":"crossref","first-page":"31","DOI":"10.1186\/s13073-021-00835-9","article-title":"CADD-Splice-improving
-          genome-wide variant effect prediction using deep learning-derived splice scores","volume":"13","author":"Rentzsch","year":"2021","journal-title":"Genome
-          Med."}],"container-title":["Cell Genomics"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S2666979X25000709?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S2666979X25000709?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2025,8,7]],"date-time":"2025-08-07T15:33:07Z","timestamp":1754580787000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S2666979X25000709"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2025,4]]},"references-count":60,"journal-issue":{"issue":"4","published-print":{"date-parts":[[2025,4]]}},"alternative-id":["S2666979X25000709"],"URL":"https:\/\/doi.org\/10.1016\/j.xgen.2025.100814","relation":{},"ISSN":["2666-979X"],"issn-type":[{"type":"print","value":"2666-979X"}],"subject":[],"published":{"date-parts":[[2025,4]]},"assertion":[{"value":"Elsevier","name":"publisher","label":"This
-          article is maintained by"},{"value":"High-throughput screening of human genetic
-          variants by pooled prime editing","name":"articletitle","label":"Article Title"},{"value":"Cell
-          Genomics","name":"journaltitle","label":"Journal Title"},{"value":"https:\/\/doi.org\/10.1016\/j.xgen.2025.100814","name":"articlelink","label":"CrossRef
-          DOI link to publisher maintained version"},{"value":"article","name":"content_type","label":"Content
-          Type"},{"value":"\u00a9 2025 The Author(s). Published by Elsevier Inc.","name":"copyright","label":"Copyright"}],"article-number":"100814"}}'
+        string: !!binary |
+          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
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
-        Content-Encoding:
-          - gzip
         Content-Length:
           - "5787"
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:20:14 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:27 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -421,8 +410,18 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1016%2Fj.xgen.2025.100814/transform/application/x-bibtex
     response:
@@ -437,23 +436,23 @@ interactions:
 
           "
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 17:20:15 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:27 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:

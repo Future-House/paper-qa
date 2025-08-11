@@ -1,9 +1,19 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -29,43 +39,55 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
+          - Mon, 11 Aug 2025 23:07:22 GMT
         Via:
-          - 1.1 ac3f0425be668a2439884bb8cbd3ccd8.cloudfront.net (CloudFront)
+          - 1.1 2347835d64b95b688a16fb2618f2577a.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - Xw-IO_bsBSgDZuwLJpAG4Ci-orE9gGXD2TiQ7vvGuMEGX0owSx5Hvg==
+          - bNMVoRKlF45whub5ZQ4-YBxs8mw8DYAKzJ8QbC1Iq6-EDycu0kp1Dw==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PJrlHGZVPHcEFQA=
+          - PKeiqGqWvHcEffw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "877"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
+          - Mon, 11 Aug 2025 23:07:22 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - f6ffa2a4-df40-4eb9-b02f-eeeb085d2264
+          - 3a7b9d2a-d346-481d-be17-553a5cec5842
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.unpaywall.org/v2/10.1007/s40278-023-41815-2?email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"doi":"10.1007/s40278-023-41815-2","doi_url":"https://doi.org/10.1007/s40278-023-41815-2","title":"Convalescent-anti-sars-cov-2-plasma/immune-globulin","genre":"journal-article","is_paratext":false,"published_date":"2023-06-23","year":2023,"journal_name":"Reactions
-          Weekly","journal_issns":"0114-9954,1179-2051","journal_issn_l":"0114-9954","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Springer
-          Science and Business Media LLC","is_oa":false,"oa_status":"closed","has_repository_copy":false,"best_oa_location":null,"first_oa_location":null,"oa_locations":[],"oa_locations_embargoed":[],"data_standard":2,"z_authors":null,"updated":"2025-05-22T18:42:22Z"}
-
-          '
+        string: !!binary |
+          H4sIAKp3mmgA/32SQU/cMBCF7/yKyOeY2CbL7uZYrvRSKiGBkDVrD1lTx448NuqC+t/rgIClrXp9
+          873npxk/MxsdG5gUp1KIdUe9UOsNF+qM93IjV1yxdkF0Sb5i+5xnGrquKqcxjd1/bdllj9V0EcMj
+          eCSDIXMI2XGCRNzER6747IEm6Nw0lYB89HFXvAvVPWJIi/shlhTAc0jZmZrXMkd6hgQZf2Y23IMn
+          bNlcdt7RHq22dVBtaukizrk6q44DQmLDIrVveTrAtHDfEEx2MVBzjfjDH9gH4YgCVURI2fPtdtW3
+          Uq63XImV/IPS/hj7NNQR3kseqS5oG+Hhr/61JruakwsjpubKOAwGGwi2+VLIBSRqvqJ10FxeXrxu
+          4ig+gqYMuSydjY+EtiJ7IJ1wjuRyTAdt4nx4N+yQcg3QPhpYdsCGULxv2b1L/x4cSfWR27vPisZp
+          B2mM9d2XWb3ES6NgIVVJtexJQ8n7mOgtsMzLuezrvVZc1I+jvsvN0KtBqRv26+Q3UuGsPKACAAA=
       headers:
         Access-Control-Allow-Headers:
           - origin, content-type, accept, x-requested-with
@@ -80,13 +102,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
+          - Mon, 11 Aug 2025 23:07:22 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=62vb7Iw%2FBH6YdQBONLMW94YTXVAPlUvNLbiKzyNS83k%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754932768"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=0fQUj4u79VZaKOEm%2FDWxYU0NsO9QMZ%2BBagjVmE1BzAQ%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953642"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=62vb7Iw%2FBH6YdQBONLMW94YTXVAPlUvNLbiKzyNS83k%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754932768"
+          - heroku-nel="https://nel.heroku.com/reports?s=0fQUj4u79VZaKOEm%2FDWxYU0NsO9QMZ%2BBagjVmE1BzAQ%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953642"
         Server:
           - Heroku
         Vary:
@@ -97,36 +119,54 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.openalex.org/works/https://doi.org/10.1007%2Fs40278-023-41815-2
     response:
       body:
-        string:
-          '{"id":"https://openalex.org/W4381738344","doi":"https://doi.org/10.1007/s40278-023-41815-2","title":"Convalescent-anti-sars-cov-2-plasma/immune-globulin","display_name":"Convalescent-anti-sars-cov-2-plasma/immune-globulin","publication_year":2023,"publication_date":"2023-06-23","ids":{"openalex":"https://openalex.org/W4381738344","doi":"https://doi.org/10.1007/s40278-023-41815-2"},"language":"en","primary_location":{"is_oa":false,"landing_page_url":"https://doi.org/10.1007/s40278-023-41815-2","pdf_url":null,"source":{"id":"https://openalex.org/S14436165","display_name":"Reactions
-          Weekly","issn_l":"0114-9954","issn":["0114-9954","1179-2051"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":true,"host_organization":"https://openalex.org/P4310320330","host_organization_name":"Adis,
-          Springer Healthcare","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310320330"],"host_organization_lineage_names":["Springer
-          Nature","Adis, Springer Healthcare"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},"type":"article","type_crossref":"journal-article","indexed_in":["crossref"],"open_access":{"is_oa":false,"oa_status":"closed","oa_url":null,"any_repository_has_fulltext":false},"authorships":[],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":0.0,"has_fulltext":false,"cited_by_count":0,"citation_normalized_percentile":{"value":0.0,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":0,"max":64},"biblio":{"volume":"1962","issue":"1","first_page":"145","last_page":"145"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T12796","display_name":"Dermatological
-          and COVID-19 studies","score":0.9358,"subfield":{"id":"https://openalex.org/subfields/2708","display_name":"Dermatology"},"field":{"id":"https://openalex.org/fields/27","display_name":"Medicine"},"domain":{"id":"https://openalex.org/domains/4","display_name":"Health
-          Sciences"}},"topics":[{"id":"https://openalex.org/T12796","display_name":"Dermatological
-          and COVID-19 studies","score":0.9358,"subfield":{"id":"https://openalex.org/subfields/2708","display_name":"Dermatology"},"field":{"id":"https://openalex.org/fields/27","display_name":"Medicine"},"domain":{"id":"https://openalex.org/domains/4","display_name":"Health
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/convalescent-plasma","display_name":"Convalescent
-          plasma","score":0.9101845},{"id":"https://openalex.org/keywords/2019-20-coronavirus-outbreak","display_name":"2019-20
-          coronavirus outbreak","score":0.52068794}],"concepts":[{"id":"https://openalex.org/C3018027319","wikidata":"https://www.wikidata.org/wiki/Q420496","display_name":"Convalescent
-          plasma","level":5,"score":0.9101845},{"id":"https://openalex.org/C3007834351","wikidata":"https://www.wikidata.org/wiki/Q82069695","display_name":"Severe
-          acute respiratory syndrome coronavirus 2 (SARS-CoV-2)","level":5,"score":0.6916741},{"id":"https://openalex.org/C3008058167","wikidata":"https://www.wikidata.org/wiki/Q84263196","display_name":"Coronavirus
-          disease 2019 (COVID-19)","level":4,"score":0.660023},{"id":"https://openalex.org/C159047783","wikidata":"https://www.wikidata.org/wiki/Q7215","display_name":"Virology","level":1,"score":0.65177965},{"id":"https://openalex.org/C203014093","wikidata":"https://www.wikidata.org/wiki/Q101929","display_name":"Immunology","level":1,"score":0.52446485},{"id":"https://openalex.org/C3006700255","wikidata":"https://www.wikidata.org/wiki/Q81068910","display_name":"2019-20
-          coronavirus outbreak","level":3,"score":0.52068794},{"id":"https://openalex.org/C71924100","wikidata":"https://www.wikidata.org/wiki/Q11190","display_name":"Medicine","level":0,"score":0.464142},{"id":"https://openalex.org/C159654299","wikidata":"https://www.wikidata.org/wiki/Q79460","display_name":"Antibody","level":2,"score":0.44701022},{"id":"https://openalex.org/C8891405","wikidata":"https://www.wikidata.org/wiki/Q1059","display_name":"Immune
-          system","level":2,"score":0.43136406},{"id":"https://openalex.org/C126322002","wikidata":"https://www.wikidata.org/wiki/Q11180","display_name":"Internal
-          medicine","level":1,"score":0.082360655},{"id":"https://openalex.org/C524204448","wikidata":"https://www.wikidata.org/wiki/Q788926","display_name":"Infectious
-          disease (medical specialty)","level":3,"score":0.07111758},{"id":"https://openalex.org/C116675565","wikidata":"https://www.wikidata.org/wiki/Q3241045","display_name":"Outbreak","level":2,"score":0.059273064},{"id":"https://openalex.org/C2779134260","wikidata":"https://www.wikidata.org/wiki/Q12136","display_name":"Disease","level":2,"score":0.041250974}],"mesh":[],"locations_count":1,"locations":[{"is_oa":false,"landing_page_url":"https://doi.org/10.1007/s40278-023-41815-2","pdf_url":null,"source":{"id":"https://openalex.org/S14436165","display_name":"Reactions
-          Weekly","issn_l":"0114-9954","issn":["0114-9954","1179-2051"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":true,"host_organization":"https://openalex.org/P4310320330","host_organization_name":"Adis,
-          Springer Healthcare","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310320330"],"host_organization_lineage_names":["Springer
-          Nature","Adis, Springer Healthcare"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"score":0.4,"display_name":"Good
-          health and well-being","id":"https://metadata.un.org/sdg/3"}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":1,"referenced_works":["https://openalex.org/W4308075214"],"related_works":["https://openalex.org/W4206669628","https://openalex.org/W4205317059","https://openalex.org/W4200329650","https://openalex.org/W3127156785","https://openalex.org/W3113664224","https://openalex.org/W3084498529","https://openalex.org/W3018906908","https://openalex.org/W3009669391","https://openalex.org/W3007868867","https://openalex.org/W3005417802"],"abstract_inverted_index":null,"abstract_inverted_index_v3":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4381738344","counts_by_year":[],"updated_date":"2025-06-13T14:03:52.178024","created_date":"2023-06-24"}
-
-          '
+        string: !!binary |
+          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
+          FI4jcu2scevh5NuX7f5SoP7ql38Bs0NXB2sZAAA=
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -150,15 +190,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
+          - Mon, 11 Aug 2025 23:07:22 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754932768&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=15QWER%2FZkHDeXmHagjekz2f9UeD3JK0If4iughdUvMo%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953642&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=YLTVXYqHZ2%2BDgcdzOdB07Dw1KAXkK8UoJXnq77RKnYA%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754932768&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=15QWER%2FZkHDeXmHagjekz2f9UeD3JK0If4iughdUvMo%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953642&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=YLTVXYqHZ2%2BDgcdzOdB07Dw1KAXkK8UoJXnq77RKnYA%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -179,47 +219,68 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
-          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
-          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
-          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
-          humoral immunodeficiency - Three consecutive cases and review of the literature.
-          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
-          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
-          Weekly"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":1,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
-          and mild decrease in baseline oxygen saturation following off-label use: 3
-          case reports"],"short-title":[],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"https:\/\/doi.org\/10.1007\/s40278-023-41815-2","relation":{},"ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"subject":[],"published":{"date-parts":[[2023,6,24]]}}}'
+        string: !!binary |
+          H4sIAAAAAAAA/8VW227jNhD9FULPpm6Rb3prnS4QINkFkrRFGwUFLY1txhQpkJQd1/C/d0j5tmnW
+          CBZoN3BgmTMazhzOOcNtYCyzrQnyQC2DXlCDMWwO1G4awLW10uerK9CGK4mGJIzD+GQJ8m3AZQWv
+          ULnHilmgDdMW4z49pXF61Rv00uz5udeZLK9ddGeg8YCm2WOc5ckQP39iTGfFrOomyJPBaNgfodsw
+          zoa7XqBhBhpkCbRUrbTo0Auadiq4WYDGiA+N5nIOmjyU3LkRJivyc2u4xDzJHVSckdvbCW7CjWld
+          Dgk+C16CNPjraevg0PY7a4hz/3mvhkE2it0f1lAqaUHaMzBtVeMrFQi2oVzSim1wz7gX/Hp/i9aF
+          tY3Ji6iI1ut1aPYVSjw1DWGp6iKaN0WkwQDTJcJgisjCq6VYOoayjNZc4ivBrvdjqlsp/X9U93za
+          u1I149KXuX96clatjKmZXlKMZjUvrc9vxoQBTNwslLbUhcA3QCMCVriWCO6BeVdDfgdYik2Asa6/
+          3LjeicMkjodFZLI4HY6oAytLRkmfpg6kjkIvqsVyBEWseYkRXSKAEF8gytU3j+HqMRnlWZqn4/eO
+          IesPs3F3DI0nZZBkfYr/6GswjdItTRwMyCPPAXokVEWnmwOpYhd6X/1EyRUTYEoHLJOWU8O0Qc8V
+          TWkjGCJaRLyuWwl0LtS0FYg3pt9gZP56Agm3WynR+nKS8SD12lFPPWvTsTMfeFxRJTEIXGzTcy3w
+          vF3CBiN59P+a3DtWV4pTZgxo64tDa3kqvZXYAm3pugwPIrgGMWeVop9c66GO/U3uegQsYSIkj+64
+          aiyfqBmZfPnt5pomY7LmdkHKM3BIBwbhkjTMovpY0zkt2lppJogHSVUIi9emDaHkcaEBXBQDZWv5
+          Cp+ZAeNVS8OKw9rtaRdABLegO1KQXyQWXkPFKnS9wR9lyZVhhvxB7jjWOOVKqDkq3QRh5CUjWVzI
+          nPTjIe0ngx75rEIydl8rgoimIflpxbhgUwFkplWdE2RmTgp5oqYBXpeh0vMiCr5q/mRQRC+hs0KI
+          sXAq4CceH9n4ASopzefcEeTghWuCyXnbdTBIL9By6U/5rWY4w1E0OrnYi0ARNdWsiC5QNESH4CQa
+          e7qypsFxwFyWPkTwbUnjbrnC5jp7x6m5k6czzf1AznttuJhuEc1aIVzwcGFr8e/MnamI3tj+u5x/
+          OM6G19i1mlvUrQWUy8MUqKBRhn+/wI7z9CpPRu8K7CgZjzqBNaXS4O8fOE322rpF1eM4YTbu8QMQ
+          XpofO7dHOz1S5xMgLF4YsOqKVOCmiAEnN1P8doJJ1OtmDpIYpxMeJTJTQqg1bok6MqPIcRCkNZCT
+          K680KDKNctg8H+bfGQn9Denyde5chc3Zleww8/aXrO1Xt62P6jyGx/gMW95dB1AcKa8cEh4hl/Fb
+          hFHwO426PJc13kS6Ftpi/JuHh88uapIMxzSN+0nQlS73jYqigxLfJX90OQ53EFBarVBlfevhgb3g
+          Qoffsc7LEO52/wBSOnixhAsAAA==
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
-        Content-Encoding:
-          - gzip
         Content-Length:
           - "1159"
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:22 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -230,8 +291,18 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
     response:
@@ -242,23 +313,23 @@ interactions:
           publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
           pages={145\u2013145} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:22 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
