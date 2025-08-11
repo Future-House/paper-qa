@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import logging
 import os
+from pathlib import Path
 from typing import Any, ClassVar
 
 from pydantic import ValidationError
@@ -13,6 +14,9 @@ from .client_models import JournalQuery, MetadataPostProcessor
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_JOURNAL_QUALITY_CSV_PATH = (
+    Path(__file__).parent / "client_data" / "journal_quality.csv"
+)
 
 # TODO: refresh script for journal quality data
 
@@ -25,13 +29,11 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
     def __init__(self, journal_quality_path: os.PathLike | str | None = None) -> None:
         if journal_quality_path is None:
             # Construct the path relative to module
-            self.journal_quality_path = str(
-                os.path.join(
-                    os.path.dirname(__file__), "client_data", "journal_quality.csv"
-                )
+            self.journal_quality_path: str | os.PathLike = (
+                DEFAULT_JOURNAL_QUALITY_CSV_PATH
             )
         else:
-            self.journal_quality_path = str(journal_quality_path)
+            self.journal_quality_path = journal_quality_path
         self.data: dict[str, Any] | None = None
 
     def load_data(self) -> None:
