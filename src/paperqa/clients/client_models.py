@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Collection
 from typing import Any, Generic, TypeVar
 
-import aiohttp
+import httpx
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class ClientQuery(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    session: aiohttp.ClientSession
+    client: httpx.AsyncClient
 
 
 class TitleAuthorQuery(ClientQuery):
@@ -121,7 +121,7 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
                 f" {self.__class__.__name__}."
             )
         # we're suppressing this error to not fail on 403 or 500 errors from providers
-        except aiohttp.ClientError:
+        except httpx.RequestError:
             logger.warning(
                 "Client error for"
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"

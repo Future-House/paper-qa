@@ -46,7 +46,7 @@ You can see the in-line citations for each clinical trial used as a response for
 to see more data on the specific contexts that were used to answer the query:
 
 ```python
-print(answer_response.session.contexts)
+print(answer_response.client.contexts)
 ```
 
     [Context(context='The excerpt mentions that a search on ClinicalTrials.gov for clinical trials related to drugs

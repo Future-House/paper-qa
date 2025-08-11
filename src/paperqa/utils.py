@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, BinaryIO, ClassVar, TypeVar
 from uuid import UUID
 
-import aiohttp
 import httpx
 from lmi import configure_llm_logs
 from pybtex.database import Person, parse_string
@@ -414,16 +413,15 @@ def is_retryable(
     additional_status_codes: Collection[HTTPStatus | int] | None = None,
 ) -> bool:
     """Check if an exception is known to be a retryable HTTP issue."""
-    if isinstance(
-        exc, aiohttp.ServerDisconnectedError | aiohttp.ClientConnectionResetError
-    ):
+    if isinstance(exc, httpx.ConnectError | httpx.ReadError):
         # Seen with Semantic Scholar:
         # > aiohttp.client_exceptions.ClientConnectionResetError:
         # > Cannot write to closing transport
+        # Then we migrated to httpx
         return True
     retry_status_codes: set[int] = {
-        httpx.codes.INTERNAL_SERVER_ERROR.value,
-        httpx.codes.GATEWAY_TIMEOUT.value,
+        httpx.codes.INTERNAL_SERVER_ERROR,
+        httpx.codes.GATEWAY_TIMEOUT,
     }
     if additional_status_codes:
         retry_status_codes.update(
@@ -431,14 +429,14 @@ def is_retryable(
             for status_code in additional_status_codes
         )
     return (
-        isinstance(exc, aiohttp.ClientResponseError)
-        and exc.status in retry_status_codes
+        isinstance(exc, httpx.HTTPStatusError)
+        and exc.response.status_code in retry_status_codes
     )
 
 
 async def _get_with_retrying(  # type: ignore[return]  # noqa: RET503
     url: str,
-    session: aiohttp.ClientSession,
+    client: httpx.AsyncClient,
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
     retry_predicate: Callable[[BaseException], bool] = is_retryable,
     **get_kwargs,
@@ -447,7 +445,7 @@ async def _get_with_retrying(  # type: ignore[return]  # noqa: RET503
 
     Args:
         url: Target URL for the GET request.
-        session: Session for the GET request.
+        client: Async HTTP client for the GET request.
         http_exception_mappings: Optional mapping of HTTP status codes to
             custom Exceptions to be thrown.
         retry_predicate: Optional predicate to dictate when to retry.
@@ -463,14 +461,17 @@ async def _get_with_retrying(  # type: ignore[return]  # noqa: RET503
         wait=wait_incrementing(0.1, 0.1),
     ):
         with attempt:
+            response = await client.get(url, **get_kwargs)
             try:
-                async with session.get(url, **get_kwargs) as response:
-                    response.raise_for_status()
-                    return await response.json()
-            except aiohttp.ClientResponseError as e:
-                if http_exception_mappings and e.status in http_exception_mappings:
-                    raise http_exception_mappings[e.status] from e
+                response.raise_for_status()
+            except httpx.HTTPStatusError as e:
+                if (
+                    http_exception_mappings
+                    and e.response.status_code in http_exception_mappings
+                ):
+                    raise http_exception_mappings[e.response.status_code] from e
                 raise
+            return response.json()
 
 
 def union_collections_to_ordered_list(collections: Iterable) -> list:
