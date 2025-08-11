@@ -42,27 +42,84 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 06 Aug 2025 19:56:24 GMT
+          - Mon, 11 Aug 2025 17:19:30 GMT
         Via:
-          - 1.1 f8b122b964bc12ee7f052daf895c865c.cloudfront.net (CloudFront)
+          - 1.1 62c71b579b931f194fbc7abcc843d132.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - xWd6llGE5Z4WcL23JbqnoFKD2jGo8Dq6XPeBdavB9mGSus0Efna7Pw==
+          - cumqESI1FbwB9N55xIjRnvCnz9aSvtsDAEwpmh-VDH3Q1mJo5hI5cQ==
         X-Amz-Cf-Pop:
-          - SFO53-P7
+          - SFO53-C1
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - O5j4VHk8PHcEhsw=
+          - PJrlZG3FvHcEpTw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1878"
         x-amzn-Remapped-Date:
-          - Wed, 06 Aug 2025 19:56:24 GMT
+          - Mon, 11 Aug 2025 17:19:30 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 395a2027-feb2-4d90-9c37-27a0b057b105
+          - 79505a96-b797-4069-8883-8b15e539a63e
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers: {}
+      method: GET
+      uri: https://api.unpaywall.org/v2/10.1073/pnas.1414271111?email=example@papercrow.ai
+    response:
+      body:
+        string:
+          '{"doi":"10.1073/pnas.1414271111","doi_url":"https://doi.org/10.1073/pnas.1414271111","title":"Developing
+          functional musculoskeletal tissues through hypoxia and lysyl oxidase-induced
+          collagen cross-linking","genre":"journal-article","is_paratext":false,"published_date":"2014-10-27","year":2014,"journal_name":"Proceedings
+          of the National Academy of Sciences","journal_issns":"0027-8424,1091-6490","journal_issn_l":"0027-8424","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Proceedings
+          of the National Academy of Sciences","is_oa":true,"oa_status":"bronze","has_repository_copy":true,"best_oa_location":{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},"first_oa_location":{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},"oa_locations":[{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},{"url":"http://doi.org/10.1073/pnas.1414271111","url_for_pdf":null,"url_for_landing_page":"http://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"submittedVersion","host_type":"repository","is_best":false,"pmh_id":"oai:pubmedcentral.nih.gov:4234579","endpoint_id":"daaf77eacc58eec31bb","repository_institution":"PubMed
+          Central","oa_date":"2014-10-27","updated":"deprecated"}],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Eleftherios
+          A. Makris","is_corresponding":true,"raw_affiliation_strings":["Departments
+          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Donald
+          J. Responte","is_corresponding":false,"raw_affiliation_strings":["Departments
+          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Nikolaos
+          K. Paschos","is_corresponding":false,"raw_affiliation_strings":["Departments
+          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Jerry
+          C. Hu","is_corresponding":false,"raw_affiliation_strings":["Departments of
+          aBiomedical Engineering and"]},{"author_position":"last","raw_author_name":"Kyriacos
+          A. Athanasiou","is_corresponding":false,"raw_affiliation_strings":["Departments
+          of aBiomedical Engineering and","Orthopedic Surgery, University of California,
+          Davis, CA 95616"]}],"updated":"2025-07-30T14:23:20Z"}
+
+          '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "893"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 17:19:30 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+        Report-To:
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=Isjho8%2FN2SI2ew95JtnBJUvdXq32anr4OEHS3Qz6uBo%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754932770"}],"max_age":3600}'
+        Reporting-Endpoints:
+          - heroku-nel="https://nel.heroku.com/reports?s=Isjho8%2FN2SI2ew95JtnBJUvdXq32anr4OEHS3Qz6uBo%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754932770"
+        Server:
+          - Heroku
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 heroku-router
       status:
         code: 200
         message: OK
@@ -179,15 +236,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 06 Aug 2025 19:56:24 GMT
+          - Mon, 11 Aug 2025 17:19:30 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754510184&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=WfYs%2B%2BSmi4CKHuyW4Y8kx6NBdpSD9h6R4f%2FTLLtI5oM%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754932770&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=pbA0GQ449lD2TGwgwUBYDZVGHkZVMcmtUik7g0N%2BMAA%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754510184&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=WfYs%2B%2BSmi4CKHuyW4Y8kx6NBdpSD9h6R4f%2FTLLtI5oM%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754932770&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=pbA0GQ449lD2TGwgwUBYDZVGHkZVMcmtUik7g0N%2BMAA%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -204,63 +261,6 @@ interactions:
           - SAMEORIGIN
         X-Xss-Protection:
           - 1; mode=block
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.unpaywall.org/v2/10.1073/pnas.1414271111?email=example@papercrow.ai
-    response:
-      body:
-        string:
-          '{"doi":"10.1073/pnas.1414271111","doi_url":"https://doi.org/10.1073/pnas.1414271111","title":"Developing
-          functional musculoskeletal tissues through hypoxia and lysyl oxidase-induced
-          collagen cross-linking","genre":"journal-article","is_paratext":false,"published_date":"2014-10-27","year":2014,"journal_name":"Proceedings
-          of the National Academy of Sciences","journal_issns":"0027-8424,1091-6490","journal_issn_l":"0027-8424","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Proceedings
-          of the National Academy of Sciences","is_oa":true,"oa_status":"bronze","has_repository_copy":true,"best_oa_location":{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},"first_oa_location":{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},"oa_locations":[{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},{"url":"http://doi.org/10.1073/pnas.1414271111","url_for_pdf":null,"url_for_landing_page":"http://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"submittedVersion","host_type":"repository","is_best":false,"pmh_id":"oai:pubmedcentral.nih.gov:4234579","endpoint_id":"daaf77eacc58eec31bb","repository_institution":"PubMed
-          Central","oa_date":"2014-10-27","updated":"deprecated"}],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Eleftherios
-          A. Makris","is_corresponding":true,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Donald
-          J. Responte","is_corresponding":false,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Nikolaos
-          K. Paschos","is_corresponding":false,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Jerry
-          C. Hu","is_corresponding":false,"raw_affiliation_strings":["Departments of
-          aBiomedical Engineering and"]},{"author_position":"last","raw_author_name":"Kyriacos
-          A. Athanasiou","is_corresponding":false,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and","Orthopedic Surgery, University of California,
-          Davis, CA 95616"]}],"updated":"2025-07-30T14:23:20Z"}
-
-          '
-      headers:
-        Access-Control-Allow-Headers:
-          - origin, content-type, accept, x-requested-with
-        Access-Control-Allow-Methods:
-          - POST, GET, OPTIONS, PUT, DELETE, PATCH
-        Access-Control-Allow-Origin:
-          - "*"
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "893"
-        Content-Type:
-          - application/json
-        Date:
-          - Wed, 06 Aug 2025 19:56:24 GMT
-        Nel:
-          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
-        Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=xk67Qt5AOm9tviFOtRCMUEuF9sl5VcLuUftB4ve9DG0%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754510184"}],"max_age":3600}'
-        Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=xk67Qt5AOm9tviFOtRCMUEuF9sl5VcLuUftB4ve9DG0%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754510184"
-        Server:
-          - Heroku
-        Vary:
-          - Accept-Encoding
-        Via:
-          - 1.1 heroku-router
       status:
         code: 200
         message: OK
@@ -341,7 +341,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 06 Aug 2025 19:56:24 GMT
+          - Mon, 11 Aug 2025 17:19:30 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -385,7 +385,7 @@ interactions:
         Connection:
           - keep-alive
         Date:
-          - Wed, 06 Aug 2025 19:56:24 GMT
+          - Mon, 11 Aug 2025 17:19:30 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:

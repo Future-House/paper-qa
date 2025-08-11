@@ -155,10 +155,10 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
                 " editing"
             ),
             "source": ["semantic_scholar", "crossref"],
-            "key": "herger2024highthroughputscreeningof",
-            "doi": "10.1101/2024.04.01.587366",
-            "doc_id": "8e7669b50f31c52b",
-            "journal": "BioRxiv",
+            "key": "herger2025highthroughputscreeningof",
+            "doi": "10.1016/j.xgen.2025.100814",
+            "doc_id": "17ba73198ea7230c",  # spellchecker: disable-line
+            "journal": "Cell Genomics",
             "authors": [
                 "Michael Herger",
                 "Christina M. Kajba",
@@ -170,9 +170,10 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "formatted_citation": (
                 "Michael Herger, Christina M. Kajba, Megan Buckley, Ana Cunha, Molly"
                 " Strom, and Gregory M. Findlay. High-throughput screening of human"
-                " genetic variants by pooled prime editing. BioRxiv, Apr 2024. URL:"
-                " https://doi.org/10.1101/2024.04.01.587366,"
-                " doi:10.1101/2024.04.01.587366. This article has 1 citations."
+                " genetic variants by pooled prime editing. Cell Genomics, 5:100814, Apr 2025. URL:"
+                " https://doi.org/10.1016/j.xgen.2025.100814,"
+                " doi:10.1016/j.xgen.2025.100814."
+                " This article has 5 citations and is from a peer-reviewed journal."
             ),
             "is_oa": True,
         },
