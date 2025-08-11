@@ -475,6 +475,7 @@ async def test_crossref_journalquality_fields_filtering() -> None:
                 "Beta-Blocker Interruption or Continuation after Myocardial"
                 " Infarction"  # codespell:ignore
             ),
+            authors=["Johanne Silvain"],
             fields=["title", "doi", "authors", "journal"],
         )
         assert nejm_crossref_details, "Assertions require successful query"
