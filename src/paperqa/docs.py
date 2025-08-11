@@ -356,8 +356,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 metadata_client = kwargs["metadata_client"]
             else:
                 metadata_client = DocMetadataClient(
-                    session=kwargs.pop("session", None),
-                    clients=kwargs.pop("clients", DEFAULT_CLIENTS),
+                    http_client=kwargs.pop("http_client", None),
+                    metadata_clients=kwargs.pop("clients", DEFAULT_CLIENTS),
                 )
 
             query_kwargs: dict[str, Any] = {}
