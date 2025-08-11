@@ -1,46 +1,52 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=The+Dilemma+and+Countermeasures+of+Music+Education+under+the+Background+of+Big+Data&rows=1&select=DOI,author,container-title,title
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=The+Dilemma+and+Countermeasures+of+Music+Education+under+the+Background+of+Big+Data&rows=1&select=DOI%2Cauthor%2Ccontainer-title%2Ctitle
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4342705,"items":[{"DOI":"10.1155\/2022\/8341966","author":[{"ORCID":"http:\/\/orcid.org\/0000-0003-3902-2613","authenticated-orcid":true,"given":"Jiaye","family":"Han","sequence":"first","affiliation":[{"name":"Pingdingshan
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4664899,"items":[{"DOI":"10.1155\/2022\/8341966","author":[{"ORCID":"https:\/\/orcid.org\/0000-0003-3902-2613","authenticated-orcid":true,"given":"Jiaye","family":"Han","sequence":"first","affiliation":[{"name":"Pingdingshan
           Polytechnic College, PingDingShan, Henan 467001, China"},{"name":"National
           University of Life and Environmental Sciences of Ukraine, Kyiv 03041, Ukraine"}]}],"container-title":["Wireless
           Communications and Mobile Computing"],"title":["The Dilemma and Countermeasures
           of Music Education under the Background of Big Data"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:37:06 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 200

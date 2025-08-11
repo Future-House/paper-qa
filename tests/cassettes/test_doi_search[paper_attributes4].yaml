@@ -1,9 +1,19 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1073/pnas.1414271111?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1073/pnas.1414271111?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -42,57 +52,64 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:30 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Via:
-          - 1.1 62c71b579b931f194fbc7abcc843d132.cloudfront.net (CloudFront)
+          - 1.1 b0797f10be715dcb685d992d17347df4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - cumqESI1FbwB9N55xIjRnvCnz9aSvtsDAEwpmh-VDH3Q1mJo5hI5cQ==
+          - xrRimOsbzDP7C6jxHu1sccEtOvUpeRb5XcvawOZjAh7b-5SWcy6Cew==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PJrlZG3FvHcEpTw=
+          - PKei-GAxvHcErAg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1878"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 17:19:30 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 79505a96-b797-4069-8883-8b15e539a63e
+          - 90588ce6-0596-4718-872c-a2243f3797fa
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.unpaywall.org/v2/10.1073/pnas.1414271111?email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"doi":"10.1073/pnas.1414271111","doi_url":"https://doi.org/10.1073/pnas.1414271111","title":"Developing
-          functional musculoskeletal tissues through hypoxia and lysyl oxidase-induced
-          collagen cross-linking","genre":"journal-article","is_paratext":false,"published_date":"2014-10-27","year":2014,"journal_name":"Proceedings
-          of the National Academy of Sciences","journal_issns":"0027-8424,1091-6490","journal_issn_l":"0027-8424","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Proceedings
-          of the National Academy of Sciences","is_oa":true,"oa_status":"bronze","has_repository_copy":true,"best_oa_location":{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},"first_oa_location":{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},"oa_locations":[{"url":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_pdf":"https://www.pnas.org/content/pnas/111/45/E4832.full.pdf","url_for_landing_page":"https://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2014-10-27","updated":"deprecated"},{"url":"http://doi.org/10.1073/pnas.1414271111","url_for_pdf":null,"url_for_landing_page":"http://doi.org/10.1073/pnas.1414271111","evidence":"deprecated","license":null,"version":"submittedVersion","host_type":"repository","is_best":false,"pmh_id":"oai:pubmedcentral.nih.gov:4234579","endpoint_id":"daaf77eacc58eec31bb","repository_institution":"PubMed
-          Central","oa_date":"2014-10-27","updated":"deprecated"}],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Eleftherios
-          A. Makris","is_corresponding":true,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Donald
-          J. Responte","is_corresponding":false,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Nikolaos
-          K. Paschos","is_corresponding":false,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and"]},{"author_position":"additional","raw_author_name":"Jerry
-          C. Hu","is_corresponding":false,"raw_affiliation_strings":["Departments of
-          aBiomedical Engineering and"]},{"author_position":"last","raw_author_name":"Kyriacos
-          A. Athanasiou","is_corresponding":false,"raw_affiliation_strings":["Departments
-          of aBiomedical Engineering and","Orthopedic Surgery, University of California,
-          Davis, CA 95616"]}],"updated":"2025-07-30T14:23:20Z"}
-
-          '
+        string: !!binary |
+          H4sIAKx3mmgA/+1W32/bNhB+319B8FmWJVmOE79lSYCiRdtg3fawIhDO5MliQ5MCSTlVi/7vO0r2
+          YrfJsA7t2gH1k3U/v/vuSN57Lq3iS55naZ4tZtPWgE/zMi+LRU4/nkR91TlNNk0IrV9OpyRJrVtP
+          H/cJKmgkj0vcoratMmtWd0YEZQ1otum86LT1t6gx0HdQ3nfoWWic7dYNa/rWvlXAwEime99rRp8S
+          PE6UkZ1AyYTVGtZomHDW+4lW5pZyUGKSuZj4je0cpZqAC0oQlIQrX7XgIODbwJc1aI8Jb7uVVr5B
+          WUlSkFuR5eUkzybFgjx6BMeXUZTs41UGNtHu2lmBKCmnZ7Ym4MhewK66cwESN32UvxIKjUDP7wNQ
+          qcZThCwrFpPTsiiTPDvLJyflWfaRVaUPzY6UlYW/ajiQKlNJC28+Kc/9K8S7NMF1FMpC5QOELkJf
+          OWveRUob8JXD1noVrOsrYdt+b79CH8i90lYMWfjyPT8eoru7u3QYnDhJwpqAJgyTNKURmpbz6VV5
+          OivSutM6bWVN6ci/qq2r4teXiKNpvogPGos1ftZ041bJyBI5SWwdUokoSa6VQONJbChZwrfo/FD6
+          /Zz9vhMRd5YICn2LB2o3sh652/PYbppKyX1ENLK1yoQD0QH/yng6d91I96ilDjw02V0rB8hH+D8k
+          vFbuR9v+f207aBidz9c/Wvbdt+ywRf+IiKOOjBn/htyvw63vVhsVwmPc3vNzSO7+KdqxSzypJXVh
+          g5KyBAc6NapJ13a7LItZOV+c8Y/I5xKgXiwQhJifIopZvlrxx7vBr7vVc9oQLsbo/DM7c3N8mirc
+          rMCtbbR7TTpyGR5CI8GRqEj4uwq60Fg3HrzxfzVAG+EMV2rEC3c7y/0OcaWxpmfYKevZecqew61T
+          u3dXWOfQt3Zo7H5Ahwh1rbQasBEMF19zyktrFq02YUMlD487/KwsEawEve1XZq0MYjSN+xS/icP3
+          KUyQUo3bwINYL6NGsqcp+2XAFfBBoLtmf0ukL9St1UCUPkvZNXhBE/q9Qn2KzvXsImVPum8GUcMj
+          0/msdwrEOJrnoQG6PpT9D3Am/KUjHG1Us1edW6PrE/abUcM9FIYl9QK0opvPKEjYJWyVT9jFOTub
+          n+QnVOfN4dkusmI+yRaTWfZrXi6LGa3zf/APP/0J4SrGgvYMAAA=
       headers:
         Access-Control-Allow-Headers:
           - origin, content-type, accept, x-requested-with
@@ -107,13 +124,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:30 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=Isjho8%2FN2SI2ew95JtnBJUvdXq32anr4OEHS3Qz6uBo%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754932770"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=8LYgfJX%2BG3oiVIkwP9OvW4M5fq%2BaGRoiaE0IylRExOA%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953644"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=Isjho8%2FN2SI2ew95JtnBJUvdXq32anr4OEHS3Qz6uBo%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754932770"
+          - heroku-nel="https://nel.heroku.com/reports?s=8LYgfJX%2BG3oiVIkwP9OvW4M5fq%2BaGRoiaE0IylRExOA%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953644"
         Server:
           - Heroku
         Vary:
@@ -124,95 +141,104 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.openalex.org/works/https://doi.org/10.1073%2Fpnas.1414271111
     response:
       body:
-        string:
-          '{"id":"https://openalex.org/W2109415576","doi":"https://doi.org/10.1073/pnas.1414271111","title":"Developing
-          functional musculoskeletal tissues through hypoxia and lysyl oxidase-induced
-          collagen cross-linking","display_name":"Developing functional musculoskeletal
-          tissues through hypoxia and lysyl oxidase-induced collagen cross-linking","publication_year":2014,"publication_date":"2014-10-27","ids":{"openalex":"https://openalex.org/W2109415576","doi":"https://doi.org/10.1073/pnas.1414271111","mag":"2109415576","pmid":"https://pubmed.ncbi.nlm.nih.gov/25349395","pmcid":"https://www.ncbi.nlm.nih.gov/pmc/articles/4234579"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1073/pnas.1414271111","pdf_url":null,"source":{"id":"https://openalex.org/S125754415","display_name":"Proceedings
-          of the National Academy of Sciences","issn_l":"0027-8424","issn":["0027-8424","1091-6490"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320052","host_organization_name":"National
-          Academy of Sciences","host_organization_lineage":["https://openalex.org/P4310320052"],"host_organization_lineage_names":["National
-          Academy of Sciences"],"type":"journal"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},"type":"article","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"bronze","oa_url":"https://doi.org/10.1073/pnas.1414271111","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5004589339","display_name":"Eleftherios
-          Makris","orcid":"https://orcid.org/0000-0003-4136-4620"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Eleftherios
-          A. Makris","raw_affiliation_strings":["Departments of Biomedical Engineering
-          and."],"affiliations":[{"raw_affiliation_string":"Departments of Biomedical
-          Engineering and.","institution_ids":[]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5043066789","display_name":"Donald
-          J. Responte","orcid":null},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Donald
-          J. Responte","raw_affiliation_strings":["Departments of Biomedical Engineering
-          and."],"affiliations":[{"raw_affiliation_string":"Departments of Biomedical
-          Engineering and.","institution_ids":[]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5002193027","display_name":"Nikolaos
-          K. Paschos","orcid":"https://orcid.org/0000-0002-1689-6636"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Nikolaos
-          K. Paschos","raw_affiliation_strings":["Departments of Biomedical Engineering
-          and."],"affiliations":[{"raw_affiliation_string":"Departments of Biomedical
-          Engineering and.","institution_ids":[]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5082324061","display_name":"Jerry
-          C. Hu","orcid":"https://orcid.org/0000-0003-0651-1461"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Jerry
-          C. Hu","raw_affiliation_strings":["Departments of Biomedical Engineering and."],"affiliations":[{"raw_affiliation_string":"Departments
-          of Biomedical Engineering and.","institution_ids":[]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5001646095","display_name":"Kyriacos
-          A. Athanasiou","orcid":"https://orcid.org/0000-0001-5387-8405"},"institutions":[{"id":"https://openalex.org/I84218800","display_name":"University
-          of California, Davis","ror":"https://ror.org/05rrcem69","country_code":"US","type":"funder","lineage":["https://openalex.org/I84218800"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Kyriacos
-          A. Athanasiou","raw_affiliation_strings":["Departments of aBiomedical Engineering
-          and","bOrthopedic Surgery, University of California, Davis, CA 95616"],"affiliations":[{"raw_affiliation_string":"Departments
-          of aBiomedical Engineering and","institution_ids":[]},{"raw_affiliation_string":"bOrthopedic
-          Surgery, University of California, Davis, CA 95616","institution_ids":["https://openalex.org/I84218800"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":4.312,"has_fulltext":true,"fulltext_origin":"pdf","cited_by_count":138,"citation_normalized_percentile":{"value":0.999986,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":98,"max":99},"biblio":{"volume":"111","issue":"45","first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T12688","display_name":"Microbial
-          metabolism and enzyme function","score":0.999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},"topics":[{"id":"https://openalex.org/T12688","display_name":"Microbial
-          metabolism and enzyme function","score":0.999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},{"id":"https://openalex.org/T12264","display_name":"Tissue Engineering
-          and Regenerative Medicine","score":0.9891,"subfield":{"id":"https://openalex.org/subfields/2746","display_name":"Surgery"},"field":{"id":"https://openalex.org/fields/27","display_name":"Medicine"},"domain":{"id":"https://openalex.org/domains/4","display_name":"Health
-          Sciences"}},{"id":"https://openalex.org/T11310","display_name":"Connective
-          tissue disorders research","score":0.9869,"subfield":{"id":"https://openalex.org/subfields/1311","display_name":"Genetics"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/lysyl-oxidase","display_name":"Lysyl
-          Oxidase","score":0.97150385},{"id":"https://openalex.org/keywords/hypoxia","display_name":"Hypoxia","score":0.5409639},{"id":"https://openalex.org/keywords/regenerative-medicine","display_name":"Regenerative
-          Medicine","score":0.4419176}],"concepts":[{"id":"https://openalex.org/C193143273","wikidata":"https://www.wikidata.org/wiki/Q419389","display_name":"Lysyl
-          oxidase","level":3,"score":0.97150385},{"id":"https://openalex.org/C207001950","wikidata":"https://www.wikidata.org/wiki/Q141124","display_name":"In
-          vivo","level":2,"score":0.56339604},{"id":"https://openalex.org/C7836513","wikidata":"https://www.wikidata.org/wiki/Q1641506","display_name":"Hypoxia
-          (environmental)","level":3,"score":0.5409639},{"id":"https://openalex.org/C202751555","wikidata":"https://www.wikidata.org/wiki/Q221681","display_name":"In
-          vitro","level":2,"score":0.5332244},{"id":"https://openalex.org/C49892992","wikidata":"https://www.wikidata.org/wiki/Q1540285","display_name":"Tissue
-          engineering","level":2,"score":0.49198553},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.47413397},{"id":"https://openalex.org/C10854531","wikidata":"https://www.wikidata.org/wiki/Q1061415","display_name":"Regenerative
-          medicine","level":3,"score":0.4419176},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.41435188},{"id":"https://openalex.org/C95444343","wikidata":"https://www.wikidata.org/wiki/Q7141","display_name":"Cell
-          biology","level":1,"score":0.40249854},{"id":"https://openalex.org/C12554922","wikidata":"https://www.wikidata.org/wiki/Q7100","display_name":"Biophysics","level":1,"score":0.33397317},{"id":"https://openalex.org/C181199279","wikidata":"https://www.wikidata.org/wiki/Q8047","display_name":"Enzyme","level":2,"score":0.32982543},{"id":"https://openalex.org/C136229726","wikidata":"https://www.wikidata.org/wiki/Q327092","display_name":"Biomedical
-          engineering","level":1,"score":0.3287788},{"id":"https://openalex.org/C71924100","wikidata":"https://www.wikidata.org/wiki/Q11190","display_name":"Medicine","level":0,"score":0.24969122},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.18288979},{"id":"https://openalex.org/C150903083","wikidata":"https://www.wikidata.org/wiki/Q7108","display_name":"Biotechnology","level":1,"score":0.13141873},{"id":"https://openalex.org/C540031477","wikidata":"https://www.wikidata.org/wiki/Q629","display_name":"Oxygen","level":2,"score":0.08565441},{"id":"https://openalex.org/C178790620","wikidata":"https://www.wikidata.org/wiki/Q11351","display_name":"Organic
-          chemistry","level":1,"score":0.0},{"id":"https://openalex.org/C1491633281","wikidata":"https://www.wikidata.org/wiki/Q7868","display_name":"Cell","level":2,"score":0.0}],"mesh":[{"descriptor_ui":"D019902","descriptor_name":"Chondrocytes","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D003094","descriptor_name":"Collagen","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D008022","descriptor_name":"Ligaments","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D008592","descriptor_name":"Menisci,
-          Tibial","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D008249","descriptor_name":"Protein-Lysine
-          6-Oxidase","qualifier_ui":"Q000494","qualifier_name":"pharmacology","is_major_topic":true},{"descriptor_ui":"D013710","descriptor_name":"Tendons","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D000818","descriptor_name":"Animals","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D002417","descriptor_name":"Cattle","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D015687","descriptor_name":"Cell
-          Hypoxia","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D002478","descriptor_name":"Cells,
-          Cultured","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D019902","descriptor_name":"Chondrocytes","qualifier_ui":"Q000166","qualifier_name":"cytology","is_major_topic":false},{"descriptor_ui":"D019902","descriptor_name":"Chondrocytes","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D003094","descriptor_name":"Collagen","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D003094","descriptor_name":"Collagen","qualifier_ui":"Q000737","qualifier_name":"chemistry","is_major_topic":false},{"descriptor_ui":"D008022","descriptor_name":"Ligaments","qualifier_ui":"Q000166","qualifier_name":"cytology","is_major_topic":false},{"descriptor_ui":"D008022","descriptor_name":"Ligaments","qualifier_ui":"Q000737","qualifier_name":"chemistry","is_major_topic":false},{"descriptor_ui":"D008022","descriptor_name":"Ligaments","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D008297","descriptor_name":"Male","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D008592","descriptor_name":"Menisci,
-          Tibial","qualifier_ui":"Q000166","qualifier_name":"cytology","is_major_topic":false},{"descriptor_ui":"D008592","descriptor_name":"Menisci,
-          Tibial","qualifier_ui":"Q000737","qualifier_name":"chemistry","is_major_topic":false},{"descriptor_ui":"D008592","descriptor_name":"Menisci,
-          Tibial","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D051379","descriptor_name":"Mice","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D008819","descriptor_name":"Mice,
-          Nude","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D008249","descriptor_name":"Protein-Lysine
-          6-Oxidase","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D013710","descriptor_name":"Tendons","qualifier_ui":"Q000166","qualifier_name":"cytology","is_major_topic":false},{"descriptor_ui":"D013710","descriptor_name":"Tendons","qualifier_ui":"Q000737","qualifier_name":"chemistry","is_major_topic":false},{"descriptor_ui":"D013710","descriptor_name":"Tendons","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D023822","descriptor_name":"Tissue
-          Engineering","qualifier_ui":"Q000379","qualifier_name":"methods","is_major_topic":false},{"descriptor_ui":"D023822","descriptor_name":"Tissue
-          Engineering","qualifier_ui":"","qualifier_name":null,"is_major_topic":false}],"locations_count":5,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1073/pnas.1414271111","pdf_url":null,"source":{"id":"https://openalex.org/S125754415","display_name":"Proceedings
-          of the National Academy of Sciences","issn_l":"0027-8424","issn":["0027-8424","1091-6490"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320052","host_organization_name":"National
-          Academy of Sciences","host_organization_lineage":["https://openalex.org/P4310320052"],"host_organization_lineage_names":["National
-          Academy of Sciences"],"type":"journal"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":true,"landing_page_url":"https://europepmc.org/articles/pmc4234579","pdf_url":"https://europepmc.org/articles/pmc4234579?pdf=render","source":{"id":"https://openalex.org/S4306400806","display_name":"Europe
-          PMC (PubMed Central)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1303153112","host_organization_name":"European
-          Bioinformatics Institute","host_organization_lineage":["https://openalex.org/I1303153112"],"host_organization_lineage_names":["European
-          Bioinformatics Institute"],"type":"repository"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":true,"landing_page_url":"https://escholarship.org/uc/item/4ws805f2","pdf_url":"https://escholarship.org/content/qt4ws805f2/qt4ws805f2.pdf?t=rt3n16","source":{"id":"https://openalex.org/S4306400115","display_name":"eScholarship
-          (California Digital Library)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I2801248553","host_organization_name":"California
-          Digital Library","host_organization_lineage":["https://openalex.org/I2801248553"],"host_organization_lineage_names":["California
-          Digital Library"],"type":"repository"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":true,"landing_page_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4234579","pdf_url":null,"source":{"id":"https://openalex.org/S2764455111","display_name":"PubMed
-          Central","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/25349395","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1073/pnas.1414271111","pdf_url":null,"source":{"id":"https://openalex.org/S125754415","display_name":"Proceedings
-          of the National Academy of Sciences","issn_l":"0027-8424","issn":["0027-8424","1091-6490"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320052","host_organization_name":"National
-          Academy of Sciences","host_organization_lineage":["https://openalex.org/P4310320052"],"host_organization_lineage_names":["National
-          Academy of Sciences"],"type":"journal"},"license":null,"license_id":null,"version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":73,"referenced_works":["https://openalex.org/W1490897467","https://openalex.org/W1498435248","https://openalex.org/W1549576586","https://openalex.org/W1584548942","https://openalex.org/W1599095320","https://openalex.org/W1613619455","https://openalex.org/W1965335428","https://openalex.org/W1966260681","https://openalex.org/W1969172986","https://openalex.org/W1970656189","https://openalex.org/W1970692048","https://openalex.org/W1976175714","https://openalex.org/W1990320378","https://openalex.org/W1994730360","https://openalex.org/W1995171880","https://openalex.org/W1996504953","https://openalex.org/W2001782747","https://openalex.org/W2003328208","https://openalex.org/W2004505453","https://openalex.org/W2006818360","https://openalex.org/W2007600252","https://openalex.org/W2008511520","https://openalex.org/W2012884980","https://openalex.org/W2015694728","https://openalex.org/W2017528738","https://openalex.org/W2018658387","https://openalex.org/W2020342708","https://openalex.org/W2026220322","https://openalex.org/W2026605921","https://openalex.org/W2027604608","https://openalex.org/W2031287613","https://openalex.org/W2033363278","https://openalex.org/W2052620919","https://openalex.org/W2053251151","https://openalex.org/W2054250836","https://openalex.org/W2054782893","https://openalex.org/W2063125290","https://openalex.org/W2071571100","https://openalex.org/W2072296234","https://openalex.org/W2072504158","https://openalex.org/W2074121232","https://openalex.org/W2076936741","https://openalex.org/W2079291436","https://openalex.org/W2085609942","https://openalex.org/W2090563588","https://openalex.org/W2091040318","https://openalex.org/W2092771822","https://openalex.org/W2094567382","https://openalex.org/W2099397203","https://openalex.org/W2099685657","https://openalex.org/W2103645671","https://openalex.org/W2108927236","https://openalex.org/W2113117448","https://openalex.org/W2115465747","https://openalex.org/W2116130840","https://openalex.org/W2116516144","https://openalex.org/W2118172082","https://openalex.org/W2125994830","https://openalex.org/W2130545847","https://openalex.org/W2137129933","https://openalex.org/W2147003578","https://openalex.org/W2158510407","https://openalex.org/W2161031052","https://openalex.org/W2168222597","https://openalex.org/W2170777004","https://openalex.org/W2173021779","https://openalex.org/W2173528967","https://openalex.org/W2173962683","https://openalex.org/W2993782230","https://openalex.org/W3030569103","https://openalex.org/W4210957139","https://openalex.org/W4211222927","https://openalex.org/W4236194206"],"related_works":["https://openalex.org/W3215530055","https://openalex.org/W3171090766","https://openalex.org/W3112371506","https://openalex.org/W3014163099","https://openalex.org/W2889165517","https://openalex.org/W2801660533","https://openalex.org/W2545305293","https://openalex.org/W2467205692","https://openalex.org/W2435286860","https://openalex.org/W2287501499"],"abstract_inverted_index":{"Significance":[0],"The":[1,41,111],"inadequate":[2],"mechanical":[3,20,55,101],"properties":[4,56],"of":[5,22,28,57,73,119],"engineered":[6,60],"tissues":[7,61,121],"have":[8],"prevented":[9],"related":[10],"therapies":[11],"from":[12],"clinical":[13],"translation.":[14],"Collagen":[15],"cross-links":[16,33],"correlate":[17],"with":[18],"the":[19,26,37,54,99],"integrity":[21],"tissues;":[23],"however,":[24],"addressing":[25],"weakness":[27],"neotissues":[29],"through":[30],"enhancing":[31],"collagen":[32,82,90],"has":[34],"not":[35],"received":[36],"attention":[38],"it":[39],"deserves.":[40],"present":[42],"study":[43],"demonstrates,":[44],"both":[45],"in":[46,49,53,89,98],"vitro":[47],"and":[48,59,70,122],"vivo,":[50],"that":[51],"improvements":[52],"native":[58],"can":[62],"be":[63],"attained":[64],"using":[65],"endogenous":[66],"(hypoxia-mediated)":[67],"lysyl":[68,74],"oxidase":[69],"exogenous":[71],"application":[72],"oxidase-like":[75],"2,":[76],"which":[77],"are":[78,123],"enzymes":[79],"responsible":[80],"for":[81,108],"cross-linking.":[83],"By":[84],"promoting":[85],"an":[86,94],"\u223c16-fold":[87],"increase":[88],"cross-linking":[91],"and,":[92],"concomitantly,":[93],"approximately":[95],"fivefold":[96],"enhancement":[97],"neotissue\u2019s":[100],"properties,":[102],"this":[103],"work":[104,115],"creates":[105],"new":[106],"prospects":[107],"regenerative":[109],"medicine.":[110],"methods":[112],"developed":[113],"here":[114],"across":[116],"a":[117],"spectrum":[118],"collagen-rich":[120],"clinically":[124],"applicable.":[125]},"abstract_inverted_index_v3":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W2109415576","counts_by_year":[{"year":2025,"cited_by_count":6},{"year":2024,"cited_by_count":13},{"year":2023,"cited_by_count":13},{"year":2022,"cited_by_count":12},{"year":2021,"cited_by_count":15},{"year":2020,"cited_by_count":18},{"year":2019,"cited_by_count":13},{"year":2018,"cited_by_count":15},{"year":2017,"cited_by_count":16},{"year":2016,"cited_by_count":12},{"year":2015,"cited_by_count":4},{"year":2014,"cited_by_count":1}],"updated_date":"2025-07-31T20:13:18.930560","created_date":"2016-06-24"}
-
-          '
+        string: !!binary |
+          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
+          1FcAAA==
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -236,15 +262,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:30 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754932770&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=pbA0GQ449lD2TGwgwUBYDZVGHkZVMcmtUik7g0N%2BMAA%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953644&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=nBO0V%2BFanUZuG2cxQUBusac7lo7PJOTX87p%2Fhg4edAo%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754932770&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=pbA0GQ449lD2TGwgwUBYDZVGHkZVMcmtUik7g0N%2BMAA%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953644&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=nBO0V%2BFanUZuG2cxQUBusac7lo7PJOTX87p%2Fhg4edAo%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -265,89 +291,111 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1073%2Fpnas.1414271111?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1073%2Fpnas.1414271111?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,8,2]],"date-time":"2025-08-02T05:06:43Z","timestamp":1754111203328,"version":"3.40.5"},"reference-count":69,"publisher":"Proceedings
-          of the National Academy of Sciences","issue":"45","content-domain":{"domain":["www.pnas.org"],"crossmark-restriction":true},"short-container-title":["Proc.
-          Natl. Acad. Sci. U.S.A."],"published-print":{"date-parts":[[2014,11,11]]},"abstract":"<jats:title>Significance<\/jats:title>\n          <jats:p>The
-          inadequate mechanical properties of engineered tissues have prevented related
-          therapies from clinical translation. Collagen cross-links correlate with the
-          mechanical integrity of tissues; however, addressing the weakness of neotissues
-          through enhancing collagen cross-links has not received the attention it deserves.
-          The present study demonstrates, both in vitro and in vivo, that improvements
-          in the mechanical properties of native and engineered tissues can be attained
-          using endogenous (hypoxia-mediated) lysyl oxidase and exogenous application
-          of lysyl oxidase-like 2, which are enzymes responsible for collagen cross-linking.
-          By promoting an \u223c16-fold increase in collagen cross-linking and, concomitantly,
-          an approximately fivefold enhancement in the neotissue\u2019s mechanical properties,
-          this work creates new prospects for regenerative medicine. The methods developed
-          here work across a spectrum of collagen-rich tissues and are clinically applicable.<\/jats:p>","DOI":"10.1073\/pnas.1414271111","type":"journal-article","created":{"date-parts":[[2014,10,28]],"date-time":"2014-10-28T07:24:15Z","timestamp":1414481055000},"update-policy":"https:\/\/doi.org\/10.1073\/pnas.cm10313","source":"Crossref","is-referenced-by-count":129,"title":["Developing
-          functional musculoskeletal tissues through hypoxia and lysyl oxidase-induced
-          collagen cross-linking"],"prefix":"10.1073","volume":"111","author":[{"given":"Eleftherios
-          A.","family":"Makris","sequence":"first","affiliation":[{"name":"Departments
-          of aBiomedical Engineering and"}]},{"given":"Donald J.","family":"Responte","sequence":"additional","affiliation":[{"name":"Departments
-          of aBiomedical Engineering and"}]},{"ORCID":"https:\/\/orcid.org\/0000-0002-1689-6636","authenticated-orcid":false,"given":"Nikolaos
-          K.","family":"Paschos","sequence":"additional","affiliation":[{"name":"Departments
-          of aBiomedical Engineering and"}]},{"given":"Jerry C.","family":"Hu","sequence":"additional","affiliation":[{"name":"Departments
-          of aBiomedical Engineering and"}]},{"given":"Kyriacos A.","family":"Athanasiou","sequence":"additional","affiliation":[{"name":"Departments
-          of aBiomedical Engineering and"},{"name":"Orthopedic Surgery, University of
-          California, Davis, CA 95616"}]}],"member":"341","published-online":{"date-parts":[[2014,10,27]]},"reference":[{"key":"e_1_3_3_1_2","doi-asserted-by":"publisher","DOI":"10.1089\/ten.2006.12.969"},{"key":"e_1_3_3_2_2","doi-asserted-by":"publisher","DOI":"10.1126\/science.1222454"},{"key":"e_1_3_3_3_2","doi-asserted-by":"publisher","DOI":"10.1371\/journal.pone.0002341"},{"key":"e_1_3_3_4_2","doi-asserted-by":"publisher","DOI":"10.1089\/ten.2006.12.469"},{"key":"e_1_3_3_5_2","doi-asserted-by":"publisher","DOI":"10.1089\/ten.tea.2008.0478"},{"key":"e_1_3_3_6_2","doi-asserted-by":"publisher","DOI":"10.2200\/S00212ED1V01Y200910TIS003"},{"key":"e_1_3_3_7_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.tvjl.2014.01.010"},{"key":"e_1_3_3_8_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.actbio.2012.09.037"},{"key":"e_1_3_3_9_2","doi-asserted-by":"publisher","DOI":"10.1002\/1097-4636(200110)57:1<25::AID-JBM1137>3.0.CO;2-H"},{"key":"e_1_3_3_10_2","doi-asserted-by":"publisher","DOI":"10.2200\/S00186ED1V01Y200903TIS001"},{"key":"e_1_3_3_11_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.joca.2007.07.003"},{"key":"e_1_3_3_12_2","doi-asserted-by":"publisher","DOI":"10.2519\/jospt.2006.2175"},{"key":"e_1_3_3_13_2","doi-asserted-by":"publisher","DOI":"10.1016\/S0021-9258(17)33124-1"},{"key":"e_1_3_3_14_2","doi-asserted-by":"publisher","DOI":"10.1038\/251105a0"},{"key":"e_1_3_3_15_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.ymeth.2008.01.002"},{"key":"e_1_3_3_16_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.joca.2005.03.005"},{"key":"e_1_3_3_17_2","doi-asserted-by":"publisher","DOI":"10.1089\/ten.tea.2010.0177"},{"key":"e_1_3_3_18_2","first-page":"477","article-title":"Articular
-          cartilage: Tissue design and chondrocyte-matrix interactions","volume":"47","author":"Buckwalter
-          JA","year":"1998","unstructured":"JA Buckwalter, HJ Mankin, Articular cartilage:
-          Tissue design and chondrocyte-matrix interactions. Instr Course Lect 47, 477\u2013486
-          (1998).","journal-title":"Instr Course Lect"},{"key":"e_1_3_3_19_2","doi-asserted-by":"publisher","DOI":"10.1007\/s10856-006-0689-2"},{"key":"e_1_3_3_20_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.biomaterials.2006.08.040"},{"key":"e_1_3_3_21_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.joca.2003.08.009"},{"key":"e_1_3_3_22_2","doi-asserted-by":"publisher","DOI":"10.1114\/1.1512676"},{"key":"e_1_3_3_23_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.biomaterials.2012.01.028"},{"key":"e_1_3_3_24_2","first-page":"113","volume-title":"Basic
-          Orthopaedic Biomechanics","author":"Mow VC","year":"1991","unstructured":",
-          eds VC Mow, WC Hayes (Raven, New York) Basic Orthopaedic Biomechanics, pp.
-          113\u2013178 (1991)."},{"key":"e_1_3_3_25_2","doi-asserted-by":"publisher","DOI":"10.1016\/S0736-0266(01)00052-3"},{"key":"e_1_3_3_26_2","doi-asserted-by":"publisher","DOI":"10.1016\/S0021-9290(97)84508-3"},{"key":"e_1_3_3_27_2","doi-asserted-by":"publisher","DOI":"10.1053\/joca.2001.0424"},{"key":"e_1_3_3_28_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.jbiomech.2007.06.005"},{"key":"e_1_3_3_29_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.orthres.2005.05.009.1100230617"},{"key":"e_1_3_3_30_2","doi-asserted-by":"publisher","DOI":"10.1038\/nature10602"},{"key":"e_1_3_3_31_2","doi-asserted-by":"publisher","DOI":"10.1038\/nature07019"},{"key":"e_1_3_3_32_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.92.12.5510"},{"key":"e_1_3_3_33_2","doi-asserted-by":"publisher","DOI":"10.1073\/pnas.1208314109"},{"key":"e_1_3_3_34_2","doi-asserted-by":"publisher","DOI":"10.1038\/nature09141"},{"key":"e_1_3_3_35_2","doi-asserted-by":"publisher","DOI":"10.1038\/35091000"},{"key":"e_1_3_3_36_2","doi-asserted-by":"publisher","DOI":"10.1089\/ten.tea.2011.0088"},{"key":"e_1_3_3_37_2","doi-asserted-by":"publisher","DOI":"10.1196\/annals.1402.076"},{"key":"e_1_3_3_38_2","doi-asserted-by":"publisher","DOI":"10.1053\/joca.2001.0477"},{"key":"e_1_3_3_39_2","doi-asserted-by":"publisher","DOI":"10.1089\/107632701753337735"},{"key":"e_1_3_3_40_2","doi-asserted-by":"publisher","DOI":"10.1002\/jcp.10481"},{"key":"e_1_3_3_41_2","doi-asserted-by":"publisher","DOI":"10.1002\/art.22878"},{"key":"e_1_3_3_42_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.bone.2005.04.040"},{"key":"e_1_3_3_43_2","doi-asserted-by":"publisher","DOI":"10.1101\/gad.934301"},{"key":"e_1_3_3_44_2","doi-asserted-by":"publisher","DOI":"10.1002\/jcp.21446"},{"key":"e_1_3_3_45_2","doi-asserted-by":"publisher","DOI":"10.1002\/jcp.1081"},{"key":"e_1_3_3_46_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.joca.2008.04.007"},{"key":"e_1_3_3_47_2","doi-asserted-by":"publisher","DOI":"10.1038\/nature04695"},{"key":"e_1_3_3_48_2","doi-asserted-by":"publisher","DOI":"10.1152\/japplphysiol.00571.2010"},{"key":"e_1_3_3_49_2","doi-asserted-by":"crossref","first-page":"3038","DOI":"10.1002\/art.24851","article-title":"Hypoxia-inducible
-          factor 1alpha inhibits the fibroblast-like markers type I and type III collagen
-          during hypoxia-induced chondrocyte redifferentiation: Hypoxia not only induces
-          type II collagen and aggrecan, but it also inhibits type I and type III collagen
-          in the hypoxia-inducible factor 1alpha-dependent redifferentiation of chondrocytes","volume":"60","author":"Duval
-          E","year":"2009","unstructured":"E Duval, , Hypoxia-inducible factor 1alpha
-          inhibits the fibroblast-like markers type I and type III collagen during hypoxia-induced
-          chondrocyte redifferentiation: Hypoxia not only induces type II collagen and
-          aggrecan, but it also inhibits type I and type III collagen in the hypoxia-inducible
-          factor 1alpha-dependent redifferentiation of chondrocytes. Arthritis Rheum
-          60, 3038\u20133048 (2009).","journal-title":"Arthritis Rheum"},{"key":"e_1_3_3_50_2","doi-asserted-by":"publisher","DOI":"10.1074\/jbc.M109.042424"},{"key":"e_1_3_3_51_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.biomaterials.2011.06.037"},{"key":"e_1_3_3_52_2","doi-asserted-by":"publisher","DOI":"10.1007\/s004290050283"},{"key":"e_1_3_3_53_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.joca.2003.08.006"},{"key":"e_1_3_3_54_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.joca.2003.08.005"},{"key":"e_1_3_3_55_2","doi-asserted-by":"publisher","DOI":"10.1089\/107632704322791790"},{"key":"e_1_3_3_56_2","doi-asserted-by":"publisher","DOI":"10.1089\/107632703768247322"},{"key":"e_1_3_3_57_2","doi-asserted-by":"publisher","DOI":"10.1016\/S0736-0266(03)00009-3"},{"key":"e_1_3_3_58_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.bbadis.2005.02.007"},{"key":"e_1_3_3_59_2","first-page":"1778","article-title":"Surgical
-          management of articular cartilage defects in the knee","volume":"91","author":"Cole
-          BJ","year":"2009","unstructured":"BJ Cole, C Pascual-Garrido, RC Grumet, Surgical
-          management of articular cartilage defects in the knee. J Bone Joint Surg Am
-          91, 1778\u20131790 (2009).","journal-title":"J Bone Joint Surg Am"},{"key":"e_1_3_3_60_2","unstructured":";
-          US Food and Drug Administration\/Center for Biologics Evaluation and Research\/Center
-          for Devices and Radiological Health Preparation of IDEs and INDs for products
-          intended to repair or replace knee cartilage. FDA Guidance for Industry (Office
-          of Communication Outreach and Development Rockville MD). (2011)."},{"key":"e_1_3_3_61_2","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2012.01.051"},{"key":"e_1_3_3_62_2","doi-asserted-by":"publisher","DOI":"10.1096\/fj.12-224030"},{"key":"e_1_3_3_63_2","doi-asserted-by":"publisher","DOI":"10.1002\/jor.20821"},{"key":"e_1_3_3_64_2","doi-asserted-by":"publisher","DOI":"10.1016\/S0378-4347(97)00391-5"},{"key":"e_1_3_3_65_2","doi-asserted-by":"publisher","DOI":"10.1097\/00003086-199507000-00035"},{"key":"e_1_3_3_66_2","doi-asserted-by":"publisher","DOI":"10.1002\/(SICI)1097-4644(19981201)71:3<313::AID-JCB1>3.0.CO;2-C"},{"key":"e_1_3_3_67_2","doi-asserted-by":"publisher","DOI":"10.1002\/ar.1092340405"},{"key":"e_1_3_3_68_2","doi-asserted-by":"publisher","DOI":"10.1016\/0076-6879(87)44176-1"},{"key":"e_1_3_3_69_2","doi-asserted-by":"publisher","DOI":"10.1371\/journal.pone.0026178"}],"updated-by":[{"updated":{"date-parts":[[2015,5,4]],"date-time":"2015-05-04T00:00:00Z","timestamp":1430697600000},"DOI":"10.1073\/pnas.1507001112","type":"correction","source":"publisher","label":"Correction"}],"container-title":["Proceedings
-          of the National Academy of Sciences"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pnas.org\/doi\/pdf\/10.1073\/pnas.1414271111","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2022,4,13]],"date-time":"2022-04-13T04:27:43Z","timestamp":1649824063000},"score":1,"resource":{"primary":{"URL":"https:\/\/pnas.org\/doi\/full\/10.1073\/pnas.1414271111"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2014,10,27]]},"references-count":69,"journal-issue":{"issue":"45","published-print":{"date-parts":[[2014,11,11]]}},"alternative-id":["10.1073\/pnas.1414271111"],"URL":"https:\/\/doi.org\/10.1073\/pnas.1414271111","relation":{},"ISSN":["0027-8424","1091-6490"],"issn-type":[{"type":"print","value":"0027-8424"},{"type":"electronic","value":"1091-6490"}],"subject":[],"published":{"date-parts":[[2014,10,27]]},"assertion":[{"value":"2014-10-27","order":2,"name":"published","label":"Published","group":{"name":"publication_history","label":"Publication
-          History"}}]}}'
+        string: !!binary |
+          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
+          N1jwfwELpZ7Qdi8AAA==
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
-        Content-Encoding:
-          - gzip
         Content-Length:
           - "3604"
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:30 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:24 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -358,8 +406,18 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1073%2Fpnas.1414271111/transform/application/x-bibtex
     response:
@@ -375,23 +433,23 @@ interactions:
 
           "
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 17:19:30 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
