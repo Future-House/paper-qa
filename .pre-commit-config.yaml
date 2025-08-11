@@ -87,30 +87,10 @@ repos:
     rev: 0.0.10
     hooks:
       - id: markdown-toc-creator
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+  - repo: local # Use local so we can inspect paperqa.version
     hooks:
       - id: mypy
-        args: [--pretty, --ignore-missing-imports]
-        additional_dependencies:
-          - aiohttp>=3.10.6 # Match pyproject.toml
-          - PyMuPDF>=1.24.12
-          - anyio
-          - fhlmi>=0.28 # Match pyproject.toml
-          - fhaviary[llm]>=0.20 # Match pyproject.toml
-          - ldp>=0.25.0 # Match pyproject.toml
-          - html2text
-          - httpx
-          - pybtex
-          - numpy
-          - pydantic~=2.11 # Match pyproject.toml
-          - pydantic-settings
-          - qdrant-client
-          - rich
-          - tantivy>=0.22.2 # Match pyproject.toml
-          - tenacity
-          - tiktoken>=0.4.0 # Match pyproject.toml
-          - types-setuptools
-          - types-PyYAML
-          - sentence-transformers
-          - pyzotero
+        name: mypy
+        entry: mypy
+        language: system
+        types_or: [python, pyi]
