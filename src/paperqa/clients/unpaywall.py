@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from http import HTTPStatus
+from typing import Literal
 from urllib.parse import quote
 
 import aiohttp
@@ -30,11 +31,11 @@ class Author(BaseModel):
 class BestOaLocation(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    updated: datetime | None = None
+    updated: datetime | Literal["deprecated"] | None = None
     url: str | None = None
     url_for_pdf: str | None = None
     url_for_landing_page: str | None = None
-    evidence: str | None = None
+    evidence: str | Literal["deprecated"] | None = None  # noqa: PYI051
     license: str | None = None
     version: str | None = None
     host_type: str | None = None
