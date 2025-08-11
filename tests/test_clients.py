@@ -99,10 +99,10 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
             "formatted_citation": (
                 "Andres M. Bran, Sam Cox, Oliver Schilter, Carlo Baldassari, Andrew D."
                 " White, and Philippe Schwaller. Augmenting large language models with"
-                " chemistry tools. Nature Machine Intelligence, 6:535, May 2024."
+                " chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
                 " doi:10.1038/s42256-024-00832-8. This article has"
-                f" {CITATION_COUNT_SENTINEL}457{CITATION_COUNT_SENTINEL} citations and"
+                f" {CITATION_COUNT_SENTINEL}462{CITATION_COUNT_SENTINEL} citations and"
                 " is from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
