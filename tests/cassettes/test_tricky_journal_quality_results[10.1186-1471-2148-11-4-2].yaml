@@ -1,219 +1,170 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1186%2F1471-2148-11-4?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1186%2F1471-2148-11-4?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,4,7]],"date-time":"2025-04-07T21:26:17Z","timestamp":1744061177733},"reference-count":47,"publisher":"Springer
-          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2011,1,5]],"date-time":"2011-01-05T00:00:00Z","timestamp":1294185600000},"content-version":"unspecified","delay-in-days":0,"URL":"http:\/\/www.springer.com\/tdm"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["BMC
-          Evol Biol"],"published-print":{"date-parts":[[2011,12]]},"DOI":"10.1186\/1471-2148-11-4","type":"journal-article","created":{"date-parts":[[2011,1,5]],"date-time":"2011-01-05T20:07:09Z","timestamp":1294258029000},"source":"Crossref","is-referenced-by-count":79,"title":["Phylogenomics
-          of phosphoinositide lipid kinases: perspectives on the evolution of second
-          messenger signaling and drug discovery"],"prefix":"10.1186","volume":"11","author":[{"given":"James
-          R","family":"Brown","sequence":"first","affiliation":[]},{"given":"Kurt R","family":"Auger","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2011,1,5]]},"reference":[{"key":"1613_CR1","doi-asserted-by":"publisher","first-page":"481","DOI":"10.1146\/annurev.biochem.67.1.481","volume":"67","author":"DA
-          Fruman","year":"1998","unstructured":"Fruman DA, Meyers RE, Cantley LC: Phosphoinositide
-          kinases. Annu Rev Biochem. 1998, 67: 481-507. 10.1146\/annurev.biochem.67.1.481.","journal-title":"Annu
-          Rev Biochem"},{"key":"1613_CR2","doi-asserted-by":"publisher","first-page":"606","DOI":"10.1038\/nrg1879","volume":"7","author":"JA
-          Engelman","year":"2006","unstructured":"Engelman JA, Luo J, Cantley LC: The
-          evolution of phosphatidylinositol 3-kinases as regulators of growth and metabolism.
-          Nat Rev Genet. 2006, 7: 606-619. 10.1038\/nrg1879.","journal-title":"Nat Rev
-          Genet"},{"key":"1613_CR3","doi-asserted-by":"publisher","first-page":"267","DOI":"10.1016\/S0968-0004(97)01061-X","volume":"22","author":"B
-          Vanhaesebroeck","year":"1997","unstructured":"Vanhaesebroeck B, Leevers SJ,
-          Panayotou G, Waterfield MD: Phosphoinositide 3-kinases: a conserved family
-          of signal transducers. Trends Biochem Sci. 1997, 22: 267-272. 10.1016\/S0968-0004(97)01061-X.","journal-title":"Trends
-          Biochem Sci"},{"key":"1613_CR4","doi-asserted-by":"publisher","first-page":"357","DOI":"10.1046\/j.1432-1327.1998.2530357.x","volume":"253","author":"T
-          Gehrmann","year":"1998","unstructured":"Gehrmann T, Heilmeyer LM: Phosphatidylinositol
-          4-kinases. Eur J Biochem. 1998, 253: 357-370. 10.1046\/j.1432-1327.1998.2530357.x.","journal-title":"Eur
-          J Biochem"},{"key":"1613_CR5","doi-asserted-by":"publisher","first-page":"351","DOI":"10.1016\/j.tcb.2006.05.003","volume":"16","author":"A
-          Balla","year":"2006","unstructured":"Balla A, Balla T: Phosphatidylinositol
-          4-kinases: old enzymes with emerging functions. Trends Cell Biol. 2006, 16:
-          351-361. 10.1016\/j.tcb.2006.05.003.","journal-title":"Trends Cell Biol"},{"key":"1613_CR6","doi-asserted-by":"publisher","first-page":"87","DOI":"10.1016\/j.ejphar.2004.07.014","volume":"500","author":"PA
-          Oude Weernink","year":"2004","unstructured":"Oude Weernink PA, Schmidt M,
-          Jakobs KH: Regulation and cellular roles of phosphoinositide 5-kinases. Eur
-          J Pharmacol. 2004, 500: 87-99. 10.1016\/j.ejphar.2004.07.014.","journal-title":"Eur
-          J Pharmacol"},{"key":"1613_CR7","doi-asserted-by":"publisher","first-page":"615","DOI":"10.1146\/annurev.cellbio.17.1.615","volume":"17","author":"R
-          Katso","year":"2001","unstructured":"Katso R, Okkenhaug K, Ahmadi K, White
-          S, Timms J, Waterfield MD: Cellular function of phosphoinositide 3-kinases:
-          implications for development, homeostasis, and cancer. Annu Rev Cell Dev Biol.
-          2001, 17: 615-675. 10.1146\/annurev.cellbio.17.1.615.","journal-title":"Annu
-          Rev Cell Dev Biol"},{"key":"1613_CR8","doi-asserted-by":"publisher","first-page":"554","DOI":"10.1126\/science.1096502","volume":"304","author":"Y
-          Samuels","year":"2004","unstructured":"Samuels Y, Wang Z, Bardelli A, Silliman
-          N, Ptak J, Szabo S, et al: High frequency of mutations of the PIK3CA gene
-          in human cancers. Science. 2004, 304: 554-10.1126\/science.1096502.","journal-title":"Science"},{"key":"1613_CR9","doi-asserted-by":"publisher","first-page":"4562","DOI":"10.1158\/0008-5472.CAN-04-4114","volume":"65","author":"T
-          Ikenoue","year":"2005","unstructured":"Ikenoue T, Kanai F, Hikiba Y, Obata
-          T, Tanaka Y, Imamura J, et al: Functional analysis of PIK3CA gene mutations
-          in human colorectal cancer. Cancer Res. 2005, 65: 4562-4567. 10.1158\/0008-5472.CAN-04-4114.","journal-title":"Cancer
-          Res"},{"key":"1613_CR10","doi-asserted-by":"publisher","first-page":"2146","DOI":"10.1158\/0008-5472.CAN-09-4355","volume":"70","author":"P
-          Workman","year":"2010","unstructured":"Workman P, Clarke PA, Raynaud FI, van
-          Montfort RL: Drugging the PI3 kinome: from chemical tools to drugs in the
-          clinic. Cancer Res. 2010, 70: 2146-2157. 10.1158\/0008-5472.CAN-09-4355.","journal-title":"Cancer
-          Res"},{"key":"1613_CR11","doi-asserted-by":"publisher","first-page":"550","DOI":"10.1038\/nrc2664","volume":"9","author":"JA
-          Engelman","year":"2009","unstructured":"Engelman JA: Targeting PI3K signalling
-          in cancer: opportunities, challenges and limitations. Nat Rev Cancer. 2009,
-          9: 550-562. 10.1038\/nrc2664.","journal-title":"Nat Rev Cancer"},{"key":"1613_CR12","doi-asserted-by":"publisher","first-page":"903","DOI":"10.1038\/nrd2145","volume":"5","author":"T
-          Ruckle","year":"2006","unstructured":"Ruckle T, Schwarz MK, Rommel C: PI3Kgamma
-          inhibition: towards an ''aspirin of the 21st century''?. Nat Rev Drug Discov.
-          2006, 5: 903-918. 10.1038\/nrd2145.","journal-title":"Nat Rev Drug Discov"},{"key":"1613_CR13","doi-asserted-by":"publisher","first-page":"791","DOI":"10.1042\/CS20080549","volume":"116","author":"A
-          Fougerat","year":"2009","unstructured":"Fougerat A, Gayral S, Malet N, Briand-Mesange
-          F, Breton-Douillon M, Laffargue M: Phosphoinositide 3-kinases and their role
-          in inflammation: potential clinical targets in atherosclerosis?. Clin Sci
-          (Lond). 2009, 116: 791-804. 10.1042\/CS20080549.","journal-title":"Clin Sci
-          (Lond)"},{"key":"1613_CR14","doi-asserted-by":"publisher","first-page":"375","DOI":"10.1016\/j.cell.2004.07.017","volume":"118","author":"E
-          Patrucco","year":"2004","unstructured":"Patrucco E, Notte A, Barberis L, Selvetella
-          G, Maffei A, Brancaccio M, et al: PI3Kgamma modulates the cardiac response
-          to chronic pressure overload by distinct kinase-dependent and -independent
-          effects. Cell. 2004, 118: 375-387. 10.1016\/j.cell.2004.07.017.","journal-title":"Cell"},{"key":"1613_CR15","doi-asserted-by":"publisher","first-page":"298","DOI":"10.1016\/j.chom.2009.02.001","volume":"5","author":"AW
-          Tai","year":"2009","unstructured":"Tai AW, Benita Y, Peng LF, Kim SS, Sakamoto
-          N, Xavier RJ, et al: A functional genomic screen identifies cellular cofactors
-          of hepatitis C virus replication. Cell Host Microbe. 2009, 5: 298-307. 10.1016\/j.chom.2009.02.001.","journal-title":"Cell
-          Host Microbe"},{"key":"1613_CR16","doi-asserted-by":"publisher","first-page":"799","DOI":"10.1016\/j.cell.2010.03.050","volume":"141","author":"NY
-          Hsu","year":"2010","unstructured":"Hsu NY, Ilnytska O, Belov G, Santiana M,
-          Chen YH, Takvorian PM, et al: Viral reorganization of the secretory pathway
-          generates distinct organelles for RNA replication. Cell. 2010, 141: 799-811.
-          10.1016\/j.cell.2010.03.050.","journal-title":"Cell"},{"key":"1613_CR17","doi-asserted-by":"publisher","first-page":"151","DOI":"10.1038\/nrm2334","volume":"9","author":"RH
-          Michell","year":"2008","unstructured":"Michell RH: Inositol derivatives: evolution
-          and functions. Nat Rev Mol Cell Biol. 2008, 9: 151-161. 10.1038\/nrm2334.","journal-title":"Nat
-          Rev Mol Cell Biol"},{"key":"1613_CR18","doi-asserted-by":"publisher","first-page":"453","DOI":"10.1016\/j.tibs.2008.07.002","volume":"33","author":"O
-          Lecompte","year":"2008","unstructured":"Lecompte O, Poch O, Laporte J: PtdIns5P
-          regulation through evolution: roles in membrane trafficking?. Trends Biochem
-          Sci. 2008, 33: 453-460. 10.1016\/j.tibs.2008.07.002.","journal-title":"Trends
-          Biochem Sci"},{"key":"1613_CR19","doi-asserted-by":"publisher","first-page":"39","DOI":"10.1186\/1471-2148-4-39","volume":"4","author":"JR
-          Brown","year":"2004","unstructured":"Brown JR, Koretke KK, Birkeland ML, Sanseau
-          P, Patrick DR: Evolutionary relationships of Aurora kinases: implications
-          for model organism studies and the development of anti-cancer drugs. BMC Evol
-          Biol. 2004, 4: 39-10.1186\/1471-2148-4-39.","journal-title":"BMC Evol Biol"},{"key":"1613_CR20","doi-asserted-by":"publisher","first-page":"241","DOI":"10.1016\/j.tips.2008.02.005","volume":"29","author":"D
-          Leroy","year":"2008","unstructured":"Leroy D, Doerig C: Drugging the Plasmodium
-          kinome: the benefits of academia-industry synergy. Trends Pharmacol Sci. 2008,
-          29: 241-249. 10.1016\/j.tips.2008.02.005.","journal-title":"Trends Pharmacol
-          Sci"},{"key":"1613_CR21","doi-asserted-by":"publisher","first-page":"963","DOI":"10.1016\/j.bbrc.2009.10.086","volume":"390","author":"D
-          Bahia","year":"2009","unstructured":"Bahia D, Oliveira LM, Lima FM, Oliveira
-          P, Silveira JF, Mortara RA, et al: The TryPIKinome of five human pathogenic
-          trypanosomatids: Trypanosoma brucei, Trypanosoma cruzi, Leishmania major,
-          Leishmania braziliensis and Leishmania infantum--new tools for designing specific
-          inhibitors. Biochem Biophys Res Commun. 2009, 390: 963-970. 10.1016\/j.bbrc.2009.10.086.","journal-title":"Biochem
-          Biophys Res Commun"},{"key":"1613_CR22","doi-asserted-by":"publisher","first-page":"3389","DOI":"10.1093\/nar\/25.17.3389","volume":"25","author":"SF
-          Altschul","year":"1997","unstructured":"Altschul SF, Madden TL, Schaffer AA,
-          Zhang J, Zhang Z, Miller W, et al: Gapped BLAST and PSI-BLAST: a new generation
-          of protein database search programs. Nucleic Acids Res. 1997, 25: 3389-3402.
-          10.1093\/nar\/25.17.3389.","journal-title":"Nucleic Acids Res"},{"key":"1613_CR23","doi-asserted-by":"publisher","first-page":"11558","DOI":"10.1073\/pnas.90.24.11558","volume":"90","author":"SL
-          Baldauf","year":"1993","unstructured":"Baldauf SL, Palmer JD: Animals and
-          fungi are each other''s closest relatives: congruent evidence from multiple
-          proteins. Proc Natl Acad Sci USA. 1993, 90: 11558-11562. 10.1073\/pnas.90.24.11558.","journal-title":"Proc
-          Natl Acad Sci USA"},{"key":"1613_CR24","doi-asserted-by":"publisher","first-page":"REVIEWS1026","DOI":"10.1186\/gb-2000-1-4-reviews1026","volume":"1","author":"GI
-          McFadden","year":"2000","unstructured":"McFadden GI: Mergers and acquisitions:
-          malaria and the great chloroplast heist. Genome Biol. 2000, 1: REVIEWS1026-10.1186\/gb-2000-1-4-reviews1026.","journal-title":"Genome
-          Biol"},{"key":"1613_CR25","doi-asserted-by":"publisher","first-page":"83","DOI":"10.1186\/1471-2164-11-83","volume":"11","author":"S
-          Banerjee","year":"2010","unstructured":"Banerjee S, Basu S, Sarkar S: Comparative
-          genomics reveals selective distribution and domain organization of FYVE and
-          PX domain proteins across eukaryotic lineages. BMC Genomics. 2010, 11: 83-10.1186\/1471-2164-11-83.","journal-title":"BMC
-          Genomics"},{"key":"1613_CR26","doi-asserted-by":"publisher","first-page":"265","DOI":"10.1016\/j.ijpara.2003.11.025","volume":"34","author":"J
-          Huang","year":"2004","unstructured":"Huang J, Mullapudi N, Sicheritz-Ponten
-          T, Kissinger JC: A first glimpse into the pattern and scale of gene transfer
-          in Apicomplexa. Int J Parasitol. 2004, 34: 265-274. 10.1016\/j.ijpara.2003.11.025.","journal-title":"Int
-          J Parasitol"},{"key":"1613_CR27","doi-asserted-by":"crossref","first-page":"355","DOI":"10.1038\/sj.bjc.6601894","volume":"91","author":"S
-          Bamford","year":"2004","unstructured":"Bamford S, Dawson E, Forbes S, Clements
-          J, Pettett R, Dogan A, et al: The COSMIC (Catalogue of Somatic Mutations in
-          Cancer) database and website. Br J Cancer. 2004, 91: 355-358.","journal-title":"Br
-          J Cancer"},{"key":"1613_CR28","doi-asserted-by":"publisher","first-page":"5569","DOI":"10.1073\/pnas.0701005104","volume":"104","author":"M
-          Gymnopoulos","year":"2007","unstructured":"Gymnopoulos M, Elsliger MA, Vogt
-          PK: Rare cancer-specific mutations in PIK3CA show gain of function. Proc Natl
-          Acad Sci USA. 2007, 104: 5569-5574. 10.1073\/pnas.0701005104.","journal-title":"Proc
-          Natl Acad Sci USA"},{"key":"1613_CR29","doi-asserted-by":"publisher","first-page":"153","DOI":"10.1038\/nature05610","volume":"446","author":"C
-          Greenman","year":"2007","unstructured":"Greenman C, Stephens P, Smith R, Dalgliesh
-          GL, Hunter C, Bignell G, et al: Patterns of somatic mutation in human cancer
-          genomes. Nature. 2007, 446: 153-158. 10.1038\/nature05610.","journal-title":"Nature"},{"key":"1613_CR30","doi-asserted-by":"publisher","first-page":"279","DOI":"10.1158\/1535-7163.MCT-09-0508","volume":"9","author":"Y
-          Zhang","year":"2010","unstructured":"Zhang Y, Italia MJ, Auger KR, Halsey
-          WS, Van Horn SF, Sathe GM, et al: Molecular evolutionary analysis of cancer
-          cell lines. Mol Cancer Ther. 2010, 9: 279-291. 10.1158\/1535-7163.MCT-09-0508.","journal-title":"Mol
-          Cancer Ther"},{"key":"1613_CR31","doi-asserted-by":"publisher","first-page":"733","DOI":"10.1016\/j.cell.2006.03.035","volume":"125","author":"ZA
-          Knight","year":"2006","unstructured":"Knight ZA, Gonzalez B, Feldman ME, Zunder
-          ER, Goldenberg DD, Williams O, et al: A pharmacological map of the PI3-K family
-          defines a role for p110alpha in insulin signaling. Cell. 2006, 125: 733-747.
-          10.1016\/j.cell.2006.03.035.","journal-title":"Cell"},{"key":"1613_CR32","doi-asserted-by":"publisher","first-page":"691","DOI":"10.1038\/nchembio.117","volume":"4","author":"B
-          Apsel","year":"2008","unstructured":"Apsel B, Blair JA, Gonzalez B, Nazif
-          TM, Feldman ME, Aizenstein B, et al: Targeted polypharmacology: discovery
-          of dual inhibitors of tyrosine and phosphoinositide kinases. Nat Chem Biol.
-          2008, 4: 691-699. 10.1038\/nchembio.117.","journal-title":"Nat Chem Biol"},{"key":"1613_CR33","doi-asserted-by":"publisher","first-page":"11381","DOI":"10.1073\/pnas.0906461107","volume":"107","author":"LC
-          Foukas","year":"2010","unstructured":"Foukas LC, Berenjeno IM, Gray A, Khwaja
-          A, Vanhaesebroeck B: Activity of any class IA PI3K isoform can sustain cell
-          proliferation and survival. Proc Natl Acad Sci USA. 2010, 107: 11381-11386.
-          10.1073\/pnas.0906461107.","journal-title":"Proc Natl Acad Sci USA"},{"key":"1613_CR34","unstructured":"W.H.O.
-          World malaria report. 2009, [ http:\/\/www.who.int\/malaria\/world_malaria_report_2009\/en\/index.html
-          ]"},{"key":"1613_CR35","doi-asserted-by":"publisher","first-page":"395","DOI":"10.1016\/j.pt.2010.04.012","volume":"26","author":"JC
-          Dujardin","year":"2010","unstructured":"Dujardin JC, Gonzalez-Pacanowska D,
-          Croft SL, Olesen OF, Spath GF: Collaborative actions in anti-trypanosomatid
-          chemotherapy with partners from disease endemic areas. Trends Parasitol. 2010,
-          26: 395-403. 10.1016\/j.pt.2010.04.012.","journal-title":"Trends Parasitol"},{"key":"1613_CR36","doi-asserted-by":"publisher","first-page":"4588","DOI":"10.1128\/AAC.00610-09","volume":"53","author":"V
-          Andriantsoanirina","year":"2009","unstructured":"Andriantsoanirina V, Ratsimbasoa
-          A, Bouchier C, Jahevitra M, Rabearimanana S, Radrianjafy R, et al: Plasmodium
-          falciparum drug resistance in Madagascar: facing the spread of unusual pfdhfr
-          and pfmdr-1 haplotypes and the decrease of dihydroartemisinin susceptibility.
-          Antimicrob Agents Chemother. 2009, 53: 4588-4597. 10.1128\/AAC.00610-09.","journal-title":"Antimicrob
-          Agents Chemother"},{"key":"1613_CR37","doi-asserted-by":"publisher","first-page":"e4551","DOI":"10.1371\/journal.pone.0004551","volume":"4","author":"VI
-          Carrara","year":"2009","unstructured":"Carrara VI, Zwang J, Ashley EA, Price
-          RN, Stepniewska K, Barends M, et al: Changes in the treatment responses to
-          artesunate-mefloquine on the northwestern border of Thailand during 13 years
-          of continuous deployment. PLoS ONE. 2009, 4: e4551-10.1371\/journal.pone.0004551.","journal-title":"PLoS
-          ONE"},{"key":"1613_CR38","doi-asserted-by":"publisher","first-page":"305","DOI":"10.1038\/nature09107","volume":"465","author":"FJ
-          Gamo","year":"2010","unstructured":"Gamo FJ, Sanz LM, Vidal J, de CC, Alvarez
-          E, Lavandera JL, et al: Thousands of chemical starting points for antimalarial
-          lead identification. Nature. 2010, 465: 305-310. 10.1038\/nature09107.","journal-title":"Nature"},{"key":"1613_CR39","doi-asserted-by":"publisher","first-page":"404","DOI":"10.1126\/science.1112181","volume":"309","author":"NM
-          El-Sayed","year":"2005","unstructured":"El-Sayed NM, Myler PJ, Blandin G,
-          Berriman M, Crabtree J, Aggarwal G, et al: Comparative genomics of trypanosomatid
-          parasitic protozoa. Science. 2005, 309: 404-409. 10.1126\/science.1112181.","journal-title":"Science"},{"key":"1613_CR40","doi-asserted-by":"publisher","first-page":"328","DOI":"10.1016\/S0966-842X(99)01547-4","volume":"7","author":"GI
-          McFadden","year":"1999","unstructured":"McFadden GI, Roos DS: Apicomplexan
-          plastids as drug targets. Trends Microbiol. 1999, 7: 328-333. 10.1016\/S0966-842X(99)01547-4.","journal-title":"Trends
-          Microbiol"},{"key":"1613_CR41","doi-asserted-by":"publisher","first-page":"4673","DOI":"10.1093\/nar\/22.22.4673","volume":"22","author":"JD
-          Thompson","year":"1994","unstructured":"Thompson JD, Higgins DG, Gibson TJ:
-          CLUSTAL W: improving the sensitivity of progressive multiple sequence alignment
-          through sequence weighting, position-specific gap penalties and weight matrix
-          choice. Nucleic Acids Res. 1994, 22: 4673-4680. 10.1093\/nar\/22.22.4673.","journal-title":"Nucleic
-          Acids Res"},{"key":"1613_CR42","volume-title":"PHYLIP (Phylogenetic Inference
-          Package). [3.6]","author":"J Felsentein","year":"2000","unstructured":"Felsentein
-          J: PHYLIP (Phylogenetic Inference Package). [3.6]. 2000, Seattle, Department
-          of Genetics, University of Washington, [ http:\/\/evolution.genetics.washington.edu\/phylip.html
-          ]"},{"key":"1613_CR43","doi-asserted-by":"publisher","first-page":"754","DOI":"10.1093\/bioinformatics\/17.8.754","volume":"17","author":"JP
-          Huelsenbeck","year":"2001","unstructured":"Huelsenbeck JP, Ronquist F: MRBAYES:
-          Bayesian inference of phylogenetic trees. Bioinformatics. 2001, 17: 754-755.
-          10.1093\/bioinformatics\/17.8.754.","journal-title":"Bioinformatics"},{"key":"1613_CR44","doi-asserted-by":"publisher","first-page":"1572","DOI":"10.1093\/bioinformatics\/btg180","volume":"19","author":"F
-          Ronquist","year":"2003","unstructured":"Ronquist F, Huelsenbeck JP: MrBayes
-          3: Bayesian phylogenetic inference under mixed models. Bioinformatics. 2003,
-          19: 1572-1574. 10.1093\/bioinformatics\/btg180.","journal-title":"Bioinformatics"},{"key":"1613_CR45","first-page":"357","volume":"12","author":"RD
-          Page","year":"1996","unstructured":"Page RD: TreeView: an application to display
-          phylogenetic trees on personal computers. Comput Appl Biosci. 1996, 12: 357-358.","journal-title":"Comput
-          Appl Biosci"},{"key":"1613_CR46","volume-title":"The Tree of Life Web Project","author":"DR
-          Maddison","year":"2007","unstructured":"Maddison DR, Schulz K-S: The Tree
-          of Life Web Project. 2007, [ http:\/\/tolweb.org ]"},{"key":"1613_CR47","doi-asserted-by":"publisher","first-page":"313","DOI":"10.1038\/46319","volume":"402","author":"EH
-          Walker","year":"1999","unstructured":"Walker EH, Perisic O, Ried C, Stephens
-          L, Williams RL: Structural insights into phosphoinositide 3-kinase catalysis
-          and signalling. Nature. 1999, 402: 313-320. 10.1038\/46319.","journal-title":"Nature"}],"container-title":["BMC
-          Evolutionary Biology"],"original-title":[],"language":"en","link":[{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1186\/1471-2148-11-4.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"http:\/\/link.springer.com\/article\/10.1186\/1471-2148-11-4\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"http:\/\/link.springer.com\/content\/pdf\/10.1186\/1471-2148-11-4.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2019,6,7]],"date-time":"2019-06-07T16:12:28Z","timestamp":1559923948000},"score":1,"resource":{"primary":{"URL":"http:\/\/bmcevolbiol.biomedcentral.com\/articles\/10.1186\/1471-2148-11-4"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2011,1,5]]},"references-count":47,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2011,12]]}},"alternative-id":["1613"],"URL":"https:\/\/doi.org\/10.1186\/1471-2148-11-4","relation":{},"ISSN":["1471-2148"],"issn-type":[{"value":"1471-2148","type":"electronic"}],"subject":[],"published":{"date-parts":[[2011,1,5]]},"article-number":"4"}}'
+        string: !!binary |
+          H4sIAAAAAAAA/8Vca3PiOLr+K6p82ZkqTNuY+5ctQu4J3amQ6Z7pS00JW4A6tsX6kgyZ2v9+nle2
+          wQKTLHvq1JnqSYgtC+l57xf575Mk5WmWnAxP1NNJ4yQUScIXwkrXK4FrLyquXn0WcSJVhBtO027a
+          2zsnw79PZOSLv4RPH32eCmvF4xTzfvvWsludRrvR+/Gjkd9JZUiT03XLblt277HlDFvdodP7iinp
+          LhYVrk5wod22u47T6/Vc99+Nk1jMRSwiT1ieyqL0ZNjuNU5W2SyQyVLEmHK6imW0EDGbepLGMR75
+          7DRLZIR1sonwJWd3d2N8i0ySjBbh4HMgPREl+Ovb3wRHnNbtwXEaTqOzvwfHsWz86zza9lD/291D
+          a9B2+p2uTf9hD56KUhGlFSyzKFkJT84lwMPsIuBrS0aWz9f4artx8tvDHUYt03Q1/P7h+4eXl5dm
+          Uuyz6anw+4fUD0/+/WM7ta9CLiO9ieLTN7obqyQJefxkxVhbLL1Uf/2cB4nAupKlilOLpsATIsYG
+          04AgOTmdjNn5swrYqVTByY8t4L5FqzgIVuvHD0x79umaULabjtPvfv/gtHuO1XLafQu4tQmpnNF+
+          qiyOeGBhCunhe2m5ApPWstO7pGiBDr2hPaghRavTt1uDnBQJvtSjR8cEDZhL84W14TLfmq1LTusN
+          aKoCkvvlOlALEalQeglTc7ZaqgT/y0glMpW+YIFcSZ89yYgnIhmyFYgNGqfyWWB8xNKlYAKYZkQD
+          miARQN5nJE5CM3AiF8ADRNYs7MfZgvky8RTYZq2JgFXKv7bQYuk0n0bCIabmWQqKap5e4GuJ0W44
+          5mcPuDnnoQzWuHQaq5cIFxLxr4y2jEtzGScpTTCfy0DynEu+gZbbiW6zODXnGWVYtDkP931JD/Og
+          ZrIfpDrCmRba1qB3UuUqFWHf4i3CV1WB3uGToEU4Xcf9c/xAu/eVtDiwjFNNRdzcqolGvkVMTIrr
+          pN2nByp82gaf8ijKYvHcnEnlLUXY7PaaTjMfuYG526vAfHI2YhdxFnJCcy04XXIGgz7+gnynceal
+          mBDsfJKPYmejBhTSGozBHs4bbMwjMNea3Y2H7H6Xmwo+arIRlsUexDPJol4Xo+9osG5vyLA6q2P3
+          cOm9TTSxqFLgCp4+2Z35hOhtwNo6Dtau3TVgtd3+9w9RvHD6vUEVRQPEmxE7B/sHBowtW0+1A2M5
+          jt0AyLtMsRsTxMddEctlFCzor4McWug01yqwZTxhsVhkAU9VrGV6AdFIl1r8QpHymcI+AfhHnmqc
+          LkUk0iajxTUY4Md+ra4zyOGvbrYObWOSfajd46BuaU6sQO2A+FN70O1bUHTtXwa9X20HdtT6vQp8
+          q1VF/pR95tGSi0TMYiW8J4OLe/vwm6PZKWggBNk0NgUh7nnE1ypVGbtssC+Q4hjWLfDZ5KyGuzc0
+          GDLOoAax52fhs1y3aOWodSFLYx4lfubhS5rsEcLvJyW3kr3XstBrsFZryICI1eq1CmIchKOONPsT
+          79OnfRx93M4OfUg4fzadttuyHLcFqYQQN1sd18bI5l8GkTpulUqP4JhlDK5/V8uU49hjg10JGYSk
+          atjdpMR/Rw7a1kbHnGcxu9lVMFjHkGF1ltuzC1Tf3kQdtMbM+6h2jkXV2ef6n83UmzVJKJt2p2nb
+          rmEXu1UsR+yUBwF/T8/oQQw6Jv/w+B6AQ6bA6CJ6XZOxfZFQISIU8YJM+TyLtNe15d+xCHLHqtQk
+          Tpdwdiy361S4d29bb3DuZsp9hLvHIdyvUSs/m+InNh/TYtpNmBvbaVcx7th2FeT7EfuUQca/CBFH
+          Mnoy0G7vo20MZveAfeotQ+mnbNJgN/xJzRJ2ezWE8tSqmlQ7KWgPe8bfMYtVIOo9ss4uh99jFyH3
+          CujbDYalD1m/Zw0GBvL7+z3M25s597HvHWk+nc5hr4S2C6PedMig5yO3TG4Y1Ad2y9NEGbA7+7Dr
+          QeyhwT49PQkodnibtw02Wobcl/Tpy1Kmgk0b7FGGYUKmdkepj0sClCxeS4OKppfhCmGXpmDC5ipm
+          PqxHoFYhApgGW6pQKHjtiUwaOYE5XL244gBpLj/L/ZWcgg6Eh+yw07G6vU6NG7SL2ptukDH/PjX7
+          x1Gz02mb1GxhXUkeo4LRBt2O3aoS0dWysaHiH2zKw0wEyXviUwxjfxCBoHC+ktqKEVIGklTYVOID
+          +UwfYaJT/kSEnL7CtSHSipTxYMiu5GLJ5nHux2vzG2ZpQSf8QZHL/fWtOx4xBECCyYgttT+bUwjS
+          VYTepVRhK0OG/VuH9l1HhmKOfdwHR/r2nW7LBL4DxwxeQN/qtOEfjEcfKQPRdkwl1u2YRvcaQqEy
+          YaDf2Ue/GEYm9xYOkGQXsL3ySc44EeTTjKec7j3i3pO+dB2CXjEnMhToXxTiA3cHo4I1BIBQryK+
+          JccWexWoGOElnioFZax/g5UTTYgOYoQOYgTgYeFHGSUcRKOOKNsp9+ni2Ee6rJDMdwkzsNpux1Bu
+          PdO4sC8qftqJFfRKdghTDGP3CBGgpJ6EtiwPfB3xzGcX1w32jLsTFaXQRPDM74bsDBG3ttk5w7sU
+          g0EpDSEaKmTkwEB7wSdVCuKWKh2ha4rQeA9+gfR2ieDYCBRgYmjvVsvpvEGEfOdHE+HIyLfTsetC
+          NK/V7RriMPhPQrTBmyEa4jEeL0RKiALN28Kn1wkOWSoPuE6rFQiQRTAXAprfW2II5UMSbQSgu2TB
+          +9s4bFwwPC2hwQaka2wLbG4EYnpLbwVi+Sw1kB4Z9Q60x7kHqQ+aG4y8o2AeMu8pMPVLjSuajyIV
+          AqfohcevbALb/KDCUASM8gYAdsHDkAPSpZzp7MsQzImhPiHI/sGTlYxlVCrylpOk8J0ifMH6H//c
+          YkrMz850uqn0S6E8sDdr4PQNYPXG3gK2MlUNukcGur3Bjsvfbn3/MJ5ihX270zbSCs6us3+hKEXF
+          0/eYthxH9vKSr2MIOYzjhAfQ0DCbp7EEK1oTkcC+CtLwp7FIVWSdqQzWFY4PHNU7Pp+D3WEKJm/F
+          u5qpQQeZ+60kCDKaB0TBnHQrRflcSWpdaxRSOFqMtKbheDRWiRfQT5mAfmOMIvvLfrlTkf9rKRQO
+          BRXAzurDhWU1wNUqGnOuGuIdGwX3TI+2cK/JK6s41z2TiP0qEc/ZPSdSeaY/W+MHlePYeYN9VCl8
+          Vx3AxTMRw6DeQYBE8CxSQRHdJVF3PhfaQzqNoQi450lFdCyM8lauQuVT2AHSaTUPuZLcY7FIVpS2
+          IDvgLWMFSrEVLiZYDaOMbaC4z2ZryuBCA3ppkdCzfLFCyAYSa06wqIJSXhBYkZdCz5EjWvpSwAPR
+          Ya9juf2eEaPsglhLUIypoeKRUXdLJxv2qQiPnRYwaMKhy0OMel03+gJLIN8TQgxhoy8gh4Ap0K7S
+          PcwAu4O43cqQTSGRU/hQoQLiEMrf+bMko7j1o0abQAQyU2TqWeLFQkDGCGAqtyTbuNFTc+6Vmb+l
+          WEEAU3DKmD3LOKPM4CZaySnCrhCesIn0YjUTpZxBRwIey7V3iLODzSHiGHPWUOrI6L03GLwhb7hi
+          u01bewBbeWtXKwcnH/9gV0n2nnOFIewjObNBtE4TOLafiG6BeibJmnLSXxEnaRovAf4fV+QAPz0r
+          0qPsfitknyWp2lioeMEj+crLIJIELREeKdl4zUAYWL619oRjLYgbmdIPYnMijycfPo72yVa6Ydgo
+          acSB1XecOkHaoHOEIB0Z4Du76avcoIYt1z3sfD1cEX8saQFVCarJ/xXD2MPVkF2XSSof6u+Z6yrU
+          sJIcJ+VTSU2VpnuCJ8z8VF87WFi55WzSU5Vlv+UHGJPVoHdkQN3uuHXMncpZQqLW13pwJ6Y2Mqmf
+          2J3wVLhKxXtIluOIr++Vt6Tfd5z8VMFuYBxS/zpKOvdl9UDq8l4ML2K5hXhYJKZgUqnsBSMjKJ09
+          n0sPpmDxz/p8do6461Lc5lrtrm1mBHf2+t8ms50jY2rXVCs7Zd225Rp+mJHHuHlgZcHxTfOtB7Gb
+          B2h7xLUp4rVbOLqnEpFbQMw6udOaJRE8o5iOrD2AZGcPQ12p1pBzaItY5ARJlnKlNfsoixXi7cNZ
+          KBh4+NK5DkpClqSZL7eOWjVJRdORcrPy2CUPAJvMqJaXdrsNqz2wDqBVRzez5r5fijs22m7Xp8qB
+          SsFBZJiMAKVl6J0zSEus1u+LCgaxswY7U9A0C4pJzDg64AkQllm4Cafp8gzKfC5TTSHucR+xNSdn
+          KMPka5asoeoX642IbHKsVSFpQS9hl1arPdgREnOLbwiJMW8N5kcG14NurYaazWIvdwbIxph1e3dg
+          m6Cf8qU0CxQ1vpIeRKB/CqDYYUXZHYUgEu7qxaRy9V7n//LPN3CkJtBgHJ8fRhsbTDXTx3h9f32r
+          qUP0mOPpIstEtpe6HuBJgS4rDquiKFLxIUiP2wtshsUJ2TCueXH2KqlGCKwwFxYc8p8qNq5ALb7K
+          QIqIkl4kcZV7iIsgbFloWZF4KbIuedaYEgnEX0UPjVfGvopykaXiw+/Vcp1Q2oSNES9nUemzAXNE
+          tl1Etj1Tve4SqlZMD05fwz9HZhJct7/jvw1cWFoef//Q6lAOuxhQKRVWmWd6wUZBmnjLrOIq1Jdy
+          y3FsSlzBfbjH7PFOJxkoLorZCBzydUn55Jvyw1eMRLiLm1823HPJVyvhs9O70fRR0+9+em3pv6iw
+          S3QrvLayPBAjvIVF9HnKZ9DHcPN4DPuK64uYh+SJZAhuQdKRBybL02hFjReuNu3fctt2mempgafW
+          Idmds4ZUR6YlHKfT2YmKeljMCkamObCbrXazHLH16gxJn95RddHn2dyglVsn7HoYm96R2QtCEODm
+          DOFOBHEPktKTW0jGEXoKDjQVZQn+gVAnUDB5aWETtQfoqWgRZzrafKagyBN5djPMAujNQJQUAuz3
+          sfLIMQyAG2JZygv8Nh1pcrhwCiFDeosWfm5Sb3UY1FGkfu4ashyZcHg4/3x9/mXq2K2dVDPZ4MXM
+          gnDblgMbHGP74iUpBm6joSqJLq/ZxLvQwmEo5JqAqBzHLq+HbALbRV0RRBnu/SuTiU7LAX0QjCMI
+          2vgWC2p4Y94yULFawVCmiEMR2zSpSYSU8cahoPhlyCq7s97bVR3qlVlroD4yK9B39xEuvJxum1r9
+          +mYh3oB2CuaHXvgpDFe8LtQsx1FG7pQj7tR5gPgJAfx0SJp3xWPN3GzTnAcUBElGIoK8/04HjLGc
+          bUOfvEmS7QaeF398Ps/V2O/lkFIeQEnqGGQiw1evVQp1Qi1rwKLwAC+Lr9/EmyBY393zAEtsDrmA
+          5TQ1BDoyGdDq1ibf5E9CjMyci5XBRzJ8QNd03tlVBtX/nu+uB5GhmGRBwFfwnylDM6VwNJbpq3Wv
+          m1R1jUwmSd6tezPWGRtaMFsEcMoTSoamSssF3I5UxDmpEo8H2i3RlTDdEEQGCqQZrSSFaYH4izcR
+          8KZUjMfWdNy7KUW2qTOoY7V6bcPU76NQR5CdSWtoUp8B8LbNpTv9KzskoUg6gePx02t2u7bTH5h5
+          gD2ZCeEA+e+GUvkwkpQz/pKAtc8b7ELFM7gqUyqHCQpmdEn/XgDoNKU2gDMFWWCmYzj+NJ1cj9kv
+          Y5jrQFFyG3SYag/QA7ErRcm8mPLr1rAT6V7EDLgJyAc1SlSqNiDMwKGml47l1huIyhM1qB9diu/u
+          +FUbO2X3IKx2x7EN4B2zFj9hl+swUiuVwaAa6Ne4VpWhlAE7D5JAEsNPAO1ntUjZ/S00OdnqPIq0
+          Nl6sUeUtyr/JUsGH4nn9pkzYHLbNtCSonrz+3h1Ync6G72u2/L+yzEemEJzd7I1OInFCze50HSMn
+          2W4bhRwoRUri7lYf67AvxrEx1E8qVksEFjoICqkni5icB1A2IlmyS3hTVxn0UkyDTxFRUKbqclsA
+          yFWQDlCTguNLAu12QOSmR+R5NCylpAP2QakzGIGOUULb7vpA+gy3azpEj80A9HayNlR0xmo6Vs/p
+          us3J+JGKznbHNr3UE6MJRbv+79noPD6gfDDUBNybCTSL7g5nt8D8ik4brNkXqJ7PgOxKQbFT2DGl
+          Yha73KaDJwr2WqfmRTWjU22KKPCmlK02v4BcZxnzy1BZcWl+KTnQG1itgVMpudfuvo4GO5PWEOPI
+          1EDPrU0NlEWcrs49u2ZXlxndfR2x20gulmY1s6ZknI9iX6mYqaJXWM9X6tW9EIFPLDuBMfiaRT62
+          dv5AQwL4rTO4rOzsrMG+ULsQAjHKeG7qKqsyTaIWuiAZ8tW2L8i1bsu+XV/MiSaI/HRtk4L1lePY
+          PMAEeaUzyajEuDnoUCl1UR8khXgAyuq160tdJUr/eYbePbaDfbfarOWVAn7dRWaWKg0bcQp3BA7n
+          e+kyPYjIcRpwGetG9iqRPvJXOWePE5NcI/kKRaYD59OtfdZVYQTfKxWsKxRaD7enRohKfgaKbRMk
+          mnBrqh5HuZHe69jb9ExSHn9c5Do2xQBYFoBkdQdG23sFoUMVgc1MNVQ6Ovh2dw5wVKzbwO62u+A6
+          s6psGy2Sd2PqDXjiyXuaLR/F7shE0NmTn1D07BrkuYz5mpyl2+UL/6l7hXe74yE4FHzIdJ2njdcI
+          x7E/dj3Ku2FkoiAgIak0lmQJHcHK9RoijkDOy6SJdoGz+Fk+8+Atu69DDrtHQTnAsehnd8/yb7D5
+          31h+t8bl/NK8an5qUm9W4G+i3FhQxaTMun1jxnG2l6Vqwt///qEYjav08J/Fn3/mD/9Jz37/IKLv
+          H/RZw+YyDQP2o2ZRx3aSD2qDo1VaVALbTdsxSkktwyW5GbOz7Cf1ArzbiFaOQ8SzlXXrnoPu6oVq
+          p9C641jNU53g+RSAhSL2iewjJV/Z5QVFuQirZqqIc7m3cRJ1McJMzOo+NZ0A4qt13otOp6kiSkjo
+          TA+UgyAHnZoOqEIOT5Rvm9ONAIp4qkXN6YOO1YbqZQeReivHfjh6co+MaNudvplzc1pQPqPRuAnb
+          4NiWbSRHzWMUn9ko8qkAnSYKMX8MJfdeln3vAfaZOgjTRIYIcVR+QkBl3lLmTuQNXwrIe6wr3w98
+          hrmp85ZK4VO6oGf7yedr8kRLN3NbHpnzwJOgFT7qs3+xgNOTkhNCpJ5wny84guF4iJFeWV5JViCf
+          Txomi7KEVP1q7i/nca7a56EfWw5b8lWg6NRltapFhy0THdD5crn2YwUuAUPALkitkDyxSmEzAigw
+          6sFOZai7FNhooYPHcclmm04IXbPs9612Z1C2Oe6Sp779+uDUNRxzZMVdtDs7NXe354B98zU0VyoS
+          TToglI+qt+yfr+EKxjHY+D2GKYaxz9dwsV6KnMgoWdL5tHMwy30sQcyHj3lwElGqDvJ/q9uUtKxs
+          feExudRi012aUqJQlyDLxiPdgUokS7KIjkyGYh6of2Vk1YvDphH05/JFJDqTAu1BHh+o/bjkUldU
+          /YwOFDPHZbSp3L1WIEaUqSwBg4Bn1vSVsDp3aso+fTwvSQ0fQANrvQlorY0pZqqh7JExvWvXpFKK
+          yGqwY/3bZnP3xQ275KF6T3HTGHZxo8vOr7rA9ln6EDBcgZc0hsCPgmcQ7pXSK3f8mZNPzdnNXSWF
+          AiQ5EZawLfuH9XFzQn4FpyvNa1qkyAvLh8CGJLrsWCpbWbaRJWnlNnV2AwLLdez9yHJwwMIfjCyP
+          bbG33zragD8d89SsaxtR5ccJOw+sKV8LM5VV015fjmMfAf9kTcWn+xvtPEdkUi+1W6a1rO42ivkM
+          kiK02C0WPH7h1ZC+NllM7rBpQFe5wdINfSpVr4qbBxw6dMAB4WWb+ubtQanq9iE46pRD+8jo3m3V
+          NOXRiceu1W+3fv9lMPjVdjrtnmUktgwvuLa+4QwGNZqtUt+g7mOVsLPpsJqAjZiuX1B9Df6ytl9F
+          2+rGtci73HQoQV+iT9BiF5brVj2L2i284V5sZq2B9NhT4d3eTpC+rS+2mvhXDDhwnPbmjAQ+XCXK
+          hLPGXS7HsZszOi5C3RJAFJx6KWd0+fEG3Hr32/RxdMe+6JaVWD1vTD5Vy7eRhS6diiQhrt5U8coz
+          +eB7xNracJQNSptbL4LyBJi1AU2Ul6i2ucgFQvyVAN5p2QuTD4dzn8byL2gzJUke6su17fxILuFl
+          tbt9e69cu4HzvyzXtre++da2XP1xd33Pfinf1CBIhK+j4p0B8EO9J9D51yb75ja7P8wyB6JtwEoR
+          9sk7lb7tSN0JdtR3lqW8KYw51txgZ4J887K16DJ/Pmmw3yKp3xWSU/gLT5YgU6oiI4raJMmaxRcn
+          zZfNyKbwM0R9WJZcHQya2sf24u8cadMEhezJiCJZSpEm3z84vWa/mY88cEDx5p5dZRrGmXHqvP6c
+          YmUou7kn7RNRSTVlCIwmD6ejP86hiU5hJBLqLpUb7PVhxApVyDDk7SGV5VZPEWLNVq/TqfDqoa0d
+          6AupjK3B+shKttPptd4He5YunL7Zz2uY2osNXAbMNV0GW1gbzIQcMMcaX+ZWgDaw3aKeJxZD+Rds
+          tm6sq4fcBeS6rbTXspxtjeLwFv8ryDt7RrNjZoUM/f1wBnldCEN316RXaQx7OKP+JyE+w4cf0jEb
+          vtp0FeqjYTKBPVzXcCB55/RqGN2lTtYzS/URyrH+CJO60h2ASfFyA50WLY7h11fK9h+sQaK7ry7z
+          xi+hBeVOzukI9ozySz+Fl1ZhOXvQDULSMGv15ZdyHDt70K1EWfDKbq1p2WRW/11lsaSi2VIVvIhZ
+          U8WLWq11ZAzoOjWVp3bXdcymVdtghvMrqN3gSc/2pmeUj2LnV1RMjRE+e5Q6f5Dg/2oR6q6SWqez
+          htNiDp2bTciyJnn5++ABauZREXZdNsptD9NtY4PcrcJOwDCOa7mtamygd/xWVFC8TerAq6A25RhK
+          4aqFfiGRiiU8l+1U9MopeOaLrAi+iWECegMAva9n55VWdH3nnVbFu6xgtvw5lG39+6OauHmyfe9V
+          8S6pivjpx0/qXrr1rIiaki774JrKM7iZir9SK6Tkx0Kz3PvLLd5bdXCl3z/MsyCgebUB3l803fr+
+          Yefe/9ly/1/RTWQoKbpN1xbiYN0ArxnOF9r1PPDOr0GjW/cKOWdg2V16hZzTHUI5tvq77/zqdAaD
+          ljto94t3fnkK/D106A1S5fu//j5ZUdgYr+njDniz0CPfSocq+BEKn85LQlQNuicHQTz5N31pNqtI
+          Rf6mtcoF/S66N990Vn3hVVJ9+V0pv8Xr7P423mt3xIva8AVw7wXmoojYkj6JO+lYEu0tJInGBPqW
+          9PHhPdNqg4Lcf2Pq6+n0o56wHHaS7zoqmAoa4ZkH+bo3QzbvhtOdW/pUnWYTgKnNkoZus8V30Cvo
+          ZEVZ8dIxIsz/AMwcQb39UAAA
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
-        Content-Encoding:
-          - gzip
         Content-Length:
           - "7029"
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 22:50:07 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:28 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -224,8 +175,18 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1186%2F1471-2148-11-4/transform/application/x-bibtex
     response:
@@ -240,23 +201,23 @@ interactions:
 
           "
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 22:50:07 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:29 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:

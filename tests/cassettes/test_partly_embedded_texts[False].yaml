@@ -1,8 +1,6 @@
 interactions:
   - request:
-      body:
-        '{"input": ["I like turtles."], "model": "text-embedding-3-small", "dimensions":
-        1536, "encoding_format": "base64"}'
+      body: '{"input":["I like turtles."],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"base64"}'
       headers:
         accept:
           - application/json
@@ -11,13 +9,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "114"
+          - "107"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -27,135 +25,134 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "120"
         x-stainless-retry-count:
-          - "1"
+          - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/embeddings
     response:
       body:
         string: !!binary |
-          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
-          BwAA//8DACS/30reIAAA
+          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
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067dc2d7896b4-SJC
+          - 96db6524590c67e2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -163,9 +160,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:15 GMT
+          - Mon, 11 Aug 2025 23:08:28 GMT
         Server:
           - cloudflare
+        Set-Cookie:
+          - __cf_bm=_w.CUcYUie9PVM5vSAB.aI9.D47mYgbIYZRa_0ErXH8-1754953708-1.0.1.1-d8XTyew1hJsE8A0PCr.IJn1j6cnoM4LKaHtlAuRQ3Yq_wayp8r.8MCfBf5UGlTjKWVyrw1hQ5qQ43o..4Un0RZO9vANWz_ZFc9hAvY6Bqp4;
+            path=/; expires=Mon, 11-Aug-25 23:38:28 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=k9RYXJvNezThXwC.yRkqrEMXpKqjyuhZHB5xZXQvzjU-1754953708442-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -176,41 +179,43 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-model:
           - text-embedding-3-small
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "419"
+          - "123"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
         via:
-          - envoy-router-5c565479c5-6qwp4
+          - envoy-router-c98c4dbb7-z25bw
         x-envoy-upstream-service-time:
-          - "398"
+          - "178"
         x-ratelimit-limit-requests:
-          - "10000"
+          - "200000"
         x-ratelimit-limit-tokens:
-          - "10000000"
+          - "200000000"
         x-ratelimit-remaining-requests:
-          - "9999"
+          - "199999"
         x-ratelimit-remaining-tokens:
-          - "9809549"
+          - "199999996"
         x-ratelimit-reset-requests:
-          - 6ms
+          - 0s
         x-ratelimit-reset-tokens:
-          - 1.142s
+          - 0s
         x-request-id:
-          - req_fc223bd45bb3ba41a99391b93d15699c
+          - req_5f1855c382ed40aab8cbb0a1c19c6f51
       status:
         code: 200
         message: OK
   - request:
-      body:
-        '{"input": ["I like cats."], "model": "text-embedding-3-small", "dimensions":
-        1536, "encoding_format": "base64"}'
+      body: '{"input":["I like cats."],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"base64"}'
       headers:
         accept:
           - application/json
@@ -219,13 +224,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "111"
+          - "104"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -235,15 +240,17 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "120"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/embeddings
     response:
@@ -359,10 +366,8 @@ interactions:
           l8GAoZiGf/vvUYF/E/+tr7P3+88YAumzR/H3P/81gfD3t2vq7/C/h+ZVfPq///lL+jNq8PfQDNn7
           /7n8r+WP/uNf/wkAAP//AwAkUor53iAAAA==
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067dfdfde96b4-SJC
+          - 96db65266b4267e2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -370,7 +375,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:15 GMT
+          - Mon, 11 Aug 2025 23:08:28 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -383,41 +388,43 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-model:
           - text-embedding-3-small
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "58"
+          - "71"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
         via:
-          - envoy-router-7f577c66cb-9wk6c
+          - envoy-router-d4df5c7b7-cgvt9
         x-envoy-upstream-service-time:
-          - "39"
+          - "89"
         x-ratelimit-limit-requests:
-          - "10000"
+          - "200000"
         x-ratelimit-limit-tokens:
-          - "10000000"
+          - "200000000"
         x-ratelimit-remaining-requests:
-          - "9999"
+          - "199999"
         x-ratelimit-remaining-tokens:
-          - "9901854"
+          - "199999996"
         x-ratelimit-reset-requests:
-          - 6ms
+          - 0s
         x-ratelimit-reset-tokens:
-          - 588ms
+          - 0s
         x-request-id:
-          - req_5213a3dff478b40328959c8c423d4791
+          - req_bd8d09ad2b6b45768a7b9718702b89b9
       status:
         code: 200
         message: OK
   - request:
-      body:
-        '{"input": ["What do I like?"], "model": "text-embedding-3-small", "dimensions":
-        1536, "encoding_format": "base64"}'
+      body: '{"input":["What do I like?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"base64"}'
       headers:
         accept:
           - application/json
@@ -426,13 +433,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "114"
+          - "107"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -442,134 +449,134 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "120"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/embeddings
     response:
       body:
         string: !!binary |
-          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
-          X/8HAAD//wMAybDCut4gAAA=
+          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
+          /wMAj7RUa94gAAA=
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067e0e87996b4-SJC
+          - 96db65274c1a67e2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -577,7 +584,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:16 GMT
+          - Mon, 11 Aug 2025 23:08:28 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -590,47 +597,54 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-model:
           - text-embedding-3-small
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "92"
+          - "207"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
         via:
-          - envoy-router-776b696f78-qdgjq
+          - envoy-router-7d9c6b8bbd-bv7k7
         x-envoy-upstream-service-time:
-          - "31"
+          - "242"
         x-ratelimit-limit-requests:
-          - "10000"
+          - "200000"
         x-ratelimit-limit-tokens:
-          - "10000000"
+          - "200000000"
         x-ratelimit-remaining-requests:
-          - "9999"
+          - "199999"
         x-ratelimit-remaining-tokens:
-          - "9892343"
+          - "199999996"
         x-ratelimit-reset-requests:
-          - 6ms
+          - 0s
         x-ratelimit-reset-tokens:
-          - 645ms
+          - 0s
         x-request-id:
-          - req_697ffca1c6f07392ccf631721f5428aa
+          - req_847886c7ce5f4db9ab081058f2c90aef
       status:
         code: 200
         message: OK
   - request:
       body:
-        '{"messages": [{"role": "system", "content": "Provide a summary of the relevant
-        information that could help answer the question based on the excerpt. Respond
-        with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
-        \"...\"\n}\n\nwhere `summary` is relevant information from the text - about
-        100 words words. `relevance_score` is an integer 1-10 for the relevance of `summary`
-        to the question.\n"}, {"role": "user", "content": "Excerpt from sentence1: stub\n\n----\n\nI
-        like turtles.\n\n----\n\nQuestion: What do I like?\n\n"}], "model": "gpt-4o-2024-11-20",
-        "temperature": 0.0}'
+        '{"messages":[{"role":"system","content":"Provide a summary of the relevant
+        information that could help answer the question based on the excerpt. Your summary,
+        combined with many others, will be given to the model to generate an answer.
+        Respond with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
+        \"...\"\n  \"used_images\"\n}\n\nwhere `summary` is relevant information from
+        the text - about 100 words words. `relevance_score` is an integer 1-10 for the
+        relevance of `summary` to the question. `used_images` is a boolean flag indicating
+        if any images present in a multimodal message were used, and if no images were
+        present it should be false."},{"role":"user","content":"Excerpt from sentence1:
+        stub\n\n------------\n\nI like turtles.\n\n------------\n\nQuestion: What do
+        I like?\n\n"}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
       headers:
         accept:
           - application/json
@@ -639,13 +653,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "605"
+          - "873"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -655,34 +669,34 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "60.0"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/chat/completions
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//jFLBbtswDL37KwheenGKOMnSILdh3aG7DRu2AfNgKDJta5ElTaS7FEX+
-          fbCdxCnWAbvowMf39B7J5wQATYlbQN0o0W2ws7eh6Va/tXr49cF99O/m1eHT/eHbl2r+9f3hHtOe
-          4Xc/ScuZdat9GyyJ8W6EdSQl1Ktmd8v1ZrPevFkPQOtLsj2tDjJb+dlivljNsmy2mJ+IjTeaGLfw
-          PQEAeB7e3qIr6YBbmKfnSkvMqibcXpoAMHrbV1AxGxblBNMJ1N4JucH1c+4AcuSubVV8ynELOX5u
-          CIQOAixKiOHmAazZE0gXxRKnN2BcabQS42qQRglIQ8CB1J7i0Mrn3tsc0/GHSJYeldNUsPaRxp+y
-          eY65O157i1R1rPrRuM7aU/14CWt9HaLf8Qm/1CvjDDdFJMXe9cFYfMABPSYAP4ahdi/mhCH6Nkgh
-          fk+uF8yyxaiH0xondHkGxYuyV6zVKn1FryhJlLF8tRbUSjdUTtRph6orjb8CkqvUf7t5TXtMblz9
-          P/IToDUFobIIkUqjXyae2iL1V/6vtsuUB8PIFB+NpkIMxX4TJVWqs+MBIj+xUFtUxtUUQzTjFVah
-          IH1HarchvcTkmPwBAAD//wMAUzRRMY4DAAA=
+          H4sIAAAAAAAAAwAAAP//jJNPi9swEMXv/hSDzsliO//YHNvjQttDWQr1YrTy2FYjS0IzDgkh373I
+          TuJk20IvPsxP73nmjXRKAISuxBaEaiWrzpv558Vrv/+Sy96/HtSKvv0IL5/W6136/PJVGTGLCvf+
+          CxVfVU/Kdd4ga2dHrAJKxuiabVbL59Vikz4PoHMVmihrPM+Xbp6n+XKeZfM8vQhbpxWS2MLPBADg
+          NHxji7bCg9hCOrtWOiSSDYrt7RCACM7EipBEmlhaFrMJKmcZ7dD1qbAAhaC+62Q4FmILhfjeIuBB
+          YfAMePBGK83mCMSSkYBbycAtQk8YwOhdrPWBDdJTIWajX0CDe2kVlqRcwNE3S2+8J6xK3ckGKbJa
+          GsLCnu+bDFj3JGNGtjfmDkhrHcuY8RDP24Wcb4EY1/jg3umDVNTaamrLgJKcjcMTOy8Gek4A3obg
+          +4cshQ+u81yy2+Hwu2xzCV5Mq57oYnGB7FiaqZ6nV/DgV1bIUhu6W51QUrVYTdJpz7KvtLsDyd3U
+          f3bzN+9xcm2b/7GfgFLoGavSB6y0epx4OhYwvoR/HbulPDQsCMNeKyxZY4ibqLCWvRkvqaAjMXZl
+          rW2DwQc93tTal3m2xvVqqZaVSM7JbwAAAP//AwAd+80NsgMAAA==
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067e26eeeebe5-SJC
+          - 96db65298edd9447-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -690,15 +704,17 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:16 GMT
+          - Mon, 11 Aug 2025 23:08:29 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=S1w1QNzp2efrqWZfpOBhveITvYjDI7tKPjlulgJMCC8-1736886856-1.0.1.1-3gCbECl79n7MGTglMp83BkyxibQ8On8tbEIb9IaEpt5d2ZKd_h1cAr1YdgOhyUWaKlCGwOgdHA2Z5mmYzVKZ1g;
-            path=/; expires=Tue, 14-Jan-25 21:04:16 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=yw9dBHN6NEhRm2L4JYv2KgA13sEf__PlvnUSVh9w5q4-1754953709-1.0.1.1-himr9C9caqduXPhNffS.1pZ.bIcQcBKDuiYIg5iY2gZJhaMB6mBI.RV7w8USZ2Uk2_uoHcE4D3vw6TN27QoW_0I.3VZWMTsBtadcACVe4kM;
+            path=/; expires=Mon, 11-Aug-25 23:38:29 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=Rz.hzl1sLfvAlavoKyQT3nT8p9LYNYVB5uv_DtmEXFM-1736886856606-0.0.1.1-604800000;
+          - _cfuvid=ml2o2WeT7AZjfLewgFjrffK_BhRMqkvnn2B60t_lnvY-1754953709662-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -707,14 +723,18 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "448"
+          - "516"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
-        strict-transport-security:
-          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "538"
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
@@ -722,26 +742,29 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999869"
+          - "29999817"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_f971d4ed4a4f06e355e4d8ed9c7221ae
+          - req_b1a164c97fa64d6389d83ee41beda382
       status:
         code: 200
         message: OK
   - request:
       body:
-        '{"messages": [{"role": "system", "content": "Provide a summary of the relevant
-        information that could help answer the question based on the excerpt. Respond
-        with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
-        \"...\"\n}\n\nwhere `summary` is relevant information from the text - about
-        100 words words. `relevance_score` is an integer 1-10 for the relevance of `summary`
-        to the question.\n"}, {"role": "user", "content": "Excerpt from sentence2: stub\n\n----\n\nI
-        like cats.\n\n----\n\nQuestion: What do I like?\n\n"}], "model": "gpt-4o-2024-11-20",
-        "temperature": 0.0}'
+        '{"messages":[{"role":"system","content":"Provide a summary of the relevant
+        information that could help answer the question based on the excerpt. Your summary,
+        combined with many others, will be given to the model to generate an answer.
+        Respond with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
+        \"...\"\n  \"used_images\"\n}\n\nwhere `summary` is relevant information from
+        the text - about 100 words words. `relevance_score` is an integer 1-10 for the
+        relevance of `summary` to the question. `used_images` is a boolean flag indicating
+        if any images present in a multimodal message were used, and if no images were
+        present it should be false."},{"role":"user","content":"Excerpt from sentence2:
+        stub\n\n------------\n\nI like cats.\n\n------------\n\nQuestion: What do I
+        like?\n\n"}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
       headers:
         accept:
           - application/json
@@ -750,13 +773,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "602"
+          - "870"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -766,34 +789,34 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "60.0"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/chat/completions
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//jFKxjtswDN39FQTn+GA7aS7IVuDGLkVvqwtDkWlbPVkSRDpIEOTfC9u5
-          OIdegS4a+Pie3iN5SQDQ1LgH1J0S3Qebfg3dsPmWZedz8YNe17Q+qu/25dS/dKdji6uR4Q+/Scs7
-          60n7PlgS490M60hKaFTNn9fb3W67+7KdgN7XZEdaGyTd+LTIik2a52mR3YidN5oY9/AzAQC4TO9o
-          0dV0wj1kq/dKT8yqJdzfmwAwejtWUDEbFuUEVwuovRNyk+tL6QBK5KHvVTyXuIcSXzsCoZMAixJi
-          kE4JSEcQKLJ3YM0bMWgl/FTiahaIZOmonKaKtY80C+VZiaW7Pn4dqRlYjcndYO2tfr1nsb4N0R/4
-          ht/rjXGGuyqSYu9G3yw+4IReE4Bf08yGD2PAEH0fpBL/Rm4UzPNi1sNlSwtabG+geFH2gbXerT7R
-          q2oSZSw/TB210h3VC3VZkRpq4x+A5CH1324+056TG9f+j/wCaE1BqK5CpNroj4mXtkjjEf+r7T7l
-          yTAyxaPRVImhOG6ipkYNdr4v5DML9VVjXEsxRDMfWRMq0s+kDjvSa0yuyR8AAAD//wMAryY6LW0D
-          AAA=
+          H4sIAAAAAAAAAwAAAP//jJJPj9owEMXv+RQjn2GVBFgEtxb1sj1VaitVzSry2pPEXcd2PRMEQnz3
+          KglLoH+kXnKY37yXmTc+JQDCaLEFoRrJqg12vlt87fbvGvvtyyd/fKIntUs//PzossP7zS6KWa/w
+          Lz9Q8ZvqQfk2WGTj3YhVRMnYu2br1XKzWqzTzQBar9H2sjrwfOnneZov51k2z9OLsPFGIYktfE8A
+          AE7Dtx/RaTyILaSzt0qLRLJGsb02AYjobV8RksgQS8diNkHlHaMbpj4VDqAQ1LWtjMdCbKEQnxsE
+          PCiMgYFYMhJwIxm4QegII1jzigRKMj0UYjY6RLS4l05hScpHHJ2y9Mo7Ql2aVtZIPaukJSzc+Xas
+          iFVHsk/FddbeAOmcZ9mnOgTyfCHnawTW1yH6F/pNKirjDDVlREne9esS+yAGek4Anoeou7v0RIi+
+          DVyyf8Xhd9n6ErWYjjvRRX6B7FnaqZ6nb+DOr9TI0li6OZZQUjWoJ+l0Wdlp429AcrP1n9P8zXvc
+          3Lj6f+wnoBQGRl2GiNqo+42ntoj92/9X2zXlYWBBGPdGYckGY38JjZXs7PgsBR2JsS0r42qMIZrx
+          bVahzLNHfFwt1VKL5Jz8AgAA//8DANV7SjGkAwAA
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067e2686a67f8-SJC
+          - 96db65298fdafaec-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -801,15 +824,17 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:16 GMT
+          - Mon, 11 Aug 2025 23:08:29 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=7ag90RltRnDQCoqOrRQcQD4NKfyO4XNRoTZlM3eu_rk-1736886856-1.0.1.1-88orzfYfUxg03I6VkBwBcrAs8vbf2QLC5gSzUxQiGQstQW_1iIRukAqEp7ql3WOCVDbwv5NR1jlaSLcioaiDPA;
-            path=/; expires=Tue, 14-Jan-25 21:04:16 GMT; domain=.api.openai.com; HttpOnly;
+          - __cf_bm=d4jzhBCkIULKSHmXzcCS57TQQOIVFPc5FzW7kbb1N.o-1754953709-1.0.1.1-ZIykQuWjgO_qK6vBSkWuD_JQ1qyN8UMUa85US2lW9Lj0fEzjr.q22PxCQt1m7RvQagdkminRZl.y1QtsTFOjXBguWJEhpqgoLPCfOq24e.4;
+            path=/; expires=Mon, 11-Aug-25 23:38:29 GMT; domain=.api.openai.com; HttpOnly;
             Secure; SameSite=None
-          - _cfuvid=gE9S5Bk2bSZsgHES4FaALcL4F_9ZS7_WSsHYE0_XZfc-1736886856900-0.0.1.1-604800000;
+          - _cfuvid=yllY0TiDRDi6PE5u8pr.h4nVOb7lBN7qPU8k6O61NRE-1754953709956-0.0.1.1-604800000;
             path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -818,14 +843,18 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "722"
+          - "573"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
-        strict-transport-security:
-          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "844"
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
@@ -833,20 +862,18 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999870"
+          - "29999818"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_3eb4fc8658a948430ae27a7b30aba146
+          - req_77fd6ffb0a714951853d3c13425e8e49
       status:
         code: 200
         message: OK
   - request:
-      body:
-        '{"input": ["What was it that I liked?"], "model": "text-embedding-3-small",
-        "dimensions": 1536, "encoding_format": "base64"}'
+      body: '{"input":["What was it that I liked?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"base64"}'
       headers:
         accept:
           - application/json
@@ -855,13 +882,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "124"
+          - "117"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -871,15 +898,17 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "120"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/embeddings
     response:
@@ -995,10 +1024,8 @@ interactions:
           qYD/+tefP//jd8Kg6+/l63swYC7X+T/+z1GB/+D/Y+qy1+vvMQQ8ZVX5z7//9wmEfz5j333m/zn3
           bfme/vn3H/D3qME/cz9nr//n8r++P/Rf//pfAAAA//8DABQsvYjeIAAA
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067e80d5296b4-SJC
+          - 96db652fbc7567e2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1006,7 +1033,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:17 GMT
+          - Mon, 11 Aug 2025 23:08:30 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -1019,47 +1046,54 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-model:
           - text-embedding-3-small
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "445"
+          - "118"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
         strict-transport-security:
           - max-age=31536000; includeSubDomains; preload
         via:
-          - envoy-router-64485b6d65-9jl4p
+          - envoy-router-5db985b4df-dwfwp
         x-envoy-upstream-service-time:
-          - "421"
+          - "150"
         x-ratelimit-limit-requests:
-          - "10000"
+          - "200000"
         x-ratelimit-limit-tokens:
-          - "10000000"
+          - "200000000"
         x-ratelimit-remaining-requests:
-          - "9999"
+          - "199999"
         x-ratelimit-remaining-tokens:
-          - "9972113"
+          - "199999993"
         x-ratelimit-reset-requests:
-          - 6ms
+          - 0s
         x-ratelimit-reset-tokens:
-          - 167ms
+          - 0s
         x-request-id:
-          - req_42e0bf4f2a2f191651c1501bc4aee439
+          - req_08bbdc48fa714671802357b8d5467269
       status:
         code: 200
         message: OK
   - request:
       body:
-        '{"messages": [{"role": "system", "content": "Provide a summary of the relevant
-        information that could help answer the question based on the excerpt. Respond
-        with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
-        \"...\"\n}\n\nwhere `summary` is relevant information from the text - about
-        100 words words. `relevance_score` is an integer 1-10 for the relevance of `summary`
-        to the question.\n"}, {"role": "user", "content": "Excerpt from sentence1: stub\n\n----\n\nI
-        like turtles.\n\n----\n\nQuestion: What was it that I liked?\n\n"}], "model":
-        "gpt-4o-2024-11-20", "temperature": 0.0}'
+        '{"messages":[{"role":"system","content":"Provide a summary of the relevant
+        information that could help answer the question based on the excerpt. Your summary,
+        combined with many others, will be given to the model to generate an answer.
+        Respond with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
+        \"...\"\n  \"used_images\"\n}\n\nwhere `summary` is relevant information from
+        the text - about 100 words words. `relevance_score` is an integer 1-10 for the
+        relevance of `summary` to the question. `used_images` is a boolean flag indicating
+        if any images present in a multimodal message were used, and if no images were
+        present it should be false."},{"role":"user","content":"Excerpt from sentence1:
+        stub\n\n------------\n\nI like turtles.\n\n------------\n\nQuestion: What was
+        it that I liked?\n\n"}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
       headers:
         accept:
           - application/json
@@ -1068,13 +1102,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "615"
+          - "883"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -1084,34 +1118,34 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "60.0"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/chat/completions
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//jFLBjtowEL3nK0ZzhhVhWaDctlK1t/ZA1VZqqsjrDImLY1ueyZYV4t8r
-          JywBtZV68eG9eU9v3viYAaCpcAOoGyW6DXb6GJruQdUfHz+923ZP269hP1tvv/z69uH90yHgJCn8
-          80/S8qa6074NlsR4N9A6khJKrvnqfrleL9cPq55ofUU2yeog04WfzmfzxTTPp/PZWdh4o4lxA98z
-          AIBj/6aIrqIDbmA2eUNaYlY14eYyBIDR24SgYjYsyglORlJ7J+T61MfCARTIXduq+FrgBgr83BDQ
-          QVMMAixKiEEaJSANAQdSe4pgzT7BXRRLfFfgZPCJZOlFOU0lax9p8MtnBRbudJ0g0q5jlQpwnbVn
-          /HRZyfo6RP/MZ/6C74wz3JSRFHuX4rP4gD17ygB+9NV1N21giL4NUorfk0uGeb4Y/HA81sjOl2dS
-          vCh7pVqcC7/1KysSZSxflY9a6YaqUTpeSnWV8VdEdrX1n2n+5j1sblz9P/YjoTUFoaoMkSqjbzce
-          xyKlv/yvsUvLfWBkii9GUymGYrpERTvV2eGbIb+yUFvujKsphmiGv7YLJekVqec16XvMTtlvAAAA
-          //8DAH31+iF0AwAA
+          H4sIAAAAAAAAAwAAAP//jJJBb9swDIXv/hWEzkkRO06D5TrstmEYEGwD5sJQJNrWIkuaSHcpivz3
+          QXYbp2sH7OIDP75n8lGPGYAwWuxAqE6y6oNdvl9/HX4fhqY5nX593Bf8+ct3h/sPx09Ybr+JRVL4
+          w09U/Ky6Ub4PFtl4N2EVUTIm13y7Kd9t1tt8NYLea7RJ1gZeln5ZrIpymefLYvUk7LxRSGIHPzIA
+          gMfxm0Z0Gk9iB6PNWOmRSLYodpcmABG9TRUhiQyxdCwWM1TeMbpx6sfKAVSChr6X8aESO6jEvkPA
+          k8IYGIglIwF3koE7hIEwgjXHVBsiW6SbSiwmk4gW76VTWJPyESezfHXhA6GuTS9bpMQaaQkrd76e
+          LGIzkEzBuMHaKyCd8yxTsGMmd0/kfEnB+jZEf6C/pKIxzlBXR5TkXdqY2Acx0nMGcDemPbwIUITo
+          +8A1+yOOv8u3xeQn5vvOdP0M2bO0c71YlYs3/GqNLI2lq3sJJVWHepbOx5WDNv4KZFdbv57mLe9p
+          c+Pa/7GfgVIYGHUdImqjXm48t0VMz/9fbZeUx4EFYbw3Cms2GNMlNDZysNPLFPRAjH3dGNdiDNFM
+          z7MJdZHf4u2mVKUW2Tn7AwAA//8DAMVkVqOnAwAA
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067ebaa3d24f7-SJC
+          - 96db653148039447-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1119,15 +1153,11 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:18 GMT
+          - Mon, 11 Aug 2025 23:08:31 GMT
         Server:
           - cloudflare
-        Set-Cookie:
-          - __cf_bm=qd9JscDxJc.xbdbxio9uZXLrVFOTtas2psjjf4gQO4I-1736886858-1.0.1.1-7sLVcKuqFJMt2KmdI4EbjV.aXz3zdgCqfQUsNS.ukngLAyU4T.nigpRf_Vmm4ERHVrgFdrKuhowFYpoOVvYD1w;
-            path=/; expires=Tue, 14-Jan-25 21:04:18 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=s7nhO5YcvElHkZjSHjylYhozWkraa_.5XzANjiAH.P4-1736886858034-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -1136,41 +1166,48 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "390"
+          - "668"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
-        strict-transport-security:
-          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "757"
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
           - "30000000"
         x-ratelimit-remaining-requests:
-          - "9998"
+          - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999866"
+          - "29999814"
         x-ratelimit-reset-requests:
-          - 10ms
+          - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_21243b8d69e79834ea23091674afe98a
+          - req_043ed284f77b4fa99536a4279fe48aeb
       status:
         code: 200
         message: OK
   - request:
       body:
-        '{"messages": [{"role": "system", "content": "Provide a summary of the relevant
-        information that could help answer the question based on the excerpt. Respond
-        with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
-        \"...\"\n}\n\nwhere `summary` is relevant information from the text - about
-        100 words words. `relevance_score` is an integer 1-10 for the relevance of `summary`
-        to the question.\n"}, {"role": "user", "content": "Excerpt from sentence2: stub\n\n----\n\nI
-        like cats.\n\n----\n\nQuestion: What was it that I liked?\n\n"}], "model": "gpt-4o-2024-11-20",
-        "temperature": 0.0}'
+        '{"messages":[{"role":"system","content":"Provide a summary of the relevant
+        information that could help answer the question based on the excerpt. Your summary,
+        combined with many others, will be given to the model to generate an answer.
+        Respond with the following JSON format:\n\n{\n  \"summary\": \"...\",\n  \"relevance_score\":
+        \"...\"\n  \"used_images\"\n}\n\nwhere `summary` is relevant information from
+        the text - about 100 words words. `relevance_score` is an integer 1-10 for the
+        relevance of `summary` to the question. `used_images` is a boolean flag indicating
+        if any images present in a multimodal message were used, and if no images were
+        present it should be false."},{"role":"user","content":"Excerpt from sentence2:
+        stub\n\n------------\n\nI like cats.\n\n------------\n\nQuestion: What was it
+        that I liked?\n\n"}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
       headers:
         accept:
           - application/json
@@ -1179,13 +1216,13 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "612"
+          - "880"
         content-type:
           - application/json
         host:
           - api.openai.com
         user-agent:
-          - AsyncOpenAI/Python 1.59.6
+          - AsyncOpenAI/Python 1.99.5
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -1195,34 +1232,34 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 1.59.6
+          - 1.99.5
         x-stainless-raw-response:
           - "true"
+        x-stainless-read-timeout:
+          - "60.0"
         x-stainless-retry-count:
           - "0"
         x-stainless-runtime:
           - CPython
         x-stainless-runtime-version:
-          - 3.12.7
+          - 3.13.5
       method: POST
       uri: https://api.openai.com/v1/chat/completions
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwAAAP//jFLLjtswDLz7Kwiek0WczQu5LbYB+ji0BbqnujAUmY7VyJIq0otdBPn3
-          wnY2dtAW6EUHDmc0Q/KUAKApcAuoKyW6Dnb6EKpm+fTh4evOPS4/+4/lr09Pu3e74+zxy+I9TlqG
-          3/8kLW+sO+3rYEmMdz2sIymhVjVd3682m9Vmue6A2hdkW9ohyHThp/PZfDFN0+l8diFW3mhi3ML3
-          BADg1L2tRVfQC25hNnmr1MSsDoTbaxMARm/bCipmw6Kc4GQAtXdCrnN9yhxAhtzUtYqvGW4hw28V
-          Ab1oikGARQkxSKUEpCLgQOpIEaw5EoNWwncZTnqRSJaeldOUs/aRerF0lmHmzuPvI5UNqza9a6y9
-          1M/XPNYfQvR7vuDXemmc4SqPpNi71juLD9ih5wTgRze35mYUGKKvg+Tij+RawTRd9Ho4bGpA56sL
-          KF6UHbEWl2nf6uUFiTKWR5NHrXRFxUAd1qSawvgRkIxS/+nmb9p9cuMO/yM/AFpTECryEKkw+jbx
-          0BapPeR/tV2n3BlGpvhsNOViKLabKKhUje1vDPmVheq8NO5AMUTTH1oZctJrUvsN6XtMzslvAAAA
-          //8DAOF3vXhxAwAA
+          H4sIAAAAAAAAAwAAAP//jJJNb9swDIbv/hWEzklhO06D5TYU6GnYBxDssLkwVJm2tciSJtL9QJD/
+          PshO43TrgF504EO+Il/ykAAIXYstCNVJVr03y5vV9+Hxy6du//WbvE1/fPx9+6g3fv95t1OrVCxi
+          hbv/hYpfqq6U671B1s5OWAWUjFE126yLD+vVJktH0LsaTSxrPS8Lt8zTvFhm2TI/6arOaYUktvAz
+          AQA4jG9s0db4JLYwyoyRHolki2J7TgIQwZkYEZJIE0vLYjFD5SyjHbs+lBagFDT0vQzPpdhCKXYd
+          Aj4pDJ6BWDIScCcZuEMYCAMYvUcCJZmuSrGYFAIafJBWYUXKBYxKWXpiA2Fd6V62SDHeSENY2uNl
+          SwGbgWR0xA7GXABprWMZHR3NuDuR43l841of3D39VSoabTV1VUBJzsZRiZ0XIz0mAHejzcMr54QP
+          rvdcsdvj+F22ySc9MS92pqsXyI6lmeN5Wize0KtqZKkNXSxKKKk6rOfSeatyqLW7AMnF1P9285b2
+          NLm27XvkZ6AUesa68gFrrV5PPKcFjHf/v7Szy2PDgjA8aIUVawxxEzU2cjDTSQp6Jsa+arRtMfig
+          p7tsfJVn13i9LlRRi+SY/AEAAP//AwC1UvjuoAMAAA==
       headers:
-        CF-Cache-Status:
-          - DYNAMIC
         CF-RAY:
-          - 902067ebaae996ba-SJC
+          - 96db653148acfaec-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1230,15 +1267,11 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Tue, 14 Jan 2025 20:34:18 GMT
+          - Mon, 11 Aug 2025 23:08:31 GMT
         Server:
           - cloudflare
-        Set-Cookie:
-          - __cf_bm=3pZi8dqCJu_ZXGxEWl9810Wlpj5HN2nD72FdauN6Kk8-1736886858-1.0.1.1-cj69HSi1OP1wv2WKll4A.tbyag0fuxueq.WQ3abdXbupnvLWMERvQhHr1grpuJgnFh62SejAwjEym6SSu7U1RA;
-            path=/; expires=Tue, 14-Jan-25 21:04:18 GMT; domain=.api.openai.com; HttpOnly;
-            Secure; SameSite=None
-          - _cfuvid=PyoFK7A2yR3ZDccW22VhEn65XsBrZZqRaYcp8SdAQ0s-1736886858055-0.0.1.1-604800000;
-            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
           - chunked
         X-Content-Type-Options:
@@ -1247,14 +1280,18 @@ interactions:
           - X-Request-ID
         alt-svc:
           - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "415"
+          - "1025"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
           - "2020-10-01"
-        strict-transport-security:
-          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "1055"
         x-ratelimit-limit-requests:
           - "10000"
         x-ratelimit-limit-tokens:
@@ -1262,13 +1299,13 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29999867"
+          - "29999815"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_e0947188388508b264e7357c1594f0ff
+          - req_83409e6537d74107a438ce8a22688819
       status:
         code: 200
         message: OK

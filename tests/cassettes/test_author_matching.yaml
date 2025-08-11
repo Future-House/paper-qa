@@ -1,55 +1,79 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Jack+NoScience&select=DOI,author,title
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Jack+NoScience&select=DOI%2Cauthor%2Ctitle
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":4067,"items":[{"DOI":"10.4337\/cilj.2023.02.08","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2467-681X","authenticated-orcid":true,"given":"Jack
-          Wright","family":"Nelson","sequence":"first","affiliation":[{"name":"Doctoral
-          Candidate, McGill University Faculty of Law, Montreal, QC, Canada"},{"name":"Adjunct
-          Research Fellow, National University of Singapore Faculty of Law, Singapore"}]}],"title":["Large
-          language models and the treaty interpretation game"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+        string: !!binary |
+          H4sIAAAAAAAA/8WTTXPTMBCG/4pGZyuRYxOmuaVNDimUMpRyaXrY2mtHU1ky0roQMv7vXRkGygk4
+          cdHMfujd3Wd2TzIS0BDlSvpHmckOY4QWFR17ZN8XHx6VNZFehJ4wROMdR/OZnulfEbk6yQYqJFY7
+          jZkkT2BVwDjY5CqLosykIezYuDvJzfUuaehZUZzp/Rz6Pn+VL5bLYsmSMNDBhynv+sPFbsOZB6I+
+          rvbz/dyHytQzH9r9XGt9pvhZqLLIC5UvyrMfv9GRqYCwVlO6XDVgI2ayNU+Ymr+EKg3cQGfske03
+          3qJ7COBqDOyP+HlAVyUIjQkTAGgaYw3QNDw35qBL4fMAtcWj2GAPgTquK3wjthYrCtyBFSwpLnzX
+          D4RBbF1rHGIwrs3EJxPYMiA+YnXIxLnlnuLDEFJoLRalXuaZuL1Zy/F+zP5MQicShVqUxWtVlLn+
+          SxJrC05czl7CuDLVAdDG30FAXZs0Pdj/TCP7We4dfG9I3GA1BENHsXORDLH6v+G95301ZFnzTr7n
+          DU+iSW7bDXaqIW6J5/3GnYq3EFrk17UDr7248nVCNWlM6616DKqfLiLPJOMLx3QbfGmBlOEF+ypX
+          OpGFUB0Uc0gX4QZrx3F8BsJmHqaRAwAA
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
+        Content-Length:
+          - "480"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
+          - Mon, 11 Aug 2025 23:07:26 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors%2CexternalIds%2Ctitle
     response:
       body:
         string:
@@ -61,7 +85,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 176.67178}]}
+          "P. Schwaller"}], "matchScore": 172.33388}]}
 
           '
       headers:
@@ -74,35 +98,45 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         Via:
-          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
+          - 1.1 cb0f9f6369baeebf7c66aebe4cb453ac.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - IsbRpJs-6dJesYURz0pMaebcWTWrxJgr4K0youJEPblH2gBzJPfJbw==
+          - XJbztQY_fQC9lvNNPyPVcEMbvIPBNYwtR40Ejfp2gefCh8EzIPONWQ==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbZ9Hr0vHcEfHg=
+          - PKejVFS0PHcEenw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - b5ecf5b2-034c-4d9a-af12-6de8ada94eef
+          - d1be6cb5-055e-4500-9273-d6a0fd7956d7
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors%2CexternalIds%2Ctitle
     response:
       body:
         string:
@@ -114,7 +148,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 178.39174}]}
+          "P. Schwaller"}], "matchScore": 172.33388}]}
 
           '
       headers:
@@ -127,67 +161,73 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:32 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         Via:
-          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
+          - 1.1 cb0f9f6369baeebf7c66aebe4cb453ac.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - EHoVfVgHE9RbrbRi4uuINY4X-WQoORnvqlRHgMG5LRdxwMp9dqjMjg==
+          - 2DLoYkBkrnDmMlxaJozHo7W2ol4BQ3kjbzEDXLKo1xfM6JeqZx1ZdA==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbaDFLKvHcEZrw=
+          - PKejnHAevHcEAVA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:32 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - bfd45f5b-35bc-42d1-a1f9-011832c60b9a
+          - eab58808-adb7-44c0-b144-3b1f7eb0af84
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
     response:
       body:
         string: Resource not found.
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 02 Dec 2024 19:36:32 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:29 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 404
