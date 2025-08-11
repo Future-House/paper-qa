@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import quote
 
-import aiohttp
+import httpx
 from anyio import open_file
 from lmi.utils import CROSSREF_KEY_HEADER
 from tenacity import (
@@ -113,7 +113,7 @@ def get_crossref_mailto() -> str:
 )
 async def doi_to_bibtex(
     doi: str,
-    session: aiohttp.ClientSession,
+    client: httpx.AsyncClient,
     missing_replacements: Mapping[str, str | list[str]] | None = None,
 ) -> str:
     """Get a bibtex entry from a DOI via Crossref, replacing the key if possible.
@@ -126,15 +126,15 @@ async def doi_to_bibtex(
         missing_replacements = {}
     FORBIDDEN_KEY_CHARACTERS = {"_", " ", "-", "/"}
     # get DOI via crossref
-    async with session.get(
+    r = await client.get(
         f"https://api.crossref.org/works/{quote(doi, safe='')}/transform/application/x-bibtex",
         headers=crossref_headers(),
-    ) as r:
-        if not r.ok:
-            raise DOINotFoundError(
-                f"Per HTTP status code {r.status}, could not resolve DOI {doi}."
-            )
-        data = await r.text()
+    )
+    if not r.is_success:
+        raise DOINotFoundError(
+            f"Per HTTP status code {r.status_code}, could not resolve DOI {doi}."
+        )
+    data = r.text
     # must make new key
     key = data.split("{")[1].split(",")[0]
     new_key = remove_substrings(key, FORBIDDEN_KEY_CHARACTERS)
@@ -165,7 +165,7 @@ async def doi_to_bibtex(
 
 async def parse_crossref_to_doc_details(
     message: dict[str, Any],
-    session: aiohttp.ClientSession,
+    client: httpx.AsyncClient,
     query_bibtex: bool = False,
 ) -> DocDetails:
 
@@ -185,7 +185,7 @@ async def parse_crossref_to_doc_details(
         # since we now create the bibtex from scratch
         if query_bibtex:
             bibtex = await doi_to_bibtex(
-                message["DOI"], session, missing_replacements=fallback_data
+                message["DOI"], client, missing_replacements=fallback_data
             )
             # track the origin of the bibtex entry for debugging
             bibtex_source = BibTeXSource.CROSSREF.value
@@ -250,7 +250,7 @@ async def parse_crossref_to_doc_details(
     stop=stop_after_attempt(5),
 )
 async def get_doc_details_from_crossref(  # noqa: PLR0912
-    session: aiohttp.ClientSession,
+    client: httpx.AsyncClient,
     doi: str | None = None,
     authors: list[str] | None = None,
     title: str | None = None,
@@ -302,24 +302,24 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
             }
         )
 
-    async with session.get(
+    response = await client.get(
         url,
         params=params,
         headers=crossref_headers(),
-        timeout=aiohttp.ClientTimeout(CROSSREF_API_REQUEST_TIMEOUT),
-    ) as response:
-        try:
-            response.raise_for_status()
-        except aiohttp.ClientResponseError as exc:
-            raise DOINotFoundError(f"Could not find paper given {inputs_msg}.") from exc
-        try:
-            response_data = await response.json()
-        except json.JSONDecodeError as exc:
-            # JSONDecodeError: Crossref didn't answer with JSON, perhaps HTML
-            raise DOINotFoundError(  # Use DOINotFoundError so we fall back to Google Scholar
-                f"Crossref API did not return JSON for {inputs_msg}, instead it"
-                f" responded with text: {await response.text()}"
-            ) from exc
+        timeout=CROSSREF_API_REQUEST_TIMEOUT,
+    )
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise DOINotFoundError(f"Could not find paper given {inputs_msg}.") from exc
+    try:
+        response_data = response.json()
+    except json.JSONDecodeError as exc:
+        # JSONDecodeError: Crossref didn't answer with JSON, perhaps HTML
+        raise DOINotFoundError(  # Use DOINotFoundError so we fall back to Google Scholar
+            f"Crossref API did not return JSON for {inputs_msg}, instead it"
+            f" responded with text: {response.text}"
+        ) from exc
     if response_data["status"] == "failed":
         raise DOINotFoundError(
             f"Crossref API returned a failed status for {inputs_msg}."
@@ -345,7 +345,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
     if doi is not None and message["DOI"] != doi:
         raise DOINotFoundError(f"DOI ({inputs_msg}) not found in Crossref")
 
-    return await parse_crossref_to_doc_details(message, session, query_bibtex)
+    return await parse_crossref_to_doc_details(message, client, query_bibtex)
 
 
 @retry(
@@ -364,13 +364,8 @@ async def download_retracted_dataset(
     """
     url = f"https://api.labs.crossref.org/data/retractionwatch?{get_crossref_mailto()}"
 
-    async with (
-        aiohttp.ClientSession() as session,
-        session.get(
-            url,
-            timeout=aiohttp.ClientTimeout(total=300),
-        ) as response,
-    ):
+    async with httpx.AsyncClient(timeout=300) as client:
+        response = await client.get(url)
         response.raise_for_status()
 
         logger.info(
@@ -378,10 +373,7 @@ async def download_retracted_dataset(
         )
 
         async with await open_file(str(retraction_data_path), "wb") as f:
-            while True:
-                chunk = await response.content.read(1024)
-                if not chunk:
-                    break
+            async for chunk in response.aiter_bytes(chunk_size=1024):
                 await f.write(chunk)
 
         if os.path.getsize(str(retraction_data_path)) == 0:
@@ -392,12 +384,12 @@ class CrossrefProvider(DOIOrTitleBasedProvider):
     async def _query(self, query: TitleAuthorQuery | DOIQuery) -> DocDetails | None:
         if isinstance(query, DOIQuery):
             return await get_doc_details_from_crossref(
-                doi=query.doi, session=query.session, fields=query.fields
+                doi=query.doi, client=query.client, fields=query.fields
             )
         return await get_doc_details_from_crossref(
             title=query.title,
             authors=query.authors,
-            session=query.session,
+            client=query.client,
             title_similarity_threshold=query.title_similarity_threshold,
             fields=query.fields,
         )
