@@ -844,7 +844,7 @@ Here's a short demo of how to do this:
 ```python
 from paperqa.clients import DocMetadataClient, ALL_CLIENTS
 
-client = DocMetadataClient(clients=ALL_CLIENTS)
+client = DocMetadataClient(metadata_clients=ALL_CLIENTS)
 details = await client.query(title="Augmenting language models with chemistry tools")
 
 print(details.formatted_citation)

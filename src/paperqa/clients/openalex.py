@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import quote
 
-import aiohttp
+import httpx
 
 from paperqa.types import DocDetails
 from paperqa.utils import BIBTEX_MAPPING, mutate_acute_accents, strings_similarity
@@ -51,7 +51,7 @@ def get_openalex_mailto() -> str | None:
 
 
 async def get_doc_details_from_openalex(
-    session: aiohttp.ClientSession,
+    client: httpx.AsyncClient,
     doi: str | None = None,
     title: str | None = None,
     fields: Collection[str] | None = None,
@@ -60,7 +60,7 @@ async def get_doc_details_from_openalex(
     """Get paper details from OpenAlex given a DOI or paper title.
 
     Args:
-        session: The active session of the request.
+        client: Async HTTP client for any requests.
         doi: The DOI of the paper.
         title: The title of the paper.
         fields: Specific fields to include in the request.
@@ -91,44 +91,38 @@ async def get_doc_details_from_openalex(
     if fields:
         params["select"] = ",".join(fields)
 
-    async with session.get(
-        url,
-        params=params,
-        timeout=aiohttp.ClientTimeout(OPENALEX_API_REQUEST_TIMEOUT),
-    ) as response:
-        try:
-            response.raise_for_status()
-            response_data = await response.json()
-        except (aiohttp.ClientResponseError, json.JSONDecodeError) as exc:
-            raise DOINotFoundError("Could not find paper given DOI/title.") from exc
+    response = await client.get(
+        url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
+    )
+    try:
+        response.raise_for_status()
+        response_data = response.json()
+    except (httpx.HTTPStatusError, json.JSONDecodeError) as exc:
+        raise DOINotFoundError("Could not find paper given DOI/title.") from exc
 
-        if response_data.get("status") == "failed":
+    if response_data.get("status") == "failed":
+        raise DOINotFoundError("OpenAlex API returned a failed status for the query.")
+
+    results_data = response_data
+    if params.get("filter") is not None:
+        results_data = results_data["results"]
+        if len(results_data) == 0:
             raise DOINotFoundError(
-                "OpenAlex API returned a failed status for the query."
+                "OpenAlex API did not return any items for the query."
             )
+        results_data = results_data[0]
 
-        results_data = response_data
-        if params.get("filter") is not None:
-            results_data = results_data["results"]
-            if len(results_data) == 0:
-                raise DOINotFoundError(
-                    "OpenAlex API did not return any items for the query."
-                )
-            results_data = results_data[0]
+    if (
+        doi is None
+        and title
+        and strings_similarity(results_data.get("title", ""), title)
+        < title_similarity_threshold
+    ):
+        raise DOINotFoundError(f"OpenAlex results did not match for title {title!r}.")
+    if doi and results_data.get("doi") != doi:
+        raise DOINotFoundError(f"DOI {doi!r} not found in OpenAlex.")
 
-        if (
-            doi is None
-            and title
-            and strings_similarity(results_data.get("title", ""), title)
-            < title_similarity_threshold
-        ):
-            raise DOINotFoundError(
-                f"OpenAlex results did not match for title {title!r}."
-            )
-        if doi and results_data.get("doi") != doi:
-            raise DOINotFoundError(f"DOI {doi!r} not found in OpenAlex.")
-
-        return parse_openalex_to_doc_details(results_data)
+    return parse_openalex_to_doc_details(results_data)
 
 
 def parse_openalex_to_doc_details(message: dict[str, Any]) -> DocDetails:
@@ -211,30 +205,30 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
     """
 
     async def get_doc_details(
-        self, doi: str, session: aiohttp.ClientSession
+        self, doi: str, client: httpx.AsyncClient
     ) -> DocDetails | None:
         """Get document details by DOI.
 
         Args:
             doi: The DOI of the document.
-            session: The active session of the request.
+            client: Async HTTP client for any requests.
 
         Returns:
             The document details if found, otherwise None.
         """
-        return await get_doc_details_from_openalex(doi=doi, session=session)
+        return await get_doc_details_from_openalex(doi=doi, client=client)
 
     async def search_by_title(
         self,
         query: str,
-        session: aiohttp.ClientSession,
+        client: httpx.AsyncClient,
         title_similarity_threshold: float = 0.75,
     ) -> DocDetails | None:
         """Search for document details by title.
 
         Args:
             query: The title query for the document.
-            session: The active session of the request.
+            client: Async HTTP client for any requests.
             title_similarity_threshold: Threshold for title similarity.
 
         Returns:
@@ -242,7 +236,7 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
         """
         return await get_doc_details_from_openalex(
             title=query,
-            session=session,
+            client=client,
             title_similarity_threshold=title_similarity_threshold,
         )
 
@@ -257,9 +251,9 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
             The document details if found, otherwise None.
         """
         if isinstance(query, DOIQuery):
-            return await self.get_doc_details(doi=query.doi, session=query.session)
+            return await self.get_doc_details(doi=query.doi, client=query.client)
         return await self.search_by_title(
             query=query.title,
-            session=query.session,
+            client=query.client,
             title_similarity_threshold=query.title_similarity_threshold,
         )

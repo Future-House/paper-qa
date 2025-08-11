@@ -6,7 +6,7 @@ from http import HTTPStatus
 from typing import Literal
 from urllib.parse import quote
 
-import aiohttp
+import httpx
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from paperqa.types import DocDetails
@@ -81,9 +81,7 @@ class SearchResults(BaseModel):
 
 class UnpaywallProvider(DOIOrTitleBasedProvider):
 
-    async def get_doc_details(
-        self, doi: str, session: aiohttp.ClientSession
-    ) -> DocDetails:
+    async def get_doc_details(self, doi: str, client: httpx.AsyncClient) -> DocDetails:
 
         try:
             results = UnpaywallResponse(
@@ -93,8 +91,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
                             f"{UNPAYWALL_BASE_URL}{doi}"
                             f"?email={os.environ.get('UNPAYWALL_EMAIL', 'example@papercrow.ai')}"
                         ),
-                        params={},
-                        session=session,
+                        client=client,
                         timeout=UNPAYWALL_TIMEOUT,
                         http_exception_mappings={
                             HTTPStatus.NOT_FOUND: DOINotFoundError(
@@ -114,7 +111,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
     async def search_by_title(
         self,
         query: str,
-        session: aiohttp.ClientSession,
+        client: httpx.AsyncClient,
         title_similarity_threshold: float = 0.75,
     ) -> DocDetails:
         try:
@@ -125,8 +122,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
                             f"{UNPAYWALL_BASE_URL}search?query={quote(query)}"
                             f"&email={os.environ.get('UNPAYWALL_EMAIL', 'example@papercrow.ai')}"
                         ),
-                        params={},
-                        session=session,
+                        client=client,
                         timeout=UNPAYWALL_TIMEOUT,
                         http_exception_mappings={
                             HTTPStatus.NOT_FOUND: DOINotFoundError(
@@ -205,9 +201,9 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
 
     async def _query(self, query: TitleAuthorQuery | DOIQuery) -> DocDetails | None:
         if isinstance(query, DOIQuery):
-            return await self.get_doc_details(doi=query.doi, session=query.session)
+            return await self.get_doc_details(doi=query.doi, client=query.client)
         return await self.search_by_title(
             query=query.title,
-            session=query.session,
+            client=query.client,
             title_similarity_threshold=query.title_similarity_threshold,
         )
