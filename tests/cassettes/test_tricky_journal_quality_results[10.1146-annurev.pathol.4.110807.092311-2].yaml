@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,7,25]],"date-time":"2025-07-25T10:32:43Z","timestamp":1753439563230},"reference-count":120,"publisher":"Annual
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,8,6]],"date-time":"2025-08-06T13:07:30Z","timestamp":1754485650155},"reference-count":120,"publisher":"Annual
           Reviews","issue":"1","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Annu.
           Rev. Pathol. Mech. Dis."],"published-print":{"date-parts":[[2009,2,1]]},"abstract":"<jats:p>
           PI3-kinase and PTEN are major positive and negative regulators, respectively,
@@ -22,7 +22,7 @@ interactions:
           in the regulation of PTEN and PI3K activity, potential novel functions for
           PTEN, and feedback regulation within the pathway. The significance and complexity
           of PI3K signaling make it an important but challenging therapeutic target
-          for cancer. <\/jats:p>","DOI":"10.1146\/annurev.pathol.4.110807.092311","type":"journal-article","created":{"date-parts":[[2008,9,3]],"date-time":"2008-09-03T18:23:28Z","timestamp":1220466208000},"page":"127-150","source":"Crossref","is-referenced-by-count":1003,"title":["PTEN
+          for cancer. <\/jats:p>","DOI":"10.1146\/annurev.pathol.4.110807.092311","type":"journal-article","created":{"date-parts":[[2008,9,3]],"date-time":"2008-09-03T18:23:28Z","timestamp":1220466208000},"page":"127-150","source":"Crossref","is-referenced-by-count":1005,"title":["PTEN
           and the PI3-Kinase Pathway in Cancer"],"prefix":"10.1146","volume":"4","author":[{"given":"Nader","family":"Chalhoub","sequence":"first","affiliation":[{"name":"Department
           of Developmental Neurobiology, St. Jude Children''s Research Hospital, Memphis,
           Tennessee 38105-2794;"}]},{"given":"Suzanne J.","family":"Baker","sequence":"additional","affiliation":[{"name":"Department
@@ -49,11 +49,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3229"
+          - "3228"
         Content-Type:
           - application/json
         Date:
-          - Fri, 25 Jul 2025 21:35:31 GMT
+          - Mon, 11 Aug 2025 22:50:08 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -62,9 +62,9 @@ interactions:
           - interest-cohort=()
         x-api-pool:
           - plus
-        x-ratelimit-interval:
+        x-rate-limit-interval:
           - 1s
-        x-ratelimit-limit:
+        x-rate-limit-limit:
           - "150"
       status:
         code: 200
@@ -94,7 +94,7 @@ interactions:
         Connection:
           - keep-alive
         Date:
-          - Fri, 25 Jul 2025 21:35:31 GMT
+          - Mon, 11 Aug 2025 22:50:08 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -103,9 +103,9 @@ interactions:
           - interest-cohort=()
         x-api-pool:
           - plus
-        x-ratelimit-interval:
+        x-rate-limit-interval:
           - 1s
-        x-ratelimit-limit:
+        x-rate-limit-limit:
           - "150"
       status:
         code: 200

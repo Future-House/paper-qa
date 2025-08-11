@@ -7,7 +7,7 @@ interactions:
     response:
       body:
         string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,7,16]],"date-time":"2025-07-16T12:53:39Z","timestamp":1752670419394},"reference-count":37,"publisher":"Proceedings
+          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,8,6]],"date-time":"2025-08-06T12:08:59Z","timestamp":1754482139670},"reference-count":37,"publisher":"Proceedings
           of the National Academy of Sciences","issue":"38","content-domain":{"domain":["www.pnas.org"],"crossmark-restriction":true},"short-container-title":["Proc.
           Natl. Acad. Sci. U.S.A."],"published-print":{"date-parts":[[2012,9,18]]},"abstract":"<jats:p>\n            The
           p110\u03b1 catalytic subunit (\n            <jats:italic>PIK3CA<\/jats:italic>\n            )
@@ -61,11 +61,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "2581"
+          - "2578"
         Content-Type:
           - application/json
         Date:
-          - Fri, 25 Jul 2025 21:35:26 GMT
+          - Mon, 11 Aug 2025 22:50:06 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -74,9 +74,9 @@ interactions:
           - interest-cohort=()
         x-api-pool:
           - plus
-        x-ratelimit-interval:
+        x-rate-limit-interval:
           - 1s
-        x-ratelimit-limit:
+        x-rate-limit-limit:
           - "150"
       status:
         code: 200
@@ -108,7 +108,7 @@ interactions:
         Connection:
           - keep-alive
         Date:
-          - Fri, 25 Jul 2025 21:35:26 GMT
+          - Mon, 11 Aug 2025 22:50:06 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -117,9 +117,9 @@ interactions:
           - interest-cohort=()
         x-api-pool:
           - plus
-        x-ratelimit-interval:
+        x-rate-limit-interval:
           - 1s
-        x-ratelimit-limit:
+        x-rate-limit-limit:
           - "150"
       status:
         code: 200
