@@ -87,6 +87,8 @@ jobs:
       - run: uv sync --python-preference=only-managed
       - run: curl https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId,OfficialTitle&pageSize=1000&countTotal=true&sort=@relevance
       - run: uv run play.py
+      - run: curl -6 'https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance' -i
+      - run: curl -4 'https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance' -i
       - run: |
           curl -X GET \
             -H 'Accept: */*' \
