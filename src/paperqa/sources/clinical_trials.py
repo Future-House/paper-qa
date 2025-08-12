@@ -264,7 +264,7 @@ async def add_clinical_trials_to_docs(
             query, _client, limit, offset
         )
     except Exception as e:
-        logger.warning(f"Failed to retrieve clinical trials for query: {query}.")
+        logger.exception(f"Failed to retrieve clinical trials for query: {query}.")
         # close client if it was ephemeral
         if client is None:
             await _client.aclose()  # TODO: move to context manager
