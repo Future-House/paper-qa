@@ -61,7 +61,13 @@ async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> d
         raise httpx.HTTPStatusError(
             message=response.text, request=response.request, response=response
         )
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as e:
+        print(f"Status: {e.response.status_code}")
+        print(f"Headers: {dict(e.response.headers)}")
+        print(f"Body: {e.response.text}")
+        raise
     return response.json()
 
 
