@@ -49,7 +49,7 @@ async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> d
             "countTotal": "true",
             "sort": "@relevance",
         },
-        headers={"User-Agent": "paper-qa"}
+        headers={"User-Agent": "paper-qa", "From": "example@papercrow.ai"},
     )
     if response.status_code == MALFORMATTED_QUERY_STATUS:
         # the 400s from clinicaltrials.gov are not JSON, here's an example text:
@@ -77,7 +77,7 @@ async def api_get_clinical_trial(nct_id: str, client: httpx.AsyncClient) -> dict
         response = await client.get(
             f"{STUDIES_API_URL}/{nct_id}",
             params={"fields": TRIAL_API_FIELDS},
-            headers={"User-Agent": "paper-qa"}#, "From": "example@papercrow.ai"},
+            headers={"User-Agent": "paper-qa", "From": "example@papercrow.ai"},
         )
         response.raise_for_status()
         return response.json()
