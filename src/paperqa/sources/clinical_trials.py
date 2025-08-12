@@ -256,6 +256,7 @@ async def add_clinical_trials_to_docs(
     """
     # Cookies are not needed
     _client = httpx.AsyncClient(timeout=10.0) if client is None else client
+    _client.headers.pop("User-Agent")  # Remove User-Agent to see if that works
 
     logger.info(f"Querying clinical trials for: {query}.")
 
