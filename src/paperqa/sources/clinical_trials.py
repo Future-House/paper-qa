@@ -1,5 +1,6 @@
 import json
 import logging
+import urllib.parse
 from contextlib import suppress
 from datetime import datetime
 from typing import Any
@@ -40,16 +41,15 @@ MALFORMATTED_QUERY_STATUS: int = 400
     reraise=True,
 )
 async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> dict:
-    response = await client.get(
-        STUDIES_API_URL,
-        params={
-            "query.term": query,
-            "fields": SEARCH_API_FIELDS,
-            "pageSize": SEARCH_PAGE_SIZE,
-            "countTotal": "true",
-            "sort": "@relevance",
-        },
+    request = client.build_request(
+        "GET",
+        (
+            f"{STUDIES_API_URL}?"
+            f"query.term={urllib.parse.quote_plus(query)}&fields=NCTId,OfficialTitle&"
+            "pageSize=1000&countTotal=true&sort=@relevance"
+        ),
     )
+    response = await client.send(request)
     if response.status_code == MALFORMATTED_QUERY_STATUS:
         # the 400s from clinicaltrials.gov are not JSON, here's an example text:
         # > Error parsing query in Other terms:
