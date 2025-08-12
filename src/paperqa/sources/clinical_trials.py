@@ -255,7 +255,11 @@ async def add_clinical_trials_to_docs(
             Total number of trials found, number of trials added, and error message if any.
     """
     # Cookies are not needed
-    _client = httpx.AsyncClient(timeout=10.0) if client is None else client
+    _client = (
+        httpx.AsyncClient(timeout=10.0, follow_redirects=True)
+        if client is None
+        else client
+    )
 
     logger.info(f"Querying clinical trials for: {query}.")
 
