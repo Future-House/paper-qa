@@ -85,6 +85,7 @@ jobs:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
+      - run: curl https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId,OfficialTitle&pageSize=1000&countTotal=true&sort=@relevance
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
