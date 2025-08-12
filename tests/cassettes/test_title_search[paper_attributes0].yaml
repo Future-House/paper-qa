@@ -1,66 +1,101 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.openalex.org/works?filter=title.search:Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study
+      uri: https://api.openalex.org/works?filter=title.search%3AEffect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study
     response:
       body:
-        string:
-          '{"meta":{"count":1,"db_response_time_ms":272,"page":1,"per_page":25,"groups_count":null},"results":[{"id":"https://openalex.org/W2277923667","doi":"https://doi.org/10.1063/1.4938384","title":"Effect
-          of native oxide layers on copper thin-film tensile properties: A reactive
-          molecular dynamics study","display_name":"Effect of native oxide layers on
-          copper thin-film tensile properties: A reactive molecular dynamics study","relevance_score":762.2231,"publication_year":2015,"publication_date":"2015-12-21","ids":{"openalex":"https://openalex.org/W2277923667","doi":"https://doi.org/10.1063/1.4938384","mag":"2277923667"},"language":"en","primary_location":{"is_oa":false,"landing_page_url":"https://doi.org/10.1063/1.4938384","pdf_url":null,"source":{"id":"https://openalex.org/S187991544","display_name":"Journal
-          of Applied Physics","issn_l":"0021-8979","issn":["0021-8979","1089-7550","1520-8850"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310320257","host_organization_name":"American
-          Institute of Physics","host_organization_lineage":["https://openalex.org/P4310320257"],"host_organization_lineage_names":["American
-          Institute of Physics"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},"type":"article","type_crossref":"journal-article","indexed_in":["crossref"],"open_access":{"is_oa":false,"oa_status":"closed","oa_url":null,"any_repository_has_fulltext":false},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5015270557","display_name":"Michael
-          Skarlinski","orcid":null},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
-          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Michael
-          D. Skarlinski","raw_affiliation_strings":["University of Rochester 1 Materials
-          Science Program, , Rochester, New York 14627, USA"],"affiliations":[{"raw_affiliation_string":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA","institution_ids":["https://openalex.org/I5388228"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5113709379","display_name":"David
-          J. Quesnel","orcid":null},"institutions":[{"id":"https://openalex.org/I5388228","display_name":"University
-          of Rochester","ror":"https://ror.org/022kthw22","country_code":"US","type":"education","lineage":["https://openalex.org/I5388228"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"David
-          J. Quesnel","raw_affiliation_strings":["University of Rochester 1 Materials
-          Science Program, , Rochester, New York 14627, USA","University of Rochester
-          2 Department of Mechanical Engineering, , Rochester, New York 14627, USA"],"affiliations":[{"raw_affiliation_string":"University
-          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
-          14627, USA","institution_ids":["https://openalex.org/I5388228"]},{"raw_affiliation_string":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA","institution_ids":["https://openalex.org/I5388228"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":3500,"currency":"USD","value_usd":3500,"provenance":"doaj"},"apc_paid":null,"fwci":0.379,"has_fulltext":true,"fulltext_origin":"ngrams","cited_by_count":8,"citation_normalized_percentile":{"value":0.657628,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":84,"max":85},"biblio":{"volume":"118","issue":"23","first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11661","display_name":"Low
-          Dielectric Constant Materials for Microelectronics","score":0.9985,"subfield":{"id":"https://openalex.org/subfields/2504","display_name":"Electronic,
-          Optical and Magnetic Materials"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},"topics":[{"id":"https://openalex.org/T11661","display_name":"Low
-          Dielectric Constant Materials for Microelectronics","score":0.9985,"subfield":{"id":"https://openalex.org/subfields/2504","display_name":"Electronic,
-          Optical and Magnetic Materials"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T10204","display_name":"Nanomaterials
-          and Mechanical Properties","score":0.9981,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
-          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T10717","display_name":"Metal Matrix
-          Composites: Science and Applications","score":0.9976,"subfield":{"id":"https://openalex.org/subfields/2210","display_name":"Mechanical
-          Engineering"},"field":{"id":"https://openalex.org/fields/22","display_name":"Engineering"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/metal-processing","display_name":"Metal
-          Processing","score":0.506838},{"id":"https://openalex.org/keywords/mechanical-properties","display_name":"Mechanical
-          Properties","score":0.50352},{"id":"https://openalex.org/keywords/copper-oxide","display_name":"Copper
-          oxide","score":0.48201525},{"id":"https://openalex.org/keywords/brittleness","display_name":"Brittleness","score":0.4519687}],"concepts":[{"id":"https://openalex.org/C192562407","wikidata":"https://www.wikidata.org/wiki/Q228736","display_name":"Materials
-          science","level":0,"score":0.8812834},{"id":"https://openalex.org/C2779851234","wikidata":"https://www.wikidata.org/wiki/Q50690","display_name":"Oxide","level":2,"score":0.7741982},{"id":"https://openalex.org/C159985019","wikidata":"https://www.wikidata.org/wiki/Q181790","display_name":"Composite
-          material","level":1,"score":0.6066828},{"id":"https://openalex.org/C61048295","wikidata":"https://www.wikidata.org/wiki/Q909022","display_name":"Nucleation","level":2,"score":0.6024141},{"id":"https://openalex.org/C112950240","wikidata":"https://www.wikidata.org/wiki/Q76005","display_name":"Ultimate
-          tensile strength","level":2,"score":0.59529036},{"id":"https://openalex.org/C56052488","wikidata":"https://www.wikidata.org/wiki/Q103382","display_name":"Amorphous
-          solid","level":2,"score":0.59333754},{"id":"https://openalex.org/C19067145","wikidata":"https://www.wikidata.org/wiki/Q1137203","display_name":"Thin
-          film","level":2,"score":0.55628073},{"id":"https://openalex.org/C2777855556","wikidata":"https://www.wikidata.org/wiki/Q4339544","display_name":"Annealing
-          (glass)","level":2,"score":0.54870987},{"id":"https://openalex.org/C544778455","wikidata":"https://www.wikidata.org/wiki/Q753","display_name":"Copper","level":2,"score":0.5078266},{"id":"https://openalex.org/C544153396","wikidata":"https://www.wikidata.org/wiki/Q11426","display_name":"Metal","level":2,"score":0.49602708},{"id":"https://openalex.org/C2781183027","wikidata":"https://www.wikidata.org/wiki/Q106920642","display_name":"Copper
-          oxide","level":3,"score":0.48201525},{"id":"https://openalex.org/C43486711","wikidata":"https://www.wikidata.org/wiki/Q192005","display_name":"Elastic
-          modulus","level":2,"score":0.45417237},{"id":"https://openalex.org/C136478896","wikidata":"https://www.wikidata.org/wiki/Q898288","display_name":"Brittleness","level":2,"score":0.4519687},{"id":"https://openalex.org/C191897082","wikidata":"https://www.wikidata.org/wiki/Q11467","display_name":"Metallurgy","level":1,"score":0.26278052},{"id":"https://openalex.org/C171250308","wikidata":"https://www.wikidata.org/wiki/Q11468","display_name":"Nanotechnology","level":1,"score":0.19102317},{"id":"https://openalex.org/C8010536","wikidata":"https://www.wikidata.org/wiki/Q160398","display_name":"Crystallography","level":1,"score":0.10279918},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.0},{"id":"https://openalex.org/C178790620","wikidata":"https://www.wikidata.org/wiki/Q11351","display_name":"Organic
-          chemistry","level":1,"score":0.0}],"mesh":[],"locations_count":1,"locations":[{"is_oa":false,"landing_page_url":"https://doi.org/10.1063/1.4938384","pdf_url":null,"source":{"id":"https://openalex.org/S187991544","display_name":"Journal
-          of Applied Physics","issn_l":"0021-8979","issn":["0021-8979","1089-7550","1520-8850"],"is_oa":false,"is_in_doaj":false,"is_core":true,"host_organization":"https://openalex.org/P4310320257","host_organization_name":"American
-          Institute of Physics","host_organization_lineage":["https://openalex.org/P4310320257"],"host_organization_lineage_names":["American
-          Institute of Physics"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/15","display_name":"Life
-          on land","score":0.6}],"grants":[{"funder":"https://openalex.org/F4320337345","funder_display_name":"Office
-          of Naval Research","award_id":"N00014-12-1-0542"}],"datasets":[],"versions":[],"referenced_works_count":58,"referenced_works":["https://openalex.org/W1964561108","https://openalex.org/W1966577027","https://openalex.org/W1967370996","https://openalex.org/W1969763275","https://openalex.org/W1972295667","https://openalex.org/W1972758026","https://openalex.org/W1973496772","https://openalex.org/W1975415324","https://openalex.org/W1979198964","https://openalex.org/W1980718691","https://openalex.org/W1998250010","https://openalex.org/W2000148778","https://openalex.org/W2002958700","https://openalex.org/W2004635538","https://openalex.org/W2005223231","https://openalex.org/W2015240911","https://openalex.org/W2015427003","https://openalex.org/W2019465613","https://openalex.org/W2024438921","https://openalex.org/W2025448774","https://openalex.org/W2033010856","https://openalex.org/W2035858373","https://openalex.org/W2037530567","https://openalex.org/W2042894263","https://openalex.org/W2047968138","https://openalex.org/W2048410032","https://openalex.org/W2051407701","https://openalex.org/W2052281371","https://openalex.org/W2055302323","https://openalex.org/W2060383028","https://openalex.org/W2061811424","https://openalex.org/W2067319108","https://openalex.org/W2067867161","https://openalex.org/W2068128554","https://openalex.org/W2068954018","https://openalex.org/W2075147729","https://openalex.org/W2082154123","https://openalex.org/W2082164550","https://openalex.org/W2082730101","https://openalex.org/W2103591835","https://openalex.org/W2112144973","https://openalex.org/W2113676282","https://openalex.org/W2118785939","https://openalex.org/W2125614899","https://openalex.org/W2129814046","https://openalex.org/W2129831264","https://openalex.org/W2155155530","https://openalex.org/W2158386952","https://openalex.org/W2163762820","https://openalex.org/W2316209218","https://openalex.org/W2317838033","https://openalex.org/W2323178299","https://openalex.org/W282450671","https://openalex.org/W3103133276","https://openalex.org/W3104017686","https://openalex.org/W3104324287","https://openalex.org/W4250102497","https://openalex.org/W4255450160"],"related_works":["https://openalex.org/W4313886759","https://openalex.org/W4289780727","https://openalex.org/W3196590631","https://openalex.org/W2363424936","https://openalex.org/W2334739780","https://openalex.org/W2189903790","https://openalex.org/W2067018196","https://openalex.org/W2014598323","https://openalex.org/W1987421019","https://openalex.org/W1495724091"],"abstract_inverted_index":{"Metal-oxide":[0],"layers":[1,94,146,212,242],"are":[2,79,107,136,264],"likely":[3],"to":[4,11,81,119,175,232,254,266],"be":[5,233],"present":[6],"on":[7,96,109,271],"metallic":[8,47],"nano-structures":[9],"due":[10],"either":[12],"environmental":[13],"exposure":[14],"during":[15,259],"use,":[16],"or":[17],"high":[18],"temperature":[19],"processing":[20],"techniques":[21],"such":[22],"as":[23],"annealing.":[24],"It":[25,167],"is":[26,168,230],"well":[27],"known":[28],"that":[29,92,131,170,278],"nano-structured":[30],"metals":[31],"have":[32,51,95,147],"vastly":[33],"different":[34,113],"mechanical":[35,98,134,262],"properties":[36,99,135,263],"from":[37],"bulk":[38,156],"metals;":[39],"however,":[40],"difficulties":[41],"in":[42,122],"modeling":[43],"the":[44,53,57,90,97,176,180,210,221,244,250,279,282,285],"transition":[45,258],"between":[46],"and":[48,116,126,158,163,192,197,237],"ionic":[49],"bonding":[50],"prevented":[52],"computational":[54],"investigation":[55],"of":[56,59,100,161,179,218,281],"effects":[58,91],"oxide":[60,117,141,145,211,241],"surface":[61],"layers.":[62,142],"Newly":[63],"developed":[64],"charge-optimized":[65],"many":[66],"body":[67],"[Liang":[68],"et":[69],"al.,":[70],"Mater.":[71],"Sci.":[72],"Eng.,":[73],"R":[74],"74,":[75],"255":[76],"(2013)]":[77],"potentials":[78],"used":[80],"perform":[82],"fully":[83],"reactive":[84],"molecular":[85],"dynamics":[86],"simulations":[87],"which":[88],"elucidate":[89],"metal-oxide":[93],"a":[101,159,184,198,234,267],"copper":[102,226,252],"thin-film.":[103],"Simulated":[104],"tensile":[105],"tests":[106],"performed":[108],"thin-films":[110],"while":[111],"using":[112],"strain-rates,":[114],"temperatures,":[115],"thicknesses":[118],"evaluate":[120],"changes":[121],"yield":[123],"stress,":[124],"modulus,":[125],"failure":[127],"mechanisms.":[128],"Findings":[129],"indicate":[130],"copper-thin":[132],"film":[133],"strongly":[137],"affected":[138],"by":[139],"native":[140],"The":[143,224,240,261,275],"formed":[144],"an":[148,256],"amorphous":[149],"structure":[150],"with":[151],"lower":[152],"Cu-O":[153],"bond-densities":[154],"than":[155],"CuO,":[157],"mixture":[160],"Cu2O":[162],"CuO":[164],"charge":[165],"character.":[166],"found":[169,231],"oxidation":[171,280],"will":[172],"cause":[173],"modifications":[174],"strain":[177,194],"response":[178],"elastic":[181],"modulii,":[182],"producing":[183],"stiffened":[185],"modulii":[186,200],"at":[187,201],"low":[188,193],"temperatures":[189],"(&amp;lt;75":[190],"K)":[191],"values":[195],"(&amp;lt;5%),":[196],"softened":[199],"higher":[202],"temperatures.":[203],"While":[204],"under":[205],"strain,":[206],"structural":[207],"reorganization":[208],"within":[209],"facilitates":[213],"brittle":[214],"yielding":[215,228,246],"through":[216],"nucleation":[217,273],"defects":[219],"across":[220],"oxide/metal":[222],"interface.":[223],"oxide-free":[225],"thin-film":[227,253],"mechanism":[229],"tensile-axis":[235],"reorientation":[236],"grain":[238],"creation.":[239],"change":[243],"observed":[245],"mechanism,":[247],"allowing":[248],"for":[249,288],"inner":[251],"sustain":[255],"FCC-to-BCC":[257],"yielding.":[260,289],"fit":[265,276],"thermodynamic":[268],"model":[269],"based":[270],"classical":[272],"theory.":[274],"implies":[277],"films":[283],"reduces":[284],"activation":[286],"volume":[287]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W2277923667","counts_by_year":[{"year":2023,"cited_by_count":1},{"year":2022,"cited_by_count":1},{"year":2020,"cited_by_count":1},{"year":2019,"cited_by_count":1},{"year":2018,"cited_by_count":1},{"year":2017,"cited_by_count":2},{"year":2016,"cited_by_count":1}],"updated_date":"2024-11-19T02:35:40.795640","created_date":"2016-06-24"}],"group_by":[]}
-
-          '
+        string: !!binary |
+          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
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -78,21 +113,21 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "4528"
+          - "4483"
         Content-Security-Policy:
           - default-src 'self'; object-src 'none'
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:29 GMT
+          - Mon, 11 Aug 2025 23:07:22 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168189&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=zzd5vuiAqh%2BuPOazDCjSK4%2BTxOdG%2FypO1xLt1DPjzAI%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953642&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=YLTVXYqHZ2%2BDgcdzOdB07Dw1KAXkK8UoJXnq77RKnYA%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1733168189&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=zzd5vuiAqh%2BuPOazDCjSK4%2BTxOdG%2FypO1xLt1DPjzAI%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953642&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=YLTVXYqHZ2%2BDgcdzOdB07Dw1KAXkK8UoJXnq77RKnYA%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -113,27 +148,36 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.unpaywall.org/v2/search?query=Effect%20of%20native%20oxide%20layers%20on%20copper%20thin-film%20tensile%20properties:%20A%20reactive%20molecular%20dynamics%20study&email=example@papercrow.ai
+      uri: https://api.unpaywall.org/v2/search?query=Effect%20of%20native%20oxide%20layers%20on%20copper%20thin-film%20tensile%20properties%3A%20A%20reactive%20molecular%20dynamics%20study&email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"elapsed_seconds":0.365,"results":[{"response":{"best_oa_location":null,"data_standard":2,"doi":"10.1063/1.4938384","doi_url":"https://doi.org/10.1063/1.4938384","first_oa_location":null,"genre":"journal-article","has_repository_copy":false,"is_oa":false,"is_paratext":false,"journal_is_in_doaj":false,"journal_is_oa":false,"journal_issn_l":"0021-8979","journal_issns":"0021-8979,1089-7550","journal_name":"Journal
-          of Applied Physics","oa_locations":[],"oa_locations_embargoed":[],"oa_status":"closed","published_date":"2015-12-21","publisher":"AIP
-          Publishing","title":"Effect of native oxide layers on copper thin-film tensile
-          properties: A reactive molecular dynamics study","updated":"2023-07-31T05:28:57.007821","year":2015,"z_authors":[{"affiliation":[{"name":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"}],"family":"Skarlinski","given":"Michael
-          D.","sequence":"first"},{"affiliation":[{"name":"University of Rochester 1
-          Materials Science Program, , Rochester, New York 14627, USA"},{"name":"University
-          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
-          14627, USA"}],"family":"Quesnel","given":"David J.","sequence":"additional"}]},"score":0.009231734,"snippet":"<b>Effect</b>
-          of <b>native</b> <b>oxide</b> <b>layers</b> on <b>copper</b> <b>thin</b>-<b>film</b>
-          <b>tensile</b> <b>properties</b>: A <b>reactive</b> <b>molecular</b> <b>dynamics</b>
-          <b>study</b>"}]}
-
-          '
+        string: !!binary |
+          H4sIAKp3mmgA/71Uy27bMBC89ysIniVbDzu2hSCAgeTQACncpjkUQSDQ1EpiQpMqSaVRg/x7l1Lk
+          BxCgPfXGfXA5HA7nlRqwrXSWZvevft1oZYFmr7TQgmY0jiZxdJZO48lslS7T5YwGtANmaJZE8Tyg
+          FSiD7fRRt0YxGTLjBJeAXcLmmtGsZNJCQJ1w0vddlSVwR3RJFHPiGYh+EQUQyTowlmhFuG4aMMTV
+          QoWlkDviQFkhgTRGY8EJsBlZEwOM9/t3WgJvJTOk6BTbCW6JdW3RIQK8Qd4aiafWzjU2m04xM9Gm
+          mn50q7YpmIMCu5MoScNoEabx92ieJctsvphE0WKZxNimWW4dcy0SRrnUFncEtGm3UtgakBa6/rwh
+          myEWqsLi75y1rtZmoLhC0ArbbgSvGUhyOcGWEoHLDrO3T8xIoeyTwKyFny0o7mkrhbEOU6xETgQy
+          p1U/DW/sy3cKpxorXOeZ/aZ5DdYhizG5wTsZgW9Abrnww8jG6MqwXUCCQ2NAvsAv8kObJxLPzpJF
+          QO5u1/Tt4S04AL5kz6Ig1ydwv7ZgFchTrKwohAfI5H8HHPz1gIRcQoMi3YHqVXgD+AxKcCbJlaqE
+          AjxcVf9GzkMvcpyGkF/cXurvXyF/R3I9hP6wddNIAQXZ1J1FoQ5qkpr39Hh54EQUYa8wVTCDYkwO
+          804/1CFr/VYaRUkcLleLVRBHy1W4mM8jetqVy+O2I9UWuVd+L/x4HsZJ2At9i5fPj/DRTLVSBoMU
+          Pyoc4RQqLzR73IOtmc0NNBrfQ5suxz/e7WvHFOSw2zJTaf8N71F91CqBdoDc0vPtxeAd59PthScT
+          E4OF9AmMeicZg8FQhl7lE4OvjGVvL34d4tq7zD4/mM0YHjzHZ7zvYHK0nrFp70BjYjSiMe79yAf+
+          n3Dt/TJCQ1klabxIZ15GIFmDTpJb4FoV1tfTxdnbpz9Y+g/GngUAAA==
       headers:
         Access-Control-Allow-Headers:
           - origin, content-type, accept, x-requested-with
@@ -141,36 +185,165 @@ interactions:
           - POST, GET, OPTIONS, PUT, DELETE, PATCH
         Access-Control-Allow-Origin:
           - "*"
-        Connection:
-          - keep-alive
         Content-Encoding:
           - gzip
         Content-Length:
-          - "707"
+          - "724"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:29 GMT
+          - Mon, 11 Aug 2025 23:07:22 GMT
         Nel:
-          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
+          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168189&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=jvHe7mLcg0TdhFD7ncV2ILt8klA3O64V%2Fr0oqzgnbqc%3D"}]}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=0fQUj4u79VZaKOEm%2FDWxYU0NsO9QMZ%2BBagjVmE1BzAQ%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953642"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1733168189&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=jvHe7mLcg0TdhFD7ncV2ILt8klA3O64V%2Fr0oqzgnbqc%3D
+          - heroku-nel="https://nel.heroku.com/reports?s=0fQUj4u79VZaKOEm%2FDWxYU0NsO9QMZ%2BBagjVmE1BzAQ%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953642"
         Server:
-          - gunicorn
+          - Heroku
         Vary:
           - Accept-Encoding
         Via:
-          - 1.1 vegur
+          - 1.1 heroku-router
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "3966"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:23 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -180,15 +353,15 @@ interactions:
           "title": "Effect of native oxide layers on copper thin-film tensile properties:
           A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
           8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
-          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
-          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
-          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
-          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
-          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
-          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
-          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
-          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}], "matchScore":
-          283.47464}]}
+          {"url": "", "status": "CLOSED", "license": null}, "publicationTypes": null,
+          "publicationDate": "2015-12-21", "journal": {"name": "Journal of Applied Physics",
+          "pages": "235306", "volume": "118"}, "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n
+          author = {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied
+          Physics},\n pages = {235306},\n title = {Effect of native oxide layers on
+          copper thin-film tensile properties: A reactive molecular dynamics study},\n
+          volume = {118},\n year = {2015}\n}\n"}, "authors": [{"authorId": "9821934",
+          "name": "Michael Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}],
+          "matchScore": 286.13303}]}
 
           '
       headers:
@@ -197,177 +370,47 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1109"
+          - "1153"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:30 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Via:
-          - 1.1 fd0518257f901c4d9c7dc3b36830c8be.cloudfront.net (CloudFront)
+          - 1.1 6269ff653a8a0b71d436afa999909318.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - HSJoQyT_9oznW6T-xlgebcf7YpC2gPMNse_pbCXihztqahCYlKz7Gw==
+          - rQvyYLS5a_Rgii-spGrePZCIsAO2v-H89T7R7wrFODX-9RInDlGISg==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbZoFaUvHcEhcQ=
+          - PKeiqGrmvHcEaag=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1109"
+          - "1153"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:30 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 2c2e09cc-9716-4a51-9e02-6541f0d4c466
+          - 118a835a-b9b6-46ff-b7d3-f2dd3a3e189b
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&rows=1
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":12022430,"items":[{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
-          Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
-          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
-          layers are likely to be present on metallic nano-structures due to either
-          environmental exposure during use, or high temperature processing techniques
-          such as annealing. It is well known that nano-structured metals have vastly
-          different mechanical properties from bulk metals; however, difficulties in
-          modeling the transition between metallic and ionic bonding have prevented
-          the computational investigation of the effects of oxide surface layers. Newly
-          developed charge-optimized many body [Liang et al., Mater. Sci. Eng., R 74,
-          255 (2013)] potentials are used to perform fully reactive molecular dynamics
-          simulations which elucidate the effects that metal-oxide layers have on the
-          mechanical properties of a copper thin-film. Simulated tensile tests are performed
-          on thin-films while using different strain-rates, temperatures, and oxide
-          thicknesses to evaluate changes in yield stress, modulus, and failure mechanisms.
-          Findings indicate that copper-thin film mechanical properties are strongly
-          affected by native oxide layers. The formed oxide layers have an amorphous
-          structure with lower Cu-O bond-densities than bulk CuO, and a mixture of Cu2O
-          and CuO charge character. It is found that oxidation will cause modifications
-          to the strain response of the elastic modulii, producing a stiffened modulii
-          at low temperatures (&amp;lt;75\u2009K) and low strain values (&amp;lt;5%),
-          and a softened modulii at higher temperatures. While under strain, structural
-          reorganization within the oxide layers facilitates brittle yielding through
-          nucleation of defects across the oxide\/metal interface. The oxide-free copper
-          thin-film yielding mechanism is found to be a tensile-axis reorientation and
-          grain creation. The oxide layers change the observed yielding mechanism, allowing
-          for the inner copper thin-film to sustain an FCC-to-BCC transition during
-          yielding. The mechanical properties are fit to a thermodynamic model based
-          on classical nucleation theory. The fit implies that the oxidation of the
-          films reduces the activation volume for yielding.<\/jats:p>","DOI":"10.1063\/1.4938384","type":"journal-article","created":{"date-parts":[[2015,12,22]],"date-time":"2015-12-22T00:59:18Z","timestamp":1450745958000},"update-policy":"http:\/\/dx.doi.org\/10.1063\/aip-crossmark-policy-page","source":"Crossref","is-referenced-by-count":8,"title":["Effect
-          of native oxide layers on copper thin-film tensile properties: A reactive
-          molecular dynamics study"],"prefix":"10.1063","volume":"118","author":[{"given":"Michael
-          D.","family":"Skarlinski","sequence":"first","affiliation":[{"name":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"}]},{"given":"David
-          J.","family":"Quesnel","sequence":"additional","affiliation":[{"name":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"},{"name":"University
-          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
-          14627, USA"}]}],"member":"317","published-online":{"date-parts":[[2015,12,21]]},"reference":[{"key":"2023062402360541600_c1","doi-asserted-by":"publisher","first-page":"10973","DOI":"10.1021\/nn504883m","volume":"8","year":"2014","journal-title":"ACS
-          Nano"},{"key":"2023062402360541600_c2","volume-title":"Ultrathin Metal Transparent
-          Electrodes for the Optoelectronics Industry","year":"2013"},{"key":"2023062402360541600_c3","doi-asserted-by":"publisher","first-page":"2224","DOI":"10.1039\/b718768h","volume":"37","year":"2008","journal-title":"Chem.
-          Soc. Rev."},{"key":"2023062402360541600_c4","doi-asserted-by":"publisher","first-page":"3011","DOI":"10.1002\/adma.200501767","volume":"17","year":"2005","journal-title":"Adv.
-          Mater."},{"key":"2023062402360541600_c5","doi-asserted-by":"publisher","first-page":"4816","DOI":"10.1016\/j.actamat.2008.05.044","volume":"56","year":"2008","journal-title":"Acta
-          Mater."},{"key":"2023062402360541600_c6","doi-asserted-by":"publisher","first-page":"76","DOI":"10.1016\/j.commatsci.2014.02.014","volume":"87","year":"2014","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c7","doi-asserted-by":"publisher","first-page":"3032","DOI":"10.1016\/j.commatsci.2011.05.023","volume":"50","year":"2011","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c8","doi-asserted-by":"publisher","first-page":"319","DOI":"10.1016\/j.commatsci.2010.08.021","volume":"50","year":"2010","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c9","doi-asserted-by":"publisher","first-page":"140","DOI":"10.1016\/j.commatsci.2012.08.044","volume":"67","year":"2013","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c10","doi-asserted-by":"publisher","first-page":"093515","DOI":"10.1063\/1.3120916","volume":"105","year":"2009","journal-title":"J.
-          Appl. Phys."},{"key":"2023062402360541600_c11","doi-asserted-by":"publisher","first-page":"3151","DOI":"10.1021\/nl201233u","volume":"11","year":"2011","journal-title":"Nano
-          Lett."},{"key":"2023062402360541600_c12","doi-asserted-by":"publisher","first-page":"3048","DOI":"10.1021\/nl9015107","volume":"9","year":"2009","journal-title":"Nano
-          Lett."},{"key":"2023062402360541600_c13","doi-asserted-by":"publisher","first-page":"2318","DOI":"10.1016\/j.actamat.2008.01.027","volume":"56","year":"2008","journal-title":"Acta
-          Mater."},{"key":"2023062402360541600_c14","doi-asserted-by":"publisher","first-page":"241403","DOI":"10.1103\/PhysRevB.71.241403","volume":"71","year":"2005","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c15","doi-asserted-by":"publisher","first-page":"195429","DOI":"10.1103\/PhysRevB.77.195429","volume":"77","year":"2008","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c16","doi-asserted-by":"publisher","first-page":"3277","DOI":"10.1039\/c2jm13682a","volume":"22","year":"2012","journal-title":"J.
-          Mater. Chem."},{"key":"2023062402360541600_c17","doi-asserted-by":"publisher","first-page":"075413","DOI":"10.1103\/PhysRevB.70.075413","volume":"70","year":"2004","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c18","doi-asserted-by":"publisher","first-page":"163112","DOI":"10.1063\/1.2723654","volume":"90","year":"2007","journal-title":"Appl.
-          Phys. Lett."},{"key":"2023062402360541600_c19","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/ncomms1149","volume":"1","year":"2010","journal-title":"Nat.
-          Commun."},{"key":"2023062402360541600_c20","doi-asserted-by":"publisher","first-page":"085408","DOI":"10.1103\/PhysRevB.75.085408","volume":"75","year":"2007","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c21","doi-asserted-by":"publisher","first-page":"025502","DOI":"10.1103\/PhysRevLett.100.025502","volume":"100","year":"2008","journal-title":"Phys.
-          Rev. Lett."},{"key":"2023062402360541600_c22","doi-asserted-by":"publisher","first-page":"33","DOI":"10.1016\/j.ijplas.2013.04.002","volume":"52","year":"2014","journal-title":"Int.
-          J. Plast."},{"key":"2023062402360541600_c23","doi-asserted-by":"publisher","first-page":"035020","DOI":"10.1088\/2053-1591\/1\/3\/035020","volume":"1","year":"2014","journal-title":"Mater.
-          Res. Express"},{"key":"2023062402360541600_c24","doi-asserted-by":"publisher","first-page":"670","DOI":"10.1016\/j.jcrysgro.2005.11.111","volume":"289","year":"2006","journal-title":"J.
-          Cryst. Growth"},{"key":"2023062402360541600_c25","doi-asserted-by":"publisher","first-page":"62","DOI":"10.1016\/j.cplett.2004.10.005","volume":"399","year":"2004","journal-title":"Chem.
-          Phys. Lett."},{"key":"2023062402360541600_c26","doi-asserted-by":"publisher","first-page":"4040","DOI":"10.1016\/j.tsf.2007.12.159","volume":"516","year":"2008","journal-title":"Thin
-          Solid Films"},{"key":"2023062402360541600_c27","doi-asserted-by":"publisher","first-page":"085311","DOI":"10.1103\/PhysRevB.75.085311","volume":"75","year":"2007","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c28","doi-asserted-by":"publisher","first-page":"11996","DOI":"10.1103\/PhysRevB.50.11996","volume":"50","year":"1994","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c29","doi-asserted-by":"publisher","first-page":"4866","DOI":"10.1103\/PhysRevLett.82.4866","volume":"82","year":"1999","journal-title":"Phys.
-          Rev. Lett."},{"key":"2023062402360541600_c30","doi-asserted-by":"publisher","first-page":"9396","DOI":"10.1021\/jp004368u","volume":"105","year":"2001","journal-title":"J.
-          Phys. Chem. A."},{"key":"2023062402360541600_c31","doi-asserted-by":"publisher","first-page":"195408","DOI":"10.1103\/PhysRevB.78.195408","volume":"78","year":"2008","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c32","doi-asserted-by":"publisher","first-page":"123517","DOI":"10.1063\/1.2938022","volume":"103","year":"2008","journal-title":"J.
-          Appl. Phys."},{"key":"2023062402360541600_c33","doi-asserted-by":"publisher","first-page":"4073","DOI":"10.1080\/14786435.2011.598881","volume":"91","year":"2011","journal-title":"Philos.
-          Mag."},{"key":"2023062402360541600_c34","doi-asserted-by":"publisher","first-page":"051912","DOI":"10.1063\/1.4790181","volume":"102","year":"2013","journal-title":"Appl.
-          Phys. Lett."},{"key":"2023062402360541600_c35","doi-asserted-by":"publisher","first-page":"3959","DOI":"10.1038\/ncomms4959","volume":"5","year":"2014","journal-title":"Nat.
-          Commun."},{"key":"2023062402360541600_c36","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1006\/jcph.1995.1039","volume":"117","year":"1995","journal-title":"J.
-          Comput. Phys."},{"key":"2023062402360541600_c37","doi-asserted-by":"publisher","first-page":"125308","DOI":"10.1103\/PhysRevB.84.125308","volume":"84","year":"2011","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c38","doi-asserted-by":"publisher","first-page":"255","DOI":"10.1016\/j.mser.2013.07.001","volume":"74","year":"2013","journal-title":"Mater.
-          Sci. Eng., R"},{"key":"2023062402360541600_c39","doi-asserted-by":"publisher","first-page":"6141","DOI":"10.1063\/1.468398","volume":"101","year":"1994","journal-title":"J.
-          Chem. Phys."},{"key":"2023062402360541600_c40","doi-asserted-by":"publisher","first-page":"98","DOI":"10.1103\/PhysRev.159.98","volume":"159","year":"1967","journal-title":"Phys.
-          Rev."},{"key":"2023062402360541600_c41","doi-asserted-by":"publisher","first-page":"109","DOI":"10.1146\/annurev-matsci-071312-121610","volume":"43","year":"2013","journal-title":"Annu.
-          Rev. Mater. Res."},{"key":"2023062402360541600_c42","doi-asserted-by":"publisher","first-page":"4177","DOI":"10.1063\/1.467468","volume":"101","year":"1994","journal-title":"J.
-          Chem. Phys."},{"key":"2023062402360541600_c43","first-page":"35","volume":"3","year":"1969","journal-title":"ESAIM-Math.
-          Model. Num."},{"key":"2023062402360541600_c44","doi-asserted-by":"publisher","first-page":"11085","DOI":"10.1103\/PhysRevB.58.11085","volume":"58","year":"1998","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c45","doi-asserted-by":"publisher","first-page":"045021","DOI":"10.1088\/0965-0393\/20\/4\/045021","volume":"20","year":"2012","journal-title":"Modell.
-          Simul. Mater. Sci. Eng."},{"key":"2023062402360541600_c46","doi-asserted-by":"publisher","first-page":"015012","DOI":"10.1088\/0965-0393\/18\/1\/015012","volume":"18","year":"2010","journal-title":"Modell.
-          Simul. Mater. Sci. Eng."},{"key":"2023062402360541600_c47","doi-asserted-by":"publisher","first-page":"605","DOI":"10.1007\/s11669-005-0005-8","volume":"26","year":"2005","journal-title":"J.
-          Phase Equilib. Diffus."},{"key":"2023062402360541600_c48","doi-asserted-by":"publisher","first-page":"386","DOI":"10.1016\/j.electacta.2015.03.221","volume":"179","year":"2015","journal-title":"Electrochim.
-          Acta"},{"key":"2023062402360541600_c49","doi-asserted-by":"publisher","first-page":"1876","DOI":"10.1016\/j.actamat.2007.12.043","volume":"56","year":"2008","journal-title":"Acta
-          Mater."},{"key":"2023062402360541600_c50","doi-asserted-by":"publisher","first-page":"2237","DOI":"10.1016\/S0020-7403(01)00043-1","volume":"43","year":"2001","journal-title":"Int.
-          J. Mech. Sci."},{"key":"2023062402360541600_c51","doi-asserted-by":"publisher","first-page":"1723","DOI":"10.1080\/14786430802206482","volume":"88","year":"2008","journal-title":"Philos.
-          Mag."},{"key":"2023062402360541600_c52","doi-asserted-by":"publisher","first-page":"224106","DOI":"10.1103\/PhysRevB.63.224106","volume":"63","year":"2001","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c53","doi-asserted-by":"publisher","first-page":"136","DOI":"10.1080\/09500830802684114","volume":"89","year":"2009","journal-title":"Philos.
-          Mag. Lett."},{"key":"2023062402360541600_c54","doi-asserted-by":"publisher","first-page":"238","DOI":"10.1016\/S0921-5093(02)00708-6","volume":"350","year":"2003","journal-title":"Mater.
-          Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
-          Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
-          Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":64.01677,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      body: ""
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "3944"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:30 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1063%2F1.4938384/transform/application/x-bibtex
     response:
@@ -382,32 +425,28 @@ interactions:
 
           "
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 200

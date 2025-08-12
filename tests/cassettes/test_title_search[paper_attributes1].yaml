@@ -1,76 +1,128 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.openalex.org/works?filter=title.search:PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research
+      uri: https://api.unpaywall.org/v2/search?query=PaperQA%3A%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"meta":{"count":1,"db_response_time_ms":80,"page":1,"per_page":25,"groups_count":null},"results":[{"id":"https://openalex.org/W4389761608","doi":"https://doi.org/10.48550/arxiv.2312.07559","title":"PaperQA:
-          Retrieval-Augmented Generative Agent for Scientific Research","display_name":"PaperQA:
-          Retrieval-Augmented Generative Agent for Scientific Research","relevance_score":725.4885,"publication_year":2023,"publication_date":"2023-01-01","ids":{"openalex":"https://openalex.org/W4389761608","doi":"https://doi.org/10.48550/arxiv.2312.07559"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
-          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
-          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
-          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"type":"preprint","type_crossref":"posted-content","indexed_in":["arxiv","datacite"],"open_access":{"is_oa":true,"oa_status":"green","oa_url":"https://arxiv.org/abs/2312.07559","any_repository_has_fulltext":true},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5092171854","display_name":"Jakub
-          L\u00e1la","orcid":"https://orcid.org/0000-0002-5424-5260"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"L\u00e1la,
-          Jakub","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5050347345","display_name":"Odhran
-          O''Donoghue","orcid":"https://orcid.org/0000-0001-6507-8990"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"O''Donoghue,
-          Odhran","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5025880600","display_name":"Aleksandar
-          Shtedritski","orcid":null},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Shtedritski,
-          Aleksandar","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5101971357","display_name":"Sam
-          Cox","orcid":"https://orcid.org/0000-0002-4441-9327"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Cox,
-          Sam","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"middle","author":{"id":"https://openalex.org/A5061828831","display_name":"Samuel
-          G. Rodriques","orcid":"https://orcid.org/0000-0002-2509-0861"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"Rodriques,
-          Samuel G.","raw_affiliation_strings":[],"affiliations":[]},{"author_position":"last","author":{"id":"https://openalex.org/A5103115676","display_name":"Andrew
-          Dickson White","orcid":"https://orcid.org/0000-0002-6647-3965"},"institutions":[],"countries":[],"is_corresponding":false,"raw_author_name":"White,
-          Andrew D.","raw_affiliation_strings":[],"affiliations":[]}],"institution_assertions":[],"countries_distinct_count":0,"institutions_distinct_count":0,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":null,"has_fulltext":false,"cited_by_count":10,"citation_normalized_percentile":{"value":0.999951,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":96,"max":97},"biblio":{"volume":null,"issue":null,"first_page":null,"last_page":null},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T10028","display_name":"Natural
-          Language Processing","score":0.9996,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
-          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},"topics":[{"id":"https://openalex.org/T10028","display_name":"Natural
-          Language Processing","score":0.9996,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
-          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T10181","display_name":"Statistical
-          Machine Translation and Natural Language Processing","score":0.9921,"subfield":{"id":"https://openalex.org/subfields/1702","display_name":"Artificial
-          Intelligence"},"field":{"id":"https://openalex.org/fields/17","display_name":"Computer
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T11710","display_name":"Biomedical
-          Ontologies and Text Mining","score":0.9722,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/relevance","display_name":"Relevance
-          (law)","score":0.723972},{"id":"https://openalex.org/keywords/benchmark","display_name":"Benchmark
-          (surveying)","score":0.70765376},{"id":"https://openalex.org/keywords/information-retrieval","display_name":"Information
-          Retrieval","score":0.548857},{"id":"https://openalex.org/keywords/language-modeling","display_name":"Language
-          Modeling","score":0.522255},{"id":"https://openalex.org/keywords/word-representation","display_name":"Word
-          Representation","score":0.517701},{"id":"https://openalex.org/keywords/natural-language-processing","display_name":"Natural
-          Language Processing","score":0.501901},{"id":"https://openalex.org/keywords/topic-modeling","display_name":"Topic
-          Modeling","score":0.500368},{"id":"https://openalex.org/keywords/scientific-literature","display_name":"Scientific
-          literature","score":0.42651427}],"concepts":[{"id":"https://openalex.org/C158154518","wikidata":"https://www.wikidata.org/wiki/Q7310970","display_name":"Relevance
-          (law)","level":2,"score":0.723972},{"id":"https://openalex.org/C185798385","wikidata":"https://www.wikidata.org/wiki/Q1161707","display_name":"Benchmark
-          (surveying)","level":2,"score":0.70765376},{"id":"https://openalex.org/C41008148","wikidata":"https://www.wikidata.org/wiki/Q21198","display_name":"Computer
-          science","level":0,"score":0.7006018},{"id":"https://openalex.org/C44291984","wikidata":"https://www.wikidata.org/wiki/Q1074173","display_name":"Question
-          answering","level":2,"score":0.60793006},{"id":"https://openalex.org/C9652623","wikidata":"https://www.wikidata.org/wiki/Q190109","display_name":"Field
-          (mathematics)","level":2,"score":0.51713365},{"id":"https://openalex.org/C23123220","wikidata":"https://www.wikidata.org/wiki/Q816826","display_name":"Information
-          retrieval","level":1,"score":0.51568186},{"id":"https://openalex.org/C39890363","wikidata":"https://www.wikidata.org/wiki/Q36108","display_name":"Generative
-          grammar","level":2,"score":0.4766829},{"id":"https://openalex.org/C2522767166","wikidata":"https://www.wikidata.org/wiki/Q2374463","display_name":"Data
-          science","level":1,"score":0.4566322},{"id":"https://openalex.org/C2781083858","wikidata":"https://www.wikidata.org/wiki/Q17327049","display_name":"Scientific
-          literature","level":2,"score":0.42651427},{"id":"https://openalex.org/C154945302","wikidata":"https://www.wikidata.org/wiki/Q11660","display_name":"Artificial
-          intelligence","level":1,"score":0.26270974},{"id":"https://openalex.org/C17744445","wikidata":"https://www.wikidata.org/wiki/Q36442","display_name":"Political
-          science","level":0,"score":0.0},{"id":"https://openalex.org/C151730666","wikidata":"https://www.wikidata.org/wiki/Q7205","display_name":"Paleontology","level":1,"score":0.0},{"id":"https://openalex.org/C33923547","wikidata":"https://www.wikidata.org/wiki/Q395","display_name":"Mathematics","level":0,"score":0.0},{"id":"https://openalex.org/C13280743","wikidata":"https://www.wikidata.org/wiki/Q131089","display_name":"Geodesy","level":1,"score":0.0},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.0},{"id":"https://openalex.org/C202444582","wikidata":"https://www.wikidata.org/wiki/Q837863","display_name":"Pure
-          mathematics","level":1,"score":0.0},{"id":"https://openalex.org/C199539241","wikidata":"https://www.wikidata.org/wiki/Q7748","display_name":"Law","level":1,"score":0.0},{"id":"https://openalex.org/C205649164","wikidata":"https://www.wikidata.org/wiki/Q1071","display_name":"Geography","level":0,"score":0.0}],"mesh":[],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
-          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
-          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
-          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://api.datacite.org/dois/10.48550/arxiv.2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4393179698","display_name":"DataCite
-          API","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I4210145204","host_organization_name":"DataCite","host_organization_lineage":["https://openalex.org/I4210145204"],"host_organization_lineage_names":["DataCite"],"type":"metadata"},"license":null,"license_id":null,"version":null}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://arxiv.org/abs/2312.07559","pdf_url":null,"source":{"id":"https://openalex.org/S4306400194","display_name":"arXiv
-          (Cornell University)","issn_l":null,"issn":null,"is_oa":true,"is_in_doaj":false,"is_core":false,"host_organization":"https://openalex.org/I205783295","host_organization_name":"Cornell
-          University","host_organization_lineage":["https://openalex.org/I205783295"],"host_organization_lineage_names":["Cornell
-          University"],"type":"repository"},"license":"other-oa","license_id":"https://openalex.org/licenses/other-oa","version":"submittedVersion","is_accepted":false,"is_published":false},"sustainable_development_goals":[{"display_name":"Quality
-          education","score":0.86,"id":"https://metadata.un.org/sdg/4"}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":0,"referenced_works":[],"related_works":["https://openalex.org/W972276598","https://openalex.org/W4321353415","https://openalex.org/W2745001401","https://openalex.org/W2387743295","https://openalex.org/W2384605597","https://openalex.org/W2378211422","https://openalex.org/W2130974462","https://openalex.org/W2087343574","https://openalex.org/W2086519370","https://openalex.org/W2028665553"],"abstract_inverted_index":{"Large":[0],"Language":[1],"Models":[2],"(LLMs)":[3],"generalize":[4],"well":[5],"across":[6,79,152],"language":[7],"tasks,":[8],"but":[9],"suffer":[10],"from":[11,148],"hallucinations":[12,33],"and":[13,34,88,90,112,144],"uninterpretability,":[14],"making":[15],"it":[16,106],"difficult":[17],"to":[18,31,46,93,125],"assess":[19],"their":[20],"accuracy":[21],"without":[22],"ground-truth.":[23],"Retrieval-Augmented":[24],"Generation":[25],"(RAG)":[26],"models":[27,45],"have":[28],"been":[29],"proposed":[30],"reduce":[32],"provide":[35,94],"provenance":[36],"for":[37,64],"how":[38,126],"an":[39,73],"answer":[40],"was":[41],"generated.":[42],"Applying":[43],"such":[44],"the":[47,68,84,122,153],"scientific":[48,56,69,81,131,150],"literature":[49],"may":[50],"enable":[51],"large-scale,":[52],"systematic":[53],"processing":[54],"of":[55,86,109,146],"knowledge.":[57],"We":[58],"present":[59],"PaperQA,":[60],"a":[61,100,137],"RAG":[62,92],"agent":[63,74,98],"answering":[65,102],"questions":[66],"over":[67],"literature.":[70,154],"PaperQA":[71],"is":[72],"that":[75,141],"performs":[76],"information":[77,147],"retrieval":[78,143],"full-text":[80,149],"articles,":[82],"assesses":[83],"relevance":[85],"sources":[87],"passages,":[89],"uses":[91],"answers.":[95],"Viewing":[96],"this":[97],"as":[99],"question":[101],"model,":[103],"we":[104,133,156],"find":[105],"exceeds":[107],"performance":[108],"existing":[110],"LLMs":[111],"LLM":[113],"agents":[114],"on":[115,130,163],"current":[116],"science":[117],"QA":[118],"benchmarks.":[119],"To":[120],"push":[121],"field":[123],"closer":[124],"humans":[127],"perform":[128],"research":[129],"literature,":[132],"also":[134],"introduce":[135],"LitQA,":[136],"more":[138],"complex":[139],"benchmark":[140],"requires":[142],"synthesis":[145],"papers":[151],"Finally,":[155],"demonstrate":[157],"PaperQA''s":[158],"matches":[159],"expert":[160],"human":[161],"researchers":[162],"LitQA.":[164]},"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W4389761608","counts_by_year":[{"year":2024,"cited_by_count":8},{"year":2023,"cited_by_count":1}],"updated_date":"2024-11-17T20:34:48.228663","created_date":"2023-12-15"}],"group_by":[]}
+        string: '{"results":[],"elapsed_seconds":0.017}
 
           '
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Content-Length:
+          - "39"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:24 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+        Report-To:
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=8LYgfJX%2BG3oiVIkwP9OvW4M5fq%2BaGRoiaE0IylRExOA%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953644"}],"max_age":3600}'
+        Reporting-Endpoints:
+          - heroku-nel="https://nel.heroku.com/reports?s=8LYgfJX%2BG3oiVIkwP9OvW4M5fq%2BaGRoiaE0IylRExOA%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953644"
+        Server:
+          - Heroku
+        Via:
+          - 1.1 heroku-router
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.openalex.org/works?filter=title.search%3APaperQA%3A+Retrieval-Augmented+Generative+Agent+for+Scientific+Research
+    response:
+      body:
+        string: !!binary |
+          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
+          WjFjfAap3017ohawPCaYN3/5L4m41JckMwAA
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -88,21 +140,21 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "3487"
+          - "3390"
         Content-Security-Policy:
           - default-src 'self'; object-src 'none'
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168191&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=voCezOGfcA%2BpZtA0pQ8xmxehXw7u0GuZsZo1Usd1FUQ%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953644&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=nBO0V%2BFanUZuG2cxQUBusac7lo7PJOTX87p%2Fhg4edAo%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1733168191&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=voCezOGfcA%2BpZtA0pQ8xmxehXw7u0GuZsZo1Usd1FUQ%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953644&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=nBO0V%2BFanUZuG2cxQUBusac7lo7PJOTX87p%2Fhg4edAo%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -123,48 +175,20 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.unpaywall.org/v2/search?query=PaperQA:%20Retrieval-Augmented%20Generative%20Agent%20for%20Scientific%20Research&email=example@papercrow.ai
-    response:
-      body:
-        string: '{"elapsed_seconds":0.038,"results":[]}
-
-          '
+      body: ""
       headers:
-        Access-Control-Allow-Headers:
-          - origin, content-type, accept, x-requested-with
-        Access-Control-Allow-Methods:
-          - POST, GET, OPTIONS, PUT, DELETE, PATCH
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
           - keep-alive
-        Content-Length:
-          - "39"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
-        Nel:
-          - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
-        Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1733168191&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=amaDfjIUHQ8kon3Kkq6Ky1tetGeiggwyv09JT1WA51E%3D"}]}'
-        Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1733168191&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&s=amaDfjIUHQ8kon3Kkq6Ky1tetGeiggwyv09JT1WA51E%3D
-        Server:
-          - gunicorn
-        Via:
-          - 1.1 vegur
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA%3A+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -172,19 +196,20 @@ interactions:
           {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
           "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
           "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 38, "influentialCitationCount":
-          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
-          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
-          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
-          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
-          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
-          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
-          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
-          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
-          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
-          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}], "matchScore": 247.75336}]}
+          "venue": "arXiv.org", "year": 2023, "citationCount": 101, "influentialCitationCount":
+          1, "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
+          null}, "publicationTypes": ["JournalArticle"], "publicationDate": "2023-12-08",
+          "journal": {"name": "ArXiv", "volume": "abs/2312.07559"}, "citationStyles":
+          {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub L''ala and Odhran
+          O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel G. Rodriques
+          and Andrew D. White},\n booktitle = {arXiv.org},\n journal = {ArXiv},\n title
+          = {PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},\n
+          volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors": [{"authorId":
+          "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056", "name":
+          "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar Shtedritski"},
+          {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "2258964497",
+          "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name": "Andrew
+          D. White"}], "matchScore": 240.52074}]}
 
           '
       headers:
@@ -193,163 +218,161 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1386"
+          - "1427"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Via:
-          - 1.1 1401c4844b3ea759244fef5091fc307a.cloudfront.net (CloudFront)
+          - 1.1 6778e3146eb385e3772c8de867b2c290.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - g5qtBr5Pt2WSYiakHslP3mQOwUSbwOO74xzFE8cNAUVRPvBLz1AEsg==
+          - V0jLEGMnmMfsga20CXR6hjiESVyOVlXgEp_Z9AObeYkK-9d7BzRayQ==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbZ8GiIPHcEGeQ=
+          - PKei7GM0vHcEsAg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1386"
+          - "1427"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:31 GMT
+          - Mon, 11 Aug 2025 23:07:24 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 191cb665-c787-4cdf-b9c4-d583ce3ebc31
+          - 02ca5e6d-b3cd-4bde-8213-304721c61c02
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=PaperQA%3A+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2066122,"items":[{"indexed":{"date-parts":[[2024,3,8]],"date-time":"2024-03-08T00:26:06Z","timestamp":1709857566241},"reference-count":48,"publisher":"Oxford
-          University Press (OUP)","issue":"1","license":[{"start":{"date-parts":[[2024,2,21]],"date-time":"2024-02-21T00:00:00Z","timestamp":1708473600000},"content-version":"vor","delay-in-days":48,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0\/"}],"funder":[{"DOI":"10.13039\/100000092","name":"National
-          Library of Medicine","doi-asserted-by":"publisher","award":["R01LM009886","R01LM014344"],"id":[{"id":"10.13039\/100000092","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100006108","name":"National
-          Center for Advancing Translational Sciences","doi-asserted-by":"publisher","award":["UL1TR001873"],"id":[{"id":"10.13039\/100006108","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000002","name":"National
-          Institutes of Health","doi-asserted-by":"publisher","id":[{"id":"10.13039\/100000002","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":[],"crossmark-restriction":false},"published-print":{"date-parts":[[2024,1,4]]},"abstract":"<jats:title>Abstract<\/jats:title>\n               <jats:sec>\n                  <jats:title>Objective<\/jats:title>\n                  <jats:p>To
-          automate scientific claim verification using PubMed abstracts.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Materials
-          and Methods<\/jats:title>\n                  <jats:p>We developed CliVER,
-          an end-to-end scientific Claim VERification system that leverages retrieval-augmented
-          techniques to automatically retrieve relevant clinical trial abstracts, extract
-          pertinent sentences, and use the PICO framework to support or refute a scientific
-          claim. We also created an ensemble of three state-of-the-art deep learning
-          models to classify rationale of support, refute, and neutral. We then constructed
-          CoVERt, a new COVID VERification dataset comprising 15 PICO-encoded drug claims
-          accompanied by 96 manually selected and labeled clinical trial abstracts that
-          either support or refute each claim. We used CoVERt and SciFact (a public
-          scientific claim verification dataset) to assess CliVER\u2019s performance
-          in predicting labels. Finally, we compared CliVER to clinicians in the verification
-          of 19 claims from 6 disease domains, using 189\u00a0648 PubMed abstracts extracted
-          from January 2010 to October 2021.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Results<\/jats:title>\n                  <jats:p>In
-          the evaluation of label prediction accuracy on CoVERt, CliVER achieved a notable
-          F1 score of 0.92, highlighting the efficacy of the retrieval-augmented models.
-          The ensemble model outperforms each individual state-of-the-art model by an
-          absolute increase from 3% to 11% in the F1 score. Moreover, when compared
-          with four clinicians, CliVER achieved a precision of 79.0% for abstract retrieval,
-          67.4% for sentence selection, and 63.2% for label prediction, respectively.<\/jats:p>\n               <\/jats:sec>\n               <jats:sec>\n                  <jats:title>Conclusion<\/jats:title>\n                  <jats:p>CliVER
-          demonstrates its early potential to automate scientific claim verification
-          using retrieval-augmented strategies to harness the wealth of clinical trial
-          abstracts in PubMed. Future studies are warranted to further test its clinical
-          utility.<\/jats:p>\n               <\/jats:sec>","DOI":"10.1093\/jamiaopen\/ooae021","type":"journal-article","created":{"date-parts":[[2024,2,22]],"date-time":"2024-02-22T01:48:17Z","timestamp":1708566497000},"source":"Crossref","is-referenced-by-count":0,"title":["Retrieval
-          augmented scientific claim verification"],"prefix":"10.1093","volume":"7","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-1975-1272","authenticated-orcid":false,"given":"Hao","family":"Liu","sequence":"first","affiliation":[{"name":"School
-          of Computing, Montclair State University , Montclair, NJ 07043, United States"}]},{"given":"Ali","family":"Soroush","sequence":"additional","affiliation":[{"name":"Department
-          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0003-1418-3103","authenticated-orcid":false,"given":"Jordan
-          G","family":"Nestor","sequence":"additional","affiliation":[{"name":"Department
-          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"given":"Elizabeth","family":"Park","sequence":"additional","affiliation":[{"name":"Department
-          of Medicine, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-4318-5987","authenticated-orcid":false,"given":"Betina","family":"Idnay","sequence":"additional","affiliation":[{"name":"Department
-          of Biomedical Informatics, Columbia University , New York, NY 10027, United
-          States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0002-2681-1931","authenticated-orcid":false,"given":"Yilu","family":"Fang","sequence":"additional","affiliation":[{"name":"Department
-          of Biomedical Informatics, Columbia University , New York, NY 10027, United
-          States"}]},{"given":"Jane","family":"Pan","sequence":"additional","affiliation":[{"name":"Department
-          of Applied Physics and Applied Mathematics, Columbia University , New York,
-          NY 10027, United States"}]},{"given":"Stan","family":"Liao","sequence":"additional","affiliation":[{"name":"Department
-          of Applied Physics and Applied Mathematics, Columbia University , New York,
-          NY 10027, United States"}]},{"given":"Marguerite","family":"Bernard","sequence":"additional","affiliation":[{"name":"Institute
-          of Human Nutrition, Columbia University , New York, NY 10027, United States"}]},{"ORCID":"http:\/\/orcid.org\/0000-0001-9309-8331","authenticated-orcid":false,"given":"Yifan","family":"Peng","sequence":"additional","affiliation":[{"name":"Department
-          of Population Health Sciences, Weill Cornell Medicine , New York, NY 10065,
-          United States"}]},{"given":"Chunhua","family":"Weng","sequence":"additional","affiliation":[{"name":"Department
-          of Biomedical Informatics, Columbia University , New York, NY 10027, United
-          States"}]}],"member":"286","published-online":{"date-parts":[[2024,2,21]]},"reference":[{"issue":"6","key":"2024030720490192400_ooae021-B1","doi-asserted-by":"crossref","first-page":"1192","DOI":"10.1093\/jamia\/ocx050","article-title":"Evidence
-          appraisal: a scoping review, conceptual framework, and research agenda","volume":"24","author":"Goldstein","year":"2017","journal-title":"J
-          Am Med Inform Assoc"},{"issue":"D1","key":"2024030720490192400_ooae021-B2","doi-asserted-by":"crossref","first-page":"D1534","DOI":"10.1093\/nar\/gkaa952","article-title":"LitCovid:
-          an open database of COVID-19 literature","volume":"49","author":"Chen","year":"2021","journal-title":"Nucleic
-          Acids Res"},{"key":"2024030720490192400_ooae021-B3","author":"Medicine NLo"},{"issue":"1","key":"2024030720490192400_ooae021-B4","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1038\/s41591-020-01203-7","article-title":"Automated
-          screening of COVID-19 preprints: can we help authors to improve transparency
-          and reproducibility?","volume":"27","author":"Weissgerber","year":"2021","journal-title":"Nat
-          Med"},{"issue":"2","key":"2024030720490192400_ooae021-B5","doi-asserted-by":"crossref","first-page":"218","DOI":"10.1001\/jama.294.2.218","article-title":"Contradicted
-          and initially stronger effects in highly cited clinical research","volume":"294","author":"Ioannidis","year":"2005","journal-title":"JAMA"},{"issue":"1","key":"2024030720490192400_ooae021-B6","doi-asserted-by":"crossref","first-page":"63","DOI":"10.1162\/coli.2007.33.1.63","article-title":"Answering
-          clinical questions with knowledge-based and statistical techniques","volume":"33","author":"Demner-Fushman","year":"2007","journal-title":"Comput
-          Linguist"},{"issue":"6","key":"2024030720490192400_ooae021-B7","doi-asserted-by":"crossref","first-page":"772","DOI":"10.1197\/jamia.M2407","article-title":"Knowledge-based
-          methods to help clinicians find answers in MEDLINE","volume":"14","author":"Sneiderman","year":"2007","journal-title":"J
-          Am Med Inform Assoc"},{"issue":"5","key":"2024030720490192400_ooae021-B8","doi-asserted-by":"crossref","first-page":"232","DOI":"10.1186\/cc5045","article-title":"Evidence-based
-          medicine: classifying the evidence from clinical trials\u2013the need to consider
-          other dimensions","volume":"10","author":"Bellomo","year":"2006","journal-title":"Crit
-          Care"},{"issue":"1","key":"2024030720490192400_ooae021-B9","doi-asserted-by":"crossref","first-page":"6","DOI":"10.1002\/clc.4960220106","article-title":"The
-          importance of randomized clinical trials and evidence-based medicine: a clinician''s
-          perspective","volume":"22","author":"Kennedy","year":"1999","journal-title":"Clin
-          Cardiol"},{"key":"2024030720490192400_ooae021-B10","first-page":"493","author":"Hanselowski","year":"2019"},{"key":"2024030720490192400_ooae021-B11","first-page":"809","author":"Thorne","year":"2018"},{"key":"2024030720490192400_ooae021-B12","first-page":"7534","author":"Wadden","year":"2020"},{"key":"2024030720490192400_ooae021-B13","first-page":"94","author":"Pradeep","year":"2021"},{"key":"2024030720490192400_ooae021-B14","first-page":"5485","article-title":"Exploring
-          the limits of transfer learning with a unified text-to-text transformer","volume":"140","author":"Raffel","year":"2020","journal-title":"J.
-          Mach. Learn. Res"},{"key":"2024030720490192400_ooae021-B15","author":"Li","year":"2021"},{"key":"2024030720490192400_ooae021-B16","first-page":"61","author":"Wadden","year":"2022"},{"key":"2024030720490192400_ooae021-B17","author":"Beltagy","year":"2020"},{"issue":"7256","key":"2024030720490192400_ooae021-B18","doi-asserted-by":"crossref","first-page":"255","DOI":"10.1136\/bmj.321.7256.255","article-title":"Which
-          clinical studies provide the best evidence?: the best RCT still trumps the
-          best observational study","volume":"321","author":"Barton","year":"2000","journal-title":"BMJ"},{"key":"2024030720490192400_ooae021-B19","doi-asserted-by":"crossref","first-page":"103717","DOI":"10.1016\/j.jbi.2021.103717","article-title":"Toward
-          assessing clinical trial publications for reporting transparency","volume":"116","author":"Kilicoglu","year":"2021","journal-title":"J
-          Biomed Inform"},{"key":"2024030720490192400_ooae021-B20","first-page":"1253","author":"Yang","year":"2017"},{"key":"2024030720490192400_ooae021-B21","first-page":"39","author":"Khattab","year":"2020"},{"key":"2024030720490192400_ooae021-B22","first-page":"19","author":"Yilmaz","year":"2019"},{"key":"2024030720490192400_ooae021-B23","author":"Kuzi","year":"2020"},{"key":"2024030720490192400_ooae021-B24","volume-title":"The
-          Probabilistic Relevance Framework: BM25 and Beyond","author":"Robertson","year":"2009"},{"key":"2024030720490192400_ooae021-B25","first-page":"105","author":"Wang","year":"2011"},{"key":"2024030720490192400_ooae021-B26","first-page":"7740","author":"Kotonya","year":"2020"},{"issue":"1","key":"2024030720490192400_ooae021-B27","doi-asserted-by":"crossref","first-page":"36","DOI":"10.1186\/s13326-016-0083-z","article-title":"A
-          corpus of potentially contradictory research claims from cardiovascular research
-          abstracts","volume":"7","author":"Alamri","year":"2016","journal-title":"J
-          Biomed Semantics"},{"key":"2024030720490192400_ooae021-B28","first-page":"3499","author":"Sarrouti","year":"2021"},{"issue":"9","key":"2024030720490192400_ooae021-B29","doi-asserted-by":"crossref","first-page":"1431","DOI":"10.1093\/jamia\/ocaa091","article-title":"TREC-COVID:
-          rationale and structure of an information retrieval shared task for COVID-19","volume":"27","author":"Roberts","year":"2020","journal-title":"J
-          Am Med Inform Assoc"},{"key":"2024030720490192400_ooae021-B30","author":"Wang","year":"2020"},{"key":"2024030720490192400_ooae021-B31","first-page":"2116","author":"Saakyan","year":"2021"},{"key":"2024030720490192400_ooae021-B32","first-page":"359","author":"Huang","year":"2006"},{"key":"2024030720490192400_ooae021-B33","first-page":"708","author":"Nogueira","year":"2020"},{"key":"2024030720490192400_ooae021-B34","doi-asserted-by":"crossref","first-page":"baw065","DOI":"10.1093\/database\/baw065","article-title":"Mining
-          chemical patents with an ensemble of open systems","volume":"2016","author":"Leaman","year":"2016","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B35","doi-asserted-by":"crossref","first-page":"bay073","DOI":"10.1093\/database\/bay073","article-title":"Extracting
-          chemical\u2013protein relations with ensembles of SVM and deep learning models","volume":"2018","author":"Peng","year":"2018","journal-title":"Database"},{"key":"2024030720490192400_ooae021-B36","author":"Liu","year":"2019"},{"issue":"1","key":"2024030720490192400_ooae021-B37","doi-asserted-by":"crossref","first-page":"1","DOI":"10.1145\/3458754","article-title":"Domain-specific
-          language model pretraining for biomedical natural language processing","volume":"3","author":"Gu","year":"2021","journal-title":"ACM
-          Trans Comput Healthc"},{"issue":"3","key":"2024030720490192400_ooae021-B38","doi-asserted-by":"crossref","first-page":"A12","DOI":"10.7326\/ACPJC-1995-123-3-A12","article-title":"The
-          well-built clinical question: a key to evidence-based decisions","volume":"123","author":"Richardson","year":"1995","journal-title":"ACP
-          J Club"},{"key":"2024030720490192400_ooae021-B39","first-page":"1971","author":"Lee","year":"2021"},{"key":"2024030720490192400_ooae021-B40","author":"Loshchilov","year":"2019"},{"key":"2024030720490192400_ooae021-B41","first-page":"13","author":"Kingma","year":"2015"},{"key":"2024030720490192400_ooae021-B42","first-page":"38","author":"Wolf","year":"2020"},{"key":"2024030720490192400_ooae021-B43","first-page":"2356","author":"Lin","year":"2021"},{"key":"2024030720490192400_ooae021-B44","first-page":"243","author":"J\u00e4rvelin","year":"2017"},{"issue":"4","key":"2024030720490192400_ooae021-B45","doi-asserted-by":"crossref","first-page":"422","DOI":"10.1145\/582415.582418","article-title":"Cumulated
-          gain-based evaluation of IR techniques","volume":"20","author":"J\u00e4rvelin","year":"2002","journal-title":"ACM
-          Trans Inf Syst"},{"key":"2024030720490192400_ooae021-B46","volume-title":"Evidence-Based
-          Practice in Nursing & Healthcare: A Guide to Best Practice","author":"Melnyk","year":"2022"},{"key":"2024030720490192400_ooae021-B47","first-page":"206","author":"Gupta","year":"2017"},{"key":"2024030720490192400_ooae021-B48","first-page":"1","author":"Park","year":"2012"}],"container-title":["JAMIA
-          Open"],"language":"en","link":[{"URL":"https:\/\/academic.oup.com\/jamiaopen\/advance-article-pdf\/doi\/10.1093\/jamiaopen\/ooae021\/56732770\/ooae021.pdf","content-type":"application\/pdf","content-version":"am","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article-pdf\/7\/1\/ooae021\/56904263\/ooae021.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,3,7]],"date-time":"2024-03-07T20:49:23Z","timestamp":1709844563000},"score":27.892555,"resource":{"primary":{"URL":"https:\/\/academic.oup.com\/jamiaopen\/article\/doi\/10.1093\/jamiaopen\/ooae021\/7612234"}},"issued":{"date-parts":[[2024,1,4]]},"references-count":48,"journal-issue":{"issue":"1","published-print":{"date-parts":[[2024,1,4]]}},"URL":"http:\/\/dx.doi.org\/10.1093\/jamiaopen\/ooae021","ISSN":["2574-2531"],"issn-type":[{"value":"2574-2531","type":"electronic"}],"published-other":{"date-parts":[[2024,4,1]]},"published":{"date-parts":[[2024,1,4]]}}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+        string: !!binary |
+          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
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "4502"
+          - "4536"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:32 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 200

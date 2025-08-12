@@ -1,9 +1,214 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.04.01.587366?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
+    response:
+      body:
+        string:
+          '{"error":"Paper with id DOI:10.1101/2024.04.01.587366 not found"}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "66"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        Via:
+          - 1.1 9a448e42428e8683fe0fc64dff7a7112.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - _yzDKUNmFWLxS7G1feOPkfkVEJn0G70AY6KtOrJLOqMPHUv1hVgMvQ==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Error from cloudfront
+        x-amz-apigw-id:
+          - PKejGEjivHcEaTQ=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "66"
+        x-amzn-Remapped-Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - c52c2e22-6e82-44fc-92c7-b6a87fa101b7
+      status:
+        code: 404
+        message: Not Found
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1063/1.4938384?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
+    response:
+      body:
+        string:
+          '{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
+          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
+          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
+          "title": "Effect of native oxide layers on copper thin-film tensile properties:
+          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
+          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
+          {"url": "", "status": "CLOSED", "license": null}, "publicationTypes": null,
+          "publicationDate": "2015-12-21", "journal": {"name": "Journal of Applied Physics",
+          "pages": "235306", "volume": "118"}, "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n
+          author = {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied
+          Physics},\n pages = {235306},\n title = {Effect of native oxide layers on
+          copper thin-film tensile properties: A reactive molecular dynamics study},\n
+          volume = {118},\n year = {2015}\n}\n"}, "authors": [{"authorId": "9821934",
+          "name": "Michael Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1116"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        Via:
+          - 1.1 0cb53c06b4d3d66446893feb6331dc78.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - cvoHhTGlsATbgtWHYjz52TOrikem0Uuv5ireKYQsNGB_eJJdanwBzA==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - PKejGG1xvHcEDGA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1116"
+        x-amzn-Remapped-Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 84c9518c-f1dd-4c80-81ae-b987c7d9a5cb
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.48550/arxiv.2312.07559?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
+    response:
+      body:
+        string:
+          '{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
+          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
+          "venue": "arXiv.org", "year": 2023, "citationCount": 101, "influentialCitationCount":
+          1, "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
+          null}, "publicationTypes": ["JournalArticle"], "publicationDate": "2023-12-08",
+          "journal": {"name": "ArXiv", "volume": "abs/2312.07559"}, "citationStyles":
+          {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub L''ala and Odhran
+          O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel G. Rodriques
+          and Andrew D. White},\n booktitle = {arXiv.org},\n journal = {ArXiv},\n title
+          = {PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},\n
+          volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors": [{"authorId":
+          "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056", "name":
+          "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar Shtedritski"},
+          {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "2258964497",
+          "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name": "Andrew
+          D. White"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1390"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        Via:
+          - 1.1 b0797f10be715dcb685d992d17347df4.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - yBDemHkREAkLVt-sbcWRya0cL3E63XJzEZ0-meo-nF7AYTDDMhFD2A==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - PKejGEG4PHcEMcg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1390"
+        x-amzn-Remapped-Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - e0b12a85-e4c9-4634-9903-2393d502c110
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -14,18 +219,18 @@ interactions:
           and histidine residue in electron transfer for iodide oxidation by horseradish
           peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
           "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
-          "openAccessPdf": null, "publicationTypes": ["JournalArticle", "Study"], "publicationDate":
-          "2001-02-01", "journal": {"name": "Molecular and Cellular Biochemistry", "pages":
-          "1-11", "volume": "218"}, "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n
-          author = {S. Adak and D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n
-          booktitle = {Molecular and Cellular Biochemistry},\n journal = {Molecular
-          and Cellular Biochemistry},\n pages = {1-11},\n title = {An essential role
-          of active site arginine residue in iodide binding and histidine residue in
-          electron transfer for iodide oxidation by horseradish peroxidase},\n volume
-          = {218},\n year = {2001}\n}\n"}, "authors": [{"authorId": "1940081", "name":
-          "S. Adak"}, {"authorId": "1701389", "name": "D. Bandyopadhyay"}, {"authorId":
-          "5343877", "name": "U. Bandyopadhyay"}, {"authorId": "32656528", "name": "R.
-          Banerjee"}]}
+          "openAccessPdf": {"url": "", "status": "CLOSED", "license": null}, "publicationTypes":
+          ["JournalArticle", "Study"], "publicationDate": "2001-02-01", "journal": {"name":
+          "Molecular and Cellular Biochemistry", "pages": "1-11", "volume": "218"},
+          "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n author = {S. Adak and
+          D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n booktitle = {Molecular
+          and Cellular Biochemistry},\n journal = {Molecular and Cellular Biochemistry},\n
+          pages = {1-11},\n title = {An essential role of active site arginine residue
+          in iodide binding and histidine residue in electron transfer for iodide oxidation
+          by horseradish peroxidase},\n volume = {218},\n year = {2001}\n}\n"}, "authors":
+          [{"authorId": "1940081", "name": "S. Adak"}, {"authorId": "1701389", "name":
+          "D. Bandyopadhyay"}, {"authorId": "5343877", "name": "U. Bandyopadhyay"},
+          {"authorId": "32656528", "name": "R. Banerjee"}]}
 
           '
       headers:
@@ -34,59 +239,62 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1446"
+          - "1490"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Via:
-          - 1.1 a2df2413207d4bf6462c2592b304bffe.cloudfront.net (CloudFront)
+          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - NEut-36VxSMoPxHlUIhVYjmEyhXH8sGrw5b7AhQSivFxVoptvst0zQ==
+          - QxP4mLK5pkzsTGyj_YobbbKxwAbifYgWfNccK_TTmmccLHUriTwGMg==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbaUG-OPHcEPHQ=
+          - PKejGGLSvHcEgng=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1446"
+          - "1490"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:25 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 6b0b285e-d39c-49fb-abd1-9a7463a0a30f
+          - c4ad4e2e-89fb-4f8b-a5eb-4039dc15279a
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.48550/arxiv.2312.07559?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
-          '{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
-          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
-          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
-          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 38, "influentialCitationCount":
-          1, "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-12-08", "journal": {"name": "ArXiv", "volume": "abs/2312.07559"},
-          "citationStyles": {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub
-          L''ala and Odhran O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel
-          G. Rodriques and Andrew D. White},\n booktitle = {arXiv.org},\n journal =
-          {ArXiv},\n title = {PaperQA: Retrieval-Augmented Generative Agent for Scientific
-          Research},\n volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors":
-          [{"authorId": "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056",
-          "name": "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar
-          Shtedritski"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId":
-          "2258964497", "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name":
-          "Andrew D. White"}]}
+          '{"paperId": "e0d2719e49ad216f98ed640864cdacd1c20f53e6", "externalIds":
+          {"DOI": "10.1007/s40278-023-41815-2", "CorpusId": 259225376}, "url": "https://www.semanticscholar.org/paper/e0d2719e49ad216f98ed640864cdacd1c20f53e6",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
+          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
+          "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
+          null}, "publicationTypes": ["JournalArticle"], "publicationDate": "2023-06-01",
+          "journal": {"name": "Reactions Weekly", "pages": "145 - 145", "volume": "1962"},
+          "citationStyles": {"bibtex": "@Article{None,\n booktitle = {Reactions weekly},\n
+          journal = {Reactions Weekly},\n pages = {145 - 145},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
+          volume = {1962},\n year = {2023}\n}\n"}, "authors": []}
 
           '
       headers:
@@ -95,97 +303,49 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1349"
+          - "877"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Via:
-          - 1.1 edc643c7c426bec36e205453aa531064.cloudfront.net (CloudFront)
+          - 1.1 29474fd3a24c6552dfdc04ee03c03aa2.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - BJMVtl0bQexs_8MKzynDoISVeAOY6Dmjh42kOeiI0CVG7oiOvkvyIg==
+          - ioTElJlKozB2V8lzgJuN-gAzK89KXZSjKGVodFZ3HHHlyK4ME4r12Q==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbaUEVuvHcEuoQ=
+          - PKejGHB8vHcEaag=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1349"
+          - "877"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:25 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 281bb9f2-8f8b-4d79-b0a4-ed211de711de
+          - e7a5dd0f-fe81-43f2-aca4-fdbf74ad60ac
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1063/1.4938384?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
-          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
-          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
-          "title": "Effect of native oxide layers on copper thin-film tensile properties:
-          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
-          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
-          null, "publicationTypes": null, "publicationDate": "2015-12-21", "journal":
-          {"name": "Journal of Applied Physics", "pages": "235306", "volume": "118"},
-          "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n author =
-          {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied Physics},\n
-          pages = {235306},\n title = {Effect of native oxide layers on copper thin-film
-          tensile properties: A reactive molecular dynamics study},\n volume = {118},\n
-          year = {2015}\n}\n"}, "authors": [{"authorId": "9821934", "name": "Michael
-          Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}]}
-
-          '
+      body: ""
       headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
           - keep-alive
-        Content-Length:
-          - "1072"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Via:
-          - 1.1 d52f5364539f50d2591f4996970cf25e.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - Y99gR9VYT8YWDUqh7L4bEVoAf4MH3DGZEt2MVYrjdacWp1jFE_qXwQ==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - CLbaUEIFvHcEcAQ=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1072"
-        x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - bf5034e9-ea26-4682-86de-f3d91b081c32
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1038/s42256-024-00832-8?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1038/s42256-024-00832-8?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -194,11 +354,11 @@ interactions:
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
           "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 230, "influentialCitationCount":
-          12, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
-          "status": "HYBRID"}, "publicationTypes": ["JournalArticle"], "publicationDate":
-          "2023-04-11", "journal": {"name": "Nature Machine Intelligence", "pages":
-          "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 457, "influentialCitationCount":
+          19, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "status": "HYBRID", "license": "CCBY"}, "publicationTypes": ["JournalArticle"],
+          "publicationDate": "2023-04-11", "journal": {"name": "Nature Machine Intelligence",
+          "pages": "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
           author = {Andr\u00e9s M Bran and Sam Cox and Oliver Schilter and Carlo Baldassari
           and Andrew D. White and P. Schwaller},\n booktitle = {Nat. Mac. Intell.},\n
           journal = {Nature Machine Intelligence},\n pages = {525 - 535},\n title =
@@ -216,929 +376,775 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "1514"
+          - "1533"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Via:
-          - 1.1 6cbbecc3198d4b8fe84dc82e5f121ae6.cloudfront.net (CloudFront)
+          - 1.1 edc643c7c426bec36e205453aa531064.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - TzSN9WnJ59KrmMqUwS_O-d5TqAlrV10i-_UeJ0tN_aRbs1hLHgdnbg==
+          - ca_kBPjGPxghdf9S3owdbG85DFXuLwA1WLDnUICAJ70lIt_PdC6IBA==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbaUHWiPHcEgnQ=
+          - PKejGEPLvHcEKmg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
-          - "1514"
+          - "1533"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:25 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 1f87b5fc-c926-44f6-87d9-33160b476857
+          - 7676291f-322d-4d8c-babb-89c8ddf38687
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1101/2024.04.01.587366?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.crossref.org/works/10.1063%2F1.4938384?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"paperId": "7e5d4466c8b85f93775fe183e1a318a3e65ac8e4", "externalIds":
-          {"DOI": "10.1101/2024.04.01.587366", "CorpusId": 268890006}, "url": "https://www.semanticscholar.org/paper/7e5d4466c8b85f93775fe183e1a318a3e65ac8e4",
-          "title": "High-throughput screening of human genetic variants by pooled prime
-          editing", "venue": "bioRxiv", "year": 2024, "citationCount": 1, "influentialCitationCount":
-          0, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.biorxiv.org/content/biorxiv/early/2024/04/01/2024.04.01.587366.full.pdf",
-          "status": "GREEN"}, "publicationTypes": null, "publicationDate": "2024-04-01",
-          "journal": {"name": "bioRxiv"}, "citationStyles": {"bibtex": "@Article{Herger2024HighthroughputSO,\n
-          author = {Michael Herger and Christina M. Kajba and Megan Buckley and Ana
-          Cunha and Molly Strom and Gregory M. Findlay},\n booktitle = {bioRxiv},\n
-          journal = {bioRxiv},\n title = {High-throughput screening of human genetic
-          variants by pooled prime editing},\n year = {2024}\n}\n"}, "authors": [{"authorId":
-          "2294884120", "name": "Michael Herger"}, {"authorId": "2163800172", "name":
-          "Christina M. Kajba"}, {"authorId": "2120283350", "name": "Megan Buckley"},
-          {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId": "2294881320",
-          "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory M. Findlay"}]}
-
-          '
+        string: !!binary |
+          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
       headers:
-        Access-Control-Allow-Origin:
-          - "*"
         Connection:
           - keep-alive
         Content-Length:
-          - "1325"
+          - "3933"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Via:
-          - 1.1 fd0518257f901c4d9c7dc3b36830c8be.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - OiVBx8zA1SoYaeKV8uM9KIWQtn1bc__J-2pkQFwN4v_PQkI2iRLUhw==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - CLbaUFMZPHcEBPw=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1325"
-        x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 8d517af7-efcb-455b-abc6-2ded172a57a8
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"paperId": "e0d2719e49ad216f98ed640864cdacd1c20f53e6", "externalIds":
-          {"DOI": "10.1007/s40278-023-41815-2", "CorpusId": 259225376}, "url": "https://www.semanticscholar.org/paper/e0d2719e49ad216f98ed640864cdacd1c20f53e6",
-          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
-          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
-          "isOpenAccess": false, "openAccessPdf": null, "publicationTypes": ["JournalArticle"],
-          "publicationDate": "2023-06-01", "journal": {"name": "Reactions Weekly", "pages":
-          "145 - 145", "volume": "1962"}, "citationStyles": {"bibtex": "@Article{None,\n
-          booktitle = {Reactions weekly},\n journal = {Reactions Weekly},\n pages =
-          {145 - 145},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
-          volume = {1962},\n year = {2023}\n}\n"}, "authors": []}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "837"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Via:
-          - 1.1 05704fecd1992557082ae04fd0558b5e.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - c6hk0wGttCBqK4PnVzZtzYAfGyVXG7WoDBAyCXeJjbfWURuATCcvbg==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - CLbaUF0JvHcEQQg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "837"
-        x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - eaca2b8d-d07e-4517-a6f6-83cffee25e3c
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.48550%2Farxiv.2312.07559?mailto=example@papercrow.ai
-    response:
-      body:
-        string: Resource not found.
-      headers:
-        Access-Control-Allow-Headers:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        access-control-allow-headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
             Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
+        access-control-allow-origin:
           - "*"
-        Access-Control-Expose-Headers:
+        access-control-expose-headers:
           - Link
-        Connection:
-          - close
-        Content-Type:
-          - text/plain
-        Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2Farxiv.2312.07559?mailto=example%40papercrow.ai
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Connection:
+          - keep-alive
+        Content-Type:
+          - text/plain
+        Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        Transfer-Encoding:
+          - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
           - 1s
-        x-ratelimit-limit:
+        x-rate-limit-limit:
           - "150"
       status:
         code: 404
         message: Not Found
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"institution":[{"name":"bioRxiv"}],"indexed":{"date-parts":[[2024,11,19]],"date-time":"2024-11-19T19:09:55Z","timestamp":1732043395754},"posted":{"date-parts":[[2024,4,1]]},"group-title":"Genomics","reference-count":50,"publisher":"Cold
-          Spring Harbor Laboratory","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"accepted":{"date-parts":[[2024,4,1]]},"abstract":"<jats:title>ABSTRACT<\/jats:title><jats:p>Understanding
-          the effects of rare genetic variants remains challenging, both in coding and
-          non-coding regions. While multiplexed assays of variant effect (MAVEs) have
-          enabled scalable functional assessment of variants, established MAVEs are
-          limited by either exogenous expression of variants or constraints of genome
-          editing. Here, we introduce a pooled prime editing (PE) platform in haploid
-          human cells to scalably assay variants in their endogenous context. We first
-          optimized delivery of variants to HAP1 cells, defining optimal pegRNA designs
-          and establishing a co-selection strategy for improved efficiency. We characterize
-          our platform in the context of negative selection by testing over 7,500 pegRNAs
-          targeting<jats:italic>SMARCB1<\/jats:italic>for editing activity and observing
-          depletion of highly active pegRNAs installing loss-of-function variants. We
-          next assess variants in<jats:italic>MLH1<\/jats:italic>via 6-thioguanine selection,
-          assaying 65.3% of all possible SNVs in a 200-bp region spanning exon 10 and
-          distinguishing LoF variants with high accuracy. Lastly, we assay 362 non-coding<jats:italic>MLH1<\/jats:italic>variants
-          across a 60 kb region in a single experiment, identifying pathogenic variants
-          acting via multiple mechanisms with high specificity. Our analyses detail
-          how filtering for highly active pegRNAs can facilitate both positive and negative
-          selection screens. Accordingly, our platform promises to enable highly scalable
-          functional assessment of human variants.<\/jats:p>","DOI":"10.1101\/2024.04.01.587366","type":"posted-content","created":{"date-parts":[[2024,4,2]],"date-time":"2024-04-02T02:05:17Z","timestamp":1712023517000},"source":"Crossref","is-referenced-by-count":1,"title":["High-throughput
-          screening of human genetic variants by pooled prime editing"],"prefix":"10.1101","author":[{"given":"Michael","family":"Herger","sequence":"first","affiliation":[]},{"given":"Christina
-          M.","family":"Kajba","sequence":"additional","affiliation":[]},{"given":"Megan","family":"Buckley","sequence":"additional","affiliation":[]},{"given":"Ana","family":"Cunha","sequence":"additional","affiliation":[]},{"given":"Molly","family":"Strom","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-7767-8608","authenticated-orcid":false,"given":"Gregory
-          M.","family":"Findlay","sequence":"additional","affiliation":[]}],"member":"246","reference":[{"key":"2024040415500652000_2024.04.01.587366v1.1","doi-asserted-by":"publisher","DOI":"10.1038\/gim.2015.30"},{"key":"2024040415500652000_2024.04.01.587366v1.2","doi-asserted-by":"crossref","first-page":"116","DOI":"10.1016\/j.cels.2017.11.003","article-title":"Quantitative
-          Missense Variant Effect Prediction Using Large-Scale Mutagenesis Data","volume":"6","year":"2018","journal-title":"Cell
-          Syst"},{"key":"2024040415500652000_2024.04.01.587366v1.3","doi-asserted-by":"publisher","DOI":"10.1126\/science.abi8207"},{"key":"2024040415500652000_2024.04.01.587366v1.4","doi-asserted-by":"publisher","DOI":"10.1016\/J.CELL.2018.12.015"},{"key":"2024040415500652000_2024.04.01.587366v1.5","doi-asserted-by":"crossref","first-page":"eabn8153","DOI":"10.1126\/science.abn8197","article-title":"The
-          landscape of tolerated genetic variation in humans and primates","volume":"380","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.6","doi-asserted-by":"crossref","first-page":"eadg7492","DOI":"10.1126\/science.adg7492","article-title":"Accurate
-          proteome-wide missense variant effect prediction with AlphaMissense","volume":"381","year":"2023","journal-title":"Science"},{"key":"2024040415500652000_2024.04.01.587366v1.7","doi-asserted-by":"publisher","DOI":"10.1093\/nar\/gkv1222"},{"key":"2024040415500652000_2024.04.01.587366v1.8","doi-asserted-by":"crossref","first-page":"1381","DOI":"10.1038\/s41436-021-01172-3","article-title":"ACMG
-          SF v3.0 list for reporting of secondary findings in clinical exome and genome
-          sequencing: a policy statement of the American College of Medical Genetics
-          and Genomics (ACMG)","volume":"23","year":"2021","journal-title":"Genet. Med"},{"key":"2024040415500652000_2024.04.01.587366v1.9","doi-asserted-by":"publisher","DOI":"10.1038\/nprot.2016.135"},{"key":"2024040415500652000_2024.04.01.587366v1.10","doi-asserted-by":"publisher","DOI":"10.1093\/hmg\/ddab219"},{"key":"2024040415500652000_2024.04.01.587366v1.11","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-11526-w"},{"key":"2024040415500652000_2024.04.01.587366v1.12","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-022-02839-z"},{"key":"2024040415500652000_2024.04.01.587366v1.13","doi-asserted-by":"crossref","first-page":"2248","DOI":"10.1016\/j.ajhg.2021.11.001","article-title":"Closing
-          the gap: Systematic integration of multiplexed functional data resolves variants
-          of uncertain significance in BRCA1, TP53, and PTEN","volume":"108","year":"2021","journal-title":"Am.
-          J. Hum. Genet."},{"key":"2024040415500652000_2024.04.01.587366v1.14","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-018-0461-z"},{"key":"2024040415500652000_2024.04.01.587366v1.15","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.10.015"},{"key":"2024040415500652000_2024.04.01.587366v1.16","doi-asserted-by":"crossref","first-page":"7702","DOI":"10.1038\/s41467-023-43041-4","article-title":"Saturation
-          genome editing of DDX3X clarifies pathogenicity of germline and somatic variation","volume":"14","year":"2023","journal-title":"Nat.
-          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.17","doi-asserted-by":"publisher","DOI":"10.1038\/nature13695"},{"key":"2024040415500652000_2024.04.01.587366v1.18","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.012"},{"key":"2024040415500652000_2024.04.01.587366v1.19","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.01.041"},{"key":"2024040415500652000_2024.04.01.587366v1.20","doi-asserted-by":"publisher","DOI":"10.1038\/s41586-019-1711-4"},{"key":"2024040415500652000_2024.04.01.587366v1.21","doi-asserted-by":"crossref","first-page":"288","DOI":"10.1016\/j.ccell.2022.12.009","article-title":"Base
-          editing screens map mutations affecting interferon-\u03b3 signaling in cancer","volume":"41","year":"2023","journal-title":"Cancer
-          Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.22","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2021.09.018"},{"key":"2024040415500652000_2024.04.01.587366v1.23","doi-asserted-by":"crossref","first-page":"402","DOI":"10.1038\/s41587-021-01039-7","article-title":"Engineered
-          pegRNAs improve prime editing efficiency","volume":"40","year":"2022","journal-title":"Nat.
-          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.24","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01201-1"},{"key":"2024040415500652000_2024.04.01.587366v1.25","doi-asserted-by":"publisher","DOI":"10.1016\/j.molcel.2023.11.021"},{"key":"2024040415500652000_2024.04.01.587366v1.26","doi-asserted-by":"publisher","DOI":"10.1038\/nature10348"},{"key":"2024040415500652000_2024.04.01.587366v1.27","doi-asserted-by":"publisher","DOI":"10.1126\/science.1247005"},{"key":"2024040415500652000_2024.04.01.587366v1.28","doi-asserted-by":"crossref","first-page":"1151","DOI":"10.1038\/s41587-022-01613-7","article-title":"Predicting
-          prime editing efficiency and product purity by deep learning","volume":"41","year":"2023","journal-title":"Nat.
-          Biotechnol"},{"key":"2024040415500652000_2024.04.01.587366v1.29","doi-asserted-by":"crossref","first-page":"2256","DOI":"10.1016\/j.cell.2023.03.034","article-title":"Prediction
-          of efficiencies for diverse prime editing systems in multiple cell types","volume":"186","year":"2023","journal-title":"Cell"},{"key":"2024040415500652000_2024.04.01.587366v1.30","doi-asserted-by":"publisher","DOI":"10.1101\/2022.10.26.513842"},{"key":"2024040415500652000_2024.04.01.587366v1.31","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-021-01172-3"},{"key":"2024040415500652000_2024.04.01.587366v1.32","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-020-0677-y"},{"key":"2024040415500652000_2024.04.01.587366v1.33","doi-asserted-by":"publisher","DOI":"10.1016\/j.tibtech.2018.07.017"},{"key":"2024040415500652000_2024.04.01.587366v1.34","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-020-20810-z"},{"key":"2024040415500652000_2024.04.01.587366v1.35","doi-asserted-by":"crossref","first-page":"5909","DOI":"10.1038\/s41467-022-33669-z","article-title":"Marker-free
-          co-selection for successive rounds of prime editing in human cells","volume":"13","year":"2022","journal-title":"Nat.
-          Commun"},{"key":"2024040415500652000_2024.04.01.587366v1.36","doi-asserted-by":"publisher","DOI":"10.1016\/j.cell.2013.12.001"},{"key":"2024040415500652000_2024.04.01.587366v1.37","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-018-02974-x"},{"key":"2024040415500652000_2024.04.01.587366v1.38","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-27838-9"},{"key":"2024040415500652000_2024.04.01.587366v1.39","doi-asserted-by":"publisher","DOI":"10.1126\/science.1225829"},{"key":"2024040415500652000_2024.04.01.587366v1.40","doi-asserted-by":"publisher","DOI":"10.3390\/cancers14153645"},{"key":"2024040415500652000_2024.04.01.587366v1.41","doi-asserted-by":"publisher","DOI":"10.1126\/science.aac7557"},{"key":"2024040415500652000_2024.04.01.587366v1.42","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-019-10849-y"},{"key":"2024040415500652000_2024.04.01.587366v1.43","doi-asserted-by":"publisher","DOI":"10.1038\/nbt.3437"},{"key":"2024040415500652000_2024.04.01.587366v1.44","doi-asserted-by":"publisher","DOI":"10.1136\/jmg.2007.056499"},{"key":"2024040415500652000_2024.04.01.587366v1.45","doi-asserted-by":"publisher","DOI":"10.1016\/j.ajhg.2020.12.003"},{"key":"2024040415500652000_2024.04.01.587366v1.46","doi-asserted-by":"publisher","DOI":"10.1038\/s41587-019-0032-3"},{"key":"2024040415500652000_2024.04.01.587366v1.47","doi-asserted-by":"publisher","DOI":"10.1038\/nmeth.3047"},{"key":"2024040415500652000_2024.04.01.587366v1.48","doi-asserted-by":"crossref","first-page":"96","DOI":"10.1089\/hgtb.2017.198","article-title":"Determination
-          of Lentiviral Infectious Titer by a Novel Droplet Digital PCR Method","volume":"29","year":"2018","journal-title":"Hum.
-          Gene Ther. Methods"},{"key":"2024040415500652000_2024.04.01.587366v1.49","doi-asserted-by":"publisher","DOI":"10.1186\/s13059-020-02091-3"},{"key":"2024040415500652000_2024.04.01.587366v1.50","doi-asserted-by":"publisher","DOI":"10.1186\/s13073-021-00835-9"}],"container-title":[],"original-title":[],"link":[{"URL":"https:\/\/syndication.highwire.org\/content\/doi\/10.1101\/2024.04.01.587366","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,4,4]],"date-time":"2024-04-04T22:50:19Z","timestamp":1712271019000},"score":1,"resource":{"primary":{"URL":"http:\/\/biorxiv.org\/lookup\/doi\/10.1101\/2024.04.01.587366"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2024,4,1]]},"references-count":50,"URL":"http:\/\/dx.doi.org\/10.1101\/2024.04.01.587366","relation":{},"subject":[],"published":{"date-parts":[[2024,4,1]]},"subtype":"preprint"}}'
+        string: !!binary |
+          H4sIAAAAAAAA/8VW227jNhD9FULPpm6Rb3prnS4QINkFkrRFGwUFLY1txhQpkJQd1/C/d0j5tmnW
+          CBZoN3BgmTMazhzOOcNtYCyzrQnyQC2DXlCDMWwO1G4awLW10uerK9CGK4mGJIzD+GQJ8m3AZQWv
+          ULnHilmgDdMW4z49pXF61Rv00uz5udeZLK9ddGeg8YCm2WOc5ckQP39iTGfFrOomyJPBaNgfodsw
+          zoa7XqBhBhpkCbRUrbTo0Auadiq4WYDGiA+N5nIOmjyU3LkRJivyc2u4xDzJHVSckdvbCW7CjWld
+          Dgk+C16CNPjraevg0PY7a4hz/3mvhkE2it0f1lAqaUHaMzBtVeMrFQi2oVzSim1wz7gX/Hp/i9aF
+          tY3Ji6iI1ut1aPYVSjw1DWGp6iKaN0WkwQDTJcJgisjCq6VYOoayjNZc4ivBrvdjqlsp/X9U93za
+          u1I149KXuX96clatjKmZXlKMZjUvrc9vxoQBTNwslLbUhcA3QCMCVriWCO6BeVdDfgdYik2Asa6/
+          3LjeicMkjodFZLI4HY6oAytLRkmfpg6kjkIvqsVyBEWseYkRXSKAEF8gytU3j+HqMRnlWZqn4/eO
+          IesPs3F3DI0nZZBkfYr/6GswjdItTRwMyCPPAXokVEWnmwOpYhd6X/1EyRUTYEoHLJOWU8O0Qc8V
+          TWkjGCJaRLyuWwl0LtS0FYg3pt9gZP56Agm3WynR+nKS8SD12lFPPWvTsTMfeFxRJTEIXGzTcy3w
+          vF3CBiN59P+a3DtWV4pTZgxo64tDa3kqvZXYAm3pugwPIrgGMWeVop9c66GO/U3uegQsYSIkj+64
+          aiyfqBmZfPnt5pomY7LmdkHKM3BIBwbhkjTMovpY0zkt2lppJogHSVUIi9emDaHkcaEBXBQDZWv5
+          Cp+ZAeNVS8OKw9rtaRdABLegO1KQXyQWXkPFKnS9wR9lyZVhhvxB7jjWOOVKqDkq3QRh5CUjWVzI
+          nPTjIe0ngx75rEIydl8rgoimIflpxbhgUwFkplWdE2RmTgp5oqYBXpeh0vMiCr5q/mRQRC+hs0KI
+          sXAq4CceH9n4ASopzefcEeTghWuCyXnbdTBIL9By6U/5rWY4w1E0OrnYi0ARNdWsiC5QNESH4CQa
+          e7qypsFxwFyWPkTwbUnjbrnC5jp7x6m5k6czzf1AznttuJhuEc1aIVzwcGFr8e/MnamI3tj+u5x/
+          OM6G19i1mlvUrQWUy8MUqKBRhn+/wI7z9CpPRu8K7CgZjzqBNaXS4O8fOE322rpF1eM4YTbu8QMQ
+          XpofO7dHOz1S5xMgLF4YsOqKVOCmiAEnN1P8doJJ1OtmDpIYpxMeJTJTQqg1bok6MqPIcRCkNZCT
+          K680KDKNctg8H+bfGQn9Denyde5chc3Zleww8/aXrO1Xt62P6jyGx/gMW95dB1AcKa8cEh4hl/Fb
+          hFHwO426PJc13kS6Ftpi/JuHh88uapIMxzSN+0nQlS73jYqigxLfJX90OQ53EFBarVBlfevhgb3g
+          Qoffsc7LEO52/wBSOnixhAsAAA==
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "3221"
+          - "1159"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
-          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
-          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
-          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
-          humoral immunodeficiency - Three consecutive cases and review of the literature.
-          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
-          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
-          Weekly"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":1,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
-          and mild decrease in baseline oxygen saturation following off-label use: 3
-          case reports"],"short-title":[],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","relation":{},"ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"subject":[],"published":{"date-parts":[[2023,6,24]]}}}'
+        string: !!binary |
+          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
+          fwAluQlTKy4AAA==
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "1163"
+          - "3259"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1063%2F1.4938384?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2023,9,29]],"date-time":"2023-09-29T22:47:50Z","timestamp":1696027670718},"reference-count":57,"publisher":"AIP
-          Publishing","issue":"23","funder":[{"DOI":"10.13039\/100000006","name":"Office
-          of Naval Research","doi-asserted-by":"publisher","award":["N00014-12-1-0542"],"id":[{"id":"10.13039\/100000006","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["pubs.aip.org"],"crossmark-restriction":true},"short-container-title":[],"published-print":{"date-parts":[[2015,12,21]]},"abstract":"<jats:p>Metal-oxide
-          layers are likely to be present on metallic nano-structures due to either
-          environmental exposure during use, or high temperature processing techniques
-          such as annealing. It is well known that nano-structured metals have vastly
-          different mechanical properties from bulk metals; however, difficulties in
-          modeling the transition between metallic and ionic bonding have prevented
-          the computational investigation of the effects of oxide surface layers. Newly
-          developed charge-optimized many body [Liang et al., Mater. Sci. Eng., R 74,
-          255 (2013)] potentials are used to perform fully reactive molecular dynamics
-          simulations which elucidate the effects that metal-oxide layers have on the
-          mechanical properties of a copper thin-film. Simulated tensile tests are performed
-          on thin-films while using different strain-rates, temperatures, and oxide
-          thicknesses to evaluate changes in yield stress, modulus, and failure mechanisms.
-          Findings indicate that copper-thin film mechanical properties are strongly
-          affected by native oxide layers. The formed oxide layers have an amorphous
-          structure with lower Cu-O bond-densities than bulk CuO, and a mixture of Cu2O
-          and CuO charge character. It is found that oxidation will cause modifications
-          to the strain response of the elastic modulii, producing a stiffened modulii
-          at low temperatures (&amp;lt;75\u2009K) and low strain values (&amp;lt;5%),
-          and a softened modulii at higher temperatures. While under strain, structural
-          reorganization within the oxide layers facilitates brittle yielding through
-          nucleation of defects across the oxide\/metal interface. The oxide-free copper
-          thin-film yielding mechanism is found to be a tensile-axis reorientation and
-          grain creation. The oxide layers change the observed yielding mechanism, allowing
-          for the inner copper thin-film to sustain an FCC-to-BCC transition during
-          yielding. The mechanical properties are fit to a thermodynamic model based
-          on classical nucleation theory. The fit implies that the oxidation of the
-          films reduces the activation volume for yielding.<\/jats:p>","DOI":"10.1063\/1.4938384","type":"journal-article","created":{"date-parts":[[2015,12,22]],"date-time":"2015-12-22T00:59:18Z","timestamp":1450745958000},"update-policy":"http:\/\/dx.doi.org\/10.1063\/aip-crossmark-policy-page","source":"Crossref","is-referenced-by-count":8,"title":["Effect
-          of native oxide layers on copper thin-film tensile properties: A reactive
-          molecular dynamics study"],"prefix":"10.1063","volume":"118","author":[{"given":"Michael
-          D.","family":"Skarlinski","sequence":"first","affiliation":[{"name":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"}]},{"given":"David
-          J.","family":"Quesnel","sequence":"additional","affiliation":[{"name":"University
-          of Rochester 1 Materials Science Program, , Rochester, New York 14627, USA"},{"name":"University
-          of Rochester 2 Department of Mechanical Engineering, , Rochester, New York
-          14627, USA"}]}],"member":"317","published-online":{"date-parts":[[2015,12,21]]},"reference":[{"key":"2023062402360541600_c1","doi-asserted-by":"publisher","first-page":"10973","DOI":"10.1021\/nn504883m","volume":"8","year":"2014","journal-title":"ACS
-          Nano"},{"key":"2023062402360541600_c2","volume-title":"Ultrathin Metal Transparent
-          Electrodes for the Optoelectronics Industry","year":"2013"},{"key":"2023062402360541600_c3","doi-asserted-by":"publisher","first-page":"2224","DOI":"10.1039\/b718768h","volume":"37","year":"2008","journal-title":"Chem.
-          Soc. Rev."},{"key":"2023062402360541600_c4","doi-asserted-by":"publisher","first-page":"3011","DOI":"10.1002\/adma.200501767","volume":"17","year":"2005","journal-title":"Adv.
-          Mater."},{"key":"2023062402360541600_c5","doi-asserted-by":"publisher","first-page":"4816","DOI":"10.1016\/j.actamat.2008.05.044","volume":"56","year":"2008","journal-title":"Acta
-          Mater."},{"key":"2023062402360541600_c6","doi-asserted-by":"publisher","first-page":"76","DOI":"10.1016\/j.commatsci.2014.02.014","volume":"87","year":"2014","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c7","doi-asserted-by":"publisher","first-page":"3032","DOI":"10.1016\/j.commatsci.2011.05.023","volume":"50","year":"2011","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c8","doi-asserted-by":"publisher","first-page":"319","DOI":"10.1016\/j.commatsci.2010.08.021","volume":"50","year":"2010","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c9","doi-asserted-by":"publisher","first-page":"140","DOI":"10.1016\/j.commatsci.2012.08.044","volume":"67","year":"2013","journal-title":"Comput.
-          Mater. Sci."},{"key":"2023062402360541600_c10","doi-asserted-by":"publisher","first-page":"093515","DOI":"10.1063\/1.3120916","volume":"105","year":"2009","journal-title":"J.
-          Appl. Phys."},{"key":"2023062402360541600_c11","doi-asserted-by":"publisher","first-page":"3151","DOI":"10.1021\/nl201233u","volume":"11","year":"2011","journal-title":"Nano
-          Lett."},{"key":"2023062402360541600_c12","doi-asserted-by":"publisher","first-page":"3048","DOI":"10.1021\/nl9015107","volume":"9","year":"2009","journal-title":"Nano
-          Lett."},{"key":"2023062402360541600_c13","doi-asserted-by":"publisher","first-page":"2318","DOI":"10.1016\/j.actamat.2008.01.027","volume":"56","year":"2008","journal-title":"Acta
-          Mater."},{"key":"2023062402360541600_c14","doi-asserted-by":"publisher","first-page":"241403","DOI":"10.1103\/PhysRevB.71.241403","volume":"71","year":"2005","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c15","doi-asserted-by":"publisher","first-page":"195429","DOI":"10.1103\/PhysRevB.77.195429","volume":"77","year":"2008","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c16","doi-asserted-by":"publisher","first-page":"3277","DOI":"10.1039\/c2jm13682a","volume":"22","year":"2012","journal-title":"J.
-          Mater. Chem."},{"key":"2023062402360541600_c17","doi-asserted-by":"publisher","first-page":"075413","DOI":"10.1103\/PhysRevB.70.075413","volume":"70","year":"2004","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c18","doi-asserted-by":"publisher","first-page":"163112","DOI":"10.1063\/1.2723654","volume":"90","year":"2007","journal-title":"Appl.
-          Phys. Lett."},{"key":"2023062402360541600_c19","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/ncomms1149","volume":"1","year":"2010","journal-title":"Nat.
-          Commun."},{"key":"2023062402360541600_c20","doi-asserted-by":"publisher","first-page":"085408","DOI":"10.1103\/PhysRevB.75.085408","volume":"75","year":"2007","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c21","doi-asserted-by":"publisher","first-page":"025502","DOI":"10.1103\/PhysRevLett.100.025502","volume":"100","year":"2008","journal-title":"Phys.
-          Rev. Lett."},{"key":"2023062402360541600_c22","doi-asserted-by":"publisher","first-page":"33","DOI":"10.1016\/j.ijplas.2013.04.002","volume":"52","year":"2014","journal-title":"Int.
-          J. Plast."},{"key":"2023062402360541600_c23","doi-asserted-by":"publisher","first-page":"035020","DOI":"10.1088\/2053-1591\/1\/3\/035020","volume":"1","year":"2014","journal-title":"Mater.
-          Res. Express"},{"key":"2023062402360541600_c24","doi-asserted-by":"publisher","first-page":"670","DOI":"10.1016\/j.jcrysgro.2005.11.111","volume":"289","year":"2006","journal-title":"J.
-          Cryst. Growth"},{"key":"2023062402360541600_c25","doi-asserted-by":"publisher","first-page":"62","DOI":"10.1016\/j.cplett.2004.10.005","volume":"399","year":"2004","journal-title":"Chem.
-          Phys. Lett."},{"key":"2023062402360541600_c26","doi-asserted-by":"publisher","first-page":"4040","DOI":"10.1016\/j.tsf.2007.12.159","volume":"516","year":"2008","journal-title":"Thin
-          Solid Films"},{"key":"2023062402360541600_c27","doi-asserted-by":"publisher","first-page":"085311","DOI":"10.1103\/PhysRevB.75.085311","volume":"75","year":"2007","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c28","doi-asserted-by":"publisher","first-page":"11996","DOI":"10.1103\/PhysRevB.50.11996","volume":"50","year":"1994","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c29","doi-asserted-by":"publisher","first-page":"4866","DOI":"10.1103\/PhysRevLett.82.4866","volume":"82","year":"1999","journal-title":"Phys.
-          Rev. Lett."},{"key":"2023062402360541600_c30","doi-asserted-by":"publisher","first-page":"9396","DOI":"10.1021\/jp004368u","volume":"105","year":"2001","journal-title":"J.
-          Phys. Chem. A."},{"key":"2023062402360541600_c31","doi-asserted-by":"publisher","first-page":"195408","DOI":"10.1103\/PhysRevB.78.195408","volume":"78","year":"2008","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c32","doi-asserted-by":"publisher","first-page":"123517","DOI":"10.1063\/1.2938022","volume":"103","year":"2008","journal-title":"J.
-          Appl. Phys."},{"key":"2023062402360541600_c33","doi-asserted-by":"publisher","first-page":"4073","DOI":"10.1080\/14786435.2011.598881","volume":"91","year":"2011","journal-title":"Philos.
-          Mag."},{"key":"2023062402360541600_c34","doi-asserted-by":"publisher","first-page":"051912","DOI":"10.1063\/1.4790181","volume":"102","year":"2013","journal-title":"Appl.
-          Phys. Lett."},{"key":"2023062402360541600_c35","doi-asserted-by":"publisher","first-page":"3959","DOI":"10.1038\/ncomms4959","volume":"5","year":"2014","journal-title":"Nat.
-          Commun."},{"key":"2023062402360541600_c36","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1006\/jcph.1995.1039","volume":"117","year":"1995","journal-title":"J.
-          Comput. Phys."},{"key":"2023062402360541600_c37","doi-asserted-by":"publisher","first-page":"125308","DOI":"10.1103\/PhysRevB.84.125308","volume":"84","year":"2011","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c38","doi-asserted-by":"publisher","first-page":"255","DOI":"10.1016\/j.mser.2013.07.001","volume":"74","year":"2013","journal-title":"Mater.
-          Sci. Eng., R"},{"key":"2023062402360541600_c39","doi-asserted-by":"publisher","first-page":"6141","DOI":"10.1063\/1.468398","volume":"101","year":"1994","journal-title":"J.
-          Chem. Phys."},{"key":"2023062402360541600_c40","doi-asserted-by":"publisher","first-page":"98","DOI":"10.1103\/PhysRev.159.98","volume":"159","year":"1967","journal-title":"Phys.
-          Rev."},{"key":"2023062402360541600_c41","doi-asserted-by":"publisher","first-page":"109","DOI":"10.1146\/annurev-matsci-071312-121610","volume":"43","year":"2013","journal-title":"Annu.
-          Rev. Mater. Res."},{"key":"2023062402360541600_c42","doi-asserted-by":"publisher","first-page":"4177","DOI":"10.1063\/1.467468","volume":"101","year":"1994","journal-title":"J.
-          Chem. Phys."},{"key":"2023062402360541600_c43","first-page":"35","volume":"3","year":"1969","journal-title":"ESAIM-Math.
-          Model. Num."},{"key":"2023062402360541600_c44","doi-asserted-by":"publisher","first-page":"11085","DOI":"10.1103\/PhysRevB.58.11085","volume":"58","year":"1998","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c45","doi-asserted-by":"publisher","first-page":"045021","DOI":"10.1088\/0965-0393\/20\/4\/045021","volume":"20","year":"2012","journal-title":"Modell.
-          Simul. Mater. Sci. Eng."},{"key":"2023062402360541600_c46","doi-asserted-by":"publisher","first-page":"015012","DOI":"10.1088\/0965-0393\/18\/1\/015012","volume":"18","year":"2010","journal-title":"Modell.
-          Simul. Mater. Sci. Eng."},{"key":"2023062402360541600_c47","doi-asserted-by":"publisher","first-page":"605","DOI":"10.1007\/s11669-005-0005-8","volume":"26","year":"2005","journal-title":"J.
-          Phase Equilib. Diffus."},{"key":"2023062402360541600_c48","doi-asserted-by":"publisher","first-page":"386","DOI":"10.1016\/j.electacta.2015.03.221","volume":"179","year":"2015","journal-title":"Electrochim.
-          Acta"},{"key":"2023062402360541600_c49","doi-asserted-by":"publisher","first-page":"1876","DOI":"10.1016\/j.actamat.2007.12.043","volume":"56","year":"2008","journal-title":"Acta
-          Mater."},{"key":"2023062402360541600_c50","doi-asserted-by":"publisher","first-page":"2237","DOI":"10.1016\/S0020-7403(01)00043-1","volume":"43","year":"2001","journal-title":"Int.
-          J. Mech. Sci."},{"key":"2023062402360541600_c51","doi-asserted-by":"publisher","first-page":"1723","DOI":"10.1080\/14786430802206482","volume":"88","year":"2008","journal-title":"Philos.
-          Mag."},{"key":"2023062402360541600_c52","doi-asserted-by":"publisher","first-page":"224106","DOI":"10.1103\/PhysRevB.63.224106","volume":"63","year":"2001","journal-title":"Phys.
-          Rev. B"},{"key":"2023062402360541600_c53","doi-asserted-by":"publisher","first-page":"136","DOI":"10.1080\/09500830802684114","volume":"89","year":"2009","journal-title":"Philos.
-          Mag. Lett."},{"key":"2023062402360541600_c54","doi-asserted-by":"publisher","first-page":"238","DOI":"10.1016\/S0921-5093(02)00708-6","volume":"350","year":"2003","journal-title":"Mater.
-          Sci. Eng. A"},{"key":"2023062402360541600_c55","doi-asserted-by":"publisher","first-page":"057129","DOI":"10.1063\/1.4880241","volume":"4","year":"2014","journal-title":"AIP
-          Adv."},{"key":"2023062402360541600_c56","doi-asserted-by":"publisher","first-page":"94","DOI":"10.1016\/j.susc.2014.10.017","volume":"633","year":"2015","journal-title":"Surf.
-          Sci."},{"key":"2023062402360541600_c57","doi-asserted-by":"publisher","first-page":"710","DOI":"10.1016\/j.pmatsci.2010.04.001","volume":"55","year":"2010","journal-title":"Prog.
-          Mater. Sci."}],"container-title":["Journal of Applied Physics"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"syndication"},{"URL":"https:\/\/pubs.aip.org\/aip\/jap\/article-pdf\/doi\/10.1063\/1.4938384\/15174088\/235306_1_online.pdf","content-type":"unspecified","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T15:07:33Z","timestamp":1687619253000},"score":1,"resource":{"primary":{"URL":"https:\/\/pubs.aip.org\/jap\/article\/118\/23\/235306\/141678\/Effect-of-native-oxide-layers-on-copper-thin-film"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2015,12,21]]},"references-count":57,"journal-issue":{"issue":"23","published-print":{"date-parts":[[2015,12,21]]}},"URL":"http:\/\/dx.doi.org\/10.1063\/1.4938384","relation":{},"ISSN":["0021-8979","1089-7550"],"issn-type":[{"value":"0021-8979","type":"print"},{"value":"1089-7550","type":"electronic"}],"subject":[],"published-other":{"date-parts":[[2015,12,21]]},"published":{"date-parts":[[2015,12,21]]}}}'
+        string: !!binary |
+          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
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "3912"
+          - "10526"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1023%2Fa%3A1007154515475?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,1,21]],"date-time":"2024-01-21T17:53:48Z","timestamp":1705859628791},"reference-count":0,"publisher":"Springer
-          Science and Business Media LLC","issue":"1\/2","content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":[],"published-print":{"date-parts":[[2001]]},"DOI":"10.1023\/a:1007154515475","type":"journal-article","created":{"date-parts":[[2002,12,22]],"date-time":"2002-12-22T09:07:15Z","timestamp":1040548035000},"page":"1-11","source":"Crossref","is-referenced-by-count":6,"title":[],"prefix":"10.1007","volume":"218","author":[{"given":"Subrata","family":"Adak","sequence":"first","affiliation":[]},{"given":"Debashis","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Uday","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Ranajit
-          K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"297","container-title":["Molecular
-          and Cellular Biochemistry"],"original-title":[],"deposited":{"date-parts":[[2012,12,27]],"date-time":"2012-12-27T23:10:34Z","timestamp":1356649834000},"score":1,"resource":{"primary":{"URL":"http:\/\/link.springer.com\/10.1023\/A:1007154515475"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2001]]},"references-count":0,"journal-issue":{"issue":"1\/2"},"alternative-id":["271450"],"URL":"http:\/\/dx.doi.org\/10.1023\/a:1007154515475","relation":{},"ISSN":["0300-8177"],"issn-type":[{"value":"0300-8177","type":"print"}],"subject":[],"published":{"date-parts":[[2001]]}}}'
+        string: !!binary |
+          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
+          W3j8+X9fE4SwoEUAAA==
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "762"
+          - "5257"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8?mailto=example@papercrow.ai
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2024,11,19]],"date-time":"2024-11-19T19:11:02Z","timestamp":1732043462673},"reference-count":103,"publisher":"Springer
-          Science and Business Media LLC","issue":"5","license":[{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"},{"start":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T00:00:00Z","timestamp":1715126400000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/creativecommons.org\/licenses\/by\/4.0"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer
-          Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["180544","180544","180544"],"id":[{"id":"10.13039\/501100001711","id-type":"DOI","asserted-by":"publisher"}]},{"DOI":"10.13039\/100000001","name":"National
-          Science Foundation","doi-asserted-by":"publisher","award":["1751471","1751471"],"id":[{"id":"10.13039\/100000001","id-type":"DOI","asserted-by":"publisher"}]}],"content-domain":{"domain":["link.springer.com"],"crossmark-restriction":false},"short-container-title":["Nat
-          Mach Intell"],"abstract":"<jats:title>Abstract<\/jats:title><jats:p>Large
-          language models (LLMs) have shown strong performance in tasks across domains
-          but struggle with chemistry-related problems. These models also lack access
-          to external knowledge sources, limiting their usefulness in scientific applications.
-          We introduce ChemCrow, an LLM chemistry agent designed to accomplish tasks
-          across organic synthesis, drug discovery and materials design. By integrating
-          18 expert-designed tools and using GPT-4 as the LLM, ChemCrow augments the
-          LLM performance in chemistry, and new capabilities emerge. Our agent autonomously
-          planned and executed the syntheses of an insect repellent and three organocatalysts
-          and guided the discovery of a novel chromophore. Our evaluation, including
-          both LLM and expert assessments, demonstrates ChemCrow\u2019s effectiveness
-          in automating a diverse set of chemical tasks. Our work not only aids expert
-          chemists and lowers barriers for non-experts but also fosters scientific advancement
-          by bridging the gap between experimental and computational chemistry.<\/jats:p>","DOI":"10.1038\/s42256-024-00832-8","type":"journal-article","created":{"date-parts":[[2024,5,8]],"date-time":"2024-05-08T10:03:31Z","timestamp":1715162611000},"page":"525-535","update-policy":"http:\/\/dx.doi.org\/10.1007\/springer_crossmark_policy","source":"Crossref","is-referenced-by-count":36,"title":["Augmenting
-          large language models with chemistry tools"],"prefix":"10.1038","volume":"6","author":[{"given":"Andres","family":"M.
-          Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
-          D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"member":"297","published-online":{"date-parts":[[2024,5,8]]},"reference":[{"key":"832_CR1","unstructured":"Devlin,
-          J., Chang, M.-W., Lee, K. & Toutanova, K. Bert: pre-training of deep bidirectional
-          transformers for language understanding. In Proc. Conference of the North
-          American Chapter of the Association for Computational Linguistics: Human Language
-          Technologies (eds Burstein, J. et al.) 4171\u20134186 (Association for Computational
-          Linguistics, 2019)."},{"key":"832_CR2","first-page":"1877","volume":"33","author":"T
-          Brown","year":"2020","unstructured":"Brown, T. et al. Language models are
-          few-shot learners. Adv. Neural Inf. Process. Syst. 33, 1877\u20131901 (2020).","journal-title":"Adv.
-          Neural Inf. Process. Syst."},{"key":"832_CR3","unstructured":"Bommasani, R.
-          et al. On the opportunities and risks of foundation models. Preprint at https:\/\/arxiv.org\/abs\/2108.07258
-          (2021)."},{"key":"832_CR4","first-page":"1","volume":"24","author":"A Chowdhery","year":"2023","unstructured":"Chowdhery,
-          A. et al. Palm: scaling language modeling with pathways. J. Mach. Learn. Res.
-          24, 1\u2013113 (2023).","journal-title":"J. Mach. Learn. Res."},{"key":"832_CR5","unstructured":"Bubeck,
-          S. et al. Sparks of artificial general intelligence: early experiments with
-          gpt-4. Preprint at https:\/\/arxiv.org\/abs\/2303.12712 (2023)."},{"key":"832_CR6","unstructured":"Github
-          Copilot. GitHub https:\/\/copilot.github.com (2023)."},{"key":"832_CR7","unstructured":"Li,
-          R. et al. Starcoder: may the source be with you! Trans. Mach. Learn. Res.
-          https:\/\/openreview.net\/pdf?id=KoFOg41haE (2023)."},{"key":"832_CR8","doi-asserted-by":"crossref","unstructured":"Ziegler,
-          A. et al. Productivity assessment of neural code completion. In Proc. 6th
-          ACM SIGPLAN International Symposium on Machine Programming (eds Chaudhuri,
-          S. and Sutton, C.) 21\u201329 (ACM, 2022).","DOI":"10.1145\/3520312.3534864"},{"key":"832_CR9","unstructured":"Vaswani,
-          A. et al. Attention is all you need. In Proc. Advances in Neural Information
-          Processing Systems 30 (eds. Guyon, I. et al.) 5999\u20136009 (Curran Associates,
-          2017)."},{"key":"832_CR10","unstructured":"Schick, T. et al. Toolformer: language
-          models can teach themselves to use tools. In Proc. Advances in Neural Information
-          Processing Systems 36 (eds. Oh, A. et al.) 68539\u201368551 (Curran Associates,
-          2023)."},{"key":"832_CR11","doi-asserted-by":"publisher","first-page":"1649","DOI":"10.1021\/acs.jcim.3c00285","volume":"63","author":"CM
-          Castro Nascimento","year":"2023","unstructured":"Castro Nascimento, C. M.
-          & Pimentel, A. S. Do large language models understand chemistry? A conversation
-          with ChatGPT. J. Chem. Inf. Model. 63, 1649\u20131655 (2023).","journal-title":"J.
-          Chem. Inf. Model."},{"key":"832_CR12","unstructured":"OpenAI. GPT-4 technical
-          report. Preprint at https:\/\/arxiv.org\/abs\/2303.08774 (2023)."},{"key":"832_CR13","first-page":"27730","volume":"35","author":"L
-          Ouyang","year":"2022","unstructured":"Ouyang, L. et al. Training language
-          models to follow instructions with human feedback. Adv. Neural Inf. Process.
-          Syst. 35, 27730\u201327744 (2022).","journal-title":"Adv. Neural Inf. Process.
-          Syst."},{"key":"832_CR14","doi-asserted-by":"publisher","first-page":"368","DOI":"10.1039\/D2DD00087C","volume":"2","author":"AD
-          White","year":"2023","unstructured":"White, A. D. et al. Assessment of chemistry
-          knowledge in large language models that generate code. Digit. Discov. 2, 368\u2013376
-          (2023).","journal-title":"Digit. Discov."},{"key":"832_CR15","doi-asserted-by":"publisher","first-page":"739","DOI":"10.1021\/ci100384d","volume":"51","author":"DM
-          Lowe","year":"2011","unstructured":"Lowe, D. M., Corbett, P. T., Murray-Rust,
-          P. & Glen, R. C. Chemical name to structure: Opsin, an open source solution.
-          J. Chem. Inf. Model. 51, 739\u2013753 (2011).","journal-title":"J. Chem. Inf.
-          Model."},{"key":"832_CR16","doi-asserted-by":"publisher","first-page":"434","DOI":"10.1021\/acscentsci.7b00064","volume":"3","author":"CW
-          Coley","year":"2017","unstructured":"Coley, C. W., Barzilay, R., Jaakkola,
-          T. S., Green, W. H. & Jensen, K. F. Prediction of organic reaction outcomes
-          using machine learning. ACS Cent. Sci. 3, 434\u2013443 (2017).","journal-title":"ACS
-          Cent. Sci."},{"key":"832_CR17","doi-asserted-by":"publisher","first-page":"370","DOI":"10.1039\/C8SC04228D","volume":"10","author":"CW
-          Coley","year":"2019","unstructured":"Coley, C. W. et al. A graph-convolutional
-          neural network model for the prediction of chemical reactivity. Chem. Sci.
-          10, 370\u2013377 (2019).","journal-title":"Chem. Sci."},{"key":"832_CR18","doi-asserted-by":"publisher","first-page":"1572","DOI":"10.1021\/acscentsci.9b00576","volume":"5","author":"P
-          Schwaller","year":"2019","unstructured":"Schwaller, P. et al. Molecular transformer:
-          a model for uncertainty-calibrated chemical reaction prediction. ACS Cent.
-          Sci. 5, 1572\u20131583 (2019).","journal-title":"ACS Cent. Sci."},{"key":"832_CR19","doi-asserted-by":"publisher","first-page":"4874","DOI":"10.1038\/s41467-020-18671-7","volume":"11","author":"G
-          Pesciullesi","year":"2020","unstructured":"Pesciullesi, G., Schwaller, P.,
-          Laino, T. & Reymond, J.-L. Transfer learning enables the molecular transformer
-          to predict regio-and stereoselective reactions on carbohydrates. Nat. Commun.
-          11, 4874 (2020).","journal-title":"Nat. Commun."},{"key":"832_CR20","doi-asserted-by":"publisher","first-page":"015022","DOI":"10.1088\/2632-2153\/ac3ffb","volume":"3","author":"R
-          Irwin","year":"2022","unstructured":"Irwin, R., Dimitriadis, S., He, J. &
-          Bjerrum, E. J. Chemformer: a pre-trained transformer for computational chemistry.
-          Mach. Learn. Sci.Technol. 3, 015022 (2022).","journal-title":"Mach. Learn.
-          Sci.Technol."},{"key":"832_CR21","doi-asserted-by":"publisher","first-page":"5904","DOI":"10.1002\/anie.201506101","volume":"55","author":"S
-          Szymkuc","year":"2016","unstructured":"Szymkuc, S. et al. Computer-assisted
-          synthetic planning: the end of the beginning. Angew. Chem. Int. Ed. Engl.
-          55, 5904\u20135937 (2016).","journal-title":"Angew. Chem. Int. Ed. Engl."},{"key":"832_CR22","doi-asserted-by":"publisher","first-page":"604","DOI":"10.1038\/nature25978","volume":"555","author":"MH
-          Segler","year":"2018","unstructured":"Segler, M. H., Preuss, M. & Waller,
-          M. P. Planning chemical syntheses with deep neural networks and symbolic AI.
-          Nature 555, 604\u2013610 (2018).","journal-title":"Nature"},{"key":"832_CR23","doi-asserted-by":"crossref","unstructured":"Coley,
-          C. W. et al. A robotic platform for flow synthesis of organic compounds informed
-          by AI planning. Science 365 (2019).","DOI":"10.1126\/science.aax1566"},{"key":"832_CR24","doi-asserted-by":"publisher","first-page":"3316","DOI":"10.1039\/C9SC05704H","volume":"11","author":"P
-          Schwaller","year":"2020","unstructured":"Schwaller, P. et al. Predicting retrosynthetic
-          pathways using transformer-based models and a hyper-graph exploration strategy.
-          Chem. Sci. 11, 3316\u20133325 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR25","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1186\/s13321-020-00472-1","volume":"12","author":"S
-          Genheden","year":"2020","unstructured":"Genheden, S. et al. AiZynthFinder:
-          a fast, robust and flexible open-source software for retrosynthetic planning.
-          J. Cheminf. 12, 1\u20139 (2020).","journal-title":"J. Cheminf."},{"key":"832_CR26","doi-asserted-by":"publisher","first-page":"1094","DOI":"10.1021\/acs.accounts.0c00714","volume":"54","author":"K
-          Molga","year":"2021","unstructured":"Molga, K., Szymkuc, S. & Grzybowski,
-          B. A. Chemist ex machina: advanced synthesis planning by computers. Acc. Chem.
-          Res. 54, 1094\u20131106 (2021).","journal-title":"Acc. Chem. Res."},{"key":"832_CR27","doi-asserted-by":"publisher","first-page":"e1604","DOI":"10.1002\/wcms.1604","volume":"12","author":"P
-          Schwaller","year":"2022","unstructured":"Schwaller, P. et al. Machine intelligence
-          for chemical reaction space. Wiley Interdiscip. Rev. Comput. Mol. Sci. 12,
-          e1604 (2022).","journal-title":"Wiley Interdiscip. Rev. Comput. Mol. Sci."},{"key":"832_CR28","doi-asserted-by":"publisher","first-page":"80","DOI":"10.3389\/fenvs.2015.00080","volume":"3","author":"A
-          Mayr","year":"2016","unstructured":"Mayr, A., Klambauer, G., Unterthiner,
-          T. & Hochreiter, S. Deeptox: toxicity prediction using deep learning. Front.
-          Environ. Sci. 3, 80 (2016).","journal-title":"Front. Environ. Sci."},{"key":"832_CR29","doi-asserted-by":"publisher","first-page":"3370","DOI":"10.1021\/acs.jcim.9b00237","volume":"59","author":"K
-          Yang","year":"2019","unstructured":"Yang, K. et al. Analyzing learned molecular
-          representations for property prediction. J. Chem. Inf. Model. 59, 3370\u20133388
-          (2019).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR30","unstructured":"Chithrananda,
-          S., Grand, G. & Ramsundar, B. Chemberta: large-scale self-supervised pretraining
-          for molecular property prediction. Preprint at https:\/\/arxiv.org\/abs\/2010.09885
-          (2020)."},{"key":"832_CR31","doi-asserted-by":"publisher","first-page":"5938","DOI":"10.1021\/acs.jcim.2c01073","volume":"62","author":"D
-          van Tilborg","year":"2022","unstructured":"van Tilborg, D., Alenicheva, A.
-          & Grisoni, F. Exposing the limitations of molecular machine learning with
-          activity cliffs. J. Chem. Inf. Model. 62, 5938\u20135951 (2022).","journal-title":"J.
-          Chem. Inf. Model."},{"key":"832_CR32","doi-asserted-by":"publisher","first-page":"161","DOI":"10.1038\/s42256-023-00788-1","volume":"6","author":"KM
-          Jablonka","year":"2024","unstructured":"Jablonka, K. M., Schwaller, P., Ortega-Guerrero,
-          A. & Smit, B. Leveraging large language models for predictive chemistry. Nat.
-          Mach. Intell. 6, 161\u2013169 (2024).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR33","doi-asserted-by":"publisher","first-page":"268","DOI":"10.1021\/acscentsci.7b00572","volume":"4","author":"R
-          G\u00f3mez-Bombarelli","year":"2018","unstructured":"G\u00f3mez-Bombarelli,
-          R. et al. Automatic chemical design using a data-driven continuous representation
-          of molecules. ACS Cent. Sci. 4, 268\u2013276 (2018).","journal-title":"ACS
-          Cent. Sci."},{"key":"832_CR34","doi-asserted-by":"publisher","first-page":"5918","DOI":"10.1021\/acs.jcim.0c00915","volume":"60","author":"T
-          Blaschke","year":"2020","unstructured":"Blaschke, T. et al. Reinvent 2.0:
-          an AI tool for de novo drug design. J. Chem. Inf. Model. 60, 5918\u20135922
-          (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR35","doi-asserted-by":"publisher","first-page":"1","DOI":"10.1038\/s41524-021-00495-8","volume":"7","author":"Q
-          Tao","year":"2021","unstructured":"Tao, Q., Xu, P., Li, M. & Lu, W. Machine
-          learning for perovskite materials design and discovery. NPJ Comput. Mater.
-          7, 1\u201318 (2021).","journal-title":"NPJ Comput. Mater."},{"key":"832_CR36","doi-asserted-by":"publisher","first-page":"1120","DOI":"10.1038\/nmat4717","volume":"15","author":"R
-          G\u00f3mez-Bombarelli","year":"2016","unstructured":"G\u00f3mez-Bombarelli,
-          R. et al. Design of efficient molecular organic light-emitting diodes by a
-          high-throughput virtual screening and experimental approach. Nat. Mater. 15,
-          1120\u20131127 (2016).","journal-title":"Nat. Mater."},{"key":"832_CR37","doi-asserted-by":"publisher","first-page":"89","DOI":"10.1038\/s41586-021-03213-y","volume":"590","author":"BJ
-          Shields","year":"2021","unstructured":"Shields, B. J. et al. Bayesian reaction
-          optimization as a tool for chemical synthesis. Nature 590, 89\u201396 (2021).","journal-title":"Nature"},{"key":"832_CR38","doi-asserted-by":"publisher","first-page":"19999","DOI":"10.1021\/jacs.2c08592","volume":"144","author":"JAG
-          Torres","year":"2022","unstructured":"Torres, J. A. G. et al. A multi-objective
-          active learning platform and web app for reaction optimization. J. Am. Chem.
-          Soc. 144, 19999\u201320007 (2022).","journal-title":"J. Am. Chem. Soc."},{"key":"832_CR39","unstructured":"Ramos,
-          M. C., Michtavy, S. S., Porosoff, M. D. & White, A. D. Bayesian optimization
-          of catalysts with in-context learning. Preprint at https:\/\/arxiv.org\/abs\/2304.05341
-          (2023)."},{"key":"832_CR40","doi-asserted-by":"crossref","unstructured":"Marra,
-          G., Giannini, F., Diligenti, M. & Gori, M. Integrating learning and reasoning
-          with deep logic models. In Proc. Machine Learning and Knowledge Discovery
-          in Databases, Part II (eds. Hutter, F. et al.) 517\u2013532 (Springer, 2020).","DOI":"10.1007\/978-3-030-46147-8_31"},{"key":"832_CR41","first-page":"24824","volume":"35","author":"J
-          Wei","year":"2022","unstructured":"Wei, J. et al. Chain-of-thought prompting
-          elicits reasoning in large language models. Adv. Neural Inf. Process. Syst.
-          35, 24824\u201324837 (2022).","journal-title":"Adv. Neural Inf. Process. Syst."},{"key":"832_CR42","doi-asserted-by":"crossref","unstructured":"Ho,
-          N., Schmid, L. & Yun, S.-Y. Large language models are reasoning teachers.
-          In Proc. 61st Annual Meeting of the Association for Computational Linguistics
-          (Volume 1: Long Papers) (eds. Rogers, A. et al.) 14852\u201314882 (ACL, 2023).","DOI":"10.18653\/v1\/2023.acl-long.830"},{"key":"832_CR43","unstructured":"Yao,
-          S. et al. ReAct: synergizing reasoning and acting in language models. In Proc.
-          11th International Conference on Learning Representations (OpenReview, 2023)."},{"key":"832_CR44","first-page":"15476","volume":"35","author":"E
-          Zelikman","year":"2022","unstructured":"Zelikman, E., Wu, Y., Mu, J. & Goodman,
-          N. Star: bootstrapping reasoning with reasoning. Adv. Neural Inf. Process.
-          Syst. 35, 15476\u201315488 (2022).","journal-title":"Adv. Neural Inf. Process.
-          Syst."},{"key":"832_CR45","doi-asserted-by":"publisher","first-page":"266","DOI":"10.1039\/D2DD00004K","volume":"1","author":"Z-W
-          Zhao","year":"2022","unstructured":"Zhao, Z.-W., del Cueto, M. & Troisi, A.
-          Limitations of machine learning models when predicting compounds with completely
-          new chemistries: possible improvements applied to the discovery of new non-fullerene
-          acceptors. Digit. Discov. 1, 266\u2013276 (2022).","journal-title":"Digit.
-          Discov."},{"key":"832_CR46","doi-asserted-by":"publisher","DOI":"10.1038\/s41467-021-22951-1","volume":"12","author":"AC
-          Vaucher","year":"2021","unstructured":"Vaucher, A. C. et al. Inferring experimental
-          procedures from text-based representations of chemical reactions. Nat. Commun.
-          12, 2573 (2021).","journal-title":"Nat. Commun."},{"key":"832_CR47","doi-asserted-by":"publisher","first-page":"144","DOI":"10.1038\/s42256-020-00284-w","volume":"3","author":"P
-          Schwaller","year":"2021","unstructured":"Schwaller, P. et al. Mapping the
-          space of chemical reactions using attention-based neural networks. Nat. Mach.
-          Intell. 3, 144\u2013152 (2021).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR48","unstructured":"RXN
-          for Chemistry. rxn4Chemistry. GitHub https:\/\/github.com\/rxn4chemistry\/rxn4chemistry
-          (2020)."},{"key":"832_CR49","doi-asserted-by":"publisher","first-page":"154","DOI":"10.1039\/C9SC04944D","volume":"11","author":"A
-          Thakkar","year":"2020","unstructured":"Thakkar, A., Kogej, T., Reymond, J.-L.,
-          Engkvist, O. & Bjerrum, E. J. Datasets and their influence on the development
-          of computer assisted synthesis planning tools in the pharmaceutical domain.
-          Chem. Sci. 11, 154\u2013168 (2020).","journal-title":"Chem. Sci."},{"key":"832_CR50","doi-asserted-by":"publisher","first-page":"8791","DOI":"10.1021\/acs.jmedchem.9b01919","volume":"63","author":"A
-          Thakkar","year":"2020","unstructured":"Thakkar, A., Selmi, N., Reymond, J.-L.,
-          Engkvist, O. & Bjerrum, E. J. \u2018Ring breaker\u2019: neural network driven
-          synthesis prediction of the ring system chemical space. J. Med. Chem. 63,
-          8791\u20138808 (2020).","journal-title":"J. Med. Chem."},{"key":"832_CR51","unstructured":"Yang,
-          Z. et al. Mm-react: prompting ChatGPT for multimodal reasoning and action.
-          Preprint at https:\/\/arxiv.org\/abs\/2303.11381 (2023)."},{"key":"832_CR52","unstructured":"Shen,
-          Y. et al. Hugginggpt: solving AI tasks with chatgpt and its friends in huggingface.
-          Poster at Advances in Neural Information Processing Systems 36 (2023)."},{"key":"832_CR53","unstructured":"Karpas,
-          E. et al. Mrkl systems: a modular, neuro-symbolic architecture that combines
-          large language models, external knowledge sources and discrete reasoning.
-          Preprint at https:\/\/arxiv.org\/abs\/2205.00445 (2022)."},{"key":"832_CR54","doi-asserted-by":"publisher","first-page":"570","DOI":"10.1038\/s41586-023-06792-0","volume":"624","author":"DA
-          Boiko","year":"2023","unstructured":"Boiko, D. A., MacKnight, R., Kline, B.
-          & Gomes, G. Autonomous chemical research with large language models. Nature
-          624, 570\u2013578 (2023).","journal-title":"Nature"},{"key":"832_CR55","unstructured":"RoboRXN.
-          IBM https:\/\/research.ibm.com\/science\/ibm-roborxn\/ (2021)."},{"key":"832_CR56","doi-asserted-by":"publisher","first-page":"407","DOI":"10.1002\/chem.200390042","volume":"9","author":"A
-          Wittkopp","year":"2003","unstructured":"Wittkopp, A. & Schreiner, P. R. Metal-free,
-          noncovalent catalysis of Diels-Alder reactions by neutral hydrogen bond donors
-          in organic solvents and in water. Chem. Eur. J. 9, 407\u2013414 (2003).","journal-title":"Chem.
-          Eur. J."},{"key":"832_CR57","doi-asserted-by":"publisher","first-page":"217","DOI":"10.1021\/ol017117s","volume":"4","author":"PR
-          Schreiner","year":"2002","unstructured":"Schreiner, P. R. & Wittkopp, A. H-bonding
-          additives act like Lewis acid catalysts. Org. Lett. 4, 217\u2013220 (2002).","journal-title":"Org.
-          Lett."},{"key":"832_CR58","doi-asserted-by":"publisher","first-page":"6576","DOI":"10.1002\/anie.200500227","volume":"44","author":"RP
-          Herrera","year":"2005","unstructured":"Herrera, R. P., Sgarzani, V., Bernardi,
-          L. & Ricci, A. Catalytic enantioselective friedel-crafts alkylation of indoles
-          with nitroalkenes by using a simple thiourea organocatalyst. Angew. Chem.
-          Int. Ed. Engl. 44, 6576\u20136579 (2005).","journal-title":"Angew. Chem. Int.
-          Ed. Engl."},{"key":"832_CR59","doi-asserted-by":"publisher","first-page":"12672","DOI":"10.1021\/ja036972z","volume":"125","author":"T
-          Okino","year":"2003","unstructured":"Okino, T., Hoashi, Y. & Takemoto, Y.
-          Enantioselective Michael reaction of malonates to nitroolefins catalyzed by
-          bifunctional organocatalysts. J. Am. Chem. Soc. 125, 12672\u201312673 (2003).","journal-title":"J.
-          Am. Chem. Soc."},{"key":"832_CR60","unstructured":"Joung, J. F., Han, M.,
-          Jeong, M. & Park, S. DB for chromophore. figshare https:\/\/figshare.com\/articles\/dataset\/DB_for_chromophore\/12045567
-          (2020)."},{"key":"832_CR61","unstructured":"Lowe, D. M. Extraction of Chemical
-          Structures and Reactions from the Literature. PhD thesis, Univ. of Cambridge
-          (2012)."},{"key":"832_CR62","doi-asserted-by":"publisher","first-page":"513","DOI":"10.1039\/C7SC02664A","volume":"9","author":"Z
-          Wu","year":"2018","unstructured":"Wu, Z. et al. Moleculenet: a benchmark for
-          molecular machine learning. Chem. Sci. 9, 513\u2013530 (2018).","journal-title":"Chem.
-          Sci."},{"key":"832_CR63","doi-asserted-by":"crossref","unstructured":"Liu,
-          Y. et al. G-Eval: NLG evaluation using GPT-4 with better human alignment.
-          In Proc. Conference on Empirical Methods in Natural Language Processing (eds.
-          Bouamor, H. et al.) 2511\u20132522 (ACL, 2023).","DOI":"10.18653\/v1\/2023.emnlp-main.153"},{"key":"832_CR64","unstructured":"Eloundou,
-          T., Manning, S., Mishkin, P. & Rock, D. GPTs are GPTs: an early look at the
-          labor market impact potential of large language models. Preprint at https:\/\/arxiv.org\/abs\/2303.10130
-          (2023)."},{"key":"832_CR65","doi-asserted-by":"publisher","first-page":"e1630","DOI":"10.1002\/wcms.1630","volume":"13","author":"BA
-          Grzybowski","year":"2023","unstructured":"Grzybowski, B. A., Badowski, T.,
-          Molga, K. & Szymkuc, S. Network search algorithms and scoring functions for
-          advanced-level computerized synthesis planning. Wiley Interdiscip. Rev. Comput.
-          Mol. Sci. 13, e1630 (2023).","journal-title":"Wiley Interdiscip. Rev. Comput.
-          Mol. Sci."},{"key":"832_CR66","doi-asserted-by":"publisher","first-page":"27","DOI":"10.1039\/D0RE00340A","volume":"6","author":"A
-          Thakkar","year":"2021","unstructured":"Thakkar, A. et al. Artificial intelligence
-          and automation in computer aided synthesis planning. React. Chem. Eng. 6,
-          27\u201351 (2021).","journal-title":"React. Chem. Eng."},{"key":"832_CR67","doi-asserted-by":"publisher","first-page":"189","DOI":"10.1038\/s42256-022-00465-9","volume":"4","author":"F
-          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
-          C. & Ekins, S. Dual use of artificial-intelligence-powered drug discovery.
-          Nat. Mach. Intell. 4, 189\u2013191 (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR68","doi-asserted-by":"publisher","first-page":"607","DOI":"10.1038\/s42256-022-00511-6","volume":"4","author":"F
-          Urbina","year":"2022","unstructured":"Urbina, F., Lentzos, F., Invernizzi,
-          C. & Ekins, S. A teachable moment for dual-use. Nat. Mach. Intell. 4, 607\u2013607
-          (2022).","journal-title":"Nat. Mach. Intell."},{"key":"832_CR69","unstructured":"Campbell,
-          Q. L., Herington, J. & White, A. D. Censoring chemical data to mitigate dual
-          use risk. Preprint at https:\/\/arxiv.org\/abs\/2304.10510 (2023)."},{"key":"832_CR70","unstructured":"Gao,
-          L., Schulman, J. & Hilton, J. Scaling laws for reward model overoptimization.
-          In Proc. International Conference on Machine Learning (eds Krause, A. et al.)
-          10835\u201310866 (PMLR, 2023)."},{"key":"832_CR71","unstructured":"Radford,
-          A. et al. Improving language understanding by generative pre-training. OpenAI
-          blog https:\/\/cdn.openai.com\/research-covers\/language-unsupervised\/language_understanding_paper.pdf
-          (2018)."},{"key":"832_CR72","first-page":"1\u201346","volume":"55","author":"B
-          Li","year":"2021","unstructured":"Li, B. et al. Trustworthy AI: from principles
-          to practices. ACM Comput. Surv. 55, 1\u201346 (2021).","journal-title":"ACM
-          Comput. Surv."},{"key":"832_CR73","doi-asserted-by":"publisher","first-page":"79","DOI":"10.1039\/D1DD00009H","volume":"1","author":"GM
-          Hocky","year":"2022","unstructured":"Hocky, G. M. & White, A. D. Natural language
-          processing models that automate programming will transform chemistry research
-          and teaching. Dig. Discov. 1, 79\u201383 (2022).","journal-title":"Dig. Discov."},{"key":"832_CR74","doi-asserted-by":"crossref","unstructured":"Henderson,
-          P. et al. Foundation models and fair use. Preprint at https:\/\/arxiv.org\/abs\/2303.15715
-          (2023).","DOI":"10.2139\/ssrn.4404340"},{"key":"832_CR75","unstructured":"Askell,
-          A., Brundage, M. & Hadfield, G. The role of cooperation in responsible AI
-          development. Preprint at https:\/\/arxiv.org\/abs\/1907.04534 (2019)."},{"key":"832_CR76","doi-asserted-by":"publisher","first-page":"101649","DOI":"10.1016\/j.techsoc.2021.101649","volume":"66","author":"RD
-          Neufville","year":"2021","unstructured":"Neufville, R. D. & Baum, S. D. Collective
-          action on artificial intelligence: a primer and review. Technol. Soc. 66,
-          101649 (2021).","journal-title":"Technol. Soc."},{"key":"832_CR77","unstructured":"Touvron,
-          H. et al. Llama: open and efficient foundation language models. Preprint at
-          https:\/\/arxiv.org\/abs\/2302.13971 (2023)."},{"key":"832_CR78","unstructured":"Chiang,
-          W.-L. et al. Vicuna: an open-source chatbot impressing GPT-4 with 90%* ChatGPT
-          quality. LMSYS Org. https:\/\/lmsys.org\/blog\/2023-03-30-vicuna\/ (2023)."},{"key":"832_CR79","unstructured":"Mukherjee,
-          S. et al. Orca: progressive learning from complex explanation traces of GPT-4.
-          Preprint at https:\/\/arxiv.org\/abs\/2306.02707 (2023)."},{"key":"832_CR80","unstructured":"Chase,
-          H. LangChain. GitHub https:\/\/github.com\/hwchase17\/langchain (2022)."},{"key":"832_CR81","doi-asserted-by":"crossref","unstructured":"Press,
-          O. et al. Measuring and narrowing the compositionality gap in language models.
-          In Proc. Association for Computational Linguistics: EMNLP (eds. Bouamor, H.
-          et al.) 5687\u20135711 (ACL, 2023).","DOI":"10.18653\/v1\/2023.findings-emnlp.378"},{"key":"832_CR82","unstructured":"Google
-          search API. SerpApi https:\/\/serpapi.com\/ (2023)."},{"key":"832_CR83","unstructured":"Neelakantan,
-          A. et al. Text and code embeddings by contrastive pre-training. Preprint at
-          https:\/\/arxiv.org\/abs\/2201.10005 (2022)."},{"key":"832_CR84","doi-asserted-by":"publisher","first-page":"535","DOI":"10.1109\/TBDATA.2019.2921572","volume":"7","author":"J
-          Johnson","year":"2019","unstructured":"Johnson, J., Douze, M. & J\u00e9gou,
-          H. Billion-scale similarity search with GPUs. IEEE Trans. Big Data 7, 535\u2013547
-          (2019).","journal-title":"IEEE Trans. Big Data"},{"key":"832_CR85","unstructured":"ChemSpace
-          https:\/\/chem-space.com\/ (2023)."},{"key":"832_CR86","unstructured":"National
-          Center for Biotechnology Information. PubChem. NIH https:\/\/pubchem.ncbi.nlm.nih.gov\/
-          (2023)."},{"key":"832_CR87","doi-asserted-by":"publisher","first-page":"95","DOI":"10.1186\/s13321-023-00765-1","volume":"15","author":"J
-          Medina","year":"2023","unstructured":"Medina, J. & White, A. D. Bloom filters
-          for molecules. J. Cheminf. 15, 95 (2023).","journal-title":"J. Cheminf."},{"key":"832_CR88","doi-asserted-by":"publisher","first-page":"6065","DOI":"10.1021\/acs.jcim.0c00675","volume":"60","author":"JJ
-          Irwin","year":"2020","unstructured":"Irwin, J. J. et al. Zinc20\u2014a free
-          ultralarge-scale chemical database for ligand discovery. J. Chem. Inf. Model.
-          60, 6065\u20136073 (2020).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR89","unstructured":"Chemical
-          Abstracts Service. CAS registry number. CAS www.cas.org\/content\/cas-registry
-          (2023)."},{"key":"832_CR90","unstructured":"Tanimoto, T. T. An Elementary
-          Mathematical Theory of Classification and Prediction (IBM, 1958)."},{"key":"832_CR91","doi-asserted-by":"publisher","first-page":"742","DOI":"10.1021\/ci100050t","volume":"50","author":"D
-          Rogers","year":"2010","unstructured":"Rogers, D. & Hahn, M. Extended-connectivity
-          fingerprints. J. Chem. Inf. Model. 50, 742\u2013754 (2010).","journal-title":"J.
-          Chem. Inf. Model."},{"key":"832_CR92","unstructured":"White, A. D. Synspace.
-          GitHub https:\/\/github.com\/whitead\/synspace (2023)."},{"key":"832_CR93","doi-asserted-by":"publisher","first-page":"3697","DOI":"10.1039\/D1SC05259D","volume":"13","author":"GP
-          Wellawatte","year":"2022","unstructured":"Wellawatte, G. P., Seshadri, A.
-          & White, A. D. Model agnostic generation of counterfactual explanations for
-          molecules. Chem. Sci. 13, 3697\u20133705 (2022).","journal-title":"Chem. Sci."},{"key":"832_CR94","doi-asserted-by":"publisher","first-page":"3093","DOI":"10.1021\/ci200379p","volume":"51","author":"M
-          Hartenfeller","year":"2011","unstructured":"Hartenfeller, M. et al. A collection
-          of robust organic synthesis reactions for in silico molecule design. J. Chem.
-          Inf. Model. 51, 3093\u20133098 (2011).","journal-title":"J. Chem. Inf. Model."},{"key":"832_CR95","doi-asserted-by":"publisher","first-page":"12152","DOI":"10.1039\/C9CC05122H","volume":"55","author":"Q
-          Yang","year":"2019","unstructured":"Yang, Q. et al. Molecular transformer
-          unifies reaction prediction and retrosynthesis across pharma chemical space.
-          Chem. Commun. 55, 12152\u201312155 (2019).","journal-title":"Chem. Commun."},{"key":"832_CR96","unstructured":"Purchasable
-          Mcule. Mcule https:\/\/purchasable.mcule.com\/ (2023)."},{"key":"832_CR97","unstructured":"RDKit:
-          open-source cheminformatics (RDKit, 2023); www.rdkit.org"},{"key":"832_CR98","unstructured":"Chemical
-          weapons convention, annex on chemicals, b. schedules of chemicals. OPCW www.opcw.org\/chemical-weapons-convention\/annexes\/annex-chemicals\/annex-chemicals
-          (2024)."},{"key":"832_CR99","unstructured":"The Australia Group. Australia
-          Group common control lists: chemical weapons precursors. Department of Foreign
-          Affairs and Trade www.dfat.gov.au\/publications\/minisite\/theaustraliagroupnet\/site\/en\/controllists.html
-          (2023)."},{"key":"832_CR100","unstructured":"Namerxn (NextMove Software, 2023);
-          www.nextmovesoftware.com\/namerxn.html"},{"key":"832_CR101","doi-asserted-by":"publisher","first-page":"2337","DOI":"10.1039\/b602413k","volume":"4","author":"JS
-          Carey","year":"2006","unstructured":"Carey, J. S., Laffan, D., Thomson, C.
-          & Williams, M. T. Analysis of the reactions used for the preparation of drug
-          candidate molecules. Org. Biomol. Chem. 4, 2337\u20132347 (2006).","journal-title":"Org.
-          Biomol. Chem."},{"key":"832_CR102","doi-asserted-by":"publisher","unstructured":"Bran,
-          A. & Cox, S. ur-whitelab\/chemcrow-runs: Zendo release. Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884645
-          (2024).","DOI":"10.5281\/zenodo.10884645"},{"key":"832_CR103","doi-asserted-by":"publisher","unstructured":"Bran,
-          A., Cox, S., White, A. & Schwaller, P. ur-whitelab\/chemcrow-public: v0.3.24.
-          Zenodo https:\/\/doi.org\/10.5281\/zenodo.10884639 (2024).","DOI":"10.5281\/zenodo.10884639"}],"container-title":["Nature
-          Machine Intelligence"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2024,5,23]],"date-time":"2024-05-23T23:03:31Z","timestamp":1716505411000},"score":1,"resource":{"primary":{"URL":"https:\/\/www.nature.com\/articles\/s42256-024-00832-8"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2024,5,8]]},"references-count":103,"journal-issue":{"issue":"5","published-online":{"date-parts":[[2024,5]]}},"alternative-id":["832"],"URL":"http:\/\/dx.doi.org\/10.1038\/s42256-024-00832-8","relation":{},"ISSN":["2522-5839"],"issn-type":[{"value":"2522-5839","type":"electronic"}],"subject":[],"published":{"date-parts":[[2024,5,8]]},"assertion":[{"value":"13
-          September 2023","order":1,"name":"received","label":"Received","group":{"name":"ArticleHistory","label":"Article
-          History"}},{"value":"27 March 2024","order":2,"name":"accepted","label":"Accepted","group":{"name":"ArticleHistory","label":"Article
-          History"}},{"value":"8 May 2024","order":3,"name":"first_online","label":"First
-          Online","group":{"name":"ArticleHistory","label":"Article History"}},{"value":"A.D.W.
-          has served as a paid consultant for evaluating AI model safety at OpenAI.
-          The other authors declare no competing interests.","order":1,"name":"Ethics","group":{"name":"EthicsHeading","label":"Competing
-          interests"}}]}}'
-      headers:
-        Access-Control-Allow-Headers:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        access-control-allow-headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
             Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
+        access-control-allow-origin:
           - "*"
-        Access-Control-Expose-Headers:
+        access-control-expose-headers:
           - Link
-        Connection:
-          - close
-        Content-Encoding:
+        content-encoding:
           - gzip
-        Content-Length:
-          - "10524"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
+        permissions-policy:
+          - interest-cohort=()
+        server:
           - Jetty(9.4.40.v20210413)
-        Vary:
+        vary:
           - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
-          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
-          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
-          pages={145\u2013145} }\n"
+      body: ""
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1063%2F1.4938384/transform/application/x-bibtex
     response:
@@ -1153,85 +1159,94 @@ interactions:
 
           "
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366/transform/application/x-bibtex
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
     response:
       body:
         string:
-          " @article{Herger_2024, title={High-throughput screening of human genetic
-          variants by pooled prime editing}, url={http://dx.doi.org/10.1101/2024.04.01.587366},
-          DOI={10.1101/2024.04.01.587366}, publisher={Cold Spring Harbor Laboratory},
-          author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and Cunha,
-          Ana and Strom, Molly and Findlay, Gregory M.}, year={2024}, month=apr }
-
-          "
+          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
+          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
+          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
+          pages={145\u2013145} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8/transform/application/x-bibtex
     response:
@@ -1245,76 +1260,132 @@ interactions:
           D. and Schwaller, Philippe}, year={2024}, month=may, pages={525\u2013535}
           }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475/transform/application/x-bibtex
+      uri: https://api.crossref.org/works/10.1023%2Fa%3A1007154515475/transform/application/x-bibtex
     response:
       body:
         string:
-          " @article{Adak_2001, volume={218}, ISSN={0300-8177}, url={http://dx.doi.org/10.1023/a:1007154515475},
-          DOI={10.1023/a:1007154515475}, number={1/2}, journal={Molecular and Cellular
+          " @article{Adak_2001, title={An essential role of active site arginine
+          residue in iodide binding and histidine residue in electron transfer for iodide
+          oxidation by horseradish peroxidase}, volume={218}, ISSN={1573-4919}, url={http://dx.doi.org/10.1023/a:1007154515475},
+          DOI={10.1023/a:1007154515475}, number={1\u20132}, journal={Molecular and Cellular
           Biochemistry}, publisher={Springer Science and Business Media LLC}, author={Adak,
           Subrata and Bandyopadhyay, Debashis and Bandyopadhyay, Uday and Banerjee,
-          Ranajit K.}, year={2001}, pages={1\u201311} }\n"
+          Ranajit K.}, year={2001}, month=feb, pages={1\u201311} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:25 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Herger_2024, title={High-throughput screening of human genetic
+          variants by pooled prime editing}, url={http://dx.doi.org/10.1101/2024.04.01.587366},
+          DOI={10.1101/2024.04.01.587366}, publisher={Cold Spring Harbor Laboratory},
+          author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and Cunha,
+          Ana and Strom, Molly and Findlay, Gregory M.}, year={2024}, month=apr }
+
+          "
+      headers:
+        Connection:
+          - keep-alive
+        Date:
+          - Mon, 11 Aug 2025 23:07:25 GMT
+        Transfer-Encoding:
+          - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
           - 1s
-        x-ratelimit-limit:
+        x-rate-limit-limit:
           - "150"
       status:
         code: 200

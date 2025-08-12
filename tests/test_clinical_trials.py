@@ -2,8 +2,8 @@
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
+import httpx
 import pytest
-from aiohttp import ClientResponseError, ClientSession
 
 from paperqa import Docs, Settings
 from paperqa.sources.clinical_trials import (
@@ -35,46 +35,48 @@ def mock_bucket_client():
         yield mock_client
 
 
-@pytest.fixture(name="mock_session")
-def fixture_mock_session() -> ClientSession:
-    return AsyncMock(spec=ClientSession)
+@pytest.fixture(name="mock_client")
+def fixture_mock_client() -> httpx.AsyncClient:
+    return AsyncMock(spec=httpx.AsyncClient)
 
 
 @pytest.mark.asyncio
-async def test_api_search_clinical_trials_success(mock_session):
-    mock_response = AsyncMock(status=200)
-    mock_response.raise_for_status = Mock()
-    mock_response.text.return_value = json.dumps({"studies": [SAMPLE_TRIAL_DATA]})
-    mock_response.json.return_value = {"studies": [SAMPLE_TRIAL_DATA]}
-    mock_session.get.return_value.__aenter__.return_value = mock_response
-
-    result = await api_search_clinical_trials("test query", mock_session)
-
-    assert result == {"studies": [SAMPLE_TRIAL_DATA]}
-    mock_session.get.assert_called_once()
-    mock_response.raise_for_status.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_api_get_clinical_trial_success(mock_session):
-    mock_response = AsyncMock()
-    mock_response.raise_for_status = Mock()
-    mock_response.json.return_value = SAMPLE_TRIAL_DATA
-    mock_session.get.return_value.__aenter__.return_value = mock_response
-
-    result = await api_get_clinical_trial("NCT12345678", mock_session)
-
-    assert result == SAMPLE_TRIAL_DATA
-    mock_response.raise_for_status.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_api_get_clinical_trial_not_found(mock_session):
-    mock_session.get.side_effect = ClientResponseError(
-        request_info=Mock(), history=Mock(), status=404
+async def test_api_search_clinical_trials_success(mock_client) -> None:
+    mock_client.get.return_value = mock_response = AsyncMock(
+        status_code=200,
+        raise_for_status=Mock(),
+        text=json.dumps({"studies": [SAMPLE_TRIAL_DATA]}),
+        json=Mock(return_value={"studies": [SAMPLE_TRIAL_DATA]}),
+        get=Mock(return_value={"studies": [SAMPLE_TRIAL_DATA]}),
     )
 
-    result = await api_get_clinical_trial("NCT12345678", mock_session)
+    result = await api_search_clinical_trials("test query", mock_client)
+
+    assert result == {"studies": [SAMPLE_TRIAL_DATA]}
+    mock_client.get.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_api_get_clinical_trial_success(mock_client) -> None:
+    mock_client.get.return_value = mock_response = AsyncMock(
+        raise_for_status=Mock(), json=Mock(return_value=SAMPLE_TRIAL_DATA)
+    )
+
+    result = await api_get_clinical_trial("NCT12345678", mock_client)
+
+    assert result == SAMPLE_TRIAL_DATA
+    mock_client.get.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_api_get_clinical_trial_not_found(mock_client) -> None:
+    mock_client.get.side_effect = httpx.HTTPStatusError(
+        "Not Found", request=Mock(), response=Mock(status_code=404)
+    )
+
+    result = await api_get_clinical_trial("NCT12345678", mock_client)
 
     assert result is None, "Should be robust to missing trials"
 
@@ -93,18 +95,25 @@ def test_format_to_doc_details():
 
 
 @pytest.mark.asyncio
-async def test_add_clinical_trials_to_docs(mock_session) -> None:
+async def test_add_clinical_trials_to_docs(mock_client) -> None:
     mock_docs = Mock(spec=Docs, aadd_texts=AsyncMock(), texts=[])
-    mock_response = AsyncMock(raise_for_status=Mock(return_value=None))
-    mock_response.json.return_value = {
-        "studies": [
-            {"protocolSection": {"identificationModule": {"nctId": "NCT12345678"}}}
-        ]
-    }
-    mock_session.get.return_value.__aenter__.return_value = mock_response
+    mock_client.get.return_value = AsyncMock(
+        raise_for_status=Mock(return_value=None),
+        json=Mock(
+            return_value={
+                "studies": [
+                    {
+                        "protocolSection": {
+                            "identificationModule": {"nctId": "NCT12345678"}
+                        }
+                    }
+                ]
+            }
+        ),
+    )
 
     await add_clinical_trials_to_docs(
-        "test query", mock_docs, Settings(), session=mock_session
+        "test query", mock_docs, Settings(), client=mock_client
     )
 
     assert (

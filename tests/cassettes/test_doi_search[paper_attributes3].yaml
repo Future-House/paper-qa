@@ -1,9 +1,19 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.addr.2015.01.008?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.addr.2015.01.008?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -36,52 +46,61 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:29 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Via:
-          - 1.1 62c71b579b931f194fbc7abcc843d132.cloudfront.net (CloudFront)
+          - 1.1 496003b8c4e3056a62dc655a8393be56.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - zdnZUBS1IfFG7e5NKyYFNX-Rt-5iw5xMogWrKB18yQMgzXFDyzAxbw==
+          - ZFdQH8A2S8B5-Ntej_-bJtWZHzVN-vitgYizBPabUCldRk62JawaqQ==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PJrlREf7vHcEsIA=
+          - PKeizFuGPHcEXDA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1395"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 17:19:29 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 9a237738-16b9-4dc9-8fb0-eb9cbda7f47a
+          - 3a7a57d0-7a3e-42da-a7ff-a8e1ae2ad4b4
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.unpaywall.org/v2/10.1016/j.addr.2015.01.008?email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"doi":"10.1016/j.addr.2015.01.008","doi_url":"https://doi.org/10.1016/j.addr.2015.01.008","title":"Pharmacokinetics,
-          biodistribution and cell uptake of antisense oligonucleotides","genre":"journal-article","is_paratext":false,"published_date":"2015-02-07","year":2015,"journal_name":"Advanced
-          Drug Delivery Reviews","journal_issns":"0169-409X,1872-8294","journal_issn_l":"0169-409X","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Elsevier
-          BV","is_oa":true,"oa_status":"hybrid","has_repository_copy":false,"best_oa_location":{"url":"https://doi.org/10.1016/j.addr.2015.01.008","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.addr.2015.01.008","evidence":"deprecated","license":"cc-by-nc-nd","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2015-02-07","updated":"deprecated"},"first_oa_location":{"url":"https://doi.org/10.1016/j.addr.2015.01.008","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.addr.2015.01.008","evidence":"deprecated","license":"cc-by-nc-nd","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2015-02-07","updated":"deprecated"},"oa_locations":[{"url":"https://doi.org/10.1016/j.addr.2015.01.008","url_for_pdf":null,"url_for_landing_page":"https://doi.org/10.1016/j.addr.2015.01.008","evidence":"deprecated","license":"cc-by-nc-nd","version":"publishedVersion","host_type":"publisher","is_best":true,"pmh_id":null,"endpoint_id":null,"repository_institution":null,"oa_date":"2015-02-07","updated":"deprecated"}],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Richard
-          S. Geary","is_corresponding":true,"raw_affiliation_strings":["Isis Pharmaceuticals,
-          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]},{"author_position":"additional","raw_author_name":"Daniel
-          Norris","is_corresponding":false,"raw_affiliation_strings":["Isis Pharmaceuticals,
-          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]},{"author_position":"additional","raw_author_name":"Rosie
-          Yu","is_corresponding":false,"raw_affiliation_strings":["Isis Pharmaceuticals,
-          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]},{"author_position":"last","raw_author_name":"C.
-          Frank Bennett","is_corresponding":false,"raw_affiliation_strings":["Isis Pharmaceuticals,
-          Inc., 2855 Gazelle Court, Carlsbad, CA 92010, USA"]}],"updated":"2025-05-22T18:42:22Z"}
-
-          '
+        string: !!binary |
+          H4sIAKt3mmgA/+1WTVPbMBC991dodLYdx0NK4hsfLcOl04GWacswGlnaOAJF8kgy1DD8967sBEKb
+          dqY9FA7cnKfd1XtvpVXuqLSKlnScZ+N8/HZ0mXEpXVbk40mWj7M8n9IkhrDWaQxbhND4cjRCJLOu
+          Hv0xLaigAZM+LrhbcmGvlIGghE9IpaxUPjhVtUFZQ7iRRIDWpG0CvwJi5wgF5cF4/KFVbU0rNNig
+          JHisXINxsfKlbZ3hOuUO6+JeCVWeNdzxAN8DLedce0ho01Za+QVIJnEB0yLNNC/SfBczOuCOlhFK
+          1vWY4csYtyevuREgyaFra3IIWl2D68gJXCu4iTzW8cp74zEBrZilO/nsSzKe7hbptJjt/BTF9GbY
+          k0Vm+QPlDVQZJi2//EUNkqbvEEEujuyfDdpjieBaDLOc+cBDG2ktusopiREL7pmDxnoVrOuYsE33
+          ULcCHzCfaSt4bAot7+g/NB1T2Nw61sg5LU2r9SOksc3K1NigGv62LMqUgL3APAmNA+QIUZFWIh4S
+          hIVIqy41IjURx0b5XsRj989WENpgUWroGthYdoOB0YW1hc1ywdC2lQowsrHKhA1ow0plPB73djBu
+          WEUvt523tpE99ydC7hM6V+61Ac/ZgA3r8dKcv5r//8y/eOo+g2XFXW1j3DmuYUo/zYzkDqEiobeM
+          t2Fh3dCo4Zv1dAbZ/WXC7Ry/WUWuZ/qJEvgcSXKakSOc/N0gXFjnwDe2b9HagT55Plda9bRYfLBM
+          Hbekx155snrXAHULnKEJOTYiS0gxnUzIEb/F9wzIAQ7ykJAD7rSvuMSvPTJDR/KEfD7doxf3yTb6
+          eAT6T663ajjkRoEmH5C08lsFrGb6i1VwgpFAvrYvk7zmvzk8Bxl577i5Ivtg8L9MeHb6F5s3qsgL
+          vGiTtCg+jaflTlEWxTd6/+YHIVrr2OMJAAA=
       headers:
         Access-Control-Allow-Headers:
           - origin, content-type, accept, x-requested-with
@@ -96,13 +115,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:29 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=p2zumZtb6atBFBa6s%2F3eLjzx3a4bWquEJZf0iL3f3Nw%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754932769"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=xxl3wKuXJ12%2FYAQyI6bgcm1m5wx1yUMTciev1NIVp2o%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953643"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=p2zumZtb6atBFBa6s%2F3eLjzx3a4bWquEJZf0iL3f3Nw%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754932769"
+          - heroku-nel="https://nel.heroku.com/reports?s=xxl3wKuXJ12%2FYAQyI6bgcm1m5wx1yUMTciev1NIVp2o%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953643"
         Server:
           - Heroku
         Vary:
@@ -113,248 +132,99 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1016%2Fj.addr.2015.01.008?mailto=example@papercrow.ai
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,8,6]],"date-time":"2025-08-06T12:45:34Z","timestamp":1754484334089},"reference-count":43,"publisher":"Elsevier
-          BV","license":[{"start":{"date-parts":[[2015,6,1]],"date-time":"2015-06-01T00:00:00Z","timestamp":1433116800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/"},{"start":{"date-parts":[[2015,2,6]],"date-time":"2015-02-06T00:00:00Z","timestamp":1423180800000},"content-version":"vor","delay-in-days":0,"URL":"http:\/\/creativecommons.org\/licenses\/by-nc-nd\/4.0\/"}],"content-domain":{"domain":["elsevier.com","sciencedirect.com"],"crossmark-restriction":true},"short-container-title":["Advanced
-          Drug Delivery Reviews"],"published-print":{"date-parts":[[2015,6]]},"DOI":"10.1016\/j.addr.2015.01.008","type":"journal-article","created":{"date-parts":[[2015,2,7]],"date-time":"2015-02-07T16:40:26Z","timestamp":1423327226000},"page":"46-51","update-policy":"http:\/\/dx.doi.org\/10.1016\/elsevier_cm_policy","source":"Crossref","is-referenced-by-count":724,"special_numbering":"C","title":["Pharmacokinetics,
-          biodistribution and cell uptake of antisense oligonucleotides"],"prefix":"10.1016","volume":"87","author":[{"given":"Richard
-          S.","family":"Geary","sequence":"first","affiliation":[]},{"given":"Daniel","family":"Norris","sequence":"additional","affiliation":[]},{"given":"Rosie","family":"Yu","sequence":"additional","affiliation":[]},{"given":"C.
-          Frank","family":"Bennett","sequence":"additional","affiliation":[]}],"member":"78","reference":[{"key":"10.1016\/j.addr.2015.01.008_bb0005","series-title":"Antisense
-          Drug Technology: Principles, Strategies, and Applications","first-page":"3","article-title":"Mechanisms
-          of antisense drug action, an introduction","author":"Crooke","year":"2007"},{"key":"10.1016\/j.addr.2015.01.008_bb0010","doi-asserted-by":"crossref","first-page":"259","DOI":"10.1146\/annurev.pharmtox.010909.105654","article-title":"RNA
-          targeting therapeutics: molecular mechanisms of antisense oligonucleotides
-          as a therapeutic platform","volume":"50","author":"Bennett","year":"2010","journal-title":"Annu
-          Rev Pharmacol Toxicol."},{"key":"10.1016\/j.addr.2015.01.008_bb0015","doi-asserted-by":"crossref","first-page":"17181","DOI":"10.1074\/jbc.M311683200","article-title":"Determination
-          of the role of the human RNase H1 in the pharmacology of DNA-like antisense
-          drugs","volume":"279","author":"Wu","year":"2004","journal-title":"J Biol
-          Chem."},{"issue":"7","key":"10.1016\/j.addr.2015.01.008_bb0020","doi-asserted-by":"crossref","first-page":"599","DOI":"10.1038\/nsmb780","article-title":"Kinetic
-          analysis of the RNAi enzyme complex","volume":"11","author":"Haley","year":"2004","journal-title":"Nat
-          Struct Mol Biol"},{"key":"10.1016\/j.addr.2015.01.008_bb0025","series-title":"Antisense
-          Drug Technology: Principles, Strategies, and Applications","first-page":"183","article-title":"Basic
-          principles of the pharmacokinetics of antisense oligonucleotide drugs","author":"Levin","year":"2007"},{"key":"10.1016\/j.addr.2015.01.008_bb0030","doi-asserted-by":"crossref","first-page":"381","DOI":"10.1517\/17425250902877680","article-title":"Antisense
-          oligonucleotide pharmacokinetics and metabolism","volume":"5","author":"Geary","year":"2009","journal-title":"Expert
-          Opin Drug Metab Toxicol."},{"key":"10.1016\/j.addr.2015.01.008_bb0035","doi-asserted-by":"crossref","first-page":"169","DOI":"10.1517\/17425255.2013.737320","article-title":"Clinical
-          pharmacokinetics of second generation antisense oligonucleotides","volume":"9","author":"Yu","year":"2013","journal-title":"Expert
-          Opin Drug Metab Toxicol."},{"key":"10.1016\/j.addr.2015.01.008_bb0040","doi-asserted-by":"crossref","first-page":"269","DOI":"10.1111\/j.1365-2125.2012.04469.x","article-title":"Clinical
-          pharmacological properties of mipomersen (Kynamro), a second generation antisense
-          inhibitor of apolipoprotein B","volume":"76","author":"Crooke","year":"2013","journal-title":"Br
-          J Clin Pharmacol."},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0045","doi-asserted-by":"crossref","first-page":"460","DOI":"10.1124\/dmd.106.012401","article-title":"Cross-species
-          pharmacokinetic comparison from mouse to man of a second-generation antisense
-          oligonucleotide, ISIS 301012, targeting human apolipoprotein B-100","volume":"35","author":"Yu","year":"2007","journal-title":"Drug
-          Metab Dispos"},{"key":"10.1016\/j.addr.2015.01.008_bb0050","doi-asserted-by":"crossref","first-page":"550","DOI":"10.1016\/j.coph.2005.07.001","article-title":"Pharmacokinetics
-          and biodistribution of phosphorodiamidate morpholino antisense oligomers","volume":"5","author":"Amantana","year":"2005","journal-title":"Current
-          Opinion in Pharmacology."},{"key":"10.1016\/j.addr.2015.01.008_bb0055","series-title":"Antisense
-          Drug Technology: Principles, Strategies, and Applications","first-page":"565","article-title":"Morpholinos","author":"Iverson","year":"2007"},{"issue":"2","key":"10.1016\/j.addr.2015.01.008_bb0060","doi-asserted-by":"crossref","first-page":"65","DOI":"10.1089\/108729002760070803","article-title":"Pharmacokinetics
-          and tissue distribution of a peptide nucleic acid after intravenous administration","volume":"12","author":"McMahon","year":"2002","journal-title":"Antisense
-          Nucleic Acid Drug Dev"},{"issue":"4","key":"10.1016\/j.addr.2015.01.008_bb0065","doi-asserted-by":"crossref","first-page":"255","DOI":"10.1089\/nat.2012.0371","article-title":"Toxicological
-          and pharmacokinetic properties of chemically modified siRNAs targeting p53
-          RNA following intravenous administration","volume":"22","author":"Thompson","year":"2012","journal-title":"Nucleic
-          Acid Ther"},{"key":"10.1016\/j.addr.2015.01.008_bb0070","doi-asserted-by":"crossref","first-page":"910","DOI":"10.1016\/j.bcp.2008.11.005","article-title":"Cross-species
-          comparison of in vivo PK\/PD relationships for second-generation antisense
-          oligonucleotides targeting apolipoprotein B-100","volume":"77","author":"Yu","year":"2009","journal-title":"Biochem
-          Pharmacol."},{"key":"10.1016\/j.addr.2015.01.008_bb0075","series-title":"Antisense
-          Drug Technology: Principles, Strategies, and Applications","first-page":"305","article-title":"Pharmacokinetic\/pharmacodynamic
-          properties of phosphorothioate 2\u2032-O-(2-methoxyethyl)-modified antisense
-          oligonucleotides in animal and man","author":"Geary","year":"2007"},{"key":"10.1016\/j.addr.2015.01.008_bb0080","doi-asserted-by":"crossref","first-page":"862","DOI":"10.1038\/78475","article-title":"Reduction
-          of liver Fas expression by an antisense oligonucleotide protects mice from
-          fulminant hepatitis","volume":"18","author":"Zhang","year":"2000","journal-title":"Nat
-          Biotechnol."},{"key":"10.1016\/j.addr.2015.01.008_bb0085","doi-asserted-by":"crossref","first-page":"168","DOI":"10.2533\/chimia.1996.168","article-title":"Second
-          generation of antisense oligonucleotides: from nuclease resistance to biological
-          efficacy in animals","volume":"50","author":"Altmann","year":"1996","journal-title":"Chimia"},{"issue":"6","key":"10.1016\/j.addr.2015.01.008_bb0090","doi-asserted-by":"crossref","first-page":"369","DOI":"10.1089\/nat.2013.0443","article-title":"Characterization
-          of target mRNA reduction through in situ RNA hybridization in multiple organ
-          systems following systemic antisense treatment in animals","volume":"23","author":"Hung","year":"2013","journal-title":"Nucleic
-          Acid Ther"},{"issue":"1\u20132","key":"10.1016\/j.addr.2015.01.008_bb0095","doi-asserted-by":"crossref","first-page":"155","DOI":"10.1016\/S0303-7207(03)00008-X","article-title":"PTP1B
-          antisense-treated mice show regulation of genes involved in lipogenesis in
-          liver and fat","volume":"203","author":"Waring","year":"2003","journal-title":"Mol
-          Cell Endocrinol"},{"issue":"8","key":"10.1016\/j.addr.2015.01.008_bb0100","doi-asserted-by":"crossref","first-page":"2405","DOI":"10.2337\/diabetes.51.8.2405","article-title":"Protein
-          tyrosine phosphatase 1B reduction regulates adiposity and expression of genes
-          involved in lipogenesis","volume":"51","author":"Rondinone","year":"2002","journal-title":"Diabetes"},{"issue":"17","key":"10.1016\/j.addr.2015.01.008_bb0105","doi-asserted-by":"crossref","first-page":"11357","DOI":"10.1073\/pnas.142298199","article-title":"PTP1B
-          antisense oligonucleotide lowers PTP1B protein, normalizes blood glucose,
-          and improves insulin sensitivity in diabetic mice","volume":"99","author":"Zinker","year":"2002","journal-title":"Proc
-          Natl Acad Sci U S A"},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0110","doi-asserted-by":"crossref","first-page":"833","DOI":"10.1158\/1078-0432.CCR-07-1310","article-title":"A
-          phase I study of OGX-011, a 2\u2032-methoxyethyl phosphorothioate antisense
-          to clusterin, in combination with docetaxel in patients with advanced cancer","volume":"14","author":"Chi","year":"2008","journal-title":"Clin
-          Cancer Res"},{"issue":"24","key":"10.1016\/j.addr.2015.01.008_bb0115","doi-asserted-by":"crossref","first-page":"6150","DOI":"10.1158\/1078-0432.CCR-10-1932","article-title":"Tumor
-          survivin is downregulated by the antisense oligonucleotide LY2181308: a proof-of-concept,
-          first-in-human dose study","volume":"16","author":"Talbot","year":"2010","journal-title":"Clin
-          Cancer Res"},{"key":"10.1016\/j.addr.2015.01.008_bb0120","article-title":"Antisense
-          therapies for cancer: Bridging the pharmacogenomic divide","author":"MacLeod","year":"2014","journal-title":"Drug
-          Discov Today"},{"issue":"26","key":"10.1016\/j.addr.2015.01.008_bb0125","doi-asserted-by":"crossref","first-page":"2677","DOI":"10.1056\/NEJMoa073108","article-title":"Local
-          dystrophin restoration with antisense oligonucleotide PRO051","volume":"357","author":"van
-          Deutekom","year":"2007","journal-title":"N Engl J Med"},{"issue":"5","key":"10.1016\/j.addr.2015.01.008_bb0130","doi-asserted-by":"crossref","first-page":"637","DOI":"10.1002\/ana.23982","article-title":"Eteplirsen
-          for the treatment of Duchenne muscular dystrophy","volume":"74","author":"Mendell","year":"2013","journal-title":"Ann
-          Neurol"},{"issue":"7409","key":"10.1016\/j.addr.2015.01.008_bb0135","doi-asserted-by":"crossref","first-page":"111","DOI":"10.1038\/nature11362","article-title":"Targeting
-          nuclear RNA for in vivo correction of myotonic dystrophy","volume":"488","author":"Wheeler","year":"2012","journal-title":"Nature"},{"issue":"4","key":"10.1016\/j.addr.2015.01.008_bb0140","doi-asserted-by":"crossref","first-page":"1028","DOI":"10.2337\/diabetes.51.4.1028","article-title":"Specific
-          inhibition of PTEN expression reverses hyperglycemia in diabetic mice","volume":"51","author":"Butler","year":"2002","journal-title":"Diabetes"},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0145","doi-asserted-by":"crossref","first-page":"774","DOI":"10.1016\/j.celrep.2014.02.008","article-title":"Peripheral
-          androgen receptor gene suppression rescues disease in mouse models of spinal
-          and bulbar muscular atrophy","volume":"7","author":"Lieberman","year":"2014","journal-title":"Cell
-          Rep"},{"issue":"2","key":"10.1016\/j.addr.2015.01.008_bb0150","doi-asserted-by":"crossref","first-page":"295","DOI":"10.1016\/j.neuron.2014.03.001","article-title":"Muscle
-          expression of mutant androgen receptor accounts for systemic and motor neuron
-          disease phenotypes in spinal and bulbar muscular atrophy","volume":"82","author":"Cortes","year":"2014","journal-title":"Neuron"},{"issue":"8","key":"10.1016\/j.addr.2015.01.008_bb0155","doi-asserted-by":"crossref","first-page":"2290","DOI":"10.1172\/JCI25424","article-title":"Antisense
-          oligonucleotide therapy for neurodegenerative disease","volume":"116","author":"Smith","year":"2006","journal-title":"J
-          Clin Invest"},{"issue":"6","key":"10.1016\/j.addr.2015.01.008_bb0160","doi-asserted-by":"crossref","first-page":"1031","DOI":"10.1016\/j.neuron.2012.05.009","article-title":"Sustained
-          therapeutic reversal of Huntington''s disease by transient repression of huntingtin
-          synthesis","volume":"74","author":"Kordasiewicz","year":"2012","journal-title":"Neuron"},{"issue":"72","key":"10.1016\/j.addr.2015.01.008_bb0165","doi-asserted-by":"crossref","first-page":"72ra18","DOI":"10.1126\/scitranslmed.3001777","article-title":"Antisense
-          oligonucleotides delivered to the mouse CNS ameliorate symptoms of severe
-          spinal muscular atrophy","volume":"3","author":"Passini","year":"2011","journal-title":"Sci
-          Transl Med."},{"issue":"1","key":"10.1016\/j.addr.2015.01.008_bb0170","doi-asserted-by":"crossref","first-page":"46","DOI":"10.1124\/jpet.113.212407","article-title":"Pharmacology
-          of a central nervous system delivered 2\u2032-O-methoxyethyl-modified survival
-          of motor neuron splicing oligonucleotide in mice and nonhuman primates","volume":"350","author":"Rigo","year":"2014","journal-title":"J
-          Pharmacol Exp Ther"},{"issue":"5","key":"10.1016\/j.addr.2015.01.008_bb0175","doi-asserted-by":"crossref","first-page":"435","DOI":"10.1016\/S1474-4422(13)70061-9","article-title":"An
-          antisense oligonucleotide against SOD1 delivered intrathecally for patients
-          with SOD1 familial amyotrophic lateral sclerosis: a phase 1, randomised, first-in-man
-          study","volume":"12","author":"Miller","year":"2013","journal-title":"Lancet
-          Neurol"},{"key":"10.1016\/j.addr.2015.01.008_bb0180","series-title":"Poster
-          Presentation, 2012 AAPS Annual Meeting and Exposition, Chicago, IL, October
-          14-18","article-title":"Adult and Juvenile Monkey Pharmacokinetics (PK) of
-          a Uniformly Modi_ed 2\u2032-(2-Methoxyethyl) Antisense Oligonucleotide(ASO;
-          ISIS-SMNRx) in Development for Treatment of Spinal Muscular Atrophy (SMA)","author":"Rigo","year":"2012"},{"key":"10.1016\/j.addr.2015.01.008_bb0185","series-title":"Poster
-          Presentation, 2013 AAPS Annual Meeting and Exposition, San Antonio, TX, Nov
-          10-14","article-title":"Pharmacokinetics (PK) of an 35S-labeled Second Generation
-          Antisense Oligonucleotide (ASO) in Mice and Rats After Intracerebroventricular
-          (ICV) and\/or Intrathecal (IT) Single Dose Administration","author":"Norris","year":"2013"},{"issue":"21","key":"10.1016\/j.addr.2015.01.008_bb0190","doi-asserted-by":"crossref","first-page":"9634","DOI":"10.1093\/nar\/gkt725","article-title":"Rational
-          design of antisense oligonucleotides targeting single nucleotide polymorphisms
-          for potent and allele selective suppression of mutant Huntingtin in the CNS","volume":"41","author":"Ostergaard","year":"2013","journal-title":"Nucleic
-          Acids Res"},{"issue":"3","key":"10.1016\/j.addr.2015.01.008_bb0195","doi-asserted-by":"crossref","first-page":"284","DOI":"10.1016\/j.bcp.2009.04.013","article-title":"Effect
-          of dose and plasma concentration on liver uptake and pharmacologic activity
-          of a 2\u2032-methoxyethyl modified chimeric antisense oligonucleotide targeting
-          PTEN","volume":"78","author":"Geary","year":"2009","journal-title":"Biochem
-          Pharmacol"},{"issue":"12","key":"10.1016\/j.addr.2015.01.008_bb0200","doi-asserted-by":"crossref","first-page":"7819","DOI":"10.1093\/nar\/gku484","article-title":"TCP1
-          complex proteins interact with phosphorothioate oligonucleotides and can co-localize
-          in oligonucleotide-induced nuclear bodies in mammalian cells","volume":"42","author":"Liang","year":"2014","journal-title":"Nucleic
-          Acids Res"},{"issue":"11","key":"10.1016\/j.addr.2015.01.008_bb0205","doi-asserted-by":"crossref","first-page":"4795","DOI":"10.1093\/nar\/gkr089","article-title":"Mechanisms
-          of single-stranded phosphorothioate modified antisense oligonucleotide accumulation
-          in hepatocytes","volume":"39","author":"Koller","year":"2011","journal-title":"Nucleic
-          Acids Res"},{"issue":"11","key":"10.1016\/j.addr.2015.01.008_bb0210","doi-asserted-by":"crossref","first-page":"967","DOI":"10.1038\/nmat3765","article-title":"Delivery
-          materials for siRNA therapeutics","volume":"12","author":"Kanasty","year":"2013","journal-title":"Nat
-          Mater"},{"issue":"13","key":"10.1016\/j.addr.2015.01.008_bb0215","doi-asserted-by":"crossref","first-page":"8796","DOI":"10.1093\/nar\/gku531","article-title":"Targeted
-          delivery of antisense oligonucleotides to hepatocytes using triantennary N-acetyl
-          galactosamine improves potency 10-fold in mice","volume":"42","author":"Prakash","year":"2014","journal-title":"Nucleic
-          Acids Res"}],"container-title":["Advanced Drug Delivery Reviews"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0169409X15000101?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0169409X15000101?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2022,4,28]],"date-time":"2022-04-28T21:19:27Z","timestamp":1651180767000},"score":1,"resource":{"primary":{"URL":"https:\/\/linkinghub.elsevier.com\/retrieve\/pii\/S0169409X15000101"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2015,6]]},"references-count":43,"alternative-id":["S0169409X15000101"],"URL":"https:\/\/doi.org\/10.1016\/j.addr.2015.01.008","relation":{},"ISSN":["0169-409X"],"issn-type":[{"type":"print","value":"0169-409X"}],"subject":[],"published":{"date-parts":[[2015,6]]},"assertion":[{"value":"Elsevier","name":"publisher","label":"This
-          article is maintained by"},{"value":"Pharmacokinetics, biodistribution and
-          cell uptake of antisense oligonucleotides","name":"articletitle","label":"Article
-          Title"},{"value":"Advanced Drug Delivery Reviews","name":"journaltitle","label":"Journal
-          Title"},{"value":"https:\/\/doi.org\/10.1016\/j.addr.2015.01.008","name":"articlelink","label":"CrossRef
-          DOI link to publisher maintained version"},{"value":"article","name":"content_type","label":"Content
-          Type"},{"value":"Copyright \u00a9 2015 The Authors. Published by Elsevier
-          B.V.","name":"copyright","label":"Copyright"}]}}'
+      body: ""
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
           - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "5118"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 17:19:29 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.openalex.org/works/https://doi.org/10.1016%2Fj.addr.2015.01.008
     response:
       body:
-        string:
-          '{"id":"https://openalex.org/W2033425827","doi":"https://doi.org/10.1016/j.addr.2015.01.008","title":"Pharmacokinetics,
-          biodistribution and cell uptake of antisense oligonucleotides","display_name":"Pharmacokinetics,
-          biodistribution and cell uptake of antisense oligonucleotides","publication_year":2015,"publication_date":"2015-02-07","ids":{"openalex":"https://openalex.org/W2033425827","doi":"https://doi.org/10.1016/j.addr.2015.01.008","mag":"2033425827","pmid":"https://pubmed.ncbi.nlm.nih.gov/25666165"},"language":"en","primary_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.addr.2015.01.008","pdf_url":null,"source":{"id":"https://openalex.org/S114437232","display_name":"Advanced
-          Drug Delivery Reviews","issn_l":"0169-409X","issn":["0169-409X","1872-8294"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
-          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
-          BV"],"type":"journal"},"license":"cc-by-nc-nd","license_id":"https://openalex.org/licenses/cc-by-nc-nd","version":"publishedVersion","is_accepted":true,"is_published":true},"type":"review","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":true,"oa_status":"hybrid","oa_url":"https://doi.org/10.1016/j.addr.2015.01.008","any_repository_has_fulltext":false},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5056554811","display_name":"Richard
-          S. Geary","orcid":"https://orcid.org/0000-0002-6308-3179"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
-          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Richard
-          S. Geary","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855 Gazelle
-          Court, Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
-          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5041113915","display_name":"Daniel
-          A. Norris","orcid":"https://orcid.org/0000-0003-2074-5862"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
-          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Daniel
-          Norris","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855 Gazelle
-          Court, Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
-          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5002446366","display_name":"Rosie
-          Z. Yu","orcid":"https://orcid.org/0000-0001-9266-7280"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
-          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"Rosie
-          Yu","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855 Gazelle Court,
-          Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
-          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5083296071","display_name":"C.
-          Frank Bennett","orcid":"https://orcid.org/0000-0001-9887-6251"},"institutions":[{"id":"https://openalex.org/I2800035258","display_name":"Ionis
-          Pharmaceuticals (United States)","ror":"https://ror.org/00t8bew53","country_code":"US","type":"funder","lineage":["https://openalex.org/I2800035258"]}],"countries":["US"],"is_corresponding":false,"raw_author_name":"C.
-          Frank Bennett","raw_affiliation_strings":["Isis Pharmaceuticals Inc, 2855
-          Gazelle Court, Carlsbad, CA 92010, USA."],"affiliations":[{"raw_affiliation_string":"Isis
-          Pharmaceuticals Inc, 2855 Gazelle Court, Carlsbad, CA 92010, USA.","institution_ids":["https://openalex.org/I2800035258"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":{"value":5150,"currency":"USD","value_usd":5150},"apc_paid":{"value":5150,"currency":"USD","value_usd":5150},"fwci":7.509,"has_fulltext":false,"cited_by_count":750,"citation_normalized_percentile":{"value":0.999758,"is_in_top_1_percent":true,"is_in_top_10_percent":true},"cited_by_percentile_year":{"min":99,"max":100},"biblio":{"volume":"87","issue":null,"first_page":"46","last_page":"51"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T10725","display_name":"RNA
-          Interference and Gene Delivery","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},"topics":[{"id":"https://openalex.org/T10725","display_name":"RNA
-          Interference and Gene Delivery","score":0.9999,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},{"id":"https://openalex.org/T10432","display_name":"DNA and Nucleic
-          Acid Chemistry","score":0.9998,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},{"id":"https://openalex.org/T10207","display_name":"Advanced biosensing
-          and bioanalysis techniques","score":0.9995,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/biodistribution","display_name":"Biodistribution","score":0.8485062}],"concepts":[{"id":"https://openalex.org/C2777807558","wikidata":"https://www.wikidata.org/wiki/Q4914764","display_name":"Biodistribution","level":3,"score":0.8485062},{"id":"https://openalex.org/C129312508","wikidata":"https://www.wikidata.org/wiki/Q133686","display_name":"Oligonucleotide","level":3,"score":0.78847396},{"id":"https://openalex.org/C181389837","wikidata":"https://www.wikidata.org/wiki/Q461809","display_name":"Bioavailability","level":2,"score":0.6992745},{"id":"https://openalex.org/C28005876","wikidata":"https://www.wikidata.org/wiki/Q189814","display_name":"Endocytosis","level":3,"score":0.65686506},{"id":"https://openalex.org/C112705442","wikidata":"https://www.wikidata.org/wiki/Q323936","display_name":"Pharmacokinetics","level":2,"score":0.5450816},{"id":"https://openalex.org/C98274493","wikidata":"https://www.wikidata.org/wiki/Q128406","display_name":"Pharmacology","level":1,"score":0.5421454},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.53808784},{"id":"https://openalex.org/C79879829","wikidata":"https://www.wikidata.org/wiki/Q5571762","display_name":"Intracellular","level":2,"score":0.4645251},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.39695248},{"id":"https://openalex.org/C1491633281","wikidata":"https://www.wikidata.org/wiki/Q7868","display_name":"Cell","level":2,"score":0.33667707},{"id":"https://openalex.org/C86803240","wikidata":"https://www.wikidata.org/wiki/Q420","display_name":"Biology","level":0,"score":0.308039},{"id":"https://openalex.org/C552990157","wikidata":"https://www.wikidata.org/wiki/Q7430","display_name":"DNA","level":2,"score":0.17627034},{"id":"https://openalex.org/C202751555","wikidata":"https://www.wikidata.org/wiki/Q221681","display_name":"In
-          vitro","level":2,"score":0.16757503}],"mesh":[{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
-          Antisense","qualifier_ui":"Q000493","qualifier_name":"pharmacokinetics","is_major_topic":true},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
-          Antisense","qualifier_ui":"Q000008","qualifier_name":"administration & dosage","is_major_topic":true},{"descriptor_ui":"D000818","descriptor_name":"Animals","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D001692","descriptor_name":"Biological
-          Transport","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D001798","descriptor_name":"Blood
-          Proteins","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D001798","descriptor_name":"Blood
-          Proteins","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D015195","descriptor_name":"Drug
-          Design","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D004705","descriptor_name":"Endocytosis","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D006801","descriptor_name":"Humans","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007275","descriptor_name":"Injections,
-          Intravenous","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007278","descriptor_name":"Injections,
-          Spinal","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007279","descriptor_name":"Injections,
-          Subcutaneous","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D009369","descriptor_name":"Neoplasms","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D009369","descriptor_name":"Neoplasms","qualifier_ui":"Q000188","qualifier_name":"drug
-          therapy","is_major_topic":false},{"descriptor_ui":"D009369","descriptor_name":"Neoplasms","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
-          Antisense","qualifier_ui":"Q000627","qualifier_name":"therapeutic use","is_major_topic":false},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
-          Antisense","qualifier_ui":"Q000737","qualifier_name":"chemistry","is_major_topic":false},{"descriptor_ui":"D016376","descriptor_name":"Oligonucleotides,
-          Antisense","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D009928","descriptor_name":"Organ
-          Specificity","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D011485","descriptor_name":"Protein
-          Binding","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D013045","descriptor_name":"Species
-          Specificity","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D014018","descriptor_name":"Tissue
-          Distribution","qualifier_ui":"","qualifier_name":null,"is_major_topic":false}],"locations_count":2,"locations":[{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.addr.2015.01.008","pdf_url":null,"source":{"id":"https://openalex.org/S114437232","display_name":"Advanced
-          Drug Delivery Reviews","issn_l":"0169-409X","issn":["0169-409X","1872-8294"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
-          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
-          BV"],"type":"journal"},"license":"cc-by-nc-nd","license_id":"https://openalex.org/licenses/cc-by-nc-nd","version":"publishedVersion","is_accepted":true,"is_published":true},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/25666165","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":{"is_oa":true,"landing_page_url":"https://doi.org/10.1016/j.addr.2015.01.008","pdf_url":null,"source":{"id":"https://openalex.org/S114437232","display_name":"Advanced
-          Drug Delivery Reviews","issn_l":"0169-409X","issn":["0169-409X","1872-8294"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310320990","host_organization_name":"Elsevier
-          BV","host_organization_lineage":["https://openalex.org/P4310320990"],"host_organization_lineage_names":["Elsevier
-          BV"],"type":"journal"},"license":"cc-by-nc-nd","license_id":"https://openalex.org/licenses/cc-by-nc-nd","version":"publishedVersion","is_accepted":true,"is_published":true},"sustainable_development_goals":[],"grants":[],"datasets":[],"versions":[],"referenced_works_count":42,"referenced_works":["https://openalex.org/W1533447420","https://openalex.org/W1600624961","https://openalex.org/W1677186713","https://openalex.org/W1738068946","https://openalex.org/W1972326561","https://openalex.org/W1988582067","https://openalex.org/W1995770815","https://openalex.org/W1997188614","https://openalex.org/W2010757394","https://openalex.org/W2018328995","https://openalex.org/W2019957038","https://openalex.org/W2026934511","https://openalex.org/W2032426626","https://openalex.org/W2044204671","https://openalex.org/W2044851147","https://openalex.org/W2050679356","https://openalex.org/W2052322311","https://openalex.org/W2061092005","https://openalex.org/W2069146205","https://openalex.org/W2081746459","https://openalex.org/W2090804804","https://openalex.org/W2095509700","https://openalex.org/W2095949497","https://openalex.org/W2112909190","https://openalex.org/W2115222513","https://openalex.org/W2116500202","https://openalex.org/W2117701024","https://openalex.org/W2120682296","https://openalex.org/W2128768698","https://openalex.org/W2130886644","https://openalex.org/W2131447660","https://openalex.org/W2149414920","https://openalex.org/W2157668743","https://openalex.org/W2167400349","https://openalex.org/W2169218609","https://openalex.org/W2171234404","https://openalex.org/W2174292614","https://openalex.org/W2497851393","https://openalex.org/W2497937268","https://openalex.org/W2504686134","https://openalex.org/W2517077698","https://openalex.org/W84014429"],"related_works":["https://openalex.org/W3148766288","https://openalex.org/W3095294796","https://openalex.org/W3032237923","https://openalex.org/W3030179994","https://openalex.org/W2385718423","https://openalex.org/W2359190752","https://openalex.org/W2046280088","https://openalex.org/W1969303838","https://openalex.org/W16113689","https://openalex.org/W1505739641"],"abstract_inverted_index":{"Pharmacokinetic":[0],"properties":[1],"of":[2,9,24,41,45,71,166,194,198,209],"oligonucleotides":[3,140,151,199,211],"are":[4,14,115],"largely":[5],"driven":[6],"by":[7,29,120,132,153,187],"chemistry":[8],"the":[10,50,72,75,100,144,157,162,195,213],"backbone":[11],"and":[12,37,60,64,82,88,109,117,124,136,184,206],"thus":[13],"sequence":[15],"independent":[16],"within":[17],"a":[18,179],"chemical":[19],"class.":[20],"Tissue":[21],"bioavailability":[22,103],"(%":[23],"administered":[25,152],"dose)":[26],"is":[27,107,129,185],"assisted":[28],"plasma":[30,58,61],"protein":[31,62],"binding":[32,63,80],"that":[33],"limits":[34],"glomerular":[35],"filtration":[36],"ultimate":[38,207],"urinary":[39],"excretion":[40],"oligonucleotides.":[42],"The":[43,164],"substitution":[44],"one":[46],"non-bridging":[47],"oxygen":[48],"with":[49,112],"more":[51],"hydrophobic":[52],"sulfur":[53],"atom":[54],"(phosphorothioate)":[55],"increases":[56],"both":[57],"stability":[59],"thus,":[65],"ultimately,":[66],"tissue":[67,86,102],"bioavailability.":[68],"Additional":[69],"modifications":[70],"sugar":[73],"at":[74],"2''":[76],"position,":[77],"increase":[78,84],"RNA":[79,90],"affinity":[81],"significantly":[83],"potency,":[85],"half-life":[87],"prolong":[89],"inhibitory":[91],"activity.":[92],"Oligonucleotides":[93],"modified":[94,149],"in":[95,161,177,204,212],"this":[96],"manner":[97],"consistently":[98],"exhibit":[99],"highest":[101,113],"(>90%).":[104],"Systemic":[105],"biodistribution":[106],"broad,":[108],"organs":[110],"typically":[111],"concentrations":[114],"liver":[116],"kidney":[118],"followed":[119],"bone":[121],"marrow,":[122],"adipocytes,":[123],"lymph":[125],"nodes.":[126],"Cell":[127],"uptake":[128,190],"predominantly":[130],"mediated":[131],"endocytosis.":[133],"Both":[134],"size":[135],"charge":[137],"for":[138],"most":[139],"prevents":[141],"distribution":[142,169],"across":[143],"blood":[145],"brain":[146],"barrier.":[147],"However,":[148],"single-strand":[150],"intrathecal":[154],"injection":[155],"into":[156],"CSF":[158],"distribute":[159],"broadly":[160],"CNS.":[163],"majority":[165],"intracellular":[167,196],"oligonucleotide":[168],"following":[170,182],"systemic":[171],"or":[172],"local":[173],"administration":[174,183],"occurs":[175],"rapidly":[176],"just":[178],"few":[180],"hours":[181],"facilitated":[186],"rapid":[188],"endocytotic":[189],"mechanisms.":[191],"Further":[192],"understanding":[193],"trafficking":[197],"may":[200],"provide":[201],"further":[202],"enhancements":[203],"design":[205],"potency":[208],"antisense":[210],"future.":[214]},"abstract_inverted_index_v3":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W2033425827","counts_by_year":[{"year":2025,"cited_by_count":40},{"year":2024,"cited_by_count":80},{"year":2023,"cited_by_count":76},{"year":2022,"cited_by_count":79},{"year":2021,"cited_by_count":94},{"year":2020,"cited_by_count":93},{"year":2019,"cited_by_count":95},{"year":2018,"cited_by_count":72},{"year":2017,"cited_by_count":63},{"year":2016,"cited_by_count":45},{"year":2015,"cited_by_count":13}],"updated_date":"2025-08-05T21:18:48.446178","created_date":"2016-06-24"}
-
-          '
+        string: !!binary |
+          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
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -378,15 +248,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:29 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754932769&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=sD3bKQN6asGgidblvjWIJHj1XLNt1QAJAuWDu3ySc2A%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953643&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=%2FTPZH%2FbjF2YReYcYQRQDfXU%2F%2F93YYUmQq9SBio39i5M%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754932769&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=sD3bKQN6asGgidblvjWIJHj1XLNt1QAJAuWDu3ySc2A%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953643&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=%2FTPZH%2FbjF2YReYcYQRQDfXU%2F%2F93YYUmQq9SBio39i5M%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -407,8 +277,159 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1016%2Fj.addr.2015.01.008?mailto=example%40papercrow.ai
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "5118"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:23 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1016%2Fj.addr.2015.01.008/transform/application/x-bibtex
     response:
@@ -421,23 +442,23 @@ interactions:
           Richard S. and Norris, Daniel and Yu, Rosie and Bennett, C. Frank}, year={2015},
           month=jun, pages={46\u201351} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 17:19:29 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
