@@ -1,7 +1,6 @@
 import json
 import logging
 import ssl
-import urllib.parse
 from contextlib import suppress
 from datetime import datetime
 from typing import Any
@@ -42,16 +41,16 @@ MALFORMATTED_QUERY_STATUS: int = 400
     reraise=True,
 )
 async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> dict:
-    request = client.build_request(
-        method="GET",
-        url=(
-            f"{STUDIES_API_URL}?"
-            f"query.term={urllib.parse.quote_plus(query)}&fields=NCTId,OfficialTitle&"
-            "pageSize=1000&countTotal=true&sort=@relevance"
-        ),
-        headers={"User-Agent": "curl/8.7.1", "Accept": "*/*"},
+    response = await client.get(
+        STUDIES_API_URL,
+        params={
+            "query.term": query,
+            "fields": SEARCH_API_FIELDS,
+            "pageSize": SEARCH_PAGE_SIZE,
+            "countTotal": "true",
+            "sort": "@relevance",
+        },
     )
-    response = await client.send(request)
     if response.status_code == MALFORMATTED_QUERY_STATUS:
         # the 400s from clinicaltrials.gov are not JSON, here's an example text:
         # > Error parsing query in Other terms:
@@ -63,13 +62,7 @@ async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> d
         raise httpx.HTTPStatusError(
             message=response.text, request=response.request, response=response
         )
-    try:
-        response.raise_for_status()
-    except httpx.HTTPStatusError as e:
-        print(f"Status: {e.response.status_code}")
-        print(f"Headers: {dict(e.response.headers)}")
-        print(f"Body: {e.response.text}")
-        raise
+    response.raise_for_status()
     return response.json()
 
 
@@ -269,8 +262,6 @@ async def add_clinical_trials_to_docs(
     _client = (
         httpx.AsyncClient(timeout=10.0, verify=context) if client is None else client
     )
-    for k in list(_client.headers.keys()):
-        _client.headers.pop(k)
 
     logger.info(f"Querying clinical trials for: {query}.")
 
