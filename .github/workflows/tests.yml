@@ -86,6 +86,14 @@ jobs:
       - run: uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
       - run: curl https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId,OfficialTitle&pageSize=1000&countTotal=true&sort=@relevance
+      - run: |
+          curl -X GET \
+            -H 'Accept: */*' \
+            -H "Accept-Encoding: gzip, deflate" \
+            -H "Connection: keep-alive" \
+            -H "Host: clinicaltrials.gov" \
+            -H "User-Agent: python-httpx/0.28.1" \
+            "https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance"
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
