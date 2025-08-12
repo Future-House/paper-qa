@@ -86,10 +86,10 @@ jobs:
       - run: uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
       - run: curl https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId,OfficialTitle&pageSize=1000&countTotal=true&sort=@relevance
+      - run: uv run play.py
       - run: |
           curl -X GET \
             -H 'Accept: */*' \
-            -H "Connection: keep-alive" \
             -H "Host: clinicaltrials.gov" \
             -H "User-Agent: python-httpx/0.28.1" \
             "https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance"
