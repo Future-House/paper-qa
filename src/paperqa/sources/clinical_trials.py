@@ -1,5 +1,6 @@
 import json
 import logging
+import ssl
 from contextlib import suppress
 from datetime import datetime
 from typing import Any
@@ -255,7 +256,14 @@ async def add_clinical_trials_to_docs(
             Total number of trials found, number of trials added, and error message if any.
     """
     # Cookies are not needed
-    _client = httpx.AsyncClient(timeout=10.0) if client is None else client
+    ssl_context = ssl.create_default_context()
+    # clinicaltrials.gov will throw 403's in GitHub Actions if TLS 1.3 is used
+    ssl_context.maximum_version = ssl.TLSVersion.TLSv1_2
+    _client = (
+        httpx.AsyncClient(timeout=10.0, verify=ssl_context)
+        if client is None
+        else client
+    )
 
     logger.info(f"Querying clinical trials for: {query}.")
 
