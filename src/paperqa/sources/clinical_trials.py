@@ -266,7 +266,11 @@ async def add_clinical_trials_to_docs(
             Total number of trials found, number of trials added, and error message if any.
     """
     # Cookies are not needed, and malformed via clinicaltrials.gov
-    _session = aiohttp.ClientSession() if session is None else session
+    _session = (
+        aiohttp.ClientSession(headers={"host": "clinicaltrials.gov"})
+        if session is None
+        else session
+    )
 
     logger.info(f"Querying clinical trials for: {query}.")
 
