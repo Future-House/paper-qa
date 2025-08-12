@@ -1,5 +1,6 @@
 import json
 import logging
+import ssl
 import urllib.parse
 from contextlib import suppress
 from datetime import datetime
@@ -262,10 +263,11 @@ async def add_clinical_trials_to_docs(
             Total number of trials found, number of trials added, and error message if any.
     """
     # Cookies are not needed
+    context = ssl.create_default_context()
+    context.minimum_version = ssl.TLSVersion.TLSv1_2
+    context.maximum_version = ssl.TLSVersion.TLSv1_2
     _client = (
-        httpx.AsyncClient(timeout=10.0, verify=False)  # noqa: S501
-        if client is None
-        else client
+        httpx.AsyncClient(timeout=10.0, verify=context) if client is None else client
     )
     for k in list(_client.headers.keys()):
         _client.headers.pop(k)

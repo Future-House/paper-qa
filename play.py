@@ -14,7 +14,7 @@ context = ssl.create_default_context()
 context.minimum_version = ssl.TLSVersion.TLSv1_2
 context.maximum_version = ssl.TLSVersion.TLSv1_2
 
-with httpx.Client(verify=context, http2=False) as client:
+with httpx.Client(verify=context) as client:
     response = client.get(url, headers=headers)
     print(f"Status: {response.status_code}")
     print(f"Text: {response.text}")
