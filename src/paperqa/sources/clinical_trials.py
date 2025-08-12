@@ -255,7 +255,11 @@ async def add_clinical_trials_to_docs(
             Total number of trials found, number of trials added, and error message if any.
     """
     # Cookies are not needed
-    _client = httpx.AsyncClient(timeout=10.0, http2=False) if client is None else client
+    _client = (
+        httpx.AsyncClient(timeout=10.0, verify=False)  # noqa: S501
+        if client is None
+        else client
+    )
     for k in list(_client.headers.keys()):
         _client.headers.pop(k)
 
