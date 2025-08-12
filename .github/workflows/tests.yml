@@ -89,7 +89,6 @@ jobs:
       - run: |
           curl -X GET \
             -H 'Accept: */*' \
-            -H "Accept-Encoding: gzip, deflate" \
             -H "Connection: keep-alive" \
             -H "Host: clinicaltrials.gov" \
             -H "User-Agent: python-httpx/0.28.1" \

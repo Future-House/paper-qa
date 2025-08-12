@@ -42,12 +42,13 @@ MALFORMATTED_QUERY_STATUS: int = 400
 )
 async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> dict:
     request = client.build_request(
-        "GET",
-        (
+        method="GET",
+        url=(
             f"{STUDIES_API_URL}?"
             f"query.term={urllib.parse.quote_plus(query)}&fields=NCTId,OfficialTitle&"
             "pageSize=1000&countTotal=true&sort=@relevance"
         ),
+        headers={"User-Agent": "curl/8.7.1", "Accept": "application/json"},
     )
     response = await client.send(request)
     if response.status_code == MALFORMATTED_QUERY_STATUS:
