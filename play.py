@@ -11,7 +11,7 @@ headers = {
 }
 
 context = ssl.create_default_context()
-context.maximum_version = ssl.TLSVersion.TLSv1_2
+context.minimum_version = ssl.TLSVersion.TLSv1_2
 
 with httpx.Client(verify=context) as client:
     response = client.get(url, headers=headers)
