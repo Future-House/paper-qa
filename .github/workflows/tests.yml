@@ -85,16 +85,11 @@ jobs:
           enable-cache: true
       - run: uv python pin ${{ matrix.python-version }}
       - run: uv sync --python-preference=only-managed
-      - run: curl https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId,OfficialTitle&pageSize=1000&countTotal=true&sort=@relevance
-      - run: uv run play.py
-      - run: curl -6 'https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance' -i
-      - run: curl -4 'https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance' -i
       - run: |
-          curl -X GET \
-            -H 'Accept: */*' \
-            -H "Host: clinicaltrials.gov" \
-            -H "User-Agent: python-httpx/0.28.1" \
-            "https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance"
+          curl -H 'Accept-Encoding: br'  'https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance' -i
+      - run: |
+          curl -H 'Accept-Encoding: gzip, deflate' 'https://clinicaltrials.gov/api/v2/studies?query.term=Covid-19+vaccines&fields=NCTId%2COfficialTitle&pageSize=1000&countTotal=true&sort=%40relevance' -i
+      - run: uv run play.py
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
