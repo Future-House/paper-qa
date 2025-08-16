@@ -37,6 +37,7 @@ from pydantic import (
 from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
+import paperqa.configs
 from paperqa._ldp_shims import (
     HAS_LDP_INSTALLED,
     Agent,
@@ -927,24 +928,25 @@ class Settings(BaseSettings):
                 )
             return Settings(_cli_settings_source=cli_source(args=True))
 
-        # First, try to find the config file in the user's .config directory
         user_config_path = pqa_directory("settings") / f"{config_name}.json"
-
-        if user_config_path.exists():
-            json_path = user_config_path
-
-        # If not found, fall back to the package's default config
-        try:
+        pkg_config_path = (
             # Use importlib.resources.files() which is recommended for Python 3.9+
-            pkg_config_path = (
-                importlib.resources.files("paperqa.configs") / f"{config_name}.json"
-            )
-            if pkg_config_path.is_file():
-                json_path = cast("pathlib.Path", pkg_config_path)
-        except FileNotFoundError as e:
-            raise FileNotFoundError(
-                f"No configuration file found for {config_name}"
-            ) from e
+            importlib.resources.files(paperqa.configs)
+            / f"{config_name}.json"
+        )
+        if user_config_path.exists():
+            # First, try to find the config file in the user's .config directory
+            json_path = user_config_path
+        else:
+            # If not found, fall back to the package's default config
+            try:
+                if pkg_config_path.is_file():
+                    json_path = cast("pathlib.Path", pkg_config_path)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(
+                    f"No configuration file {config_name!r} found at user config path"
+                    f" {user_config_path} or bundled config path {pkg_config_path}."
+                ) from e
 
         if json_path:
             # we do the ole switcheroo
@@ -956,8 +958,10 @@ class Settings(BaseSettings):
                 **(tmp.model_dump()),
                 _cli_settings_source=cli_source(args=True) if cli_source else None,
             )
-
-        raise FileNotFoundError(f"No configuration file found for {config_name}")
+        raise FileNotFoundError(
+            f"No configuration file {config_name!r} found at user config path"
+            f" {user_config_path} or bundled config path {pkg_config_path}."
+        )
 
     def get_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
