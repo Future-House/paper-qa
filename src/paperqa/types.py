@@ -915,7 +915,7 @@ class DocDetails(Doc):
                 ):
                     data["citation"] = None
             except Exception:
-                logger.warning(
+                logger.debug(
                     "Failed to generate bibtex for"
                     f" {data.get('docname') or data.get('citation')}"
                 )
