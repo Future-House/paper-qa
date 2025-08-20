@@ -104,7 +104,7 @@ def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float
 
 def hexdigest(data: str | bytes) -> str:
     if isinstance(data, str):
-        return hashlib.md5(data.encode("utf-8")).hexdigest()  # noqa: S324
+        return hashlib.md5(data.encode("utf-8", errors="replace")).hexdigest()  # noqa: S324
     return hashlib.md5(data).hexdigest()  # noqa: S324
 
 
