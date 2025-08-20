@@ -104,6 +104,10 @@ def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float
 
 def hexdigest(data: str | bytes) -> str:
     if isinstance(data, str):
+        # Using 'replace' to handle invalid UTF-8 chars and preserve data structure,
+        # important for papers with special characters/units we cannot parse but want to keep.
+        # Chosen over 'strict', which throws errors stopping processing, and
+        # 'ignore', which causes silent data loss by dropping important units before hashing.
         return hashlib.md5(data.encode("utf-8", errors="replace")).hexdigest()  # noqa: S324
     return hashlib.md5(data).hexdigest()  # noqa: S324
 
