@@ -14,7 +14,7 @@ import zlib
 from collections import Counter
 from collections.abc import AsyncIterator, Callable, Sequence
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import anyio
 from pydantic import BaseModel, JsonValue
@@ -120,9 +120,7 @@ class SearchIndex:
         self,
         fields: Sequence[str] | None = None,
         index_name: str = "pqa_index",
-        index_directory: str | os.PathLike = IndexSettings.model_fields[
-            "index_directory"
-        ].default,
+        index_directory: str | os.PathLike | None = None,
         storage: SearchDocumentStorage = SearchDocumentStorage.PICKLE_COMPRESSED,
     ):
         if fields is None:
@@ -133,6 +131,11 @@ class SearchIndex:
                 f"{self.REQUIRED_FIELDS} must be included in search index fields."
             )
         self.index_name = index_name
+        if index_directory is None:  # Pull from settings
+            index_directory = cast(
+                Callable[[], str | os.PathLike],
+                IndexSettings.model_fields["index_directory"].default_factory,
+            )()
         self._index_directory = index_directory
         self._schema: Schema | None = None
         self._index: Index | None = None
