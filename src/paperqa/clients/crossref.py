@@ -166,7 +166,7 @@ async def doi_to_bibtex(
 async def parse_crossref_to_doc_details(
     message: dict[str, Any],
     session: aiohttp.ClientSession,
-    query_bibtex: bool = True,
+    query_bibtex: bool = False,
 ) -> DocDetails:
 
     bibtex_source = BibTeXSource.SELF_GENERATED.value
