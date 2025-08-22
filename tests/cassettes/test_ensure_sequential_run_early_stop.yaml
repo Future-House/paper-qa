@@ -1,9 +1,19 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.48550/arxiv.2312.07559?fields=externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.48550/arxiv.2312.07559?fields=externalIds%2Ctitle
     response:
       body:
         string:
@@ -23,67 +33,73 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:29 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         Via:
-          - 1.1 30dc54066252ce01682df0394718d89c.cloudfront.net (CloudFront)
+          - 1.1 f36785ff79b1d07dbaa3721ed491b772.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - MXDMSMatUs-RAzQOQ-VxUhPgrYLO_XR4yn4DX9q5Z6EaPArW6F86gg==
+          - jpfhVw1HLK8M4L09f6WiPP9N3yMHV9IZVxdvD87TD1Y9hQAfWfNLiA==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbZpEc7PHcEQsA=
+          - PKei4HjJvHcEZKQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "277"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:29 GMT
+          - Mon, 11 Aug 2025 23:07:23 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - c3a1d516-60c5-4055-b816-a626f6aa94e0
+          - f3173498-aa1b-420c-b37c-aec4fa0f9b2a
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.48550%2FarXiv.2312.07559/transform/application/x-bibtex
     response:
       body:
         string: Resource not found.
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 02 Dec 2024 19:36:29 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:24 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 404

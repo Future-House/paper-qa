@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
 
-import aiohttp
+import httpx
 import pytest
 
 import paperqa
@@ -49,7 +49,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
                 " dynamics study. Journal of Applied Physics, 118:235306, Dec 2015."
                 " URL: https://doi.org/10.1063/1.4938384, doi:10.1063/1.4938384. This"
                 " article has"
-                f" {CITATION_COUNT_SENTINEL}8{CITATION_COUNT_SENTINEL} citations and is"
+                f" {CITATION_COUNT_SENTINEL}9{CITATION_COUNT_SENTINEL} citations and is"
                 " from a peer-reviewed journal."
             ),
             "is_oa": False,
@@ -77,7 +77,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
                 " retrieval-augmented generative agent for scientific research. ArXiv,"
                 " Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559,"
                 " doi:10.48550/arxiv.2312.07559. This article has"
-                f" {CITATION_COUNT_SENTINEL}38{CITATION_COUNT_SENTINEL} citations."
+                f" {CITATION_COUNT_SENTINEL}101{CITATION_COUNT_SENTINEL} citations."
             ),
             "is_oa": None,
         },
@@ -102,7 +102,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
                 " chemistry tools. Nature Machine Intelligence, 6:525-535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
                 " doi:10.1038/s42256-024-00832-8. This article has"
-                f" {CITATION_COUNT_SENTINEL}230{CITATION_COUNT_SENTINEL} citations and"
+                f" {CITATION_COUNT_SENTINEL}462{CITATION_COUNT_SENTINEL} citations and"
                 " is from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
@@ -111,13 +111,13 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
 )
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]) -> None:
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         client_list = [
             client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
         ]
         client = DocMetadataClient(
-            session,
-            clients=cast(
+            http_client,
+            metadata_clients=cast(
                 "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 client_list,
             ),
@@ -263,13 +263,13 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
 )
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         client_list = [
             client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
         ]
         client = DocMetadataClient(
-            session,
-            clients=cast(
+            http_client,
+            metadata_clients=cast(
                 "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 client_list,
             ),
@@ -306,8 +306,8 @@ async def test_bulk_doi_search() -> None:
         "10.1023/a:1007154515475",
         "10.1007/s40278-023-41815-2",
     ]
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.bulk_query([{"doi": doi} for doi in dois])
         assert len(details) == 6, "Should return 6 results"
         assert all(d for d in details), "All results should be non-None"
@@ -331,8 +331,8 @@ async def test_bulk_title_search() -> None:
         ),
         "Convalescent-anti-sars-cov-2-plasma/immune-globulin",
     ]
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.bulk_query([{"title": title} for title in titles])
         assert len(details) == 6, "Should return 6 results"
         assert all(d for d in details), "All results should be non-None"
@@ -341,8 +341,8 @@ async def test_bulk_title_search() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_bad_titles() -> None:
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(title="askldjrq3rjaw938h")
         assert not details, "Should return None for bad title"
         details = await client.query(
@@ -357,20 +357,27 @@ async def test_bad_titles() -> None:
 @pytest.mark.asyncio
 async def test_client_os_error() -> None:
     """Confirm an OSError variant does not crash us."""
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session, clients=[SemanticScholarProvider])
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(
+            http_client, metadata_clients=[SemanticScholarProvider]
+        )
         with patch.object(
-            session, "get", side_effect=aiohttp.ClientOSError("Bad file descriptor")
+            http_client,
+            "get",
+            side_effect=httpx.ConnectError(
+                "This used to say 'Bad file descriptor' for aiohttp,"
+                " now it's this placeholder for httpx."
+            ),
         ) as mock_get:
             assert not await client.query(doi="placeholder")
-        assert mock_get.call_count == 1, "Expected the exception to have been thrown"
+        assert mock_get.call_count >= 1, "Expected the exception to have been thrown"
 
 
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_bad_dois() -> None:
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(title="abs12032jsdafn")
         assert not details, "Should return None for bad doi"
 
@@ -378,8 +385,8 @@ async def test_bad_dois() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_minimal_fields_filtering() -> None:
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
             fields=["title", "doi"],
@@ -412,9 +419,11 @@ async def test_minimal_fields_filtering() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_s2_only_fields_filtering() -> None:
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         # now get with authors just from one source
-        s2_client = DocMetadataClient(session, clients=[SemanticScholarProvider])
+        s2_client = DocMetadataClient(
+            http_client, metadata_clients=[SemanticScholarProvider]
+        )
         s2_details = await s2_client.query(
             title="Augmenting large language models with chemistry tools",
             fields=["title", "doi", "authors"],
@@ -436,10 +445,10 @@ async def test_s2_only_fields_filtering() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_journalquality_fields_filtering() -> None:
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         crossref_client = DocMetadataClient(
-            session,
-            clients=cast(
+            http_client,
+            metadata_clients=cast(
                 "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
@@ -462,10 +471,10 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             " doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
 
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         crossref_client = DocMetadataClient(
-            session,
-            clients=cast(
+            http_client,
+            metadata_clients=cast(
                 "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
@@ -487,9 +496,13 @@ async def test_crossref_journalquality_fields_filtering() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_author_matching() -> None:
-    async with aiohttp.ClientSession() as session:
-        crossref_client = DocMetadataClient(session, clients=[CrossrefProvider])
-        s2_client = DocMetadataClient(session, clients=[SemanticScholarProvider])
+    async with httpx.AsyncClient() as http_client:
+        crossref_client = DocMetadataClient(
+            http_client, metadata_clients=[CrossrefProvider]
+        )
+        s2_client = DocMetadataClient(
+            http_client, metadata_clients=[SemanticScholarProvider]
+        )
         crossref_details_bad_author = await crossref_client.query(
             title="Augmenting large language models with chemistry tools",
             authors=["Jack NoScience"],
@@ -517,8 +530,8 @@ async def test_author_matching() -> None:
 @pytest.mark.asyncio
 async def test_odd_client_requests() -> None:
     # try querying using an authors match, but not requesting authors back
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
             authors=["Andres M. Bran", "Sam Cox"],
@@ -528,8 +541,8 @@ async def test_odd_client_requests() -> None:
         assert details.authors, "Should return correct author results"
 
     # try querying using a title, asking for no DOI back
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
             fields=["title"],
@@ -538,8 +551,8 @@ async def test_odd_client_requests() -> None:
         assert details.doi, "Should return a doi even though we don't ask for it"
 
     # try querying using a title, asking for no title back
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
             fields=["doi"],
@@ -547,8 +560,8 @@ async def test_odd_client_requests() -> None:
         assert details, "Assertions require successful query"
         assert details.title, "Should return a title even though we don't ask for it"
 
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(
             doi="10.1007/s40278-023-41815-2",
             fields=["doi", "title", "gibberish-field", "no-field"],
@@ -565,8 +578,8 @@ async def test_odd_client_requests() -> None:
     paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.001
 )
 async def test_ensure_robust_to_timeouts() -> None:
-    async with aiohttp.ClientSession() as session:
-        client = DocMetadataClient(session)
+    async with httpx.AsyncClient() as http_client:
+        client = DocMetadataClient(http_client)
         details = await client.query(
             doi="10.1007/s40278-023-41815-2",
             fields=["doi", "title"],
@@ -578,7 +591,7 @@ def test_bad_init() -> None:
     with pytest.raises(
         ValueError, match=r"At least one MetadataProvider must be provided."
     ):
-        client = DocMetadataClient(clients=[])  # noqa: F841
+        DocMetadataClient(metadata_clients=[])
 
 
 @pytest.mark.vcr
@@ -588,10 +601,10 @@ async def test_ensure_sequential_run(caplog) -> None:
     # were using a DOI that is NOT in crossref, but running the crossref client first
     # we will ensure that both are run sequentially
 
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         client = DocMetadataClient(
-            session=session,
-            clients=cast(
+            http_client=http_client,
+            metadata_clients=cast(
                 "Sequence[Collection[type[MetadataPostProcessor[Any] |"
                 " MetadataProvider[Any]]]]",
                 [[CrossrefProvider], [SemanticScholarProvider]],
@@ -632,10 +645,10 @@ async def test_ensure_sequential_run(caplog) -> None:
 async def test_ensure_sequential_run_early_stop(caplog) -> None:
     caplog.set_level(logging.DEBUG, logger=paperqa.clients.__name__)
     # now we should stop after hitting s2
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         client = DocMetadataClient(
-            session=session,
-            clients=cast(
+            http_client=http_client,
+            metadata_clients=cast(
                 "Sequence[Collection[type[MetadataPostProcessor[Any] |"
                 " MetadataProvider[Any]]]]",
                 [[SemanticScholarProvider], [CrossrefProvider]],
@@ -668,13 +681,13 @@ async def test_ensure_sequential_run_early_stop(caplog) -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         retract_processor = RetractionDataPostProcessor(
             f"{stub_data_dir}/stub_retractions.csv"
         )
         crossref_client = DocMetadataClient(
-            session,
-            clients=cast(
+            http_client,
+            metadata_clients=cast(
                 "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, retract_processor],
             ),
@@ -718,7 +731,9 @@ def test_reformat_name(name: str, expected: str) -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_arxiv_doi_is_used_when_available() -> None:
-    client = DocMetadataClient(clients={CrossrefProvider, SemanticScholarProvider})
+    client = DocMetadataClient(
+        metadata_clients={CrossrefProvider, SemanticScholarProvider}
+    )
     result = await client.query(
         title="Attention is All you Need",
         authors=(  # noqa: SIM905
@@ -752,10 +767,10 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
     or they have a swap like an & for and.
 
     """
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as http_client:
         crossref_client = DocMetadataClient(
-            session,
-            clients=cast(
+            http_client,
+            metadata_clients=cast(
                 "Collection[type[MetadataPostProcessor[Any] | MetadataProvider[Any]]]",
                 [CrossrefProvider, JournalQualityPostProcessor],
             ),
