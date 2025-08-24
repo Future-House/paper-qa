@@ -467,7 +467,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
 @pytest.mark.asyncio
 async def test_timeout(agent_test_settings: Settings, agent_type: str | type) -> None:
     agent_test_settings.prompts.pre = None
-    agent_test_settings.agent.timeout = 0.001
+    agent_test_settings.agent.timeout = 0.05  # Give time for Environment.reset()
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
     response = await agent_query(
