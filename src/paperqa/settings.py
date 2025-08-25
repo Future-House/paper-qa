@@ -1044,7 +1044,14 @@ class Settings(BaseSettings):
                             ]
                         )
                     )
-                config["memory_model"] = UIndexMemoryModel(**config["memory_model"])
+                try:
+                    config["memory_model"] = UIndexMemoryModel(**config["memory_model"])
+                except ImportError as exc:
+                    raise ImportError(
+                        "Memory agents require the 'usearch' package,"
+                        " which is part of the 'memory' extra."
+                        " Please: `pip install paper-qa[memory]`."
+                    ) from exc
                 memories = _Memories.validate_python(config.pop("memories"))
                 await asyncio.gather(
                     *(

@@ -61,7 +61,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[image,ldp,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -86,6 +86,10 @@ ldp = [
 ]
 local = [
     "sentence-transformers",
+]
+memory = [
+    "paper-qa[ldp]",
+    "usearch>=2.16.4",  # Pin for Python 3.13 support
 ]
 openreview = [
     "openreview-py",
