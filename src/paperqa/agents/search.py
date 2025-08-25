@@ -261,13 +261,12 @@ class SearchIndex:
     def filehash(body: str) -> str:
         return hexdigest(body)
 
-    async def filecheck(self, filename: str, body: str | None = None) -> bool:
+    async def filecheck(self, filename: str, body_filehash: str | None = None) -> bool:
         """Check if this index contains the filename and if the body's filehash matches."""
-        filehash: str | None = self.filehash(body) if body else None
         index_files = await self.index_files
         return bool(
             index_files.get(filename)
-            and (filehash is None or index_files[filename] == filehash)
+            and (body_filehash is None or index_files[filename] == body_filehash)
         )
 
     async def mark_failed_document(self, path: str | os.PathLike) -> None:
@@ -297,19 +296,20 @@ class SearchIndex:
             retry=retry_if_exception_type(AsyncRetryError),
         )
         async def _add_document() -> None:
-            if not await self.filecheck(index_doc["file_location"], index_doc["body"]):
+            body_filehash = self.filehash(index_doc["body"])
+            if not await self.filecheck(index_doc["file_location"], body_filehash):
                 try:
                     async with self.writer() as writer:
                         # Let caller handle commit to allow for batching
                         writer.add_document(Document.from_dict(index_doc))
 
-                    filehash = self.filehash(index_doc["body"])
-                    (await self.index_files)[index_doc["file_location"]] = filehash
+                    (await self.index_files)[index_doc["file_location"]] = body_filehash
 
                     if document:
                         docs_index_dir = await self.docs_index_directory
                         async with await anyio.open_file(
-                            docs_index_dir / f"{filehash}.{self.storage.extension()}",
+                            docs_index_dir
+                            / f"{body_filehash}.{self.storage.extension()}",
                             "wb",
                         ) as f:
                             await f.write(self.storage.write_to_string(document))
