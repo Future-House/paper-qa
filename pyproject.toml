@@ -82,7 +82,7 @@ image = [
     "pillow>=10.3.0",  # Pin for py.typed
 ]
 ldp = [
-    "ldp>=0.25.0",  # For new LLM client interface
+    "ldp>=0.25.0,<1",  # Lower pin for new LLM client interface, upper pin if v1 introduces breaks
 ]
 local = [
     "sentence-transformers",
