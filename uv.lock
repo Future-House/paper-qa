@@ -1052,7 +1052,7 @@ wheels = [
 
 [[package]]
 name = "ldp"
-version = "33.1"
+version = "0.33.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1066,9 +1066,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/27/3e/d7085ecdfab0f3ac00549463a19e1c39c16e5969eefa27145a0b016b2301/ldp-33.1.tar.gz", hash = "sha256:bb029c1e3cc9e9c6421d875c5512b4b6bc008155af46250e1ef4d66711906b1a", size = 4462926, upload-time = "2025-08-25T21:26:09.063Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1a/d6/2a5b81eec880b9815f9279e1c8baeeb468178c88d2a5d77495a8864e4a65/ldp-0.33.1.tar.gz", hash = "sha256:af2f96ed7ea393cf4af3f99ad4a517fd73da2882bd5ca71ddcf36895c01f9dec", size = 4463034, upload-time = "2025-08-25T22:04:44.303Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/93/533e889023c4694d7de2a08cfabe663db80c822391bec1055fcda6fe004b/ldp-33.1-py3-none-any.whl", hash = "sha256:284653bac580243e11f995444f605b963433cce2ad9c82d97ac0eda7d109f1ca", size = 140560, upload-time = "2025-08-25T21:26:07.026Z" },
+    { url = "https://files.pythonhosted.org/packages/f9/a0/4577e4a2642a09b0b0239ca02ffb0eb2593a775463a4c9512e216736463a/ldp-0.33.1-py3-none-any.whl", hash = "sha256:ba764475f926f9675d8a4f9f9cc2088dea3d3abe0d1ead20c26c0705cbf3aaa1", size = 140587, upload-time = "2025-08-25T22:04:43.008Z" },
 ]
 
 [[package]]
@@ -1725,7 +1725,7 @@ requires-dist = [
     { name = "httpx" },
     { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
-    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0" },
+    { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0,<1" },
     { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.68,<1.71" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
