@@ -12,7 +12,7 @@ import zlib
 from functools import wraps
 from pathlib import Path
 from typing import cast
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import ldp.agent
@@ -467,15 +467,27 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
 @pytest.mark.asyncio
 async def test_timeout(agent_test_settings: Settings, agent_type: str | type) -> None:
     agent_test_settings.prompts.pre = None
-    agent_test_settings.agent.timeout = 0.001
+    agent_test_settings.agent.timeout = 0.05  # Give time for Environment.reset()
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
-    response = await agent_query(
-        query="Are COVID-19 vaccines effective?",
-        settings=agent_test_settings,
-        agent_type=agent_type,
-    )
-    # ensure that GenerateAnswerTool was called
+    docs = Docs()
+
+    async def custom_aget_evidence(*_, **kwargs) -> PQASession:  # noqa: RUF029
+        return kwargs["query"]
+
+    with (
+        patch.object(docs, "docs", {"stub_key": MagicMock(spec_set=Doc)}),
+        patch.multiple(
+            Docs, clear_docs=MagicMock(), aget_evidence=custom_aget_evidence
+        ),
+    ):
+        response = await agent_query(
+            query="Are COVID-19 vaccines effective?",
+            settings=agent_test_settings,
+            docs=docs,
+            agent_type=agent_type,
+        )
+    # Ensure that GenerateAnswerTool was called in truncation's failover
     assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
     assert CANNOT_ANSWER_PHRASE in response.session.answer
 
