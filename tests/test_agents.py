@@ -21,6 +21,7 @@ from aviary.core import (
     Environment,
     Tool,
     ToolRequestMessage,
+    ToolResponseMessage,
     ToolsAdapter,
     ToolSelector,
 )
@@ -470,14 +471,27 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
     agent_test_settings.agent.timeout = 0.05  # Give time for Environment.reset()
     agent_test_settings.llm = "gpt-4o-mini"
     agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
-    response = await agent_query(
-        query="Are COVID-19 vaccines effective?",
-        settings=agent_test_settings,
-        agent_type=agent_type,
-    )
+    orig_exec_tool_calls = PaperQAEnvironment.exec_tool_calls
+    tool_responses: list[list[ToolResponseMessage]] = []
+
+    async def spy_exec_tool_calls(*args, **kwargs) -> list[ToolResponseMessage]:
+        responses = await orig_exec_tool_calls(*args, **kwargs)
+        tool_responses.append(responses)
+        return responses
+
+    with patch.object(PaperQAEnvironment, "exec_tool_calls", spy_exec_tool_calls):
+        response = await agent_query(
+            query="Are COVID-19 vaccines effective?",
+            settings=agent_test_settings,
+            agent_type=agent_type,
+        )
     # Ensure that GenerateAnswerTool was called in truncation's failover
     assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
     assert CANNOT_ANSWER_PHRASE in response.session.answer
+    (last_response,) = tool_responses[-1]
+    assert (
+        "no papers" in last_response.content
+    ), "Expecting agent to been shown specifics on the failure"
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
