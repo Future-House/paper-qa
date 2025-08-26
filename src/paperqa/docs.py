@@ -742,7 +742,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         contexts = session.contexts
         if answer_config.get_evidence_if_no_contexts and not contexts:
             session = await self.aget_evidence(
-                query=session,
+                session,
                 callbacks=callbacks,
                 settings=settings,
                 embedding_model=embedding_model,

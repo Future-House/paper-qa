@@ -309,9 +309,6 @@ class GenerateAnswer(NamedTool):
         Args:
             state: Current state.
         """
-        if not state.docs.docs:
-            raise EmptyDocsError("Not generating an answer due to having no papers.")
-
         logger.info(f"Generating answer for '{state.session.question}'.")
 
         if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
