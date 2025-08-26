@@ -475,7 +475,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
         settings=agent_test_settings,
         agent_type=agent_type,
     )
-    # ensure that GenerateAnswerTool was called
+    # Ensure that GenerateAnswerTool was called in truncation's failover
     assert response.status == AgentStatus.TRUNCATED, "Agent did not timeout"
     assert CANNOT_ANSWER_PHRASE in response.session.answer
 

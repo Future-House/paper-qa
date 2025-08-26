@@ -146,5 +146,6 @@ EVAL_PROMPT_TEMPLATE = (
 )
 
 CONTEXT_OUTER_PROMPT = "{context_str}\n\nValid Keys: {valid_keys}"
+EMPTY_CONTEXTS = len(CONTEXT_OUTER_PROMPT.format(context_str="", valid_keys="").strip())
 CONTEXT_INNER_PROMPT_NOT_DETAILED = "{name}: {text}"
 CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"
