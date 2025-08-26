@@ -26,7 +26,7 @@ from paperqa.llms import (
     NumpyVectorStore,
     VectorStore,
 )
-from paperqa.prompts import CANNOT_ANSWER_PHRASE
+from paperqa.prompts import CANNOT_ANSWER_PHRASE, EMPTY_CONTEXTS
 from paperqa.readers import read_doc
 from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
@@ -738,7 +738,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         contexts = session.contexts
         if answer_config.get_evidence_if_no_contexts and not contexts:
             session = await self.aget_evidence(
-                query=session,
+                session,
                 callbacks=callbacks,
                 settings=settings,
                 embedding_model=embedding_model,
@@ -770,9 +770,10 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             pre_str=pre_str,
         )
 
-        if len(context_str.strip()) < 10:  # noqa: PLR2004
+        if len(context_str.strip()) <= EMPTY_CONTEXTS:
             answer_text = (
-                f"{CANNOT_ANSWER_PHRASE} this question due to insufficient information."
+                f"{CANNOT_ANSWER_PHRASE} this question due to"
+                f" {'having no papers' if not self.docs else 'insufficient information.'}."
             )
             answer_reasoning = None
         else:
