@@ -1,9 +1,19 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1023/a:1007154515475?fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
     response:
       body:
         string:
@@ -38,110 +48,164 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:27 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         Via:
-          - 1.1 01dbe7e23991a177a7cdfba5803db41c.cloudfront.net (CloudFront)
+          - 1.1 1401c4844b3ea759244fef5091fc307a.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - pAsyQ43-pw_g9hNshUEaW669Aaoer7Xr3rE7t-LjI7JUJPzvvOm83g==
+          - QyEZqEuw8-Gw7YwDCdacfCN1idSyjtMgA8zAUvhNi4tmFOAf9dypEg==
         X-Amz-Cf-Pop:
-          - SFO53-C1
+          - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PJrk_F14PHcELwQ=
+          - PKejmFRTPHcEsQw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1490"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 17:19:27 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - cd94f62f-190c-4719-bbb6-9b1fc14aaf2b
+          - 7d6ea6c8-df58-4b9a-8f56-c71518f0c217
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.unpaywall.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.openalex.org/works/https://doi.org/10.1023%2Fa:1007154515475
+      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=example@papercrow.ai
     response:
       body:
-        string:
-          '{"id":"https://openalex.org/W1554322594","doi":"https://doi.org/10.1023/a:1007154515475","title":"An
-          essential role of active site arginine residue in iodide binding and histidine
-          residue in electron transfer for iodide oxidation by horseradish peroxidase.","display_name":"An
-          essential role of active site arginine residue in iodide binding and histidine
-          residue in electron transfer for iodide oxidation by horseradish peroxidase.","publication_year":2001,"publication_date":"2001-01-01","ids":{"openalex":"https://openalex.org/W1554322594","doi":"https://doi.org/10.1023/a:1007154515475","mag":"1554322594","pmid":"https://pubmed.ncbi.nlm.nih.gov/11330823"},"language":"en","primary_location":{"is_oa":false,"landing_page_url":"https://doi.org/10.1023/a:1007154515475","pdf_url":null,"source":{"id":"https://openalex.org/S11742566","display_name":"Molecular
-          and Cellular Biochemistry","issn_l":"0300-8177","issn":["0300-8177","1573-4919"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310319900","host_organization_name":"Springer
-          Science+Business Media","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310319900"],"host_organization_lineage_names":["Springer
-          Nature","Springer Science+Business Media"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},"type":"article","type_crossref":"journal-article","indexed_in":["crossref","pubmed"],"open_access":{"is_oa":false,"oa_status":"closed","oa_url":null,"any_repository_has_fulltext":false},"authorships":[{"author_position":"first","author":{"id":"https://openalex.org/A5007713390","display_name":"Subrata
-          Adak","orcid":"https://orcid.org/0000-0001-7376-4755"},"institutions":[{"id":"https://openalex.org/I160344538","display_name":"Indian
-          Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"funder","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Subrata
-          Adak","raw_affiliation_strings":["Department of Physiology, Indian Institute
-          of Chemical Biology, Calcutta."],"affiliations":[{"raw_affiliation_string":"Department
-          of Physiology, Indian Institute of Chemical Biology, Calcutta.","institution_ids":["https://openalex.org/I160344538"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5053039237","display_name":"Debasish
-          Bandyopadhyay","orcid":"https://orcid.org/0000-0001-7993-0777"},"institutions":[{"id":"https://openalex.org/I160344538","display_name":"Indian
-          Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"funder","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Debashis
-          Bandyopadhyay","raw_affiliation_strings":["Department of Physiology, Indian
-          Institute of Chemical Biology, Calcutta, India"],"affiliations":[{"raw_affiliation_string":"Department
-          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]},{"author_position":"middle","author":{"id":"https://openalex.org/A5012898753","display_name":"Uday
-          Bandyopadhyay","orcid":"https://orcid.org/0000-0002-5928-6790"},"institutions":[{"id":"https://openalex.org/I160344538","display_name":"Indian
-          Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"funder","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Uday
-          Bandyopadhyay","raw_affiliation_strings":["Department of Physiology, Indian
-          Institute of Chemical Biology, Calcutta, India"],"affiliations":[{"raw_affiliation_string":"Department
-          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]},{"author_position":"last","author":{"id":"https://openalex.org/A5110419549","display_name":"Ranajit
-          K. Banerjee","orcid":null},"institutions":[{"id":"https://openalex.org/I160344538","display_name":"Indian
-          Institute of Chemical Biology","ror":"https://ror.org/01kh0x418","country_code":"IN","type":"funder","lineage":["https://openalex.org/I160344538","https://openalex.org/I2799351866","https://openalex.org/I4210134808","https://openalex.org/I66760702"]}],"countries":["IN"],"is_corresponding":false,"raw_author_name":"Ranajit
-          K. Banerjee","raw_affiliation_strings":["Department of Physiology, Indian
-          Institute of Chemical Biology, Calcutta, India"],"affiliations":[{"raw_affiliation_string":"Department
-          of Physiology, Indian Institute of Chemical Biology, Calcutta, India","institution_ids":["https://openalex.org/I160344538"]}]}],"institution_assertions":[],"countries_distinct_count":1,"institutions_distinct_count":1,"corresponding_author_ids":[],"corresponding_institution_ids":[],"apc_list":null,"apc_paid":null,"fwci":0.344,"has_fulltext":true,"fulltext_origin":"ngrams","cited_by_count":7,"citation_normalized_percentile":{"value":0.492128,"is_in_top_1_percent":false,"is_in_top_10_percent":false},"cited_by_percentile_year":{"min":77,"max":78},"biblio":{"volume":"218","issue":"1/2","first_page":"1","last_page":"11"},"is_retracted":false,"is_paratext":false,"primary_topic":{"id":"https://openalex.org/T11848","display_name":"Heme
-          Oxygenase-1 and Carbon Monoxide","score":0.9979,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},"topics":[{"id":"https://openalex.org/T11848","display_name":"Heme
-          Oxygenase-1 and Carbon Monoxide","score":0.9979,"subfield":{"id":"https://openalex.org/subfields/1312","display_name":"Molecular
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}},{"id":"https://openalex.org/T10903","display_name":"Porphyrin
-          and Phthalocyanine Chemistry","score":0.9928,"subfield":{"id":"https://openalex.org/subfields/2505","display_name":"Materials
-          Chemistry"},"field":{"id":"https://openalex.org/fields/25","display_name":"Materials
-          Science"},"domain":{"id":"https://openalex.org/domains/3","display_name":"Physical
-          Sciences"}},{"id":"https://openalex.org/T12094","display_name":"Hemoglobin
-          structure and function","score":0.9913,"subfield":{"id":"https://openalex.org/subfields/1307","display_name":"Cell
-          Biology"},"field":{"id":"https://openalex.org/fields/13","display_name":"Biochemistry,
-          Genetics and Molecular Biology"},"domain":{"id":"https://openalex.org/domains/1","display_name":"Life
-          Sciences"}}],"keywords":[{"id":"https://openalex.org/keywords/horseradish-peroxidase","display_name":"Horseradish
-          peroxidase","score":0.8032125},{"id":"https://openalex.org/keywords/residue","display_name":"Residue
-          (chemistry)","score":0.6542269}],"concepts":[{"id":"https://openalex.org/C2777676563","wikidata":"https://www.wikidata.org/wiki/Q413665","display_name":"Horseradish
-          peroxidase","level":3,"score":0.8032125},{"id":"https://openalex.org/C185592680","wikidata":"https://www.wikidata.org/wiki/Q2329","display_name":"Chemistry","level":0,"score":0.6674619},{"id":"https://openalex.org/C2778460671","wikidata":"https://www.wikidata.org/wiki/Q485277","display_name":"Histidine","level":3,"score":0.65546286},{"id":"https://openalex.org/C2781338088","wikidata":"https://www.wikidata.org/wiki/Q903495","display_name":"Residue
-          (chemistry)","level":2,"score":0.6542269},{"id":"https://openalex.org/C2778870691","wikidata":"https://www.wikidata.org/wiki/Q44794658","display_name":"Iodide","level":2,"score":0.64176863},{"id":"https://openalex.org/C2777468819","wikidata":"https://www.wikidata.org/wiki/Q173670","display_name":"Arginine","level":3,"score":0.62104857},{"id":"https://openalex.org/C162008176","wikidata":"https://www.wikidata.org/wiki/Q419305","display_name":"Peroxidase","level":3,"score":0.563822},{"id":"https://openalex.org/C123669783","wikidata":"https://www.wikidata.org/wiki/Q902898","display_name":"Electron
-          transfer","level":2,"score":0.5258432},{"id":"https://openalex.org/C41183919","wikidata":"https://www.wikidata.org/wiki/Q423026","display_name":"Active
-          site","level":3,"score":0.42865705},{"id":"https://openalex.org/C55493867","wikidata":"https://www.wikidata.org/wiki/Q7094","display_name":"Biochemistry","level":1,"score":0.35143477},{"id":"https://openalex.org/C71240020","wikidata":"https://www.wikidata.org/wiki/Q186011","display_name":"Stereochemistry","level":1,"score":0.33614993},{"id":"https://openalex.org/C181199279","wikidata":"https://www.wikidata.org/wiki/Q8047","display_name":"Enzyme","level":2,"score":0.2994284},{"id":"https://openalex.org/C179104552","wikidata":"https://www.wikidata.org/wiki/Q11165","display_name":"Inorganic
-          chemistry","level":1,"score":0.27048028},{"id":"https://openalex.org/C178790620","wikidata":"https://www.wikidata.org/wiki/Q11351","display_name":"Organic
-          chemistry","level":1,"score":0.2124742},{"id":"https://openalex.org/C515207424","wikidata":"https://www.wikidata.org/wiki/Q8066","display_name":"Amino
-          acid","level":2,"score":0.08797869}],"mesh":[{"descriptor_ui":"D001120","descriptor_name":"Arginine","qualifier_ui":"","qualifier_name":null,"is_major_topic":true},{"descriptor_ui":"D002250","descriptor_name":"Carbon
-          Radioisotopes","qualifier_ui":"","qualifier_name":null,"is_major_topic":true},{"descriptor_ui":"D004047","descriptor_name":"Diethyl
-          Pyrocarbonate","qualifier_ui":"Q000494","qualifier_name":"pharmacology","is_major_topic":true},{"descriptor_ui":"D006639","descriptor_name":"Histidine","qualifier_ui":"","qualifier_name":null,"is_major_topic":true},{"descriptor_ui":"D006735","descriptor_name":"Horseradish
-          Peroxidase","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D007454","descriptor_name":"Iodides","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":true},{"descriptor_ui":"D001665","descriptor_name":"Binding
-          Sites","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D002942","descriptor_name":"Circular
-          Dichroism","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D003512","descriptor_name":"Cyclohexanones","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D003512","descriptor_name":"Cyclohexanones","qualifier_ui":"Q000494","qualifier_name":"pharmacology","is_major_topic":false},{"descriptor_ui":"D003512","descriptor_name":"Cyclohexanones","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D003931","descriptor_name":"Diacetyl","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D003931","descriptor_name":"Diacetyl","qualifier_ui":"Q000494","qualifier_name":"pharmacology","is_major_topic":false},{"descriptor_ui":"D003931","descriptor_name":"Diacetyl","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D004047","descriptor_name":"Diethyl
-          Pyrocarbonate","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D004579","descriptor_name":"Electron
-          Transport","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D006735","descriptor_name":"Horseradish
-          Peroxidase","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D006877","descriptor_name":"Hydroxamic
-          Acids","qualifier_ui":"Q000494","qualifier_name":"pharmacology","is_major_topic":false},{"descriptor_ui":"D006877","descriptor_name":"Hydroxamic
-          Acids","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D006877","descriptor_name":"Hydroxamic
-          Acids","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007454","descriptor_name":"Iodides","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D007700","descriptor_name":"Kinetics","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D010084","descriptor_name":"Oxidation-Reduction","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D010658","descriptor_name":"Phenylglyoxal","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D010658","descriptor_name":"Phenylglyoxal","qualifier_ui":"Q000494","qualifier_name":"pharmacology","is_major_topic":false},{"descriptor_ui":"D010658","descriptor_name":"Phenylglyoxal","qualifier_ui":"Q000378","qualifier_name":"metabolism","is_major_topic":false},{"descriptor_ui":"D013053","descriptor_name":"Spectrophotometry","qualifier_ui":"","qualifier_name":null,"is_major_topic":false},{"descriptor_ui":"D013816","descriptor_name":"Thermodynamics","qualifier_ui":"","qualifier_name":null,"is_major_topic":false}],"locations_count":2,"locations":[{"is_oa":false,"landing_page_url":"https://doi.org/10.1023/a:1007154515475","pdf_url":null,"source":{"id":"https://openalex.org/S11742566","display_name":"Molecular
-          and Cellular Biochemistry","issn_l":"0300-8177","issn":["0300-8177","1573-4919"],"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":true,"is_core":true,"host_organization":"https://openalex.org/P4310319900","host_organization_name":"Springer
-          Science+Business Media","host_organization_lineage":["https://openalex.org/P4310319965","https://openalex.org/P4310319900"],"host_organization_lineage_names":["Springer
-          Nature","Springer Science+Business Media"],"type":"journal"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false},{"is_oa":false,"landing_page_url":"https://pubmed.ncbi.nlm.nih.gov/11330823","pdf_url":null,"source":{"id":"https://openalex.org/S4306525036","display_name":"PubMed","issn_l":null,"issn":null,"is_oa":false,"is_in_doaj":false,"is_indexed_in_scopus":false,"is_core":false,"host_organization":"https://openalex.org/I1299303238","host_organization_name":"National
-          Institutes of Health","host_organization_lineage":["https://openalex.org/I1299303238"],"host_organization_lineage_names":["National
-          Institutes of Health"],"type":"repository"},"license":null,"license_id":null,"version":null,"is_accepted":false,"is_published":false}],"best_oa_location":null,"sustainable_development_goals":[{"id":"https://metadata.un.org/sdg/6","score":0.74,"display_name":"Clean
-          water and sanitation"}],"grants":[],"datasets":[],"versions":[],"referenced_works_count":36,"referenced_works":["https://openalex.org/W105515906","https://openalex.org/W1515075543","https://openalex.org/W1565240752","https://openalex.org/W1565691495","https://openalex.org/W1571455001","https://openalex.org/W1578742674","https://openalex.org/W1581359855","https://openalex.org/W1587806072","https://openalex.org/W1589479912","https://openalex.org/W1590103084","https://openalex.org/W1799674254","https://openalex.org/W1849424407","https://openalex.org/W1967044424","https://openalex.org/W1971827843","https://openalex.org/W1986659402","https://openalex.org/W1989790643","https://openalex.org/W1990052170","https://openalex.org/W1998706402","https://openalex.org/W1999881926","https://openalex.org/W2002978594","https://openalex.org/W2003479580","https://openalex.org/W2005601978","https://openalex.org/W2006822851","https://openalex.org/W2017379977","https://openalex.org/W2023180351","https://openalex.org/W2024117678","https://openalex.org/W2055799504","https://openalex.org/W2095100183","https://openalex.org/W2095873332","https://openalex.org/W2154061135","https://openalex.org/W2165898505","https://openalex.org/W2179092050","https://openalex.org/W2411439573","https://openalex.org/W2418888804","https://openalex.org/W91326892","https://openalex.org/W955725593"],"related_works":["https://openalex.org/W2327133413","https://openalex.org/W2122752058","https://openalex.org/W2072464466","https://openalex.org/W2062221185","https://openalex.org/W2044979688","https://openalex.org/W1996602571","https://openalex.org/W1991900549","https://openalex.org/W1978474786","https://openalex.org/W1975984439","https://openalex.org/W1530487393"],"abstract_inverted_index":null,"abstract_inverted_index_v3":null,"cited_by_api_url":"https://api.openalex.org/works?filter=cites:W1554322594","counts_by_year":[{"year":2023,"cited_by_count":1}],"updated_date":"2025-07-20T21:07:59.552616","created_date":"2016-06-24"}
-
-          '
+        string: !!binary |
+          H4sIALB3mmgA/91UTW/aQBC991es9mxgbUA0vgVyqZpIVWgvrSJr8A54yLJr7a7buFH+e8cGUpKS
+          H9AcEPZ8vjfzxo9SO5K5TNUwVdl4BHmq1CydTqb8m01l0vmLxhuOqWKsQz4asWXo/Gb0dk6kaJAz
+          Lq3AENBGAiO8MyjcWkAZ6SeKQBEF+A1Zsig8BtINCrKCnCaNYkVWk90IsFpUFCLpV3FosIzeWRE9
+          2LBGL9bOH7PdA2mIxN5VKyrnA3rQFCpRo+99ARnnBq3vcG5d4y2YAfhIpek8FIoaPER8iDJfgwmY
+          yLpZGS6BuuDSXVqmVDpQ2UClnNEieJl3puRYr7Cw6+JumHnZGPA9mQUa07/MyZUV7pibb+XfJArB
+          Bs5SY6UGH9PZLEmns/FgcpFevIoqzGnYC2fh4Bn3iZVsoR1s/6HEyOWy9jxvHuOyJLQl9mDnTeCx
+          hyBuUBOI6+vFfjgn5R0UIUJsOsylcQE1h1QQCo+14y073xalq9vnhBWGyAUK48p+RTK3jTGJXJM/
+          7zgxcZMfdy8tBe5WrCPHfXsfL6dHZDV4NmWJ/F1AEzsRcMCj3D8XPba+yb4xg/bw6xB53NyyWbEI
+          QFxquN8TL51nDdauF6fMo2/wkLhek6EeEnfvRtm1k1fIOoo7voFO+1+qNpAzbtMm4hOXAMt/rO3Y
+          xP42Fp0eSj6W+TFqIm5hC2I5XAzFDU+Dyntx60AnYgGmbGKERMyUEmqcHUrKu6fkHEvQun8Ec5bq
+          Fa4g8KGJOU+udTXoqoX2LOnDHt8D628a2nfG2MAbYr4FC1uK4vOwY4x+i/g/keXTburuy6v7T282
+          HajpIJt8VVk+Hufjj9/l04c/ZfMgw88GAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - origin, content-type, accept, x-requested-with
+        Access-Control-Allow-Methods:
+          - POST, GET, OPTIONS, PUT, DELETE, PATCH
+        Access-Control-Allow-Origin:
+          - "*"
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "653"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:28 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+        Report-To:
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=p4iuQCCL6YC2cs5XvjFVSeabwpASYS2qnovcozEbiKw%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953648"}],"max_age":3600}'
+        Reporting-Endpoints:
+          - heroku-nel="https://nel.heroku.com/reports?s=p4iuQCCL6YC2cs5XvjFVSeabwpASYS2qnovcozEbiKw%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953648"
+        Server:
+          - Heroku
+        Vary:
+          - Accept-Encoding
+        Via:
+          - 1.1 heroku-router
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.openalex.org/works/https://doi.org/10.1023%2Fa%3A1007154515475
+    response:
+      body:
+        string: !!binary |
+          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
+          MLu0OBqhaATB+fYv/wPnJ8RS8UEAAA==
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -165,15 +229,15 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:27 GMT
+          - Mon, 11 Aug 2025 23:07:28 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754932767&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=TV2Vf8cFqNfx5lxIQzYbd01GS656BDKw3oBLxrHHxlA%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953648&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=qY%2FNGUCDJIRPKLNuk9Oue6tqHFGt4HSSnPnqHhBpxoE%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754932767&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=TV2Vf8cFqNfx5lxIQzYbd01GS656BDKw3oBLxrHHxlA%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1754953648&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=qY%2FNGUCDJIRPKLNuk9Oue6tqHFGt4HSSnPnqHhBpxoE%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -194,243 +258,140 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.unpaywall.org/v2/10.1023/a:1007154515475?email=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1023%2Fa%3A1007154515475?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"doi":"10.1023/a:1007154515475","doi_url":"https://doi.org/10.1023/a:1007154515475","title":"An
-          essential role of active site arginine residue in iodide binding and histidine
-          residue in electron transfer for iodide oxidation by horseradish peroxidase","genre":"journal-article","is_paratext":false,"published_date":"2001-02-01","year":2001,"journal_name":"Molecular
-          and Cellular Biochemistry","journal_issns":"0300-8177,1573-4919","journal_issn_l":"0300-8177","journal_is_oa":false,"journal_is_in_doaj":false,"publisher":"Springer
-          Science and Business Media LLC","is_oa":false,"oa_status":"closed","has_repository_copy":false,"best_oa_location":null,"first_oa_location":null,"oa_locations":[],"oa_locations_embargoed":[],"data_standard":2,"z_authors":[{"author_position":"first","raw_author_name":"Subrata
-          Adak","is_corresponding":true,"raw_affiliation_strings":["Department of Physiology,
-          Indian Institute of Chemical Biology, 4 Raja S.C. Mullick Road, Calcutta,
-          700 032, India"]},{"author_position":"additional","raw_author_name":"Debashis
-          Bandyopadhyay","is_corresponding":false,"raw_affiliation_strings":["Department
-          of Physiology, Indian Institute of Chemical Biology, 4 Raja S.C. Mullick Road,
-          Calcutta, 700 032, India"]},{"author_position":"additional","raw_author_name":"Uday
-          Bandyopadhyay","is_corresponding":false,"raw_affiliation_strings":["Department
-          of Physiology, Indian Institute of Chemical Biology, 4 Raja S.C. Mullick Road,
-          Calcutta, 700 032, India"]},{"author_position":"last","raw_author_name":"Ranajit
-          K. Banerjee","is_corresponding":false,"raw_affiliation_strings":["Department
-          of Physiology, Indian Institute of Chemical Biology, 4 Raja S.C. Mullick Road,
-          Calcutta, 700 032, India"]}],"updated":"2025-05-24T02:33:38Z"}
-
-          '
+        string: !!binary |
+          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
+          W3j8+X9fE4SwoEUAAA==
       headers:
-        Access-Control-Allow-Headers:
-          - origin, content-type, accept, x-requested-with
-        Access-Control-Allow-Methods:
-          - POST, GET, OPTIONS, PUT, DELETE, PATCH
-        Access-Control-Allow-Origin:
-          - "*"
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "653"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 17:19:27 GMT
-        Nel:
-          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
-        Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=9SdM082hIAucRk7r5%2F1sOXzOeh9c%2BzeVzzusOXN3hNc%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754932767"}],"max_age":3600}'
-        Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=9SdM082hIAucRk7r5%2F1sOXzOeh9c%2BzeVzzusOXN3hNc%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754932767"
-        Server:
-          - Heroku
-        Vary:
-          - Accept-Encoding
-        Via:
-          - 1.1 heroku-router
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475?mailto=example@papercrow.ai
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2025,5,21]],"date-time":"2025-05-21T04:29:13Z","timestamp":1747801753621,"version":"3.41.0"},"reference-count":38,"publisher":"Springer
-          Science and Business Media LLC","issue":"1-2","license":[{"start":{"date-parts":[[2001,2,1]],"date-time":"2001-02-01T00:00:00Z","timestamp":980985600000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2001,2,1]],"date-time":"2001-02-01T00:00:00Z","timestamp":980985600000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Mol
-          Cell Biochem"],"published-print":{"date-parts":[[2001,2]]},"DOI":"10.1023\/a:1007154515475","type":"journal-article","created":{"date-parts":[[2002,12,22]],"date-time":"2002-12-22T09:07:15Z","timestamp":1040548035000},"page":"1-11","source":"Crossref","is-referenced-by-count":7,"title":["An
-          essential role of active site arginine residue in iodide binding and histidine
-          residue in electron transfer for iodide oxidation by horseradish peroxidase"],"prefix":"10.1007","volume":"218","author":[{"given":"Subrata","family":"Adak","sequence":"first","affiliation":[]},{"given":"Debashis","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Uday","family":"Bandyopadhyay","sequence":"additional","affiliation":[]},{"given":"Ranajit
-          K.","family":"Banerjee","sequence":"additional","affiliation":[]}],"member":"297","reference":[{"key":"271450_CR1","doi-asserted-by":"crossref","first-page":"187","DOI":"10.1016\/S0010-8545(00)80316-1","volume":"19","author":"HB
-          Dunford","year":"1976","unstructured":"Dunford HB, Stillman JS: On the function
-          and mechanism of action of peroxidases. Coord Chem Rev 19: 187\u2013251, 1976","journal-title":"Coord
-          Chem Rev"},{"key":"271450_CR2","first-page":"1","volume-title":"Peroxidases
-          in Chemistry and Biology","author":"HB Dunford","year":"1991","unstructured":"Dunford
-          HB: Horseradish peroxidase: Structure and kinetic properties. In J. Everse,
-          K.E. Everse, M.B. Gresham (eds). Peroxidases in Chemistry and Biology, vol.
-          II. CRC Press, Boca Raton, FL, 1991, pp 1\u201324"},{"key":"271450_CR3","doi-asserted-by":"crossref","first-page":"861","DOI":"10.1146\/annurev.bi.45.070176.004241","volume":"45","author":"M
-          Morrison","year":"1976","unstructured":"Morrison M, Schonbaum GR: Peroxide-catalyzed
-          halogenation. Ann Rev Biochem 45: 861\u2013888, 1976","journal-title":"Ann
-          Rev Biochem"},{"key":"271450_CR4","doi-asserted-by":"crossref","first-page":"2076","DOI":"10.1021\/bi00761a013","volume":"11","author":"R
-          Roman","year":"1972","unstructured":"Roman R, Dunford HB: pH dependence of
-          the oxidation of iodide by compound I of horseradish peroxidase. Biochemistry
-          11: 2076\u20132082, 1972","journal-title":"Biochemistry"},{"key":"271450_CR5","doi-asserted-by":"crossref","first-page":"13783","DOI":"10.1016\/S0021-9258(18)89814-3","volume":"259","author":"RP
-          Magnusson","year":"1984","unstructured":"Magnusson RP, Taurog A, Dorris ML:
-          Mechanisms of thyroid peroxidase and lactoperoxidase-catalyzed reactions involving
-          iodide. J Biol Chem 259: 13783\u201313790, 1984","journal-title":"J Biol Chem"},{"key":"271450_CR6","doi-asserted-by":"crossref","first-page":"502","DOI":"10.1016\/S0021-9258(19)44403-7","volume":"248","author":"GR
-          Schonbaum","year":"1973","unstructured":"Schonbaum GR: New complexes of peroxidases
-          with hydroxamic acids, hydrazides, and amides. J Biol Chem 248: 502\u2013511,
-          1973","journal-title":"J Biol Chem"},{"key":"271450_CR7","doi-asserted-by":"crossref","first-page":"9657","DOI":"10.1016\/S0021-9258(18)67564-7","volume":"261","author":"J
-          Sakurada","year":"1986","unstructured":"Sakurada J, Takahashi S, Hosoya TJ:
-          Nuclear magnetic resonance studies on the spatial relationship of aromatic
-          donor molecules to the heme iron of horseradish peroxidase. Biol Chem 261:
-          9657\u20139662, 1986","journal-title":"Biol Chem"},{"key":"271450_CR8","doi-asserted-by":"crossref","first-page":"3027","DOI":"10.1021\/ja00218a005","volume":"110","author":"V
-          Thanabal","year":"1988","unstructured":"Thanabal V, De Ropp JS, La Mar GN:
-          Proton NMR characterization of the catalytically relevant proximal and distal
-          hydrogen-bonding networks in ligated resting state horseradish peroxidase.
-          J Am Chem Soc 110: 3027\u20133035, 1988","journal-title":"J Am Chem Soc"},{"key":"271450_CR9","doi-asserted-by":"crossref","first-page":"88","DOI":"10.1021\/ar00140a004","volume":"20","author":"PR
-          Ortiz de Montellano","year":"1987","unstructured":"Ortiz de Montellano PR:
-          Catalytic sites of hemoprotein peroxidases. Acc Chem Res 20: 88\u2013104,
-          1987","journal-title":"Acc Chem Res"},{"key":"271450_CR10","doi-asserted-by":"crossref","first-page":"19430","DOI":"10.1074\/jbc.270.33.19430","volume":"270","author":"S
-          Newmyer","year":"1995","unstructured":"Newmyer S, Ortiz de Montellano PR:
-          Horseradish peroxidase His 42\u2192Ala, His-42\u2192Val, and Phe-41\u2192Ala
-          mutants: Histidine catalysis and control of substrate access to the heme iron.
-          J Biol Chem 270: 19430\u201319438, 1995","journal-title":"J Biol Chem"},{"key":"271450_CR11","doi-asserted-by":"crossref","first-page":"232","DOI":"10.1042\/bst0230232","volume":"23","author":"NC
-          Veitch","year":"1995","unstructured":"Veitch NC: Aromatic donor molecule binding
-          sites of heme peroxidases. Biochem Soc Trans 23: 232\u2013240, 1995","journal-title":"Biochem
-          Soc Trans"},{"key":"271450_CR12","doi-asserted-by":"crossref","first-page":"250","DOI":"10.1042\/bst0230250","volume":"23","author":"GH
-          Loew","year":"1995","unstructured":"Loew GH, Du P, Smith AT: Homology modelling
-          of horseradish peroxidase coupled to two-dimensional NMR spectral assignments.
-          Biochem Soc Trans 23: 250\u2013256, 1995","journal-title":"Biochem Soc Trans"},{"key":"271450_CR13","doi-asserted-by":"crossref","first-page":"136","DOI":"10.1007\/s007750050032","volume":"1","author":"JN
-          Rodriguez-Lopez","year":"1996","unstructured":"Rodriguez-Lopez JN, Smith AT,
-          Thorneley RNF: Recombinant horseradish isoenzyme C: The effect of distal haem
-          cavity mutations (His42\u2192Leu and Arg38\u2192Leu) on compound I formation
-          and substratebinding. J Biol Inorg Chem 1: 136\u2013142, 1996","journal-title":"J
-          Biol Inorg Chem"},{"key":"271450_CR14","doi-asserted-by":"crossref","first-page":"4023","DOI":"10.1074\/jbc.271.8.4023","volume":"271","author":"JN
-          Rodriguez-Lopez","year":"1996","unstructured":"Rodriguez-Lopez JN, Smith AT,
-          Thorneley NF: Role of arginine 38 in horseradish peroxidase: A critical residue
-          for substrate binding and catalysis. J Biol Chem 271: 4023\u20134030, 1996","journal-title":"J
-          Biol Chem"},{"key":"271450_CR15","doi-asserted-by":"crossref","first-page":"1532","DOI":"10.1021\/bi962502o","volume":"36","author":"BD
-          Howes","year":"1997","unstructured":"Howes BD, Rodriguez-Lopez JN, Smith AT,
-          Smulevich G: Mutation of distal residues of horseradish peroxidase: Influence
-          on substrate binding and cavity properties. Biochemistry 36: 1532\u20131543,
-          1997","journal-title":"Biochemistry"},{"key":"271450_CR16","doi-asserted-by":"crossref","first-page":"14751","DOI":"10.1021\/bi9718402","volume":"36","author":"NC
-          Veitch","year":"1997","unstructured":"Veitch NC, Gao Y, Smith AT, White CG:
-          Identification of a critical phenylalanine residue in horseradish peroxidase,
-          Phe-179, by sitedirected mutagenesis and 1H-NMR: Implications for complex
-          formation with aromatic donor molecules. Biochemistry 36: 14751-14761, 1997","journal-title":"Biochemistry"},{"key":"271450_CR17","doi-asserted-by":"crossref","first-page":"1032","DOI":"10.1038\/nsb1297-1032","volume":"4","author":"M
-          Gajhede","year":"1997","unstructured":"Gajhede M, Schuller DJ, Henriksen A,
-          Smith AT, Poulos TL: Crystal structure of horseradish peroxidase C at 2.15
-          A resolution. Nature Struct Biol 4: 1032\u20131038, 1997","journal-title":"Nature
-          Struct Biol"},{"key":"271450_CR18","doi-asserted-by":"crossref","first-page":"4007","DOI":"10.1016\/S0021-9258(18)61303-1","volume":"262","author":"J
-          Sakurada","year":"1987","unstructured":"Sakurada J, Takahashi S, Hosoya T:
-          Proton nuclear magnetic resonance studies on the iodide binding by horseradish
-          peroxidase. J Biol Chem 262: 4007\u20134010, 1987","journal-title":"J Biol
-          Chem"},{"key":"271450_CR19","doi-asserted-by":"crossref","first-page":"6478","DOI":"10.1021\/bi00394a028","volume":"26","author":"J
-          Sakurada","year":"1987","unstructured":"Sakurada J, Takahashi S, Shimizu T,
-          Hatano M, Nakamura S, Hosoya T: Proton and iodine-127 nuclear magnetic resonance
-          studies on the binding of iodide by lactoperoxidase. Biochemistry 26: 6478\u20136483,
-          1987","journal-title":"Biochemistry"},{"key":"271450_CR20","doi-asserted-by":"crossref","first-page":"1637","DOI":"10.1016\/S0021-9258(18)53900-4","volume":"268","author":"RZ
-          Harris","year":"1993","unstructured":"Harris RZ, Newmyer SL, Ortiz de Montellano
-          PR: Horseradish peroxidase-catalyzed two-electron oxidations: Oxidation of
-          iodide, thioanisoles, and phenols at distinct sites. J Biol Chem 268: 1637\u20131645,
-          1993","journal-title":"J Biol Chem"},{"key":"271450_CR21","doi-asserted-by":"crossref","first-page":"7516","DOI":"10.1021\/ja00258a043","volume":"109","author":"V
-          Thanabal","year":"1987","unstructured":"Thanabal V, De Ropp JS, La Mar GN:
-          Identification of the catalytically important amino acid residue resonances
-          in ferric low-spin horseradish peroxidase with nuclear overhauser effect measurements.
-          J Am Chem Soc 109: 7516\u20137525, 1987","journal-title":"J Am Chem Soc"},{"key":"271450_CR22","doi-asserted-by":"crossref","unstructured":"Modi
-          S, Behere DV, Mitra S: Interaction of thiocyanate with horseradish peroxidase.
-          1H and 15N nuclear magnetic resonance studies. J Biol Chem 264: 19677\u201319684,
-          1989","DOI":"10.1016\/S0021-9258(19)47166-4"},{"key":"271450_CR23","doi-asserted-by":"crossref","first-page":"83","DOI":"10.1016\/0167-4838(90)90126-Z","volume":"1041","author":"A
-          Saxena","year":"1990","unstructured":"Saxena A, Modi S, Behere DV, Mitra S:
-          Interaction of aromatic donor molecules with manganese (III) reconstituted
-          horseradish peroxidase: Proton nuclear magnetic resonance optical difference
-          spectroscopic studies. Biochim Biophys Acta 1041: 83\u201393, 1990","journal-title":"Biochim
-          Biophys Acta"},{"key":"271450_CR24","doi-asserted-by":"crossref","first-page":"8199","DOI":"10.1016\/S0021-9258(19)70630-9","volume":"255","author":"TL
-          Poulos","year":"1980","unstructured":"Poulos TL, Kraut J: The stereochemistry
-          of peroxidase catalysis. J Biol Chem 255: 8199\u20138205, 1980","journal-title":"J
-          Biol Chem"},{"key":"271450_CR25","doi-asserted-by":"crossref","first-page":"9800","DOI":"10.1016\/S0021-9258(19)50164-8","volume":"267","author":"DK
-          Bhattacharyya","year":"1992","unstructured":"Bhattacharyya DK, Bandyopadhyay
-          U, Banerjee RK: Chemical and kinetic evidence for an essential histidine in
-          horseradish peroxidase for iodide oxidation. J Biol Chem 267: 9800\u20139804,
-          1992","journal-title":"J Biol Chem"},{"key":"271450_CR26","doi-asserted-by":"crossref","first-page":"22292","DOI":"10.1016\/S0021-9258(18)41527-X","volume":"268","author":"DK
-          Bhattacharyya","year":"1993","unstructured":"Bhattacharyya DK, Bandyopadhyay
-          U, Banerjee RK: Chemical and kinetic evidence for an essential histidine residue
-          in the electron transfer from aromatic donor to horseradish peroxidase compound
-          I. J Biol Chem 268: 22292\u201322298, 1993","journal-title":"J Biol Chem"},{"key":"271450_CR27","doi-asserted-by":"crossref","first-page":"985","DOI":"10.1042\/bj3140985","volume":"314","author":"S
-          Adak","year":"1996","unstructured":"Adak S, Mazumdar A, Banerjee RK: Probing
-          the active site residues in aromatic donor oxidation in horseradish peroxidase:
-          Involvement of an arginine and a tyrosine residue in aromatic donor binding.
-          Biochem J 314: 985\u2013991, 1996","journal-title":"Biochem J"},{"key":"271450_CR28","doi-asserted-by":"crossref","first-page":"251","DOI":"10.1021\/bi00804a010","volume":"9","author":"WB
-          Melchior Jr","year":"1970","unstructured":"Melchior WB Jr, Fahrney D: Ethoxyformylation
-          of proteins. Reaction of ethoxyformic anhydride with a-chymotrypsin, pepsin,
-          and pancreatic ribonuclease at pH-4. Biochemistry 9: 251\u2013252, 1970","journal-title":"Biochemistry"},{"key":"271450_CR29","doi-asserted-by":"crossref","first-page":"431","DOI":"10.1016\/0076-6879(77)47043-5","volume":"47","author":"EW
-          Miles","year":"1977","unstructured":"Miles EW: Modification of histidyl residues
-          in proteins by diethylpyrocarbonate. Meth Enzymol 47: 431\u2013442, 1977","journal-title":"Meth
-          Enzymol"},{"key":"271450_CR30","doi-asserted-by":"crossref","first-page":"2639","DOI":"10.1021\/bi00432a042","volume":"28","author":"T
-          Hosoya","year":"1989","unstructured":"Hosoya T, Sakurada J, Kurokawa C, Toyoda
-          R, Nakamura S: Interaction of aromatic donor molecules with lactoperoxidase
-          probed by optical difference spectra. Biochemistry 28: 2639\u20132644, 1989","journal-title":"Biochemistry"},{"key":"271450_CR31","doi-asserted-by":"crossref","first-page":"12998","DOI":"10.1021\/bi00040a010","volume":"34","author":"S
-          Adak","year":"1995","unstructured":"Adak S, Bhattacharyya DK, Mazumdar A,
-          Bandyopadhyay U, Banerjee RK: Concurrent reduction of iodine and oxidation
-          of EDTA at the active site of horseradish peroxidase: Probing the iodine binding
-          site by optical difference spectroscopy and steady state kinetic analysis
-          for the formation of active enzyme-I+-EDTA ternary complex for iodine reductase
-          activity. Biochemistry 34: 12998\u201313006, 1995","journal-title":"Biochemistry"},{"key":"271450_CR32","doi-asserted-by":"crossref","first-page":"11049","DOI":"10.1074\/jbc.272.17.11049","volume":"272","author":"S
-          Adak","year":"1997","unstructured":"Adak S, Mazumdar A, Banerjee RK: Low catalytic
-          turnover of horseradish peroxidase in thiocyanate oxidation: Evidence for
-          concurrent inactivation by cyanide generated through one-electron oxidation
-          of thiocyanate. J Biol Chem 272: 11049\u201311056, 1997","journal-title":"J
-          Biol Chem"},{"key":"271450_CR33","doi-asserted-by":"crossref","first-page":"6171","DOI":"10.1016\/S0021-9258(18)94475-3","volume":"243","author":"K
-          Takahashi","year":"1968","unstructured":"Takahashi K: The reaction of phenylglyoxal
-          with arginine residues in proteins. J Biol Chem 243: 6171\u20136179, 1968","journal-title":"J
-          Biol Chem"},{"key":"271450_CR34","doi-asserted-by":"crossref","first-page":"3714","DOI":"10.1016\/S0021-9258(18)97101-2","volume":"240","author":"MC
-          Scrutton","year":"1965","unstructured":"Scrutton MC, Utter MF: Pyruvate carboxylase
-          V. Interaction of the enzyme with adenosine triphosphate. J Biol Chem 240:
-          3714\u20133723, 1965","journal-title":"J Biol Chem"},{"key":"271450_CR35","doi-asserted-by":"crossref","first-page":"483","DOI":"10.1111\/j.1432-1033.1979.tb13061.x","volume":"96","author":"KG
-          Welinder","year":"1979","unstructured":"Welinder KG: Amino acid sequence studies
-          of horseradish peroxidase. Amino and carboxyl termini, cyanogen bromide and
-          tryptic fragments, the complete sequence and some structural characteristics
-          of horseradish peroxide C. Eur J Biochem 96: 483\u2013502, 1979","journal-title":"Eur
-          J Biochem"},{"key":"271450_CR36","doi-asserted-by":"crossref","first-page":"9158","DOI":"10.1021\/bi00153a007","volume":"31","author":"GN
-          La Mar","year":"1992","unstructured":"La Mar GN, Hernandez G, De Ropp JS:
-          1H NMR investigation of the influence of interacting sites on the dynamics
-          and thermodynamics of substrate and ligand binding to horseradish peroxidase.
-          Biochemistry 31: 9158\u20139168, 1992","journal-title":"Biochemistry"},{"key":"271450_CR37","doi-asserted-by":"crossref","first-page":"3331","DOI":"10.1021\/bi00409a032","volume":"27","author":"WA
-          Oertling","year":"1988","unstructured":"Oertling WA, Babcock GA: Time-resolved
-          and static resonance Raman spectroscopy of horseradish peroxidase intermediates.
-          Biochemistry 27: 3331\u20133338, 1988","journal-title":"Biochemistry"},{"key":"271450_CR38","doi-asserted-by":"crossref","first-page":"5752","DOI":"10.1074\/jbc.272.9.5752","volume":"272","author":"K
-          Fukuyama","year":"1997","unstructured":"Fukuyama K, Sato K, Itakura H, Takahashi
-          S, Hosoya T: Binding of iodide to Arthromyces ramosus peroxidase investigated
-          with X-ray crystallographic analysis, 1H and 127I NMR spectroscopy, and steadystate
-          kinetics. J Biol Chem 272: 5752\u20135756, 1997","journal-title":"J Biol Chem"}],"container-title":["Molecular
-          and Cellular Biochemistry"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1023\/A:1007154515475.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1023\/A:1007154515475\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1023\/A:1007154515475.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2025,5,20]],"date-time":"2025-05-20T12:57:39Z","timestamp":1747745859000},"score":1,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1023\/A:1007154515475"}},"subtitle":[],"short-title":[],"issued":{"date-parts":[[2001,2]]},"references-count":38,"journal-issue":{"issue":"1-2","published-print":{"date-parts":[[2001,2]]}},"alternative-id":["271450"],"URL":"https:\/\/doi.org\/10.1023\/a:1007154515475","relation":{},"ISSN":["0300-8177","1573-4919"],"issn-type":[{"type":"print","value":"0300-8177"},{"type":"electronic","value":"1573-4919"}],"subject":[],"published":{"date-parts":[[2001,2]]}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
-        Content-Encoding:
-          - gzip
         Content-Length:
           - "5257"
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 17:19:27 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:28 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -441,10 +402,20 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475/transform/application/x-bibtex
+      uri: https://api.crossref.org/works/10.1023%2Fa%3A1007154515475/transform/application/x-bibtex
     response:
       body:
         string:
@@ -456,23 +427,23 @@ interactions:
           Subrata and Bandyopadhyay, Debashis and Bandyopadhyay, Uday and Banerjee,
           Ranajit K.}, year={2001}, month=feb, pages={1\u201311} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 17:19:28 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:28 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:

@@ -1,58 +1,78 @@
 interactions:
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Andres+M.+Bran+Sam+Cox&select=DOI,author,title
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Andres+M.+Bran+Sam+Cox&select=DOI%2Cauthor%2Ctitle
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":5727,"items":[{"DOI":"10.1038\/s42256-024-00832-8","author":[{"given":"Andres","family":"M.
-          Bran","sequence":"first","affiliation":[]},{"given":"Sam","family":"Cox","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-0310-0851","authenticated-orcid":false,"given":"Oliver","family":"Schilter","sequence":"additional","affiliation":[]},{"given":"Carlo","family":"Baldassari","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0002-6647-3965","authenticated-orcid":false,"given":"Andrew
-          D.","family":"White","sequence":"additional","affiliation":[]},{"ORCID":"http:\/\/orcid.org\/0000-0003-3046-6576","authenticated-orcid":false,"given":"Philippe","family":"Schwaller","sequence":"additional","affiliation":[]}],"title":["Augmenting
-          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+        string: !!binary |
+          H4sIAAAAAAAA/7WTwXKbMBCGX4XRGWEBNnG4JfYlh447zaEHO4cdWECTBVFJxPF4ePcuTNvQTg/J
+          IRwYsbv69C+r/yqcBz84kQvzLELRonNQo/SXHjl2NvZZknZ+kXpB67TpOBtHKlJvGZFfRQUFeqZd
+          x1B444GkRTfQFMri7W0otMeWP45XsT88TAwVxSrdnlZunSSbTKpkLZXaponcMhkG3xg7l9f6BadD
+          77qSkZyroNV04ciXKLi30HHI4Y8Bu2JSXmk7q4aq0qTBz4qPT2P4RnqEdonZmde/EVCWetoH9H/O
+          4dvuYc91jfe9y0+r08rYQpeRsfVppfjhRlQqVRrzaruJf/WDndcFeCzlXC7yCshh+EfWgXhhl8oe
+          i0aTn2MfkPebtwNLZom7ByqBJ2b1J/SbyCxb38j0Ntu8s995oOdgHy01fm/4onzKOFK1zmS2ucne
+          Ke8r/3vd9/jPQM5A9KGJPLEhtCeuO4q7oW6nc7s6ILA18rurB7ZQ0JoSyQVn7ZugaLBl69lL4I0h
+          J2bG7B/Zo5X9bLk4FHy+vUzmYytbL3VX4qvI1SQNbNFIvjmT5bqBaBzHn2Aj1bnyAwAA
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "451"
+          - "450"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
+          - Mon, 11 Aug 2025 23:07:29 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors%2CexternalIds%2Ctitle
     response:
       body:
         string:
@@ -64,7 +84,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 178.39174}]}
+          "P. Schwaller"}], "matchScore": 172.33388}]}
 
           '
       headers:
@@ -77,76 +97,92 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:29 GMT
         Via:
-          - 1.1 f8b122b964bc12ee7f052daf895c865c.cloudfront.net (CloudFront)
+          - 1.1 b735cef950dccc7c59398fa8df6c4f7e.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - yKFvmUVUczU4QFiruYdAf-4pbiDWov0M4o3i4JTwpAT1ZT37S8BKqg==
+          - nkPDGPo8WQ95iIDStmiHGOE4BK1JJbyKF7Mu9lZUaX084aww0AKe-A==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbaOHBmPHcERdQ=
+          - PKejwGOHvHcEVsA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
+          - Mon, 11 Aug 2025 23:07:29 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - c85f2082-f108-4a49-aa28-f9bebf3d2ee8
+          - c7fcb0c1-ceab-4351-9d6f-52228f14fb5a
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
     response:
       body:
         string: Resource not found.
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 02 Dec 2024 19:36:33 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:29 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 404
         message: Not Found
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds%2Ctitle
     response:
       body:
         string:
@@ -154,7 +190,7 @@ interactions:
           {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 176.67178}]}
+          "matchScore": 172.33388}]}
 
           '
       headers:
@@ -167,252 +203,296 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
+          - Mon, 11 Aug 2025 23:07:30 GMT
+        Via:
+          - 1.1 ad0f81beb11a40b80a59b548e3794d00.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - U6GVoAWByKASOEZeK9wZjOAgFgtMqO6MBFZXyUCOt2uJEKKjVjbLiA==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - PKej6ERjPHcEhsw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "348"
+        x-amzn-Remapped-Date:
+          - Mon, 11 Aug 2025 23:07:30 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 3a7f37da-71c0-4b1f-b680-a332a5845e59
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI%2Ctitle
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2509115,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:31 GMT
+        Transfer-Encoding:
+          - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
+    response:
+      body:
+        string: Resource not found.
+      headers:
+        Connection:
+          - keep-alive
+        Content-Type:
+          - text/plain;charset=utf-8
+        Date:
+          - Mon, 11 Aug 2025 23:07:31 GMT
+        Transfer-Encoding:
+          - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 404
+        message: Not Found
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI%2Ctitle
+    response:
+      body:
+        string:
+          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2509115,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
+          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      headers:
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:31 GMT
+        Transfer-Encoding:
+          - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds%2Ctitle
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "matchScore": 172.33388}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "348"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 11 Aug 2025 23:07:32 GMT
         Via:
           - 1.1 b0797f10be715dcb685d992d17347df4.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - -tfmEPKCpG3d64bK5MNheFpy5CZYWkkSKc91baPwTAp-pUoGgWHLNA==
+          - OAqJJhJQiS0SVeyDr4ht1q5ojGQteyk78fT_uuh5cP7HppAipyaQiw==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbaYHhxPHcEfZQ=
+          - PKekHFc-vHcElrA=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "348"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
+          - Mon, 11 Aug 2025 23:07:32 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 99c2be1d-61d8-4b3d-a297-8d00e3292ea7
+          - cfb341d2-ff15-4055-9f88-14774e0bf4da
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
     response:
       body:
         string: Resource not found.
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:32 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 404
         message: Not Found
   - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2349040,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
-          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
+      body: ""
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:34 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=externalIds,title
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
-          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
-          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
-          "38799228"}, "title": "Augmenting large language models with chemistry tools",
-          "matchScore": 176.67178}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
           - keep-alive
-        Content-Length:
-          - "348"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:35 GMT
-        Via:
-          - 1.1 30dc54066252ce01682df0394718d89c.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - oYseCGJt3gbHalkmpCicgyfQLuhDgkfv4aqBoBKewb29x3chbUAQjw==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - CLbajHJCvHcEQXg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "348"
-        x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:35 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - f29a29e8-3fbd-4c96-9d4a-9bd525733ae7
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI,title
-    response:
-      body:
-        string:
-          '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":2349040,"items":[{"DOI":"10.1038\/s42256-024-00832-8","title":["Augmenting
-          large language models with chemistry tools"]}],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 02 Dec 2024 19:36:35 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.crossref.org/works/10.48550%2FarXiv.2304.05376/transform/application/x-bibtex
-    response:
-      body:
-        string: Resource not found.
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - close
-        Content-Type:
-          - text/plain;charset=utf-8
-        Date:
-          - Mon, 02 Dec 2024 19:36:35 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Transfer-Encoding:
-          - chunked
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
-      status:
-        code: 404
-        message: Not Found
-  - request:
-      body: null
-      headers: {}
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=externalIds,title
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1007/s40278-023-41815-2?fields=externalIds%2Ctitle
     response:
       body:
         string:
@@ -430,88 +510,115 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:36 GMT
+          - Mon, 11 Aug 2025 23:07:32 GMT
         Via:
-          - 1.1 6cbbecc3198d4b8fe84dc82e5f121ae6.cloudfront.net (CloudFront)
+          - 1.1 0113a71a4be95c1ea6c4a193aad565aa.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - XpSwBrnWCDjkdeJ7qOssbh719MN0jC9_tviDYpCiAsyJIW4E1tG4PQ==
+          - lCrlQxQhajvAm7xBGn-DKotKXEazlgudbFvdVTB_t1bshv_7Ee4gLg==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - CLbatEUUvHcEGQg=
+          - PKekREVnvHcEApQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "197"
         x-amzn-Remapped-Date:
-          - Mon, 02 Dec 2024 19:36:36 GMT
+          - Mon, 11 Aug 2025 23:07:32 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - c5357fe1-9e8f-4106-b930-eccdd82a814f
+          - c5a14a46-5350-4ca1-8921-e7770d3491c8
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=example@papercrow.ai
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2?mailto=example%40papercrow.ai
     response:
       body:
-        string:
-          '{"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T04:17:17Z","timestamp":1687580237047},"reference-count":1,"publisher":"Springer
-          Science and Business Media LLC","issue":"1","license":[{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"tdm","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"},{"start":{"date-parts":[[2023,6,24]],"date-time":"2023-06-24T00:00:00Z","timestamp":1687564800000},"content-version":"vor","delay-in-days":0,"URL":"https:\/\/www.springernature.com\/gp\/researchers\/text-and-data-mining"}],"content-domain":{"domain":[],"crossmark-restriction":false},"short-container-title":["Reactions
-          Weekly"],"DOI":"10.1007\/s40278-023-41815-2","type":"journal-article","created":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T18:42:29Z","timestamp":1687545749000},"page":"145-145","source":"Crossref","is-referenced-by-count":0,"title":["Convalescent-anti-sars-cov-2-plasma\/immune-globulin"],"prefix":"10.1007","volume":"1962","member":"297","published-online":{"date-parts":[[2023,6,24]]},"reference":[{"key":"41815_CR1","doi-asserted-by":"crossref","unstructured":"Delgado-Fernandez
-          M, et al. Treatment of COVID-19 with convalescent plasma in patients with
-          humoral immunodeficiency - Three consecutive cases and review of the literature.
-          Enfermedades Infecciosas Y Microbiologia Clinica 40\n: 507-516, No. 9, Nov
-          2022. Available from: URL: \nhttps:\/\/seimc.org\/","DOI":"10.1016\/j.eimce.2021.01.009"}],"container-title":["Reactions
-          Weekly"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/article\/10.1007\/s40278-023-41815-2\/fulltext.html","content-type":"text\/html","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/link.springer.com\/content\/pdf\/10.1007\/s40278-023-41815-2.pdf","content-type":"application\/pdf","content-version":"vor","intended-application":"similarity-checking"}],"deposited":{"date-parts":[[2023,6,23]],"date-time":"2023-06-23T19:23:18Z","timestamp":1687548198000},"score":1,"resource":{"primary":{"URL":"https:\/\/link.springer.com\/10.1007\/s40278-023-41815-2"}},"subtitle":["Fever
-          and mild decrease in baseline oxygen saturation following off-label use: 3
-          case reports"],"short-title":[],"issued":{"date-parts":[[2023,6,24]]},"references-count":1,"journal-issue":{"issue":"1","published-online":{"date-parts":[[2023,6]]}},"alternative-id":["41815"],"URL":"http:\/\/dx.doi.org\/10.1007\/s40278-023-41815-2","relation":{},"ISSN":["1179-2051"],"issn-type":[{"value":"1179-2051","type":"electronic"}],"subject":[],"published":{"date-parts":[[2023,6,24]]}}}'
+        string: !!binary |
+          H4sIAAAAAAAA/8VW227jNhD9FULPpm6Rb3prnS4QINkFkrRFGwUFLY1txhQpkJQd1/C/d0j5tmnW
+          CBZoN3BgmTMazhzOOcNtYCyzrQnyQC2DXlCDMWwO1G4awLW10uerK9CGK4mGJIzD+GQJ8m3AZQWv
+          ULnHilmgDdMW4z49pXF61Rv00uz5udeZLK9ddGeg8YCm2WOc5ckQP39iTGfFrOomyJPBaNgfodsw
+          zoa7XqBhBhpkCbRUrbTo0Auadiq4WYDGiA+N5nIOmjyU3LkRJivyc2u4xDzJHVSckdvbCW7CjWld
+          Dgk+C16CNPjraevg0PY7a4hz/3mvhkE2it0f1lAqaUHaMzBtVeMrFQi2oVzSim1wz7gX/Hp/i9aF
+          tY3Ji6iI1ut1aPYVSjw1DWGp6iKaN0WkwQDTJcJgisjCq6VYOoayjNZc4ivBrvdjqlsp/X9U93za
+          u1I149KXuX96clatjKmZXlKMZjUvrc9vxoQBTNwslLbUhcA3QCMCVriWCO6BeVdDfgdYik2Asa6/
+          3LjeicMkjodFZLI4HY6oAytLRkmfpg6kjkIvqsVyBEWseYkRXSKAEF8gytU3j+HqMRnlWZqn4/eO
+          IesPs3F3DI0nZZBkfYr/6GswjdItTRwMyCPPAXokVEWnmwOpYhd6X/1EyRUTYEoHLJOWU8O0Qc8V
+          TWkjGCJaRLyuWwl0LtS0FYg3pt9gZP56Agm3WynR+nKS8SD12lFPPWvTsTMfeFxRJTEIXGzTcy3w
+          vF3CBiN59P+a3DtWV4pTZgxo64tDa3kqvZXYAm3pugwPIrgGMWeVop9c66GO/U3uegQsYSIkj+64
+          aiyfqBmZfPnt5pomY7LmdkHKM3BIBwbhkjTMovpY0zkt2lppJogHSVUIi9emDaHkcaEBXBQDZWv5
+          Cp+ZAeNVS8OKw9rtaRdABLegO1KQXyQWXkPFKnS9wR9lyZVhhvxB7jjWOOVKqDkq3QRh5CUjWVzI
+          nPTjIe0ngx75rEIydl8rgoimIflpxbhgUwFkplWdE2RmTgp5oqYBXpeh0vMiCr5q/mRQRC+hs0KI
+          sXAq4CceH9n4ASopzefcEeTghWuCyXnbdTBIL9By6U/5rWY4w1E0OrnYi0ARNdWsiC5QNESH4CQa
+          e7qypsFxwFyWPkTwbUnjbrnC5jp7x6m5k6czzf1AznttuJhuEc1aIVzwcGFr8e/MnamI3tj+u5x/
+          OM6G19i1mlvUrQWUy8MUqKBRhn+/wI7z9CpPRu8K7CgZjzqBNaXS4O8fOE322rpF1eM4YTbu8QMQ
+          XpofO7dHOz1S5xMgLF4YsOqKVOCmiAEnN1P8doJJ1OtmDpIYpxMeJTJTQqg1bok6MqPIcRCkNZCT
+          K680KDKNctg8H+bfGQn9Denyde5chc3Zleww8/aXrO1Xt62P6jyGx/gMW95dB1AcKa8cEh4hl/Fb
+          hFHwO426PJc13kS6Ftpi/JuHh88uapIMxzSN+0nQlS73jYqigxLfJX90OQ53EFBarVBlfevhgb3g
+          Qoffsc7LEO52/wBSOnixhAsAAA==
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
-        Content-Encoding:
-          - gzip
+          - keep-alive
         Content-Length:
-          - "1163"
+          - "1159"
         Content-Type:
           - application/json
         Date:
-          - Mon, 02 Dec 2024 19:36:36 GMT
-        Server:
+          - Mon, 11 Aug 2025 23:07:32 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
+        permissions-policy:
+          - interest-cohort=()
+        server:
           - Jetty(9.4.40.v20210413)
-        Vary:
+        vary:
           - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
     response:
@@ -522,39 +629,45 @@ interactions:
           publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
           pages={145\u2013145} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:36 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:32 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
           - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
-          - "150"
       status:
         code: 200
         message: OK
   - request:
-      body: null
-      headers: {}
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
       method: GET
       uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
     response:
@@ -565,32 +678,28 @@ interactions:
           publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
           pages={145\u2013145} }\n"
       headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
         Connection:
-          - close
+          - keep-alive
         Date:
-          - Mon, 02 Dec 2024 19:36:37 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
+          - Mon, 11 Aug 2025 23:07:33 GMT
         Transfer-Encoding:
           - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
         permissions-policy:
           - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
           - 1s
         x-rate-limit-limit:
-          - "150"
-        x-ratelimit-interval:
-          - 1s
-        x-ratelimit-limit:
           - "150"
       status:
         code: 200

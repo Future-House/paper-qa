@@ -1,12 +1,11 @@
 import json
 import logging
+import ssl
 from contextlib import suppress
 from datetime import datetime
 from typing import Any
 
-import aiohttp
-from aiohttp import ClientResponseError, ClientSession
-from aiohttp.web import HTTPBadRequest
+import httpx
 from lmi.utils import gather_with_concurrency
 from tenacity import (
     before_sleep_log,
@@ -19,7 +18,6 @@ from tenacity import (
 from paperqa.docs import Docs
 from paperqa.settings import Settings
 from paperqa.types import DocDetails, Embeddable, Text
-from paperqa.utils import logging_filters
 
 logger = logging.getLogger(__name__)
 
@@ -35,43 +33,37 @@ TRIAL_CHAR_TRUNCATION_SIZE = 28_000  # stay under 8k tokens for embeddings conte
 MALFORMATTED_QUERY_STATUS: int = 400
 
 
-class CookieWarningFilter(logging.Filter):
-    """Filters out invalid cookie warning.
-
-    clincialtrials.gov always sends an x-enc header which aiohttp parsers can't handle
-    """
-
-    def filter(self, record):
-        return "Can not load response cookies" not in record.getMessage()
-
-
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_incrementing(0.1, 0.1),
-    retry=retry_if_exception_type(ClientResponseError),
+    retry=retry_if_exception_type(httpx.HTTPStatusError),
     before_sleep=before_sleep_log(logger, logging.WARNING),
     reraise=True,
 )
-async def api_search_clinical_trials(query: str, session: ClientSession) -> dict:
-
-    with logging_filters(loggers={"aiohttp.client"}, filters={CookieWarningFilter}):
-        async with (
-            session.get(
-                STUDIES_API_URL,
-                params={
-                    "query.term": query,
-                    "fields": SEARCH_API_FIELDS,
-                    "pageSize": SEARCH_PAGE_SIZE,
-                    "countTotal": "true",
-                    "sort": "@relevance",
-                },
-            ) as response,
-        ):
-            if response.status == MALFORMATTED_QUERY_STATUS:
-                # the 400s from clinicaltrials.gov are not JSON
-                raise HTTPBadRequest(reason=await response.text())
-            response.raise_for_status()
-            return await response.json()
+async def api_search_clinical_trials(query: str, client: httpx.AsyncClient) -> dict:
+    response = await client.get(
+        STUDIES_API_URL,
+        params={
+            "query.term": query,
+            "fields": SEARCH_API_FIELDS,
+            "pageSize": SEARCH_PAGE_SIZE,
+            "countTotal": "true",
+            "sort": "@relevance",
+        },
+    )
+    if response.status_code == MALFORMATTED_QUERY_STATUS:
+        # the 400s from clinicaltrials.gov are not JSON, here's an example text:
+        # > Error parsing query in Other terms:
+        # > Allowed values for enum field `protocolSection.statusModule.overallStatus`
+        # > are `ACTIVE_NOT_RECRUITING`, `COMPLETED`, `ENROLLING_BY_INVITATION`,
+        # > `NOT_YET_RECRUITING`, `RECRUITING`, `SUSPENDED`, `TERMINATED`, `WITHDRAWN`,
+        # > `AVAILABLE`, `NO_LONGER_AVAILABLE`, `TEMPORARILY_NOT_AVAILABLE`,
+        # > `APPROVED_FOR_MARKETING`, `WITHHELD`, `UNKNOWN`
+        raise httpx.HTTPStatusError(
+            message=response.text, request=response.request, response=response
+        )
+    response.raise_for_status()
+    return response.json()
 
 
 @retry(
@@ -80,26 +72,24 @@ async def api_search_clinical_trials(query: str, session: ClientSession) -> dict
     before_sleep=before_sleep_log(logger, logging.WARNING),
     reraise=True,
 )
-async def api_get_clinical_trial(nct_id: str, session: ClientSession) -> dict | None:
-    with logging_filters(loggers={"aiohttp.client"}, filters={CookieWarningFilter}):
-        with suppress(ClientResponseError):
-            async with session.get(
-                f"{STUDIES_API_URL}/{nct_id}",
-                params={"fields": TRIAL_API_FIELDS},
-            ) as response:
-                response.raise_for_status()
-                return await response.json()
-        return None
+async def api_get_clinical_trial(nct_id: str, client: httpx.AsyncClient) -> dict | None:
+    with suppress(httpx.HTTPStatusError):
+        response = await client.get(
+            f"{STUDIES_API_URL}/{nct_id}", params={"fields": TRIAL_API_FIELDS}
+        )
+        response.raise_for_status()
+        return response.json()
+    return None
 
 
 async def search_retrieve_clinical_trials(
     query: str,
-    session: ClientSession,
+    client: httpx.AsyncClient,
     limit: int = 10,
     offset: int = 0,
 ) -> tuple[list[dict], int]:
 
-    search_results = await api_search_clinical_trials(query, session=session)
+    search_results = await api_search_clinical_trials(query, client=client)
     return (
         [
             trial
@@ -108,7 +98,7 @@ async def search_retrieve_clinical_trials(
                 [
                     api_get_clinical_trial(
                         result["protocolSection"]["identificationModule"]["nctId"],
-                        session,
+                        client,
                     )
                     for result in search_results.get("studies", [])[
                         offset : offset + limit
@@ -249,7 +239,7 @@ async def add_clinical_trials_to_docs(
     settings: Settings,
     limit: int = 10,
     offset: int = 0,
-    session: ClientSession | None = None,
+    client: httpx.AsyncClient | None = None,
 ) -> tuple[int, int, str | None]:
     """Add clinical trials to the docs state.
 
@@ -259,26 +249,33 @@ async def add_clinical_trials_to_docs(
         settings: Query settings.
         limit: Number of trials to add.
         offset: Offset for the search results.
-        session: AIOHTTP session.
+        client: Async HTTP client for any requests.
 
     Returns:
         tuple[int, int, str | None]:
             Total number of trials found, number of trials added, and error message if any.
     """
-    # Cookies are not needed, and malformed via clinicaltrials.gov
-    _session = aiohttp.ClientSession() if session is None else session
+    ssl_context = ssl.create_default_context()
+    # clinicaltrials.gov throws 403's in GitHub Actions if TLS 1.3 is used with httpx
+    ssl_context.maximum_version = ssl.TLSVersion.TLSv1_2
+    # Cookies are not needed
+    _client = (
+        httpx.AsyncClient(timeout=10.0, verify=ssl_context)
+        if client is None
+        else client
+    )
 
     logger.info(f"Querying clinical trials for: {query}.")
 
     try:
         trials, total_result_count = await search_retrieve_clinical_trials(
-            query, _session, limit, offset
+            query, _client, limit, offset
         )
     except Exception as e:
         logger.warning(f"Failed to retrieve clinical trials for query: {query}.")
-        # close session if it was ephemeral
-        if session is None:
-            await _session.close()
+        # close client if it was ephemeral
+        if client is None:
+            await _client.aclose()  # TODO: move to context manager
         return (0, 0, str(e))
 
     logger.info(f"Successfully found {len(trials)} trials.")
@@ -335,9 +332,9 @@ async def add_clinical_trials_to_docs(
         settings=settings,
     )
 
-    # close session if it was ephemeral
-    if session is None:
-        await _session.close()
+    # close client if it was ephemeral
+    if client is None:
+        await _client.aclose()
 
     return (total_result_count, len(docs.texts) - initial_docs_size, None)
 
