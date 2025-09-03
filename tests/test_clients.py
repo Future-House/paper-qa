@@ -503,20 +503,22 @@ async def test_author_matching() -> None:
         s2_client = DocMetadataClient(
             http_client, metadata_clients=[SemanticScholarProvider]
         )
+        # We add a period at the end so we don't have exact title match.
+        title_with_period = "Augmenting large language models with chemistry tools."
         crossref_details_bad_author = await crossref_client.query(
-            title="Augmenting large language models with chemistry tools",
+            title=title_with_period,
             authors=["Jack NoScience"],
             fields=["title", "doi", "authors"],
         )
 
         s2_details_bad_author = await s2_client.query(
-            title="Augmenting large language models with chemistry tools",
+            title=title_with_period,
             authors=["Jack NoScience"],
             fields=["title", "doi", "authors"],
         )
 
         s2_details_w_author = await s2_client.query(
-            title="Augmenting large language models with chemistry tools",
+            title=title_with_period,
             authors=["Andres M. Bran", "Sam Cox"],
             fields=["title", "doi", "authors"],
         )
