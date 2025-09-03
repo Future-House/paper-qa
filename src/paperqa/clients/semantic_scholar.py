@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-import re
 from collections.abc import Collection
 from datetime import datetime
 from enum import IntEnum, auto
@@ -155,27 +154,6 @@ def s2_authors_match(authors: list[str], data: dict) -> bool:
     )
 
 
-def _sanitize_title(title: str) -> str:
-    """Sanitize the title.
-
-    Removes XML tags, punctuation, and capitalization.
-    Also replaces multiple spaces with a single space.
-    """
-    title = re.sub(r"<[^>]*>", "", title)
-    title = re.sub(r"[^\w\s]", "", title)
-    title = re.sub(r"\s+", " ", title)
-    return title.strip().lower()
-
-
-def s2_titles_match(title: str, data: dict) -> bool:
-    # false positive rate on short titles is likely to be high,
-    # so require at least 10 words after sanitizing
-    title = _sanitize_title(title)
-    if len(title.split()) < 10:  # noqa: PLR2004
-        return False
-    return title == _sanitize_title(data["title"])
-
-
 async def parse_s2_to_doc_details(
     paper_data: dict[str, Any], client: httpx.AsyncClient
 ) -> DocDetails:
@@ -250,6 +228,9 @@ def semantic_scholar_headers() -> dict[str, str]:
     return {}
 
 
+HIGH_TITLE_SIMILARITY_THRESHOLD = 1.0
+
+
 async def s2_title_search(
     title: str,
     client: httpx.AsyncClient,
@@ -272,31 +253,36 @@ async def s2_title_search(
             HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {title}.")
         },
     )
+
+    # In case we matched >1, sort by similarity of title
     try:
-        if (
-            authors
-            and not s2_authors_match(authors, data=data["data"][0])
-            and not s2_titles_match(title, data=data["data"][0])
-        ):
-            raise DOINotFoundError(
-                f"Could not find DOI for {title} - author and title disagreement."
-            )
-    except KeyError as exc:  # Very rare, but "data" may not be in data
+        title_similarity, result = max(
+            # need to check if nested under a 'data' key or not (depends on filtering)
+            (strings_similarity(entry["title"], title), entry)
+            for entry in data.get("data", data)
+        )
+    except (KeyError, IndexError) as exc:
         raise DOINotFoundError(
             f"Unexpected Semantic Scholar search/match endpoint shape for {title}"
             f" given data {data}."
         ) from exc
-    # need to check if nested under a 'data' key or not (depends on filtering)
+
     if (
-        strings_similarity(
-            data.get("title", "") if "data" not in data else data["data"][0]["title"],
-            title,
-        )
-        < title_similarity_threshold
+        authors
+        and title_similarity < HIGH_TITLE_SIMILARITY_THRESHOLD
+        and not s2_authors_match(authors, data=result)
     ):
+        raise DOINotFoundError(
+            f"Could not find DOI for {title} - author and title disagreement."
+        )
+
+    # If we made it here, either authors were not provided or they matched, so apply
+    # a possibly weakter threshold
+    if title_similarity < title_similarity_threshold:
         raise DOINotFoundError(
             f"Semantic scholar results did not match for title {title!r}."
         )
+
     return await parse_s2_to_doc_details(data, client)
 
 
