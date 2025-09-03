@@ -517,6 +517,12 @@ async def test_author_matching() -> None:
             fields=["title", "doi", "authors"],
         )
 
+        s2_details_no_author = await s2_client.query(
+            title=title_with_period,
+            authors=None,
+            fields=["title", "doi", "authors"],
+        )
+
         s2_details_w_author = await s2_client.query(
             title=title_with_period,
             authors=["Andres M. Bran", "Sam Cox"],
@@ -525,6 +531,7 @@ async def test_author_matching() -> None:
 
         assert not crossref_details_bad_author, "Should return None for bad author"
         assert not s2_details_bad_author, "Should return None for bad author"
+        assert not s2_details_no_author, "Should return None for no author"
         assert s2_details_w_author, "Should return results for good author"
 
 

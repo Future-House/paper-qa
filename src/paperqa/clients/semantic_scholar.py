@@ -267,20 +267,20 @@ async def s2_title_search(
             f" given data {data}."
         ) from exc
 
-    if (
-        authors
-        and title_similarity < HIGH_TITLE_SIMILARITY_THRESHOLD
-        and not s2_authors_match(authors, data=result)
-    ):
+    if authors:
+        if title_similarity < HIGH_TITLE_SIMILARITY_THRESHOLD and not s2_authors_match(
+            authors, data=result
+        ):
+            raise DOINotFoundError(
+                f"Semantic scholar results did not match for {title!r} - author and title disagreement."
+            )
+        if title_similarity < title_similarity_threshold:
+            raise DOINotFoundError(
+                f"Semantic scholar results did not match for {title!r} - title disagreement."
+            )
+    elif title_similarity < HIGH_TITLE_SIMILARITY_THRESHOLD:
         raise DOINotFoundError(
-            f"Could not find DOI for {title} - author and title disagreement."
-        )
-
-    # If we made it here, either authors were not provided or they matched, so apply
-    # a possibly weakter threshold
-    if title_similarity < title_similarity_threshold:
-        raise DOINotFoundError(
-            f"Semantic scholar results did not match for title {title!r}."
+            f"Semantic scholar results did not match for {title!r} - title disagreement and no authors provided."
         )
 
     return await parse_s2_to_doc_details(data, client)
