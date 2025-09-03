@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from collections.abc import Collection
 from datetime import datetime
 from enum import IntEnum, auto
@@ -154,6 +155,26 @@ def s2_authors_match(authors: list[str], data: dict) -> bool:
     )
 
 
+def _sanitize_title(title: str) -> str:
+    """Sanitize the title to remove extra whitespace, punctuation,.
+
+    emphasis, and capitalization.
+    """
+    title = re.sub(r"<[^>]*>", "", title)
+    title = re.sub(r"[^\w\s]", "", title)
+    title = re.sub(r"\s+", " ", title)
+    return title.strip().lower()
+
+
+def s2_titles_match(title: str, data: dict) -> bool:
+    # false positive rate on short titles is likely to be high,
+    # so require at least 10 words after sanitizing
+    title = _sanitize_title(title)
+    if len(title.split()) < 10:  # noqa: PLR2004
+        return False
+    return title == _sanitize_title(data["title"])
+
+
 async def parse_s2_to_doc_details(
     paper_data: dict[str, Any], client: httpx.AsyncClient
 ) -> DocDetails:
@@ -251,9 +272,13 @@ async def s2_title_search(
         },
     )
     try:
-        if authors and not s2_authors_match(authors, data=data["data"][0]):
+        if (
+            authors
+            and not s2_authors_match(authors, data=data["data"][0])
+            and not s2_titles_match(title, data=data["data"][0])
+        ):
             raise DOINotFoundError(
-                f"Could not find DOI for {title} - author disagreement."
+                f"Could not find DOI for {title} - author and title disagreement."
             )
     except KeyError as exc:  # Very rare, but "data" may not be in data
         raise DOINotFoundError(
