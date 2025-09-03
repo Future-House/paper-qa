@@ -156,9 +156,10 @@ def s2_authors_match(authors: list[str], data: dict) -> bool:
 
 
 def _sanitize_title(title: str) -> str:
-    """Sanitize the title to remove extra whitespace, punctuation,.
+    """Sanitize the title.
 
-    emphasis, and capitalization.
+    Removes XML tags, punctuation, and capitalization.
+    Also replaces multiple spaces with a single space.
     """
     title = re.sub(r"<[^>]*>", "", title)
     title = re.sub(r"[^\w\s]", "", title)
