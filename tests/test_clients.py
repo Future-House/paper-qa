@@ -519,7 +519,7 @@ async def test_author_matching() -> None:
 
         s2_details_no_author = await s2_client.query(
             title=title_with_period,
-            authors=None,
+            authors=[],
             fields=["title", "doi", "authors"],
         )
 
