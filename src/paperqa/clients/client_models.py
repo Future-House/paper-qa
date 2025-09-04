@@ -9,6 +9,7 @@ import httpx
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Field,
     ValidationError,
     ValidationInfo,
     field_validator,
@@ -32,7 +33,7 @@ class ClientQuery(BaseModel):
 
 class TitleAuthorQuery(ClientQuery):
     title: str
-    authors: list[str] = []
+    authors: list[str] = Field(default_factory=list)
     title_similarity_threshold: float = 0.75
     fields: Collection[str] | None = None
 

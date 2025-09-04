@@ -13,19 +13,19 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&query.author=Jack+NoScience&select=DOI%2Cauthor%2Ctitle
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools.&rows=1&query.author=Jack+NoScience&select=DOI%2Cauthor%2Ctitle
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/8WTTXPTMBCG/4pGZyuRYxOmuaVNDimUMpRyaXrY2mtHU1ky0roQMv7vXRkGygk4
-          cdHMfujd3Wd2TzIS0BDlSvpHmckOY4QWFR17ZN8XHx6VNZFehJ4wROMdR/OZnulfEbk6yQYqJFY7
-          jZkkT2BVwDjY5CqLosykIezYuDvJzfUuaehZUZzp/Rz6Pn+VL5bLYsmSMNDBhynv+sPFbsOZB6I+
-          rvbz/dyHytQzH9r9XGt9pvhZqLLIC5UvyrMfv9GRqYCwVlO6XDVgI2ayNU+Ymr+EKg3cQGfske03
-          3qJ7COBqDOyP+HlAVyUIjQkTAGgaYw3QNDw35qBL4fMAtcWj2GAPgTquK3wjthYrCtyBFSwpLnzX
-          D4RBbF1rHGIwrs3EJxPYMiA+YnXIxLnlnuLDEFJoLRalXuaZuL1Zy/F+zP5MQicShVqUxWtVlLn+
-          SxJrC05czl7CuDLVAdDG30FAXZs0Pdj/TCP7We4dfG9I3GA1BENHsXORDLH6v+G95301ZFnzTr7n
-          DU+iSW7bDXaqIW6J5/3GnYq3EFrk17UDr7248nVCNWlM6616DKqfLiLPJOMLx3QbfGmBlOEF+ypX
-          OpGFUB0Uc0gX4QZrx3F8BsJmHqaRAwAA
+          H4sIAAAAAAAA/8WTTXPTMBCG/4pGZyuRYxNIbm2TQwqlDKVcmh629trRVJaMtC6EjP87K8NAOQEn
+          LprZD727+8zuSUYCGqJcS/8oM9lhjNCiomOP7Pvsw6OyJtKz0BOGaLzjaD7TM/0rItcn2UCFxGqn
+          MZPkCawKGAebXGXxqsikIezYuDvJzfUuaehZUaz0fg59n7/IF8tlsWRJGOjgw5R3/f5it+HMA1Ef
+          1/v5fu5DZeqZD+1+rrVeKX4WqizyQuWLcvXjNzoyFRDWakqX6wZsxEy25glT85dQpYEb6Iw9sv3a
+          W3QPAVyNgf0RPw3oqgShMWECAE1jrAGahufGHHQpfB6gtngUG+whUMd1hW/E1mJFgTuwgiXFhe/6
+          gTCIrWuNQwzGtZn4aAJbBsQHrA6ZOLfcU3wYQgqdiUWpl3kmbm/O5Hg/Zn8moROJQi3K4qUqylz/
+          JYkzC05czp7DuDLVAdDG30FAXZs0Pdj/TCP7We4tfG9I3GA1BENHsXORDLH6v+G95301ZFnzTr7j
+          DU+iSW7bDXaqIW6J5/3KnYo3EFrk17UDr7248nVCNWlM6616DKqfLiLPJOMLx3QbfGmBlOEF+yLX
+          OpGFUB0Uc0gX4QZrx3H8BtE+QwuRAwAA
       headers:
         Connection:
           - keep-alive
@@ -34,7 +34,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:26 GMT
+          - Wed, 03 Sep 2025 21:29:05 GMT
         access-control-allow-headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
             Accept-Ranges, Cache-Control
@@ -73,7 +73,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors%2CexternalIds%2Ctitle
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools.&fields=authors%2CexternalIds%2Ctitle
     response:
       body:
         string:
@@ -85,7 +85,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 172.33388}]}
+          "P. Schwaller"}], "matchScore": 175.73248}]}
 
           '
       headers:
@@ -98,27 +98,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
+          - Wed, 03 Sep 2025 21:29:06 GMT
         Via:
-          - 1.1 cb0f9f6369baeebf7c66aebe4cb453ac.cloudfront.net (CloudFront)
+          - 1.1 0ac5a786563da4ae2e2a28a1fe210e04.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - XJbztQY_fQC9lvNNPyPVcEMbvIPBNYwtR40Ejfp2gefCh8EzIPONWQ==
+          - BSGjMa4PG9iwXM-P5C2b2kAYhraE8o_1gLWd7zMUCMK-6CglS0Xitw==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PKejVFS0PHcEenw=
+          - QWDtSEZNPHcEs2g=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
+          - Wed, 03 Sep 2025 21:29:06 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - d1be6cb5-055e-4500-9273-d6a0fd7956d7
+          - 605f1fe8-3201-48b9-b58e-aa99bbc1d09b
       status:
         code: 200
         message: OK
@@ -136,7 +136,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors%2CexternalIds%2Ctitle
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools.&fields=authors%2CexternalIds%2Ctitle
     response:
       body:
         string:
@@ -148,7 +148,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 172.33388}]}
+          "P. Schwaller"}], "matchScore": 175.73248}]}
 
           '
       headers:
@@ -161,27 +161,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
+          - Wed, 03 Sep 2025 21:29:06 GMT
         Via:
-          - 1.1 cb0f9f6369baeebf7c66aebe4cb453ac.cloudfront.net (CloudFront)
+          - 1.1 0ac5a786563da4ae2e2a28a1fe210e04.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - 2DLoYkBkrnDmMlxaJozHo7W2ol4BQ3kjbzEDXLKo1xfM6JeqZx1ZdA==
+          - h3xXSjFw1z1tZ4nPFKXM2Vp6Flevk_8zhhw-IS-B67YHpUVQgegGZQ==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PKejnHAevHcEAVA=
+          - QWDtYFtTPHcErIw=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
+          - Wed, 03 Sep 2025 21:29:06 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - eab58808-adb7-44c0-b144-3b1f7eb0af84
+          - 503c9f1d-75bc-44dd-a112-bc94d5c1b53b
       status:
         code: 200
         message: OK
@@ -209,7 +209,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Mon, 11 Aug 2025 23:07:29 GMT
+          - Wed, 03 Sep 2025 21:29:06 GMT
         Transfer-Encoding:
           - chunked
         access-control-allow-headers:

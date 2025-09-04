@@ -228,6 +228,9 @@ def semantic_scholar_headers() -> dict[str, str]:
     return {}
 
 
+HIGH_TITLE_SIMILARITY_THRESHOLD = 1.0
+
+
 async def s2_title_search(
     title: str,
     client: httpx.AsyncClient,
@@ -250,27 +253,36 @@ async def s2_title_search(
             HTTPStatus.NOT_FOUND: DOINotFoundError(f"Could not find DOI for {title}.")
         },
     )
+
+    # In case we matched >1, sort by similarity of title
     try:
-        if authors and not s2_authors_match(authors, data=data["data"][0]):
-            raise DOINotFoundError(
-                f"Could not find DOI for {title} - author disagreement."
-            )
-    except KeyError as exc:  # Very rare, but "data" may not be in data
+        title_similarity, result = max(
+            # need to check if nested under a 'data' key or not (depends on filtering)
+            (strings_similarity(entry["title"], title), entry)
+            for entry in data.get("data", data)
+        )
+    except (KeyError, IndexError) as exc:
         raise DOINotFoundError(
             f"Unexpected Semantic Scholar search/match endpoint shape for {title}"
             f" given data {data}."
         ) from exc
-    # need to check if nested under a 'data' key or not (depends on filtering)
-    if (
-        strings_similarity(
-            data.get("title", "") if "data" not in data else data["data"][0]["title"],
-            title,
-        )
-        < title_similarity_threshold
-    ):
+
+    if authors:
+        if title_similarity < HIGH_TITLE_SIMILARITY_THRESHOLD and not s2_authors_match(
+            authors, data=result
+        ):
+            raise DOINotFoundError(
+                f"Semantic scholar results did not match for {title!r} - author and title disagreement."
+            )
+        if title_similarity < title_similarity_threshold:
+            raise DOINotFoundError(
+                f"Semantic scholar results did not match for {title!r} - title disagreement."
+            )
+    elif title_similarity < HIGH_TITLE_SIMILARITY_THRESHOLD:
         raise DOINotFoundError(
-            f"Semantic scholar results did not match for title {title!r}."
+            f"Semantic scholar results did not match for {title!r} - title disagreement and no authors provided."
         )
+
     return await parse_s2_to_doc_details(data, client)
 
 
