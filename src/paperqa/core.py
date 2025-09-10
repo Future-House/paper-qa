@@ -7,10 +7,10 @@ from typing import Any
 
 import litellm
 from aviary.core import Message
-from lmi import LLMModel
+from lmi import LLMModel, LLMResult
 
 from paperqa.prompts import text_with_tables_prompt_template
-from paperqa.types import Context, LLMResult, Text
+from paperqa.types import Context, Text
 from paperqa.utils import extract_score, strip_citations
 
 logger = logging.getLogger(__name__)
