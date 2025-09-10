@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import cast
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 from uuid import UUID
 
 import httpx
@@ -493,21 +493,41 @@ async def test_evidence(docs_fixture: Docs) -> None:
     ), "Expected unique contexts"
     texts = {c.text for c in evidence}
     assert texts, "Below assertions require at least one text to be used"
+    orig_acompletion = litellm.acompletion
+    has_made_scoreless_context = False
+    no_score_context_body = "MAKEUNIQUE Explainable Artificial Intelligence (XAI)"
 
-    # Okay, let's check we can get other evidence using the same underlying sources
-    other_evidence = (
-        await docs_fixture.aget_evidence(
-            PQASession(question="What is an acronym for explainable AI?"),
-            settings=debug_settings,
-        )
-    ).contexts
+    async def acompletion_that_breaks_first_context(*args, **kwargs):
+        completion = await orig_acompletion(*args, **kwargs)
+        nonlocal has_made_scoreless_context
+        if not has_made_scoreless_context:
+            assert len(completion.choices) == 1, "Test expects one choice"
+            completion.choices[0].message.content = no_score_context_body
+            has_made_scoreless_context = True
+        return completion
+
+    # Let's check we are resilient to bad context creation
+    with patch.object(litellm, "acompletion", acompletion_that_breaks_first_context):
+        # Let's also check we can get other evidence using the same underlying sources
+        other_evidence = (
+            await docs_fixture.aget_evidence(
+                PQASession(question="What is an acronym for explainable AI?"),
+                settings=debug_settings,
+            )
+        ).contexts
+    (no_score_context,) = (
+        c for c in other_evidence if c.context == no_score_context_body
+    )
+    assert (
+        no_score_context.score == 1
+    ), "Expected context without score to be downweighted"
     assert texts.intersection(
         {c.text for c in other_evidence}
     ), "We should be able to reuse sources across evidence calls"
 
 
 @pytest.mark.asyncio
-async def test_json_evidence(docs_fixture) -> None:
+async def test_json_evidence(docs_fixture: Docs) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
     settings.prompts.summary_json_system = (
@@ -520,13 +540,38 @@ async def test_json_evidence(docs_fixture) -> None:
         " author , and `relevance_score` is  the relevance of `summary` to answer the"
         " question (integer out of 10)."
     )
-    evidence = (
-        await docs_fixture.aget_evidence(
-            PQASession(question="Who wrote this article?"),
-            settings=settings,
-        )
-    ).contexts
-    assert evidence[0].author_name
+    orig_acompletion = litellm.acompletion
+    has_made_bad_json_context = False
+    bad_json_context = (  # Broken summary and relevance_score
+        '{\n  "summary": "Complete of th'
+        '\n  "author_name": "Sentinel value.",'
+        '\n  "relevance_score": "A"\n}'
+    )
+
+    async def acompletion_that_breaks_first_context(*args, **kwargs):
+        completion = await orig_acompletion(*args, **kwargs)
+        nonlocal has_made_bad_json_context
+        if not has_made_bad_json_context:
+            assert len(completion.choices) == 1, "Test expects one choice"
+            completion.choices[0].message.content = bad_json_context
+            has_made_bad_json_context = True
+        return completion
+
+    # Let's check we are resilient to bad context creation
+    with patch.object(litellm, "acompletion", acompletion_that_breaks_first_context):
+        evidence = (
+            await docs_fixture.aget_evidence(
+                PQASession(question="Who wrote this article?"),
+                settings=settings,
+            )
+        ).contexts
+    evidence_with_authors = [
+        c for c in evidence if hasattr(c, "author_name") and c.author_name
+    ]
+    assert evidence_with_authors
+    assert all(
+        "sentinel" not in c.author_name.lower() for c in evidence_with_authors
+    ), "Expected broken context retrying to work"
 
 
 @pytest.mark.asyncio
