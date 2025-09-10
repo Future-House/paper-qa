@@ -967,7 +967,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
             return [
                 LLMResult(
                     model=self.name,
-                    text="Echo",
+                    text="Echo 2",
                     prompt=messages,
                     prompt_count=1,
                     completion_count=1,
@@ -980,7 +980,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         ) -> AsyncIterable[LLMResult]:
             yield LLMResult(
                 model=self.name,
-                text="Echo",
+                text="Echo 2",
                 prompt=messages,
                 prompt_count=1,
                 completion_count=1,
