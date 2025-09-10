@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # For setuptools-scm, replace with fetch-tags after https://github.com/actions/checkout/issues/1471
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v6
