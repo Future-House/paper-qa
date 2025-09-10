@@ -678,8 +678,9 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 ],
             )
 
-        for _, llm_result in results:
-            session.add_tokens(llm_result)
+        for _, llm_results in results:
+            for r in llm_results:
+                session.add_tokens(r)
 
         session.contexts += [r for r, _ in results]
         return session

@@ -5,7 +5,7 @@ import json
 import logging
 import re
 from collections.abc import Callable, Sequence
-from typing import Any, cast
+from typing import Any
 
 import litellm
 from aviary.core import Message
@@ -142,7 +142,7 @@ async def map_fxn_summary(
     callbacks: Sequence[Callable[[str], None]] | None = None,
     skip_citation_strip: bool = False,
     evidence_text_only_fallback: bool = False,
-) -> tuple[Context, LLMResult]:
+) -> tuple[Context, list[LLMResult]]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
     The parser should at least return a dict with `summary`. A `relevant_score` will be used and any
@@ -164,10 +164,9 @@ async def map_fxn_summary(
             without media in the completion.
 
     Returns:
-        The context object and LLMResult to get info about the LLM execution.
+        A two-tuple of the made Context, and any LLM results made along the way.
     """
-    # needed empties for failures/skips
-    llm_result = LLMResult(model="", date="")
+    llm_results = []
     extras: dict[str, Any] = {}
     citation = text.name + ": " + text.doc.formatted_citation
     successfully_has_score = False
@@ -226,7 +225,8 @@ async def map_fxn_summary(
                 name="evidence:" + text.name,
             )
             used_text_only_fallback = True
-        context = cast("str", llm_result.text)
+        llm_results.append(llm_result)
+        context = llm_result.text or ""
         result_data = parser(context) if parser else {}
         if result_data:
             try:
@@ -243,6 +243,7 @@ async def map_fxn_summary(
             except KeyError:
                 successfully_has_score = False
     else:
+        llm_results.append(LLMResult(model="", date=""))
         context = cleaned_text
         # If we don't assign scores, just default to 5.
         # why 5? Because we filter out 0s in another place
@@ -273,5 +274,5 @@ async def map_fxn_summary(
             score=score,  # pylint: disable=possibly-used-before-assignment
             **extras,
         ),
-        llm_result,
+        llm_results,
     )
