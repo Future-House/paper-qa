@@ -1,4 +1,3 @@
-import contextlib
 import json
 import logging
 import re
@@ -8,6 +7,7 @@ from typing import Any
 import litellm
 from aviary.core import Message
 from lmi import LLMModel, LLMResult
+from pydantic import JsonValue
 
 from paperqa.prompts import text_with_tables_prompt_template
 from paperqa.types import Context, Text
@@ -16,13 +16,10 @@ from paperqa.utils import extract_score, strip_citations
 logger = logging.getLogger(__name__)
 
 
-def llm_parse_json(text: str) -> dict:
+def llm_parse_json(text: str) -> dict[str, JsonValue]:
     """Read LLM output and extract JSON data from it."""
-    # Remove leading/trailing whitespaces
-    ptext = text.strip()
-
     # Removing <think> tags for reasoning models
-    ptext = re.sub(r"<think>.*?</think>", "", ptext, flags=re.DOTALL).strip()
+    ptext = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
     # fetches from markdown ```json if present
     ptext = ptext.split("```json")[-1].split("```")[0]
@@ -47,8 +44,7 @@ def llm_parse_json(text: str) -> dict:
     # Match anything between double quotes
     # including escaped quotes and other escaped characters.
     # https://regex101.com/r/VFcDmB/1
-    pattern = r'"(?:[^"\\]|\\.)*"'
-    ptext = re.sub(pattern, escape_newlines, ptext)
+    ptext = re.sub(r'"(?:[^"\\]|\\.)*"', escape_newlines, ptext)
 
     # Ensure that any backslashes in the string that are not part
     # of a valid escape sequence are properly escaped
@@ -77,8 +73,11 @@ def llm_parse_json(text: str) -> dict:
     # Replace X/Y scores with integer value from 0-10
     # e.g. "relevance_score": "8/10" -> "relevance_score": 8
     # e.g. "relevance_score": 3/5 -> "relevance_score": 6
-    pattern = r'("\s*(?:relevance|score)[\w\s\-]*"\s*:\s*)(?:"(\d+)\s*/\s*(\d+)"|(\d+)\s*/\s*(\d+))'
-    ptext = re.sub(pattern, fraction_replacer, ptext)
+    ptext = re.sub(
+        r'("\s*(?:relevance|score)[\w\s\-]*"\s*:\s*)(?:"(\d+)\s*/\s*(\d+)"|(\d+)\s*/\s*(\d+))',
+        fraction_replacer,
+        ptext,
+    )
 
     # Add missing commas after fields where another key follows
     ptext = re.sub(r'(?<=[}\]0-9"])\s*(?="[^"\\]*"\s*:)', ", ", ptext)
@@ -94,37 +93,33 @@ def llm_parse_json(text: str) -> dict:
     except json.JSONDecodeError as e:
         # If normal parsing fails, try to handle nested quotes case
         if "summary" in ptext and '"relevance_score"' in ptext:
-            with contextlib.suppress(
-                Exception  # Continue to the standard error if regex approach fails
-            ):
-                # Extract summary and relevance_score directly using regex
-                summary_match = re.search(
-                    r'"summary"\s*:\s*"(.*?)",\s*"relevance_score"', ptext, re.DOTALL
-                )
-                score_match = re.search(r'"relevance_score"\s*:\s*"?(\d+)"?', ptext)
-
-                if summary_match and score_match:
-                    return {
-                        "summary": summary_match.group(1).replace(r"\'", "'"),
-                        "relevance_score": int(score_match.group(1)),
-                    }
+            # Extract summary and relevance_score directly using regex
+            summary_match = re.search(
+                r'"summary"\s*:\s*"(.*?)",\s*"relevance_score"', ptext, re.DOTALL
+            )
+            score_match = re.search(r'"relevance_score"\s*:\s*"?(\d+)"?', ptext)
+            if summary_match and score_match:
+                return {
+                    "summary": summary_match.group(1).replace(r"\'", "'"),
+                    "relevance_score": int(score_match.group(1)),
+                }
 
         raise ValueError(f"Failed to load JSON from text {text!r}.") from e
 
     # Handling incorrect key names for "relevance_score"
-    for key in list(data.keys()):
+    for key in list(data):  # List is here to copy keys, since we're in-place mutating
         if re.search(r"relevance|score", key, re.IGNORECASE):
             data["relevance_score"] = data.pop(key)  # Renaming key
 
     # Handling float, str values for relevance_score
-    if "relevance_score" in data:
+    if "relevance_score" in data and not isinstance(data["relevance_score"], int):
         try:
             data["relevance_score"] = round(float(data["relevance_score"]))
-
-        except ValueError:
-            data["relevance_score"] = (
-                0  # Default if relevance_score is empty/not a number
-            )
+        except ValueError as exc:
+            raise ValueError(
+                f"Failed to extract 'relevance_score' of {data['relevance_score']!r}"
+                " to an integer."
+            ) from exc
 
     return data
 
