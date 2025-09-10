@@ -10,7 +10,6 @@ repos:
             src/paperqa/clients/client_data.*|
             tests/stub_data.*
           )$
-      - id: check-byte-order-marker
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable
@@ -20,6 +19,7 @@ repos:
       - id: debug-statements
       - id: detect-private-key
       - id: end-of-file-fixer
+      - id: fix-byte-order-marker
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
