@@ -960,6 +960,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
             "Echo", summary_llm_model=StubLLMModel(), settings=no_json_settings
         )
     ).contexts
+    assert evidence
     assert "Echo" in evidence[0].context
 
     async def test_callback(result: LLMResult | str) -> None:
@@ -973,6 +974,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
             settings=no_json_settings,
         )
     ).contexts
+    assert evidence
     assert "Echo" in evidence[0].context
 
 
