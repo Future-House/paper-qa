@@ -2390,6 +2390,10 @@ class TestLLMParseJson:
                 "Hope this helps!",
                 id="fixing-broken-json-formatting-in-string-comma-3",
             ),
+            pytest.param(
+                '{   "summary": "Lorem Ipsum"   "relevance_score": 8 }',
+                id="missing-comma-between-fields",
+            ),
         ],
     )
     def test_json_broken_formatting(self, input_text: str) -> None:

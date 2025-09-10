@@ -80,6 +80,9 @@ def llm_parse_json(text: str) -> dict:
     pattern = r'("\s*(?:relevance|score)[\w\s\-]*"\s*:\s*)(?:"(\d+)\s*/\s*(\d+)"|(\d+)\s*/\s*(\d+))'
     ptext = re.sub(pattern, fraction_replacer, ptext)
 
+    # Add missing commas after fields where another key follows
+    ptext = re.sub(r'(?<=[}\]0-9"])\s*(?="[^"\\]*"\s*:)', ", ", ptext)
+
     # Remove extra commas
     ptext = re.sub(r",\s*,+", ",", ptext)  # Remove multiple consecutive commas
     ptext = re.sub(r",\s*}", "}", ptext)  # Remove trailing commas before closing brace
