@@ -170,7 +170,7 @@ async def map_fxn_summary(
     llm_result = LLMResult(model="", date="")
     extras: dict[str, Any] = {}
     citation = text.name + ": " + text.doc.formatted_citation
-    success = False
+    successfully_has_score = False
     used_text_only_fallback = False
 
     # Strip newlines in case chunking led to blank lines,
@@ -228,8 +228,7 @@ async def map_fxn_summary(
             used_text_only_fallback = True
         context = cast("str", llm_result.text)
         result_data = parser(context) if parser else {}
-        success = bool(result_data)
-        if success:
+        if result_data:
             try:
                 context = result_data.pop("summary")
                 score = (
@@ -237,23 +236,24 @@ async def map_fxn_summary(
                     if "relevance_score" in result_data
                     else extract_score(context)
                 )
+                successfully_has_score = True
                 # just in case question was present
                 result_data.pop("question", None)
                 extras = result_data
             except KeyError:
-                success = False
+                successfully_has_score = False
     else:
         context = cleaned_text
         # If we don't assign scores, just default to 5.
         # why 5? Because we filter out 0s in another place
         # and 5/10 is the other default I could come up with
         score = 5
-        success = True
+        successfully_has_score = True
     # remove citations that collide with our grounded citations (for the answer LLM)
     if not skip_citation_strip:
         context = strip_citations(context)
 
-    if not success:
+    if not successfully_has_score:
         score = extract_score(context)
     if used_text_only_fallback:
         extras["used_images"] = False
