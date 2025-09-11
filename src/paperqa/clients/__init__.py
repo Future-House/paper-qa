@@ -21,18 +21,18 @@ from .unpaywall import UnpaywallProvider
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
+# NOTE: we use tuple here so ordering is constant for unit testing's HTTP caching
+DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = (
     CrossrefProvider,
     SemanticScholarProvider,
     JournalQualityPostProcessor,
-}
-
-ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = {
+)
+ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = (
     *DEFAULT_CLIENTS,
     OpenAlexProvider,
     UnpaywallProvider,
     RetractionDataPostProcessor,
-}
+)
 
 
 class DocMetadataTask(BaseModel):
