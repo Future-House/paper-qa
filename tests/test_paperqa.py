@@ -309,7 +309,8 @@ def test_extract_score() -> None:
     of Covid-19 vaccinations.
     """
 
-    assert extract_score(sample) == 5
+    with pytest.raises(ValueError, match="Failed to extract score"):
+        extract_score(sample)
 
     sample = """
     Introduce dynamic elements such as moving nodes or edges to create a sense of activity within
@@ -515,12 +516,9 @@ async def test_evidence(docs_fixture: Docs) -> None:
                 settings=debug_settings,
             )
         ).contexts
-    (no_score_context,) = (
-        c for c in other_evidence if c.context == no_score_context_body
-    )
-    assert (
-        no_score_context.score == 1
-    ), "Expected context without score to be downweighted"
+    assert all(
+        c.context != no_score_context_body for c in other_evidence
+    ), "Expected context without score to be replaced via retrying"
     assert texts.intersection(
         {c.text for c in other_evidence}
     ), "We should be able to reuse sources across evidence calls"
@@ -969,7 +967,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
             return [
                 LLMResult(
                     model=self.name,
-                    text="Echo",
+                    text="Echo 2",
                     prompt=messages,
                     prompt_count=1,
                     completion_count=1,
@@ -982,7 +980,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         ) -> AsyncIterable[LLMResult]:
             yield LLMResult(
                 model=self.name,
-                text="Echo",
+                text="Echo 2",
                 prompt=messages,
                 prompt_count=1,
                 completion_count=1,
@@ -2391,6 +2389,10 @@ class TestLLMParseJson:
                 '{ ,  "summary": "Lorem Ipsum",  "relevance_score": 8 }'
                 "Hope this helps!",
                 id="fixing-broken-json-formatting-in-string-comma-3",
+            ),
+            pytest.param(
+                '{   "summary": "Lorem Ipsum"   "relevance_score": 8 }',
+                id="missing-comma-between-fields",
             ),
         ],
     )

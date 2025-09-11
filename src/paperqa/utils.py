@@ -151,9 +151,7 @@ def extract_score(text: str) -> int:
         if s > 10:  # noqa: PLR2004
             s = int(s / 10)  # sometimes becomes out of 100
         return s
-    if len(text) < 100:  # noqa: PLR2004
-        return 1
-    return 5
+    raise ValueError(f"Failed to extract score from text {text!r}.")
 
 
 def get_citation_ids(text: str) -> set[str]:
