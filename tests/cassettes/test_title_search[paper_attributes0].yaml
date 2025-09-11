@@ -9,6 +9,249 @@ interactions:
         connection:
           - keep-alive
         host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "3966"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 11 Sep 2025 18:57:07 GMT
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        content-encoding:
+          - gzip
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        vary:
+          - Accept-Encoding
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1063%2F1.4938384/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Skarlinski_2015, title={Effect of native oxide layers on
+          copper thin-film tensile properties: A reactive molecular dynamics study},
+          volume={118}, ISSN={1089-7550}, url={http://dx.doi.org/10.1063/1.4938384},
+          DOI={10.1063/1.4938384}, number={23}, journal={Journal of Applied Physics},
+          publisher={AIP Publishing}, author={Skarlinski, Michael D. and Quesnel, David
+          J.}, year={2015}, month=dec }
+
+          "
+      headers:
+        Connection:
+          - keep-alive
+        Date:
+          - Thu, 11 Sep 2025 18:57:07 GMT
+        Transfer-Encoding:
+          - chunked
+        access-control-allow-headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        access-control-allow-origin:
+          - "*"
+        access-control-expose-headers:
+          - Link
+        permissions-policy:
+          - interest-cohort=()
+        server:
+          - Jetty(9.4.40.v20210413)
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
+          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
+          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
+          "title": "Effect of native oxide layers on copper thin-film tensile properties:
+          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
+          9, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
+          {"url": "", "status": "CLOSED", "license": null}, "publicationTypes": null,
+          "publicationDate": "2015-12-21", "journal": {"name": "Journal of Applied Physics",
+          "pages": "235306", "volume": "118"}, "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n
+          author = {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied
+          Physics},\n pages = {235306},\n title = {Effect of native oxide layers on
+          copper thin-film tensile properties: A reactive molecular dynamics study},\n
+          volume = {118},\n year = {2015}\n}\n"}, "authors": [{"authorId": "9821934",
+          "name": "Michael Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}],
+          "matchScore": 284.00894}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1153"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 11 Sep 2025 18:57:08 GMT
+        Via:
+          - 1.1 97354ec70bdda7ac06cc29aed9bfdb3c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 36DcHqizjEe1jE3u4voxdMpBcaNp8A8uAC0usTmKmj_iA-5lT9pVCw==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - QwE8oFzXPHcEbvA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1153"
+        x-amzn-Remapped-Date:
+          - Thu, 11 Sep 2025 18:57:08 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 2b9e3e52-70a3-4cef-829a-75cd03d68ea1
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
           - api.openalex.org
         user-agent:
           - python-httpx/0.28.1
@@ -17,85 +260,85 @@ interactions:
     response:
       body:
         string: !!binary |
-          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
+          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
       headers:
         Access-Control-Allow-Credentials:
           - "true"
@@ -113,21 +356,21 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "4483"
+          - "4480"
         Content-Security-Policy:
           - default-src 'self'; object-src 'none'
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:22 GMT
+          - Thu, 11 Sep 2025 18:57:09 GMT
         Nel:
           - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Report-To:
-          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1754953642&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=YLTVXYqHZ2%2BDgcdzOdB07Dw1KAXkK8UoJXnq77RKnYA%3D"}]}'
+          - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1757617028&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=Hi0ST9YPOaQgO50Zb4nLD7RcJ6%2Fg171Y41AG5dg9uYo%3D"}]}'
         Reporting-Endpoints:
-          - heroku-nel=https://nel.heroku.com/reports?ts=1754953642&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=YLTVXYqHZ2%2BDgcdzOdB07Dw1KAXkK8UoJXnq77RKnYA%3D
+          - heroku-nel=https://nel.heroku.com/reports?ts=1757617028&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=Hi0ST9YPOaQgO50Zb4nLD7RcJ6%2Fg171Y41AG5dg9uYo%3D
         Server:
           - gunicorn
         Strict-Transport-Security:
@@ -165,7 +408,7 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAKp3mmgA/71Uy27bMBC89ysIniVbDzu2hSCAgeTQACncpjkUQSDQ1EpiQpMqSaVRg/x7l1Lk
+          H4sIAIYbw2gA/71Uy27bMBC89ysIniVbDzu2hSCAgeTQACncpjkUQSDQ1EpiQpMqSaVRg/x7l1Lk
           BxCgPfXGfXA5HA7nlRqwrXSWZvevft1oZYFmr7TQgmY0jiZxdJZO48lslS7T5YwGtANmaJZE8Tyg
           FSiD7fRRt0YxGTLjBJeAXcLmmtGsZNJCQJ1w0vddlSVwR3RJFHPiGYh+EQUQyTowlmhFuG4aMMTV
           QoWlkDviQFkhgTRGY8EJsBlZEwOM9/t3WgJvJTOk6BTbCW6JdW3RIQK8Qd4aiafWzjU2m04xM9Gm
@@ -177,7 +420,7 @@ interactions:
           804/1CFr/VYaRUkcLleLVRBHy1W4mM8jetqVy+O2I9UWuVd+L/x4HsZJ2At9i5fPj/DRTLVSBoMU
           Pyoc4RQqLzR73IOtmc0NNBrfQ5suxz/e7WvHFOSw2zJTaf8N71F91CqBdoDc0vPtxeAd59PthScT
           E4OF9AmMeicZg8FQhl7lE4OvjGVvL34d4tq7zD4/mM0YHjzHZ7zvYHK0nrFp70BjYjSiMe79yAf+
-          n3Dt/TJCQ1klabxIZ15GIFmDTpJb4FoV1tfTxdnbpz9Y+g/GngUAAA==
+          n3Dt/TJCQ1klabxIZ15GIFmDTpJb4FoV1teTs/jt0x8IopxGngUAAA==
       headers:
         Access-Control-Allow-Headers:
           - origin, content-type, accept, x-requested-with
@@ -192,262 +435,19 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:22 GMT
+          - Thu, 11 Sep 2025 18:57:10 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=0fQUj4u79VZaKOEm%2FDWxYU0NsO9QMZ%2BBagjVmE1BzAQ%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1754953642"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=jQTt5m5bAnbglWxOxzzX97a0tyPWeXArYe5eV3Ci3g0%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1757617029"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=0fQUj4u79VZaKOEm%2FDWxYU0NsO9QMZ%2BBagjVmE1BzAQ%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1754953642"
+          - heroku-nel="https://nel.heroku.com/reports?s=jQTt5m5bAnbglWxOxzzX97a0tyPWeXArYe5eV3Ci3g0%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1757617029"
         Server:
           - Heroku
         Vary:
           - Accept-Encoding
         Via:
           - 1.1 heroku-router
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&rows=1
-    response:
-      body:
-        string: !!binary |
-          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
-      headers:
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "3966"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:23 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        content-encoding:
-          - gzip
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.semanticscholar.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
-          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
-          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
-          "title": "Effect of native oxide layers on copper thin-film tensile properties:
-          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
-          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
-          {"url": "", "status": "CLOSED", "license": null}, "publicationTypes": null,
-          "publicationDate": "2015-12-21", "journal": {"name": "Journal of Applied Physics",
-          "pages": "235306", "volume": "118"}, "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n
-          author = {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied
-          Physics},\n pages = {235306},\n title = {Effect of native oxide layers on
-          copper thin-film tensile properties: A reactive molecular dynamics study},\n
-          volume = {118},\n year = {2015}\n}\n"}, "authors": [{"authorId": "9821934",
-          "name": "Michael Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}],
-          "matchScore": 286.13303}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1153"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:23 GMT
-        Via:
-          - 1.1 6269ff653a8a0b71d436afa999909318.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - rQvyYLS5a_Rgii-spGrePZCIsAO2v-H89T7R7wrFODX-9RInDlGISg==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - PKeiqGrmvHcEaag=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1153"
-        x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:23 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 118a835a-b9b6-46ff-b7d3-f2dd3a3e189b
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works/10.1063%2F1.4938384/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{Skarlinski_2015, title={Effect of native oxide layers on
-          copper thin-film tensile properties: A reactive molecular dynamics study},
-          volume={118}, ISSN={1089-7550}, url={http://dx.doi.org/10.1063/1.4938384},
-          DOI={10.1063/1.4938384}, number={23}, journal={Journal of Applied Physics},
-          publisher={AIP Publishing}, author={Skarlinski, Michael D. and Quesnel, David
-          J.}, year={2015}, month=dec }
-
-          "
-      headers:
-        Connection:
-          - keep-alive
-        Date:
-          - Mon, 11 Aug 2025 23:07:23 GMT
-        Transfer-Encoding:
-          - chunked
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
       status:
         code: 200
         message: OK

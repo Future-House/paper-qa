@@ -49,7 +49,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
                 " dynamics study. Journal of Applied Physics, 118:235306, Dec 2015."
                 " URL: https://doi.org/10.1063/1.4938384, doi:10.1063/1.4938384. This"
                 " article has"
-                f" {CITATION_COUNT_SENTINEL}9{CITATION_COUNT_SENTINEL} citations and is"
+                f" {CITATION_COUNT_SENTINEL}10{CITATION_COUNT_SENTINEL} citations and is"
                 " from a peer-reviewed journal."
             ),
             "is_oa": False,
@@ -77,7 +77,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
                 " retrieval-augmented generative agent for scientific research. ArXiv,"
                 " Dec 2023. URL: https://doi.org/10.48550/arxiv.2312.07559,"
                 " doi:10.48550/arxiv.2312.07559. This article has"
-                f" {CITATION_COUNT_SENTINEL}101{CITATION_COUNT_SENTINEL} citations."
+                f" {CITATION_COUNT_SENTINEL}106{CITATION_COUNT_SENTINEL} citations."
             ),
             "is_oa": None,
         },
@@ -102,7 +102,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
                 " chemistry tools. Nature Machine Intelligence, 6:535, May 2024."
                 " URL: https://doi.org/10.1038/s42256-024-00832-8,"
                 " doi:10.1038/s42256-024-00832-8. This article has"
-                f" {CITATION_COUNT_SENTINEL}462{CITATION_COUNT_SENTINEL} citations and"
+                f" {CITATION_COUNT_SENTINEL}488{CITATION_COUNT_SENTINEL} citations and"
                 " is from a domain leading peer-reviewed journal."
             ),
             "is_oa": True,
