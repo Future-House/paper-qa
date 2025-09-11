@@ -427,7 +427,7 @@ class SearchIndex:
             result
             for result in [
                 await self.get_saved_object(
-                    doc["file_location"][0], keep_filenames=keep_filenames  # type: ignore[index]
+                    doc["file_location"][0], keep_filenames=keep_filenames
                 )
                 for doc in search_index_docs
             ]
