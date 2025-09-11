@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 TESTS_DIR = Path(__file__).parent
 CASSETTES_DIR = TESTS_DIR / "cassettes"
 
+IN_GITHUB_ACTIONS: bool = os.getenv("GITHUB_ACTIONS") == "true"
+
 
 @pytest.fixture(autouse=True, scope="session")
 def _load_env() -> None:
@@ -58,7 +60,7 @@ def fixture_vcr_config() -> dict[str, Any]:
             ANTHROPIC_API_KEY_HEADER,
             "cookie",
         ],
-        "record_mode": "once",
+        "record_mode": "once" if not IN_GITHUB_ACTIONS else "none",
         "allow_playback_repeats": True,
         "cassette_library_dir": str(CASSETTES_DIR),
     }
