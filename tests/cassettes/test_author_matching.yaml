@@ -19,13 +19,13 @@ interactions:
         string: !!binary |
           H4sIAAAAAAAA/8WTTXPTMBCG/4pGZyuRYxNIbm2TQwqlDKVcmh629trRVJaMtC6EjP87K8NAOQEn
           LprZD727+8zuSUYCGqJcS/8oM9lhjNCiomOP7Pvsw6OyJtKz0BOGaLzjaD7TM/0rItcn2UCFxGqn
-          MZPkCawKGAebXGXxqsikIezYuDvJzfUuaehZUaz0fg59n7/IF8tlsWRJGOjgw5R3/f5it+HMA1Ef
-          1/v5fu5DZeqZD+1+rrVeKX4WqizyQuWLcvXjNzoyFRDWakqX6wZsxEy25glT85dQpYEb6Iw9sv3a
-          W3QPAVyNgf0RPw3oqgShMWECAE1jrAGahufGHHQpfB6gtngUG+whUMd1hW/E1mJFgTuwgiXFhe/6
-          gTCIrWuNQwzGtZn4aAJbBsQHrA6ZOLfcU3wYQgqdiUWpl3kmbm/O5Hg/Zn8moROJQi3K4qUqylz/
-          JYkzC05czp7DuDLVAdDG30FAXZs0Pdj/TCP7We4tfG9I3GA1BENHsXORDLH6v+G95301ZFnzTr7j
-          DU+iSW7bDXaqIW6J5/3KnYo3EFrk17UDr7248nVCNWlM6616DKqfLiLPJOMLx3QbfGmBlOEF+yLX
-          OpGFUB0Uc0gX4QZrx3H8BtE+QwuRAwAA
+          MZPkCawKGAebXGXxaplJQ9ixcXeSm+td0tCzoljp/Rz6Pn+RL5bLYsmSMNDBhynv+v3FbsOZB6I+
+          rvfz/dyHytQzH9r9XGu9UvwsVFnkhcoX5erHb3RkKiCs1ZQu1w3YiJlszROm5i+hSgM30Bl7ZPu1
+          t+geArgaA/sjfhrQVQlCY8IEAJrGWAM0Dc+NOehS+DxAbfEoNthDoI7rCt+IrcWKAndgBUuKC9/1
+          A2EQW9cahxiMazPx0QS2DIgPWB0ycW65p/gwhBQ6E4tSL/NM3N6cyfF+zP5MQicShVqUxUtVlLn+
+          SxJnFpy4nD2HcWWqA6CNv4OAujZperD/mUb2s9xb+N6QuMFqCIaOYuciGWL1f8N7z/tqyLLmnXzH
+          G55Ek9y2G+xUQ9wSz/uVOxVvILTIr2sHXntx5euEatKY1lv1GFQ/XUSeScYXjuk2+NICKcML9kWu
+          dSILoToo5pAuwg3WjuP4DZbpyjSRAwAA
       headers:
         Connection:
           - keep-alive
@@ -34,7 +34,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 03 Sep 2025 21:29:05 GMT
+          - Thu, 11 Sep 2025 17:38:04 GMT
         access-control-allow-headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
             Accept-Ranges, Cache-Control
@@ -85,7 +85,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 175.73248}]}
+          "P. Schwaller"}], "matchScore": 178.26385}]}
 
           '
       headers:
@@ -98,27 +98,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 03 Sep 2025 21:29:06 GMT
+          - Thu, 11 Sep 2025 17:38:04 GMT
         Via:
           - 1.1 0ac5a786563da4ae2e2a28a1fe210e04.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - BSGjMa4PG9iwXM-P5C2b2kAYhraE8o_1gLWd7zMUCMK-6CglS0Xitw==
+          - 4ZJfDYGcp5wAyZUvLVGUBT3UKXCibwoF6zHc9nkigvXgYSm_5T1pVw==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - QWDtSEZNPHcEs2g=
+          - Qv5XdE5kPHcECpQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Wed, 03 Sep 2025 21:29:06 GMT
+          - Thu, 11 Sep 2025 17:38:04 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 605f1fe8-3201-48b9-b58e-aa99bbc1d09b
+          - 6f4e483e-c5ad-422d-91b4-cb69fec66841
       status:
         code: 200
         message: OK
@@ -148,7 +148,7 @@ interactions:
           "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
           Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
           "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
-          "P. Schwaller"}], "matchScore": 175.73248}]}
+          "P. Schwaller"}], "matchScore": 178.26385}]}
 
           '
       headers:
@@ -161,27 +161,90 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 03 Sep 2025 21:29:06 GMT
+          - Thu, 11 Sep 2025 17:38:05 GMT
         Via:
           - 1.1 0ac5a786563da4ae2e2a28a1fe210e04.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - h3xXSjFw1z1tZ4nPFKXM2Vp6Flevk_8zhhw-IS-B67YHpUVQgegGZQ==
+          - qb8P3yEIkzlBcgmB4QAzWYqjPwKBSCWxcDlV39KmGXVv8SwOJjAwCQ==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - QWDtYFtTPHcErIw=
+          - Qv5XjG6uvHcEBfg=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "684"
         x-amzn-Remapped-Date:
-          - Wed, 03 Sep 2025 21:29:06 GMT
+          - Thu, 11 Sep 2025 17:38:05 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 503c9f1d-75bc-44dd-a112-bc94d5c1b53b
+          - c6d4913a-0f90-486e-8929-a21cccf0b180
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: ""
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools.&fields=authors%2CexternalIds%2Ctitle
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "354dcdebf3f8b5feeed5c62090e0bc1f0c28db06", "externalIds":
+          {"DBLP": "journals/natmi/BranCSBWS24", "ArXiv": "2304.05376", "PubMedCentral":
+          "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
+          "38799228"}, "title": "Augmenting large language models with chemistry tools",
+          "authors": [{"authorId": "2216007369", "name": "Andr\u00e9s M Bran"}, {"authorId":
+          "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773", "name": "Oliver
+          Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"}, {"authorId":
+          "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853", "name":
+          "P. Schwaller"}], "matchScore": 178.26385}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "684"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 11 Sep 2025 17:38:05 GMT
+        Via:
+          - 1.1 0ac5a786563da4ae2e2a28a1fe210e04.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 1NlPpTre8eGbGtTOdMmQ47aUsZmE-8n7RVTtKJKQ7hN5iD8EnUtxBQ==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - Qv5XpGVNvHcEJgw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "684"
+        x-amzn-Remapped-Date:
+          - Thu, 11 Sep 2025 17:38:05 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - da290116-3a4a-4800-88b3-f642c11bdb4b
       status:
         code: 200
         message: OK
@@ -209,7 +272,7 @@ interactions:
         Content-Type:
           - text/plain;charset=utf-8
         Date:
-          - Wed, 03 Sep 2025 21:29:06 GMT
+          - Thu, 11 Sep 2025 17:38:06 GMT
         Transfer-Encoding:
           - chunked
         access-control-allow-headers:
