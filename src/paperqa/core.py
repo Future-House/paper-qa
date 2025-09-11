@@ -1,18 +1,16 @@
-from __future__ import annotations
-
 import contextlib
 import json
 import logging
 import re
 from collections.abc import Callable, Sequence
-from typing import Any, cast
+from typing import Any
 
 import litellm
 from aviary.core import Message
-from lmi import LLMModel
+from lmi import LLMModel, LLMResult
 
 from paperqa.prompts import text_with_tables_prompt_template
-from paperqa.types import Context, LLMResult, Text
+from paperqa.types import Context, Text
 from paperqa.utils import extract_score, strip_citations
 
 logger = logging.getLogger(__name__)
@@ -108,11 +106,7 @@ def llm_parse_json(text: str) -> dict:
                         "relevance_score": int(score_match.group(1)),
                     }
 
-        raise ValueError(
-            f"Failed to parse JSON from text {text!r}. Your model may not be capable of"
-            " supporting JSON output or our parsing technique could use some work. Try"
-            " a different model or specify `Settings(prompts={'use_json': False})`"
-        ) from e
+        raise ValueError(f"Failed to load JSON from text {text!r}.") from e
 
     # Handling incorrect key names for "relevance_score"
     for key in list(data.keys()):
@@ -132,7 +126,15 @@ def llm_parse_json(text: str) -> dict:
     return data
 
 
-async def map_fxn_summary(
+class LLMBadContextJSONError(ValueError):
+    """Retryable exception for when the LLM gives back bad JSON."""
+
+    def __init__(self, message: str, llm_results: list[LLMResult]) -> None:
+        super().__init__(message)
+        self.llm_results = llm_results  # House so we can cost track across retries
+
+
+async def _map_fxn_summary(  # noqa: PLR0912
     text: Text,
     question: str,
     summary_llm_model: LLMModel | None,
@@ -142,7 +144,8 @@ async def map_fxn_summary(
     callbacks: Sequence[Callable[[str], None]] | None = None,
     skip_citation_strip: bool = False,
     evidence_text_only_fallback: bool = False,
-) -> tuple[Context, LLMResult]:
+    _prior_attempt: LLMBadContextJSONError | None = None,
+) -> tuple[Context, list[LLMResult]]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
     The parser should at least return a dict with `summary`. A `relevant_score` will be used and any
@@ -162,15 +165,25 @@ async def map_fxn_summary(
         skip_citation_strip: Optional skipping of citation stripping, if you want to keep in the context.
         evidence_text_only_fallback: Opt-in flag to allow retrying context creation
             without media in the completion.
+        _prior_attempt: Optional failure from a prior attempt, for LLM result tracking.
 
     Returns:
-        The context object and LLMResult to get info about the LLM execution.
+        A two-tuple of the made Context, and any LLM results made along the way.
     """
-    # needed empties for failures/skips
-    llm_result = LLMResult(model="", date="")
+    if _prior_attempt is not None:
+        llm_results = _prior_attempt.llm_results
+        append_msgs = [
+            Message(
+                content=(
+                    "In a prior attempt, we failed with this failure message:"
+                    f" {_prior_attempt!s}."
+                )
+            )
+        ]
+    else:
+        llm_results, append_msgs = [], []
     extras: dict[str, Any] = {}
     citation = text.name + ": " + text.doc.formatted_citation
-    success = False
     used_text_only_fallback = False
 
     # Strip newlines in case chunking led to blank lines,
@@ -204,6 +217,7 @@ async def map_fxn_summary(
                             else None
                         ),
                     ),
+                    *append_msgs,
                 ],
                 callbacks=callbacks,
                 name="evidence:" + text.name,
@@ -221,40 +235,69 @@ async def map_fxn_summary(
                 messages=[
                     Message(role="system", content=system_prompt),
                     Message(content=message_prompt),
+                    *append_msgs,
                 ],
                 callbacks=callbacks,
                 name="evidence:" + text.name,
             )
             used_text_only_fallback = True
-        context = cast("str", llm_result.text)
-        result_data = parser(context) if parser else {}
-        success = bool(result_data)
-        if success:
+        llm_results.append(llm_result)
+        context = llm_result.text or ""
+        try:
+            result_data = parser(context) if parser else {}
+        except ValueError as exc:
+            raise LLMBadContextJSONError(
+                f"Failed to parse JSON from context {context!r} due to: {exc}",
+                llm_results=llm_results,
+            ) from exc
+        if result_data:
             try:
                 context = result_data.pop("summary")
-                score = (
-                    result_data.pop("relevance_score")
-                    if "relevance_score" in result_data
-                    else extract_score(context)
-                )
+                try:
+                    score = (
+                        result_data.pop("relevance_score")
+                        if "relevance_score" in result_data
+                        else extract_score(context)
+                    )
+                except ValueError as exc:
+                    raise LLMBadContextJSONError(
+                        f"Successfully parsed JSON and extracted 'summary' key,"
+                        f" but then failed to extract score from context {context!r} due to: {exc}",
+                        llm_results=llm_results,
+                    ) from exc
                 # just in case question was present
                 result_data.pop("question", None)
                 extras = result_data
-            except KeyError:
-                success = False
+            except KeyError:  # No summary key, so extract from LLM result
+                try:
+                    score = extract_score(context)
+                except ValueError as exc:
+                    raise LLMBadContextJSONError(
+                        f"Successfully parsed JSON but it had no 'summary' key."
+                        f" Then, the failover to extract score from raw context {context!r}"
+                        f" failed due to: {exc}",
+                        llm_results=llm_results,
+                    ) from exc
+        else:
+            try:
+                score = extract_score(context)
+            except ValueError as exc:
+                raise LLMBadContextJSONError(
+                    f"Extracting score from raw context {context!r}"
+                    f" failed due to: {exc}",
+                    llm_results=llm_results,
+                ) from exc
     else:
+        llm_results.append(LLMResult(model="", date=""))
         context = cleaned_text
         # If we don't assign scores, just default to 5.
         # why 5? Because we filter out 0s in another place
-        # and 5/10 is the other default I could come up with
+        # and 5/10 is the only default I could come up with
         score = 5
-        success = True
     # remove citations that collide with our grounded citations (for the answer LLM)
     if not skip_citation_strip:
         context = strip_citations(context)
 
-    if not success:
-        score = extract_score(context)
     if used_text_only_fallback:
         extras["used_images"] = False
 
@@ -270,8 +313,30 @@ async def map_fxn_summary(
                 doc=text.doc.model_dump(exclude={"embedding"}),
                 **text.model_dump(exclude={"embedding", "doc"}),
             ),
-            score=score,  # pylint: disable=possibly-used-before-assignment
+            score=score,
             **extras,
         ),
-        llm_result,
+        llm_results,
     )
+
+
+async def map_fxn_summary(**kwargs) -> tuple[Context | None, list[LLMResult]]:
+    if "_prior_attempt" in kwargs:
+        raise ValueError(
+            "_prior_attempt is reserved for internal use only, don't specify it."
+        )
+    try:
+        return await _map_fxn_summary(**kwargs)
+    except LLMBadContextJSONError as exc:
+        try:
+            return await _map_fxn_summary(**kwargs, _prior_attempt=exc)
+        except LLMBadContextJSONError as exc2:
+            logger.exception(
+                "Failed twice to create a context, abandoning it."
+                " Your model may not be capable of supporting JSON output"
+                " or our parsing technique could use some work. Try"
+                " a different model or specify `Settings(prompts={'use_json': False})`."
+                " Or, feel free to just ignore this message, as many contexts are"
+                " concurrently made and we're not attached to any one given context."
+            )
+            return None, exc2.llm_results
