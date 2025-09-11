@@ -23,7 +23,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.8
+    rev: v0.13.0
     hooks:
       - id: ruff-check
         args: [--fix, --exit-non-zero-on-fix]
@@ -37,7 +37,7 @@ repos:
       - id: prettier
         exclude: ^docs/.*\.md$
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+    rev: v0.24.3
     hooks:
       - id: toml-sort-fix
   - repo: https://github.com/codespell-project/codespell
@@ -54,15 +54,15 @@ repos:
     hooks:
       - id: check-mailmap
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.08.07
+    rev: 2025.09.11
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.6
+    rev: 0.8.17
     hooks:
       - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.19.1
+    rev: 1.20.0
     hooks:
       - id: blacken-docs
         exclude: \.md$ # The generated markdown files are being blackened by jupytext
@@ -72,12 +72,12 @@ repos:
       - id: nb-clean
         args: [--preserve-cell-outputs, --remove-empty-cells]
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: v0.9.31
+    rev: v0.9.32
     hooks:
       - id: pymarkdown
         exclude: docs/tutorials/
   - repo: https://github.com/mwouts/jupytext
-    rev: v1.17.2
+    rev: v1.17.3
     hooks:
       - id: jupytext
         args: [--to, md, --pipe, black]
