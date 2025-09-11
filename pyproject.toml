@@ -232,8 +232,9 @@ disable = [
     "arguments-differ",  # Ops intentionally differ arguments
     "attribute-defined-outside-init",  # Disagrees with reset pattern
     "bare-except",  # Rely on ruff E722 for this
-    "broad-exception-caught",  # Don't care to enforce this
+    "broad-exception-caught",  # Rely on ruff BLE001 for this
     "broad-exception-raised",  # Rely on ruff TRY002 for this
+    "consider-using-in",  # Rely on ruff PLR1714 for this
     "cyclic-import",  # Let Python blow up
     "dangerous-default-value",  # Rely on ruff W0102 for this
     "empty-docstring",  # Let pep257 take care of docstrings
@@ -335,6 +336,7 @@ enable_all = true
 ignore = [
     "FURB101",  # Rely on ruff FURB101 for this
     "FURB103",  # Rely on ruff FURB103 for this
+    "FURB108",  # Rely on ruff PLR1714 for this
     "FURB141",  # Rely on ruff PTH110 for this
     "FURB144",  # Rely on ruff PTH107 for this
     "FURB146",  # Rely on ruff PTH113 for this
@@ -358,12 +360,8 @@ preview = true
 [tool.ruff.lint]
 explicit-preview-rules = true
 extend-select = [
-    "AIR002",
-    "AIR301",
-    "AIR302",
-    "AIR311",
-    "AIR312",
-    "ASYNC116",
+    "ASYNC212",
+    "ASYNC250",
     "B901",
     "B903",
     "B909",
@@ -419,7 +417,6 @@ extend-select = [
     "FURB103",
     "FURB110",
     "FURB113",
-    "FURB116",
     "FURB118",
     "FURB131",
     "FURB140",
@@ -457,9 +454,6 @@ extend-select = [
     "PLW1514",
     "PLW3201",
     "PT029",
-    "PTH211",
-    "PYI059",
-    "PYI061",
     "RUF027",
     "RUF029",
     "RUF031",
@@ -467,20 +461,19 @@ extend-select = [
     "RUF037",
     "RUF038",
     "RUF039",
-    "RUF043",
     "RUF045",
     "RUF047",
     "RUF052",
     "RUF054",
     "RUF055",
     "RUF056",
-    "RUF059",
     "RUF060",
     "RUF061",
+    "RUF063",
+    "RUF064",
     "RUF102",
     "TC008",
     "UP042",
-    "UP050",
     "W391",
 ]
 # List of rule codes that are unsupported by Ruff, but should be preserved when
