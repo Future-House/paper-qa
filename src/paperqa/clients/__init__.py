@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import logging
 from collections.abc import Awaitable, Collection, Coroutine, Sequence
-from typing import Any, cast
+from typing import Any, TypeAlias, cast
 
 import httpx
 from lmi.utils import gather_with_concurrency
@@ -32,6 +32,13 @@ ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = (
     OpenAlexProvider,
     UnpaywallProvider,
     RetractionDataPostProcessor,
+)
+
+MetadataClientQuerier: TypeAlias = (
+    MetadataProvider
+    | MetadataPostProcessor
+    | type[MetadataProvider]
+    | type[MetadataPostProcessor]
 )
 
 
@@ -78,18 +85,19 @@ class DocMetadataClient:
         self,
         http_client: httpx.AsyncClient | None = None,
         metadata_clients: (
-            Collection[type[MetadataPostProcessor | MetadataProvider]]
-            | Sequence[Collection[type[MetadataPostProcessor | MetadataProvider]]]
+            Collection[MetadataClientQuerier]
+            | Sequence[Collection[MetadataClientQuerier]]
         ) = DEFAULT_CLIENTS,
     ) -> None:
         """Metadata client for querying multiple metadata providers and processors.
 
         Args:
             http_client: Async HTTP client to allow for connection pooling.
-            metadata_clients: list of MetadataProvider and MetadataPostProcessor classes to query;
-                if nested, will query in order looking for termination criteria after each.
-                Will terminate early if either DocDetails.is_hydration_needed is False OR if
-                all requested fields are present in the DocDetails object.
+            metadata_clients: list of MetadataProvider and MetadataPostProcessor
+                instances or classes to query; if nested,
+                will query in order looking for termination criteria after each.
+                Will terminate early if either DocDetails.is_hydration_needed is False
+                OR if all requested fields are present in the DocDetails object.
         """
         self._http_client = http_client
         self.tasks: list[DocMetadataTask] = []
@@ -125,13 +133,13 @@ class DocMetadataClient:
             self.tasks.append(
                 DocMetadataTask(
                     providers=[
-                        c if isinstance(c, MetadataProvider) else c()  # type: ignore[redundant-expr]
+                        c if isinstance(c, MetadataProvider) else c()
                         for c in metadata_clients
                         if (isinstance(c, type) and issubclass(c, MetadataProvider))
                         or isinstance(c, MetadataProvider)
                     ],
                     processors=[
-                        c if isinstance(c, MetadataPostProcessor) else c()  # type: ignore[redundant-expr]
+                        c if isinstance(c, MetadataPostProcessor) else c()
                         for c in metadata_clients
                         if (
                             isinstance(c, type) and issubclass(c, MetadataPostProcessor)
