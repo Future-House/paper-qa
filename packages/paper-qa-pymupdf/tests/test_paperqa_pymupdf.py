@@ -2,6 +2,7 @@ import base64
 import json
 from pathlib import Path
 from typing import cast
+from unittest.mock import MagicMock, patch
 
 import pymupdf
 import pytest
@@ -139,8 +140,25 @@ def test_page_size_limit_denial() -> None:
 
 
 def test_table_parsing() -> None:
+    spy_to_markdown = MagicMock(side_effect=pymupdf.table.Table.to_markdown)
+    zeroth_raw_table_text = ""
+
+    def custom_to_markdown(self, clean=False, fill_empty=True) -> str:
+        md = spy_to_markdown(self, clean=clean, fill_empty=fill_empty)
+        if spy_to_markdown.call_count == 1:
+            nonlocal zeroth_raw_table_text
+            zeroth_raw_table_text = md
+            return (  # NOTE: this text has a null byte, which we want to filter
+                "|Col1|Col2|Col3|Col4|Col5|Col6|Col7|Col8|"
+                "\n|---|---|---|---|---|---|---|---|"
+                "\n||\x02\x03<br>|\x04\x05\x06\x07\x08<br>"
+                " <br>|\x07\x08\x08<br>\n\x08<br>\x0e\x0f<br>\x17\x18\x18\x08<br>|\x02<br>\x0c\x10<br>\x11<br>\x19\r\x02\x1a\x00\x01\x02\x03<br>|\x11<br>\x12\x06\x05<br>\x0e\x13\x14\x15<br>\x04\x05\x06\x07<br>|\x05\x08<br>\x0c\x10<br>\x12\x06\x05<br>\x0e\x16\x13<br>|\x05\x08<br>\x0c\x10<br>\x12\x06\x05<br>\x0e\x16\x13<br>|"  # noqa: E501
+            )
+        return md
+
     filepath = STUB_DATA_DIR / "influence.pdf"
-    parsed_text = parse_pdf_to_pages(filepath)
+    with patch.object(pymupdf.table.Table, "to_markdown", custom_to_markdown):
+        parsed_text = parse_pdf_to_pages(filepath)
     assert isinstance(parsed_text.content, dict)
     assert all(
         t and t[0] != "\n" and t[-1] != "\n" for t in parsed_text.content.values()
@@ -151,6 +169,17 @@ def test_table_parsing() -> None:
         for i, pagenum_media in parsed_text.content.items()
         if isinstance(pagenum_media, tuple)
     }
+    all_tables = {k: v for k, v in all_tables.items() if v}
     assert (
         sum(len(tables) for tables in all_tables.values()) >= 2
-    ), "Expected a few tables to be parsed"
+    ), "Expected a few tables to be parsed for assertions to work"
+    zeroth_media, *_ = next(iter(all_tables.values()))
+    assert zeroth_media.text is None, "Expected null byte to be filtered"
+    assert zeroth_raw_table_text == (
+        "|Gap Size (mm)|Ununited|Uncertain|United|"
+        "\n|---|---|---|---|"
+        "\n|**1.0**|1/5 (20%)|1/5 (20%)|3/5 (60%)|"
+        "\n|**1.5**|3/7  (43%)|2/7  (29%)|2/7 (29%)|"
+        "\n|**2.0** <br>|3/6 (50%)|2/6 (33%)|1/6 (17%)|"
+        "\n\n"  # NOTE: this is before strip, so there can be trailing whitespace
+    )
