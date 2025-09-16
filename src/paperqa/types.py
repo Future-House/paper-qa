@@ -388,9 +388,7 @@ class PQASession(BaseModel):
                 for key in get_citation_ids(parenthetical)
                 if id_to_name_map.get(key)
             )
-            # replace the parenthetical with the deduped names
             if deduped_names:
-
                 formatted_without_references = formatted_without_references.replace(
                     parenthetical,
                     f"({', '.join(deduped_names)})",
