@@ -154,7 +154,7 @@ def extract_score(text: str) -> int:
     raise ValueError(f"Failed to extract score from text {text!r}.")
 
 
-def get_parentheses_substrings(text: str) -> list[str]:
+def get_parenthetical_substrings(text: str) -> list[str]:
     """
     Finds the all nested parenthetical substrings.
 

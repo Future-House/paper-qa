@@ -41,7 +41,7 @@ from paperqa.utils import (
     encode_id,
     format_bibtex,
     get_citation_ids,
-    get_parentheses_substrings,
+    get_parenthetical_substrings,
     maybe_get_date,
     string_to_bytes,
 )
@@ -287,8 +287,6 @@ class PQASession(BaseModel):
         ),
     )
 
-    MAX_CITATION_NESTING_DEPTH: ClassVar[int] = 3
-
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
@@ -380,9 +378,9 @@ class PQASession(BaseModel):
         }
         name_bib = {}
 
-        for parenthetical in get_parentheses_substrings(formatted_without_references):
+        for parenthetical in get_parenthetical_substrings(formatted_without_references):
             # now we replace eligible parentheticals with the deduped names
-            # preserve order and deduplicate
+            # while we preserve order and deduplicate
             deduped_names: dict[str, None] = dict.fromkeys(
                 id_to_name_map.get(key)  # type: ignore[misc]
                 for key in get_citation_ids(parenthetical)
