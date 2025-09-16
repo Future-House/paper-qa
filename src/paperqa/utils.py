@@ -154,8 +154,31 @@ def extract_score(text: str) -> int:
     raise ValueError(f"Failed to extract score from text {text!r}.")
 
 
-def get_citation_ids(text: str) -> set[str]:
-    return set(re.findall(r"\bpqac-[a-zA-Z0-9]{8}\b", text))
+def get_parenthetical_substrings(text: str) -> list[str]:
+    """
+    Finds the all nested parenthetical substrings.
+
+    Args:
+        text: The input string to analyze.
+
+    Returns:
+        A list of parenthetical substrings.
+    """
+    substrings = []
+    open_paren_indices = []
+    for i, char in enumerate(text):
+        if char == "(":
+            open_paren_indices.append(i)
+        elif char == ")" and open_paren_indices:
+            start_index = open_paren_indices.pop()
+            substrings.append(text[start_index : i + 1])
+    return substrings
+
+
+def get_citation_ids(text: str) -> list[str]:
+    matches = re.findall(r"\bpqac-[a-zA-Z0-9]{8}\b", text)
+    # remove duplicates while preserving order
+    return list(dict.fromkeys(matches))
 
 
 def extract_doi(reference: str) -> str:
