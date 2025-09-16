@@ -382,7 +382,7 @@ class PQASession(BaseModel):
             # now we replace eligible parentheticals with the deduped names
             # while we preserve order and deduplicate
             deduped_names: dict[str, None] = dict.fromkeys(
-                id_to_name_map.get(key)  # type: ignore[misc]
+                id_to_name_map[key]
                 for key in get_citation_ids(parenthetical)
                 if id_to_name_map.get(key)
             )
