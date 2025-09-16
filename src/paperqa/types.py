@@ -41,6 +41,7 @@ from paperqa.utils import (
     encode_id,
     format_bibtex,
     get_citation_ids,
+    get_parentheses_substrings,
     maybe_get_date,
     string_to_bytes,
 )
@@ -286,6 +287,8 @@ class PQASession(BaseModel):
         ),
     )
 
+    MAX_CITATION_NESTING_DEPTH: ClassVar[int] = 3
+
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
@@ -377,19 +380,20 @@ class PQASession(BaseModel):
         }
         name_bib = {}
 
-        # https://regex101.com/r/h2Ca20/1
-        for parenthetical in re.findall(r"\(([^)]*)\)", formatted_without_references):
-
+        for parenthetical in get_parentheses_substrings(formatted_without_references):
             # now we replace eligible parentheticals with the deduped names
-            deduped_names = {
-                id_to_name_map.get(key, "") for key in get_citation_ids(parenthetical)
-            }
-
+            # preserve order and deduplicate
+            deduped_names: dict[str, None] = dict.fromkeys(
+                id_to_name_map.get(key)  # type: ignore[misc]
+                for key in get_citation_ids(parenthetical)
+                if id_to_name_map.get(key)
+            )
             # replace the parenthetical with the deduped names
             if deduped_names:
+
                 formatted_without_references = formatted_without_references.replace(
                     parenthetical,
-                    f"{', '.join(deduped_names)}",
+                    f"({', '.join(deduped_names)})",
                 )
                 for deduped_name in deduped_names:
                     if (
