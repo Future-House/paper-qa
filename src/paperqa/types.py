@@ -358,7 +358,10 @@ class PQASession(BaseModel):
                     # Similar to the explanation in `map_fxn_summary`'s internals
                     # on why we drop embeddings, drop embeddings here too because
                     # embeddings aren't displayed to front end users
-                    doc=c.text.doc.model_dump(exclude={"embedding"}),
+                    # we drop "other" because it is large and depends on provenance
+                    # of the doc, so no downstream code should rely on it anyway.
+                    # We do not drop in map_fxn_summary because we may want tools to inspect other.
+                    doc=c.text.doc.model_dump(exclude={"embedding", "other"}),
                     # We drop media since images can be quite large
                     **c.text.model_dump(exclude={"text", "embedding", "doc", "media"}),
                 ),
