@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import re
 from collections.abc import Collection, Sequence
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
@@ -225,7 +225,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
         },
         {
             "bibtex_type": "article",
-            "publication_date": datetime(2015, 6, 29),
+            "publication_date": datetime(2015, 6, 29, tzinfo=UTC),
             "year": 2015,
             "volume": "87",
             "pages": (
@@ -244,7 +244,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
             "doi_url": "https://doi.org/10.1016/j.addr.2015.01.008",
         },
         {
-            "publication_date": datetime(2014, 10, 27),
+            "publication_date": datetime(2014, 10, 27, tzinfo=UTC),
             "year": 2014,
             "volume": "111",
             "pages": "E4832-E4841",

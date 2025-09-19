@@ -10,7 +10,7 @@ import re
 import warnings
 from collections.abc import Collection, Iterable, Mapping, Sequence
 from copy import deepcopy
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from random import Random
@@ -706,6 +706,15 @@ class DocDetails(Doc):
     def clean_key(cls, value: str) -> str:
         # Replace HTML tags with empty string
         return re.sub(pattern=r"<\/?\w{1,10}>", repl="", string=value)
+
+    @field_validator("publication_date")
+    @classmethod
+    def add_tzinfo(cls, value: datetime | None) -> datetime | None:
+        if value is None:
+            return None
+        if value.tzinfo is None or value.tzinfo.utcoffset(value) is None:
+            return value.replace(tzinfo=UTC)  # Assume UTC if unspecified
+        return value.astimezone(UTC)  # Convert to UTC
 
     @classmethod
     def lowercase_doi_and_populate_doc_id(cls, data: dict[str, Any]) -> dict[str, Any]:
