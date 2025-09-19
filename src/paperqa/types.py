@@ -54,6 +54,9 @@ DocKey = Any
 logger = logging.getLogger(__name__)
 
 
+# These probably should be promoted to be on DocDetails
+# but this will take a larger refactor.
+DOC_DETAILS_OTHERS_TO_KEEP: Collection[str] = {"bibtex_source", "client_source"}
 VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
 VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
 DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
@@ -358,16 +361,21 @@ class PQASession(BaseModel):
                     # Similar to the explanation in `map_fxn_summary`'s internals
                     # on why we drop embeddings, drop embeddings here too because
                     # embeddings aren't displayed to front end users
-                    # we drop "other" because it is large and depends on provenance
-                    # of the doc, so no downstream code should rely on it anyway.
-                    # We do not drop in map_fxn_summary because we may want tools to inspect other.
-                    doc=c.text.doc.model_dump(exclude={"embedding", "other"}),
+                    doc=c.text.doc.model_dump(exclude={"embedding"}),
                     # We drop media since images can be quite large
                     **c.text.model_dump(exclude={"text", "embedding", "doc", "media"}),
                 ),
             )
             for c in self.contexts
         ]
+        # Now we drop extras from other fields
+        for c in self.contexts:
+            if isinstance(c.text.doc, DocDetails):
+                c.text.doc.other = {
+                    k: v
+                    for k, v in c.text.doc.other.items()
+                    if k in DOC_DETAILS_OTHERS_TO_KEEP
+                }
 
     def populate_formatted_answers_and_bib_from_raw_answer(
         self,
