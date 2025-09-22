@@ -24,8 +24,9 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-      - run: echo "UV_PROJECT_ENVIRONMENT=$(python -c "import sysconfig; print(sysconfig.get_config_var('prefix'))")" >> $GITHUB_ENV
-      - run: uv sync --python-preference only-system --verbose
+          activate-environment: true
+      - run: uv sync --verbose
+      - run: uv pip install pip
       - uses: pre-commit/action@v3.0.1
         with:
           extra_args: "--all-files --verbose"
