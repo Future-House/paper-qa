@@ -23,11 +23,12 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: echo "UV_PROJECT_ENVIRONMENT=$(python -c "import sysconfig; print(sysconfig.get_config_var('prefix'))")" >> $GITHUB_ENV
-      - run: uv python pin ${{ matrix.python-version }} # uv requires .python-version to match OS Python: https://github.com/astral-sh/uv/issues/11389
-      - run: uv sync --python-preference only-system
-      - run: git checkout .python-version # For clean git diff given `pre-commit run --show-diff-on-failure`
-      - uses: pre-commit/action@v3.0.1
+          python-version: ${{ matrix.python-version }}
+          activate-environment: true
+      - run: uv sync
+      - uses: j178/prek-action@v1
+        with:
+          extra_args: "--all-files --verbose"
       - uses: pre-commit-ci/lite-action@v1.1.0
         if: always()
   lint:

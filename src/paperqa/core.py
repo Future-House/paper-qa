@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, TypeVar
 
 import litellm
 from aviary.core import Message
@@ -14,6 +14,9 @@ from paperqa.types import Context, Text
 from paperqa.utils import extract_score, strip_citations
 
 logger = logging.getLogger(__name__)
+
+TTest = TypeVar("TTest", default=float)
+type Alias = int
 
 
 def llm_parse_json(text: str) -> dict[str, JsonValue]:
