@@ -92,12 +92,6 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: mypy
+        entry: uv run --verbose --frozen mypy # Use --frozen to avoid mutating local venv
         language: system
         types_or: [python, pyi]
-      - id: print-python-version
-        name: Print Python Version
-        entry: python --version
-        language: system
-        always_run: true
-        pass_filenames: false
