@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from collections.abc import Callable, Sequence
-from typing import Any, TypeVar
+from typing import Any
 
 import litellm
 from aviary.core import Message
@@ -15,11 +15,10 @@ from paperqa.utils import extract_score, strip_citations
 
 logger = logging.getLogger(__name__)
 
-TTest = TypeVar("TTest", default=float)
-type Alias = int
 
-
-def llm_parse_json(text: str) -> dict[str, JsonValue]:
+def llm_parse_json(
+    text: str
+) -> dict[str, JsonValue]:
     """Read LLM output and extract JSON data from it."""
     # Removing <think> tags for reasoning models
     ptext = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
