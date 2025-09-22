@@ -29,6 +29,7 @@ dependencies = [
     "fhlmi>=0.25.4",  # For LLM reasoning
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
+    "httpx-aiohttp",
     "numpy",
     "paper-qa-pypdf",  # TODO: after https://peps.python.org/pep-0771/, make this opt-out if 'pymupdf' extra is specified`
     "pybtex",

@@ -783,6 +783,19 @@ http2 = [
 ]
 
 [[package]]
+name = "httpx-aiohttp"
+version = "0.1.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "httpx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/37/19/ae2d2bf1f57fdd23c8ad83675599fb5c407fa13bc20e90f00cffa4dea3aa/httpx_aiohttp-0.1.8.tar.gz", hash = "sha256:756c5e74cdb568c3248ba63fe82bfe8bbe64b928728720f7eaac64b3cf46f308", size = 25401, upload-time = "2025-07-04T10:40:32.329Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/7a/514c484b88cc4ebbcd2e27e92b86019c0c5bb920582f5fbb10b7e6c78574/httpx_aiohttp-0.1.8-py3-none-any.whl", hash = "sha256:b7bd958d1331f3759a38a0ba22ad29832cb63ca69498c17735228055bf78fa7e", size = 6180, upload-time = "2025-07-04T10:40:31.522Z" },
+]
+
+[[package]]
 name = "huggingface-hub"
 version = "0.34.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1650,6 +1663,7 @@ dependencies = [
     { name = "fhlmi" },
     { name = "html2text" },
     { name = "httpx" },
+    { name = "httpx-aiohttp" },
     { name = "numpy" },
     { name = "paper-qa-pypdf" },
     { name = "pybtex" },
@@ -1747,6 +1761,7 @@ requires-dist = [
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.28" },
     { name = "html2text" },
     { name = "httpx" },
+    { name = "httpx-aiohttp" },
     { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0,<1" },
