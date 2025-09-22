@@ -24,9 +24,7 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-          activate-environment: true
-      - run: uv sync --verbose
-      - run: uv pip install pip
+      - run: uv sync --python-preference only-system --verbose
       - uses: pre-commit/action@v3.0.1
         with:
           extra_args: "--all-files --verbose"
