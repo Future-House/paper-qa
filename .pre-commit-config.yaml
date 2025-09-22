@@ -91,6 +91,6 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: mypy
+        entry: uv run --frozen mypy # Use --frozen to avoid mutating local venv
         language: system
         types_or: [python, pyi]
