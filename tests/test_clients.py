@@ -9,6 +9,7 @@ from typing import Any, cast
 from unittest.mock import patch
 
 import httpx
+import httpx_aiohttp
 import pytest
 
 import paperqa
@@ -111,7 +112,7 @@ CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
 )
 @pytest.mark.asyncio
 async def test_title_search(paper_attributes: dict[str, str]) -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client_list = [
             client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
         ]
@@ -263,7 +264,7 @@ async def test_title_search(paper_attributes: dict[str, str]) -> None:
 )
 @pytest.mark.asyncio
 async def test_doi_search(paper_attributes: dict[str, str | list[str]]) -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client_list = [
             client for client in ALL_CLIENTS if client != RetractionDataPostProcessor
         ]
@@ -306,7 +307,7 @@ async def test_bulk_doi_search() -> None:
         "10.1023/a:1007154515475",
         "10.1007/s40278-023-41815-2",
     ]
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.bulk_query([{"doi": doi} for doi in dois])
         assert len(details) == 6, "Should return 6 results"
@@ -331,7 +332,7 @@ async def test_bulk_title_search() -> None:
         ),
         "Convalescent-anti-sars-cov-2-plasma/immune-globulin",
     ]
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.bulk_query([{"title": title} for title in titles])
         assert len(details) == 6, "Should return 6 results"
@@ -341,7 +342,7 @@ async def test_bulk_title_search() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_bad_titles() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(title="askldjrq3rjaw938h")
         assert not details, "Should return None for bad title"
@@ -357,7 +358,7 @@ async def test_bad_titles() -> None:
 @pytest.mark.asyncio
 async def test_client_os_error() -> None:
     """Confirm an OSError variant does not crash us."""
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(
             http_client, metadata_clients=[SemanticScholarProvider]
         )
@@ -376,7 +377,7 @@ async def test_client_os_error() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_bad_dois() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(title="abs12032jsdafn")
         assert not details, "Should return None for bad doi"
@@ -385,7 +386,7 @@ async def test_bad_dois() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_minimal_fields_filtering() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
@@ -419,7 +420,7 @@ async def test_minimal_fields_filtering() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_s2_only_fields_filtering() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         # now get with authors just from one source
         s2_client = DocMetadataClient(
             http_client, metadata_clients=[SemanticScholarProvider]
@@ -445,7 +446,7 @@ async def test_s2_only_fields_filtering() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_journalquality_fields_filtering() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         crossref_client = DocMetadataClient(
             http_client,
             metadata_clients=cast(
@@ -471,7 +472,7 @@ async def test_crossref_journalquality_fields_filtering() -> None:
             " doi:10.1038/s42256-024-00832-8."
         ), "Citation should be populated"
 
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         crossref_client = DocMetadataClient(
             http_client,
             metadata_clients=cast(
@@ -496,7 +497,7 @@ async def test_crossref_journalquality_fields_filtering() -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_author_matching() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         crossref_client = DocMetadataClient(
             http_client, metadata_clients=[CrossrefProvider]
         )
@@ -539,7 +540,7 @@ async def test_author_matching() -> None:
 @pytest.mark.asyncio
 async def test_odd_client_requests() -> None:
     # try querying using an authors match, but not requesting authors back
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
@@ -550,7 +551,7 @@ async def test_odd_client_requests() -> None:
         assert details.authors, "Should return correct author results"
 
     # try querying using a title, asking for no DOI back
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
@@ -560,7 +561,7 @@ async def test_odd_client_requests() -> None:
         assert details.doi, "Should return a doi even though we don't ask for it"
 
     # try querying using a title, asking for no title back
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(
             title="Augmenting large language models with chemistry tools",
@@ -569,7 +570,7 @@ async def test_odd_client_requests() -> None:
         assert details, "Assertions require successful query"
         assert details.title, "Should return a title even though we don't ask for it"
 
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(
             doi="10.1007/s40278-023-41815-2",
@@ -587,7 +588,7 @@ async def test_odd_client_requests() -> None:
     paperqa.clients.semantic_scholar, "SEMANTIC_SCHOLAR_API_REQUEST_TIMEOUT", 0.001
 )
 async def test_ensure_robust_to_timeouts() -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(http_client)
         details = await client.query(
             doi="10.1007/s40278-023-41815-2",
@@ -610,7 +611,7 @@ async def test_ensure_sequential_run(caplog) -> None:
     # were using a DOI that is NOT in crossref, but running the crossref client first
     # we will ensure that both are run sequentially
 
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(
             http_client=http_client,
             metadata_clients=cast(
@@ -654,7 +655,7 @@ async def test_ensure_sequential_run(caplog) -> None:
 async def test_ensure_sequential_run_early_stop(caplog) -> None:
     caplog.set_level(logging.DEBUG, logger=paperqa.clients.__name__)
     # now we should stop after hitting s2
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         client = DocMetadataClient(
             http_client=http_client,
             metadata_clients=cast(
@@ -690,7 +691,7 @@ async def test_ensure_sequential_run_early_stop(caplog) -> None:
 @pytest.mark.vcr
 @pytest.mark.asyncio
 async def test_crossref_retraction_status(stub_data_dir: Path) -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         retract_processor = RetractionDataPostProcessor(
             f"{stub_data_dir}/stub_retractions.csv"
         )
@@ -776,7 +777,7 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
     or they have a swap like an & for and.
 
     """
-    async with httpx.AsyncClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         crossref_client = DocMetadataClient(
             http_client,
             metadata_clients=cast(

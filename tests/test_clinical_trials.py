@@ -3,6 +3,7 @@ import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
+import httpx_aiohttp
 import pytest
 
 from paperqa import Docs, Settings
@@ -37,7 +38,7 @@ def mock_bucket_client():
 
 @pytest.fixture(name="mock_client")
 def fixture_mock_client() -> httpx.AsyncClient:
-    return AsyncMock(spec=httpx.AsyncClient)
+    return AsyncMock(spec=httpx_aiohttp.HttpxAiohttpClient)
 
 
 @pytest.mark.asyncio

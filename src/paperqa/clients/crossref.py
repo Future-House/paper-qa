@@ -11,6 +11,7 @@ from typing import Any
 from urllib.parse import quote
 
 import httpx
+import httpx_aiohttp
 from anyio import open_file
 from lmi.utils import CROSSREF_KEY_HEADER
 from tenacity import (
@@ -364,7 +365,7 @@ async def download_retracted_dataset(
     """
     url = f"https://api.labs.crossref.org/data/retractionwatch?{get_crossref_mailto()}"
 
-    async with httpx.AsyncClient(timeout=300) as client:
+    async with httpx_aiohttp.HttpxAiohttpClient(timeout=300) as client:
         response = await client.get(url)
         response.raise_for_status()
 
