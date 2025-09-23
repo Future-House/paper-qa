@@ -199,6 +199,7 @@ module = [
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pypdfium2",  # SEE: https://github.com/pypdfium2-team/pypdfium2/issues/367
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
+    "vcr.*",  # SEE: https://github.com/kevin1024/vcrpy/issues/780
 ]
 
 [tool.pylint]
