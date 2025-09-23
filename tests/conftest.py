@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import httpx_aiohttp
+import litellm.llms.custom_httpx.aiohttp_transport
 import pytest
 from dotenv import load_dotenv
 from lmi.utils import (
@@ -162,4 +163,7 @@ class PreReadCompatibleAiohttpResponseStream(
 
 # Permanently patch the original response stream,
 # to work around https://github.com/karpetrosyan/httpx-aiohttp/issues/23
-httpx_aiohttp.transport.AiohttpResponseStream = PreReadCompatibleAiohttpResponseStream  # type: ignore[misc]
+# and https://github.com/BerriAI/litellm/issues/11724
+httpx_aiohttp.transport.AiohttpResponseStream = (  # type: ignore[misc]
+    litellm.llms.custom_httpx.aiohttp_transport.AiohttpResponseStream  # type: ignore[misc]
+) = PreReadCompatibleAiohttpResponseStream  # type: ignore[assignment]
