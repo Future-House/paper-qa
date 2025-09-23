@@ -1,78 +1,6 @@
 interactions:
   - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.semanticscholar.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA%3A+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
-          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
-          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
-          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
-          "venue": "arXiv.org", "year": 2023, "citationCount": 101, "influentialCitationCount":
-          1, "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
-          null}, "publicationTypes": ["JournalArticle"], "publicationDate": "2023-12-08",
-          "journal": {"name": "ArXiv", "volume": "abs/2312.07559"}, "citationStyles":
-          {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub L''ala and Odhran
-          O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel G. Rodriques
-          and Andrew D. White},\n booktitle = {arXiv.org},\n journal = {ArXiv},\n title
-          = {PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},\n
-          volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors": [{"authorId":
-          "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056", "name":
-          "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar Shtedritski"},
-          {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "2258964497",
-          "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name": "Andrew
-          D. White"}], "matchScore": 236.95642}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1427"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        Via:
-          - 1.1 28da7b50b2dbdddfb257605df1527026.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - cqvT1yXjWy-55IdBTrlROSr-qrO2I_ZKmP0Dmzc-lh3YVCHuIhBgoA==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - PKejVHNmvHcEaag=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1427"
-        x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 4a4353e8-73d7-4666-85bd-1f66205d4cc7
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
+      body: null
       headers:
         accept:
           - "*/*"
@@ -85,493 +13,13 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
-    response:
-      body:
-        string: !!binary |
-          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
-      headers:
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "10579"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        content-encoding:
-          - gzip
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Convalescent-anti-sars-cov-2-plasma%2Fimmune-globulin&rows=1
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAA/8VWbW/bNhD+K4Q+m3qL/KZvW7oCAdIWaNINWxQMtHS22VCkRlJ2vCD/fXeU47hd
-          agQFtgYOLOvI4z0P73nIh8h54XsXlZG5i0ZRC86JFXC/6wDfbY2940o6fxTagHXSaIxmcRqnz5Go
-          fIiWogaP2R4eR5E3XihuwfWKXmXjeZGns1EkPbT4++YhkrqBe2hoYiM88E5YGnlzk6f52Wgyyovb
-          29EQ8rKlgijA0wnPi+u0KLMpfv7ACiiKQNoOl5nMpuMZDpumxRSrsLAEC7oGXpteexwwirp+gaDW
-          YDHjVWelXoFlV7WkYUzohv3cO6kRFXsHjRTs8vIcF5HO9VRDhs9K1qAdBBS4sPXfiSEtw+clDJNi
-          ltIfYqiN9qD9EfW+aXFKA0rsuNS8ETtcMx1Fnz5eYnTtfefKKqmS7XYbuz1CjRttIa5NWyWrrkpw
-          Z0DYGmlwVeLh3nOEjqm84K3UOCV6HP0YdBtj/w90t89rN6YVUgeY+6cbilrjXCtQA5jNW1n7UN9S
-          KAdYuFsb6zmlwBlgkQGvqCWijyDCUMd+A7hTuwhzvflwQb2TxlmaTqvEFWk+nXEiq8hm2ZjnRNKg
-          us+mRziKI9eyxoxUCCDFJ4Ry9s1tOLvOZmWRl/n8pW0oxtNiPmxDFyQcZcWY4z+OdVhGTa/OiQbU
-          UdAAPwiq4Yvdk6hSSr1Hf270RihwNRErtJfcCetw5IbnvFMCGa0S2ba9Br5SZtEr5BvL7zCzvH8m
-          CZfbGNUHONl8kgenaRdBtfmcwk86brjRmAROtumxFwTd3sEOMwX2/zz/SKpujOTCObA+gMNo/Qy9
-          19gCfU1dhhsRvQG1Eo3hb6n10Mf+Zu9GDDwTKmbXtF0twmdmyc4//HrxhmdztpV+zeojcthABpOa
-          dcKj+3g3DFr3rbFCsUCSaZCW4E07xtn12gJQFgd17+UGn4UDF1zLwkbCltb0a2AKfdYOomC/aATe
-          QiMaHHqBP+paGicc+529k4hxIY0yK3S6c6RR1oIVaaVLNk6nfJxNRuy9idmcvjYMGc1j9tNGSCUW
-          CtjSmrZkqMySVfpZmg5kW8fGrqok+qL5s0mVfI4pCjHmwjMEP+n8oMZXSEkJveqHbgUdzFjfhR39
-          2h8ocDCIwRr2gq+SrllWyQk5xjggejaIvTRF16H1C6oopIi+bV+SXjfYSEdzyLnJio789RU1733g
-          ZLlVsuyVouTx2rfq35VTqEq+iv13Nf9wnp1ssUOt9OhRa6jvnhy/gc44+f1mOi/zszKbvWims2w+
-          G8zU1cbizPEsnmTTeZaT9zz56QM6ncRTZUePr6Dy1JnxSGv1i4Nc3gLSE8wA0TesATo5HJDFLPCb
-          TJKZ+90KNHPkDYEttjRKmS0uid6x5KhrUKx3ULKz4C5oLJ0hjm73l6DTN7Zjo3VHt66nY21/j3r4
-          4kL1WivH9JhfYKfTiY/+x2VDwAMhVODXhKKnDzZ0+ui9uLp6T3ky3C6ep+NsD1bvOxLdBX17KPcw
-          5HBig4LaW4PWGXrsAOY0TzQ0XIZ5h5Y3nL/I0189DL0Rrl48XJLDCTtcaDhCp/uzRr0/Pj7+A6fp
-          oOXCCwAA
-      headers:
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1203"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        content-encoding:
-          - gzip
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&rows=1
-    response:
-      body:
-        string: !!binary |
-          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
-      headers:
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "3966"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        content-encoding:
-          - gzip
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
-          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
-          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
-          pages={145\u2013145} }\n"
-      headers:
-        Connection:
-          - keep-alive
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        Transfer-Encoding:
-          - chunked
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=PaperQA%3A+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&rows=1
     response:
       body:
         string: !!binary |
           H4sIAAAAAAAA/9VbjW/bOJb/VwgDc7sLWI4+LctY7CJx2k46SRokmSl6TXGgJdpmI4k6UUrqFvnf
           9z1SsqVYTuXO3GAumKltiaTe+73vR+rbQBa0KOVgOhD3g+EgYVLSJTOKdcbg2qPI742Yy6Jx64Hl
-          kosU7lojc2Ru7wym3wYLGrICVvv2NBwUoqCxkTNZxnjJtq3At83hgBcsgd8fvw14GrEvLMKJES2Y
+          kosU7lojc2Ru7wym3wYLGrICVvv2NBwUoqCxkTNZxnjJtj3L8e3hgBcsgd8fvw14GrEvLMKJES2Y
           kdEcR378aJu2N/SHjvnp01DfKniCBOENw/QNx7y1rKnnTD3rv4ECvAuMJNlgavmeM/HHrmONvWA4
           2FLrjFxrZA+AsJwtWM7SkBmhKNNiMHUnw0FWzoHRFcth6LsvC5FH5NeUq+nFmlwBG5L8/d2vV/+A
           x3EpS6TGgu8xD1kqmeIHSMiLTm7coT20rQ5uXMO0Ddu6Nc2p+m+HG3Pi+s7YxD8gPRRpwdKiIYQH
@@ -598,7 +46,7 @@ interactions:
           Dm6mLMoc40QZ4VogewLJJqSpKhYKsihz5TKBl0Ixs1m0LHgMVU5fWUAut00vzcDBWwmnENHTuyMh
           KAMPgmWMTv4+g+alyDAEzzDGeqAKc/sLJXtvoWTfmhZUN1AXdRRK3njsBr4ulCQ8NcSpM8wcITSo
           ss3YlH6YhW7KP1wJNEIVIbWASENALwkWk3dQ7gX/sgUEnvUAxqtI9zHzLSFJ0tXUu+vZ2WmrLhN5
-          yCNdjWHmbGD2bECp7BmW7dvVbHx+iKAZaniV+Q4HSzAirAJ/pgJGLkAMMSbX57yEn5JB7pMqFBY8
+          yCNdjWHmbGD2bFiB7xmW7dvVbHx+iKAZaniV+Q4HSzAirAJ/pgJGLkAMMSbX57yEn5JB7pMqFBY8
           V0U8BW8Wc004klOVAjfhSogYFW0GXqNE5zcEf5IWyG9ObtBRNcvhxs0huXxLTN90nSGOQLzUcFkV
           IjWFxzFvUngjclHKVZtKGkVcpyz7ST1lqC4omWaVCf4MAZ9z2ibzEjKXD5CLwbcPBIoT2++mspdY
           HMNyrYnhWKbTUyxvRR6BL3/T5PwSVFbV7H8JxmtKX8X8KzhqVfhtSL2CguuvQmhPw3EdkJAXTPye
@@ -645,34 +93,34 @@ interactions:
           nmragRTv1RmG56/20ZBGmDOMRJmNQpG0DuRS9coaq8/fGlm0gIxEcHxZa+/xXVDTMbh/3zc3l0Yw
           cbB9T6s63UvxfJHu7NwdtUds31GkCVzmeDUCk2lMgXtynUb1L4T7MN6aPPnAUYuBwHTtsfNHMKBf
           svyLclCmVfLCoh8gniccqnJerA3IO8N7TF5QOSOWCcn3n9J2hn73IW3HMP1b25y6wdR2dg9pBxPX
-          9cZOdUgbX1wYTO3JyApM0x3jWZ364Pa3QZbzhOZr/PojkPZRcn9s2TZUPk9P1Uu9+9itXx3cnCWS
-          zXeHa1daRZN2fnvIu4lPu6/tAhP6mNrLh+3Pbm4u0YPYnu8atgcl6yfFUlppCXiNSl3Uexq5gOwM
-          IweEFd05r6eh8BsnrAr1RnQnyUC0wmQz+nuvXVaqnpbVca6aenykeincyMAZak9rDQcQ3LT01WvV
-          hnpZfDA18Yga9o+MguX4HnlaxvHT09N/APZDVnTKPgAA
+          9cZOdUgbX1wYTO3JyLHtyQSP6tTntr8NspwnNF/j1x9BtI+O+2PLtqHweXqq3undx2395uDmKJFs
+          vjpce9IqmLTT20NeTXzafWsXmNCn1F4+a392c3OJDsT2fNewPahYPymW0kpJwGlU2qJe08gFJGcY
+          OCCq6MZ5PQ1l3zhgVagXojtJBqIVJpvR33vrstL0tKxOc9XU4yPVO+FGBr5QO1prOIDYpqWv3qo2
+          1Lvig6mJJ9SwfWQULMfXyNMyjp+env4D5RJQ0Mk+AAA=
       headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
         Connection:
           - keep-alive
+        Content-Encoding:
+          - gzip
         Content-Length:
-          - "4536"
+          - "4535"
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        content-encoding:
-          - gzip
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
         permissions-policy:
           - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -683,7 +131,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: ""
+      body: null
       headers:
         accept:
           - "*/*"
@@ -696,76 +144,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
-          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
-          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
-          "title": "Effect of native oxide layers on copper thin-film tensile properties:
-          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
-          8, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
-          {"url": "", "status": "CLOSED", "license": null}, "publicationTypes": null,
-          "publicationDate": "2015-12-21", "journal": {"name": "Journal of Applied Physics",
-          "pages": "235306", "volume": "118"}, "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n
-          author = {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied
-          Physics},\n pages = {235306},\n title = {Effect of native oxide layers on
-          copper thin-film tensile properties: A reactive molecular dynamics study},\n
-          volume = {118},\n year = {2015}\n}\n"}, "authors": [{"authorId": "9821934",
-          "name": "Michael Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}],
-          "matchScore": 286.84427}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1153"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        Via:
-          - 1.1 2cb541f687a080afb4184dfb4c43940a.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - plseh3mjddwZgNoI9uY2AyCAvjy55pHxE5nsxMv73e8cQRehBhdFvA==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - PKejVGltvHcEBhQ=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1153"
-        x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 35fef862-1eb5-4935-b13d-9687fc87401b
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.semanticscholar.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Augmenting+large+language+models+with+chemistry+tools&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
@@ -774,8 +153,8 @@ interactions:
           "11116106", "DOI": "10.1038/s42256-024-00832-8", "CorpusId": 258059792, "PubMed":
           "38799228"}, "url": "https://www.semanticscholar.org/paper/354dcdebf3f8b5feeed5c62090e0bc1f0c28db06",
           "title": "Augmenting large language models with chemistry tools", "venue":
-          "Nat. Mac. Intell.", "year": 2023, "citationCount": 457, "influentialCitationCount":
-          19, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
+          "Nat. Mac. Intell.", "year": 2023, "citationCount": 500, "influentialCitationCount":
+          20, "isOpenAccess": true, "openAccessPdf": {"url": "https://www.nature.com/articles/s42256-024-00832-8.pdf",
           "status": "HYBRID", "license": "CCBY"}, "publicationTypes": ["JournalArticle"],
           "publicationDate": "2023-04-11", "journal": {"name": "Nature Machine Intelligence",
           "pages": "525 - 535", "volume": "6"}, "citationStyles": {"bibtex": "@Article{Bran2023AugmentingLL,\n
@@ -787,7 +166,7 @@ interactions:
           M Bran"}, {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "1820929773",
           "name": "Oliver Schilter"}, {"authorId": "2251414370", "name": "Carlo Baldassari"},
           {"authorId": "2150199535", "name": "Andrew D. White"}, {"authorId": "1379965853",
-          "name": "P. Schwaller"}], "matchScore": 171.99506}]}
+          "name": "P. Schwaller"}], "matchScore": 174.51831}]}
 
           '
       headers:
@@ -800,229 +179,32 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
+          - Tue, 23 Sep 2025 23:00:21 GMT
         Via:
-          - 1.1 77c3ff47f2ab47e28346b6b3668d2c3a.cloudfront.net (CloudFront)
+          - 1.1 1401c4844b3ea759244fef5091fc307a.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - BnC-gk47mjgu3PQz4K49dZGgEBoF_p83WmkcSNUl1ylS9Gib52x6bQ==
+          - JWjKQBS_yooC_GGck3WFK6K0Z3zTK1u6tPyCIfugtolcOkmE2tnXBw==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PKejVGiDPHcEsAg=
+          - RYL00E6WvHcEDew=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1570"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
+          - Tue, 23 Sep 2025 23:00:21 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - a5756045-44bf-46dd-b467-8ee1bc6e0b96
+          - 672a73ae-c97b-4009-aec1-0e5f73928d05
       status:
         code: 200
         message: OK
   - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&rows=1
-    response:
-      body:
-        string: !!binary |
-          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
-          RQAA
-      headers:
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "5304"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        content-encoding:
-          - gzip
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8/transform/application/x-bibtex
-    response:
-      body:
-        string:
-          " @article{M_Bran_2024, title={Augmenting large language models with
-          chemistry tools}, volume={6}, ISSN={2522-5839}, url={http://dx.doi.org/10.1038/s42256-024-00832-8},
-          DOI={10.1038/s42256-024-00832-8}, number={5}, journal={Nature Machine Intelligence},
-          publisher={Springer Science and Business Media LLC}, author={M. Bran, Andres
-          and Cox, Sam and Schilter, Oliver and Baldassari, Carlo and White, Andrew
-          D. and Schwaller, Philippe}, year={2024}, month=may, pages={525\u2013535}
-          }\n"
-      headers:
-        Connection:
-          - keep-alive
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        Transfer-Encoding:
-          - chunked
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
+      body: null
       headers:
         accept:
           - "*/*"
@@ -1035,7 +217,761 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "4187800ac995ae172c88b83f8c2c4da990d02934", "externalIds":
+          {"MAG": "2277923667", "DOI": "10.1063/1.4938384", "CorpusId": 124514389},
+          "url": "https://www.semanticscholar.org/paper/4187800ac995ae172c88b83f8c2c4da990d02934",
+          "title": "Effect of native oxide layers on copper thin-film tensile properties:
+          A reactive molecular dynamics study", "venue": "", "year": 2015, "citationCount":
+          9, "influentialCitationCount": 0, "isOpenAccess": false, "openAccessPdf":
+          {"url": "", "status": "CLOSED", "license": null}, "publicationTypes": null,
+          "publicationDate": "2015-12-21", "journal": {"name": "Journal of Applied Physics",
+          "pages": "235306", "volume": "118"}, "citationStyles": {"bibtex": "@Article{Skarlinski2015EffectON,\n
+          author = {Michael Skarlinski and D. Quesnel},\n journal = {Journal of Applied
+          Physics},\n pages = {235306},\n title = {Effect of native oxide layers on
+          copper thin-film tensile properties: A reactive molecular dynamics study},\n
+          volume = {118},\n year = {2015}\n}\n"}, "authors": [{"authorId": "9821934",
+          "name": "Michael Skarlinski"}, {"authorId": "37723150", "name": "D. Quesnel"}],
+          "matchScore": 284.6143}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1152"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Via:
+          - 1.1 6b175795d4c4b1909e08459648cd6214.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - A0dyLB5IR-4g2K1cP_XD_UV0yNSk4tYubKNPQE55fiMbHg7GJqt6ZA==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - RYL00HQ7vHcEMVA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1152"
+        x-amzn-Remapped-Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 922ce141-f278-4ad0-be11-01716f1479ff
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Convalescent-anti-sars-cov-2-plasma/immune-globulin&rows=1
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/8VWbW/bNhD+K4Q+m3qL/KZvW7oCAdIWaNINWxQMtHS22VCkRlJ2vCD/fXeU47hd
+          agQFtgYOLOuOx3se3j28h8h54XsXlZG5i0ZRC86JFXC/6wDfbY2940o6f2TagHXSaLRmcRqnz5ao
+          fIiWogaP0R4eR5E3XihuwfWKXmWTdDbL5qNIemjx981DJHUD99DQwkZ44J2w5Hlzk6f52Wgyyovb
+          29Fg8rKlhMjA0wnPi+u0KLMpfv7ADMiKQNqOtplNxzN0m6bFFLOwsAQLugZem157dBhFXb9AUGuw
+          GPGqs1KvwLKrWpIbE7phP/dOakTF3kEjBbu8PMdNpHM95ZDhs5I1aAcBBW5s/XdiSMvweQnDpJil
+          9IcYaqM9aH9EvW9aXNKAEjsuNW/EDvdMR9Gnj5doXXvfubJKqmS73cZuj1DjQVuIa9NWyaqrEjwZ
+          ELZGGlyVeLj3HKFjKC94KzUuiR5HPwbdxtj/A93t896NaYXUAeb+6Yas1jjXCuwBjOatrH3IbymU
+          A0zcrY31nELgCrDIgFdUEtFHEMHVsd8A7tQuwlhvPlxQ7aRxlqbTKnFFmk9nnMgqslk25jmRNHTd
+          Z9MjHMWRa1ljREoEkOITjXL2zWM4u85mZZGX+fylYyjG02I+HEMXWjjKijHHf/R1mEZNr86JBuyj
+          0AP80FANX+yemiql0Hv050ZvhAJXE7FCe8mdsA49NzznnRLIaJXItu018JUyi14h35h+h5Hl/TNJ
+          uN3GqD7AyeaTPChNuwhdm8/J/NTHDTcag8DJMj3WgtC3d7DDSIH9P88/Ulc3RnLhHFgfwKG1fobe
+          ayyBvqYqw4OI3oBaicbwt1R6qGN/s3cjBp4JFbNrOq4W4TOzZOcffr14w7M520q/ZvUROWwgg0nN
+          OuFRfbwbnNZ9a6xQLJBkGqQlaNOOcXa9tgAUxUHde7nBZ+HABdWysJGwpT39GphCnbVDU7BfNAJv
+          oRENul7gj7qWxgnHfmfvJGJcSKPMCpXuHGmUtWBFWumSjdMpH2eTEXtvYjanrw1DRvOY/bQRUomF
+          Ara0pi0ZdmbJKv3cmg5kW8fGrqok+qL4s0mVfI7JCjHGwjsEP+n80I2vaCUl9KofqhV0EGN9F070
+          a30gw0EgBmnYN3yVdM2ySk60Y4wO0bNA7FtTdB1Kv6CMQojo2/Il6XWDhXS0hpSbpOhIX1+R814H
+          TqZbJcteKQoer32r/p05markK9t/l/MP59nJFivUSo8atYb67knxG+iMk98vpvMyPyuz2YtiiuPN
+          bBBTVxuLK8ezeDydzIsJac+Tnj6g0km8VXb0+AoqT90Zj7RXvzi0y1tAeoIYIPqGNUA3hwOSmAV+
+          k0gyc79bgWaOtCGwxZZGKbPFLVE7lhz7GhTrHZTsLKgLCktniKPb/RB0emI7Flp3NHU9XWv7Oerh
+          i4HqtVKO4TG+wEqnGx/1j8uGgAdCKMGvCUVNH2To9NV7cXX1nuJk2XTO83Sc7cHqfUWiuqBuD+ke
+          XA43NiiovTUonaHGDmBO80SuYRjmHUrecP8iT3/1MNRGGL14GJLDDTsMNByh0/yssd8fHx//Acis
+          +O3CCwAA
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1203"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "10581"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "3302"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+          RQAA
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "5304"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties:+A+reactive+molecular+dynamics+study&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "3966"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
     response:
       body:
         string:
@@ -1056,7 +992,7 @@ interactions:
           "2163800172", "name": "Christina M. Kajba"}, {"authorId": "2120283350", "name":
           "Megan Buckley"}, {"authorId": "2294861709", "name": "Ana Cunha"}, {"authorId":
           "2294881320", "name": "Molly Strom"}, {"authorId": "145686550", "name": "Gregory
-          M. Findlay"}], "matchScore": 253.11633}]}
+          M. Findlay"}], "matchScore": 252.28352}]}
 
           '
       headers:
@@ -1069,32 +1005,342 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
+          - Tue, 23 Sep 2025 23:00:21 GMT
         Via:
-          - 1.1 2cb541f687a080afb4184dfb4c43940a.cloudfront.net (CloudFront)
+          - 1.1 28da7b50b2dbdddfb257605df1527026.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - emuXr1EgGSZB43ay13mbxYmXjK8ro4Jbm7mByH0q1aiWMBpfp06lhg==
+          - VYrBbYNwplRl4Ft6hhdzQ6AfDrELbm8tCMIw7hlIGZOHgNw8MXtn0w==
         X-Amz-Cf-Pop:
           - SFO53-P7
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - PKejVHzxPHcEXEw=
+          - RYL00HZQPHcEe-g=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1448"
         x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
+          - Tue, 23 Sep 2025 23:00:21 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - fc27d07a-07c7-4943-93bc-fc9b80f36181
+          - 66ea595f-9f57-4aa8-b90a-02f532b088c7
       status:
         code: 200
         message: OK
   - request:
-      body: ""
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=PaperQA:+Retrieval-Augmented+Generative+Agent+for+Scientific+Research&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "7e55d8701785818776323b4147cb13354c820469", "externalIds":
+          {"ArXiv": "2312.07559", "DBLP": "journals/corr/abs-2312-07559", "DOI": "10.48550/arXiv.2312.07559",
+          "CorpusId": 266191420}, "url": "https://www.semanticscholar.org/paper/7e55d8701785818776323b4147cb13354c820469",
+          "title": "PaperQA: Retrieval-Augmented Generative Agent for Scientific Research",
+          "venue": "arXiv.org", "year": 2023, "citationCount": 111, "influentialCitationCount":
+          2, "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
+          null}, "publicationTypes": ["JournalArticle"], "publicationDate": "2023-12-08",
+          "journal": {"name": "ArXiv", "volume": "abs/2312.07559"}, "citationStyles":
+          {"bibtex": "@Article{L''ala2023PaperQARG,\n author = {Jakub L''ala and Odhran
+          O''Donoghue and Aleksandar Shtedritski and Sam Cox and Samuel G. Rodriques
+          and Andrew D. White},\n booktitle = {arXiv.org},\n journal = {ArXiv},\n title
+          = {PaperQA: Retrieval-Augmented Generative Agent for Scientific Research},\n
+          volume = {abs/2312.07559},\n year = {2023}\n}\n"}, "authors": [{"authorId":
+          "2219926382", "name": "Jakub L''ala"}, {"authorId": "2258961056", "name":
+          "Odhran O''Donoghue"}, {"authorId": "2258961451", "name": "Aleksandar Shtedritski"},
+          {"authorId": "2161337138", "name": "Sam Cox"}, {"authorId": "2258964497",
+          "name": "Samuel G. Rodriques"}, {"authorId": "2273941271", "name": "Andrew
+          D. White"}], "matchScore": 238.6861}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1426"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Via:
+          - 1.1 97354ec70bdda7ac06cc29aed9bfdb3c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - eOjVVVO0BrVQ2l5VQlrPAb-TRtz5guIKqrF7dN2BEoIoshbV50Ocgg==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - RYL00FrBvHcEahw=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1426"
+        x-amzn-Remapped-Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - d921f19d-e941-48fb-a6ad-b7aa5d89154d
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1007%2Fs40278-023-41815-2/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{2023, volume={1962}, ISSN={1179-2051}, url={http://dx.doi.org/10.1007/s40278-023-41815-2},
+          DOI={10.1007/s40278-023-41815-2}, number={1}, journal={Reactions Weekly},
+          publisher={Springer Science and Business Media LLC}, year={2023}, month=jun,
+          pages={145\u2013145} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Convalescent-anti-sars-cov-2-plasma/immune-globulin&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "762ceacc20db232d3f6bcda6e867eb8148848ced", "externalIds":
+          {"DOI": "10.1007/s40278-023-33114-1", "CorpusId": 256742540}, "url": "https://www.semanticscholar.org/paper/762ceacc20db232d3f6bcda6e867eb8148848ced",
+          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
+          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
+          "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
+          null}, "publicationTypes": null, "publicationDate": "2023-02-01", "journal":
+          {"name": "Reactions Weekly", "pages": "229", "volume": "1943"}, "citationStyles":
+          {"bibtex": "@Article{None,\n booktitle = {Reactions weekly},\n journal = {Reactions
+          Weekly},\n pages = {229},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
+          volume = {1943},\n year = {2023}\n}\n"}, "authors": [], "matchScore": 240.77946}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "888"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Via:
+          - 1.1 0cb53c06b4d3d66446893feb6331dc78.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - UW5_Uuooe2iFRXQ58FKGcGJK-YtNAMQyIDTitW4_iM1cN2BBU8Xx1g==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - RYL00EUgvHcELdA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "888"
+        x-amzn-Remapped-Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - d9abf7a3-63d3-472d-9eb4-fdc81c6df85b
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
+          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
+          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
+          "title": "An essential role of active site arginine residue in iodide binding
+          and histidine residue in electron transfer for iodide oxidation by horseradish
+          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
+          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": {"url": "", "status": "CLOSED", "license": null}, "publicationTypes":
+          ["JournalArticle", "Study"], "publicationDate": "2001-02-01", "journal": {"name":
+          "Molecular and Cellular Biochemistry", "pages": "1-11", "volume": "218"},
+          "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n author = {S. Adak and
+          D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n booktitle = {Molecular
+          and Cellular Biochemistry},\n journal = {Molecular and Cellular Biochemistry},\n
+          pages = {1-11},\n title = {An essential role of active site arginine residue
+          in iodide binding and histidine residue in electron transfer for iodide oxidation
+          by horseradish peroxidase},\n volume = {218},\n year = {2001}\n}\n"}, "authors":
+          [{"authorId": "1940081", "name": "S. Adak"}, {"authorId": "1701389", "name":
+          "D. Bandyopadhyay"}, {"authorId": "5343877", "name": "U. Bandyopadhyay"},
+          {"authorId": "32656528", "name": "R. Banerjee"}], "matchScore": 390.13876}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1527"
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Via:
+          - 1.1 2347835d64b95b688a16fb2618f2577a.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - TqsV1wPAAkJ9hjXsOPPi72HVG6UhEmmHeBbwH3A0EDoxupBxQT9ouw==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - RYL00HYFPHcEOAA=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1527"
+        x-amzn-Remapped-Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 1fb27c8a-ec10-4f9b-812d-9f48bbcb49e5
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1101%2F2024.04.01.587366/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Herger_2024, title={High-throughput screening of human genetic
+          variants by pooled prime editing}, url={http://dx.doi.org/10.1101/2024.04.01.587366},
+          DOI={10.1101/2024.04.01.587366}, publisher={Cold Spring Harbor Laboratory},
+          author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and Cunha,
+          Ana and Strom, Molly and Findlay, Gregory M.}, year={2024}, month=apr }
+
+          "
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
       headers:
         accept:
           - "*/*"
@@ -1120,241 +1366,23 @@ interactions:
 
           "
       headers:
-        Connection:
-          - keep-alive
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        Transfer-Encoding:
-          - chunked
-        access-control-allow-headers:
+        Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
             Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
-        permissions-policy:
-          - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.semanticscholar.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Convalescent-anti-sars-cov-2-plasma%2Fimmune-globulin&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "762ceacc20db232d3f6bcda6e867eb8148848ced", "externalIds":
-          {"DOI": "10.1007/s40278-023-33114-1", "CorpusId": 256742540}, "url": "https://www.semanticscholar.org/paper/762ceacc20db232d3f6bcda6e867eb8148848ced",
-          "title": "Convalescent-anti-sars-cov-2-plasma/immune-globulin", "venue": "Reactions
-          weekly", "year": 2023, "citationCount": 0, "influentialCitationCount": 0,
-          "isOpenAccess": false, "openAccessPdf": {"url": "", "status": null, "license":
-          null}, "publicationTypes": null, "publicationDate": "2023-02-01", "journal":
-          {"name": "Reactions Weekly", "pages": "229", "volume": "1943"}, "citationStyles":
-          {"bibtex": "@Article{None,\n booktitle = {Reactions weekly},\n journal = {Reactions
-          Weekly},\n pages = {229},\n title = {Convalescent-anti-sars-cov-2-plasma/immune-globulin},\n
-          volume = {1943},\n year = {2023}\n}\n"}, "authors": [], "matchScore": 240.35303}]}
-
-          '
-      headers:
         Access-Control-Allow-Origin:
           - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "888"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        Via:
-          - 1.1 1401c4844b3ea759244fef5091fc307a.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - qM_Dy68bhh8O65IVLT_2zvz5wS5vs-tQcKPKqWzX098GFLJnS8COIQ==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - PKejVESgPHcEtjg=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "888"
-        x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - 9074ac46-1055-453d-b8ca-bcd4553ed4f2
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=High-throughput+screening+of+human+genetic+variants+by+pooled+prime+editing&rows=1
-    response:
-      body:
-        string: !!binary |
-          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
-          VOcr2ihBwIjTMo5//Pjxf3BE8ktTVwAA
-      headers:
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "5838"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
+        Access-Control-Expose-Headers:
           - Link
-        content-encoding:
-          - gzip
+        Connection:
+          - keep-alive
+        Date:
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
         permissions-policy:
           - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
-        vary:
-          - Accept-Encoding
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -1365,7 +1393,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: ""
+      body: null
       headers:
         accept:
           - "*/*"
@@ -1378,7 +1406,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1023%2Fa%3A1007154515475/transform/application/x-bibtex
+      uri: https://api.crossref.org/works/10.1023%2Fa:1007154515475/transform/application/x-bibtex
     response:
       body:
         string:
@@ -1390,23 +1418,23 @@ interactions:
           Subrata and Bandyopadhyay, Debashis and Bandyopadhyay, Uday and Banerjee,
           Ranajit K.}, year={2001}, month=feb, pages={1\u201311} }\n"
       headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 23:07:27 GMT
+          - Tue, 23 Sep 2025 23:00:21 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
           - chunked
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
         permissions-policy:
           - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
@@ -1417,80 +1445,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: ""
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.semanticscholar.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=An+essential+role+of+active+site+arginine+residue+in+iodide+binding+and+histidine+residue+in+electron+transfer+for+iodide+oxidation+by+horseradish+peroxidase&fields=authors%2CcitationCount%2CcitationStyles%2CexternalIds%2CinfluentialCitationCount%2CisOpenAccess%2Cjournal%2CopenAccessPdf%2CpublicationDate%2CpublicationTypes%2Ctitle%2Curl%2Cvenue%2Cyear
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "19807da5b11f3e641535cb72e465001b49b48ee5", "externalIds":
-          {"MAG": "1554322594", "DOI": "10.1023/A:1007154515475", "CorpusId": 22646521,
-          "PubMed": "11330823"}, "url": "https://www.semanticscholar.org/paper/19807da5b11f3e641535cb72e465001b49b48ee5",
-          "title": "An essential role of active site arginine residue in iodide binding
-          and histidine residue in electron transfer for iodide oxidation by horseradish
-          peroxidase", "venue": "Molecular and Cellular Biochemistry", "year": 2001,
-          "citationCount": 7, "influentialCitationCount": 0, "isOpenAccess": false,
-          "openAccessPdf": {"url": "", "status": "CLOSED", "license": null}, "publicationTypes":
-          ["JournalArticle", "Study"], "publicationDate": "2001-02-01", "journal": {"name":
-          "Molecular and Cellular Biochemistry", "pages": "1-11", "volume": "218"},
-          "citationStyles": {"bibtex": "@Article{Adak2001AnER,\n author = {S. Adak and
-          D. Bandyopadhyay and U. Bandyopadhyay and R. Banerjee},\n booktitle = {Molecular
-          and Cellular Biochemistry},\n journal = {Molecular and Cellular Biochemistry},\n
-          pages = {1-11},\n title = {An essential role of active site arginine residue
-          in iodide binding and histidine residue in electron transfer for iodide oxidation
-          by horseradish peroxidase},\n volume = {218},\n year = {2001}\n}\n"}, "authors":
-          [{"authorId": "1940081", "name": "S. Adak"}, {"authorId": "1701389", "name":
-          "D. Bandyopadhyay"}, {"authorId": "5343877", "name": "U. Bandyopadhyay"},
-          {"authorId": "32656528", "name": "R. Banerjee"}], "matchScore": 390.39423}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1527"
-        Content-Type:
-          - application/json
-        Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
-        Via:
-          - 1.1 42e027e0a25dba57ed6be490a4389144.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - ydrJVuRAX8ZMxoAYib4k1zBS7CKjWTyPy9dZTCoYN7k5OkoD2KtJIQ==
-        X-Amz-Cf-Pop:
-          - SFO53-P7
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - PKejVH5AvHcEHKA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1527"
-        x-amzn-Remapped-Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - a2f26bf0-dc49-4971-bda9-9a666c8c9c8c
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: ""
+      body: null
       headers:
         accept:
           - "*/*"
@@ -1503,36 +1458,35 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works/10.1016%2Fj.xgen.2025.100814/transform/application/x-bibtex
+      uri: https://api.crossref.org/works/10.1038%2Fs42256-024-00832-8/transform/application/x-bibtex
     response:
       body:
         string:
-          " @article{Herger_2025, title={High-throughput screening of human genetic
-          variants by pooled prime editing}, volume={5}, ISSN={2666-979X}, url={http://dx.doi.org/10.1016/j.xgen.2025.100814},
-          DOI={10.1016/j.xgen.2025.100814}, number={4}, journal={Cell Genomics}, publisher={Elsevier
-          BV}, author={Herger, Michael and Kajba, Christina M. and Buckley, Megan and
-          Cunha, Ana and Strom, Molly and Findlay, Gregory M.}, year={2025}, month=apr,
-          pages={100814} }
-
-          "
+          " @article{M_Bran_2024, title={Augmenting large language models with
+          chemistry tools}, volume={6}, ISSN={2522-5839}, url={http://dx.doi.org/10.1038/s42256-024-00832-8},
+          DOI={10.1038/s42256-024-00832-8}, number={5}, journal={Nature Machine Intelligence},
+          publisher={Springer Science and Business Media LLC}, author={M. Bran, Andres
+          and Cox, Sam and Schilter, Oliver and Baldassari, Carlo and White, Andrew
+          D. and Schwaller, Philippe}, year={2024}, month=may, pages={525\u2013535}
+          }\n"
       headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
         Connection:
           - keep-alive
         Date:
-          - Mon, 11 Aug 2025 23:07:28 GMT
+          - Tue, 23 Sep 2025 23:00:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
           - chunked
-        access-control-allow-headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        access-control-allow-origin:
-          - "*"
-        access-control-expose-headers:
-          - Link
         permissions-policy:
           - interest-cohort=()
-        server:
-          - Jetty(9.4.40.v20210413)
         x-api-pool:
           - plus
         x-rate-limit-interval:
