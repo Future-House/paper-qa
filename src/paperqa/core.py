@@ -143,7 +143,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
     skip_citation_strip: bool = False,
     evidence_text_only_fallback: bool = False,
     _prior_attempt: LLMBadContextJSONError | None = None,
-) -> tuple[Context, list[LLMResult]]:
+) -> tuple[Context | None, list[LLMResult]]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
     The parser should at least return a dict with `summary`. A `relevant_score` will be used and any
@@ -241,6 +241,16 @@ async def _map_fxn_summary(  # noqa: PLR0912
             used_text_only_fallback = True
         llm_results.append(llm_result)
         context = llm_result.text or ""
+
+        # before trying anything, let's see
+        # if we received a potential "short-circuit" NA response
+        if (
+            context.strip().lower()
+            in {"n/a", "na", "not applicable", "none", "not relevant"}
+            or not context.strip()
+        ):
+            return None, llm_results
+
         try:
             result_data = parser(context) if parser else {}
         except ValueError as exc:
