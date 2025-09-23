@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import os
 import shutil
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
+import httpx_aiohttp
 import pytest
 from dotenv import load_dotenv
 from lmi.utils import (
@@ -139,3 +140,26 @@ def stub_data_dir_w_near_dupes(stub_data_dir: Path, tmp_path: Path) -> Iterator[
 
     if tmp_path.exists():
         shutil.rmtree(tmp_path, ignore_errors=True)
+
+
+class PreReadCompatibleAiohttpResponseStream(
+    httpx_aiohttp.transport.AiohttpResponseStream
+):
+    """aiohttp-backed response stream that works if the response was pre-read."""
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        with httpx_aiohttp.transport.map_aiohttp_exceptions():
+            if self._aiohttp_response._body is not None:
+                # Happens if some intermediary called `await _aiohttp_response.read()`
+                # TODO: take into account chunk size
+                yield self._aiohttp_response._body
+            else:
+                async for chunk in self._aiohttp_response.content.iter_chunked(
+                    self.CHUNK_SIZE
+                ):
+                    yield chunk
+
+
+# Permanently patch the original response stream,
+# to work around https://github.com/karpetrosyan/httpx-aiohttp/issues/23
+httpx_aiohttp.transport.AiohttpResponseStream = PreReadCompatibleAiohttpResponseStream  # type: ignore[misc]
