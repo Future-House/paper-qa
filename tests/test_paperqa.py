@@ -528,7 +528,8 @@ async def test_evidence(docs_fixture: Docs) -> None:
 async def test_json_evidence(docs_fixture: Docs) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
-    settings.prompts.summary_json_system = (
+    assert isinstance(settings.prompts.summary_json, list)
+    settings.prompts.summary_json[0] = (
         "Provide a summary of the excerpt that could help answer the question based on"
         " the excerpt. The excerpt may be irrelevant. Do not directly answer the"
         " question - only summarize relevant information.  Respond with the following"

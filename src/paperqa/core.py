@@ -136,7 +136,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
     text: Text,
     question: str,
     summary_llm_model: LLMModel | None,
-    prompt_templates: tuple[str, str] | None,
+    prompt_templates: tuple[str | list[str], str] | None,
     extra_prompt_data: dict[str, str] | None = None,
     parser: Callable[[str], dict[str, Any]] | None = None,
     callbacks: Sequence[Callable[[str], None]] | None = None,
@@ -154,8 +154,9 @@ async def _map_fxn_summary(  # noqa: PLR0912
         text: The text to parse.
         question: The question to use for summarization.
         summary_llm_model: The LLM model to use for generating summaries.
-        prompt_templates: Optional two-elements tuple containing templates for the user and system prompts.
-            prompt_templates = (user_prompt_template, system_prompt_template)
+        prompt_templates: Optional two-tuple containing
+            the user prompt template(s) and a system prompt.
+            prompt_templates = (user_prompt_template(s), system_prompt_template)
         extra_prompt_data: Optional extra data to pass to the prompt template.
         parser: Optional parser function to parse LLM output into structured data.
             Should return dict with at least 'summary' field.
@@ -202,13 +203,27 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 else cleaned_text
             ),
         } | (extra_prompt_data or {})
-        message_prompt, system_prompt = (pt.format(**data) for pt in prompt_templates)
+        user_msg_prompts: list[str] = (
+            [prompt_templates[0].format(**data)]
+            if isinstance(prompt_templates[0], str)
+            else [pt.format(**data) for pt in prompt_templates[0]]
+        )
+        system_msg = Message(role="system", content=prompt_templates[1])
+        prepend_msgs = (
+            [
+                system_msg,
+                *(Message(content=m) for m in user_msg_prompts[:-1]),
+            ]
+            if len(user_msg_prompts) > 1
+            else [system_msg]
+        )
+        msg_with_media_prompt = user_msg_prompts[-1]
         try:
             llm_result = await summary_llm_model.call_single(
                 messages=[
-                    Message(role="system", content=system_prompt),
+                    *prepend_msgs,
                     Message.create_message(
-                        text=message_prompt,
+                        text=msg_with_media_prompt,
                         images=(
                             [i.to_image_url() for i in text.media]
                             if text.media
@@ -231,8 +246,8 @@ async def _map_fxn_summary(  # noqa: PLR0912
             )
             llm_result = await summary_llm_model.call_single(
                 messages=[
-                    Message(role="system", content=system_prompt),
-                    Message(content=message_prompt),
+                    *prepend_msgs,
+                    Message(content=msg_with_media_prompt),
                     *append_msgs,
                 ],
                 callbacks=callbacks,

@@ -927,15 +927,14 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.chunking_algorithm`                 | `ChunkingOptions.SIMPLE_OVERLAP`       | Algorithm for chunking.                                                                                 |
 | `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                 |
 | `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                          |
-| `prompt.summary`                             | `summary_prompt`                       | Template for summarizing text, must contain variables matching `summary_prompt`.                        |
+| `prompt.summary`                             | `summary_prompt`                       | User prompt template(s) to use when generating contextual summaries.                                    |
 | `prompt.qa`                                  | `qa_prompt`                            | Template for QA, must contain variables matching `qa_prompt`.                                           |
 | `prompt.select`                              | `select_paper_prompt`                  | Template for selecting papers, must contain variables matching `select_paper_prompt`.                   |
 | `prompt.pre`                                 | `None`                                 | Optional pre-prompt templated with just the original question to append information before a qa prompt. |
 | `prompt.post`                                | `None`                                 | Optional post-processing prompt that can access PQASession fields.                                      |
-| `prompt.system`                              | `default_system_prompt`                | System prompt for the model.                                                                            |
+| `prompt.system`                              | `default_system_prompt`                | System prompt to use when generating contextual summaries and answers.                                  |
 | `prompt.use_json`                            | `True`                                 | Whether to use JSON formatting.                                                                         |
-| `prompt.summary_json`                        | `summary_json_prompt`                  | JSON-specific summary prompt.                                                                           |
-| `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
+| `prompt.summary_json`                        | `summary_json_prompt`                  | JSON-specific user prompt template(s) to use when generating contextual summaries.                      |
 | `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
 | `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
 | `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | Model to use for agent making tool selections.                                                          |

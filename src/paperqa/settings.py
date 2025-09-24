@@ -371,7 +371,13 @@ class PromptSettings(BaseModel):
     # SEE: https://nwtc.libguides.com/citations/MLA#s-lg-box-707489
     EXAMPLE_CITATION: ClassVar[str] = "(pqac-0f650d59)"
 
-    summary: str = summary_prompt
+    summary: str | list[str] = Field(
+        default=summary_prompt,
+        description=(
+            "User prompt template(s) to use when generating contextual summaries."
+            " Must contain variables matching the default argument `summary_prompt`."
+        ),
+    )
     qa: str = qa_prompt
     answer_iteration_prompt: str | None = Field(
         default=answer_iteration_prompt_template,
@@ -392,13 +398,25 @@ class PromptSettings(BaseModel):
         ),
     )
     post: str | None = None
-    system: str = default_system_prompt
+    system: str = Field(
+        default=default_system_prompt,
+        description="System prompt to use when generating contextual summaries and answers.",
+    )
     use_json: bool = True
     # Not thrilled about this model,
     # but need to split out the system/summary
     # to get JSON
-    summary_json: str = include_text_prompt_template
-    summary_json_system: str = summary_json_system_prompt
+    summary_json: str | list[str] = Field(
+        default_factory=lambda: [
+            summary_json_system_prompt,
+            include_text_prompt_template,
+        ],
+        description=(
+            "JSON-specific user prompt template(s) to use"
+            " when generating contextual summaries."
+            " Must contain variables matching the default argument `summary_prompt`."
+        ),
+    )
     context_outer: str = Field(
         default=CONTEXT_OUTER_PROMPT,
         description="Prompt for how to format all contexts in generate answer.",
