@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Any
 
 import httpx
+import httpx_aiohttp
 from lmi.utils import gather_with_concurrency
 from tenacity import (
     before_sleep_log,
@@ -260,7 +261,7 @@ async def add_clinical_trials_to_docs(
     ssl_context.maximum_version = ssl.TLSVersion.TLSv1_2
     # Cookies are not needed
     _client = (
-        httpx.AsyncClient(timeout=10.0, verify=ssl_context)
+        httpx_aiohttp.HttpxAiohttpClient(timeout=10.0, verify=ssl_context)
         if client is None
         else client
     )

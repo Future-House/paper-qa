@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Collection, Coroutine, Sequence
 from typing import Any, TypeAlias, cast
 
 import httpx
+import httpx_aiohttp
 from lmi.utils import gather_with_concurrency
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -155,7 +156,7 @@ class DocMetadataClient:
     async def query(self, **kwargs) -> DocDetails | None:
 
         client = (
-            httpx.AsyncClient(timeout=10.0)
+            httpx_aiohttp.HttpxAiohttpClient(timeout=10.0)
             if self._http_client is None
             else self._http_client
         )

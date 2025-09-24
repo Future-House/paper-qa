@@ -11,6 +11,7 @@ from typing import Any, ClassVar
 
 import anyio
 import httpx
+import httpx_aiohttp
 from pydantic import ValidationError
 from rich.progress import (
     BarColumn,
@@ -128,7 +129,7 @@ async def download_file(
                         progress.update(task_id, advance=len(chunk))
 
     if client is None:
-        async with httpx.AsyncClient() as client:  # noqa: PLR1704
+        async with httpx_aiohttp.HttpxAiohttpClient() as client:  # noqa: PLR1704
             await download(client)
     else:
         await download(client)

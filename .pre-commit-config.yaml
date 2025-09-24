@@ -8,7 +8,9 @@ repos:
         exclude: |
           (?x)^(
             src/paperqa/clients/client_data.*|
-            tests/stub_data.*
+            tests/stub_data.*|
+            tests/cassettes.*|
+            uv\.lock
           )$
       - id: check-case-conflict
       - id: check-merge-conflict

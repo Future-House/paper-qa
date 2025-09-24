@@ -29,6 +29,7 @@ dependencies = [
     "fhlmi>=0.25.4",  # For LLM reasoning
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
+    "httpx-aiohttp",
     "numpy",
     "paper-qa-pypdf",  # TODO: after https://peps.python.org/pep-0771/, make this opt-out if 'pymupdf' extra is specified`
     "pybtex",
@@ -58,7 +59,7 @@ dev = [
     "fhlmi>=0.28",  # For update_litellm_max_callbacks convenience
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.68,<1.71",  # Lower pin for PydanticDeprecatedSince20 fixes, upper pin for VCR cassette breaks (https://github.com/BerriAI/litellm/issues/11724)
+    "litellm>=1.71",  # Lower pin for aiohttp transport adoption
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
     "pre-commit>=3.4",  # Pin to keep recent
@@ -198,6 +199,7 @@ module = [
     "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
     "pypdfium2",  # SEE: https://github.com/pypdfium2-team/pypdfium2/issues/367
     "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
+    "vcr.*",  # SEE: https://github.com/kevin1024/vcrpy/issues/780
 ]
 
 [tool.pylint]

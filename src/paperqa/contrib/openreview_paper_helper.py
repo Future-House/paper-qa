@@ -6,6 +6,7 @@ from typing import Any
 
 import anyio
 import httpx
+import httpx_aiohttp
 from aviary.core import Message
 from lmi import LiteLLMModel
 from pydantic import BaseModel, Field
@@ -132,7 +133,7 @@ class OpenReviewPaperHelper:
     async def _download_pdf(self, submission: Any) -> bool:
         """Download a single PDF."""
         pdf_link = f"https://openreview.net/{submission.content['pdf']['value']}"
-        async with httpx.AsyncClient() as client:
+        async with httpx_aiohttp.HttpxAiohttpClient() as client:
             response = await client.get(pdf_link)
         if response.status_code == httpx.codes.OK.value:
             async with await anyio.open_file(
