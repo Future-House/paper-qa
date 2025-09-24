@@ -137,7 +137,7 @@ class LLMBadContextJSONError(LLMContextError):
     """Retryable exception for when the LLM gives back bad JSON."""
 
     retryable = True
-    error_log = (
+    help_message = (
         "Abandoning this context creation."
         " Your model may not be capable of supporting JSON output"
         " or our parsing technique could use some work. Try"
@@ -151,7 +151,7 @@ class LLMContextTimeoutError(LLMContextError):
     """Non-retryable exception for when the LLM call times out."""
 
     retryable = False
-    error_log = (
+    help_message = (
         "Timeout when creating a context, abandoning it."
         " If you see this error frequently, consider increasing the timeout in"
         " Settings(summary_llm_config=...). Or, feel free to just ignore this message,"
