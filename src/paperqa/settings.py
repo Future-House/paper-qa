@@ -58,10 +58,10 @@ from paperqa.prompts import (
     default_system_prompt,
     env_reset_prompt,
     env_system_prompt,
+    include_text_prompt_template,
     qa_prompt,
     select_paper_prompt,
     structured_citation_prompt,
-    summary_json_prompt,
     summary_json_system_prompt,
     summary_prompt,
 )
@@ -397,7 +397,7 @@ class PromptSettings(BaseModel):
     # Not thrilled about this model,
     # but need to split out the system/summary
     # to get JSON
-    summary_json: str = summary_json_prompt
+    summary_json: str = include_text_prompt_template
     summary_json_system: str = summary_json_system_prompt
     context_outer: str = Field(
         default=CONTEXT_OUTER_PROMPT,
