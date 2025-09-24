@@ -126,7 +126,7 @@ def llm_parse_json(text: str) -> dict[str, JsonValue]:
 
 class LLMContextError(ValueError):
     retryable: ClassVar[bool]
-    error_log: ClassVar[str]
+    help_message: ClassVar[str]  # Eventually passed to logger.exception
 
     def __init__(self, message: str, llm_results: list[LLMResult]) -> None:
         super().__init__(message)
@@ -138,7 +138,7 @@ class LLMBadContextJSONError(LLMContextError):
 
     retryable = True
     error_log = (
-        "Abandoning this context."
+        "Abandoning this context creation."
         " Your model may not be capable of supporting JSON output"
         " or our parsing technique could use some work. Try"
         " a different model or specify `Settings(prompts={'use_json': False})`."
@@ -270,7 +270,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 used_text_only_fallback = True
         except litellm.Timeout as exc:
             raise LLMContextTimeoutError(
-                f"LLM call to create a context timed out on text named {text.name!r}: {exc}",
+                f"LLM call to create a context timed out on text named {text.name!r}.",
                 llm_results=llm_results,
             ) from exc
 
@@ -362,11 +362,11 @@ async def map_fxn_summary(**kwargs) -> tuple[Context | None, list[LLMResult]]:
     except LLMContextError as exc:
         if not exc.retryable:
             logger.exception(
-                "Non-retryable failure creating a context. %s", exc.error_log
+                "Non-retryable failure creating a context. %s", exc.help_message
             )
             return None, exc.llm_results
         try:
             return await _map_fxn_summary(**kwargs, _prior_attempt=exc)
         except LLMContextError as exc2:
-            logger.exception("Failed twice to create a context. %s", exc2.error_log)
+            logger.exception("Failed twice to create a context. %s", exc2.help_message)
             return None, exc2.llm_results
