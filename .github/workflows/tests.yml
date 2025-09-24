@@ -23,11 +23,10 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: echo "UV_PROJECT_ENVIRONMENT=$(python -c "import sysconfig; print(sysconfig.get_config_var('prefix'))")" >> $GITHUB_ENV
-      - run: uv python pin ${{ matrix.python-version }} # uv requires .python-version to match OS Python: https://github.com/astral-sh/uv/issues/11389
-      - run: uv sync --python-preference only-system
-      - run: git checkout .python-version # For clean git diff given `pre-commit run --show-diff-on-failure`
-      - uses: pre-commit/action@v3.0.1
+          python-version: ${{ matrix.python-version }}
+          activate-environment: true # Activate for simple `uv sync` below
+      - run: uv sync
+      - uses: j178/prek-action@v1
       - uses: pre-commit-ci/lite-action@v1.1.0
         if: always()
   lint:
@@ -40,7 +39,9 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv python pin ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
+      - name: Unset UV_PYTHON for BAIPP # SEE: https://github.com/hynek/build-and-inspect-python-package/issues/180
+        run: echo "UV_PYTHON=" >> "$GITHUB_ENV"
       - name: Check paper-qa-pymupdf build
         id: build-paper-qa-pymupdf
         if: matrix.python-version == '3.11'
@@ -70,7 +71,9 @@ jobs:
       - name: Clean up paper-qa build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         if: matrix.python-version == '3.11'
         run: rm -r ${{ steps.build-paper-qa.outputs.dist }}
-      - run: uv sync --python-preference=only-managed
+      - name: Reset UV_PYTHON after BAIPP # SEE: https://github.com/hynek/build-and-inspect-python-package/issues/180
+        run: echo "UV_PYTHON=${{ matrix.python-version }}" >> "$GITHUB_ENV"
+      - run: uv sync
       - run: uv run pylint src packages
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
   test:
@@ -83,8 +86,8 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv python pin ${{ matrix.python-version }}
-      - run: uv sync --python-preference=only-managed
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync
       - run: uv run pytest -n auto
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
