@@ -403,9 +403,6 @@ class PromptSettings(BaseModel):
         description="System prompt to use when generating contextual summaries and answers.",
     )
     use_json: bool = True
-    # Not thrilled about this model,
-    # but need to split out the system/summary
-    # to get JSON
     summary_json: str | list[str] = Field(
         default_factory=lambda: [
             summary_json_system_prompt,
