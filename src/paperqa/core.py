@@ -362,14 +362,11 @@ async def map_fxn_summary(**kwargs) -> tuple[Context | None, list[LLMResult]]:
     except LLMContextError as exc:
         if not exc.retryable:
             logger.exception(
-                "Non-retryable failure creating a context. "  # noqa: G003
-                + exc.error_log
+                "Non-retryable failure creating a context. %s", exc.error_log
             )
             return None, exc.llm_results
         try:
             return await _map_fxn_summary(**kwargs, _prior_attempt=exc)
         except LLMContextError as exc2:
-            logger.exception(
-                "Failed twice to create a context. " + exc2.error_log  # noqa: G003
-            )
+            logger.exception("Failed twice to create a context. %s", exc2.error_log)
             return None, exc2.llm_results
