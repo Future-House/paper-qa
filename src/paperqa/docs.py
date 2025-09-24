@@ -666,8 +666,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                         summary_llm_model=summary_llm_model,
                         prompt_templates=prompt_templates,
                         extra_prompt_data={
-                            "summary_length": answer_config.evidence_summary_length,
-                            "citation": f"{m.name}: {m.doc.formatted_citation}",
+                            "summary_length": answer_config.evidence_summary_length
                         },
                         parser=llm_parse_json if prompt_config.use_json else None,
                         callbacks=callbacks,
