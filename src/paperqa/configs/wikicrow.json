@@ -36,8 +36,10 @@
     "post": null,
     "system": "Answer in a direct and concise tone.",
     "use_json": true,
-    "summary_json": "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\n",
-    "summary_json_system": "Provide a summary of the relevant information that could help answer the question based on the excerpt. The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. \n\nRespond with the following JSON format:\n\n{{\n  \"summary\": \"...\",\n  \"relevance_score\": \"...\",\n  \"gene_name: \"...\"\n}}\n\nwhere `summary` is relevant information from text - {summary_length}, \n`gene_name` is the gene discussed in the excerpt (may be different than query), and `relevance_score` is the relevance of `summary` to answer the question (integer out of 10)"
+    "summary_json": [
+      "Provide a summary of the relevant information that could help answer the question based on the excerpt. The excerpt may be irrelevant. Do not directly answer the question - only summarize relevant information. \n\nRespond with the following JSON format:\n\n{{\n  \"summary\": \"...\",\n  \"relevance_score\": \"...\",\n  \"gene_name: \"...\"\n}}\n\nwhere `summary` is relevant information from text - {summary_length}, \n`gene_name` is the gene discussed in the excerpt (may be different than query), and `relevance_score` is the relevance of `summary` to answer the question (integer out of 10)",
+      "Excerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}"
+    ]
   },
   "agent": {
     "agent_llm": "gpt-4-turbo-2024-04-09",
