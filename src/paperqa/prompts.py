@@ -7,9 +7,10 @@ summary_prompt = (
     " answer the question, instead summarize to give evidence to help answer the"
     " question. Stay detailed; report specific numbers, equations, or direct quotes"
     ' (marked with quotation marks). Reply "Not applicable" if the excerpt is'
-    " irrelevant. At the end of your response, provide an integer score from 1-10 on a"
-    " newline indicating relevance to question. Do not explain your score.\n\nRelevant"
-    " Information Summary ({summary_length}):"
+    " irrelevant. At the end of your response,"
+    "provide an integer score from 1-10 on a newline indicating relevance to question."  # Don't use 0-10 since we mention "not applicable" instead  # noqa: E501
+    " Do not explain your score."
+    "\n\nRelevant Information Summary ({summary_length}):"
 )
 # This prompt template integrates with `text` variable of the above `summary_prompt`
 text_with_tables_prompt_template = (
