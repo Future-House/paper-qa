@@ -524,8 +524,9 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     result = response.session
     assert len(result.answer) > 200, "Answer did not return any results"
     assert "###" in result.answer, "Answer did not propagate system prompt"
+    # Subtract 2 to allow tolerance for chunks with leading/trailing whitespace
     assert (
-        len(result.contexts[0].context) == agent_test_settings.parsing.chunk_size
+        len(result.contexts[0].context) >= agent_test_settings.parsing.chunk_size - 2
     ), "Summary was not skipped"
 
 
