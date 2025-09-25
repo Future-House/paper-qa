@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, ClassVar
 
 import litellm
 from aviary.core import Message
@@ -124,12 +124,40 @@ def llm_parse_json(text: str) -> dict[str, JsonValue]:
     return data
 
 
-class LLMBadContextJSONError(ValueError):
-    """Retryable exception for when the LLM gives back bad JSON."""
+class LLMContextError(ValueError):
+    retryable: ClassVar[bool]
+    help_message: ClassVar[str]  # Eventually passed to logger.exception
 
     def __init__(self, message: str, llm_results: list[LLMResult]) -> None:
         super().__init__(message)
         self.llm_results = llm_results  # House so we can cost track across retries
+
+
+class LLMBadContextJSONError(LLMContextError):
+    """Retryable exception for when the LLM gives back bad JSON."""
+
+    retryable = True
+    help_message = (
+        "Abandoning this context creation."
+        " Your model may not be capable of supporting JSON output"
+        " or our parsing technique could use some work. Try"
+        " a different model or specify `Settings(prompts={'use_json': False})`."
+        " Or, feel free to just ignore this message, as many contexts are"
+        " concurrently made and we're not attached to any one given context."
+    )
+
+
+class LLMContextTimeoutError(LLMContextError):
+    """Non-retryable exception for when the LLM call times out."""
+
+    retryable = False
+    help_message = (
+        "Timeout when creating a context, abandoning it."
+        " If you see this error frequently, consider increasing the timeout in"
+        " Settings(summary_llm_config=...). Or, feel free to just ignore this message,"
+        " as many contexts are concurrently made and we're not attached to any one"
+        " given context."
+    )
 
 
 async def _map_fxn_summary(  # noqa: PLR0912
@@ -142,7 +170,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
     callbacks: Sequence[Callable[[str], None]] | None = None,
     skip_citation_strip: bool = False,
     evidence_text_only_fallback: bool = False,
-    _prior_attempt: LLMBadContextJSONError | None = None,
+    _prior_attempt: LLMContextError | None = None,
 ) -> tuple[Context, list[LLMResult]]:
     """Parses the given text and returns a context object with the parser and prompt runner.
 
@@ -204,41 +232,48 @@ async def _map_fxn_summary(  # noqa: PLR0912
         } | (extra_prompt_data or {})
         message_prompt, system_prompt = (pt.format(**data) for pt in prompt_templates)
         try:
-            llm_result = await summary_llm_model.call_single(
-                messages=[
-                    Message(role="system", content=system_prompt),
-                    Message.create_message(
-                        text=message_prompt,
-                        images=(
-                            [i.to_image_url() for i in text.media]
-                            if text.media
-                            else None
+            try:
+                llm_result = await summary_llm_model.call_single(
+                    messages=[
+                        Message(role="system", content=system_prompt),
+                        Message.create_message(
+                            text=message_prompt,
+                            images=(
+                                [i.to_image_url() for i in text.media]
+                                if text.media
+                                else None
+                            ),
                         ),
-                    ),
-                    *append_msgs,
-                ],
-                callbacks=callbacks,
-                name="evidence:" + text.name,
-            )
-        except litellm.BadRequestError as exc:
-            if not evidence_text_only_fallback:
-                raise
-            logger.warning(
-                f"LLM call to create a context failed with exception {exc!r}"
-                f" on text named {text.name!r}"
-                f" with doc name {text.doc.docname!r} and doc key {text.doc.dockey!r}."
-                f" Retrying without media."
-            )
-            llm_result = await summary_llm_model.call_single(
-                messages=[
-                    Message(role="system", content=system_prompt),
-                    Message(content=message_prompt),
-                    *append_msgs,
-                ],
-                callbacks=callbacks,
-                name="evidence:" + text.name,
-            )
-            used_text_only_fallback = True
+                        *append_msgs,
+                    ],
+                    callbacks=callbacks,
+                    name="evidence:" + text.name,
+                )
+            except litellm.BadRequestError as exc:
+                if not evidence_text_only_fallback:
+                    raise
+                logger.warning(
+                    f"LLM call to create a context failed with exception {exc!r}"
+                    f" on text named {text.name!r}"
+                    f" with doc name {text.doc.docname!r} and doc key {text.doc.dockey!r}."
+                    f" Retrying without media."
+                )
+                llm_result = await summary_llm_model.call_single(
+                    messages=[
+                        Message(role="system", content=system_prompt),
+                        Message(content=message_prompt),
+                        *append_msgs,
+                    ],
+                    callbacks=callbacks,
+                    name="evidence:" + text.name,
+                )
+                used_text_only_fallback = True
+        except litellm.Timeout as exc:
+            raise LLMContextTimeoutError(
+                f"LLM call to create a context timed out on text named {text.name!r}.",
+                llm_results=llm_results,
+            ) from exc
+
         llm_results.append(llm_result)
         context = llm_result.text or ""
         try:
@@ -281,8 +316,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 score = extract_score(context)
             except ValueError as exc:
                 raise LLMBadContextJSONError(
-                    f"Extracting score from raw context {context!r}"
-                    f" failed due to: {exc}",
+                    f"Extracting score from raw context {context!r} failed due to: {exc}",
                     llm_results=llm_results,
                 ) from exc
     else:
@@ -325,16 +359,14 @@ async def map_fxn_summary(**kwargs) -> tuple[Context | None, list[LLMResult]]:
         )
     try:
         return await _map_fxn_summary(**kwargs)
-    except LLMBadContextJSONError as exc:
+    except LLMContextError as exc:
+        if not exc.retryable:
+            logger.exception(
+                "Non-retryable failure creating a context. %s", exc.help_message
+            )
+            return None, exc.llm_results
         try:
             return await _map_fxn_summary(**kwargs, _prior_attempt=exc)
-        except LLMBadContextJSONError as exc2:
-            logger.exception(
-                "Failed twice to create a context, abandoning it."
-                " Your model may not be capable of supporting JSON output"
-                " or our parsing technique could use some work. Try"
-                " a different model or specify `Settings(prompts={'use_json': False})`."
-                " Or, feel free to just ignore this message, as many contexts are"
-                " concurrently made and we're not attached to any one given context."
-            )
+        except LLMContextError as exc2:
+            logger.exception("Failed twice to create a context. %s", exc2.help_message)
             return None, exc2.llm_results
