@@ -30,6 +30,7 @@ from pydantic import (
     Field,
     JsonValue,
     PlainSerializer,
+    StringConstraints,
     computed_field,
     field_validator,
     model_validator,
@@ -192,7 +193,9 @@ class Context(BaseModel):
         description="Unique identifier for the context. Auto-generated if not provided.",
     )
 
-    context: str = Field(description="Summary of the text with respect to a question.")
+    context: Annotated[str, StringConstraints(min_length=1, strip_whitespace=True)] = (
+        Field(description="Summary of the text with respect to a question.")
+    )
     question: str | None = Field(
         default=None,
         description=(
