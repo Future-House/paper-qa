@@ -276,14 +276,14 @@ async def _map_fxn_summary(  # noqa: PLR0912
 
         llm_results.append(llm_result)
         context = llm_result.text or ""
-        try:
-            result_data = parser(context) if parser else {}
-        except ValueError as exc:
-            raise LLMBadContextJSONError(
-                f"Failed to parse JSON from context {context!r} due to: {exc}",
-                llm_results=llm_results,
-            ) from exc
-        if result_data:
+        if parser:
+            try:
+                result_data = parser(context)
+            except ValueError as exc:
+                raise LLMBadContextJSONError(
+                    f"Failed to parse JSON from context {context!r} due to: {exc}",
+                    llm_results=llm_results,
+                ) from exc
             try:
                 context = result_data.pop("summary")
                 try:
