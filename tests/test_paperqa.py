@@ -110,10 +110,7 @@ def test_multiple_authors() -> None:
 
 
 def test_multiple_citations() -> None:
-    text = (
-        "As discussed by several authors (Smith et al. 1999; Johnson 2001; Lee et al."
-        " 2003)."
-    )
+    text = "As discussed by several authors (Smith et al. 1999; Johnson 2001; Lee et al. 2003)."
     assert strip_citations(text) == "As discussed by several authors ."
 
 
@@ -626,7 +623,6 @@ async def test_query(docs_fixture) -> None:
 
 @pytest.mark.asyncio
 async def test_custom_context_str_fn(docs_fixture) -> None:
-
     async def custom_context_str_fn(  # noqa: RUF029
         settings: Settings,  # noqa: ARG001
         contexts: list[Context],  # noqa: ARG001
@@ -652,7 +648,6 @@ async def test_custom_context_str_fn(docs_fixture) -> None:
 
 @pytest.mark.asyncio
 async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
-
     session = PQASession(question="What is the relationship between chemistry and AI?")
 
     doc = Doc(docname="test_doc", citation="Test Doc, 2025", dockey="key1")
@@ -739,12 +734,14 @@ async def test_query_with_iteration(docs_fixture) -> None:
     prior_session = PQASession(question=question, answer=prior_answer)
     await docs_fixture.aquery(prior_session, llm_model=llm, settings=settings)
     assert prior_answer in cast(
-        "str", my_results[-1].prompt[1].content  # type: ignore[union-attr, index]
+        "str",
+        my_results[-1].prompt[1].content,  # type: ignore[union-attr, index]
     ), "prior answer not in prompt"
     # run without a prior session to check that the flow works correctly
     await docs_fixture.aquery(question, llm_model=llm, settings=settings)
     assert settings.prompts.answer_iteration_prompt[:10] not in cast(  # type: ignore[index]
-        "str", my_results[-1].prompt[1].content  # type: ignore[union-attr, index]
+        "str",
+        my_results[-1].prompt[1].content,  # type: ignore[union-attr, index]
     ), "prior answer prompt should not be inserted"
 
 
@@ -968,7 +965,9 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         name: str = "custom/myllm"
 
         async def acompletion(
-            self, messages: list[Message], **kwargs  # noqa: ARG002
+            self,
+            messages: list[Message],
+            **kwargs,  # noqa: ARG002
         ) -> list[LLMResult]:
             return [
                 LLMResult(
@@ -982,7 +981,9 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
 
         @rate_limited
         async def acompletion_iter(
-            self, messages: list[Message], **kwargs  # noqa: ARG002
+            self,
+            messages: list[Message],
+            **kwargs,  # noqa: ARG002
         ) -> AsyncIterable[LLMResult]:
             yield LLMResult(
                 model=self.name,
@@ -1714,10 +1715,7 @@ async def test_custom_prompts(stub_data_dir: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_pre_prompt(stub_data_dir: Path) -> None:
-    pre = (
-        "What is water's boiling point in Fahrenheit? Please respond with a complete"
-        " sentence."
-    )
+    pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
 
     settings = Settings.from_name("fast")
     settings.prompts.pre = pre
@@ -2445,8 +2443,7 @@ class TestLLMParseJson:
     def test_llm_subquotes_and_newlines(self, input_text: str) -> None:
         output = {
             "summary": (
-                'An excerpt with "quoted stuff" or "maybe more." More stuff (with'
-                " parenthesis)."
+                'An excerpt with "quoted stuff" or "maybe more." More stuff (with parenthesis).'
             ),
             "relevance_score": 8,
         }
@@ -2624,7 +2621,6 @@ def test_pqa_context_id_parsing(raw_text: str, cleaned_text: str) -> None:
     assert session.answer == cleaned_text
 
 
-@pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
 async def test_timeout_resilience() -> None:
     model_name = CommonLLMNames.ANTHROPIC_TEST.value
