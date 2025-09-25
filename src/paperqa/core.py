@@ -333,6 +333,14 @@ async def _map_fxn_summary(  # noqa: PLR0912
     if used_text_only_fallback:
         extras["used_images"] = False
 
+    if not context.strip():
+        raise LLMBadContextJSONError(
+            (
+                f"The context parsing process from text {llm_results[-1].text}"
+                " led to an empty context."
+            ),
+            llm_results=llm_results,
+        )
     return (
         Context(
             context=context,
