@@ -252,11 +252,12 @@ class GatherEvidence(NamedTool):
         status = state.status
         logger.info(status)
         # only show top n contexts for this particular question to the agent
-        sorted_contexts = sorted(
+        # only show non-empty context so tool response doesn't include empty contexts
+        sorted_nonempty_contexts = sorted(
             [
                 c
                 for c in state.session.contexts
-                if (c.question is None or c.question == question)
+                if ((c.question is None or c.question == question) and c.context)
             ],
             key=lambda x: x.score,
             reverse=True,
@@ -266,7 +267,7 @@ class GatherEvidence(NamedTool):
             [
                 f"{n + 1}. {sc.context}\n"
                 for n, sc in enumerate(
-                    sorted_contexts[: self.settings.agent.agent_evidence_n]
+                    sorted_nonempty_contexts[: self.settings.agent.agent_evidence_n]
                 )
             ]
         )
