@@ -682,7 +682,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             for r in llm_results:
                 session.add_tokens(r)
 
-        session.contexts += [c for c, _ in results if c is not None]
+        # Filter out failed context creations or irrelevant contexts
+        session.contexts += [c for c, _ in results if c is not None and c.score > 0]
         return session
 
     def query(

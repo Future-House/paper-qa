@@ -252,13 +252,12 @@ class GatherEvidence(NamedTool):
         status = state.status
         logger.info(status)
         # only show top n contexts for this particular question to the agent
-        # only show context above score 0, because 0 is a sentinel for irrelevance
-        sorted_relevant_contexts = sorted(
-            [
+        sorted_contexts = sorted(
+            (
                 c
                 for c in state.session.contexts
-                if ((c.question is None or c.question == question) and c.score > 0)
-            ],
+                if c.question is None or c.question == question
+            ),
             key=lambda x: x.score,
             reverse=True,
         )
@@ -267,7 +266,7 @@ class GatherEvidence(NamedTool):
             [
                 f"{n + 1}. {sc.context}\n"
                 for n, sc in enumerate(
-                    sorted_relevant_contexts[: self.settings.agent.agent_evidence_n]
+                    sorted_contexts[: self.settings.agent.agent_evidence_n]
                 )
             ]
         )
