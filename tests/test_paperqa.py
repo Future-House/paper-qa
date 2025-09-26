@@ -1623,7 +1623,7 @@ async def test_images(stub_data_dir: Path) -> None:
         if c.id in session.used_contexts and c.text.doc == districts_doc
     ]
     assert contexts_used
-    assert all(c.used_images for c in contexts_used)  # type: ignore[attr-defined]
+    assert all(bool(c.used_images) for c in contexts_used)  # type: ignore[attr-defined]
 
 
 @pytest.mark.asyncio
@@ -1685,7 +1685,7 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
         if c.id in session.used_contexts and c.text.doc == districts_doc
     ]
     assert contexts_used
-    assert all(not c.used_images for c in contexts_used)  # type: ignore[attr-defined]
+    assert all(not bool(c.used_images) for c in contexts_used)  # type: ignore[attr-defined]
 
 
 def test_zotero() -> None:
