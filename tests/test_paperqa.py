@@ -529,14 +529,17 @@ async def test_json_evidence(docs_fixture: Docs) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
     settings.prompts.summary_json_system = (
-        "Provide a summary of the excerpt that could help answer the question based on"
-        " the excerpt. The excerpt may be irrelevant. Do not directly answer the"
-        " question - only summarize relevant information.  Respond with the following"
-        ' JSON format:\n\n {{\n"summary": "...",\n"author_name":'
-        ' "...",\n"relevance_score": "..."}}\n\n where `summary` is relevant'
-        " information from text -  about 100 words words, `author_name` specifies the"
-        " author , and `relevance_score` is  the relevance of `summary` to answer the"
-        " question (integer out of 10)."
+        "Provide a summary of the relevant information"
+        " that could help answer the question based on the excerpt."
+        " Your summary, combined with many others,"
+        " will be given to the model to generate an answer."
+        " Respond with the following JSON format:"
+        '\n\n{{\n  "summary": "...",\n  "author_name": "...",\n  "relevance_score": 0-10,\n}}'
+        "\n\nwhere `summary` is relevant information from the text - about 100 words."
+        " `author_name` specifies the author."
+        " `relevance_score` is an integer 0-10 for the relevance of `summary` to the question."
+        "\n\nThe excerpt may or may not contain relevant information."
+        " If not, leave `summary` empty, and make `relevance_score` be 0."
     )
     orig_acompletion = litellm.acompletion
     has_made_bad_json_context = False
