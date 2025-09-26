@@ -25,12 +25,12 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.0
+    rev: v0.13.2
     hooks:
       - id: ruff-check
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.1.0
+    rev: 25.9.0
     hooks:
       - id: black
   - repo: https://github.com/rbubley/mirrors-prettier
@@ -48,7 +48,7 @@ repos:
       - id: codespell
         additional_dependencies: [".[toml]"]
   - repo: https://github.com/crate-ci/typos
-    rev: v1.32.0
+    rev: v1.36.3
     hooks:
       - id: typos
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -56,11 +56,11 @@ repos:
     hooks:
       - id: check-mailmap
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.09.11
+    rev: 2025.09.26
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.17
+    rev: 0.8.22
     hooks:
       - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
