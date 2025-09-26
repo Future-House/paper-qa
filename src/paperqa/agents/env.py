@@ -141,6 +141,7 @@ def make_clinical_trial_status(
     total_clinical_trials: int,
     relevant_clinical_trials: int,
     evidence_count: int,
+    relevant_evidence_count: int,
     cost: float,
 ) -> str:
     return (
@@ -148,15 +149,17 @@ def make_clinical_trial_status(
         f" | Relevant Papers={relevant_paper_count}"
         f" | Clinical Trial Count={total_clinical_trials}"
         f" | Relevant Clinical Trials={relevant_clinical_trials}"
-        f" | Current Evidence={evidence_count}"
+        f" | Evidence Count={evidence_count}"
+        f" | Relevant Evidence={relevant_evidence_count}"
         f" | Current Cost=${cost:.4f}"
     )
 
 
-# SEE: https://regex101.com/r/L0L5MH/1
+# SEE: https://regex101.com/r/L0L5MH/4
 CLINICAL_STATUS_SEARCH_REGEX_PATTERN: str = (
-    r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+)(?:\s\|\sClinical Trial"
-    r" Count=(\d+)\s\|\sRelevant Clinical Trials=(\d+))?\s\|\sCurrent Evidence=(\d+)"
+    r"Status: Paper Count=(\d+)\s\|\sRelevant Papers=(\d+)"
+    r"(?:\s\|\sClinical Trial Count=(\d+)\s\|\sRelevant Clinical Trials=(\d+))?"
+    r"\s\|\sEvidence Count=(\d+)\s\|\sRelevant Evidence=(\d+)"
 )
 
 
@@ -195,7 +198,8 @@ def clinical_trial_status(state: "EnvironmentState") -> str:
                 in getattr(c.text.doc, "other", {}).get("client_source", [])
             }
         ),
-        evidence_count=len(relevant_contexts),
+        evidence_count=len(state.session.contexts),
+        relevant_evidence_count=len(relevant_contexts),
         cost=state.session.cost,
     )
 

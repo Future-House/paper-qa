@@ -25,11 +25,17 @@ logger = logging.getLogger(__name__)
 
 
 def make_status(
-    total_paper_count: int, relevant_paper_count: int, evidence_count: int, cost: float
+    total_paper_count: int,
+    relevant_paper_count: int,
+    evidence_count: int,
+    relevant_evidence_count: int,
+    cost: float,
 ) -> str:
     return (
         f"Status: Paper Count={total_paper_count}"
-        f" | Relevant Papers={relevant_paper_count} | Current Evidence={evidence_count}"
+        f" | Relevant Papers={relevant_paper_count}"
+        f" | Evidence Count={evidence_count}"
+        f" | Relevant Evidence={relevant_evidence_count}"
         f" | Current Cost=${cost:.4f}"
     )
 
@@ -39,7 +45,8 @@ def default_status(state: "EnvironmentState") -> str:
     return make_status(
         total_paper_count=len(state.docs.docs),
         relevant_paper_count=len({c.text.doc.dockey for c in relevant_contexts}),
-        evidence_count=len(relevant_contexts),
+        evidence_count=len(state.session.contexts),
+        relevant_evidence_count=len(relevant_contexts),
         cost=state.session.cost,
     )
 
@@ -60,9 +67,10 @@ class EnvironmentState(BaseModel):
         ),
     )
 
-    # SEE: https://regex101.com/r/RmuVdC/1
+    # SEE: https://regex101.com/r/RmuVdC/3
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
-        r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+) \| Current Evidence=(\d+)"
+        r"Status: Paper Count=(\d+)\s\|\sRelevant Papers=(\d+)"
+        r"\s\|\sEvidence Count=(\d+)\s\|\sRelevant Evidence=(\d+)"
     )
 
     @computed_field  # type: ignore[prop-decorator]
@@ -350,7 +358,7 @@ class GenerateAnswer(NamedTool):
     # Use to separate answer from status
     # NOTE: can match failure to answer or an actual answer
     ANSWER_SPLIT_REGEX_PATTERN: ClassVar[str] = (
-        r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
+        r"\s\|\s" + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
     @classmethod
@@ -359,7 +367,7 @@ class GenerateAnswer(NamedTool):
         answer, *rest = re.split(
             pattern=cls.ANSWER_SPLIT_REGEX_PATTERN, string=content, maxsplit=1
         )
-        return answer if len(rest) == 4 else ""  # noqa: PLR2004
+        return answer if len(rest) == 5 else ""  # noqa: PLR2004
 
 
 class Reset(NamedTool):
@@ -383,7 +391,7 @@ class Complete(NamedTool):
 
     # Use to separate certainty from status
     CERTAINTY_SPLIT_REGEX_PATTERN: ClassVar[str] = (
-        r" \| " + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
+        r"\s\|\s" + EnvironmentState.STATUS_SEARCH_REGEX_PATTERN
     )
 
     NO_ANSWER_PHRASE: ClassVar[str] = "No answer generated."

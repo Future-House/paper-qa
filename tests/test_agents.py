@@ -397,11 +397,11 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
             " and you have already tried to answer several times,"
             " you can terminate by calling the {complete_tool_name} tool."
             " The current status of evidence/papers/cost is "
-            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Started 0  # noqa: E501
+            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, relevant_evidence_count=0, cost=0.0)}"  # Started 0  # noqa: E501
             "\n\nTool request message '' for tool calls: paper_search(query='XAI for"
             " chemical property prediction', min_year='2018', max_year='2024')"
             f" [id={memory_id}]\n\nTool response message '"
-            f"{make_status(total_paper_count=2, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Found 2  # noqa: E501
+            f"{make_status(total_paper_count=2, relevant_paper_count=0, evidence_count=0, relevant_evidence_count=0, cost=0.0)}"  # Found 2  # noqa: E501
             f"' for tool call ID {memory_id} of tool 'paper_search'"
         ),
         input=(
@@ -412,7 +412,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
             " and you have already tried to answer several times,"
             " you can terminate by calling the {complete_tool_name} tool."
             " The current status of evidence/papers/cost is "
-            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"
+            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, relevant_evidence_count=0, cost=0.0)}"  # noqa: E501
         ),
         output=(
             "Tool request message '' for tool calls: paper_search(query='XAI for"
