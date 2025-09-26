@@ -262,9 +262,9 @@ class GatherEvidence(NamedTool):
             reverse=True,
         )
 
-        top_contexts = "\n".join(
+        top_contexts = "\n\n".join(
             [
-                f"{n + 1}. {sc.context}\n"
+                f"- {sc.context}"
                 for n, sc in enumerate(
                     sorted_contexts[: self.settings.agent.agent_evidence_n]
                 )
