@@ -580,7 +580,7 @@ async def test_json_evidence(docs_fixture: Docs) -> None:
 
 
 @pytest.mark.asyncio
-async def test_ablations(docs_fixture) -> None:
+async def test_ablations(docs_fixture: Docs) -> None:
     settings = Settings()
     settings.answer.evidence_skip_summary = True
     settings.answer.evidence_retrieval = False
@@ -592,7 +592,9 @@ async def test_ablations(docs_fixture) -> None:
             settings=settings,
         )
     ).contexts
-    assert contexts[0].text.text == contexts[0].context, "summarization not ablated"
+    assert (
+        contexts[0].text.text.strip() == contexts[0].context
+    ), "summarization not ablated"
 
     assert len(contexts) == len(docs_fixture.texts), "evidence retrieval not ablated"
 

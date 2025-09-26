@@ -64,7 +64,6 @@ class EnvironmentState(BaseModel):
     STATUS_SEARCH_REGEX_PATTERN: ClassVar[str] = (
         r"Status: Paper Count=(\d+) \| Relevant Papers=(\d+) \| Current Evidence=(\d+)"
     )
-    RELEVANT_SCORE_CUTOFF: ClassVar[int] = 5
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -73,9 +72,12 @@ class EnvironmentState(BaseModel):
             return self.status_fn(cast("Self", self))
         return default_status(self)
 
-    def get_relevant_contexts(self) -> list[Context]:
+    def get_relevant_contexts(self, score_threshold: int | None = 0) -> list[Context]:
+        """Get all contexts whose score is above (exclusive) of the input threshold."""
         return [
-            c for c in self.session.contexts if c.score > self.RELEVANT_SCORE_CUTOFF
+            c
+            for c in self.session.contexts
+            if score_threshold is None or c.score > score_threshold
         ]
 
     def record_action(self, action: ToolRequestMessage) -> None:
@@ -226,7 +228,6 @@ class GatherEvidence(NamedTool):
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
         original_question = state.session.question
         l1 = l0 = len(state.session.contexts)
-        l1_relevant = l0_relevant = len(state.get_relevant_contexts())
 
         try:
             # Swap out the question with the more specific question
@@ -245,18 +246,18 @@ class GatherEvidence(NamedTool):
                 ),
             )
             l1 = len(state.session.contexts)
-            l1_relevant = len(state.get_relevant_contexts())
         finally:
             state.session.question = original_question
 
         status = state.status
         logger.info(status)
         # only show top n contexts for this particular question to the agent
-        sorted_contexts = sorted(
+        # only show context above score 0, because 0 is a sentinel for irrelevance
+        sorted_relevant_contexts = sorted(
             [
                 c
                 for c in state.session.contexts
-                if (c.question is None or c.question == question)
+                if ((c.question is None or c.question == question) and c.score > 0)
             ],
             key=lambda x: x.score,
             reverse=True,
@@ -266,7 +267,7 @@ class GatherEvidence(NamedTool):
             [
                 f"{n + 1}. {sc.context}\n"
                 for n, sc in enumerate(
-                    sorted_contexts[: self.settings.agent.agent_evidence_n]
+                    sorted_relevant_contexts[: self.settings.agent.agent_evidence_n]
                 )
             ]
         )
@@ -283,10 +284,7 @@ class GatherEvidence(NamedTool):
                 )
             )
 
-        return (
-            f"Added {l1 - l0} pieces of evidence, {l1_relevant - l0_relevant} of which"
-            f" were relevant.{best_evidence}\n\n" + status
-        )
+        return f"Added {l1 - l0} pieces of evidence.{best_evidence}\n\n" + status
 
 
 class GenerateAnswer(NamedTool):

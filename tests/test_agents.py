@@ -524,8 +524,9 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     result = response.session
     assert len(result.answer) > 200, "Answer did not return any results"
     assert "###" in result.answer, "Answer did not propagate system prompt"
+    # Subtract 2 to allow tolerance for chunks with leading/trailing whitespace
     assert (
-        len(result.contexts[0].context) == agent_test_settings.parsing.chunk_size
+        len(result.contexts[0].context) >= agent_test_settings.parsing.chunk_size - 2
     ), "Summary was not skipped"
 
 
@@ -705,17 +706,11 @@ async def test_agent_sharing_state(
             gather_evidence_initialized_callback.assert_awaited_once_with(env_state)
             gather_evidence_completed_callback.assert_awaited_once_with(env_state)
 
-        split = re.split(
-            r"(\d+) pieces of evidence, (\d+) of which were relevant",
-            response,
-            maxsplit=1,
-        )
-        assert len(split) == 4, "Unexpected response shape"
-        total_added_1, relevant_added_1 = int(split[1]), int(split[2])
-        assert all(
-            x >= 0 for x in (total_added_1, relevant_added_1)
-        ), "Expected non-negative counts"
-        assert len(env_state.get_relevant_contexts()) == relevant_added_1
+        split = re.split(r"(\d+) pieces of evidence", response, maxsplit=1)
+        assert len(split) == 3, "Unexpected response shape"
+        total_added_1 = int(split[1])
+        assert total_added_1 > 0, "Expected non-negative added evidence count"
+        assert len(env_state.get_relevant_contexts()) == total_added_1
         # ensure 1 piece of top evidence is returned
         assert "\n1." in response, "gather_evidence did not return any results"
         assert (
@@ -745,20 +740,11 @@ async def test_agent_sharing_state(
             )
             == 2
         ), "gather_evidence should only return 2 contexts for the new question"
-        split = re.split(
-            r"(\d+) pieces of evidence, (\d+) of which were relevant",
-            response,
-            maxsplit=1,
-        )
-        assert len(split) == 4, "Unexpected response shape"
-        total_added_2, relevant_added_2 = int(split[1]), int(split[2])
-        assert all(
-            x >= 0 for x in (total_added_2, relevant_added_2)
-        ), "Expected non-negative counts"
-        assert (
-            len(env_state.get_relevant_contexts())
-            == relevant_added_1 + relevant_added_2
-        )
+        split = re.split(r"(\d+) pieces of evidence", response, maxsplit=1)
+        assert len(split) == 3, "Unexpected response shape"
+        total_added_2 = int(split[1])
+        assert total_added_2 > 0, "Expected non-negative added evidence count"
+        assert len(env_state.get_relevant_contexts()) == total_added_1 + total_added_2
         # ensure both evidences are returned
         assert "\n1." in response, "gather_evidence did not return any results"
         assert "\n2." in response, "gather_evidence should return 2 contexts"
