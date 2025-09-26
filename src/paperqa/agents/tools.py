@@ -263,13 +263,10 @@ class GatherEvidence(NamedTool):
             reverse=True,
         )
 
+        # Show scores over numbered list, since scores are actually the heuristic
         top_contexts = "\n".join(
-            [
-                f"{n + 1}. {sc.context}\n"
-                for n, sc in enumerate(
-                    sorted_relevant_contexts[: self.settings.agent.agent_evidence_n]
-                )
-            ]
+            f"- Relevance score {sc.score}: {sc.context}\n"
+            for sc in sorted_relevant_contexts[: self.settings.agent.agent_evidence_n]
         )
 
         best_evidence = f" Best evidence(s):\n\n{top_contexts}" if top_contexts else ""
