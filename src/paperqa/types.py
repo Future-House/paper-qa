@@ -1108,8 +1108,8 @@ class DocDetails(Doc):
                 best_authors = (
                     self.authors
                     if (
-                        sum(len(a) for a in (self.authors or []))
-                        >= sum(len(a) for a in (other.authors or []))
+                        sum(len(a) for a in self.authors or [])
+                        >= sum(len(a) for a in other.authors or [])
                     )
                     else other.authors
                 )

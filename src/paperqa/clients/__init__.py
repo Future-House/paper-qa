@@ -175,10 +175,8 @@ class DocMetadataClient:
             doc_details = (
                 sum(
                     p
-                    for p in (
-                        await gather_with_concurrency(
-                            len(task.providers), task.provider_queries(query_args)
-                        )
+                    for p in await gather_with_concurrency(
+                        len(task.providers), task.provider_queries(query_args)
                     )
                     if p
                 )

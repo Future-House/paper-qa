@@ -165,7 +165,7 @@ class UnpaywallProvider(DOIOrTitleBasedProvider):
             license = data.best_oa_location.license  # noqa: A001
         return DocDetails(
             authors=[
-                f"{author.given} {author.family}" for author in (data.z_authors or [])
+                f"{author.given} {author.family}" for author in data.z_authors or []
             ],
             publication_date=(
                 None
