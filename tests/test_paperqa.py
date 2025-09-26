@@ -6,6 +6,7 @@ import io
 import os
 import pathlib
 import pickle
+import random
 import re
 import sys
 from collections.abc import AsyncIterable, Sequence
@@ -1064,13 +1065,21 @@ async def test_unrelated_context(
     assert unsure_sentinel in qa_prompt, "Test relies on unsure sentinel in qa prompt"
 
     docs = Docs()
-    await docs.aadd(
+    assert await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    session = await docs.aquery(
+    session = await docs.aget_evidence(
         "What do scientist estimate as the planetary composition of Jupyter?",
         settings=agent_test_settings,
     )
+    assert session.contexts, "Test relies on some contexts being added"
+    for c in session.contexts:
+        assert c.score <= 2, "Expected contexts to be considered irrelevant"
+        if c.score <= 0:
+            # Now, let's trick the system into thinking the context
+            # was at least somewhat relevant
+            c.score = random.randint(1, 2)
+    session = await docs.aquery(session, settings=agent_test_settings)
     assert unsure_sentinel in session.answer
 
 
