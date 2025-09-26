@@ -751,6 +751,12 @@ When creating contextual summaries on a given chunk (a `Text`),
 the summary LLM is passed both the chunk's text and the chunk's associated media,
 but the output contextual summary itself remains text-only.
 
+If you would like,
+specifying the prompt `paperqa.prompts.summary_json_multimodal_system_prompt`
+to the setting `prompt.summary_json_system`
+will include a `used_images` flag attributing
+usage of images in any contextual summarizations.
+
 ### Using External DB/Vector DB and Caching
 
 You may want to cache parsed texts and embeddings in an external database or file.
