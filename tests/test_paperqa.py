@@ -61,7 +61,7 @@ from paperqa.core import (
     llm_parse_json,
     map_fxn_summary,
 )
-from paperqa.prompts import CANNOT_ANSWER_PHRASE
+from paperqa.prompts import CANNOT_ANSWER_PHRASE, summary_json_multimodal_system_prompt
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, parse_image, read_doc
 from paperqa.settings import AsyncContextSerializer
@@ -1594,6 +1594,7 @@ async def test_images(stub_data_dir: Path) -> None:
     # We don't support image embeddings yet, so disable embedding
     settings.answer.evidence_retrieval = False
     settings.parsing.defer_embedding = True
+    settings.prompts.summary_json_system = summary_json_multimodal_system_prompt
 
     docs = Docs()
     districts_docname = await docs.aadd(
@@ -1625,7 +1626,7 @@ async def test_images(stub_data_dir: Path) -> None:
         if c.id in session.used_contexts and c.text.doc == districts_doc
     ]
     assert contexts_used
-    assert all(c.used_images for c in contexts_used)  # type: ignore[attr-defined]
+    assert all(bool(c.used_images) for c in contexts_used)  # type: ignore[attr-defined]
 
 
 @pytest.mark.asyncio
@@ -1636,6 +1637,7 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
     # We don't support image embeddings yet, so disable embedding
     settings.answer.evidence_retrieval = False
     settings.parsing.defer_embedding = True
+    settings.prompts.summary_json_system = summary_json_multimodal_system_prompt
 
     docs = Docs()
     districts_docname = await docs.aadd(
@@ -1687,7 +1689,7 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
         if c.id in session.used_contexts and c.text.doc == districts_doc
     ]
     assert contexts_used
-    assert all(not c.used_images for c in contexts_used)  # type: ignore[attr-defined]
+    assert all(not bool(c.used_images) for c in contexts_used)  # type: ignore[attr-defined]
 
 
 def test_zotero() -> None:
