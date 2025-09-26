@@ -6,6 +6,7 @@ import io
 import os
 import pathlib
 import pickle
+import random
 import re
 import sys
 from collections.abc import AsyncIterable, Sequence
@@ -532,14 +533,17 @@ async def test_json_evidence(docs_fixture: Docs) -> None:
     settings = Settings.from_name("fast")
     settings.prompts.use_json = True
     settings.prompts.summary_json_system = (
-        "Provide a summary of the excerpt that could help answer the question based on"
-        " the excerpt. The excerpt may be irrelevant. Do not directly answer the"
-        " question - only summarize relevant information.  Respond with the following"
-        ' JSON format:\n\n {{\n"summary": "...",\n"author_name":'
-        ' "...",\n"relevance_score": "..."}}\n\n where `summary` is relevant'
-        " information from text -  about 100 words words, `author_name` specifies the"
-        " author , and `relevance_score` is  the relevance of `summary` to answer the"
-        " question (integer out of 10)."
+        "Provide a summary of the relevant information"
+        " that could help answer the question based on the excerpt."
+        " Your summary, combined with many others,"
+        " will be given to the model to generate an answer."
+        " Respond with the following JSON format:"
+        '\n\n{{\n  "summary": "...",\n  "author_name": "...",\n  "relevance_score": 0-10,\n}}'
+        "\n\nwhere `summary` is relevant information from the text - about 100 words."
+        " `author_name` specifies the author."
+        " `relevance_score` is an integer 0-10 for the relevance of `summary` to the question."
+        "\n\nThe excerpt may or may not contain relevant information."
+        " If not, leave `summary` empty, and make `relevance_score` be 0."
     )
     orig_acompletion = litellm.acompletion
     has_made_bad_json_context = False
@@ -1068,13 +1072,21 @@ async def test_unrelated_context(
     assert unsure_sentinel in qa_prompt, "Test relies on unsure sentinel in qa prompt"
 
     docs = Docs()
-    await docs.aadd(
+    assert await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
-    session = await docs.aquery(
+    session = await docs.aget_evidence(
         "What do scientist estimate as the planetary composition of Jupyter?",
         settings=agent_test_settings,
     )
+    assert session.contexts, "Test relies on some contexts being added"
+    for c in session.contexts:
+        assert c.score <= 2, "Expected contexts to be considered irrelevant"
+        if c.score <= 0:
+            # Now, let's trick the system into thinking the context
+            # was at least somewhat relevant
+            c.score = random.randint(1, 2)
+    session = await docs.aquery(session, settings=agent_test_settings)
     assert unsure_sentinel in session.answer
 
 
@@ -1644,15 +1656,27 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
             m.data = m.data[: len(m.data) // 2]
             with pytest.raises(OSError, match="truncated"):
                 validate_image(io.BytesIO(m.data))
+
+    # With a garbage image, we can't make contexts. So let's confirm that's the case
     with pytest.raises(litellm.BadRequestError, match="unsupported image"):
-        await docs.aquery(
+        await docs.aget_evidence(
             "What districts neighbor the Western Addition?", settings=settings
         )
+
+    # By suppressing the use of images, we can actually gather evidence now
     settings.answer.evidence_text_only_fallback = True
     # The answer will be garbage, but let's make sure we didn't claim to use images
-    session = await docs.aquery(
+    session = await docs.aget_evidence(
         "What districts neighbor the Western Addition?", settings=settings
     )
+    assert session.contexts, "Test relies on some contexts being added"
+    for c in session.contexts:
+        assert c.score <= 2, "Expected contexts to be considered irrelevant"
+        if c.score <= 0:
+            # Now, let's trick the system into thinking the context
+            # was at least somewhat relevant
+            c.score = random.randint(1, 2)
+    await docs.aquery(session, settings=settings)
     assert session.used_contexts
     assert session.cost > 0
     contexts_used = [
