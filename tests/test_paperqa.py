@@ -1649,15 +1649,27 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
             m.data = m.data[: len(m.data) // 2]
             with pytest.raises(OSError, match="truncated"):
                 validate_image(io.BytesIO(m.data))
+
+    # With a garbage image, we can't make contexts. So let's confirm that's the case
     with pytest.raises(litellm.BadRequestError, match="unsupported image"):
-        await docs.aquery(
+        await docs.aget_evidence(
             "What districts neighbor the Western Addition?", settings=settings
         )
+
+    # By suppressing the use of images, we can actually gather evidence now
     settings.answer.evidence_text_only_fallback = True
     # The answer will be garbage, but let's make sure we didn't claim to use images
-    session = await docs.aquery(
+    session = await docs.aget_evidence(
         "What districts neighbor the Western Addition?", settings=settings
     )
+    assert session.contexts, "Test relies on some contexts being added"
+    for c in session.contexts:
+        assert c.score <= 2, "Expected contexts to be considered irrelevant"
+        if c.score <= 0:
+            # Now, let's trick the system into thinking the context
+            # was at least somewhat relevant
+            c.score = random.randint(1, 2)
+    await docs.aquery(session, settings=settings)
     assert session.used_contexts
     assert session.cost > 0
     contexts_used = [
