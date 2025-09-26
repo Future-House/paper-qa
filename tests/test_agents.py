@@ -837,7 +837,7 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
             "info": {
                 "name": "gen_answer",
                 "description": (
-                    "Generate an answer using current evidence.\n\nThe tool may fail,"
+                    "Generate an answer using relevant evidence.\n\nThe tool may fail,"
                     " indicating that better or different evidence should be"
                     " found.\nAim for at least five pieces of evidence from multiple"
                     " sources before invoking this tool.\nFeel free to invoke this tool"

@@ -306,7 +306,7 @@ class GenerateAnswer(NamedTool):
 
     async def gen_answer(self, state: EnvironmentState) -> str:
         """
-        Generate an answer using current evidence.
+        Generate an answer using relevant evidence.
 
         The tool may fail, indicating that better or different evidence should be found.
         Aim for at least five pieces of evidence from multiple sources before invoking this tool.
