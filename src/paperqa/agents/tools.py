@@ -280,7 +280,13 @@ class GatherEvidence(NamedTool):
             ]
         )
 
-        best_evidence = f" Best evidence(s):\n\n{top_contexts}" if top_contexts else ""
+        # Include 'current question' because different questions will lead to
+        # different best evidences being shown
+        best_evidence = (
+            f" Best evidence(s) for the current question:\n\n{top_contexts}"
+            if top_contexts
+            else ""
+        )
 
         if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
             await asyncio.gather(
