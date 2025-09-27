@@ -711,11 +711,9 @@ async def test_agent_sharing_state(
         total_added_1 = int(split[1])
         assert total_added_1 > 0, "Expected non-negative added evidence count"
         assert len(env_state.get_relevant_contexts()) == total_added_1
-        # ensure 1 piece of top evidence is returned
-        assert "\n1." in response, "gather_evidence did not return any results"
         assert (
-            "\n2." not in response
-        ), "gather_evidence should return only 1 context, not 2"
+            response.count("\n- ") == 1
+        ), "Expected exactly one best evidence to be shown"
 
         # now adjust to give the agent 2x pieces of evidence
         gather_evidence_tool.settings.agent.agent_evidence_n = 2
@@ -745,9 +743,9 @@ async def test_agent_sharing_state(
         total_added_2 = int(split[1])
         assert total_added_2 > 0, "Expected non-negative added evidence count"
         assert len(env_state.get_relevant_contexts()) == total_added_1 + total_added_2
-        # ensure both evidences are returned
-        assert "\n1." in response, "gather_evidence did not return any results"
-        assert "\n2." in response, "gather_evidence should return 2 contexts"
+        assert (
+            response.count("\n- ") == 2
+        ), "Expected both evidences to be shown as best evidences"
 
         assert session.contexts, "Evidence did not return any results"
         assert not session.answer, "Expected no answer yet"

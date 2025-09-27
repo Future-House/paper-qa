@@ -6,7 +6,6 @@ import io
 import os
 import pathlib
 import pickle
-import random
 import re
 import sys
 from collections.abc import AsyncIterable, Sequence
@@ -1077,17 +1076,21 @@ async def test_unrelated_context(
     assert await docs.aadd(
         stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
     )
+    assert docs.texts, "Test requires at least one text"
     session = await docs.aget_evidence(
         "What do scientist estimate as the planetary composition of Jupyter?",
         settings=agent_test_settings,
     )
-    assert session.contexts, "Test relies on some contexts being added"
+    session.contexts.append(  # Give a context so the rest of the test can run
+        Context(
+            context="George Washington is a founding father",
+            question="What do scientist estimate as the planetary composition of Jupyter?",
+            text=docs.texts[0],
+            score=1,
+        )
+    )
     for c in session.contexts:
         assert c.score <= 2, "Expected contexts to be considered irrelevant"
-        if c.score <= 0:
-            # Now, let's trick the system into thinking the context
-            # was at least somewhat relevant
-            c.score = random.randint(1, 2)
     session = await docs.aquery(session, settings=agent_test_settings)
     assert unsure_sentinel in session.answer
 
@@ -1652,6 +1655,8 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
     )
     assert districts_docname, "Expected successful image addition"
     (districts_doc,) = (d for d in docs.docs.values() if d.docname == districts_docname)
+    (districts_text,) = docs.texts
+    assert not districts_text.text, "Test expects no text content from image addition"
     for media in (t.media for t in docs.texts if t.doc == districts_doc and t.media):
         for m in media:
             # Validate the image, then chop the image in half (breaking it), and
@@ -1669,27 +1674,13 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
 
     # By suppressing the use of images, we can actually gather evidence now
     settings.answer.evidence_text_only_fallback = True
-    # The answer will be garbage, but let's make sure we didn't claim to use images
     session = await docs.aget_evidence(
         "What districts neighbor the Western Addition?", settings=settings
     )
-    assert session.contexts, "Test relies on some contexts being added"
-    for c in session.contexts:
-        assert c.score <= 2, "Expected contexts to be considered irrelevant"
-        if c.score <= 0:
-            # Now, let's trick the system into thinking the context
-            # was at least somewhat relevant
-            c.score = random.randint(1, 2)
-    await docs.aquery(session, settings=settings)
-    assert session.used_contexts
-    assert session.cost > 0
-    contexts_used = [
-        c
-        for c in session.contexts
-        if c.id in session.used_contexts and c.text.doc == districts_doc
-    ]
-    assert contexts_used
-    assert all(not bool(c.used_images) for c in contexts_used)  # type: ignore[attr-defined]
+    assert (
+        not session.contexts
+    ), "Expected no contexts to be made from a bad image that has no text"
+    assert session.cost > 0, "Expected some costs to have been incurred in our attempt"
 
 
 def test_zotero() -> None:

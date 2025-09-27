@@ -252,27 +252,30 @@ class GatherEvidence(NamedTool):
         status = state.status
         logger.info(status)
         # only show top n contexts for this particular question to the agent
-        # only show context above score 0, because 0 is a sentinel for irrelevance
-        sorted_relevant_contexts = sorted(
-            [
+        sorted_contexts = sorted(
+            (
                 c
                 for c in state.session.contexts
-                if ((c.question is None or c.question == question) and c.score > 0)
-            ],
+                if c.question is None or c.question == question
+            ),
             key=lambda x: x.score,
             reverse=True,
         )
 
-        top_contexts = "\n".join(
+        top_contexts = "\n\n".join(
             [
-                f"{n + 1}. {sc.context}\n"
+                f"- {sc.context}"
                 for n, sc in enumerate(
-                    sorted_relevant_contexts[: self.settings.agent.agent_evidence_n]
+                    sorted_contexts[: self.settings.agent.agent_evidence_n]
                 )
             ]
         )
 
-        best_evidence = f" Best evidence(s):\n\n{top_contexts}" if top_contexts else ""
+        best_evidence = (
+            f" Best evidence(s) for the current question:\n\n{top_contexts}"
+            if top_contexts
+            else ""
+        )
 
         if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
             await asyncio.gather(
