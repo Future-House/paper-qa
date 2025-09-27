@@ -34,7 +34,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 import paperqa.configs
@@ -93,10 +92,6 @@ class AnswerSettings(BaseModel):
 
     evidence_k: int = Field(
         default=10, description="Number of evidence pieces to retrieve."
-    )
-    evidence_detailed_citations: bool = Field(
-        default=True,
-        description="Whether to include detailed citations in summaries.",
     )
     evidence_retrieval: bool = Field(
         default=True,
@@ -160,19 +155,6 @@ class AnswerSettings(BaseModel):
         default=False,
         description="Whether to skip stripping citations from evidence.",
     )
-
-    @model_validator(mode="after")
-    def _deprecated_field(self) -> Self:
-        # default is True, so we only warn if it's False
-        if not self.evidence_detailed_citations:
-            warnings.warn(
-                "The 'evidence_detailed_citations' field is deprecated and will be"
-                " removed in version 6. Adjust 'PromptSettings.context_inner' to remove"
-                " detailed citations.",
-                category=DeprecationWarning,
-                stacklevel=2,
-            )
-        return self
 
 
 class ParsingOptions(StrEnum):
@@ -613,7 +595,6 @@ class AgentSettings(BaseModel):
         ),
     )
     search_count: int = 8
-    wipe_context_on_answer_failure: bool = True
     agent_evidence_n: int = Field(
         default=1,
         ge=1,
@@ -627,10 +608,6 @@ class AgentSettings(BaseModel):
             "Matches LangChain AgentExecutor.max_execution_time (seconds), the timeout"
             " on agent execution."
         ),
-    )
-    should_pre_search: bool = Field(
-        default=False,
-        description="If set to true, run the search tool before invoking agent.",
     )
 
     tool_names: set[str] | Sequence[str] | None = Field(
@@ -648,12 +625,6 @@ class AgentSettings(BaseModel):
         description="Optional upper limit on the number of environment steps.",
     )
 
-    index_concurrency: int = Field(
-        default=5,  # low default for folks without S2/Crossref keys
-        description="Number of concurrent filesystem reads for indexing.",
-        exclude=True,
-        frozen=True,
-    )
     index: IndexSettings = Field(default_factory=IndexSettings)
 
     rebuild_index: bool = Field(
@@ -692,38 +663,6 @@ class AgentSettings(BaseModel):
         """,
         exclude=True,
     )
-
-    @model_validator(mode="after")
-    def _deprecated_field(self) -> Self:
-        for deprecated_field_name, new_name in (("index_concurrency", "concurrency"),):
-            value = getattr(self, deprecated_field_name)
-            if value != type(self).model_fields[deprecated_field_name].default:
-                warnings.warn(
-                    f"The {deprecated_field_name!r} field has been moved to"
-                    f" {IndexSettings.__name__}, located at Settings.agent.index,"
-                    " this deprecation will conclude in version 6.",
-                    category=DeprecationWarning,
-                    stacklevel=2,
-                )
-                setattr(self.index, new_name, value)  # Propagate to new location
-        return self
-
-    @field_validator("should_pre_search", "wipe_context_on_answer_failure")
-    @classmethod
-    def _deprecated_bool_fields(cls, value: bool, info) -> bool:
-        custom_message = ""
-        if info.field_name == "should_pre_search" and value:
-            custom_message = "dead code"
-        elif info.field_name == "wipe_context_on_answer_failure" and not value:
-            custom_message = "no longer used due to the reset tool"
-        if custom_message:
-            warnings.warn(
-                f"The {info.field_name!r} field is {custom_message},"
-                " and will be removed in version 6.",
-                category=DeprecationWarning,
-                stacklevel=2,
-            )
-        return value
 
 
 def make_default_litellm_model_list_settings(
@@ -787,52 +726,12 @@ class Settings(BaseSettings):
     texts_index_mmr_lambda: float = Field(
         default=1.0, description="Lambda for MMR in text index."
     )
-    index_absolute_directory: bool = Field(
-        default=False,
-        description="Whether to use the absolute paper directory for the PQA index.",
-        exclude=True,
-        frozen=True,
-    )
-    index_directory: str | os.PathLike | None = Field(
-        default_factory=lambda: pqa_directory("indexes"),
-        description=(
-            "Directory to store the PQA generated search index, configuration, and"
-            " answer indexes."
-        ),
-        exclude=True,
-        frozen=True,
-    )
-    index_recursively: bool = Field(
-        default=True,
-        description="Whether to recurse into subdirectories when indexing sources.",
-        exclude=True,
-        frozen=True,
-    )
     verbosity: int = Field(
         default=0,
         description=(
             "Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls"
             " logged."
         ),
-    )
-    manifest_file: str | os.PathLike | None = Field(
-        default=None,
-        description=(
-            "Optional absolute path to a manifest CSV, or a relative path from the"
-            " paper_directory to a manifest CSV. A manifest CSV contains columns which"
-            " are attributes for a DocDetails object. Only 'file_location', 'doi', and"
-            " 'title' will be used when indexing, others are discarded."
-        ),
-        exclude=True,
-        frozen=True,
-    )
-    paper_directory: str | os.PathLike = Field(
-        default=pathlib.Path.cwd(),
-        description=(
-            "Local directory which contains the papers to be indexed and searched."
-        ),
-        exclude=True,
-        frozen=True,
     )
     custom_context_serializer: AsyncContextSerializer | None = Field(
         default=None,
@@ -842,28 +741,6 @@ class Settings(BaseSettings):
         ),
         exclude=True,
     )
-
-    @model_validator(mode="after")
-    def _deprecated_field(self) -> Self:
-        for deprecated_field_name, new_name, is_factory in (
-            ("index_absolute_directory", "use_absolute_paper_directory", False),
-            ("index_directory", "index_directory", True),
-            ("index_recursively", "recurse_subdirectories", False),
-            ("manifest_file", "manifest_file", False),
-            ("paper_directory", "paper_directory", False),
-        ):
-            value = getattr(self, deprecated_field_name)
-            finfo: FieldInfo = type(self).model_fields[deprecated_field_name]
-            if value != (finfo.default_factory() if is_factory else finfo.default):  # type: ignore[call-arg,misc]
-                warnings.warn(
-                    f"The {deprecated_field_name!r} field has been moved to"
-                    f" {IndexSettings.__name__}, located at Settings.agent.index,"
-                    " this deprecation will conclude in version 6.",
-                    category=DeprecationWarning,
-                    stacklevel=2,
-                )
-                setattr(self.agent.index, new_name, value)  # Propagate to new location
-        return self
 
     @model_validator(mode="after")
     def _validate_temperature_for_o1_preview(self) -> Self:
@@ -1111,16 +988,7 @@ class Settings(BaseSettings):
             if c.score >= answer_config.evidence_relevance_score_cutoff
         ]
 
-        # shim deprecated flag
-        # TODO: remove in v6
         context_inner_prompt = prompt_config.context_inner
-        if (
-            not answer_config.evidence_detailed_citations
-            and "\nFrom {citation}" in context_inner_prompt
-        ):
-            # Only keep "\nFrom {citation}" if we are showing detailed citations
-            context_inner_prompt = context_inner_prompt.replace("\nFrom {citation}", "")
-
         context_str_body = ""
         if answer_config.group_contexts_by_question:
             contexts_by_question: dict[str, list[Context]] = defaultdict(list)
