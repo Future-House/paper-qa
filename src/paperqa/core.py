@@ -160,11 +160,11 @@ class LLMContextTimeoutError(LLMContextError):
     )
 
 
-class LLMContextResponseError(LLMContextError):
+class LLMContextRequestFailedError(LLMContextError):
     """Non-retryable exception for when the LLM provider fails to respond.
 
     Kind of a catch-all for intermittent failures, safety refusals, etc.
-    Catches all litellm.ServiceUnavailableErrors
+    Catches all litellm.BadRequestErrors and litellm.MidStreamFallbackErrors.
     """
 
     retryable = False
@@ -288,9 +288,14 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 f"LLM call to create a context timed out on text named {text.name!r}.",
                 llm_results=llm_results,
             ) from exc
-        except litellm.ServiceUnavailableError as exc:
-            raise LLMContextResponseError(
-                f"LLM call to create a context failed with exception {exc!r} on text named {text.name!r}.",
+        except (
+            litellm.exceptions.MidStreamFallbackError,
+            litellm.BadRequestError,
+        ) as exc:
+            # BadRequestError: what is thrown if you directly call an LLM with a bad request
+            # MidStreamFallbackError: what litellm throws if there are fallbacks configured
+            raise LLMContextRequestFailedError(
+                f"LLM call to create a context failed on text named {text.name!r}.",
                 llm_results=llm_results,
             ) from exc
 
