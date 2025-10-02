@@ -57,7 +57,6 @@ logger = logging.getLogger(__name__)
 
 # These probably should be promoted to be on DocDetails
 # but this will take a larger refactor.
-DOC_DETAILS_OTHERS_TO_KEEP: Collection[str] = {"bibtex_source", "client_source"}
 VAR_MATCH_LOOKUP: Collection[str] = {"1", "true"}
 VAR_MISMATCH_LOOKUP: Collection[str] = {"0", "false"}
 DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA: Collection[str] = {
@@ -238,6 +237,12 @@ class Context(BaseModel):
 class PQASession(BaseModel):
     """A class to hold session about researching/answering."""
 
+    # Keys in the other field to not remove when filtering for user display
+    DOC_DETAILS_OTHERS_TO_KEEP: ClassVar[Collection[str]] = {
+        "bibtex_source",
+        "client_source",
+    }
+
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     id: UUID = Field(default_factory=uuid4)
@@ -381,7 +386,7 @@ class PQASession(BaseModel):
                 c.text.doc.other = {
                     k: v
                     for k, v in c.text.doc.other.items()
-                    if k in DOC_DETAILS_OTHERS_TO_KEEP
+                    if k in self.DOC_DETAILS_OTHERS_TO_KEEP
                 }
 
     def populate_formatted_answers_and_bib_from_raw_answer(
