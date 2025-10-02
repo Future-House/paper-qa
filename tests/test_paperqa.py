@@ -1633,7 +1633,7 @@ async def test_images(stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_images_corrupt(stub_data_dir: Path) -> None:
+async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
     settings = Settings.from_name("fast")
     # Let's use default prompting set up, so we can get JSON summary-support
     settings.prompts = type(settings.prompts)()
@@ -1667,10 +1667,13 @@ async def test_images_corrupt(stub_data_dir: Path) -> None:
                 validate_image(io.BytesIO(m.data))
 
     # With a garbage image, we can't make contexts. So let's confirm that's the case
-    with pytest.raises(litellm.BadRequestError, match="unsupported image"):
-        await docs.aget_evidence(
-            "What districts neighbor the Western Addition?", settings=settings
-        )
+    session = await docs.aget_evidence(
+        "What districts neighbor the Western Addition?", settings=settings
+    )
+    assert not session.contexts, "Expected no contexts to be made from a bad image."
+    assert (
+        "unsupported image" in caplog.text
+    ), "Expected a caught exception about an unsupported image."
 
     # By suppressing the use of images, we can actually gather evidence now
     settings.answer.evidence_text_only_fallback = True
