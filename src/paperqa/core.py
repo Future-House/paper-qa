@@ -160,6 +160,21 @@ class LLMContextTimeoutError(LLMContextError):
     )
 
 
+class LLMContextResponseError(LLMContextError):
+    """Non-retryable exception for when the LLM provider fails to respond.
+
+    Kind of a catch-all for intermittent failures, safety refusals, etc.
+    Catches all litellm.ServiceUnavailableErrors
+    """
+
+    retryable = False
+    help_message = (
+        "Response error when creating a context, abandoning it."
+        " If you see this error frequently, the summary_llm endpoint is either"
+        " misconfigured or is having issues."
+    )
+
+
 async def _map_fxn_summary(  # noqa: PLR0912
     text: Text,
     question: str,
@@ -271,6 +286,11 @@ async def _map_fxn_summary(  # noqa: PLR0912
         except litellm.Timeout as exc:
             raise LLMContextTimeoutError(
                 f"LLM call to create a context timed out on text named {text.name!r}.",
+                llm_results=llm_results,
+            ) from exc
+        except litellm.ServiceUnavailableError as exc:
+            raise LLMContextResponseError(
+                f"LLM call to create a context failed with exception {exc!r} on text named {text.name!r}.",
                 llm_results=llm_results,
             ) from exc
 
