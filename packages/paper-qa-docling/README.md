@@ -10,3 +10,9 @@
 
 PDF reading code backed by
 [Docling](https://github.com/docling-project/docling).
+
+<img src="https://raw.githubusercontent.com/docling-project/docling/refs/heads/main/docs/assets/logo.png" alt="docling logo" style="width:200px;"/>
+
+If you use this reader library in your projects,
+Docling requests you consider citing them:
+<https://github.com/docling-project/docling-parse/tree/main?tab=readme-ov-file#references>
