@@ -72,6 +72,7 @@ jobs:
         run: echo "UV_PYTHON=${{ matrix.python-version }}" >> "$GITHUB_ENV"
       - run: uv sync
       - run: uv run pylint src packages
+      - run: uv run refurb .
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
   test:
     runs-on: ubuntu-latest
