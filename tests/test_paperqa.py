@@ -1470,7 +1470,7 @@ async def test_read_doc_images_metadata(stub_data_dir: Path) -> None:
     assert isinstance(parsed_image, ParsedMedia)
     assert parsed_image.index == 0
     assert isinstance(parsed_image.data, bytes)
-    assert len(parsed_image.data) > 0
+    assert parsed_image.data
     assert not parsed_image.text, "Expected no text content for a standalone image"
     assert parsed_image.info["suffix"] == ".png"
     image_id = parsed_image.to_id()

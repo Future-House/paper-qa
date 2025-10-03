@@ -73,14 +73,14 @@ async def test_parse_pdf_to_pages() -> None:
     fig_1_text.text = "stub"  # Replace text to confirm multimodality works
     docs = Docs()
     assert await docs.aadd_texts(texts=[fig_1_text], doc=doc)
-    for query, substrings_min_counts in [
+    for query, substrings_min_counts in (
         ("What actions can the Crawler take?", [(("search", "expand", "stop"), 2)]),
         ("What actions can the Selector take?", [(("select", "drop"), 2)]),
         (
             "How many User Query are there, and what do they do?",
             [(("two", "2"), 2), (("crawler", "selector"), 2)],
         ),
-    ]:
+    ):
         session = await docs.aquery(query=query)
         assert session.contexts, "Expected contexts to be generated"
         assert all(
@@ -107,7 +107,7 @@ async def test_parse_pdf_to_pages() -> None:
         assert page_text
         assert full_page_image.index == 0, "Full page image should have index 0"
         assert isinstance(full_page_image.data, bytes)
-        assert len(full_page_image.data) > 0, "Full page image should have data"
+        assert full_page_image.data, "Full page image should have data"
         # Check useful attributes are present and are JSON serializable
         json.dumps(p2_image.info)
         for attr in ("width", "height"):

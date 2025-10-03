@@ -659,7 +659,7 @@ def string_to_bytes(value: str) -> bytes:
     """Convert a base64-encoded string to bytes."""
     # 1. Convert base64 string to base64 bytes
     # 2. Convert base64 bytes to original bytes
-    return base64.b64decode(value.encode("utf-8"))
+    return base64.b64decode(value.encode("utf-8"))  # noqa: FURB120
 
 
 def validate_image(path: StrOrBytesPath | IO[bytes]) -> None:

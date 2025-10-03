@@ -4,7 +4,6 @@ import re
 import pymupdf
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
-from paperqa.version import __version__ as pqa_version
 
 
 def setup_pymupdf_python_logging() -> None:
@@ -171,7 +170,6 @@ def parse_pdf_to_pages(
 
     metadata = ParsedMetadata(
         parsing_libraries=[f"{pymupdf.__name__} ({pymupdf.__version__})"],
-        paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
         parse_type="pdf",
