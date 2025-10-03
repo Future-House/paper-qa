@@ -204,9 +204,7 @@ async def main() -> None:
         )
         records = await process_csv(downloaded_path)
 
-        with open(  # noqa: ASYNC230
-            DEFAULT_JOURNAL_QUALITY_CSV_PATH, "w", encoding="utf-8"
-        ) as csvfile:
+        with DEFAULT_JOURNAL_QUALITY_CSV_PATH.open("w", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["clean_name", "quality"])
             for name, quality in records:

@@ -76,14 +76,14 @@ async def test_parse_pdf_to_pages() -> None:
     fig_1_text.text = "stub"  # Replace text to confirm multimodality works
     docs = Docs()
     assert await docs.aadd_texts(texts=[fig_1_text], doc=doc)
-    for query, substrings_min_counts in [
+    for query, substrings_min_counts in (
         ("What actions can the Crawler take?", [(("search", "expand", "stop"), 2)]),
         ("What actions can the Selector take?", [(("select", "drop"), 2)]),
         (
             "How many User Query are there, and what do they do?",
             [(("two", "2"), 2), (("crawler", "selector"), 2)],
         ),
-    ]:
+    ):
         session = await docs.aquery(query=query)
         assert session.contexts, "Expected contexts to be generated"
         assert all(

@@ -5,7 +5,6 @@ from typing import Any
 import pypdf
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
-from paperqa.version import __version__ as pqa_version
 
 try:
     import pypdfium2 as pdfium
@@ -96,7 +95,6 @@ def parse_pdf_to_pages(
                 else pypdf_version_str
             )
         ],
-        paperqa_version=pqa_version,
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
         parse_type="pdf",

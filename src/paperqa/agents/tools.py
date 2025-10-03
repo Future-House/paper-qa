@@ -263,12 +263,8 @@ class GatherEvidence(NamedTool):
         )
 
         top_contexts = "\n\n".join(
-            [
-                f"- {sc.context}"
-                for n, sc in enumerate(
-                    sorted_contexts[: self.settings.agent.agent_evidence_n]
-                )
-            ]
+            f"- {sc.context}"
+            for sc in sorted_contexts[: self.settings.agent.agent_evidence_n]
         )
 
         best_evidence = (
