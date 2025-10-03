@@ -36,6 +36,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+          cache-local-path: /tmp/baipp-uv_cache_dir # Work around https://github.com/hynek/build-and-inspect-python-package/issues/181
           python-version: ${{ matrix.python-version }}
       - name: Unset UV_PYTHON for BAIPP # SEE: https://github.com/hynek/build-and-inspect-python-package/issues/180
         run: echo "UV_PYTHON=" >> "$GITHUB_ENV"
