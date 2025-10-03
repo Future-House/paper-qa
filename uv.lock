@@ -2326,12 +2326,23 @@ dependencies = [
     { name = "paper-qa" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "paper-qa" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "docling", specifier = ">=2" },
     { name = "docling-core", specifier = ">=2" },
     { name = "paper-qa", editable = "." },
+    { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "paper-qa-pymupdf"
@@ -2341,11 +2352,22 @@ dependencies = [
     { name = "pymupdf" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "paper-qa" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "paper-qa", editable = "." },
+    { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pymupdf", specifier = ">=1.24.12" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "paper-qa-pypdf"
@@ -2356,6 +2378,12 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+dev = [
+    { name = "paper-qa" },
+    { name = "pypdfium2" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
 media = [
     { name = "pypdfium2" },
 ]
@@ -2363,10 +2391,14 @@ media = [
 [package.metadata]
 requires-dist = [
     { name = "paper-qa", editable = "." },
+    { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
+    { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'dev'", editable = "packages/paper-qa-pypdf" },
     { name = "pypdf", specifier = ">=3" },
     { name = "pypdfium2", marker = "extra == 'media'", specifier = ">=4.22.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
-provides-extras = ["media"]
+provides-extras = ["dev", "media"]
 
 [[package]]
 name = "parso"
