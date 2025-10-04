@@ -102,7 +102,23 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync
-      - run: uv run pytest -n auto packages
+      - run: uv run pytest -n auto packages --ignore=packages/paper-qa-docling
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
+          CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
+      - name: Cache Docling and EasyOCR models
+        id: cache-models
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/docling
+            ~/.EasyOCR
+          key: ${{ runner.os }}-docling-easyocr-${{ hashFiles('uv.lock') }}
+          restore-keys: ${{ runner.os }}-docling-easyocr-
+      - run: uv run pytest packages/paper-qa-docling # Don't use `-n auto` to avoid race condition with EasyOCR model downloads
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
