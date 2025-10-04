@@ -61,7 +61,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.71",  # Lower pin for aiohttp transport adoption
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
     "prek",
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -78,6 +78,7 @@ dev = [
     "typeguard",
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
+docling = ["paper-qa-docling"]
 image = [
     "pillow>=10.3.0",  # Pin for py.typed
 ]
@@ -617,6 +618,7 @@ extend-exclude = [
 
 [tool.uv.sources]
 paper-qa = {workspace = true}
+paper-qa-docling = {workspace = true}
 paper-qa-pymupdf = {workspace = true}
 paper-qa-pypdf = {workspace = true}
 

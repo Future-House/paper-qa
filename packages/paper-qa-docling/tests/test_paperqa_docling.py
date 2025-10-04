@@ -1,16 +1,17 @@
 import base64
 import json
+import os
 import re
+import time
 from pathlib import Path
 from typing import cast
 
-import pypdf
 import pytest
 from paperqa import Doc, Docs
 from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import ImpossibleParsingError, bytes_to_string
 
-from paperqa_pypdf import parse_pdf_to_pages
+from paperqa_docling import parse_pdf_to_pages
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
@@ -21,23 +22,25 @@ async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
 
     filepath = STUB_DATA_DIR / "pasa.pdf"
-    parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
-    assert isinstance(parsed_text_full_page.content, dict)
-    assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
-    assert isinstance(parsed_text_full_page.content["1"], tuple)
+    parsed_text = parse_pdf_to_pages(filepath)
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content, "Parsed text should contain page 1"
+    assert isinstance(parsed_text.content["1"], tuple)
+    # Weird spaces are because 'Pa S a' is bolded in the original PDF
     matches = re.findall(
-        r"Abstract\nWe introduce PaSa, an advanced Paper ?Search"
-        r"\nagent powered by large language models.",
-        parsed_text_full_page.content["1"][0],
+        r"Abstract\n+We introduce PaSa, an advanced Pa ?per S ?e ?a ?rch"
+        r" agent powered by large language models.",
+        parsed_text.content["1"][0],
     )
     assert len(matches) == 1, "Parsing failed to handle abstract"
 
     # Check the images in Figure 1
-    assert not isinstance(parsed_text_full_page.content["2"], str)
-    p2_text, p2_media = parsed_text_full_page.content["2"]
+    assert not isinstance(parsed_text.content["2"], str)
+    p2_text, p2_media = parsed_text.content["2"]
     assert "Figure 1" in p2_text, "Expected Figure 1 title"
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
-    (p2_image,) = p2_media
+    # pylint: disable=duplicate-code
+    (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
     assert isinstance(p2_image.data, bytes)
 
@@ -52,7 +55,7 @@ async def test_parse_pdf_to_pages() -> None:
 
     # Check useful attributes are present and are JSON serializable
     json.dumps(p2_image.info)
-    for attr in ("page_width", "page_height"):
+    for attr in ("width", "height"):
         assert (
             p2_image.info[attr] == serde_p2_image.info[attr]
         ), "Expected serialization to match original"
@@ -69,8 +72,7 @@ async def test_parse_pdf_to_pages() -> None:
             ' Search." *arXiv*, 2025, arXiv:2501.10120v1. Accessed 2025.'
         ),
     )
-    texts = chunk_pdf(parsed_text_full_page, doc=doc, chunk_chars=3000, overlap=100)
-    # pylint: disable=duplicate-code
+    texts = chunk_pdf(parsed_text, doc=doc, chunk_chars=3000, overlap=100)
     fig_1_text = texts[1]
     assert (
         "Figure 1: Architecture of PaSa" in fig_1_text.text
@@ -106,13 +108,13 @@ async def test_parse_pdf_to_pages() -> None:
     assert all(isinstance(c, str) for c in parsed_text_no_media.content.values())
 
     # Check metadata
-    for pt in (parsed_text_full_page, parsed_text_no_media):
+    for pt in (parsed_text, parsed_text_no_media):
         (parsing_library,) = pt.metadata.parsing_libraries
-        assert pypdf.__name__ in parsing_library
+        assert "docling" in parsing_library
         assert pt.metadata.parse_type == "pdf"
 
     # Check commonalities across all modes
-    assert len(parsed_text_full_page.content) == len(
+    assert len(parsed_text.content) == len(
         parsed_text_no_media.content
     ), "All modes should parse the same number of pages"
 
@@ -120,3 +122,37 @@ async def test_parse_pdf_to_pages() -> None:
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars
+
+
+def test_table_parsing() -> None:
+    # pylint: disable=duplicate-code
+    filepath = STUB_DATA_DIR / "influence.pdf"
+    parsed_text = parse_pdf_to_pages(filepath)
+    assert isinstance(parsed_text.content, dict)
+    assert all(
+        t and t[0] != "\n" and t[-1] != "\n" for t in parsed_text.content.values()
+    ), "Expected no leading/trailing newlines in parsed text"
+    assert "1" in parsed_text.content, "Parsed text should contain page 1"
+    all_tables = {
+        i: [m for m in pagenum_media[1] if m.info["type"] == "table"]
+        for i, pagenum_media in parsed_text.content.items()
+        if isinstance(pagenum_media, tuple)
+    }
+    all_tables = {k: v for k, v in all_tables.items() if v}
+    assert (
+        sum(len(tables) for tables in all_tables.values()) >= 2
+    ), "Expected a few tables to be parsed for assertions to work"
+
+
+IN_GITHUB_ACTIONS: bool = os.getenv("GITHUB_ACTIONS") == "true"
+
+
+def test_document_timeout_denial() -> None:
+    tic = time.perf_counter()
+    with pytest.raises(ImpossibleParsingError, match="partial"):
+        parse_pdf_to_pages(STUB_DATA_DIR / "pasa.pdf", document_timeout=1)
+    if not IN_GITHUB_ACTIONS:  # GitHub Actions runners are too noisy in timing
+        # On 10/3/2025 on a MacBook M3 Pro with 36-GB RAM, reading PaSa took 18.7-sec
+        assert (
+            time.perf_counter() - tic < 10
+        ), "Expected document timeout to have taken much less time than a normal read"
