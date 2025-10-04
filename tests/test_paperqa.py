@@ -62,9 +62,15 @@ from paperqa.core import (
 )
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, summary_json_multimodal_system_prompt
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import PDFParserFn, parse_image, read_doc
+from paperqa.readers import PDFParserFn, chunk_pdf, parse_image, read_doc
 from paperqa.settings import AsyncContextSerializer
-from paperqa.types import ChunkMetadata, Context, ParsedMedia
+from paperqa.types import (
+    ChunkMetadata,
+    Context,
+    ParsedMedia,
+    ParsedMetadata,
+    ParsedText,
+)
 from paperqa.utils import (
     bytes_to_string,
     clean_possessives,
@@ -1684,6 +1690,22 @@ async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
         not session.contexts
     ), "Expected no contexts to be made from a bad image that has no text"
     assert session.cost > 0, "Expected some costs to have been incurred in our attempt"
+
+
+def test_missing_page_doesnt_crash_us() -> None:
+    stub_parsed_text = ParsedText(
+        content={
+            "1": "A",
+            # Page 2 was totally blank
+            "3": "C",
+        },
+        metadata=ParsedMetadata(parsing_libraries=["stub"], total_parsed_text_length=2),
+    )
+    stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    (text,) = chunk_pdf(stub_parsed_text, stub_doc, chunk_chars=100, overlap=5)
+    assert text.doc == stub_doc
+    assert "1-3" in text.name
+    assert text.text == "AC"
 
 
 def test_zotero() -> None:

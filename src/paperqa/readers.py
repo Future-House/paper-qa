@@ -61,7 +61,7 @@ def _make_chunk(
 ) -> Text:
     media: list[ParsedMedia] = []
     for pg_num in range(int(lower_page), int(upper_page) + 1):
-        pg_contents = cast(dict, parsed_text.content)[str(pg_num)]
+        pg_contents = cast(dict, parsed_text.content).get(str(pg_num))
         if isinstance(pg_contents, tuple):
             media.extend(pg_contents[1])
     # pretty formatting of pages (e.g. 1-3, 4, 5-7)
