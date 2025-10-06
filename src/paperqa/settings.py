@@ -908,6 +908,7 @@ class Settings(BaseSettings):
             first_segment,
             str(self.agent.index.use_absolute_paper_directory),
             self.embedding,
+            str(self.parsing.parse_pdf),  # Don't use __name__ as lambda wouldn't differ
             str(self.parsing.chunk_size),
             str(self.parsing.overlap),
             self.parsing.chunking_algorithm,
