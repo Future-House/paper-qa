@@ -584,6 +584,9 @@ max-line-length = 120
 # defaults when analyzing docstring sections.
 convention = "google"
 
+[tool.ruff.lint.pylint]
+max-bool-expr = 8
+
 [tool.setuptools.package-data]
 paperqa = ["configs/**json"]
 
