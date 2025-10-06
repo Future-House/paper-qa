@@ -147,8 +147,7 @@ class Text(Embeddable):
     text: str = Field(description="Processed text content of the chunk.")
     name: str = Field(
         description=(
-            "Human-readable identifier for the chunk"
-            " (e.g., 'Wiki2023 chunk 1', 'sentence1')."
+            "Human-readable identifier for the chunk (e.g., 'Wiki2023 chunk 1', 'sentence1')."
         )
     )
     media: list[ParsedMedia] = Field(
@@ -272,8 +271,7 @@ class PQASession(BaseModel):
     formatted_answer: str = Field(
         default="",
         description=(
-            "Optional prettified answer that includes information like question and"
-            " citations."
+            "Optional prettified answer that includes information like question and citations."
         ),
     )
     graded_answer: str | None = Field(
@@ -680,12 +678,11 @@ class DocDetails(Doc):
     )
     doi: str | None = None
     doi_url: str | None = None
-    doc_id: str | None = Field(
-        default=None,
+    doc_id: str = Field(
         description=(
             "Unique ID for this document. Simple ways to acquire one include"
             " hashing the DOI or a stringifying a UUID."
-        ),
+        )
     )
     file_location: str | os.PathLike | None = None
     license: str | None = Field(
@@ -962,7 +959,6 @@ class DocDetails(Doc):
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
-
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
         if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
@@ -1019,7 +1015,6 @@ class DocDetails(Doc):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def formatted_citation(self) -> str:
-
         if self.is_retracted:
             base_message = "**RETRACTED ARTICLE**"
             retract_info = "Retrieved from http://retractiondatabase.org/."
