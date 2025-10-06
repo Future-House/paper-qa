@@ -398,9 +398,18 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
                 not parse_config.disable_doc_valid_check
-                # Use the first few text chunks to avoid potential issues with
-                # title page parsing in the first chunk
-                and not maybe_is_text("".join(text.text for text in texts[:5]))
+                and (
+                    (
+                        # Quick sanity check the text is not just some terse one-page
+                        # 404 message interspersed with newlines. Check here
+                        # instead of maybe_is_text because a 404 HTML page is text
+                        sum(len(t.text.replace("\n", "")) for t in texts[:2])
+                        < 20  # noqa: PLR2004
+                    )
+                    # Use the first few text chunks to avoid potential issues with
+                    # title page parsing in the first chunk
+                    or not maybe_is_text("".join(t.text for t in texts[:5]))
+                )
             )
         ):
             raise ValueError(
