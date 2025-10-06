@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pymupdf
 import pytest
-from paperqa import Doc, Docs
+from paperqa import Doc, Docs, Settings
 from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import ImpossibleParsingError, bytes_to_string
 
@@ -137,6 +137,34 @@ async def test_parse_pdf_to_pages() -> None:
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars
+
+
+@pytest.mark.asyncio
+async def test_invalid_pdf_is_denied(tmp_path) -> None:
+    # This PDF content (actually it's a 404 HTML page) was seen with open access
+    # in June 2025, so let's make sure it's denied
+    bad_pdf_content = """<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->"""
+
+    bad_pdf_path = tmp_path / "bad.pdf"
+    bad_pdf_path.write_text(bad_pdf_content)
+
+    docs = Docs()
+    with pytest.raises(ValueError, match="does not look"):
+        await docs.aadd(
+            bad_pdf_path,
+            citation="Citation 1",  # Skip citation inference
+            title="Title",  # Skip title inference
+            settings=Settings(
+                parsing={"parse_pdf": parse_pdf_to_pages, "use_doc_details": False}
+            ),
+        )
 
 
 def test_table_parsing() -> None:
