@@ -3,6 +3,7 @@ import os
 from typing import Any
 
 import pypdf
+import pypdf.errors
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
 
@@ -34,7 +35,13 @@ def parse_pdf_to_pages(
         **_: Thrown away kwargs.
     """
     with open(path, "rb") as file:
-        pdf_reader = pypdf.PdfReader(file)
+        try:
+            pdf_reader = pypdf.PdfReader(file)
+        except pypdf.errors.PdfReadError as exc:
+            raise ImpossibleParsingError(
+                f"PDF reading via {pypdf.__name__} failed on the PDF at path {path!r},"
+                " likely this PDF file is corrupt."
+            ) from exc
 
         pages: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
         total_length = count_media = 0

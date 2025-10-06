@@ -117,3 +117,22 @@ async def test_parse_pdf_to_pages() -> None:
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars
+
+
+def test_invalid_pdf_is_denied(tmp_path) -> None:
+    # This PDF content (actually it's a 404 HTML page) was seen with open access
+    # in June 2025, so let's make sure it's denied
+    bad_pdf_content = """<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->"""
+
+    bad_pdf_path = tmp_path / "bad.pdf"
+    bad_pdf_path.write_text(bad_pdf_content)
+
+    with pytest.raises(ImpossibleParsingError, match="corrupt"):
+        parse_pdf_to_pages(bad_pdf_path)
