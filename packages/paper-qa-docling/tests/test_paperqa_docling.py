@@ -190,7 +190,9 @@ IN_GITHUB_ACTIONS: bool = os.getenv("GITHUB_ACTIONS") == "true"
 def test_document_timeout_denial() -> None:
     tic = time.perf_counter()
     with pytest.raises(ImpossibleParsingError, match="partial"):
-        parse_pdf_to_pages(STUB_DATA_DIR / "pasa.pdf", document_timeout=1)
+        parse_pdf_to_pages(
+            STUB_DATA_DIR / "pasa.pdf", custom_pipeline_options={"document_timeout": 1}
+        )
     if not IN_GITHUB_ACTIONS:  # GitHub Actions runners are too noisy in timing
         # On 10/3/2025 on a MacBook M3 Pro with 36-GB RAM, reading PaSa took 18.7-sec
         assert (

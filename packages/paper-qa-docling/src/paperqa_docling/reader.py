@@ -1,8 +1,10 @@
 import collections
 import io
 import os
+from collections.abc import Mapping
 from importlib.metadata import version
 from pathlib import Path
+from typing import Any
 
 import docling
 from docling.datamodel.base_models import ConversionStatus
@@ -10,7 +12,13 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, InputFormat, PdfFormatOption
 from docling.exceptions import ConversionError
 from docling.pipeline.standard_pdf_pipeline import StandardPdfPipeline
-from docling_core.types.doc import DocItem, PictureItem, TableItem, TextItem
+from docling_core.types.doc import (
+    DescriptionAnnotation,
+    DocItem,
+    PictureItem,
+    TableItem,
+    TextItem,
+)
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
 
@@ -25,8 +33,8 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     page_size_limit: int | None = None,
     parse_media: bool = True,
     pipeline_cls: type = StandardPdfPipeline,
-    document_timeout: float | None = None,
     dpi: int | None = None,
+    custom_pipeline_options: Mapping[str, Any] | None = None,
     **_,
 ) -> ParsedText:
     """Parse a PDF.
@@ -38,9 +46,10 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         parse_media: Flag to also parse media (e.g. images, tables).
         pipeline_cls: Optional custom pipeline class for document conversion.
             Default is Docling's standard PDF pipeline.
-        document_timeout: Optional timeout (sec) for document processing.
         dpi: Optional DPI (dots per inch) for image resolution.
             Default PDF resolution is 72 DPI, so dpi of 144 would render at 2x scale.
+        custom_pipeline_options: Optional keyword arguments to use to construct the
+            PDF pipeline's options.
         **_: Thrown away kwargs.
     """
     path = Path(path)
@@ -50,10 +59,10 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             generate_picture_images=True,
             generate_table_images=True,
             images_scale=1.0 if dpi is None else dpi / DOCLING_IMAGES_SCALE_PER_DPI,
-            document_timeout=document_timeout,
+            **(custom_pipeline_options or {}),
         )
     else:
-        pipeline_options = PdfPipelineOptions(document_timeout=document_timeout)
+        pipeline_options = PdfPipelineOptions(**(custom_pipeline_options or {}))
 
     converter = DocumentConverter(
         format_options={
@@ -123,17 +132,36 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                 image_data.save(img_bytes, format="PNG")
                 img_bytes.seek(0)  # Reset pointer before read to avoid empty data
 
+                media_metadata = {
+                    "type": "picture",
+                    "width": image_data.width,
+                    "height": image_data.height,
+                    "bbox": item.prov[0].bbox.as_tuple(),
+                    "images_scale": pipeline_options.images_scale,
+                }
+                annotations = [
+                    x for x in item.annotations if isinstance(x, DescriptionAnnotation)
+                ]
+                if len(annotations) == 1:
+                    # We don't set this text in ParsedMedia.text because it's
+                    # a synthetic description, not actually text in the PDF,
+                    # and we don't want citations going to synthetic text
+                    media_metadata.update(
+                        {
+                            "description_text": annotations[0].text,
+                            "description_provenance": annotations[0].provenance,
+                        }
+                    )
+                elif len(annotations) > 1:
+                    raise NotImplementedError(
+                        f"Didn't yet handle 2+ picture description annotations {annotations}."
+                    )
+
                 content[str(page_num)][1].append(
                     ParsedMedia(
                         index=len(content[str(page_num)][1]),
                         data=img_bytes.read(),
-                        info={
-                            "type": "picture",
-                            "width": image_data.width,
-                            "height": image_data.height,
-                            "bbox": item.prov[0].bbox.as_tuple(),
-                            "images_scale": pipeline_options.images_scale,
-                        },
+                        info=media_metadata,
                     )
                 )
                 count_media += 1
