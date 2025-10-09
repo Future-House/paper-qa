@@ -1697,7 +1697,6 @@ dev = [
     { name = "mypy" },
     { name = "paper-qa-pymupdf" },
     { name = "paper-qa-pypdf", extra = ["media"] },
-    { name = "pillow" },
     { name = "prek" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1722,7 +1721,7 @@ dev = [
     { name = "vcrpy" },
 ]
 image = [
-    { name = "pillow" },
+    { name = "fhlmi" },
 ]
 ldp = [
     { name = "ldp" },
@@ -1770,6 +1769,7 @@ requires-dist = [
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.20" },
     { name = "fhlmi", specifier = ">=0.25.4" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.28" },
+    { name = "fhlmi", extras = ["image"], marker = "extra == 'image'" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "httpx-aiohttp" },
@@ -1787,7 +1787,6 @@ requires-dist = [
     { name = "paper-qa-pypdf", editable = "packages/paper-qa-pypdf" },
     { name = "paper-qa-pypdf", marker = "extra == 'pypdf'", editable = "packages/paper-qa-pypdf" },
     { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'pypdf-media'", editable = "packages/paper-qa-pypdf" },
-    { name = "pillow", marker = "extra == 'image'", specifier = ">=10.3.0" },
     { name = "prek", marker = "extra == 'dev'" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0,>=2.10.1" },
