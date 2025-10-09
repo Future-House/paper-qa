@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 import asyncio
-import base64
 import contextlib
 import hashlib
 import logging
@@ -16,7 +13,7 @@ from datetime import datetime
 from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, BinaryIO, ClassVar, TypeVar
+from typing import Any, BinaryIO, ClassVar, TypeVar
 from uuid import UUID
 
 import httpx
@@ -32,12 +29,6 @@ from tenacity import (
     stop_after_attempt,
     wait_incrementing,
 )
-
-if TYPE_CHECKING:
-    from typing import IO
-
-    from PIL._typing import StrOrBytesPath
-
 
 logger = logging.getLogger(__name__)
 
@@ -645,37 +636,3 @@ def clean_possessives(text: str) -> str:
     # Remove standalone apostrophes
     text = re.sub(r"\s+'\s+", " ", text)
     return re.sub(r"(?<!\w)'\s*", "", text)
-
-
-def bytes_to_string(value: bytes) -> str:
-    """Convert bytes to a base64-encoded string."""
-    # 1. Convert bytes to base64 bytes
-    # 2. Convert base64 bytes to base64 string,
-    #    using UTF-8 since base64 produces ASCII characters
-    return base64.b64encode(value).decode("utf-8")
-
-
-def string_to_bytes(value: str) -> bytes:
-    """Convert a base64-encoded string to bytes."""
-    # 1. Convert base64 string to base64 bytes
-    # 2. Convert base64 bytes to original bytes
-    return base64.b64decode(value.encode("utf-8"))  # noqa: FURB120
-
-
-def validate_image(path: StrOrBytesPath | IO[bytes]) -> None:
-    """
-    Validate that the file at the given path is a valid image.
-
-    Raises:
-        OSError: If the image file is truncated.
-    """  # noqa: DOC502
-    try:
-        from PIL import Image
-    except ImportError as exc:
-        raise ImportError(
-            "Image validation requires the 'image' extra for 'pillow'. Please:"
-            " `pip install paper-qa[image]`."
-        ) from exc
-
-    with Image.open(path) as img:
-        img.load()
