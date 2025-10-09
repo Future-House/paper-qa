@@ -597,6 +597,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9f/11/57e34bf6acfc459cceebfad419d79777f20d7a8301609fdb51a53012f505/fhlmi-0.39.0-py3-none-any.whl", hash = "sha256:50e815c71d1cf582cadfa64d5488d92f934366e1987bc676a6434f92a980eb3f", size = 41962, upload-time = "2025-10-14T20:54:20.995Z" },
 ]
 
+[package.optional-dependencies]
+image = [
+    { name = "pillow" },
+]
+
 [[package]]
 name = "filelock"
 version = "3.20.0"
@@ -1806,7 +1811,7 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "fhlmi" },
+    { name = "fhlmi", extra = ["image"] },
     { name = "ipykernel" },
     { name = "ipython" },
     { name = "ldp" },
@@ -1814,7 +1819,6 @@ dev = [
     { name = "mypy" },
     { name = "paper-qa-pymupdf" },
     { name = "paper-qa-pypdf", extra = ["media"] },
-    { name = "pillow" },
     { name = "prek" },
     { name = "pydantic" },
     { name = "pylint-pydantic" },
@@ -1839,7 +1843,7 @@ dev = [
     { name = "vcrpy" },
 ]
 image = [
-    { name = "pillow" },
+    { name = "fhlmi", extra = ["image"] },
 ]
 ldp = [
     { name = "ldp" },
@@ -1887,6 +1891,7 @@ requires-dist = [
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.20" },
     { name = "fhlmi", specifier = ">=0.25.4" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.28" },
+    { name = "fhlmi", extras = ["image"], marker = "extra == 'image'" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "httpx-aiohttp" },
@@ -1904,7 +1909,6 @@ requires-dist = [
     { name = "paper-qa-pypdf", editable = "packages/paper-qa-pypdf" },
     { name = "paper-qa-pypdf", marker = "extra == 'pypdf'", editable = "packages/paper-qa-pypdf" },
     { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'pypdf-media'", editable = "packages/paper-qa-pypdf" },
-    { name = "pillow", marker = "extra == 'image'", specifier = ">=10.3.0" },
     { name = "prek", marker = "extra == 'dev'" },
     { name = "pybtex" },
     { name = "pydantic", specifier = "~=2.0,>=2.10.1" },

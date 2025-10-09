@@ -20,6 +20,7 @@ from uuid import UUID, uuid4
 import tiktoken
 from aviary.core import Message
 from lmi import Embeddable, LLMResult
+from lmi.utils import bytes_to_string, encode_image_as_url, string_to_bytes
 from pybtex.database import BibliographyData, Entry, InvalidNameString, Person
 from pybtex.database.input.bibtex import Parser
 from pybtex.scanner import PybtexSyntaxError
@@ -37,14 +38,12 @@ from pydantic import (
 )
 
 from paperqa.utils import (
-    bytes_to_string,
     create_bibtex_key,
     encode_id,
     format_bibtex,
     get_citation_ids,
     get_parenthetical_substrings,
     maybe_get_date,
-    string_to_bytes,
 )
 from paperqa.version import __version__ as pqa_version
 
@@ -552,7 +551,7 @@ class ParsedMedia(BaseModel):
 
     def to_image_url(self, image_type: str = "png") -> str:
         """Convert the image data to an RFC 2397 data URL format."""
-        return f"data:image/{image_type};base64,{bytes_to_string(self.data)}"
+        return encode_image_as_url(image_type, self.data)
 
     def save(self, path: str | os.PathLike) -> None:
         """Save the image to the input file path."""
