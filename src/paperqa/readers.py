@@ -380,6 +380,7 @@ async def read_doc(  # noqa: PLR0912
 
     # check if chunk is 0 (no chunking)
     if chunk_chars == 0:
+        # TODO: add tiktoken usage to chunk metadata
         chunked_text = [
             Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
         ]
@@ -402,6 +403,7 @@ async def read_doc(  # noqa: PLR0912
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
+        # TODO: add tiktoken usage to chunk metadata
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
         )
