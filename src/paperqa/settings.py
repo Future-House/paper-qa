@@ -923,6 +923,7 @@ class Settings(BaseSettings):
             str(self.parsing.chunk_size),
             str(self.parsing.overlap),
             self.parsing.chunking_algorithm,
+            str(self.parsing.multimodal),
         ]
         return f"pqa_index_{hexdigest('|'.join(segments))}"
 
