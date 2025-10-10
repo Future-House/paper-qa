@@ -899,7 +899,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
 | `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | LLM for creating contextual summaries.                                                                  |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
-| `embedding`                                  | `"text-embedding-3-small"`             | Default embedding model for texts.                                                                      |
+| `embedding`                                  | `"text-embedding-3-small"`             | Embedding model for embedding text chunks when adding papers.                                           |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                 |
 | `temperature`                                | `0.0`                                  | Temperature for LLMs.                                                                                   |
 | `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                            |

@@ -783,7 +783,7 @@ class Settings(BaseSettings):
     )
     embedding: str = Field(
         default="text-embedding-3-small",
-        description="Default embedding model for texts",
+        description="Embedding model for embedding text chunks when adding papers.",
     )
     embedding_config: dict | None = Field(
         default=None,
