@@ -459,9 +459,14 @@ class Answer(PQASession):
 class ChunkMetadata(BaseModel):
     """Metadata for chunking algorithm."""
 
-    chunk_chars: int = Field(description="Chunk size (chars), or 0 for no chunking.")
+    size: int = Field(description="Chunk size (chars), or 0 for no chunking.")
     overlap: int = Field(description="Chunk overlap (chars), or 0 for no overlap.")
-    chunk_type: str
+    summary: str | None = Field(
+        default=None,
+        description=(
+            "Optional string summarizing the chunking parameters, embodying a hash."
+        ),
+    )
 
 
 class ParsedMetadata(BaseModel):
@@ -476,7 +481,7 @@ class ParsedMetadata(BaseModel):
     )
     total_parsed_text_length: int
     count_parsed_media: int = Field(default=0, ge=0)
-    parse_type: str | None = Field(
+    summary: str | None = Field(
         default=None,
         description=(
             "Optional string summarizing the parsing parameters, embodying a hash."
