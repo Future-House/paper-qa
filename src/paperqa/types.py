@@ -568,7 +568,6 @@ class ParsedText(BaseModel):
     def encode_content(
         self, enc: tiktoken.Encoding | str = "cl100k_base"
     ) -> list[int] | list[list[int]]:
-        # we tokenize using tiktoken so cuts are in reasonable places
         if isinstance(enc, str):
             enc = tiktoken.get_encoding(enc)
         if isinstance(self.content, str):

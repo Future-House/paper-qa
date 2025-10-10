@@ -190,6 +190,7 @@ def chunk_text(
     content: str | list[int] = (
         parsed_text.content
         if not use_tiktoken
+        # we tokenize using tiktoken so cuts are in reasonable places
         else cast(list[int], parsed_text.encode_content(enc))
     )
     if not content:  # Avoid div0 in token calculations
