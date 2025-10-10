@@ -506,13 +506,18 @@ class ParsedMedia(BaseModel):
     ] = Field(description="Raw image, ideally directly savable to a PNG image.")
     text: str | None = Field(
         default=None,
-        description="Optional associated text content (e.g. markdown export of a table).",
+        description=(
+            "Optional associated text content (e.g. markdown export of a table)."
+            " This should not be enriched/augmented text, but actual text."
+        ),
     )
     info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
         default_factory=dict,
         description=(
             "Optional image metadata. This may come from image definitions sourced from"
-            " the PDF, or attributes of custom pixel maps."
+            " the PDF, attributes of custom pixel maps, or what the PDF reader"
+            " considered the media to be (e.g. table or image). It may also include"
+            " model-generated description(s) of the image."
         ),
     )
 
