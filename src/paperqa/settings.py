@@ -762,7 +762,7 @@ class Settings(BaseSettings):
     )
     summary_llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
-        description="Default LLM for summaries and parsing citations.",
+        description="LLM for creating contextual summaries.",
     )
     summary_llm_config: dict | None = Field(
         default=None,
