@@ -467,12 +467,24 @@ class ChunkMetadata(BaseModel):
 class ParsedMetadata(BaseModel):
     """Metadata for parsed text."""
 
-    parsing_libraries: list[str]
+    parsing_libraries: list[str] = Field(
+        description="Libraries used to generate the parsing."
+    )
+    paperqa_version: str = Field(
+        default=pqa_version,
+        description="PaperQA version that invoked the parsing_libraries.",
+    )
     total_parsed_text_length: int
     count_parsed_media: int = Field(default=0, ge=0)
-    paperqa_version: str = pqa_version
-    parse_type: str | None = None
-    chunk_metadata: ChunkMetadata | None = None
+    parse_type: str | None = Field(
+        default=None,
+        description=(
+            "Optional string summarizing the parsing parameters, embodying a hash."
+        ),
+    )
+    chunk_metadata: ChunkMetadata | None = Field(
+        default=None, description="Optional metadata from the chunking process."
+    )
 
 
 class ParsedMedia(BaseModel):
