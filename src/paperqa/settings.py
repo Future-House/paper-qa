@@ -747,7 +747,8 @@ class Settings(BaseSettings):
     llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
         description=(
-            "LLM for general use including metadata inference and answer generation."
+            "LLM for general use including metadata inference (see Docs.aadd)"
+            " and answer generation (see Docs.aquery and gen_answer tool)."
             " Should be 'best' LLM. Uses include:"
             " 1. Inferring citation information from documents when left unspecified,"
             " 2. Extracting title, DOI, and authors from citation information when left unspecified,"
@@ -769,7 +770,10 @@ class Settings(BaseSettings):
     )
     summary_llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
-        description="LLM for creating contextual summaries.",
+        description=(
+            "LLM for creating contextual summaries"
+            " (see Docs.aget_evidence and gather_evidence tool)."
+        ),
     )
     summary_llm_config: dict | None = Field(
         default=None,
