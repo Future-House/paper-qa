@@ -578,7 +578,7 @@ class AgentSettings(BaseModel):
 
     agent_llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
-        description="Model to use for agent making tool selections.",
+        description="LLM inside the agent making tool selections.",
     )
 
     agent_llm_config: dict | None = Field(
@@ -747,7 +747,15 @@ class Settings(BaseSettings):
     llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
         description=(
-            "Default LLM for most things, including answers. Should be 'best' LLM."
+            "LLM for general use including metadata inference (see Docs.aadd)"
+            " and answer generation (see Docs.aquery and gen_answer tool)."
+            " Should be 'best' LLM. Uses include:"
+            " 1. Inferring citation information from documents when left unspecified,"
+            " 2. Extracting title, DOI, and authors from citation information when left unspecified,"
+            " 3. Optionally injecting pre-answer information (see PromptSettings.pre),"
+            " 4. Generating an answer given evidence (see PromptSettings.qa),"
+            " 5. Optionally injecting post-answer information (see PromptSettings.post),"
+            " 6. If using the 'fake' agent, proposing search queries."
         ),
     )
     llm_config: dict | None = Field(
@@ -762,7 +770,10 @@ class Settings(BaseSettings):
     )
     summary_llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
-        description="Default LLM for summaries and parsing citations.",
+        description=(
+            "LLM for creating contextual summaries"
+            " (see Docs.aget_evidence and gather_evidence tool)."
+        ),
     )
     summary_llm_config: dict | None = Field(
         default=None,
@@ -776,7 +787,7 @@ class Settings(BaseSettings):
     )
     embedding: str = Field(
         default="text-embedding-3-small",
-        description="Default embedding model for texts",
+        description="Embedding model for embedding text chunks when adding papers.",
     )
     embedding_config: dict | None = Field(
         default=None,
