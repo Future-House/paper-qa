@@ -114,17 +114,15 @@ def parse_text(
     path: str | os.PathLike,
     html: bool = False,
     split_lines: bool = False,
-    use_tiktoken: bool = True,
     page_size_limit: int | None = None,
     **_,
 ) -> ParsedText:
-    """Simple text splitter, can optionally use tiktoken, parse html, or split into newlines.
+    """Simple text splitter, can parse html or split into newlines.
 
     Args:
         path: path to file.
         html: flag to use html2text library for parsing.
         split_lines: flag to split lines into a list.
-        use_tiktoken: flag to use tiktoken library to encode text.
         page_size_limit: optional limit on the number of characters per page. Only
             relevant when split_lines is True.
     """
@@ -136,7 +134,7 @@ def parse_text(
         with path.open(encoding="utf-8", errors="ignore") as f:
             text = f.read()
 
-    parsing_libraries: list[str] = ["tiktoken (cl100k_base)"] if use_tiktoken else []
+    parsing_libraries: list[str] = []
     if html:
         if not isinstance(text, str):
             raise NotImplementedError(
@@ -190,7 +188,10 @@ def chunk_text(
         )
 
     content: str | list[int] = (
-        parsed_text.content if not use_tiktoken else parsed_text.encode_content()
+        parsed_text.content
+        if not use_tiktoken
+        # we tokenize using tiktoken so cuts are in reasonable places
+        else cast(list[int], parsed_text.encode_content(enc))
     )
     if not content:  # Avoid div0 in token calculations
         raise ImpossibleParsingError(
@@ -370,7 +371,7 @@ async def read_doc(  # noqa: PLR0912
         parsed_text = await parse_image(path, **parser_kwargs)
     else:
         parsed_text = await asyncio.to_thread(
-            parse_text, path, split_lines=True, use_tiktoken=False, **parser_kwargs
+            parse_text, path, split_lines=True, **parser_kwargs
         )
 
     if parsed_text_only:
@@ -380,6 +381,7 @@ async def read_doc(  # noqa: PLR0912
 
     # check if chunk is 0 (no chunking)
     if chunk_chars == 0:
+        # TODO: add tiktoken usage to chunk metadata
         chunked_text = [
             Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
         ]
@@ -402,6 +404,7 @@ async def read_doc(  # noqa: PLR0912
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
+        # TODO: add tiktoken usage to chunk metadata
         chunk_metadata = ChunkMetadata(
             chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
         )

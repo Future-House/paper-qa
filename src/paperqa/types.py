@@ -565,18 +565,19 @@ class ParsedText(BaseModel):
         description="Metadata on the parsing process used."
     )
 
-    def encode_content(self):
-        # we tokenize using tiktoken so cuts are in reasonable places
-        # See https://github.com/openai/tiktoken
-        enc = tiktoken.get_encoding("cl100k_base")
+    def encode_content(
+        self, enc: tiktoken.Encoding | str = "cl100k_base"
+    ) -> list[int] | list[list[int]]:
+        if isinstance(enc, str):
+            enc = tiktoken.get_encoding(enc)
         if isinstance(self.content, str):
             return enc.encode_ordinary(self.content)
-        elif isinstance(self.content, list):  # noqa: RET505
+        if isinstance(self.content, list):
             return [enc.encode_ordinary(c) for c in self.content]
-        else:
-            raise NotImplementedError(
-                "Encoding only implemented for str and list[str] content."
-            )
+        raise NotImplementedError(
+            "Encoding only implemented for str and list[str] content,"
+            f" not {type(self.content)}."
+        )
 
     def reduce_content(self) -> str:
         """Reduce any content to a string."""
