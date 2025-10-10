@@ -231,7 +231,9 @@ async def _map_fxn_summary(  # noqa: PLR0912
     # but not spaces, to preserve text alignment
     cleaned_text = text.text.strip("\n")
     if summary_llm_model and prompt_templates:
-        media_text: list[str] = [m.text for m in text.media if m.text]
+        table_texts: list[str] = [
+            m.text for m in text.media if m.info.get("type") == "table" and m.text
+        ]
         data = {
             "question": question,
             "citation": citation,
@@ -239,9 +241,9 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 text_with_tables_prompt_template.format(
                     text=cleaned_text,
                     citation=citation,
-                    tables="\n\n----\n\n".join(media_text),
+                    tables="\n\n----\n\n".join(table_texts),
                 )
-                if media_text
+                if table_texts
                 else cleaned_text
             ),
         } | (extra_prompt_data or {})
