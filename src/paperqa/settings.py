@@ -578,7 +578,7 @@ class AgentSettings(BaseModel):
 
     agent_llm: str = Field(
         default=CommonLLMNames.GPT_4O.value,
-        description="Model to use for agent making tool selections.",
+        description="LLM inside the agent making tool selections.",
     )
 
     agent_llm_config: dict | None = Field(

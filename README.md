@@ -944,7 +944,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                       |
 | `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                               |
 | `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables. |
-| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | Model to use for agent making tool selections.                                                          |
+| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | LLM inside the agent making tool selections.                                                            |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                 |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                   |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                   |
