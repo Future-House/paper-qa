@@ -895,7 +895,7 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                             |
 | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-11-20"`                  | Default LLM for most things, including answers. Should be 'best' LLM.                                   |
+| `llm`                                        | `"gpt-4o-2024-11-20"`                  | LLM for general use including metadata inference and answer generation.                                 |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                       |
 | `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | LLM for creating contextual summaries.                                                                  |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                               |
