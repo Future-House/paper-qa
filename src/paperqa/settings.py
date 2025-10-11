@@ -7,16 +7,7 @@ from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from enum import StrEnum
 from pydoc import locate
-from typing import (
-    Any,
-    ClassVar,
-    Protocol,
-    Self,
-    TypeAlias,
-    assert_never,
-    cast,
-    runtime_checkable,
-)
+from typing import Any, ClassVar, Protocol, Self, TypeAlias, cast, runtime_checkable
 
 import anyio
 from aviary.core import Tool, ToolSelector
@@ -68,7 +59,6 @@ from paperqa.prompts import (
 from paperqa.readers import PDFParserFn
 from paperqa.types import Context
 from paperqa.utils import hexdigest, pqa_directory
-from paperqa.version import __version__
 
 # TODO: move to actual EnvironmentState
 # when we can do so without a circular import
@@ -175,28 +165,8 @@ class AnswerSettings(BaseModel):
         return self
 
 
-class ParsingOptions(StrEnum):
-    PAPERQA_DEFAULT = "paperqa_default"
-
-    def available_for_inference(self) -> list["ParsingOptions"]:
-        return [self.PAPERQA_DEFAULT]
-
-
-def _get_parse_type(opt: ParsingOptions, config: "ParsingSettings") -> str:
-    if opt == ParsingOptions.PAPERQA_DEFAULT:
-        return config.parser_version_string
-    assert_never(opt)
-
-
 class ChunkingOptions(StrEnum):
     SIMPLE_OVERLAP = "simple_overlap"
-
-    @property
-    def valid_parsings(self) -> list[ParsingOptions]:
-        # Note that SIMPLE_OVERLAP must be valid for all by default
-        # TODO: implement for future parsing options
-        valid_parsing_dict: dict[str, list[ParsingOptions]] = {}
-        return valid_parsing_dict.get(self.value, [])  # noqa: FURB184
 
 
 def get_default_pdf_parser() -> PDFParserFn:
@@ -300,7 +270,10 @@ class ParsingSettings(BaseModel):
         ),
         exclude=True,
     )
-    chunking_algorithm: ChunkingOptions = ChunkingOptions.SIMPLE_OVERLAP
+    chunking_algorithm: ChunkingOptions = Field(
+        default=ChunkingOptions.SIMPLE_OVERLAP,
+        deprecated="This field is deprecated and will be removed in version 6.",
+    )
     doc_filters: Sequence[Mapping[str, Any]] | None = Field(
         default=None,
         description=(
@@ -318,31 +291,6 @@ class ParsingSettings(BaseModel):
         default=False,
         description="Parse clinical trial JSONs into human readable text.",
     )
-
-    def chunk_type(self, chunking_selection: ChunkingOptions | None = None) -> str:
-        """Future chunking implementations (i.e. by section) will get an elif clause here."""
-        if chunking_selection is None:
-            chunking_selection = self.chunking_algorithm
-        if chunking_selection == ChunkingOptions.SIMPLE_OVERLAP:
-            return (
-                f"{self.parser_version_string}|{chunking_selection.value}"
-                f"|tokens={self.chunk_size}|overlap={self.overlap}"
-            )
-        assert_never(chunking_selection)
-
-    @property
-    def parser_version_string(self) -> str:
-        return f"paperqa-{__version__}"
-
-    def is_chunking_valid_for_parsing(self, parsing: str):
-        # must map the parsings because they won't include versions by default
-        return (
-            self.chunking_algorithm == ChunkingOptions.SIMPLE_OVERLAP
-            or parsing
-            in {  # type: ignore[unreachable]
-                _get_parse_type(p, self) for p in self.chunking_algorithm.valid_parsings
-            }
-        )
 
 
 class _FormatDict(dict):  # noqa: FURB189
@@ -923,6 +871,7 @@ class Settings(BaseSettings):
             str(self.parsing.chunk_size),
             str(self.parsing.overlap),
             self.parsing.chunking_algorithm,
+            str(self.parsing.multimodal),
         ]
         return f"pqa_index_{hexdigest('|'.join(segments))}"
 
