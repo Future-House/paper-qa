@@ -340,12 +340,11 @@ async def read_doc(  # noqa: PLR0912
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
-    Optionally can include just the parsing as well as metadata about the parsing/chunking
     Args:
         path: local document path
         doc: object with document metadata
         parsed_text_only: return parsed text without chunking
-        include_metadata: return a tuple
+        include_metadata: Opt-in flag to include metadata about the chunking algorithm.
         chunk_chars: size of chunks
         overlap: size of overlap between chunks
         parse_pdf: Optional function to parse PDF files (if you're parsing a PDF).
