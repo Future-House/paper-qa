@@ -1,5 +1,4 @@
 import asyncio
-import base64
 import contextlib
 import csv
 import io
@@ -35,7 +34,7 @@ from lmi import (
     SparseEmbeddingModel,
 )
 from lmi.llms import rate_limited
-from lmi.utils import VCR_DEFAULT_MATCH_ON
+from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
 from paperqa_pymupdf import parse_pdf_to_pages as pymupdf_parse_pdf_to_pages
 from paperqa_pypdf import parse_pdf_to_pages as pypdf_parse_pdf_to_pages
 from pytest_subtests import SubTests
@@ -72,7 +71,6 @@ from paperqa.types import (
     ParsedText,
 )
 from paperqa.utils import (
-    bytes_to_string,
     clean_possessives,
     encode_id,
     extract_score,
@@ -80,10 +78,8 @@ from paperqa.utils import (
     maybe_is_html,
     maybe_is_text,
     name_in_text,
-    string_to_bytes,
     strings_similarity,
     strip_citations,
-    validate_image,
 )
 
 THIS_MODULE = pathlib.Path(__file__)
@@ -2555,26 +2551,6 @@ def test_maybe_get_date():
 )
 def test_clean_possessives(raw_text: str, cleaned_text: str) -> None:
     assert clean_possessives(raw_text) == cleaned_text
-
-
-@pytest.mark.parametrize(
-    "value",
-    [
-        pytest.param(b"Hello, World!", id="simple-text"),
-        pytest.param(b"", id="empty-bytes"),
-        pytest.param(bytes([0, 1, 2, 255, 128, 64]), id="binary-data"),
-        pytest.param(b"Test data for base64 encoding", id="base64-validation"),
-        pytest.param("Hello 世界 🌍".encode(), id="utf8-text"),
-    ],
-)
-def test_str_bytes_conversions(value: bytes) -> None:
-    # Test round-trip conversion
-    encoded_string = bytes_to_string(value)
-    decoded_bytes = string_to_bytes(encoded_string)
-    assert decoded_bytes == value
-
-    # Validate that encoded string is valid base64
-    assert base64.b64decode(encoded_string) == value
 
 
 tricky_test = (

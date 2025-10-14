@@ -4,6 +4,8 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 
 [dependency-groups]
 dev = [
+    "paper-qa-pymupdf[dev]",
+    "paper-qa-pypdf[dev]",
     "paper-qa[dev]",
 ]
 
@@ -78,9 +80,7 @@ dev = [
     "typeguard",
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
-image = [
-    "pillow>=10.3.0",  # Pin for py.typed
-]
+image = ["fhlmi[image]"]
 ldp = [
     "ldp>=0.25.0,<1",  # Lower pin for new LLM client interface, upper pin if v1 introduces breaks
 ]
