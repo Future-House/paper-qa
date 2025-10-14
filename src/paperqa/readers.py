@@ -51,7 +51,7 @@ async def parse_image(
         paperqa_version=pqa_version,
         total_parsed_text_length=0,  # No text, just an image
         count_parsed_media=1,
-        summary="image",
+        name="image",
     )
     return ParsedText(content={"1": ("", [parsed_media])}, metadata=metadata)
 
@@ -162,7 +162,7 @@ def parse_text(
             parsing_libraries=parsing_libraries,
             paperqa_version=pqa_version,
             total_parsed_text_length=total_length,
-            summary=f"{parse_summary}|split-lines={split_lines}",
+            name=f"{parse_summary}|split-lines={split_lines}",
         ),
     )
 
@@ -385,7 +385,7 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=0,
             overlap=0,
-            summary=f"paper-qa={pqa_version}|algorithm=none|reduction=cl100k_base",
+            name=f"paper-qa={pqa_version}|algorithm=none|reduction=cl100k_base",
         )
     elif str_path.endswith(".pdf"):
         chunked_text = chunk_pdf(
@@ -394,7 +394,7 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=chunk_chars,
             overlap=overlap,
-            summary=(
+            name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-pdf"
                 f"|size={chunk_chars}|overlap={overlap}"
             ),
@@ -406,7 +406,7 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=0,
             overlap=0,
-            summary=f"paper-qa={pqa_version}|algorithm=none",
+            name=f"paper-qa={pqa_version}|algorithm=none",
         )
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
@@ -415,7 +415,7 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=chunk_chars,
             overlap=overlap,
-            summary=(
+            name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-text|reduction=cl100k_base"
                 f"|size={chunk_chars}|overlap={overlap}"
             ),
@@ -427,7 +427,7 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=chunk_chars,
             overlap=overlap,
-            summary=(
+            name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-code|reduction=cl100k_base"
                 f"|size={chunk_chars}|overlap={overlap}"
             ),

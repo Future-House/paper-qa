@@ -177,6 +177,6 @@ def parse_pdf_to_pages(
         parsing_libraries=[f"{pymupdf.__name__} ({pymupdf.__version__})"],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        summary=f"pdf|block={use_block_parsing}{multimodal_string if parse_media else ''}",
+        name=f"pdf|block={use_block_parsing}{multimodal_string if parse_media else ''}",
     )
     return ParsedText(content=content, metadata=metadata)

@@ -461,7 +461,7 @@ class ChunkMetadata(BaseModel):
 
     size: int = Field(description="Chunk size (chars), or 0 for no chunking.")
     overlap: int = Field(description="Chunk overlap (chars), or 0 for no overlap.")
-    summary: str | None = Field(
+    name: str | None = Field(
         default=None,
         description=(
             "Optional string summarizing the chunking parameters, embodying a hash."
@@ -481,7 +481,7 @@ class ParsedMetadata(BaseModel):
     )
     total_parsed_text_length: int
     count_parsed_media: int = Field(default=0, ge=0)
-    summary: str | None = Field(
+    name: str | None = Field(
         default=None,
         description=(
             "Optional string summarizing the parsing parameters, embodying a hash."

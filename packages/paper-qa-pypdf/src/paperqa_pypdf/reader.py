@@ -105,6 +105,6 @@ def parse_pdf_to_pages(
         ],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        summary=f"pdf|{multimodal_string if parse_media else ''}",
+        name=f"pdf|{multimodal_string if parse_media else ''}",
     )
     return ParsedText(content=pages, metadata=metadata)

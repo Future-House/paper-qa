@@ -1307,8 +1307,8 @@ async def test_parser_only_reader(pdf_parser: PDFParserFn, stub_data_dir: Path) 
         parse_pdf=pdf_parser,
         full_page=True,  # Simple to support across many parsers
     )
-    assert parsed_text.metadata.summary
-    assert "pdf" in parsed_text.metadata.summary
+    assert parsed_text.metadata.name
+    assert "pdf" in parsed_text.metadata.name
     assert parsed_text.metadata.chunk_metadata is None
     assert isinstance(parsed_text.content, dict)
     num_chars = 0
@@ -1339,11 +1339,11 @@ async def test_chunk_metadata_reader(
         include_metadata=True,
         parse_pdf=pdf_parser,
     )
-    assert metadata.summary
-    assert "pdf" in metadata.summary
+    assert metadata.name
+    assert "pdf" in metadata.name
     assert isinstance(metadata.chunk_metadata, ChunkMetadata)
-    assert metadata.chunk_metadata.summary
-    assert "overlap-pdf" in metadata.chunk_metadata.summary
+    assert metadata.chunk_metadata.name
+    assert "overlap-pdf" in metadata.chunk_metadata.name
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.size == 3000
     assert len(chunk_text) > 2, "Expected multiple chunks, for meaningful assertions"
@@ -1380,11 +1380,11 @@ async def test_chunk_metadata_reader(
         include_metadata=True,
     )
     # NOTE the use of tiktoken changes the actual char and overlap counts
-    assert metadata.summary
-    assert "html" in metadata.summary
+    assert metadata.name
+    assert "html" in metadata.name
     assert isinstance(metadata.chunk_metadata, ChunkMetadata)
-    assert metadata.chunk_metadata.summary
-    assert "overlap-text" in metadata.chunk_metadata.summary
+    assert metadata.chunk_metadata.name
+    assert "overlap-text" in metadata.chunk_metadata.name
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.size == 3000
     assert all(
@@ -1404,11 +1404,11 @@ async def test_chunk_metadata_reader(
             doc=Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
             include_metadata=True,
         )
-        assert metadata.summary
-        assert "txt" in metadata.summary
+        assert metadata.name
+        assert "txt" in metadata.name
         assert isinstance(metadata.chunk_metadata, ChunkMetadata)
-        assert metadata.chunk_metadata.summary
-        assert "overlap-code" in metadata.chunk_metadata.summary
+        assert metadata.chunk_metadata.name
+        assert "overlap-code" in metadata.chunk_metadata.name
         assert metadata.chunk_metadata.overlap == 100
         assert metadata.chunk_metadata.size == 3000
         assert all(
@@ -1483,8 +1483,8 @@ async def test_read_doc_images_metadata(stub_data_dir: Path) -> None:
     image_id = parsed_image.to_id()
     assert image_id.version == 4, "Expected a uuid4-compatible ID"
     assert image_id == UUID("f6426bc3-382a-45a4-8677-08744044864f")
-    assert parsed_text.metadata.summary
-    assert "image" in parsed_text.metadata.summary
+    assert parsed_text.metadata.name
+    assert "image" in parsed_text.metadata.name
     assert parsed_text.metadata.count_parsed_media == 1
     assert parsed_text.metadata.total_parsed_text_length == 0
     assert parsed_text.metadata.chunk_metadata is None
@@ -1502,15 +1502,15 @@ async def test_read_doc_images_metadata(stub_data_dir: Path) -> None:
     texts, metadata = texts_with_metadata
     assert len(texts) == 1
     assert texts[0] == text
-    assert metadata.summary
-    assert "image" in metadata.summary
+    assert metadata.name
+    assert "image" in metadata.name
     assert metadata.count_parsed_media == 1
     assert metadata.total_parsed_text_length == 0
     assert metadata.chunk_metadata is not None
     assert not metadata.chunk_metadata.size
     assert not metadata.chunk_metadata.overlap
-    assert metadata.chunk_metadata.summary
-    assert "algorithm=none" in metadata.chunk_metadata.summary
+    assert metadata.chunk_metadata.name
+    assert "algorithm=none" in metadata.chunk_metadata.name
 
 
 @pytest.mark.asyncio
