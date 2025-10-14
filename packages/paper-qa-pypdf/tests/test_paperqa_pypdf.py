@@ -6,9 +6,10 @@ from typing import cast
 
 import pypdf
 import pytest
+from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs
 from paperqa.readers import PDFParserFn, chunk_pdf
-from paperqa.utils import ImpossibleParsingError, bytes_to_string
+from paperqa.utils import ImpossibleParsingError
 
 from paperqa_pypdf import parse_pdf_to_pages
 

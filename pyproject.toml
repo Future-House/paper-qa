@@ -4,6 +4,8 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 
 [dependency-groups]
 dev = [
+    "paper-qa-pymupdf[dev]",
+    "paper-qa-pypdf[dev]",
     "paper-qa[dev]",
 ]
 

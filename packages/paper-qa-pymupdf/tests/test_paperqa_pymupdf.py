@@ -6,9 +6,10 @@ from unittest.mock import MagicMock, patch
 
 import pymupdf
 import pytest
+from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs, Settings
 from paperqa.readers import PDFParserFn, chunk_pdf
-from paperqa.utils import ImpossibleParsingError, bytes_to_string
+from paperqa.utils import ImpossibleParsingError
 
 from paperqa_pymupdf import parse_pdf_to_pages
 

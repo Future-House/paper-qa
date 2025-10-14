@@ -1883,6 +1883,8 @@ zotero = [
 [package.dev-dependencies]
 dev = [
     { name = "paper-qa", extra = ["dev"] },
+    { name = "paper-qa-pymupdf", extra = ["dev"] },
+    { name = "paper-qa-pypdf", extra = ["dev"] },
 ]
 
 [package.metadata]
@@ -1943,7 +1945,11 @@ requires-dist = [
 provides-extras = ["dev", "image", "ldp", "local", "memory", "openreview", "pymupdf", "pypdf", "pypdf-media", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "paper-qa", extras = ["dev"], editable = "." }]
+dev = [
+    { name = "paper-qa", extras = ["dev"], editable = "." },
+    { name = "paper-qa-pymupdf", extras = ["dev"], editable = "packages/paper-qa-pymupdf" },
+    { name = "paper-qa-pypdf", extras = ["dev"], editable = "packages/paper-qa-pypdf" },
+]
 
 [[package]]
 name = "paper-qa-pymupdf"
@@ -1953,11 +1959,24 @@ dependencies = [
     { name = "pymupdf" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "fhlmi" },
+    { name = "paper-qa" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
 [package.metadata]
 requires-dist = [
+    { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "paper-qa", editable = "." },
+    { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pymupdf", specifier = ">=1.24.12" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "paper-qa-pypdf"
@@ -1968,17 +1987,29 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+dev = [
+    { name = "fhlmi" },
+    { name = "paper-qa" },
+    { name = "pypdfium2" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
 media = [
     { name = "pypdfium2" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "paper-qa", editable = "." },
+    { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
+    { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'dev'", editable = "packages/paper-qa-pypdf" },
     { name = "pypdf", specifier = ">=3" },
     { name = "pypdfium2", marker = "extra == 'media'", specifier = ">=4.22.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
-provides-extras = ["media"]
+provides-extras = ["dev", "media"]
 
 [[package]]
 name = "parso"

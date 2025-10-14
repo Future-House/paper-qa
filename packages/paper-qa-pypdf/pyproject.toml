@@ -34,6 +34,13 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
+dev = [
+    "fhlmi>=0.39",  # Pin for bytes_to_string
+    "paper-qa-pypdf[media]",
+    "paper-qa>=5.23",  # Pin for PDFParserFn
+    "pytest-asyncio",
+    "pytest>=8",  # Pin to keep recent
+]
 media = [
     "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition
 ]
