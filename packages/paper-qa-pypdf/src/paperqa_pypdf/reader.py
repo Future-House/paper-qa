@@ -94,6 +94,7 @@ def parse_pdf_to_pages(
             total_length += len(text)
 
     pypdf_version_str = f"{pypdf.__name__} ({pypdf.__version__})"
+    multimodal_string = f"|multimodal{'|mode=full-page' if full_page else ''}"
     metadata = ParsedMetadata(
         parsing_libraries=[
             (
@@ -104,6 +105,6 @@ def parse_pdf_to_pages(
         ],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        parse_type="pdf",
+        name=f"pdf|{multimodal_string if parse_media else ''}",
     )
     return ParsedText(content=pages, metadata=metadata)

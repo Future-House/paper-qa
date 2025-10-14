@@ -168,10 +168,15 @@ def parse_pdf_to_pages(
             total_length += len(text)
             count_media += len(media)
 
+    multimodal_string = f"|multimodal|dpi={image_dpi}" + (
+        "|mode=full-page"
+        if full_page
+        else f"|mode=individual|x-tol={x_tol}|y-tol={y_tol}"
+    )
     metadata = ParsedMetadata(
         parsing_libraries=[f"{pymupdf.__name__} ({pymupdf.__version__})"],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        parse_type="pdf",
+        name=f"pdf|block={use_block_parsing}{multimodal_string if parse_media else ''}",
     )
     return ParsedText(content=content, metadata=metadata)

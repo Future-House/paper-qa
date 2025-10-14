@@ -51,7 +51,7 @@ async def parse_image(
         paperqa_version=pqa_version,
         total_parsed_text_length=0,  # No text, just an image
         count_parsed_media=1,
-        parse_type="image",
+        name="image",
     )
     return ParsedText(content={"1": ("", [parsed_media])}, metadata=metadata)
 
@@ -140,11 +140,11 @@ def parse_text(
             raise NotImplementedError(
                 "HTML parsing is not yet set up to work with split_lines."
             )
-        parse_type: str = "html"
+        parse_summary: str = "html"
         text = html2text(text)
         parsing_libraries.append(f"html2text ({html2text_version})")
     else:
-        parse_type = "txt"
+        parse_summary = "txt"
     if isinstance(text, str):
         total_length: int = len(text)
     else:
@@ -152,7 +152,7 @@ def parse_text(
         for i, t in enumerate(text):
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
-                    f"The {parse_type} on page {i} of {len(text)} was {len(t)} chars"
+                    f"The {parse_summary} on page {i} of {len(text)} was {len(t)} chars"
                     f" long, which exceeds the {page_size_limit} char limit at path"
                     f" {path}."
                 )
@@ -162,7 +162,7 @@ def parse_text(
             parsing_libraries=parsing_libraries,
             paperqa_version=pqa_version,
             total_parsed_text_length=total_length,
-            parse_type=parse_type,
+            name=f"{parse_summary}|split-lines={split_lines}",
         ),
     )
 
@@ -340,12 +340,11 @@ async def read_doc(  # noqa: PLR0912
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
     """Parse a document and split into chunks.
 
-    Optionally can include just the parsing as well as metadata about the parsing/chunking
     Args:
         path: local document path
         doc: object with document metadata
         parsed_text_only: return parsed text without chunking
-        include_metadata: return a tuple
+        include_metadata: Opt-in flag to include metadata about the chunking algorithm.
         chunk_chars: size of chunks
         overlap: size of overlap between chunks
         parse_pdf: Optional function to parse PDF files (if you're parsing a PDF).
@@ -379,43 +378,59 @@ async def read_doc(  # noqa: PLR0912
 
     # next chunk the parsed text
 
-    # check if chunk is 0 (no chunking)
     if chunk_chars == 0:
-        # TODO: add tiktoken usage to chunk metadata
         chunked_text = [
             Text(text=parsed_text.reduce_content(), name=doc.docname, doc=doc)
         ]
-        chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
+        chunk_metadata = ChunkMetadata(
+            size=0,
+            overlap=0,
+            name=f"paper-qa={pqa_version}|algorithm=none|reduction=cl100k_base",
+        )
     elif str_path.endswith(".pdf"):
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars,
+            size=chunk_chars,
             overlap=overlap,
-            chunk_type="overlap_pdf_by_page",
+            name=(
+                f"paper-qa={pqa_version}|algorithm=overlap-pdf"
+                f"|size={chunk_chars}|overlap={overlap}"
+            ),
         )
     elif str_path.endswith(IMAGE_EXTENSIONS):
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
-        chunk_metadata = ChunkMetadata(chunk_chars=0, overlap=0, chunk_type="no_chunk")
+        chunk_metadata = ChunkMetadata(
+            size=0,
+            overlap=0,
+            name=f"paper-qa={pqa_version}|algorithm=none",
+        )
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
-        # TODO: add tiktoken usage to chunk metadata
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars, overlap=overlap, chunk_type="overlap"
+            size=chunk_chars,
+            overlap=overlap,
+            name=(
+                f"paper-qa={pqa_version}|algorithm=overlap-text|reduction=cl100k_base"
+                f"|size={chunk_chars}|overlap={overlap}"
+            ),
         )
     else:
         chunked_text = chunk_code_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
         chunk_metadata = ChunkMetadata(
-            chunk_chars=chunk_chars,
+            size=chunk_chars,
             overlap=overlap,
-            chunk_type="overlap_code_by_line",
+            name=(
+                f"paper-qa={pqa_version}|algorithm=overlap-code|reduction=cl100k_base"
+                f"|size={chunk_chars}|overlap={overlap}"
+            ),
         )
 
     if include_metadata:

@@ -106,7 +106,8 @@ async def test_parse_pdf_to_pages() -> None:
     for pt in (parsed_text_full_page, parsed_text_no_media):
         (parsing_library,) = pt.metadata.parsing_libraries
         assert pypdf.__name__ in parsing_library
-        assert pt.metadata.parse_type == "pdf"
+        assert pt.metadata.name
+        assert "pdf" in pt.metadata.name
 
     # Check commonalities across all modes
     assert len(parsed_text_full_page.content) == len(

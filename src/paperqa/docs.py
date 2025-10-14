@@ -393,7 +393,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             include_metadata=True,
         )
         # loose check to see if document was loaded
-        if metadata.parse_type != "image" and (
+        if metadata.name != "image" and (
             not texts
             or len(texts[0].text) < 10  # noqa: PLR2004
             or (
