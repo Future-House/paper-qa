@@ -2447,6 +2447,7 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "docling" },
     { name = "fhlmi" },
     { name = "paper-qa" },
     { name = "pytest" },
@@ -2456,6 +2457,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "docling", specifier = ">=2" },
+    { name = "docling", marker = "extra == 'dev'", specifier = ">=2.56" },
     { name = "docling-core", specifier = ">=2" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "paper-qa", editable = "." },
