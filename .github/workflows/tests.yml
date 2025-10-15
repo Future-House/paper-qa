@@ -71,7 +71,7 @@ jobs:
       - run: uv run pylint src packages
       - run: uv run refurb .
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
-  test:
+  test-src:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -83,7 +83,34 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync
-      - run: uv run pytest -n auto
+      - run: uv run pytest -n auto tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
+          CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
+  test-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11, 3.13] # Our min and max supported Python versions
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync
+      - name: Cache Docling models
+        id: cache-models
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/docling
+          key: ${{ runner.os }}-docling-${{ hashFiles('uv.lock') }}
+          restore-keys: ${{ runner.os }}-docling-
+      - run: uv run pytest -n auto packages
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

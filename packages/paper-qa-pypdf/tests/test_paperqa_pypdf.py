@@ -54,7 +54,10 @@ async def test_parse_pdf_to_pages() -> None:
     # Check useful attributes are present and are JSON serializable
     json.dumps(p2_image.info)
     for attr in ("page_width", "page_height"):
-        dim = serde_p2_image.info[attr]
+        assert (
+            p2_image.info[attr] == serde_p2_image.info[attr]
+        ), "Expected serialization to match original"
+        dim = p2_image.info[attr]
         assert isinstance(dim, int | float)
         assert dim > 0, "Edge length should be positive"
 
