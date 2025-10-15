@@ -29,7 +29,7 @@ classifiers = [
 dependencies = [
     "anyio",
     "fhaviary[llm]>=0.20",  # For Environment.get_id
-    "fhlmi>=0.25.4",  # For LLM reasoning
+    "fhlmi>=0.39",  # Pin for bytes_to_string
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "httpx-aiohttp",
