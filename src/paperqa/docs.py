@@ -387,6 +387,12 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 doc, **(query_kwargs | kwargs)
             )
 
+        parse_images, enrich_media = parse_config.should_parse_and_enrich_media
+        multimodal_kwargs: dict[str, Any] = {"parse_images": parse_images}
+        if enrich_media:
+            multimodal_kwargs["multimodal_enricher"] = (
+                all_settings.make_media_enricher()
+            )
         texts, metadata = await read_doc(
             path,
             doc,
@@ -394,9 +400,9 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             overlap=parse_config.overlap,
             page_size_limit=parse_config.page_size_limit,
             use_block_parsing=parse_config.pdfs_use_block_parsing,
-            parse_images=parse_config.multimodal,
             parse_pdf=parse_config.parse_pdf,
             include_metadata=True,
+            **multimodal_kwargs,
         )
         # loose check to see if document was loaded
         if metadata.name != "image" and (
