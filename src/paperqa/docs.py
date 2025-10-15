@@ -300,6 +300,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 or "insufficient" in citation
             ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
+            del result, texts  # Ensure we don't reuse
 
         doc = Doc(
             docname=self._get_unique_name(
