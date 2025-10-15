@@ -288,10 +288,7 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
     absolute_index = await get_directory_index(settings=absolute_test_settings)
     assert set((await absolute_index.index_files).keys()) == {
         str(abs_paper_dir / f) for f in EXPECTED_STUB_DATA_FILES
-    }, (
-        "Incorrect index files, should be absolute to deny sharing indexes across"
-        " machines"
-    )
+    }, "Incorrect index files, should be absolute to deny sharing indexes across machines"
     for index in (relative_index, absolute_index):
         assert index.fields == [
             "file_location",
@@ -534,7 +531,6 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 async def test_gather_evidence_rejects_empty_docs(
     agent_test_settings: Settings,
 ) -> None:
-
     @wraps(GenerateAnswer.gen_answer)
     async def gen_answer(self, state) -> str:  # noqa: ARG001, RUF029
         return f"{CANNOT_ANSWER_PHRASE}."
@@ -551,7 +547,8 @@ async def test_gather_evidence_rejects_empty_docs(
                             settings=agent_test_settings,
                             summary_llm_model=agent_test_settings.get_summary_llm(),
                             embedding_model=agent_test_settings.get_embedding_model(),
-                        ).gather_evidence
+                        ).gather_evidence,
+                        concurrency_safe=GatherEvidence.CONCURRENCY_SAFE,
                     ),
                     Tool.from_function(
                         GenerateAnswer(
@@ -559,7 +556,8 @@ async def test_gather_evidence_rejects_empty_docs(
                             llm_model=agent_test_settings.get_llm(),
                             summary_llm_model=agent_test_settings.get_summary_llm(),
                             embedding_model=agent_test_settings.get_embedding_model(),
-                        ).gen_answer
+                        ).gen_answer,
+                        concurrency_safe=GenerateAnswer.CONCURRENCY_SAFE,
                     ),
                 ]
             ],
@@ -1073,7 +1071,6 @@ class TestClinicalTrialSearchTool:
 
 @pytest.mark.asyncio
 async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
-
     high_concurrency_settings = agent_test_settings.model_copy(deep=True)
     high_concurrency_settings.agent.index.name = "high_concurrency"
     high_concurrency_settings.agent.index.concurrency = 3

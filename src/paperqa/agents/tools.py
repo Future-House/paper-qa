@@ -95,12 +95,18 @@ class NamedTool(BaseModel):
     TOOL_FN_NAME: ClassVar[str] = (
         "# unpopulated"  # Comment symbol ensures no collisions
     )
+    CONCURRENCY_SAFE: ClassVar[bool] = Field(
+        default=False,
+        description="Whether the tool can be called concurrently with other tools. "
+        "Be careful when enabling.",
+    )
 
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
 
 class PaperSearch(NamedTool):
     TOOL_FN_NAME = "paper_search"
+    CONCURRENCY_SAFE = True
 
     settings: Settings
     embedding_model: EmbeddingModel
@@ -417,6 +423,7 @@ class Complete(NamedTool):
 
 class ClinicalTrialsSearch(NamedTool):
     TOOL_FN_NAME = "clinical_trials_search"
+    CONCURRENCY_SAFE = True
 
     model_config = ConfigDict(extra="forbid")
 
@@ -425,8 +432,9 @@ class ClinicalTrialsSearch(NamedTool):
     settings: Settings = Field(default_factory=Settings)
 
     # Gather evidence tool must be modified to understand the new evidence
-    GATHER_EVIDENCE_TOOL_PROMPT_OVERRIDE: ClassVar[str] = (
-        """Gather evidence from previous papers and clinical trials given a specific question.
+    GATHER_EVIDENCE_TOOL_PROMPT_OVERRIDE: ClassVar[
+        str
+    ] = """Gather evidence from previous papers and clinical trials given a specific question.
 
         Will increase evidence, relevant paper counts, and relevant clinical trial counts.
         A valuable time to invoke this tool is right after another tool increases paper or clinical trials count.
@@ -440,7 +448,6 @@ class ClinicalTrialsSearch(NamedTool):
         Returns:
             String describing gathered evidence and the current status.
         """
-    )
 
     async def clinical_trials_search(self, query: str, state: EnvironmentState) -> str:
         r"""Search for clinical trials, with support for repeated calls and concurrent execution.
@@ -459,20 +466,20 @@ class ClinicalTrialsSearch(NamedTool):
                     Modified Search:
                         Use operators to modify search behavior:
                         >>> 'EXPANSION[None]COVERAGE[FullMatch]"exact phrase"'
-                        >>> 'EXPANSION[Concept]heart attack'
+                        >>> "EXPANSION[Concept]heart attack"
 
                     Field Search:
                         Specify fields using AREA operator:
-                        >>> 'AREA[InterventionName]aspirin'
-                        >>> 'AREA[Phase]PHASE3'
+                        >>> "AREA[InterventionName]aspirin"
+                        >>> "AREA[Phase]PHASE3"
 
                     Location Search:
                         Use SEARCH operator for compound location queries:
-                        >>> 'cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)'
+                        >>> "cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)"
 
                     Complex Boolean:
                         Combine terms with AND, OR, NOT and parentheses:
-                        >>> '(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)'
+                        >>> "(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)"
 
                     Date Ranges:
                         Use RANGE to specify date ranges with formats like "yyyy-MM" or "yyyy-MM-dd".

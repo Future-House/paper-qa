@@ -69,7 +69,8 @@ def settings_to_tools(  # noqa: PLR0912
             tool = Tool.from_function(
                 PaperSearch(
                     settings=settings, embedding_model=embedding_model
-                ).paper_search
+                ).paper_search,
+                concurrency_safe=tool_type.CONCURRENCY_SAFE,
             )
             for pname in ("min_year", "max_year"):
                 tool.info.get_properties()[pname]["description"] = cast(
@@ -96,7 +97,10 @@ def settings_to_tools(  # noqa: PLR0912
                     partition_clinical_trials_by_source
                 )
 
-            tool = Tool.from_function(gather_evidence_tool.gather_evidence)
+            tool = Tool.from_function(
+                gather_evidence_tool.gather_evidence,
+                concurrency_safe=tool_type.CONCURRENCY_SAFE,
+            )
 
         elif issubclass(tool_type, GenerateAnswer):
             generate_answer_tool = GenerateAnswer(
@@ -116,15 +120,20 @@ def settings_to_tools(  # noqa: PLR0912
             tool = Tool.from_function(generate_answer_tool.gen_answer)
 
         elif issubclass(tool_type, Reset):
-            tool = Tool.from_function(Reset().reset)
+            tool = Tool.from_function(
+                Reset().reset, concurrency_safe=tool_type.CONCURRENCY_SAFE
+            )
         elif issubclass(tool_type, Complete):
-            tool = Tool.from_function(Complete().complete)
+            tool = Tool.from_function(
+                Complete().complete, concurrency_safe=tool_type.CONCURRENCY_SAFE
+            )
         elif issubclass(tool_type, ClinicalTrialsSearch):
             tool = Tool.from_function(
                 ClinicalTrialsSearch(
                     search_count=settings.agent.search_count,
                     settings=settings,
-                ).clinical_trials_search
+                ).clinical_trials_search,
+                concurrency_safe=tool_type.CONCURRENCY_SAFE,
             )
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
@@ -310,7 +319,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             "list[Message]",
             await self.exec_tool_calls(
                 action,
-                concurrency=False,  # PQA tools aren't yet concurrency safe
+                concurrency=True,  # We allow tools to define their own concurrency
                 state=self.state,
                 handle_tool_exc=True,
             ),
