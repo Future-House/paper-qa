@@ -89,7 +89,12 @@ THIS_MODULE = pathlib.Path(__file__)
 async def fixture_docs_fixture(stub_data_dir: Path) -> Docs:
     docs = Docs()
     with (stub_data_dir / "paper.pdf").open("rb") as f:
-        await docs.aadd_file(f, "Wellawatte et al, XAI Review, 2023")
+        await docs.aadd_file(
+            f,
+            citation="Wellawatte et al, XAI Review, 2023",  # Skip citation inference
+            doi="10.1021/acs.jctc.2c01235",  # Skip DOI inference
+            title="A Perspective on Explanations of Molecular Prediction Models",  # Skip title inference
+        )
     return docs
 
 
