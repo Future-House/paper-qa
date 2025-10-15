@@ -1597,6 +1597,25 @@ async def test_read_doc_images_concurrency(stub_data_dir: Path) -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("multimodal_option", "expected"),
+    [
+        (False, (False, False)),
+        (True, (True, True)),
+        (MultimodalOptions.OFF, (False, False)),
+        (MultimodalOptions.ON_WITH_ENRICHMENT, (True, True)),
+        (MultimodalOptions.ON_WITHOUT_ENRICHMENT, (True, False)),
+    ],
+)
+def test_should_parse_and_enrich_media(
+    multimodal_option: bool | MultimodalOptions, expected: tuple[bool, bool]
+) -> None:
+    assert (
+        ParsingSettings(multimodal=multimodal_option).should_parse_and_enrich_media
+        == expected
+    )
+
+
 @pytest.mark.asyncio
 async def test_code() -> None:
     settings = Settings.from_name("fast")
