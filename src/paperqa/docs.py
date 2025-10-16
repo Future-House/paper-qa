@@ -281,7 +281,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 overlap=parse_config.overlap,
                 page_size_limit=parse_config.page_size_limit,
                 use_block_parsing=parse_config.pdfs_use_block_parsing,
-                parse_images=parse_config.multimodal,
+                parse_images=False,  # Peeking is text only
                 parse_pdf=parse_config.parse_pdf,
             )
             if not texts or not texts[0].text.strip():
@@ -300,6 +300,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 or "insufficient" in citation
             ):
                 citation = f"Unknown, {os.path.basename(path)}, {datetime.now().year}"
+            del result, texts  # Ensure we don't reuse
 
         doc = Doc(
             docname=self._get_unique_name(
