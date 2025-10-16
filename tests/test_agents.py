@@ -288,7 +288,10 @@ async def test_get_directory_index_w_manifest(agent_test_settings: Settings) -> 
     absolute_index = await get_directory_index(settings=absolute_test_settings)
     assert set((await absolute_index.index_files).keys()) == {
         str(abs_paper_dir / f) for f in EXPECTED_STUB_DATA_FILES
-    }, "Incorrect index files, should be absolute to deny sharing indexes across machines"
+    }, (
+        "Incorrect index files, should be absolute to deny sharing indexes across "
+        "machines"
+    )
     for index in (relative_index, absolute_index):
         assert index.fields == [
             "file_location",
