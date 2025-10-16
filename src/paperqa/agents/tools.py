@@ -436,9 +436,8 @@ class ClinicalTrialsSearch(NamedTool):
     settings: Settings = Field(default_factory=Settings)
 
     # Gather evidence tool must be modified to understand the new evidence
-    GATHER_EVIDENCE_TOOL_PROMPT_OVERRIDE: ClassVar[
-        str
-    ] = """Gather evidence from previous papers and clinical trials given a specific question.
+    GATHER_EVIDENCE_TOOL_PROMPT_OVERRIDE: ClassVar[str] = (
+        """Gather evidence from previous papers and clinical trials given a specific question.
 
         Will increase evidence, relevant paper counts, and relevant clinical trial counts.
         A valuable time to invoke this tool is right after another tool increases paper or clinical trials count.
@@ -452,6 +451,7 @@ class ClinicalTrialsSearch(NamedTool):
         Returns:
             String describing gathered evidence and the current status.
         """
+    )
 
     async def clinical_trials_search(self, query: str, state: EnvironmentState) -> str:
         r"""Search for clinical trials, with support for repeated calls and concurrent execution.

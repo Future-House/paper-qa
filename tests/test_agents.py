@@ -531,6 +531,7 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
 async def test_gather_evidence_rejects_empty_docs(
     agent_test_settings: Settings,
 ) -> None:
+
     @wraps(GenerateAnswer.gen_answer)
     async def gen_answer(self, state) -> str:  # noqa: ARG001, RUF029
         return f"{CANNOT_ANSWER_PHRASE}."
