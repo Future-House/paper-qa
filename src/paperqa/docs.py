@@ -503,7 +503,20 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     ) -> None:
         """Delete a document from the collection."""
         # name is an alias for docname
-        name = docname if name is None else name
+        if name and docname and name != docname:
+            raise ValueError(
+                "When specifying both name and docname for deletion,"
+                f" they need to match. The inputs were {name=} and {docname=}."
+            )
+        if name is not None:
+            warnings.warn(
+                "The 'name' argument is deprecated in favor of 'docname',"
+                " this deprecation will conclude in version 6.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+        else:
+            name = docname
 
         if name is not None:
             doc = next((doc for doc in self.docs.values() if doc.docname == name), None)

@@ -466,17 +466,27 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert result.cost > 0
 
 
-@pytest.mark.vcr
+@pytest.mark.vcr(
+    match_on=[*VCR_DEFAULT_MATCH_ON, "body"]  # body is needed for /embeddings
+)
 @pytest.mark.asyncio
 async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
     docs = Docs()
-    await docs.aadd(
+    assert await docs.aadd(
         stub_data_dir / "flag_day.html",
-        "WikiMedia Foundation, 2023, Accessed now",
+        citation='"National Flag of Canada Day." WikiMedia Foundation, 2023, Accessed now',  # Skip citation inference
+        title="National Flag of Canada Day",  # Skip title inference
         dockey="test",
     )
+    grav_hill_docname = await docs.aadd(
+        stub_data_dir / "gravity_hill.md",
+        citation='"Gravity Hill." WikiMedia Foundation, 2023, Accessed now',  # Skip citation inference
+        title="Gravity hill",  # Skip title inference
+    )
+    assert grav_hill_docname, "Test expects successful add"
+
     with subtests.test(msg="citation-creation"):
-        assert docs.docs["test"].docname == "Wiki2023"
+        assert docs.docs["test"].docname == "National2023"
 
     with subtests.test(msg="text-contains"):
         await docs.aget_evidence("What is the national flag of Canada?")
@@ -484,6 +494,23 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
         assert docs.texts
         assert all(t in docs.texts_index for t in docs.texts)
 
+    with subtests.test(msg="delete"):
+        (grav_hill_details,) = (
+            d for d in docs.docs.values() if d.docname == grav_hill_docname
+        )
+        prior_texts_index_size = len(docs.texts_index)
+        docs.delete(docname=grav_hill_docname)
+        assert grav_hill_details.dockey not in docs.docs, "Details should be gone"
+        assert not [
+            t for t in docs.texts if t.doc == grav_hill_details
+        ], "Texts should be gone"
+        if len(docs.texts_index) == prior_texts_index_size:
+            pytest.xfail(
+                "Per https://github.com/Future-House/paper-qa/issues/1140"
+                " this can be improved"
+            )
+
+    with subtests.test(msg="cleanup"):
         docs.texts_index.clear()
         assert docs.texts
         assert all(t not in docs.texts_index for t in docs.texts)
