@@ -472,11 +472,12 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
     docs = Docs()
     await docs.aadd(
         stub_data_dir / "flag_day.html",
-        "WikiMedia Foundation, 2023, Accessed now",
+        citation='"National Flag of Canada Day." WikiMedia Foundation, 2023, Accessed now',  # Skip citation inference
+        title="National Flag of Canada Day",  # Skip title inference
         dockey="test",
     )
     with subtests.test(msg="citation-creation"):
-        assert docs.docs["test"].docname == "Wiki2023"
+        assert docs.docs["test"].docname == "National2023"
 
     with subtests.test(msg="text-contains"):
         await docs.aget_evidence("What is the national flag of Canada?")
