@@ -33,6 +33,7 @@ from .tools import (
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
+    NamedTool,
     PaperSearch,
     Reset,
 )
@@ -65,12 +66,15 @@ def settings_to_tools(  # noqa: PLR0912
             for name in set(settings.agent.tool_names)
         ]
     ):
+
+        def make_tool(fn, tool_type: type[NamedTool] = tool_type) -> Tool:
+            return Tool.from_function(fn, concurrency_safe=tool_type.CONCURRENCY_SAFE)
+
         if issubclass(tool_type, PaperSearch):
-            tool = Tool.from_function(
+            tool = make_tool(
                 PaperSearch(
                     settings=settings, embedding_model=embedding_model
-                ).paper_search,
-                concurrency_safe=tool_type.CONCURRENCY_SAFE,
+                ).paper_search
             )
             for pname in ("min_year", "max_year"):
                 tool.info.get_properties()[pname]["description"] = cast(
@@ -97,10 +101,7 @@ def settings_to_tools(  # noqa: PLR0912
                     partition_clinical_trials_by_source
                 )
 
-            tool = Tool.from_function(
-                gather_evidence_tool.gather_evidence,
-                concurrency_safe=tool_type.CONCURRENCY_SAFE,
-            )
+            tool = make_tool(gather_evidence_tool.gather_evidence)
 
         elif issubclass(tool_type, GenerateAnswer):
             generate_answer_tool = GenerateAnswer(
@@ -117,23 +118,17 @@ def settings_to_tools(  # noqa: PLR0912
                     partition_clinical_trials_by_source
                 )
 
-            tool = Tool.from_function(generate_answer_tool.gen_answer)
+            tool = make_tool(generate_answer_tool.gen_answer)
 
         elif issubclass(tool_type, Reset):
-            tool = Tool.from_function(
-                Reset().reset, concurrency_safe=tool_type.CONCURRENCY_SAFE
-            )
+            tool = make_tool(Reset().reset)
         elif issubclass(tool_type, Complete):
-            tool = Tool.from_function(
-                Complete().complete, concurrency_safe=tool_type.CONCURRENCY_SAFE
-            )
+            tool = make_tool(Complete().complete)
         elif issubclass(tool_type, ClinicalTrialsSearch):
-            tool = Tool.from_function(
+            tool = make_tool(
                 ClinicalTrialsSearch(
-                    search_count=settings.agent.search_count,
-                    settings=settings,
-                ).clinical_trials_search,
-                concurrency_safe=tool_type.CONCURRENCY_SAFE,
+                    search_count=settings.agent.search_count, settings=settings
+                ).clinical_trials_search
             )
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")
