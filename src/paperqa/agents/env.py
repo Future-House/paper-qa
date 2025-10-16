@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Callable
 from copy import deepcopy
 from typing import Any, ClassVar, Self, cast
 from uuid import UUID
@@ -33,6 +34,7 @@ from .tools import (
     EnvironmentState,
     GatherEvidence,
     GenerateAnswer,
+    NamedTool,
     PaperSearch,
     Reset,
 )
@@ -65,8 +67,12 @@ def settings_to_tools(  # noqa: PLR0912
             for name in set(settings.agent.tool_names)
         ]
     ):
+
+        def make_tool(fn: Callable, tool_type: type[NamedTool] = tool_type) -> Tool:
+            return Tool.from_function(fn, concurrency_safe=tool_type.CONCURRENCY_SAFE)
+
         if issubclass(tool_type, PaperSearch):
-            tool = Tool.from_function(
+            tool = make_tool(
                 PaperSearch(
                     settings=settings, embedding_model=embedding_model
                 ).paper_search
@@ -96,7 +102,7 @@ def settings_to_tools(  # noqa: PLR0912
                     partition_clinical_trials_by_source
                 )
 
-            tool = Tool.from_function(gather_evidence_tool.gather_evidence)
+            tool = make_tool(gather_evidence_tool.gather_evidence)
 
         elif issubclass(tool_type, GenerateAnswer):
             generate_answer_tool = GenerateAnswer(
@@ -113,17 +119,16 @@ def settings_to_tools(  # noqa: PLR0912
                     partition_clinical_trials_by_source
                 )
 
-            tool = Tool.from_function(generate_answer_tool.gen_answer)
+            tool = make_tool(generate_answer_tool.gen_answer)
 
         elif issubclass(tool_type, Reset):
-            tool = Tool.from_function(Reset().reset)
+            tool = make_tool(Reset().reset)
         elif issubclass(tool_type, Complete):
-            tool = Tool.from_function(Complete().complete)
+            tool = make_tool(Complete().complete)
         elif issubclass(tool_type, ClinicalTrialsSearch):
-            tool = Tool.from_function(
+            tool = make_tool(
                 ClinicalTrialsSearch(
-                    search_count=settings.agent.search_count,
-                    settings=settings,
+                    search_count=settings.agent.search_count, settings=settings
                 ).clinical_trials_search
             )
         else:
@@ -310,7 +315,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             "list[Message]",
             await self.exec_tool_calls(
                 action,
-                concurrency=False,  # PQA tools aren't yet concurrency safe
+                concurrency=True,  # We allow tools to define their own concurrency
                 state=self.state,
                 handle_tool_exc=True,
             ),

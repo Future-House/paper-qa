@@ -28,7 +28,7 @@ classifiers = [
 ]
 dependencies = [
     "anyio",
-    "fhaviary[llm]>=0.20",  # For Environment.get_id
+    "fhaviary[llm]>=0.27",  # For partial tool concurrency
     "fhlmi>=0.39",  # Pin for bytes_to_string
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",

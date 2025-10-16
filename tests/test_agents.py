@@ -551,7 +551,8 @@ async def test_gather_evidence_rejects_empty_docs(
                             settings=agent_test_settings,
                             summary_llm_model=agent_test_settings.get_summary_llm(),
                             embedding_model=agent_test_settings.get_embedding_model(),
-                        ).gather_evidence
+                        ).gather_evidence,
+                        concurrency_safe=GatherEvidence.CONCURRENCY_SAFE,
                     ),
                     Tool.from_function(
                         GenerateAnswer(
@@ -559,7 +560,8 @@ async def test_gather_evidence_rejects_empty_docs(
                             llm_model=agent_test_settings.get_llm(),
                             summary_llm_model=agent_test_settings.get_summary_llm(),
                             embedding_model=agent_test_settings.get_embedding_model(),
-                        ).gen_answer
+                        ).gen_answer,
+                        concurrency_safe=GenerateAnswer.CONCURRENCY_SAFE,
                     ),
                 ]
             ],
