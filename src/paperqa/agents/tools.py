@@ -95,11 +95,10 @@ class NamedTool(BaseModel):
     TOOL_FN_NAME: ClassVar[str] = (
         "# unpopulated"  # Comment symbol ensures no collisions
     )
-    CONCURRENCY_SAFE: ClassVar[bool] = Field(
-        default=False,
-        description="Whether the tool can be called concurrently with other tools. "
-        "Be careful when enabling.",
-    )
+
+    # Whether the tool can be called concurrently with other tools.
+    # Be careful when enabling.
+    CONCURRENCY_SAFE: ClassVar[bool] = False
 
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
