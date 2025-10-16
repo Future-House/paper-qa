@@ -1,0 +1,546 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1021/acs.jctc.2c01235?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "1db1bde653658ec9b30858ae14650b8f9c9d438b", "externalIds":
+          {"PubMedCentral": "10134429", "DOI": "10.1021/acs.jctc.2c01235", "CorpusId":
+          257786462, "PubMed": "36972469"}, "url": "https://www.semanticscholar.org/paper/1db1bde653658ec9b30858ae14650b8f9c9d438b",
+          "title": "A Perspective on Explanations of Molecular Prediction Models", "venue":
+          "Journal of Chemical Theory and Computation", "year": 2023, "citationCount":
+          48, "influentialCitationCount": 2, "isOpenAccess": true, "openAccessPdf":
+          {"url": "https://doi.org/10.1021/acs.jctc.2c01235", "status": "HYBRID", "license":
+          "CCBY"}, "publicationTypes": ["Review", "JournalArticle"], "publicationDate":
+          "2023-03-27", "journal": {"name": "Journal of Chemical Theory and Computation",
+          "pages": "2149 - 2160", "volume": "19"}, "citationStyles": {"bibtex": "@Article{Wellawatte2023APO,\n
+          author = {G. Wellawatte and Heta A. Gandhi and Aditi Seshadri and A. White},\n
+          booktitle = {Journal of Chemical Theory and Computation},\n journal = {Journal
+          of Chemical Theory and Computation},\n pages = {2149 - 2160},\n title = {A
+          Perspective on Explanations of Molecular Prediction Models},\n volume = {19},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "1805407482", "name": "G. Wellawatte"},
+          {"authorId": "95666896", "name": "Heta A. Gandhi"}, {"authorId": "1481244794",
+          "name": "Aditi Seshadri"}, {"authorId": "2257535", "name": "A. White"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1398"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 16 Oct 2025 21:14:22 GMT
+        Via:
+          - 1.1 28da7b50b2dbdddfb257605df1527026.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - jQzSXf1sNFbGb5OZZeN7PaooCGOMDlJmYoKJxbuQvUBfcCedmNE23Q==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - Sjv3TFYfvHcESAg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1398"
+        x-amzn-Remapped-Date:
+          - Thu, 16 Oct 2025 21:14:22 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 6f958d56-c9c6-4cda-96f3-f1c7b8e0ae81
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1021%2Facs.jctc.2c01235?mailto=example@papercrow.ai
+    response:
+      body:
+        string: !!binary |
+          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
+          o33Ry66Hohf5dikeXucfP/4H7FUKuINOAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "5612"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 16 Oct 2025 21:14:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1021%2Facs.jctc.2c01235/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Wellawatte_2023, title={A Perspective on Explanations of
+          Molecular Prediction Models}, volume={19}, ISSN={1549-9626}, url={http://dx.doi.org/10.1021/acs.jctc.2c01235},
+          DOI={10.1021/acs.jctc.2c01235}, number={8}, journal={Journal of Chemical Theory
+          and Computation}, publisher={American Chemical Society (ACS)}, author={Wellawatte,
+          Geemi P. and Gandhi, Heta A. and Seshadri, Aditi and White, Andrew D.}, year={2023},
+          month=mar, pages={2149\u20132160} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Thu, 16 Oct 2025 21:14:22 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/DOI:10.1021/acs.jctc.2c01235?fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"paperId": "1db1bde653658ec9b30858ae14650b8f9c9d438b", "externalIds":
+          {"PubMedCentral": "10134429", "DOI": "10.1021/acs.jctc.2c01235", "CorpusId":
+          257786462, "PubMed": "36972469"}, "url": "https://www.semanticscholar.org/paper/1db1bde653658ec9b30858ae14650b8f9c9d438b",
+          "title": "A Perspective on Explanations of Molecular Prediction Models", "venue":
+          "Journal of Chemical Theory and Computation", "year": 2023, "citationCount":
+          48, "influentialCitationCount": 2, "isOpenAccess": true, "openAccessPdf":
+          {"url": "https://doi.org/10.1021/acs.jctc.2c01235", "status": "HYBRID", "license":
+          "CCBY"}, "publicationTypes": ["Review", "JournalArticle"], "publicationDate":
+          "2023-03-27", "journal": {"name": "Journal of Chemical Theory and Computation",
+          "pages": "2149 - 2160", "volume": "19"}, "citationStyles": {"bibtex": "@Article{Wellawatte2023APO,\n
+          author = {G. Wellawatte and Heta A. Gandhi and Aditi Seshadri and A. White},\n
+          booktitle = {Journal of Chemical Theory and Computation},\n journal = {Journal
+          of Chemical Theory and Computation},\n pages = {2149 - 2160},\n title = {A
+          Perspective on Explanations of Molecular Prediction Models},\n volume = {19},\n
+          year = {2023}\n}\n"}, "authors": [{"authorId": "1805407482", "name": "G. Wellawatte"},
+          {"authorId": "95666896", "name": "Heta A. Gandhi"}, {"authorId": "1481244794",
+          "name": "Aditi Seshadri"}, {"authorId": "2257535", "name": "A. White"}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1398"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 16 Oct 2025 21:14:25 GMT
+        Via:
+          - 1.1 6b6864bce40e8c6517571357636f0dbe.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - Z6eQyfT7L7ca-fjb_6n_7vYAxU9lWmZ5JXXpw4DWtcG9EqSjLEFaDQ==
+        X-Amz-Cf-Pop:
+          - SFO53-P7
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - Sjv30F3_vHcESAg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1398"
+        x-amzn-Remapped-Date:
+          - Thu, 16 Oct 2025 21:14:25 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 676a233c-12a1-4f5b-9027-61c4b6f81616
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1021%2Facs.jctc.2c01235?mailto=example@papercrow.ai
+    response:
+      body:
+        string: !!binary |
+          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
+          o33Ry66Hohf5dikeXucfP/4H7FUKuINOAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "5612"
+        Content-Type:
+          - application/json
+        Date:
+          - Thu, 16 Oct 2025 21:14:25 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.1021%2Facs.jctc.2c01235/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @article{Wellawatte_2023, title={A Perspective on Explanations of
+          Molecular Prediction Models}, volume={19}, ISSN={1549-9626}, url={http://dx.doi.org/10.1021/acs.jctc.2c01235},
+          DOI={10.1021/acs.jctc.2c01235}, number={8}, journal={Journal of Chemical Theory
+          and Computation}, publisher={American Chemical Society (ACS)}, author={Wellawatte,
+          Geemi P. and Gandhi, Heta A. and Seshadri, Aditi and White, Andrew D.}, year={2023},
+          month=mar, pages={2149\u20132160} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Thu, 16 Oct 2025 21:14:26 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Transfer-Encoding:
+          - chunked
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+version: 1
