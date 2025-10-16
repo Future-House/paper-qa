@@ -110,6 +110,9 @@ jobs:
             ~/.cache/docling
           key: ${{ runner.os }}-docling-${{ hashFiles('uv.lock') }}
           restore-keys: ${{ runner.os }}-docling-
+      - name: Pre-download Docling's RapidOCR models # Avoid CI race conditions in filesystem on model download
+        if: steps.cache-models.outputs.cache-hit != 'true'
+        run: uv run docling-tools models download rapidocr
       - run: uv run pytest -n auto packages
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
