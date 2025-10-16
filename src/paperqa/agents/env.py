@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Callable
 from copy import deepcopy
 from typing import Any, ClassVar, Self, cast
 from uuid import UUID
@@ -67,7 +68,7 @@ def settings_to_tools(  # noqa: PLR0912
         ]
     ):
 
-        def make_tool(fn, tool_type: type[NamedTool] = tool_type) -> Tool:
+        def make_tool(fn: Callable, tool_type: type[NamedTool] = tool_type) -> Tool:
             return Tool.from_function(fn, concurrency_safe=tool_type.CONCURRENCY_SAFE)
 
         if issubclass(tool_type, PaperSearch):
