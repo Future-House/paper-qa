@@ -13,7 +13,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, call, patch
 from uuid import UUID, uuid4
 
@@ -65,7 +65,12 @@ from paperqa.core import (
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, summary_json_multimodal_system_prompt
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, chunk_pdf, parse_image, read_doc
-from paperqa.settings import AsyncContextSerializer, ParsingSettings
+from paperqa.settings import (
+    AnswerSettings,
+    AsyncContextSerializer,
+    MultimodalOptions,
+    ParsingSettings,
+)
 from paperqa.types import (
     ChunkMetadata,
     Context,
@@ -84,6 +89,9 @@ from paperqa.utils import (
     strings_similarity,
     strip_citations,
 )
+
+if TYPE_CHECKING:
+    import vcr.request
 
 THIS_MODULE = pathlib.Path(__file__)
 
@@ -1614,6 +1622,140 @@ def test_should_parse_and_enrich_media(
         ParsingSettings(multimodal=multimodal_option).should_parse_and_enrich_media
         == expected
     )
+
+
+def record_non_llm_requests(
+    request: "vcr.request.Request",
+) -> "vcr.request.Request | None":
+    """Filter to only record non-OpenAI non-Anthropic requests."""
+    return (
+        request
+        if all(x not in request.uri for x in ("api.openai.com", "api.anthropic.com"))
+        else None
+    )
+
+
+@pytest.mark.vcr(before_record_request=record_non_llm_requests)
+@pytest.mark.asyncio
+async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
+    unenriched_settings = Settings(
+        answer=AnswerSettings(evidence_k=2),  # Only one context is actually necessary
+        parsing=ParsingSettings(multimodal=MultimodalOptions.OFF),
+    )
+    unenriched_docs = Docs()
+    await unenriched_docs.aadd(
+        stub_data_dir / "paper.pdf",
+        citation="Wellawatte et al, XAI Review, 2023",  # Skip citation inference
+        doi="10.1021/acs.jctc.2c01235",  # Skip DOI inference
+        title="A Perspective on Explanations of Molecular Prediction Models",  # Skip title inference
+        settings=unenriched_settings,
+    )
+    unenriched_mm_texts = [text for text in unenriched_docs.texts if text.media]
+    assert all(
+        not m.info.get("enriched_description")
+        for t in unenriched_mm_texts
+        for m in t.media
+    ), "Test expects no enrichment for the comparison"
+
+    enriched_settings = Settings(
+        answer=AnswerSettings(evidence_k=2),  # Only one context is actually necessary
+        parsing=ParsingSettings(multimodal=MultimodalOptions.ON_WITH_ENRICHMENT),
+    )
+    enriched_docs = Docs()
+    assert await enriched_docs.aadd(
+        stub_data_dir / "paper.pdf",
+        citation="Wellawatte et al, XAI Review, 2023",  # Skip citation inference
+        doi="10.1021/acs.jctc.2c01235",  # Skip DOI inference
+        title="A Perspective on Explanations of Molecular Prediction Models",  # Skip title inference
+        settings=enriched_settings,
+    )
+    enriched_mm_texts = [t for t in enriched_docs.texts if t.media]
+    assert all(
+        m.info.get("enriched_description") for t in enriched_mm_texts for m in t.media
+    ), "Expected enrichment to have occurred"
+
+    # Before asking FigQA-style questions, confirm the inputs are equivalent
+    assert all(
+        t_unen.name == t_en.name
+        and len(t_unen.media) == len(t_en.media)
+        and all(
+            m_unen.to_id() == m_en.to_id()
+            for m_unen, m_en in zip(t_unen.media, t_en.media, strict=True)
+        )
+        for t_unen, t_en in zip(unenriched_mm_texts, enriched_mm_texts, strict=True)
+    ), "Test expects same texts and ordering from both adds"
+
+    # Ask a FigQA-style question, where the answer only exists
+    # in the figure's image (and not the text)
+    fig1_question = "What else is f(x) besides a model? Looking for return values"
+    fig1_media = enriched_mm_texts[0].media[0]
+    fig1_enrichment = fig1_media.info["enriched_description"]
+    assert isinstance(fig1_enrichment, str)
+    fig3_question = "What is Base?"
+    fig3_media = enriched_mm_texts[1].media[-1]
+    fig3_enrichment = fig3_media.info["enriched_description"]
+    assert isinstance(fig3_enrichment, str)
+    cached_exc: AssertionError | None = None
+    if "f(x)" in fig1_enrichment:
+        # If Figure 1's question is answerable, try to answer with it
+        try:
+            unenriched_session1 = await unenriched_docs.aquery(
+                fig1_question, settings=unenriched_settings
+            )
+            assert (
+                CANNOT_ANSWER_PHRASE in unenriched_session1.answer
+            ), "Expected unsure without enrichment"
+            enriched_session1 = await enriched_docs.aquery(
+                fig1_question, settings=enriched_settings
+            )
+            assert [
+                c
+                for c in enriched_session1.contexts
+                if c.id in enriched_session1.used_contexts
+                if c.text.media
+                # Use to_id() to ignore info, just looking at media text/data
+                and any(m.to_id() == fig1_media.to_id() for m in c.text.media)
+            ], "Expected media to be referenced in a used context"
+            assert (
+                CANNOT_ANSWER_PHRASE not in enriched_session1.answer
+            ), f"Expected answer with enrichment {fig1_enrichment}."
+            assert (
+                "0.0" in enriched_session1.answer
+            ), f"Expected answer with enrichment {fig1_enrichment}."
+            assert (
+                "1.0" in enriched_session1.answer
+            ), f"Expected answer with enrichment {fig1_enrichment}."
+            return  # noqa: TRY300
+        except AssertionError as exc:
+            cached_exc = exc
+
+    # Otherwise use Figure 3's question
+    try:
+        unenriched_session2 = await unenriched_docs.aquery(
+            fig3_question, settings=unenriched_settings
+        )
+        assert (
+            CANNOT_ANSWER_PHRASE in unenriched_session2.answer
+        ), "Expected unsure without enrichment"
+        enriched_session2 = await enriched_docs.aquery(
+            fig3_question, settings=enriched_settings
+        )
+        assert [
+            c
+            for c in enriched_session2.contexts
+            if c.id in enriched_session2.used_contexts
+            if c.text.media
+            # Use to_id() to ignore info, just looking at media text/data
+            and any(m.to_id() == fig3_media.to_id() for m in c.text.media)
+        ], "Expected media to be referenced in a used context"
+        assert (
+            CANNOT_ANSWER_PHRASE not in enriched_session2.answer
+        ), f"Expected answer with enrichment {fig3_enrichment}."
+        assert all(
+            x in enriched_session2.answer.lower() for x in ("molecule", "reference")
+        ), f"Expected answer with enrichment {fig3_enrichment}."
+    except AssertionError as exc:
+        raise exc from cached_exc
 
 
 @pytest.mark.asyncio
