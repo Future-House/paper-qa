@@ -470,20 +470,20 @@ class ClinicalTrialsSearch(NamedTool):
                     Modified Search:
                         Use operators to modify search behavior:
                         >>> 'EXPANSION[None]COVERAGE[FullMatch]"exact phrase"'
-                        >>> "EXPANSION[Concept]heart attack"
+                        >>> 'EXPANSION[Concept]heart attack'
 
                     Field Search:
                         Specify fields using AREA operator:
-                        >>> "AREA[InterventionName]aspirin"
-                        >>> "AREA[Phase]PHASE3"
+                        >>> 'AREA[InterventionName]aspirin'
+                        >>> 'AREA[Phase]PHASE3'
 
                     Location Search:
                         Use SEARCH operator for compound location queries:
-                        >>> "cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)"
+                        >>> 'cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)'
 
                     Complex Boolean:
                         Combine terms with AND, OR, NOT and parentheses:
-                        >>> "(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)"
+                        >>> '(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)'
 
                     Date Ranges:
                         Use RANGE to specify date ranges with formats like "yyyy-MM" or "yyyy-MM-dd".
