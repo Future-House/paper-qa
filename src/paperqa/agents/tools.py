@@ -105,6 +105,9 @@ class NamedTool(BaseModel):
 
 class PaperSearch(NamedTool):
     TOOL_FN_NAME = "paper_search"
+
+    # This tool is safe to run concurrently. The only stateful operation on the state
+    # is docs.aadd_texts, which itself is concurrency safe.
     CONCURRENCY_SAFE = True
 
     settings: Settings
@@ -422,6 +425,8 @@ class Complete(NamedTool):
 
 class ClinicalTrialsSearch(NamedTool):
     TOOL_FN_NAME = "clinical_trials_search"
+
+    # See PaperSearch for rationale.
     CONCURRENCY_SAFE = True
 
     model_config = ConfigDict(extra="forbid")
