@@ -41,6 +41,7 @@ async def test_parse_pdf_to_pages() -> None:
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
     (p2_image,) = p2_media
     assert p2_image.index == 0
+    assert p2_image.info["page_num"] == 2
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64

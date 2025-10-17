@@ -183,6 +183,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     },
                     sort_keys=True,
                 )
+                # Add page number after info_hashable so differing pages
+                # don't break the cache key
+                media_metadata["page_num"] = page_num
                 content[str(page_num)][1].append(
                     ParsedMedia(
                         index=len(content[str(page_num)][1]),
@@ -227,6 +230,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     },
                     sort_keys=True,
                 )
+                # Add page number after info_hashable so differing pages
+                # don't break the cache key
+                media_metadata["page_num"] = page_num
                 content[str(page_num)][1].append(
                     ParsedMedia(
                         index=len(content[str(page_num)][1]),

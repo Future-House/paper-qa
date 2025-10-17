@@ -1,4 +1,5 @@
 import io
+import json
 import os
 from typing import Any
 
@@ -88,20 +89,22 @@ def parse_pdf_to_pages(
                 pdfium_rendered_page: pdfium.PdfBitmap = pdfium_page.render(scale=1)
                 buf = io.BytesIO()
                 pdfium_rendered_page.to_pil().save(buf, format="PNG")
+                media_metadata = {
+                    "type": "screenshot",
+                    "page_width": pdfium_page.get_width(),
+                    "page_height": pdfium_page.get_height(),
+                } | {
+                    f"bitmap_{a}": getattr(pdfium_rendered_page, a)
+                    for a in PDFIUM_BITMAP_ATTRS
+                }
+                media_metadata["info_hashable"] = json.dumps(
+                    media_metadata, sort_keys=True
+                )
+                # Add page number after info_hashable so differing pages
+                # don't break the cache key
+                media_metadata["page_num"] = i + 1
                 pages[str(i + 1)] = text, [
-                    ParsedMedia(
-                        index=0,
-                        data=buf.getvalue(),
-                        info={
-                            "type": "screenshot",
-                            "page_width": pdfium_page.get_width(),
-                            "page_height": pdfium_page.get_height(),
-                        }
-                        | {
-                            f"bitmap_{a}": getattr(pdfium_rendered_page, a)
-                            for a in PDFIUM_BITMAP_ATTRS
-                        },
-                    )
+                    ParsedMedia(index=0, data=buf.getvalue(), info=media_metadata)
                 ]
                 count_media += 1
             else:
