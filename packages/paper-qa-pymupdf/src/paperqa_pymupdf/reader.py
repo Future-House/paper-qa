@@ -134,7 +134,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         ParsedMedia(
                             index=0,
                             data=pix.tobytes(),
-                            info={"type": "screenshot"}
+                            info={"type": "screenshot", "page_num": i + 1}
                             | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                         )
                     )
@@ -152,7 +152,11 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             ParsedMedia(
                                 index=box_i,
                                 data=pix.tobytes(),
-                                info={"bbox": tuple(box), "type": "drawing"}
+                                info={
+                                    "bbox": tuple(box),
+                                    "type": "drawing",
+                                    "page_num": i + 1,
+                                }
                                 | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                             )
                         )
@@ -170,7 +174,11 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                                 text=(
                                     None if _INVALID_MD_CHARS.search(raw_md) else raw_md
                                 ),
-                                info={"bbox": tuple(table.bbox), "type": "table"}
+                                info={
+                                    "bbox": tuple(table.bbox),
+                                    "type": "table",
+                                    "page_num": i + 1,
+                                }
                                 | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
                             )
                         )

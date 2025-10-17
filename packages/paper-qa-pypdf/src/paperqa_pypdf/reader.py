@@ -94,6 +94,7 @@ def parse_pdf_to_pages(
                         data=buf.getvalue(),
                         info={
                             "type": "screenshot",
+                            "page_num": i + 1,
                             "page_width": pdfium_page.get_width(),
                             "page_height": pdfium_page.get_height(),
                         }
