@@ -747,6 +747,24 @@ Depending on the source document, the same image can appear multiple times
 Thus, clients should consider media databases
 to have a many-to-many relationship with chunks.
 
+Since PaperQA's evidence gathering process centers on text-based retrieval,
+it's possible relevant image(s) or table(s) aren't retrieved
+because their associated text content is irrelevant.
+For a concrete example, imagine the figure in a paper has a terse caption
+and is placed one page after relevant main-text discussion.
+To solve this problem, PaperQA supports media enrichment at document read-time.
+Basically after reading in the PDF,
+the `parsing.enrichment_llm` is given the `parsing.enrichment_prompt`
+and co-located text to generate a synthetic caption for every image/table.
+The synthetic captions are used to shift the embeddings of each text chunk,
+but are kept separate from the actual source text.
+This way evidence gathering can fetch relevant images/tables
+without risk of polluting contextual summaries with LLM-generated captions.
+
+If you want multimodal PDF reading, but do not want enrichment
+(since adds one LLM prompt/media at read-time),
+enrichment can be disabled by setting `parsing.multimodal` to `ON_WITHOUT_ENRICHMENT`.
+
 When creating contextual summaries on a given chunk (a `Text`),
 the summary LLM is passed both the chunk's text and the chunk's associated media,
 but the output contextual summary itself remains text-only.
