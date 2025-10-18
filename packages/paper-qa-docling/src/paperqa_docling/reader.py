@@ -33,7 +33,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     page_size_limit: int | None = None,
     parse_media: bool = True,
     pipeline_cls: type = StandardPdfPipeline,
-    dpi: int | None = None,
+    dpi: int | None = 300,
     custom_pipeline_options: Mapping[str, Any] | None = None,
     **_,
 ) -> ParsedText:
