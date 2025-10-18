@@ -2382,7 +2382,6 @@ requires-dist = [
     { name = "anyio" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.27" },
     { name = "fhlmi", specifier = ">=0.39" },
-    { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.28" },
     { name = "fhlmi", extras = ["image"], marker = "extra == 'image'" },
     { name = "html2text" },
     { name = "httpx" },
