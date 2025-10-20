@@ -123,7 +123,7 @@ def agent_stub_session() -> PQASession:
     # > are already imported: paperqa
     from paperqa.types import PQASession
 
-    return PQASession(question="What is is a self-explanatory model?")
+    return PQASession(question="What is a self-explanatory model?")
 
 
 @pytest.fixture

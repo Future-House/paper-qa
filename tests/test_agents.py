@@ -516,7 +516,7 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     agent_test_settings.answer.evidence_skip_summary = True
 
     response = await agent_query(
-        query="What is is a self-explanatory model?",
+        query="What is a self-explanatory model?",
         settings=agent_test_settings,
         agent_type=FAKE_AGENT_TYPE,
     )
@@ -622,7 +622,7 @@ async def test_agent_sharing_state(
 
     agent_test_settings.agent.callbacks = callbacks
 
-    session = PQASession(question="What is is a self-explanatory model?")
+    session = PQASession(question="What is a self-explanatory model?")
     env_state = EnvironmentState(docs=Docs(), session=session)
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
