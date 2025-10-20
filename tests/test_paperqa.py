@@ -2217,7 +2217,7 @@ def test_docdetails_doc_id_roundtrip() -> None:
 @pytest.mark.asyncio
 async def test_partitioning_fn_docs(use_partition: bool) -> None:
     settings = Settings.from_name("fast")
-    settings.answer.evidence_k = 2  # limit to only 2
+    settings.answer.evidence_k = 2  # Match positive or negative statement count below
 
     # imagine we have some special selection we want to
     # embedding rank by itself
