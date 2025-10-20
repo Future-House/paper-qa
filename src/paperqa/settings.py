@@ -825,21 +825,23 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
-    def _validate_temperature_for_o1_preview(self) -> Self:
-        """Ensures temperature is 1 if the LLM is 'o1-preview' or 'o1-mini'.
+    def _update_temperature(self) -> Self:
+        """Ensures temperature is 1 if the LLM requires it.
 
-        o1 reasoning models only support temperature = 1.  See
-        https://platform.openai.com/docs/guides/reasoning/quickstart
+        o1 reasoning models only support temperature = 1.
+        SEE: https://platform.openai.com/docs/guides/reasoning/quickstart
         """
-        if self.llm.startswith("o1-") and self.temperature != 1:
-            warnings.warn(
-                "When dealing with OpenAI o1 models, the temperature must be set to 1."
-                f" The specified temperature {self.temperature} has been overridden"
-                " to 1.",
-                category=UserWarning,
-                stacklevel=2,
-            )
-            self.temperature = 1
+        for model_prefix in ("o1", "gpt-5"):
+            if self.llm.startswith(model_prefix) and self.temperature != 1:
+                warnings.warn(
+                    f"When dealing with OpenAI {model_prefix} models,"
+                    " the temperature must be set to 1,"
+                    f" so the specified temperature {self.temperature}"
+                    " has been overridden to 1.",
+                    category=UserWarning,
+                    stacklevel=2,
+                )
+                self.temperature = 1
         return self
 
     @computed_field  # type: ignore[prop-decorator]

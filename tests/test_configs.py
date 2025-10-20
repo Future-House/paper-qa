@@ -1,6 +1,5 @@
 import os
 import pathlib
-import warnings
 from unittest.mock import patch
 
 import pytest
@@ -102,18 +101,25 @@ def test_router_kwargs_present_in_models() -> None:
     assert settings.get_summary_llm().config["router_kwargs"] is not None
 
 
-def test_o1_requires_temp_equals_1() -> None:
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        s = Settings(llm="o1-thismodeldoesnotexist", temperature=0)
-        assert "temperature must be set to 1" in str(w[-1].message)
+@pytest.mark.parametrize(
+    "model_name",
+    [
+        "o1",
+        "o1-thismodeldoesnotexist",
+        "gpt-5",
+        "gpt-5-2025-08-07",
+        "gpt-5-mini-2025-08-07",
+    ],
+)
+def test_models_requiring_temp_1(model_name: str) -> None:
+    with pytest.warns(UserWarning, match="temperature") as record:  # noqa: PT031
+        s = Settings(llm=model_name, temperature=0)
+        (w,) = record.list
+        assert "temperature must be set to 1" in str(w.message)
         assert s.temperature == 1
 
-    # Test that temperature=1 produces no warning
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        _ = Settings(llm="o1-thismodeldoesnotexist", temperature=1)
-        assert not w
+        Settings(llm=model_name, temperature=1)
+        assert record.list == [w], "Expected no new warnings with correct temperature"
 
 
 @pytest.mark.parametrize(
