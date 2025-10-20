@@ -2315,6 +2315,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     )
     assert docs.texts_index.texts == docs.texts == texts
 
+    assert session.contexts, "Test requires contexts to be made"
     if use_partition:
         assert any(
             "don't" in c.text.text for c in session.contexts
