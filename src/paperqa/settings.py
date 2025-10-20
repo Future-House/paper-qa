@@ -336,12 +336,6 @@ class ParsingSettings(BaseModel):
         default=media_enrichment_prompt_template,
         description="Prompt template for enriching media.",
     )
-    enrichment_description_length: str = Field(
-        default="about 150 words",
-        description=(
-            "Plain text stating the desired length of an enriched media's description."
-        ),
-    )
 
     @property
     def should_parse_and_enrich_media(self) -> tuple[bool, bool]:
@@ -1191,8 +1185,7 @@ class Settings(BaseSettings):
                         f"Here is the co-located text from {radius_msg}:\n\n{context_text}\n\n"
                         if context_text
                         else ""
-                    ),
-                    description_length=self.parsing.enrichment_description_length,
+                    )
                 )
                 result = await llm.call_single(
                     messages=[

@@ -179,14 +179,14 @@ media_enrichment_prompt_template = (
     " so only use aspects relevant to accompanying image or table."
     "\n\nHere's a few failure mode with possible resolutions:"
     "\n- The media was a logo or icon, so the text is unrelated."
-    " In this case, describe the media as a logo or icon,"
+    " In this case, briefly describe the media as a logo or icon,"
     " and do not mention other unrelated surrounding text."
     "\n- The media was display type, so the text is probably unrelated."
     " The display type can be spread over several lines."
-    " In this case, describe the media as display type,"
+    " In this case, briefly describe the media as display type,"
     " and do not mention other unrelated surrounding text."
     "\n- The media is a margin box or design element, so the text is unrelated."
-    " In this case, describe the media as decorative,"
+    " In this case, briefly describe the media as decorative,"
     " and do not mention other unrelated surrounding text."
     "\n- The media came from a bad PDF read, so it's garbled."
     " In this case, describe the media as garbled, state why it's considered garbled,"
@@ -195,6 +195,6 @@ media_enrichment_prompt_template = (
     " In this case, make sure to only detail the subfigure or subtable,"
     " not the entire figure or table."
     " Do not mention other unrelated surrounding text."
-    "\n\n{context_text}Describe the media ({description_length}),"  # Allow for empty context_text
+    "\n\n{context_text}Describe the media,"  # Allow for empty context_text
     " or if uncertain on a description please state why:"
 )
