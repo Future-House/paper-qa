@@ -11,12 +11,7 @@ from typing import Any, ClassVar, Protocol, Self, TypeAlias, cast, runtime_check
 
 import anyio
 from aviary.core import Tool, ToolSelector
-from lmi import (
-    CommonLLMNames,
-    EmbeddingModel,
-    LiteLLMModel,
-    embedding_model_factory,
-)
+from lmi import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -525,7 +520,7 @@ class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="claude-sonnet-4-5-20250929",
         description="LLM inside the agent making tool selections.",
     )
 
@@ -693,7 +688,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="claude-sonnet-4-5-20250929",
         description=(
             "LLM for general use including metadata inference (see Docs.aadd)"
             " and answer generation (see Docs.aquery and gen_answer tool)."
@@ -717,7 +712,7 @@ class Settings(BaseSettings):
         ),
     )
     summary_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="claude-sonnet-4-5-20250929",
         description=(
             "LLM for creating contextual summaries"
             " (see Docs.aget_evidence and gather_evidence tool)."
