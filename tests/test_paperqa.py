@@ -2222,7 +2222,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     # imagine we have some special selection we want to
     # embedding rank by itself
     def partition_by_citation(t: Embeddable) -> int:
-        if isinstance(t, Text) and "special" in t.doc.citation:
+        if isinstance(t, Text) and "negative" in t.doc.citation:
             return 1
         return 0
 
@@ -2235,9 +2235,11 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     ), "We want this test to cover NumpyVectorStore"
 
     # add docs that we can use our partitioning function on
-    positive_statements_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    positive_statements_doc = Doc(
+        docname="positive", citation="positive", dockey="positive"
+    )
     negative_statements_doc = Doc(
-        docname="special", citation="special", dockey="special"
+        docname="negative", citation="negative", dockey="negative"
     )
     texts = []
     for i, (statement, doc) in enumerate(
@@ -2253,10 +2255,11 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
             await settings.get_embedding_model().embed_documents([texts[-1].text])
         )[0]
     await docs.aadd_texts(
-        texts=[t for t in texts if t.doc.docname == "stub"], doc=positive_statements_doc
+        texts=[t for t in texts if t.doc.docname == "positive"],
+        doc=positive_statements_doc,
     )
     await docs.aadd_texts(
-        texts=[t for t in texts if t.doc.docname == "special"],
+        texts=[t for t in texts if t.doc.docname == "negative"],
         doc=negative_statements_doc,
     )
 
