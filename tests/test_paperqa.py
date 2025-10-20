@@ -19,6 +19,7 @@ from uuid import UUID, uuid4
 
 import httpx
 import litellm
+import litellm.llms.anthropic.common_utils
 import numpy as np
 import pytest
 import pytest_asyncio
@@ -1756,6 +1757,66 @@ async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
         ), f"Expected answer with enrichment {fig3_enrichment}."
     except AssertionError as exc:
         raise exc from cached_exc
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_image_enrichment_invalid_image(caplog) -> None:
+    """Confirm an invalid image doesn't crash the image enrichment process."""
+    parsed_text = ParsedText(
+        content={
+            # The image data here is invalid (not a PNG)
+            "1": ("Some text", [ParsedMedia(data=b"not_image_data" * 30, index=0)])
+        },
+        metadata=ParsedMetadata(parsing_libraries=["stub"], total_parsed_text_length=9),
+    )
+
+    enricher = Settings().make_media_enricher()
+    with caplog.at_level("WARNING", logger="paperqa.settings"):
+        result = await enricher(parsed_text)
+    assert "enriched=0" in result, "Expected no enrichment to have occurred"
+    (record_tuple,) = caplog.record_tuples
+    assert (
+        "rejected by the LLM provider" in record_tuple[2]
+    ), "Expected rejection to be documented"
+
+
+@pytest.mark.asyncio
+async def test_image_enrichment_with_oversized_image(caplog) -> None:
+    """Confirm a too-large image doesn't crash the image enrichment process."""
+    parsed_text = ParsedText(
+        content={
+            # An alternate way to test this is use PyMuPDF or Docling reader on a PDF
+            # with a really high DPI setting (> 300)
+            "1": ("Some text", [ParsedMedia(data=b"stub", index=0)])
+        },
+        metadata=ParsedMetadata(parsing_libraries=["stub"], total_parsed_text_length=9),
+    )
+
+    settings = Settings(parsing={"enrichment_llm": "claude-sonnet-4-5-20250929"})
+    enricher = settings.make_media_enricher()  # noqa: FURB184
+    with (
+        caplog.at_level("WARNING", logger="paperqa.settings"),
+        # Use patch over VCR since VCR cassette would be huge
+        patch(
+            "litellm.llms.anthropic.chat.handler.AnthropicChatCompletion.acompletion_function",
+            side_effect=litellm.llms.anthropic.common_utils.AnthropicError(
+                message=(
+                    '{"type":"error","error":{"type":"invalid_request_error",'
+                    '"message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 6229564 bytes > 5242880 bytes"},'  # noqa: E501
+                    '"request_id":"req_abc123"}'
+                ),
+                status_code=400,
+            ),
+        ) as mock_acompletion_function,
+    ):
+        result = await enricher(parsed_text)
+    assert "enriched=0" in result, "Expected no enrichment to have occurred"
+    assert mock_acompletion_function.await_count >= litellm.allowed_fails
+    (record_tuple,) = caplog.record_tuples
+    assert (
+        "rejected by the LLM provider" in record_tuple[2]
+    ), "Expected rejection to be documented"
 
 
 @pytest.mark.asyncio

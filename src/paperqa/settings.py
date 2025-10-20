@@ -1,7 +1,9 @@
 import asyncio
 import importlib.resources
+import logging
 import os
 import pathlib
+import re
 import warnings
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Mapping, Sequence
@@ -11,6 +13,7 @@ from pydoc import locate
 from typing import Any, ClassVar, Protocol, Self, TypeAlias, cast, runtime_checkable
 
 import anyio
+import litellm
 from aviary.core import Message, Tool, ToolSelector
 from lmi import (
     CommonLLMNames,
@@ -61,6 +64,8 @@ from paperqa.prompts import (
 from paperqa.readers import PDFParserFn
 from paperqa.types import Context, ParsedMedia, ParsedText
 from paperqa.utils import hexdigest, pqa_directory
+
+logger = logging.getLogger(__name__)
 
 # TODO: move to actual EnvironmentState
 # when we can do so without a circular import
@@ -1187,15 +1192,42 @@ class Settings(BaseSettings):
                         else ""
                     )
                 )
-                result = await llm.call_single(
-                    messages=[
-                        Message.create_message(
-                            text=prompt, images=[media.to_image_url()]
+                try:
+                    result = await llm.call_single(
+                        messages=[
+                            Message.create_message(
+                                text=prompt, images=[media.to_image_url()]
+                            )
+                        ]
+                    )
+                    if result.text:
+                        media.info["enriched_description"] = result.text.strip()
+                except (litellm.InternalServerError, litellm.BadRequestError) as exc:
+                    # Handle image > 5-MB failure mode 1:
+                    # > litellm.BadRequestError: AnthropicException -
+                    # > {"type":"error","error":{"type":"invalid_request_error",
+                    # > "message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 6229564 bytes > 5242880 bytes"},  # noqa: E501, W505
+                    # > "request_id":"req_abc123"}.
+                    # and image > 5-MB failure mode 2:
+                    # > litellm.InternalServerError: AnthropicException -
+                    # > {"type":"error","error":{"type":"invalid_request_error",
+                    # > "message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 5690780 bytes > 5242880 bytes"},  # noqa: E501, W505
+                    # > "request_id":"req_abc123"}.
+                    # And the image being corrupt (but a reasonable size)
+                    if (
+                        isinstance(exc, litellm.InternalServerError)
+                        and re.search(
+                            r"image exceeds .+ maximum", str(exc), re.IGNORECASE
                         )
-                    ]
-                )
-                if result.text:
-                    media.info["enriched_description"] = result.text.strip()
+                    ) or isinstance(exc, litellm.BadRequestError):
+                        logger.warning(
+                            f"Skipping enrichment for media index {media.index}"
+                            f" on page {page_num} with metadata {media.info} because"
+                            f" it was rejected by the LLM provider for {llm.name!r}."
+                            f" Full error message: {exc!r}"
+                        )
+                    else:
+                        raise
 
             await asyncio.gather(*list(starmap(enrich_single_media, media_to_enrich)))
             count_enriched = sum(

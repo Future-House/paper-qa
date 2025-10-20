@@ -1,0 +1,524 @@
+interactions:
+  - request:
+      body:
+        '{"messages":[{"role":"user","content":[{"type":"image_url","image_url":{"url":"data:image/png;base64,bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "2615"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.6.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.6.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string:
+          "{\n  \"error\": {\n    \"message\": \"You uploaded an unsupported image.
+          Please make sure your image has of one the following formats: ['png', 'jpeg',
+          'gif', 'webp'].\",\n    \"type\": \"invalid_request_error\",\n    \"param\":
+          null,\n    \"code\": \"invalid_image_format\"\n  }\n}"
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+        CF-RAY:
+          - 996444815cbd9e4d-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "258"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 29 Oct 2025 17:07:09 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=UYI_bAoy_0CerstuLFO2cPN45_o0EA5jjaogCC2rHrU-1761757629-1.0.1.1-Ju5HhzTejQp16ebnFTZh7ztEemKsDH3g78ycvntL27gZxkIy9TnTovzz1bFtxP4ARBvlgJ7iLHMBVe2QcWsLsjmoRHD4dj.gdo90..kmCyA;
+            path=/; expires=Wed, 29-Oct-25 17:37:09 GMT; domain=.api.openai.com; HttpOnly;
+            Secure; SameSite=None
+          - _cfuvid=O9noGEVke8BNctEtJOlezpI_e5BqfdaSQCA58rmOsZ8-1761757629793-0.0.1.1-604800000;
+            path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "50"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-envoy-upstream-service-time:
+          - "79"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-input-images:
+          - "250000"
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-input-images:
+          - "249999"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998769"
+        x-ratelimit-reset-input-images:
+          - 0s
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 2ms
+        x-request-id:
+          - req_d730074c9c1b4dc1b6f71a4051597a21
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body:
+        '{"messages":[{"role":"user","content":[{"type":"image_url","image_url":{"url":"data:image/png;base64,bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "2615"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.6.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.6.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string:
+          "{\n  \"error\": {\n    \"message\": \"You uploaded an unsupported image.
+          Please make sure your image has of one the following formats: ['png', 'jpeg',
+          'gif', 'webp'].\",\n    \"type\": \"invalid_request_error\",\n    \"param\":
+          null,\n    \"code\": \"invalid_image_format\"\n  }\n}"
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+        CF-RAY:
+          - 996444a59f179e4d-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "258"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 29 Oct 2025 17:07:15 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "69"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-envoy-upstream-service-time:
+          - "126"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-input-images:
+          - "250000"
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-input-images:
+          - "249999"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998769"
+        x-ratelimit-reset-input-images:
+          - 0s
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 2ms
+        x-request-id:
+          - req_efd923bd83ac489dbc4f5d5b72b6081c
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body:
+        '{"messages":[{"role":"user","content":[{"type":"image_url","image_url":{"url":"data:image/png;base64,bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "2615"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.6.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.6.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string:
+          "{\n  \"error\": {\n    \"message\": \"You uploaded an unsupported image.
+          Please make sure your image has of one the following formats: ['png', 'jpeg',
+          'gif', 'webp'].\",\n    \"type\": \"invalid_request_error\",\n    \"param\":
+          null,\n    \"code\": \"invalid_image_format\"\n  }\n}"
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+        CF-RAY:
+          - 996444c679f39e4d-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "258"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 29 Oct 2025 17:07:20 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "70"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-envoy-upstream-service-time:
+          - "113"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-input-images:
+          - "250000"
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-input-images:
+          - "249999"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998769"
+        x-ratelimit-reset-input-images:
+          - 0s
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 2ms
+        x-request-id:
+          - req_df1bab90385c43fba4722df5b4eb9572
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body:
+        '{"messages":[{"role":"user","content":[{"type":"image_url","image_url":{"url":"data:image/png;base64,bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"model":"gpt-4o-2024-11-20","n":1,"temperature":0.0}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "2615"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.6.1
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.6.1
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string:
+          "{\n  \"error\": {\n    \"message\": \"You uploaded an unsupported image.
+          Please make sure your image has of one the following formats: ['png', 'jpeg',
+          'gif', 'webp'].\",\n    \"type\": \"invalid_request_error\",\n    \"param\":
+          null,\n    \"code\": \"invalid_image_format\"\n  }\n}"
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+        CF-RAY:
+          - 996444eb6ad39e4d-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "258"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 29 Oct 2025 17:07:26 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        cf-cache-status:
+          - DYNAMIC
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "19"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-envoy-upstream-service-time:
+          - "40"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-input-images:
+          - "250000"
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-input-images:
+          - "249999"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998769"
+        x-ratelimit-reset-input-images:
+          - 0s
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 2ms
+        x-request-id:
+          - req_c39adb49a3aa419197361dddd452319d
+      status:
+        code: 400
+        message: Bad Request
+version: 1
