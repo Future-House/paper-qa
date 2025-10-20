@@ -26,9 +26,9 @@ def get_year(ts: datetime | None = None) -> str:
 
 async def litellm_get_search_query(
     question: str,
+    llm: LLMModel | str,
     count: int,
     template: str | None = None,
-    llm: LLMModel | str = "gpt-4o-mini",
     temperature: float = 1.0,
 ) -> list[str]:
     search_prompt = ""
