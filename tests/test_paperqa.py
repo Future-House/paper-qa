@@ -1613,7 +1613,8 @@ async def test_querying_tables(stub_data_dir: Path) -> None:
     assert all(
         [m.data for m in t.media] for t in used_texts
     ), "Expected image data to be present in the used contexts"
-    assert any(x in session.answer for x in ("1.0 mm", "1.0-mm"))
+    # Check for 1.0mm, 1.0-mm, 1.0 mm
+    assert re.search(r"1\.0[ -]?mm", session.answer)
     assert session.cost > 0
 
     # Filter contexts for HTTP requests, and ensure no images are present
