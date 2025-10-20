@@ -110,11 +110,14 @@ jobs:
             ~/.cache/docling
           key: ${{ runner.os }}-docling-${{ hashFiles('uv.lock') }}
           restore-keys: ${{ runner.os }}-docling-
-      - name: Pre-download Docling's RapidOCR models # Avoid CI race conditions in filesystem on model download
+      - name: Pre-download Docling models # Avoid CI race conditions in filesystem on model download
         if: steps.cache-models.outputs.cache-hit != 'true'
-        run: uv run docling-tools models download rapidocr
+        # RapidOCR is used for PDF pipeline's OCR, layout for layout analysis,
+        # tableformer for table structure
+        run: uv run docling-tools models download rapidocr layout tableformer
       - run: uv run pytest -n auto packages
         env:
+          DOCLING_ARTIFACTS_PATH: ~/.cache/docling/models # Work around https://github.com/docling-project/docling/issues/2500
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
