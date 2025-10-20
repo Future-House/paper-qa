@@ -112,8 +112,9 @@ jobs:
           restore-keys: ${{ runner.os }}-docling-
       - name: Pre-download Docling models # Avoid CI race conditions in filesystem on model download
         if: steps.cache-models.outputs.cache-hit != 'true'
-        # RapidOCR is used for PDF pipeline's OCR, layout is used for PDF pipeline's layout analysis
-        run: uv run docling-tools models download rapidocr layout
+        # RapidOCR is used for PDF pipeline's OCR, layout for layout analysis,
+        # tableformer for table structure
+        run: uv run docling-tools models download rapidocr layout tableformer
       - run: uv run pytest -n auto packages
         env:
           DOCLING_ARTIFACTS_PATH: ~/.cache/docling/models # Work around https://github.com/docling-project/docling/issues/2500
