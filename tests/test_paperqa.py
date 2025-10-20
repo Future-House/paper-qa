@@ -2311,7 +2311,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     # with partitioning, we are forcing them to be interleaved, thus
     # at least one "I don't like X" statements will be in the top 2
     session = await docs.aget_evidence(
-        "What do I like?", settings=settings, partitioning_fn=partitioning_fn
+        "What do I like or dislike?", settings=settings, partitioning_fn=partitioning_fn
     )
     assert docs.texts_index.texts == docs.texts == texts
 
