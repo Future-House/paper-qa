@@ -115,6 +115,7 @@ jobs:
         run: uv run docling-tools models download rapidocr
       - run: uv run pytest -n auto packages
         env:
+          DOCLING_ARTIFACTS_PATH: ~/.cache/docling/models # Work around https://github.com/docling-project/docling/issues/2500
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
