@@ -736,11 +736,11 @@ async def test_agent_sharing_state(
         for context in session.contexts:
             if context.question != new_question:
                 assert (
-                    context.context[:20] not in response
+                    context.context[:30] not in response
                 ), "gather_evidence should not return any contexts for the old question"
         assert (
             sum(
-                (1 if (context.context[:20] in response) else 0)
+                (1 if (context.context[:30] in response) else 0)
                 for context in session.contexts
                 if context.question == new_question
             )
