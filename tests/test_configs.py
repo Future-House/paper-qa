@@ -67,7 +67,7 @@ def test_settings_default_instantiation(tmpdir, subtests: SubTests) -> None:
     # Also let's check our default settings work fine with round-trip JSON serialization
     serde_default_settings = Settings(**default_settings.model_dump(mode="json"))
     for setting in (default_settings, serde_default_settings):
-        assert "gpt-" in setting.llm
+        assert any(x in setting.llm for x in ("gpt-", "claude-"))
         assert setting.answer.evidence_k == 10
         assert HOME_DIR in str(setting.agent.index.index_directory)
         assert ".pqa" in str(setting.agent.index.index_directory)
