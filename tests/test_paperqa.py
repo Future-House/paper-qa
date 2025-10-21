@@ -1448,6 +1448,28 @@ async def test_chunk_metadata_reader(
         )
 
 
+def test_media_to_image_url(subtests: SubTests) -> None:
+    with subtests.test(msg="jpg"):
+        media = ParsedMedia(index=0, data=b"fake_jpg", info={"suffix": ".jpg"})
+        url = media.to_image_url()
+        assert "image/jpeg" in url
+
+    with subtests.test(msg="jpeg"):
+        media = ParsedMedia(index=0, data=b"fake_jpeg", info={"suffix": ".jpeg"})
+        url = media.to_image_url()
+        assert "image/jpeg" in url
+
+    with subtests.test(msg="png"):
+        media = ParsedMedia(index=0, data=b"fake_png", info={"suffix": ".png"})
+        url = media.to_image_url()
+        assert "image/png" in url
+
+    with subtests.test(msg="default"):
+        media = ParsedMedia(index=0, data=b"fake_png")
+        url = media.to_image_url()
+        assert "image/png" in url
+
+
 @pytest.mark.asyncio
 async def test_image_aggregation(stub_data_dir: Path) -> None:
     png_path = stub_data_dir / "sf_districts.png"

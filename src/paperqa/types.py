@@ -549,8 +549,11 @@ class ParsedMedia(BaseModel):
             == json.dumps(other.info, sort_keys=True)
         )
 
-    def to_image_url(self, image_type: str = "png") -> str:
+    def to_image_url(self) -> str:
         """Convert the image data to an RFC 2397 data URL format."""
+        image_type = cast(str, self.info.get("suffix", "png")).removeprefix(".")
+        if image_type == "jpg":  # SEE: https://stackoverflow.com/a/54488403
+            image_type = "jpeg"
         return encode_image_as_url(image_type, self.data)
 
     def save(self, path: str | os.PathLike) -> None:
