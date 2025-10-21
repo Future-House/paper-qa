@@ -43,6 +43,12 @@ from pydantic import (
 )
 from pydantic_core.core_schema import SerializationInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
+from tenacity import (
+    AsyncRetrying,
+    before_sleep_log,
+    retry_if_exception,
+    stop_after_attempt,
+)
 
 import paperqa.configs
 from paperqa._ldp_shims import (
@@ -1119,13 +1125,33 @@ class Settings(BaseSettings):
                     )
                 )
                 try:
-                    result = await llm.call_single(
-                        messages=[
-                            Message.create_message(
-                                text=prompt, images=[media.to_image_url()]
+                    async for attempt in AsyncRetrying(
+                        retry=retry_if_exception(
+                            lambda exc: (
+                                isinstance(
+                                    exc,
+                                    litellm.APIConnectionError
+                                    | litellm.InternalServerError,
+                                )
+                                and "internal server error" in exc.message.lower()
                             )
-                        ]
-                    )
+                            or isinstance(exc, litellm.Timeout)
+                            or (
+                                isinstance(exc, litellm.InternalServerError)
+                                and "broken pipe" in exc.message.lower()
+                            )
+                        ),
+                        before_sleep=before_sleep_log(logger, logging.WARNING),
+                        stop=stop_after_attempt(5),
+                    ):
+                        with attempt:
+                            result = await llm.call_single(
+                                messages=[
+                                    Message.create_message(
+                                        text=prompt, images=[media.to_image_url()]
+                                    )
+                                ]
+                            )
                     if result.text:
                         (
                             media.info["is_irrelevant"],
