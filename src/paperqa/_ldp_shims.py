@@ -5,6 +5,7 @@ __all__ = [
     "Agent",
     "Callback",
     "ComputeTrajectoryMetricsMixin",
+    "EnvsTaskDataset",
     "HTTPAgentClient",
     "Memory",
     "MemoryAgent",
@@ -22,6 +23,10 @@ __all__ = [
 from pydantic import TypeAdapter
 
 try:
+    from typing import Generic
+
+    from aviary.env import EnvsTaskDataset as _EnvsTaskDataset
+    from aviary.env import TEnvironment
     from ldp.agent import (
         Agent,
         HTTPAgentClient,
@@ -36,11 +41,19 @@ try:
         RolloutManager,
         bulk_evaluate_consensus,
     )
+    from ldp.data_structures import Trajectory
     from ldp.graph.memory import Memory, UIndexMemoryModel
     from ldp.graph.op_utils import set_training_mode
     from ldp.utils import discounted_returns
 
     _Memories = TypeAdapter(dict[int, Memory] | list[Memory])  # type: ignore[var-annotated]
+
+    class EnvsTaskDataset(
+        _EnvsTaskDataset[TEnvironment],
+        ComputeTrajectoryMetricsMixin,
+        Generic[TEnvironment],
+    ):
+        """Add the trajectory metrics mixin."""
 
     HAS_LDP_INSTALLED = True
 except ImportError:
@@ -61,7 +74,10 @@ except ImportError:
     RolloutManager = None  # type: ignore[assignment,misc]
     SimpleAgent = None  # type: ignore[assignment,misc]
     SimpleAgentState = None  # type: ignore[assignment,misc]
+    Trajectory = None  # type: ignore[assignment,misc]
     UIndexMemoryModel = None  # type: ignore[assignment,misc]
     discounted_returns = None  # type: ignore[assignment]
     bulk_evaluate_consensus = None  # type: ignore[assignment]
     set_training_mode = None  # type: ignore[assignment]
+
+    from aviary.env import EnvsTaskDataset  # type: ignore[assignment]
