@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import collections
 import importlib
 import itertools
 import json
@@ -13,12 +15,15 @@ from functools import wraps
 from pathlib import Path
 from typing import ClassVar, cast
 from unittest.mock import AsyncMock, patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
+import anyio
 import ldp.agent
+import litellm
 import pytest
 from aviary.core import (
     Environment,
+    Message,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -26,6 +31,7 @@ from aviary.core import (
     ToolSelector,
 )
 from aviary.envs.labbench import (
+    GradablePaperQAEnvironment,
     ImageQAEnvironment,
     ImageQATaskDataset,
     LABBenchDatasets,
@@ -42,10 +48,20 @@ from ldp.alg import (
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
 from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
+from lmi.utils import bytes_to_string
+from paperqa_docling import parse_pdf_to_pages
 from pytest_subtests import SubTests
+from rich.progress import track
 from tantivy import Index
-from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
+from tenacity import (
+    Retrying,
+    before_sleep_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+)
 
+from paperqa._ldp_shims import EnvsTaskDataset
 from paperqa.agents import SearchIndex, agent_query
 from paperqa.agents.env import (
     CLINICAL_STATUS_SEARCH_REGEX_PATTERN,
@@ -72,9 +88,11 @@ from paperqa.agents.tools import (
 )
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
-from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text
+from paperqa.settings import AgentSettings, IndexSettings, ParsingSettings, Settings
+from paperqa.types import Context, Doc, ParsedMedia, PQASession, Text
 from paperqa.utils import encode_id, extract_thought, get_year, md5sum
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.asyncio
@@ -1154,14 +1172,16 @@ async def test_env_from_name(subtests: SubTests) -> None:
 @pytest.mark.usefixtures("extended_llm_retrying")
 @pytest.mark.asyncio
 async def test_image_qa(tmp_path) -> None:
-    settings = ImageQAEnvironment.make_base_settings()
-    settings.llm = settings.summary_llm = "gpt-4o-2024-05-13"  # Match LAB-Bench paper
-    settings.agent = AgentSettings(
-        agent_type="ldp.agent.SimpleAgent",
-        index=IndexSettings(paper_directory=tmp_path),
-        # TODO: add image support for paper_search
-        tool_names={"gather_evidence", "gen_answer", "complete", "reset"},
-        agent_evidence_n=3,  # Bumped up to collect several perspectives
+    settings = ImageQAEnvironment.make_base_settings(
+        llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+        summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+        agent=AgentSettings(
+            agent_type="ldp.agent.SimpleAgent",
+            index=IndexSettings(paper_directory=tmp_path),
+            # TODO: add image support for paper_search
+            tool_names={"gather_evidence", "gen_answer", "complete"},
+            agent_evidence_n=3,  # Bumped up to collect several perspectives
+        ),
     )
     dataset = ImageQATaskDataset(dataset=LABBenchDatasets.TABLE_QA, settings=settings)
     t_cb = StoreTrajectoriesCallback()
@@ -1169,7 +1189,7 @@ async def test_image_qa(tmp_path) -> None:
     m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
     evaluator = Evaluator(
         config=EvaluatorConfig(
-            batch_size=128,
+            batch_size=31,  # TableQA in 8 batches, FigQA in 6 batches
             max_rollout_steps=18,  # Match aviary paper's PaperQA setting
         ),
         agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
@@ -1177,63 +1197,355 @@ async def test_image_qa(tmp_path) -> None:
         callbacks=[t_cb, env_cb, m_cb],
     )
     await evaluator.evaluate()
+    print(m_cb.eval_means)
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    retry=retry_if_exception_type(litellm.exceptions.APIError)
+    | retry_if_exception_type(litellm.exceptions.InternalServerError),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+)
+async def has_image(
+    media: ParsedMedia, im_bytes: bytes
+) -> tuple[bool, litellm.ModelResponse]:
+    completion = await litellm.acompletion(
+        "gpt-5",
+        messages=[
+            Message.create_message(
+                text=(
+                    "Attached are two images."
+                    " Does the first image contain the second image?"
+                    " If it does, please answer YES, otherwise NO."
+                ),
+                images=[
+                    f"data:image/png;base64,{bytes_to_string(im_bytes)}",
+                    media.to_image_url(),
+                ],
+            ).model_dump(mode="json")
+        ],
+    )
+    if (
+        len(completion.choices) == 1
+        and completion.choices[0].finish_reason == "stop"
+        and completion.choices[0].message.content
+    ):
+        return "yes" in completion.choices[0].message.content.lower(), completion
+    return False, completion
 
 
 class TestTextQATaskDataset:
     PAPERS_DIR: ClassVar[Path] = Path.home() / "Documents" / "Datasets"
 
-    # @pytest.mark.skip(reason="Manually run benchmark")
-    # @pytest.mark.usefixtures("extended_llm_retrying")
     @pytest.mark.asyncio
-    async def test_figqa_pdfs(self) -> None:
+    async def test_figqa_retrieval(self, tmp_path) -> None:
         settings = Settings(
-            llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
             summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+            embedding="text-embedding-3-large",
             agent=AgentSettings(
                 agent_type="ldp.agent.SimpleAgent",
                 index=IndexSettings(
-                    name="figqa",
+                    name="figqa-docling",
                     paper_directory=self.PAPERS_DIR / "FigQA",
                     manifest_file="manifest.csv",
                 ),
                 agent_evidence_n=3,  # Bumped up to collect several perspectives
             ),
+            parsing=ParsingSettings(parse_pdf=parse_pdf_to_pages),
         )
-        await get_directory_index(settings=settings)  # Build the index up front
         dataset = TextQATaskDataset(
             settings=settings,
             dataset=LABBenchDatasets.FIG_QA,
             read_data_kwargs={"seed": 42},
         )
+        paper_directory = anyio.Path(settings.agent.index.paper_directory)
+        manifest = await maybe_get_manifest(
+            filename=await settings.agent.index.finalize_manifest_file()
+        )
+
+        def make_individual_env(idx: int) -> GradablePaperQAEnvironment:
+            env = dataset.get_new_env_by_idx(idx)
+            (doi,) = env.sources
+            (details,) = (v for v in manifest.values() if v.get("doi") == doi)
+            new_paper_dir = tmp_path / str(env._session_id)
+            new_paper_dir.mkdir()
+            for filename in (
+                details.get("file_location"),
+                settings.agent.index.manifest_file,
+            ):
+                shutil.copyfile(
+                    src=paper_directory / filename, dst=new_paper_dir / filename
+                )
+            settings_orig_set = settings.model_dump()
+            settings_orig_set["agent"]["index"]["paper_directory"] = new_paper_dir
+            settings_orig_set["agent"]["index"]["name"] += f"-{env._session_id}"
+            return GradablePaperQAEnvironment(
+                query=env._query,
+                settings=Settings(**settings_orig_set),
+                docs=env._docs,
+                sources=env.sources,
+                rewards=env._rewards,
+                session_id=env._query.question_id,  # Expedite manual inspection
+            )
+
+        async def run_one(
+            idx: int,
+        ) -> tuple[str, dict[str, float], GradablePaperQAEnvironment]:
+            env = make_individual_env(idx)
+            await get_directory_index(settings=env._settings)
+            new_dataset = EnvsTaskDataset(envs=env)
+            t_cb = StoreTrajectoriesCallback()
+            m_cb = MeanMetricsCallback(eval_dataset=new_dataset, track_tool_usage=True)
+            evaluator = Evaluator(
+                config=EvaluatorConfig(
+                    max_rollout_steps=18,  # Match aviary paper's PaperQA setting
+                ),
+                agent=cast(
+                    Agent, await settings.make_ldp_agent(settings.agent.agent_type)
+                ),
+                dataset=new_dataset,
+                callbacks=[t_cb, m_cb],
+            )
+            await evaluator.evaluate()
+            reward = t_cb.eval_trajectories[-1].steps[-1].reward
+            m_cb.eval_means["correct"] = reward == env._rewards["correct"]
+            m_cb.eval_means["correct_unsure"] = reward in {
+                env._rewards["correct"],
+                env._rewards["unsure"],
+            }
+            # Appropriate source was in docs, indicating search failure
+            added_texts = sorted(
+                (
+                    t
+                    for t in env.state.docs.texts
+                    if t.doc.doi and t.doc.doi in env.sources
+                ),
+                key=lambda t: int(t.name.rsplit("pages ")[-1].split("-")[0]),
+            )
+            used_contexts = [
+                c
+                for c in env.state.session.contexts
+                if c.id in env.state.session.used_contexts
+            ]
+            used_texts = [
+                c.text
+                for c in used_contexts
+                if c.text.doc.doi and c.text.doc.doi in env.sources
+            ]
+            figure = cast(bytes, await dataset.get_images(env))
+            contains_media = await asyncio.gather(
+                *(
+                    has_image(m, figure)
+                    for t in used_texts
+                    for m in t.media
+                    if m.info["type"] in {"picture", "drawing"}
+                )
+            )
+            if not added_texts:
+                fr = "search didn't add doc"
+            elif not used_texts:
+                fr = "evidence didn't use doc"
+            elif not any(contains_media):
+                fr = "evidence didn't use image"
+            else:
+                fr = ""
+            return fr, m_cb.eval_means, env
+
+        hi = [await run_one(i) for i in range(5, 12)]
+        _ = 0
+
+    # @pytest.mark.skip(reason="Manually run benchmark")
+    # @pytest.mark.usefixtures("extended_llm_retrying")
+    @pytest.mark.asyncio
+    async def test_figqa_pdf_bucket(self) -> None:
+        settings = Settings(
+            summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
+            embedding="text-embedding-3-large",
+            agent=AgentSettings(
+                agent_type="ldp.agent.SimpleAgent",
+                index=IndexSettings(
+                    name="figqa-docling",
+                    paper_directory=self.PAPERS_DIR / "FigQA",
+                    manifest_file="manifest.csv",
+                ),
+                agent_evidence_n=3,  # Bumped up to collect several perspectives
+            ),
+            parsing=ParsingSettings(parse_pdf=parse_pdf_to_pages),
+            # parsing=ParsingSettings(multimodal=False),
+        )
+        dataset = TextQATaskDataset(
+            settings=settings,
+            dataset=LABBenchDatasets.FIG_QA,
+            read_data_kwargs={"seed": 42},
+        )
+        _ = 0
+        (env,) = [
+            dataset.get_new_env_by_idx(i)
+            for i in range(len(dataset))
+            if str(dataset.get_new_env_by_idx(i)._session_id)
+            == "14c5ac89-49f3-43e6-89d1-1be4c2ec35f1"
+        ]
+
+        await get_directory_index(settings=settings)  # Build the index up front
         env_cb = StoreEnvironmentsCallback()
+        t_cb = StoreTrajectoriesCallback()
         m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
         evaluator = Evaluator(
             config=EvaluatorConfig(
-                batch_size=32,
+                batch_size=31,  # TableQA in 8 batches, FigQA in 6 batches
                 max_rollout_steps=18,  # Match aviary paper's PaperQA setting
             ),
             agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
             dataset=dataset,
-            callbacks=[env_cb, m_cb],
+            callbacks=[env_cb, t_cb, m_cb],
         )
         await evaluator.evaluate()
+        print(m_cb.eval_means)
+        _ = 0
+
+        # Sort by env state session ID for reproducibility
+        env_cb.traj_id_to_envs = dict(
+            sorted(
+                env_cb.traj_id_to_envs.items(),
+                key=lambda item: item[1].state.session.id,
+            )
+        )
+        t_env_failed = [
+            (t, env_cb.traj_id_to_envs[t.traj_id])
+            for t in t_cb.eval_trajectories
+            if not t.failed and t.steps and t.steps[-1].reward < 0
+        ]
+
+        # Appropriate source was in docs, indicating search failure
+        added_texts = [
+            (
+                env,
+                sorted(
+                    (
+                        t
+                        for t in env.state.docs.texts
+                        if t.doc.doi and t.doc.doi in env.sources
+                    ),
+                    key=lambda t: int(t.name.rsplit("pages ")[-1].split("-")[0]),
+                ),
+            )
+            for env in env_cb.traj_id_to_envs.values()
+        ]
+        used_contexts = [
+            [
+                c
+                for c in env.state.session.contexts
+                if c.id in env.state.session.used_contexts
+            ]
+            for env in env_cb.traj_id_to_envs.values()
+        ]
+        used_texts = [
+            [
+                c.text
+                for c in contexts
+                if c.text.doc.doi and c.text.doc.doi in env.sources
+            ]
+            for env, contexts in zip(
+                env_cb.traj_id_to_envs.values(), used_contexts, strict=True
+            )
+        ]
+
+        failure_reasons = {env.state.session.id: "" for _, env in t_env_failed}
+        env_to_images = collections.defaultdict(list)
+        for (env, ts1), ts2 in track(
+            zip(added_texts, used_texts, strict=True),
+            total=len(added_texts),
+            description="Checking images in evidence",
+        ):
+            if not ts1:
+                failure_reasons[env.state.session.id] = "search didn't add doc"
+            elif not ts2:
+                failure_reasons[env.state.session.id] = "evidence didn't use doc"
+            else:
+                figure = cast(bytes, await dataset.get_images(env))
+
+                @retry(
+                    stop=stop_after_attempt(3),
+                    retry=retry_if_exception_type(litellm.exceptions.APIError)
+                    | retry_if_exception_type(litellm.exceptions.InternalServerError),
+                    before_sleep=before_sleep_log(logger, logging.WARNING),
+                )
+                async def has_image(
+                    media: ParsedMedia, env_id: UUID, im_bytes: bytes = figure
+                ) -> bool:
+                    completion = await litellm.acompletion(
+                        "gpt-5",
+                        messages=[
+                            Message.create_message(
+                                text=(
+                                    "Attached are two images."
+                                    " Does the first image contain the second image?"
+                                    " If it does, please answer YES, otherwise NO."
+                                ),
+                                images=[
+                                    f"data:image/png;base64,{bytes_to_string(im_bytes)}",
+                                    media.to_image_url(),
+                                ],
+                            ).model_dump(mode="json")
+                        ],
+                    )
+                    if (
+                        len(completion.choices) == 1
+                        and completion.choices[0].finish_reason == "stop"
+                        and completion.choices[0].message.content
+                    ):
+                        env_to_images[env_id].append(
+                            (media.to_id(), completion.choices[0].message.content)
+                        )
+                        return "yes" in completion.choices[0].message.content.lower()
+                    return False
+
+                contains_media = await asyncio.gather(
+                    *(
+                        has_image(m, env.state.session.id)
+                        for t in ts2
+                        for m in t.media
+                        if m.info["type"] in {"picture", "drawing"}
+                    )
+                )
+                if not any(contains_media):
+                    failure_reasons[env.state.session.id] = "evidence didn't use image"
+
+        no_doc_in_search_failure_frac = sum(
+            r == "search didn't add doc" for r in failure_reasons.values()
+        ) / len(failure_reasons)
+        no_doc_in_evidence_failure_frac = sum(
+            r == "evidence didn't use doc" for r in failure_reasons.values()
+        ) / len(failure_reasons)
+        no_image_in_evidence_failure_frac = sum(
+            r == "evidence didn't use image" for r in failure_reasons.values()
+        ) / len(failure_reasons)
+        print(
+            f"{no_doc_in_search_failure_frac=},"
+            f" {no_doc_in_evidence_failure_frac=},"
+            f" {no_image_in_evidence_failure_frac=}."
+        )
+        _ = 0
 
     @pytest.mark.skip(reason="Manually run benchmark")
     @pytest.mark.usefixtures("extended_llm_retrying")
     @pytest.mark.asyncio
-    async def test_tableqa_pdfs(self) -> None:
+    async def test_tableqa_pdf_bucket(self) -> None:
         settings = Settings(
-            llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
             summary_llm="gpt-4o-2024-05-13",  # Match LAB-Bench paper
             agent=AgentSettings(
                 agent_type="ldp.agent.SimpleAgent",
                 index=IndexSettings(
+                    # name="tableqa-docling",
+                    # name="tableqa-pymupdf",
                     name="tableqa",
                     paper_directory=self.PAPERS_DIR / "TableQA",
                     manifest_file="manifest.csv",
                 ),
                 agent_evidence_n=3,  # Bumped up to collect several perspectives
             ),
+            # parsing=ParsingSettings(parse_pdf=parse_pdf_to_pages),
+            parsing=ParsingSettings(multimodal=False),
         )
         await get_directory_index(settings=settings)  # Build the index up front
         dataset = TextQATaskDataset(
@@ -1245,7 +1557,7 @@ class TestTextQATaskDataset:
         m_cb = MeanMetricsCallback(eval_dataset=dataset, track_tool_usage=True)
         evaluator = Evaluator(
             config=EvaluatorConfig(
-                batch_size=32,
+                batch_size=31,  # TableQA in 8 batches, FigQA in 6 batches
                 max_rollout_steps=18,  # Match aviary paper's PaperQA setting
             ),
             agent=cast(Agent, await settings.make_ldp_agent(settings.agent.agent_type)),
@@ -1253,3 +1565,5 @@ class TestTextQATaskDataset:
             callbacks=[env_cb, m_cb],
         )
         await evaluator.evaluate()
+        print(m_cb.eval_means)
+        _ = 0
