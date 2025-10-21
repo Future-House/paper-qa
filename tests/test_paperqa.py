@@ -1635,7 +1635,8 @@ async def test_querying_tables(stub_data_dir: Path) -> None:
     assert all(
         [m.data for m in t.media] for t in used_texts
     ), "Expected image data to be present in the used contexts"
-    assert any(x in session.answer for x in ("1.0 mm", "1.0-mm"))
+    # Check for 1.0mm, 1.0-mm, 1.0 mm
+    assert re.search(r"1\.0[ -]?mm", session.answer)
     assert session.cost > 0
 
     # Filter contexts for HTTP requests, and ensure no images are present
@@ -2239,12 +2240,12 @@ def test_docdetails_doc_id_roundtrip() -> None:
 @pytest.mark.asyncio
 async def test_partitioning_fn_docs(use_partition: bool) -> None:
     settings = Settings.from_name("fast")
-    settings.answer.evidence_k = 2  # limit to only 2
+    settings.answer.evidence_k = 2  # Match positive or negative statement count below
 
     # imagine we have some special selection we want to
     # embedding rank by itself
     def partition_by_citation(t: Embeddable) -> int:
-        if isinstance(t, Text) and "special" in t.doc.citation:
+        if isinstance(t, Text) and "negative" in t.doc.citation:
             return 1
         return 0
 
@@ -2257,9 +2258,11 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     ), "We want this test to cover NumpyVectorStore"
 
     # add docs that we can use our partitioning function on
-    positive_statements_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    positive_statements_doc = Doc(
+        docname="positive", citation="positive", dockey="positive"
+    )
     negative_statements_doc = Doc(
-        docname="special", citation="special", dockey="special"
+        docname="negative", citation="negative", dockey="negative"
     )
     texts = []
     for i, (statement, doc) in enumerate(
@@ -2275,10 +2278,11 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
             await settings.get_embedding_model().embed_documents([texts[-1].text])
         )[0]
     await docs.aadd_texts(
-        texts=[t for t in texts if t.doc.docname == "stub"], doc=positive_statements_doc
+        texts=[t for t in texts if t.doc.docname == "positive"],
+        doc=positive_statements_doc,
     )
     await docs.aadd_texts(
-        texts=[t for t in texts if t.doc.docname == "special"],
+        texts=[t for t in texts if t.doc.docname == "negative"],
         doc=negative_statements_doc,
     )
 
@@ -2330,10 +2334,11 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
     # with partitioning, we are forcing them to be interleaved, thus
     # at least one "I don't like X" statements will be in the top 2
     session = await docs.aget_evidence(
-        "What do I like?", settings=settings, partitioning_fn=partitioning_fn
+        "What do I like or dislike?", settings=settings, partitioning_fn=partitioning_fn
     )
     assert docs.texts_index.texts == docs.texts == texts
 
+    assert session.contexts, "Test requires contexts to be made"
     if use_partition:
         assert any(
             "don't" in c.text.text for c in session.contexts

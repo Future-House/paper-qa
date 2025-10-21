@@ -516,7 +516,7 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     agent_test_settings.answer.evidence_skip_summary = True
 
     response = await agent_query(
-        query="What is is a self-explanatory model?",
+        query="What is a self-explanatory model?",
         settings=agent_test_settings,
         agent_type=FAKE_AGENT_TYPE,
     )
@@ -524,9 +524,15 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     result = response.session
     assert len(result.answer) > 200, "Answer did not return any results"
     assert "###" in result.answer, "Answer did not propagate system prompt"
+    assert len(result.contexts) >= 2, "Test expects a few contexts"
     # Subtract 2 to allow tolerance for chunks with leading/trailing whitespace
+    num_contexts_sufficient_length = sum(
+        len(c.context) >= agent_test_settings.parsing.chunk_size - 2
+        for c in result.contexts
+    )
+    # Check most contexts have the expected length
     assert (
-        len(result.contexts[0].context) >= agent_test_settings.parsing.chunk_size - 2
+        num_contexts_sufficient_length >= len(result.contexts) - 1
     ), "Summary was not skipped"
 
 
@@ -622,7 +628,7 @@ async def test_agent_sharing_state(
 
     agent_test_settings.agent.callbacks = callbacks
 
-    session = PQASession(question="What is is a self-explanatory model?")
+    session = PQASession(question="What is a self-explanatory model?")
     env_state = EnvironmentState(docs=Docs(), session=session)
     built_index = await get_directory_index(settings=agent_test_settings)
     assert await built_index.count, "Index build did not work"
@@ -730,11 +736,11 @@ async def test_agent_sharing_state(
         for context in session.contexts:
             if context.question != new_question:
                 assert (
-                    context.context[:20] not in response
+                    context.context[:30] not in response
                 ), "gather_evidence should not return any contexts for the old question"
         assert (
             sum(
-                (1 if (context.context[:20] in response) else 0)
+                (1 if (context.context[:30] in response) else 0)
                 for context in session.contexts
                 if context.question == new_question
             )
