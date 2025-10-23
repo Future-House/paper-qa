@@ -478,7 +478,9 @@ class ParsedMetadata(BaseModel):
         default=pqa_version,
         description="PaperQA version that invoked the parsing_libraries.",
     )
-    total_parsed_text_length: int
+    total_parsed_text_length: int = Field(
+        ge=0, description="Length (chars) of the parsed text."
+    )
     count_parsed_media: int = Field(default=0, ge=0)
     name: str | None = Field(
         default=None,
