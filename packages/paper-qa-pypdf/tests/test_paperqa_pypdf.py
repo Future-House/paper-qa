@@ -24,6 +24,7 @@ async def test_parse_pdf_to_pages() -> None:
     filepath = STUB_DATA_DIR / "pasa.pdf"
     parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
     assert isinstance(parsed_text_full_page.content, dict)
+    assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
     assert isinstance(parsed_text_full_page.content["1"], tuple)
     matches = re.findall(
@@ -105,6 +106,7 @@ async def test_parse_pdf_to_pages() -> None:
     parsed_text_no_media = parse_pdf_to_pages(filepath, parse_media=False)
     assert isinstance(parsed_text_no_media.content, dict)
     assert all(isinstance(c, str) for c in parsed_text_no_media.content.values())
+    assert len(parsed_text_no_media.content) == 15, "Expected all pages to be parsed"
 
     # Check metadata
     for pt in (parsed_text_full_page, parsed_text_no_media):

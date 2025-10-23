@@ -25,6 +25,7 @@ async def test_parse_pdf_to_pages() -> None:
     filepath = STUB_DATA_DIR / "pasa.pdf"
     parsed_text = parse_pdf_to_pages(filepath)
     assert isinstance(parsed_text.content, dict)
+    assert len(parsed_text.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text.content, "Parsed text should contain page 1"
     assert isinstance(parsed_text.content["1"], tuple)
     # Weird spaces are because 'Pa S a' is bolded in the original PDF
@@ -107,10 +108,12 @@ async def test_parse_pdf_to_pages() -> None:
     parsed_text_no_media = parse_pdf_to_pages(filepath, parse_media=False)
     assert isinstance(parsed_text_no_media.content, dict)
     assert all(isinstance(c, str) for c in parsed_text_no_media.content.values())
+    assert len(parsed_text_no_media.content) == 15, "Expected all pages to be parsed"
 
     # Check our ability to get a high DPI
     parsed_text_high_dpi = parse_pdf_to_pages(filepath, dpi=144)
     assert isinstance(parsed_text_high_dpi.content, dict)
+    assert len(parsed_text_high_dpi.content) == 15, "Expected all pages to be parsed"
     assert not isinstance(parsed_text_high_dpi.content["2"], str)
     p2_text_high_dpi, p2_media_high_dpi = parsed_text_high_dpi.content["2"]
     assert "Figure 1" in p2_text_high_dpi, "Expected Figure 1 title"
