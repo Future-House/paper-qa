@@ -29,7 +29,11 @@ class PDFParserFn(Protocol):
     """Protocol for parsing a PDF."""
 
     def __call__(
-        self, path: str | os.PathLike, page_size_limit: int | None = None, **kwargs
+        self,
+        path: str | os.PathLike,
+        page_size_limit: int | None = None,
+        page_range: int | tuple[int, int] | None = None,
+        **kwargs,
     ) -> ParsedText: ...
 
 
