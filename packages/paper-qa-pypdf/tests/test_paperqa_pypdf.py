@@ -121,6 +121,33 @@ async def test_parse_pdf_to_pages() -> None:
     ), "All modes should parse the same number of pages"
 
 
+def test_page_range() -> None:
+    filepath = STUB_DATA_DIR / "pasa.pdf"
+
+    parsed_text_p1 = parse_pdf_to_pages(filepath, page_range=1, parse_media=False)
+    assert isinstance(parsed_text_p1.content, dict)
+    assert list(parsed_text_p1.content) == ["1"]
+    assert parsed_text_p1.metadata.name
+    assert "page_range=1" in parsed_text_p1.metadata.name
+
+    parsed_text_p12 = parse_pdf_to_pages(filepath, page_range=(1, 2), parse_media=False)
+    assert isinstance(parsed_text_p12.content, dict)
+    assert list(parsed_text_p12.content) == ["1", "2"]
+    assert parsed_text_p12.metadata.name
+    assert "page_range=(1,2)" in parsed_text_p12.metadata.name
+
+    # NOTE: exceeds 15-page PDF length
+    parsed_text_p1_20 = parse_pdf_to_pages(
+        filepath, page_range=(1, 20), parse_media=False
+    )
+    assert isinstance(parsed_text_p1_20.content, dict)
+    assert list(parsed_text_p1_20.content) == [
+        str(i) for i in range(1, 15 + 1)
+    ], "Expected pages to be truncated to 15 or us to get blown up"
+    assert parsed_text_p1_20.metadata.name
+    assert "page_range=(1,20)" in parsed_text_p1_20.metadata.name
+
+
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars

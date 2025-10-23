@@ -133,6 +133,7 @@ async def test_parse_pdf_to_pages() -> None:
         assert "docling" in parsing_library
         assert pt.metadata.name
         assert "pdf" in pt.metadata.name
+        assert "page_range=None" in pt.metadata.name
 
     # Check commonalities across all modes
     assert (
@@ -140,6 +141,31 @@ async def test_parse_pdf_to_pages() -> None:
         == len(parsed_text_no_media.content)
         == len(parsed_text_high_dpi.content)
     ), "All modes should parse the same number of pages"
+
+
+def test_page_range() -> None:
+    filepath = STUB_DATA_DIR / "pasa.pdf"
+
+    parsed_text_p1 = parse_pdf_to_pages(filepath, page_range=1)
+    assert isinstance(parsed_text_p1.content, dict)
+    assert list(parsed_text_p1.content) == ["1"]
+    assert parsed_text_p1.metadata.name
+    assert "page_range=1" in parsed_text_p1.metadata.name
+
+    parsed_text_p1_2 = parse_pdf_to_pages(filepath, page_range=(1, 2))
+    assert isinstance(parsed_text_p1_2.content, dict)
+    assert list(parsed_text_p1_2.content) == ["1", "2"]
+    assert parsed_text_p1_2.metadata.name
+    assert "page_range=(1,2)" in parsed_text_p1_2.metadata.name
+
+    # NOTE: exceeds 15-page PDF length
+    parsed_text_p1_20 = parse_pdf_to_pages(filepath, page_range=(1, 20))
+    assert isinstance(parsed_text_p1_20.content, dict)
+    assert list(parsed_text_p1_20.content) == [
+        str(i) for i in range(1, 15 + 1)
+    ], "Expected pages to be truncated to 15 or us to get blown up"
+    assert parsed_text_p1_20.metadata.name
+    assert "page_range=(1,20)" in parsed_text_p1_20.metadata.name
 
 
 def test_page_size_limit_denial() -> None:

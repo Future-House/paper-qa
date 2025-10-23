@@ -142,6 +142,26 @@ async def test_parse_pdf_to_pages() -> None:
     ), "All modes should parse the same number of pages"
 
 
+def test_page_range() -> None:
+    filepath = STUB_DATA_DIR / "pasa.pdf"
+
+    parsed_text_p1 = parse_pdf_to_pages(filepath, page_range=1)
+    assert isinstance(parsed_text_p1.content, dict)
+    assert list(parsed_text_p1.content) == ["1"]
+    assert parsed_text_p1.metadata.name
+    assert "page_range=1" in parsed_text_p1.metadata.name
+
+    parsed_text_p1_2 = parse_pdf_to_pages(filepath, page_range=(1, 2))
+    assert isinstance(parsed_text_p1_2.content, dict)
+    assert list(parsed_text_p1_2.content) == ["1", "2"]
+    assert parsed_text_p1_2.metadata.name
+    assert "page_range=(1,2)" in parsed_text_p1_2.metadata.name
+
+    # NOTE: exceeds 15-page PDF length
+    with pytest.raises(ValueError, match="page not in document"):
+        parse_pdf_to_pages(filepath, page_range=(1, 20))
+
+
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars
