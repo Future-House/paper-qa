@@ -1,0 +1,334 @@
+interactions:
+  - request:
+      body:
+        '{"model":"claude-sonnet-4-5-20250929","messages":[{"role":"user","content":[{"type":"image","source":{"type":"base64","media_type":"image/png","data":"bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"temperature":0.0,"max_tokens":4096}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        anthropic-version:
+          - "2023-06-01"
+        connection:
+          - keep-alive
+        content-length:
+          - "2649"
+        content-type:
+          - application/json
+        host:
+          - api.anthropic.com
+        user-agent:
+          - litellm/1.74.15.post2
+      method: POST
+      uri: https://api.anthropic.com/v1/messages
+    response:
+      body:
+        string:
+          '{"type":"error","error":{"type":"invalid_request_error","message":"Could
+          not process image"},"request_id":"req_011CUKE3qjzyCkHUsbxzCFhx"}'
+      headers:
+        CF-RAY:
+          - 991be3b5bf1c36e8-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "137"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 20 Oct 2025 22:18:10 GMT
+        Server:
+          - cloudflare
+        Via:
+          - 1.1 google
+        X-Robots-Tag:
+          - none
+        anthropic-organization-id:
+          - f2c99ed9-038a-406f-9cb5-1f840b758a20
+        cf-cache-status:
+          - DYNAMIC
+        request-id:
+          - req_011CUKE3qjzyCkHUsbxzCFhx
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "114"
+        x-should-retry:
+          - "false"
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body:
+        '{"model":"claude-sonnet-4-5-20250929","messages":[{"role":"user","content":[{"type":"image","source":{"type":"base64","media_type":"image/png","data":"bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"temperature":0.0,"max_tokens":4096}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        anthropic-version:
+          - "2023-06-01"
+        connection:
+          - keep-alive
+        content-length:
+          - "2649"
+        content-type:
+          - application/json
+        host:
+          - api.anthropic.com
+        user-agent:
+          - litellm/1.74.15.post2
+      method: POST
+      uri: https://api.anthropic.com/v1/messages
+    response:
+      body:
+        string:
+          '{"type":"error","error":{"type":"invalid_request_error","message":"Could
+          not process image"},"request_id":"req_011CUKE4ExWFSbNejsuhPinN"}'
+      headers:
+        CF-RAY:
+          - 991be3d7a92136e8-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "137"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 20 Oct 2025 22:18:16 GMT
+        Server:
+          - cloudflare
+        Via:
+          - 1.1 google
+        X-Robots-Tag:
+          - none
+        anthropic-organization-id:
+          - f2c99ed9-038a-406f-9cb5-1f840b758a20
+        cf-cache-status:
+          - DYNAMIC
+        request-id:
+          - req_011CUKE4ExWFSbNejsuhPinN
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "318"
+        x-should-retry:
+          - "false"
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body:
+        '{"model":"claude-sonnet-4-5-20250929","messages":[{"role":"user","content":[{"type":"image","source":{"type":"base64","media_type":"image/png","data":"bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"temperature":0.0,"max_tokens":4096}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        anthropic-version:
+          - "2023-06-01"
+        connection:
+          - keep-alive
+        content-length:
+          - "2649"
+        content-type:
+          - application/json
+        host:
+          - api.anthropic.com
+        user-agent:
+          - litellm/1.74.15.post2
+      method: POST
+      uri: https://api.anthropic.com/v1/messages
+    response:
+      body:
+        string:
+          '{"type":"error","error":{"type":"invalid_request_error","message":"Could
+          not process image"},"request_id":"req_011CUKE4fBHaGMDqkfXLZp4V"}'
+      headers:
+        CF-RAY:
+          - 991be3fafe4636e8-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "137"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 20 Oct 2025 22:18:21 GMT
+        Server:
+          - cloudflare
+        Via:
+          - 1.1 google
+        X-Robots-Tag:
+          - none
+        anthropic-organization-id:
+          - f2c99ed9-038a-406f-9cb5-1f840b758a20
+        cf-cache-status:
+          - DYNAMIC
+        request-id:
+          - req_011CUKE4fBHaGMDqkfXLZp4V
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "142"
+        x-should-retry:
+          - "false"
+      status:
+        code: 400
+        message: Bad Request
+  - request:
+      body:
+        '{"model":"claude-sonnet-4-5-20250929","messages":[{"role":"user","content":[{"type":"image","source":{"type":"base64","media_type":"image/png","data":"bm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRhbm90X2ltYWdlX2RhdGFub3RfaW1hZ2VfZGF0YW5vdF9pbWFnZV9kYXRh"}},{"type":"text","text":"You
+        are analyzing an image or table from a scientific document. Provide a detailed
+        description that will be used to answer questions about its content. Focus on
+        key elements, data, relationships, and scientific insights visible in the image.
+        It''s especially important to document referential information such as figure/table
+        numbers, labels, plot colors, or legends.\n\nText co-located with the media
+        may be associated with other media or unrelated content, so do not just blindly
+        quote referential information. The smaller the image, the more likely co-located
+        text is unrelated. To restate, often the co-located text is several pages of
+        content, so only use aspects relevant to accompanying image or table.\n\nHere''s
+        a few failure mode with possible resolutions:\n- The media was a logo or icon,
+        so the text is unrelated. In this case, briefly describe the media as a logo
+        or icon, and do not mention other unrelated surrounding text.\n- The media was
+        display type, so the text is probably unrelated. The display type can be spread
+        over several lines. In this case, briefly describe the media as display type,
+        and do not mention other unrelated surrounding text.\n- The media is a margin
+        box or design element, so the text is unrelated. In this case, briefly describe
+        the media as decorative, and do not mention other unrelated surrounding text.\n-
+        The media came from a bad PDF read, so it''s garbled. In this case, describe
+        the media as garbled, state why it''s considered garbled, and do not mention
+        other unrelated surrounding text.\n- The media is a subfigure or a subtable.
+        In this case, make sure to only detail the subfigure or subtable, not the entire
+        figure or table. Do not mention other unrelated surrounding text.\n\nHere is
+        the co-located text from a radius of 1 page:\n\nSome text\n\nDescribe the media,
+        or if uncertain on a description please state why:"}]}],"temperature":0.0,"max_tokens":4096}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        anthropic-version:
+          - "2023-06-01"
+        connection:
+          - keep-alive
+        content-length:
+          - "2649"
+        content-type:
+          - application/json
+        host:
+          - api.anthropic.com
+        user-agent:
+          - litellm/1.74.15.post2
+      method: POST
+      uri: https://api.anthropic.com/v1/messages
+    response:
+      body:
+        string:
+          '{"type":"error","error":{"type":"invalid_request_error","message":"Could
+          not process image"},"request_id":"req_011CUKE55biZNoryXYFAsrMM"}'
+      headers:
+        CF-RAY:
+          - 991be41eb83d36e8-SJC
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "137"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 20 Oct 2025 22:18:27 GMT
+        Server:
+          - cloudflare
+        Via:
+          - 1.1 google
+        X-Robots-Tag:
+          - none
+        anthropic-organization-id:
+          - f2c99ed9-038a-406f-9cb5-1f840b758a20
+        cf-cache-status:
+          - DYNAMIC
+        request-id:
+          - req_011CUKE55biZNoryXYFAsrMM
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains; preload
+        x-envoy-upstream-service-time:
+          - "86"
+        x-should-retry:
+          - "false"
+      status:
+        code: 400
+        message: Bad Request
+version: 1

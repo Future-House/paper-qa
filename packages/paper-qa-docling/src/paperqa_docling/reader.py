@@ -150,6 +150,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     "height": image_data.height,
                     "bbox": item.prov[0].bbox.as_tuple(),
                     "images_scale": pipeline_options.images_scale,
+                    "page_num": page_num,
                 }
                 annotations = [
                     x for x in item.annotations if isinstance(x, DescriptionAnnotation)
@@ -204,6 +205,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             "height": table_image_data.height,
                             "bbox": item.prov[0].bbox.as_tuple(),
                             "images_scale": pipeline_options.images_scale,
+                            "page_num": page_num,
                         },
                     )
                 )

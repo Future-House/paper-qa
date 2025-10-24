@@ -275,6 +275,8 @@ def chunk_code_text(
 
 
 IMAGE_EXTENSIONS = tuple({".png", ".jpg", ".jpeg"})
+# When HTML reader supports images, add here
+ENRICHMENT_EXTENSIONS = tuple({".pdf", *IMAGE_EXTENSIONS})
 
 
 @overload
@@ -285,6 +287,7 @@ async def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
+    multimodal_enricher: Callable[[ParsedText], Awaitable] | None = ...,
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> ParsedText: ...
@@ -296,6 +299,7 @@ async def read_doc(
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
+    multimodal_enricher: Callable[[ParsedText], Awaitable] | None = ...,
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> ParsedText: ...
@@ -307,6 +311,7 @@ async def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
+    multimodal_enricher: Callable[[ParsedText], Awaitable] | None = ...,
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> tuple[list[Text], ParsedMetadata]: ...
@@ -318,6 +323,7 @@ async def read_doc(
     include_metadata: Literal[False] = ...,
     chunk_chars: int = ...,
     overlap: int = ...,
+    multimodal_enricher: Callable[[ParsedText], Awaitable] | None = ...,
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> list[Text]: ...
@@ -329,6 +335,8 @@ async def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
+    image_enrichment_pages: int | bool = ...,
+    multimodal_enricher: Callable[[ParsedText], Awaitable] | None = ...,
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
 ) -> tuple[list[Text], ParsedMetadata]: ...
@@ -339,6 +347,7 @@ async def read_doc(  # noqa: PLR0912
     include_metadata: bool = False,
     chunk_chars: int = 3000,
     overlap: int = 100,
+    multimodal_enricher: Callable[[ParsedText], Awaitable[str]] | None = None,
     parse_pdf: PDFParserFn | None = None,
     **parser_kwargs,
 ) -> list[Text] | ParsedText | tuple[list[Text], ParsedMetadata]:
@@ -351,6 +360,8 @@ async def read_doc(  # noqa: PLR0912
         include_metadata: Opt-in flag to include metadata about the chunking algorithm.
         chunk_chars: size of chunks
         overlap: size of overlap between chunks
+        multimodal_enricher: Optional function to enrich the parsed text
+            and return a hashable string summary before chunking.
         parse_pdf: Optional function to parse PDF files (if you're parsing a PDF).
         parser_kwargs: Keyword arguments to pass to the used parsing function.
     """
@@ -380,6 +391,13 @@ async def read_doc(  # noqa: PLR0912
     if parsed_text_only:
         return parsed_text
 
+    # Enrich upon full parsed text before chunking, since enrichment
+    # may view adjacent pages (and not getting cut off on chunk boundaries)
+    if str_path.endswith(ENRICHMENT_EXTENSIONS) and multimodal_enricher:
+        enrichment_summary: str = f"|{await multimodal_enricher(parsed_text)}"
+    else:
+        enrichment_summary = ""
+
     # next chunk the parsed text
 
     if chunk_chars == 0:
@@ -389,7 +407,10 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=0,
             overlap=0,
-            name=f"paper-qa={pqa_version}|algorithm=none|reduction=cl100k_base",
+            name=(
+                f"paper-qa={pqa_version}|algorithm=none"
+                f"|reduction=cl100k_base{enrichment_summary}"
+            ),
         )
     elif str_path.endswith(".pdf"):
         chunked_text = chunk_pdf(
@@ -400,7 +421,7 @@ async def read_doc(  # noqa: PLR0912
             overlap=overlap,
             name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-pdf"
-                f"|size={chunk_chars}|overlap={overlap}"
+                f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
     elif str_path.endswith(IMAGE_EXTENSIONS):
@@ -410,7 +431,7 @@ async def read_doc(  # noqa: PLR0912
         chunk_metadata = ChunkMetadata(
             size=0,
             overlap=0,
-            name=f"paper-qa={pqa_version}|algorithm=none",
+            name=f"paper-qa={pqa_version}|algorithm=none{enrichment_summary}",
         )
     elif str_path.endswith((".txt", ".html")):
         chunked_text = chunk_text(
@@ -421,7 +442,7 @@ async def read_doc(  # noqa: PLR0912
             overlap=overlap,
             name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-text|reduction=cl100k_base"
-                f"|size={chunk_chars}|overlap={overlap}"
+                f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
     else:
@@ -433,7 +454,7 @@ async def read_doc(  # noqa: PLR0912
             overlap=overlap,
             name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-code|reduction=cl100k_base"
-                f"|size={chunk_chars}|overlap={overlap}"
+                f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
 

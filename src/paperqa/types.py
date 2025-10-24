@@ -173,6 +173,35 @@ class Text(Embeddable):
     def __hash__(self) -> int:
         return hash((self.name, self.text))
 
+    async def get_embeddable_text(self, with_enrichment: bool = False) -> str:
+        """Get the text to embed, which may be different from the actual text content.
+
+        This method, despite currently not involving any awaits,
+        is async so subclassers can have custom just-in-time enrichment logic
+        or fetch enrichments from an external service.
+
+        Args:
+            with_enrichment: Opt-in flag to include media enrichment in the return.
+                Media enrichment can improve placement in embedding space,
+                without affecting the text used for quotation.
+
+        Returns:
+            Content to embed.
+        """
+        if not with_enrichment:
+            return self.text
+        # Media enrichment can improve placement in embedding space,
+        # without affecting the text used for quotation
+        enriched_media = (
+            (
+                f"Media {m.index} from page {m.info.get('page_num', 'unknown')!s}'s"
+                f" enriched description:\n\n{m.info['enriched_description']!s}"
+            )
+            for m in self.media
+            if m.info.get("enriched_description")
+        )
+        return "\n\n".join((self.text, *enriched_media))
+
 
 # Sentinel to autopopulate a field within model_validator
 AUTOPOPULATE_VALUE = ""  # NOTE: this is falsy by design
@@ -506,13 +535,18 @@ class ParsedMedia(BaseModel):
     ] = Field(description="Raw image, ideally directly savable to a PNG image.")
     text: str | None = Field(
         default=None,
-        description="Optional associated text content (e.g. markdown export of a table).",
+        description=(
+            "Optional associated text content (e.g. markdown export of a table)."
+            " This should not be enriched/augmented text, but actual text."
+        ),
     )
     info: dict[str, JsonValue | tuple[float, ...] | bytes] = Field(
         default_factory=dict,
         description=(
             "Optional image metadata. This may come from image definitions sourced from"
-            " the PDF, or attributes of custom pixel maps."
+            " the PDF, attributes of custom pixel maps, or what the PDF reader"
+            " considered the media to be (e.g. table or image). It may also include"
+            " model-generated description(s) of the image."
         ),
     )
 
