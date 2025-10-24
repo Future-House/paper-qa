@@ -24,6 +24,7 @@ async def test_parse_pdf_to_pages() -> None:
     filepath = STUB_DATA_DIR / "pasa.pdf"
     parsed_text = parse_pdf_to_pages(filepath, use_block_parsing=True)
     assert isinstance(parsed_text.content, dict)
+    assert len(parsed_text.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text.content, "Parsed text should contain page 1"
     assert (
         "Abstract\n\nWe introduce PaSa, an advanced Paper Search"
@@ -101,6 +102,7 @@ async def test_parse_pdf_to_pages() -> None:
     # Let's check the full page parsing behavior
     parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
     assert isinstance(parsed_text_full_page.content, dict)
+    assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
     assert "2" in parsed_text_full_page.content, "Parsed text should contain page 2"
     for page_num in ("1", "2"):
@@ -123,6 +125,7 @@ async def test_parse_pdf_to_pages() -> None:
     parsed_text_no_media = parse_pdf_to_pages(filepath, parse_media=False)
     assert isinstance(parsed_text_no_media.content, dict)
     assert all(isinstance(c, str) for c in parsed_text_no_media.content.values())
+    assert len(parsed_text_no_media.content) == 15, "Expected all pages to be parsed"
 
     # Check metadata
     for pt in (parsed_text, parsed_text_full_page, parsed_text_no_media):
@@ -137,6 +140,26 @@ async def test_parse_pdf_to_pages() -> None:
         == len(parsed_text_full_page.content)
         == len(parsed_text_no_media.content)
     ), "All modes should parse the same number of pages"
+
+
+def test_page_range() -> None:
+    filepath = STUB_DATA_DIR / "pasa.pdf"
+
+    parsed_text_p1 = parse_pdf_to_pages(filepath, page_range=1)
+    assert isinstance(parsed_text_p1.content, dict)
+    assert list(parsed_text_p1.content) == ["1"]
+    assert parsed_text_p1.metadata.name
+    assert "page_range=1" in parsed_text_p1.metadata.name
+
+    parsed_text_p1_2 = parse_pdf_to_pages(filepath, page_range=(1, 2))
+    assert isinstance(parsed_text_p1_2.content, dict)
+    assert list(parsed_text_p1_2.content) == ["1", "2"]
+    assert parsed_text_p1_2.metadata.name
+    assert "page_range=(1,2)" in parsed_text_p1_2.metadata.name
+
+    # NOTE: exceeds 15-page PDF length
+    with pytest.raises(ValueError, match="page not in document"):
+        parse_pdf_to_pages(filepath, page_range=(1, 20))
 
 
 def test_page_size_limit_denial() -> None:

@@ -282,6 +282,11 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 page_size_limit=parse_config.page_size_limit,
                 use_block_parsing=parse_config.pdfs_use_block_parsing,
                 parse_images=False,  # Peeking is text only
+                # We only use the first chunk, so let's peek just enough pages for that.
+                # Usually pages 1 - 2 give that,
+                # but in the event page 2 is blank (true for some PDFs),
+                # we read pages 1 - 3 to be safe
+                page_range=(1, 3),
                 parse_pdf=parse_config.parse_pdf,
             )
             if not texts or not texts[0].text.strip():

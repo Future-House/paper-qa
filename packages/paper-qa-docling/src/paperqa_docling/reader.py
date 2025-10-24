@@ -9,6 +9,7 @@ from typing import Any
 import docling
 from docling.datamodel.base_models import ConversionStatus
 from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.settings import DEFAULT_PAGE_RANGE
 from docling.document_converter import DocumentConverter, InputFormat, PdfFormatOption
 from docling.exceptions import ConversionError
 from docling.pipeline.standard_pdf_pipeline import StandardPdfPipeline
@@ -31,6 +32,7 @@ DOCLING_IMAGES_SCALE_PER_DPI = (
 def parse_pdf_to_pages(  # noqa: PLR0912
     path: str | os.PathLike,
     page_size_limit: int | None = None,
+    page_range: int | tuple[int, int] | None = None,
     parse_media: bool = True,
     pipeline_cls: type = StandardPdfPipeline,
     dpi: int | None = None,
@@ -50,6 +52,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             Default PDF resolution is 72 DPI, so dpi of 144 would render at 2x scale.
         custom_pipeline_options: Optional keyword arguments to use to construct the
             PDF pipeline's options.
+        page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
+            to parse only specific pages, where pages are one-indexed.
+            Leaving as the default of None will parse all pages.
         **_: Thrown away kwargs.
     """
     path = Path(path)
@@ -74,7 +79,14 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     try:
         # NOTE: this conversion is synchronous, because many backends only support sync
         # https://github.com/docling-project/docling/issues/2229#issuecomment-3269019929
-        result = converter.convert(path)
+        result = converter.convert(
+            path,
+            page_range=(
+                (page_range, page_range)
+                if isinstance(page_range, int)
+                else (page_range or DEFAULT_PAGE_RANGE)
+            ),
+        )
     except ConversionError as exc:
         raise ImpossibleParsingError(
             f"PDF reading via {docling.__name__} failed on the PDF at path {path!r},"
@@ -204,7 +216,11 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         parsing_libraries=[f"{docling.__name__} ({DOCLING_VERSION})"],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        name=f"pdf|pipeline={pipeline_cls.__name__}{multimodal_string if parse_media else ''}",
+        name=(
+            f"pdf|pipeline={pipeline_cls.__name__}"
+            f"|page_range={str(page_range).replace(' ', '')}"  # Remove space in tuple
+            f"{multimodal_string if parse_media else ''}"
+        ),
     )
     return ParsedText(
         # Convert content from list to 2-tuple for return

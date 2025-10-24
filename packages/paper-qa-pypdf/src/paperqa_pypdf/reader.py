@@ -19,6 +19,7 @@ PDFIUM_BITMAP_ATTRS = {"width", "height", "stride", "n_channels", "mode"}
 def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
+    page_range: int | tuple[int, int] | None = None,
     parse_media: bool = True,
     full_page: bool = False,
     **_: Any,
@@ -32,6 +33,9 @@ def parse_pdf_to_pages(
         parse_media: Flag to also parse media (e.g. images, tables).
         full_page: Set True to screenshot the entire page as one image,
             instead of parsing individual images or tables.
+        page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
+            to parse only specific pages, where pages are one-indexed.
+            Leaving as the default of None will parse all pages.
         **_: Thrown away kwargs.
     """
     with open(path, "rb") as file:
@@ -45,7 +49,18 @@ def parse_pdf_to_pages(
 
         pages: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
         total_length = count_media = 0
-        for i, page in enumerate(pdf_reader.pages):
+
+        # Determine page range (convert from 1-indexed to 0-indexed)
+        if page_range is None:
+            start_page, end_page = 0, len(pdf_reader.pages)
+        elif isinstance(page_range, int):
+            start_page, end_page = page_range - 1, page_range
+        else:
+            start_page, end_page = page_range[0] - 1, page_range[1]
+
+        for i, page in enumerate(
+            pdf_reader.pages[start_page:end_page], start=start_page
+        ):
             text = page.extract_text()
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
@@ -105,6 +120,6 @@ def parse_pdf_to_pages(
         ],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        name=f"pdf|{multimodal_string if parse_media else ''}",
+        name=f"pdf|page_range={str(page_range).replace(' ', '')}{multimodal_string if parse_media else ''}",
     )
     return ParsedText(content=pages, metadata=metadata)

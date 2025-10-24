@@ -43,9 +43,10 @@ PYMUPDF_PIXMAP_ATTRS = {
 _INVALID_MD_CHARS = re.compile(r"\x00")
 
 
-def parse_pdf_to_pages(
+def parse_pdf_to_pages(  # noqa: PLR0912
     path: str | os.PathLike,
     page_size_limit: int | None = None,
+    page_range: int | tuple[int, int] | None = None,
     use_block_parsing: bool = False,
     parse_media: bool = True,
     full_page: bool = False,
@@ -68,6 +69,9 @@ def parse_pdf_to_pages(
             or a two-tuple to specify X and Y directions separately.
             The default was chosen to perform well on image extraction from LitQA2 PDFs.
         image_dpi: Dots per inch for images captured from the PDF.
+        page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
+            to parse only specific pages, where pages are one-indexed.
+            Leaving as the default of None will parse all pages.
         **_: Thrown away kwargs.
     """
     x_tol, y_tol = (
@@ -80,7 +84,15 @@ def parse_pdf_to_pages(
         content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
         total_length = count_media = 0
 
-        for i in range(file.page_count):
+        # Determine page range (convert from 1-indexed to 0-indexed)
+        if page_range is None:
+            page_iter = range(file.page_count)
+        elif isinstance(page_range, int):
+            page_iter = range(page_range - 1, page_range)
+        else:
+            page_iter = range(page_range[0] - 1, page_range[1])
+
+        for i in page_iter:
             try:
                 page = file.load_page(i)
             except pymupdf.mupdf.FzErrorFormat as exc:
@@ -177,6 +189,9 @@ def parse_pdf_to_pages(
         parsing_libraries=[f"{pymupdf.__name__} ({pymupdf.__version__})"],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
-        name=f"pdf|block={use_block_parsing}{multimodal_string if parse_media else ''}",
+        name=(
+            f"pdf|page_range={str(page_range).replace(' ', '')}"
+            f"|block={use_block_parsing}{multimodal_string if parse_media else ''}"
+        ),
     )
     return ParsedText(content=content, metadata=metadata)
