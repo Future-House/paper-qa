@@ -66,7 +66,7 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model: LLMModel | str = "gpt-4o") -> str:
+    async def get_summary(self, llm_model: LLMModel | str) -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
