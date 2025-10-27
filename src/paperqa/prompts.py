@@ -1,8 +1,11 @@
 from datetime import datetime
 
+summary_json_prompt = (
+    "Excerpt from {citation}\n\n---\n\n{text}\n\n---\n\nQuestion: {question}"
+)
 summary_prompt = (
     "Summarize the excerpt below to help answer a question."
-    "\n\nExcerpt from {citation}\n\n---\n\n{text}\n\n---\n\nQuestion: {question}\n\n"
+    f"\n\n{summary_json_prompt}\n\n"
     "Do not directly answer the question,"
     " instead summarize to give evidence to help answer the question."
     " Stay detailed; report specific numbers, equations, or direct quotes"
@@ -17,10 +20,6 @@ text_with_tables_prompt_template = (
     "{text}\n\n---\n\nMarkdown tables from {citation}."
     " If the markdown is poorly formatted, defer to the images"
     "\n\n{tables}"
-)
-
-summary_json_prompt = (
-    "Excerpt from {citation}\n\n---\n\n{text}\n\n---\n\nQuestion: {question}\n\n"
 )
 
 # The below "cannot answer" sentinel phrase should:
