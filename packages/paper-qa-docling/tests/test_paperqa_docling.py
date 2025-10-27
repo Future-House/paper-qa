@@ -173,6 +173,25 @@ def test_page_range() -> None:
     assert "page_range=(1,20)" in parsed_text_p1_20.metadata.name
 
 
+def test_media_deduplication() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert len(parsed_text.content) == 5, "Expected full PDF read"
+    all_media = [m for _, media in parsed_text.content.values() for m in media]  # type: ignore[misc]
+
+    all_images = [m for m in all_media if m.info.get("type") == "picture"]
+    assert len(all_images) == 5, "Expected each image to be read"
+    assert (
+        len(set(all_images)) <= 2
+    ), "Expected images on all pages beyond 1 to be deduplicated"
+
+    all_tables = [m for m in all_media if m.info.get("type") == "table"]
+    assert len(all_tables) == 5, "Expected each table to be read"
+    assert (
+        len(set(all_tables)) <= 2
+    ), "Expected tables on all pages beyond 1 to be deduplicated"
+
+
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars
