@@ -1,10 +1,11 @@
 import collections
 import io
+import json
 import os
 from collections.abc import Mapping
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import docling
 from docling.datamodel.base_models import ConversionStatus
@@ -169,6 +170,19 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         f"Didn't yet handle 2+ picture description annotations {annotations}."
                     )
 
+                media_metadata["info_hashable"] = json.dumps(
+                    {
+                        k: (
+                            v
+                            if k != "bbox"
+                            # Enables bbox deduplication based on whole pixels,
+                            # since <1-px differences are just noise
+                            else tuple(round(x) for x in cast(tuple, v))
+                        )
+                        for k, v in media_metadata.items()
+                    },
+                    sort_keys=True,
+                )
                 content[str(page_num)][1].append(
                     ParsedMedia(
                         index=len(content[str(page_num)][1]),
@@ -193,18 +207,32 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                 table_image_data.save(img_bytes, format="PNG")
                 img_bytes.seek(0)  # Reset pointer before read to avoid empty data
 
+                media_metadata = {
+                    "type": "table",
+                    "width": table_image_data.width,
+                    "height": table_image_data.height,
+                    "bbox": item.prov[0].bbox.as_tuple(),
+                    "images_scale": pipeline_options.images_scale,
+                }
+                media_metadata["info_hashable"] = json.dumps(
+                    {
+                        k: (
+                            v
+                            if k != "bbox"
+                            # Enables bbox deduplication based on whole pixels,
+                            # since <1-px differences are just noise
+                            else tuple(round(x) for x in cast(tuple, v))
+                        )
+                        for k, v in media_metadata.items()
+                    },
+                    sort_keys=True,
+                )
                 content[str(page_num)][1].append(
                     ParsedMedia(
                         index=len(content[str(page_num)][1]),
                         data=img_bytes.read(),
                         text=item.export_to_markdown(doc),
-                        info={
-                            "type": "table",
-                            "width": table_image_data.width,
-                            "height": table_image_data.height,
-                            "bbox": item.prov[0].bbox.as_tuple(),
-                            "images_scale": pipeline_options.images_scale,
-                        },
+                        info=media_metadata,
                     )
                 )
                 count_media += 1
