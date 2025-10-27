@@ -736,7 +736,10 @@ class Settings(BaseSettings):
         default=None,
         description="Optional configuration for the embedding model.",
     )
-    temperature: float = Field(default=0.0, description="Temperature for LLMs.")
+    temperature: float = Field(
+        default=1.0,
+        description="Temperature for LLMs, default is 1 for compatibility with OpenAI's GPT-5.",
+    )
     batch_size: int = Field(default=1, description="Batch size for calling LLMs.")
     texts_index_mmr_lambda: float = Field(
         default=1.0, description="Lambda for MMR in text index."
