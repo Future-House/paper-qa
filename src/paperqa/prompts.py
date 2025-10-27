@@ -36,16 +36,16 @@ answer_iteration_prompt_template = (
 )
 
 CITATION_KEY_CONSTRAINTS = (
-    "## Valid citation examples, only use comma/space delimited parentheticals: \n"
-    "- (pqac-d79ef6fa, pqac-0f650d59) \n"
-    "- (pqac-d79ef6fa) \n"
-    "## Invalid citation examples: \n"
-    "- (pqac-d79ef6fa and pqac-0f650d59) \n"
-    "- (pqac-d79ef6fa;pqac-0f650d59) \n"
-    "- (pqac-d79ef6fa-pqac-0f650d59) \n"
-    "- pqac-d79ef6fa and pqac-0f650d59 \n"
-    "- Example's work (pqac-d79ef6fa) \n"
-    "- (pages pqac-d79ef6fa) \n"
+    "## Valid citation examples, only use comma/space delimited parentheticals:\n"
+    "- (pqac-d79ef6fa, pqac-0f650d59)\n"
+    "- (pqac-d79ef6fa)\n"
+    "## Invalid citation examples:\n"
+    "- (pqac-d79ef6fa and pqac-0f650d59)\n"
+    "- (pqac-d79ef6fa;pqac-0f650d59)\n"
+    "- (pqac-d79ef6fa-pqac-0f650d59)\n"
+    "- pqac-d79ef6fa and pqac-0f650d59\n"
+    "- Example's work (pqac-d79ef6fa)\n"
+    "- (pages pqac-d79ef6fa)"
 )
 
 qa_prompt = (
@@ -57,8 +57,8 @@ qa_prompt = (
     f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, like {example_citation}. "
-    "Only cite from the context above and only use the citation keys from the context. "
-    f"{CITATION_KEY_CONSTRAINTS}"
+    "Only cite from the context above and only use the citation keys from the context."
+    f"\n\n{CITATION_KEY_CONSTRAINTS}\n\n"
     "Do not concatenate citation keys, just use them as is. "
     "Write in the style of a scientific article, with concise sentences and "
     "coherent paragraphs. This answer will be used directly, "
