@@ -1818,6 +1818,7 @@ async def test_pre_prompt(stub_data_dir: Path) -> None:
     pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
 
     settings = Settings.from_name("fast")
+    settings.llm = "gpt-4o-2024-11-20"
     settings.prompts.pre = pre
     docs = Docs()
     await docs.aadd(
