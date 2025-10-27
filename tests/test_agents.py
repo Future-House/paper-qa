@@ -90,11 +90,12 @@ async def test_get_directory_index(
             "year",
         ], "Incorrect fields in index"
         assert not index.changed, "Expected index to not have changes at this point"
-        # bates.txt + empty.txt + flag_day.html + gravity_hill.md + influence.pdf + obama.txt + paper.pdf + pasa.pdf,
+        # bates.txt + empty.txt + flag_day.html + gravity_hill.md + influence.pdf
+        # + obama.txt + paper.pdf + pasa.pdf + duplicate_media.pdf,
         # but empty.txt fails to be added
         path_to_id = await index.index_files
         assert (
-            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 7
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 8
         ), "Incorrect number of parsed index files"
 
         with subtests.test(msg="check-txt-query"):
@@ -252,6 +253,7 @@ async def test_getting_manifest(
 
 EXPECTED_STUB_DATA_FILES = {
     "bates.txt",
+    "duplicate_media.pdf",
     "empty.txt",
     "flag_day.html",
     "gravity_hill.md",
