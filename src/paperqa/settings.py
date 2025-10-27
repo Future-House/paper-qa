@@ -1111,7 +1111,7 @@ class Settings(BaseSettings):
                 )
                 section = f"{section_header}\n\n" + "\n\n".join(inner_strs)
                 context_sections.append(section)
-            context_str_body = "\n\n----\n\n".join(context_sections)
+            context_str_body = "\n\n---\n\n".join(context_sections)
         else:
             inner_context_strs = [
                 context_inner_prompt.format(
