@@ -170,7 +170,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         f"Didn't yet handle 2+ picture description annotations {annotations}."
                     )
 
-                media_metadata["info_hash"] = json.dumps(
+                media_metadata["info_hashable"] = json.dumps(
                     {
                         k: (
                             v
@@ -214,7 +214,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     "bbox": item.prov[0].bbox.as_tuple(),
                     "images_scale": pipeline_options.images_scale,
                 }
-                media_metadata["info_hash"] = json.dumps(
+                media_metadata["info_hashable"] = json.dumps(
                     {
                         k: (
                             v

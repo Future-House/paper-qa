@@ -516,14 +516,14 @@ class ParsedMedia(BaseModel):
         ),
     )
 
-    def _get_info_hash(self) -> Hashable:
-        if info_hash := self.info.get("info_hash"):
-            return cast(Hashable, info_hash)
-        # We know info_hash key isn't present, so no need to filter it
+    def _get_info_hashable(self) -> Hashable:
+        if info_hashable := self.info.get("info_hashable"):
+            return cast(Hashable, info_hashable)
+        # We know info_hashable_hash key isn't present, so no need to filter it
         return json.dumps(self.info, sort_keys=True)
 
     def __hash__(self) -> int:
-        return hash((self.index, self.data, self.text, self._get_info_hash()))
+        return hash((self.index, self.data, self.text, self._get_info_hashable()))
 
     def to_id(self) -> UUID:
         """Convert this media to a UUID4 suitable for a database ID."""
@@ -551,7 +551,7 @@ class ParsedMedia(BaseModel):
             self.index == other.index
             and self.data == other.data
             and self.text == other.text
-            and self._get_info_hash() == other._get_info_hash()
+            and self._get_info_hashable() == other._get_info_hashable()
         )
 
     def to_image_url(self) -> str:
