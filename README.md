@@ -451,7 +451,7 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
+By default, PaperQA2 uses OpenAI's `gpt-5-2025-08-07` model for the
 `summary_llm`, `llm`, and `agent_llm`.
 Please see the [Settings Cheatsheet](#settings-cheatsheet)
 for more information on these settings.
@@ -895,13 +895,13 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                                                   |
 | -------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-11-20"`                  | LLM for general use including metadata inference (see Docs.aadd) and answer generation (see Docs.aquery and gen_answer tool). |
+| `llm`                                        | `"gpt-5-2025-08-07"`                   | LLM for general use including metadata inference (see Docs.aadd) and answer generation (see Docs.aquery and gen_answer tool). |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                                             |
-| `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | LLM for creating contextual summaries (see Docs.aget_evidence and gather_evidence tool).                                      |
+| `summary_llm`                                | `"gpt-5-2025-08-07"`                   | LLM for creating contextual summaries (see Docs.aget_evidence and gather_evidence tool).                                      |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                                                     |
 | `embedding`                                  | `"text-embedding-3-small"`             | Embedding model for embedding text chunks when adding papers.                                                                 |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                                       |
-| `temperature`                                | `0.0`                                  | Temperature for LLMs.                                                                                                         |
+| `temperature`                                | `1.0`                                  | Temperature for LLMs.                                                                                                         |
 | `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                                                  |
 | `texts_index_mmr_lambda`                     | `1.0`                                  | Lambda for MMR in text index.                                                                                                 |
 | `verbosity`                                  | `0`                                    | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                                               |
@@ -944,7 +944,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompt.summary_json_system`                 | `summary_json_system_prompt`           | System prompt for JSON summaries.                                                                                             |
 | `prompt.context_outer`                       | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                                                     |
 | `prompt.context_inner`                       | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables.                       |
-| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | LLM inside the agent making tool selections.                                                                                  |
+| `agent.agent_llm`                            | `"gpt-5-2025-08-07"`                   | LLM inside the agent making tool selections.                                                                                  |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                                       |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                                         |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                                         |

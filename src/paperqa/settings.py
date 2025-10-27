@@ -11,12 +11,7 @@ from typing import Any, ClassVar, Protocol, Self, TypeAlias, cast, runtime_check
 
 import anyio
 from aviary.core import Tool, ToolSelector
-from lmi import (
-    CommonLLMNames,
-    EmbeddingModel,
-    LiteLLMModel,
-    embedding_model_factory,
-)
+from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel, embedding_model_factory
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -525,7 +520,7 @@ class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default=CommonLLMNames.GPT_5.value,
         description="LLM inside the agent making tool selections.",
     )
 
@@ -693,7 +688,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default=CommonLLMNames.GPT_5.value,
         description=(
             "LLM for general use including metadata inference (see Docs.aadd)"
             " and answer generation (see Docs.aquery and gen_answer tool)."
@@ -717,7 +712,7 @@ class Settings(BaseSettings):
         ),
     )
     summary_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default=CommonLLMNames.GPT_5.value,
         description=(
             "LLM for creating contextual summaries"
             " (see Docs.aget_evidence and gather_evidence tool)."
@@ -741,7 +736,10 @@ class Settings(BaseSettings):
         default=None,
         description="Optional configuration for the embedding model.",
     )
-    temperature: float = Field(default=0.0, description="Temperature for LLMs.")
+    temperature: float = Field(
+        default=1.0,
+        description="Temperature for LLMs, default is 1 for compatibility with OpenAI's GPT-5.",
+    )
     batch_size: int = Field(default=1, description="Batch size for calling LLMs.")
     texts_index_mmr_lambda: float = Field(
         default=1.0, description="Lambda for MMR in text index."

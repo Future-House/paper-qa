@@ -1732,8 +1732,9 @@ async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
         "What districts neighbor the Western Addition?", settings=settings
     )
     assert not session.contexts, "Expected no contexts to be made from a bad image."
-    assert (
-        "unsupported image" in caplog.text
+    assert any(
+        x in caplog.text.lower()
+        for x in ("unsupported image", "could not process image")
     ), "Expected a caught exception about an unsupported image."
 
     # By suppressing the use of images, we can actually gather evidence now
@@ -1817,6 +1818,7 @@ async def test_pre_prompt(stub_data_dir: Path) -> None:
     pre = "What is water's boiling point in Fahrenheit? Please respond with a complete sentence."
 
     settings = Settings.from_name("fast")
+    settings.llm = "gpt-4o-2024-11-20"
     settings.prompts.pre = pre
     docs = Docs()
     await docs.aadd(
