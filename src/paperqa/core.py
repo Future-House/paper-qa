@@ -231,7 +231,8 @@ async def _map_fxn_summary(  # noqa: PLR0912
     # but not spaces, to preserve text alignment
     cleaned_text = text.text.strip("\n")
     if summary_llm_model and prompt_templates:
-        media_text: list[str] = [m.text for m in text.media if m.text]
+        unique_media = list(dict.fromkeys(text.media))  # Preserve order
+        media_text: list[str] = [m.text for m in unique_media if m.text]
         data = {
             "question": question,
             "citation": citation,
@@ -254,8 +255,8 @@ async def _map_fxn_summary(  # noqa: PLR0912
                         Message.create_message(
                             text=message_prompt,
                             images=(
-                                [i.to_image_url() for i in text.media]
-                                if text.media
+                                [i.to_image_url() for i in unique_media]
+                                if unique_media
                                 else None
                             ),
                         ),

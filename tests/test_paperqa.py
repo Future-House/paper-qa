@@ -2,6 +2,7 @@ import asyncio
 import contextlib
 import csv
 import io
+import json
 import os
 import pathlib
 import pickle
@@ -35,6 +36,7 @@ from lmi import (
 )
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
+from paperqa_docling import parse_pdf_to_pages as docling_parse_pdf_to_pages
 from paperqa_pymupdf import parse_pdf_to_pages as pymupdf_parse_pdf_to_pages
 from paperqa_pypdf import parse_pdf_to_pages as pypdf_parse_pdf_to_pages
 from pytest_subtests import SubTests
@@ -1691,6 +1693,44 @@ async def test_images(stub_data_dir: Path) -> None:
     ]
     assert contexts_used
     assert all(bool(c.used_images) for c in contexts_used)  # type: ignore[attr-defined]
+
+
+@pytest.mark.asyncio
+async def test_duplicate_media_context_creation(stub_data_dir: Path) -> None:
+    settings = Settings(
+        prompts={"summary_json_system": summary_json_multimodal_system_prompt},
+        parsing={"parse_pdf": docling_parse_pdf_to_pages},
+    )
+
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "duplicate_media.pdf",
+        citation="FutureHouse, 2025, Accessed now",  # Skip citation inference
+        title="SF Districts in the style of Andy Warhol",  # Skip title inference
+        settings=settings,
+    )
+    with patch.object(
+        LLMModel, "call_single", side_effect=LLMModel.call_single, autospec=True
+    ) as mock_call_single:
+        session = await docs.aquery(
+            "What districts neighbor the Western Addition?", settings=settings
+        )
+    context_user_msg = mock_call_single.await_args_list[0][1]["messages"][1]
+    assert isinstance(context_user_msg, Message)
+    assert context_user_msg.content
+    content_list = json.loads(context_user_msg.content)
+    assert isinstance(content_list, list)
+    assert (
+        sum("image_url" in x for x in content_list) < 5
+    ), "Expected some deduplication to take place during context creation"
+    assert (
+        sum(
+            district in session.answer
+            for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
+        )
+        >= 2
+    ), "Expected at least two neighbors to be matched"
+    assert session.cost > 0
 
 
 @pytest.mark.asyncio
