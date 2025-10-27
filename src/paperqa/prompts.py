@@ -16,7 +16,7 @@ summary_prompt = (
 text_with_tables_prompt_template = (
     "{text}\n\n------------\n\nMarkdown tables from {citation}."
     " If the markdown is poorly formatted, defer to the images"
-    "\n\n{tables}"
+    "\n\n------------\n\n{tables}"
 )
 
 summary_json_prompt = (

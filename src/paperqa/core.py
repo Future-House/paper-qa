@@ -240,7 +240,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 text_with_tables_prompt_template.format(
                     text=cleaned_text,
                     citation=citation,
-                    tables="\n\n".join(media_text),
+                    tables="\n\n----\n\n".join(media_text),
                 )
                 if media_text
                 else cleaned_text
