@@ -775,9 +775,9 @@ class DocDetails(Doc):
         elif "doc_id" not in data or not data["doc_id"]:  # keep user defined doc_ids
             data["doc_id"] = encode_id(uuid4())
 
-        if "dockey" in data.get(
-            "fields_to_overwrite_from_metadata",
-            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        if "dockey" in (
+            data.get("fields_to_overwrite_from_metadata")
+            or DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
         ) and ("dockey" not in data or not data["dockey"]):
             data["dockey"] = data["doc_id"]
 
@@ -870,9 +870,9 @@ class DocDetails(Doc):
     ) -> dict[str, Any]:
         """Overwrite fields from metadata if specified."""
         overwrite_fields = {"key": "docname", "doc_id": "dockey"}
-        fields_to_overwrite = data.get(
-            "fields_to_overwrite_from_metadata",
-            DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+        fields_to_overwrite = (
+            data.get("fields_to_overwrite_from_metadata")
+            or DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
         )
         for field in overwrite_fields.keys() & fields_to_overwrite:
             if data.get(field):
@@ -898,9 +898,9 @@ class DocDetails(Doc):
                 data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]
                 data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
             )
-            if "docname" in data.get(
-                "fields_to_overwrite_from_metadata",
-                DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+            if "docname" in (
+                data.get("fields_to_overwrite_from_metadata")
+                or DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
             ):
                 data["docname"] = data["key"]
 
@@ -966,9 +966,9 @@ class DocDetails(Doc):
                     data.get("other")
                 )
                 # clear out the citation, since it will be regenerated
-                if "citation" in data.get(
-                    "fields_to_overwrite_from_metadata",
-                    DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA,
+                if "citation" in (
+                    data.get("fields_to_overwrite_from_metadata")
+                    or DEFAULT_FIELDS_TO_OVERWRITE_FROM_METADATA
                 ):
                     data["citation"] = None
             except Exception:
