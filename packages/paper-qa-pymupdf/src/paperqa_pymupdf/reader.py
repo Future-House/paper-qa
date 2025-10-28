@@ -1,9 +1,11 @@
+import json
 import os
 import re
 
 import pymupdf
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
+from pydantic import JsonValue
 
 
 def setup_pymupdf_python_logging() -> None:
@@ -130,13 +132,17 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             if parse_media:
                 if full_page:  # Capture the entire page as one image
                     pix = page.get_pixmap(dpi=image_dpi)
+                    media_metadata: dict[str, JsonValue] = {"type": "screenshot"} | {
+                        a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
+                    }
+                    media_metadata["info_hashable"] = json.dumps(
+                        media_metadata, sort_keys=True
+                    )
+                    # Add page number after info_hashable so differing pages
+                    # don't break the cache key
+                    media_metadata["page_num"] = i + 1
                     media.append(
-                        ParsedMedia(
-                            index=0,
-                            data=pix.tobytes(),
-                            info={"type": "screenshot"}
-                            | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
-                        )
+                        ParsedMedia(index=0, data=pix.tobytes(), info=media_metadata)
                     )
                 else:
                     # Capture drawings/figures
@@ -148,18 +154,34 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         )
                     ):
                         pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                        media_metadata = {"bbox": tuple(box), "type": "drawing"} | {
+                            a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
+                        }
+                        media_metadata["info_hashable"] = json.dumps(
+                            media_metadata, sort_keys=True
+                        )
+                        # Add page number after info_hashable so differing pages
+                        # don't break the cache key
+                        media_metadata["page_num"] = i + 1
                         media.append(
                             ParsedMedia(
-                                index=box_i,
-                                data=pix.tobytes(),
-                                info={"bbox": tuple(box), "type": "drawing"}
-                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                                index=box_i, data=pix.tobytes(), info=media_metadata
                             )
                         )
 
                     # Capture tables
                     for table_i, table in enumerate(t for t in page.find_tables()):
                         pix = page.get_pixmap(clip=table.bbox, dpi=image_dpi)
+                        media_metadata = {
+                            "bbox": tuple(table.bbox),
+                            "type": "table",
+                        } | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS}
+                        media_metadata["info_hashable"] = json.dumps(
+                            media_metadata, sort_keys=True
+                        )
+                        # Add page number after info_hashable so differing pages
+                        # don't break the cache key
+                        media_metadata["page_num"] = i + 1
                         raw_md = table.to_markdown().strip()
                         media.append(
                             ParsedMedia(
@@ -170,8 +192,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                                 text=(
                                     None if _INVALID_MD_CHARS.search(raw_md) else raw_md
                                 ),
-                                info={"bbox": tuple(table.bbox), "type": "table"}
-                                | {a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS},
+                                info=media_metadata,
                             )
                         )
                 content[str(i + 1)] = text, media

@@ -38,6 +38,7 @@ async def test_parse_pdf_to_pages() -> None:
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
     (p2_image,) = [m for m in p2_media if m.info["type"] == "drawing"]
     assert p2_image.index == 0
+    assert p2_image.info["page_num"] == 2
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
@@ -117,6 +118,7 @@ async def test_parse_pdf_to_pages() -> None:
         page_text, (full_page_image,) = page_content
         assert page_text
         assert full_page_image.index == 0, "Full page image should have index 0"
+        assert full_page_image.info["page_num"] == int(page_num)
         assert isinstance(full_page_image.data, bytes)
         assert full_page_image.data, "Full page image should have data"
         # Check useful attributes are present and are JSON serializable

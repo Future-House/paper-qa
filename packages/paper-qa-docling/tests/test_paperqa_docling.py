@@ -44,6 +44,7 @@ async def test_parse_pdf_to_pages() -> None:
     # pylint: disable=duplicate-code
     (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
+    assert p2_image.info["page_num"] == 2
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
