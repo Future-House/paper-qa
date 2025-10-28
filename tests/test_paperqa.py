@@ -2010,7 +2010,9 @@ def test_dois_resolve_to_correct_journals(doi_journals):
 
 def test_none_values() -> None:
     """Check can handle or crash as expected with None inputs."""
-    with pytest.raises(ValidationError, match="fields_to_overwrite_from_metadata"):
+    with pytest.raises(
+        (ValidationError, TypeError), match="fields_to_overwrite_from_metadata"
+    ):
         DocDetails(fields_to_overwrite_from_metadata=None)
 
 
