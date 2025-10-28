@@ -39,6 +39,7 @@ from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
 from paperqa_docling import parse_pdf_to_pages as docling_parse_pdf_to_pages
 from paperqa_pymupdf import parse_pdf_to_pages as pymupdf_parse_pdf_to_pages
 from paperqa_pypdf import parse_pdf_to_pages as pypdf_parse_pdf_to_pages
+from pydantic import ValidationError
 from pytest_subtests import SubTests
 
 from paperqa import (
@@ -2005,6 +2006,14 @@ def test_answer_rename(recwarn) -> None:
 def test_dois_resolve_to_correct_journals(doi_journals):
     details = DocDetails(doi=doi_journals["doi"])
     assert details.journal == doi_journals["journal"]
+
+
+def test_none_values() -> None:
+    """Check can handle or crash as expected with None inputs."""
+    with pytest.raises(
+        (ValidationError, TypeError), match="fields_to_overwrite_from_metadata"
+    ):
+        DocDetails(fields_to_overwrite_from_metadata=None)
 
 
 def test_docdetails_merge_with_non_list_fields() -> None:

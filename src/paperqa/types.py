@@ -8,7 +8,7 @@ import logging
 import os
 import re
 import warnings
-from collections.abc import Collection, Hashable, Iterable, Mapping, Sequence
+from collections.abc import Collection, Container, Hashable, Iterable, Mapping, Sequence
 from copy import deepcopy
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -990,14 +990,20 @@ class DocDetails(Doc):
 
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
-        if isinstance(data.get("fields_to_overwrite_from_metadata"), str):
+        if "fields_to_overwrite_from_metadata" in data:
             raw_value = data["fields_to_overwrite_from_metadata"]
-            if (raw_value[0], raw_value[-1]) in {("[", "]"), ("{", "}")}:
-                # If string-ified set or list, remove brackets before split
-                raw_value = raw_value[1:-1]
-            data["fields_to_overwrite_from_metadata"] = {
-                s.strip("\"' ") for s in raw_value.split(",")
-            }
+            if isinstance(raw_value, str):
+                if (raw_value[0], raw_value[-1]) in {("[", "]"), ("{", "}")}:
+                    # If string-ified set or list, remove brackets before split
+                    raw_value = raw_value[1:-1]
+                data["fields_to_overwrite_from_metadata"] = {
+                    s.strip("\"' ") for s in raw_value.split(",")
+                }
+            if not isinstance(data["fields_to_overwrite_from_metadata"], Container):
+                raise TypeError(
+                    "fields_to_overwrite_from_metadata should be a container,"
+                    f" not {type(data['fields_to_overwrite_from_metadata'])}."
+                )
         for possibly_str_field in ("authors", "other"):
             if data.get(possibly_str_field) and isinstance(
                 data[possibly_str_field], str
