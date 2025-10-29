@@ -89,12 +89,11 @@ class OpenReviewPaperHelper:
         submissions = self.get_submissions()
         submission_string = self.create_submission_string(submissions)
 
-        if len(submission_string) > self.settings.parsing.chunk_size:
+        chunk_size = self.settings.parsing.reader_config["chunk_chars"]
+        if len(submission_string) > chunk_size:
             chunks = [
-                submission_string[i : i + self.settings.parsing.chunk_size]
-                for i in range(
-                    0, len(submission_string), self.settings.parsing.chunk_size
-                )
+                submission_string[i : i + chunk_size]
+                for i in range(0, len(submission_string), chunk_size)
             ]
         else:
             chunks = [submission_string]

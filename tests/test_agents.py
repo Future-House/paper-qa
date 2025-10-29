@@ -529,7 +529,7 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     assert len(result.contexts) >= 2, "Test expects a few contexts"
     # Subtract 2 to allow tolerance for chunks with leading/trailing whitespace
     num_contexts_sufficient_length = sum(
-        len(c.context) >= agent_test_settings.parsing.chunk_size - 2
+        len(c.context) >= agent_test_settings.parsing.reader_config["chunk_chars"] - 2
         for c in result.contexts
     )
     # Check most contexts have the expected length
