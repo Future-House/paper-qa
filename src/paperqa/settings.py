@@ -242,6 +242,11 @@ class ParsingSettings(BaseModel):
     overlap: int = Field(
         default=250, description="Number of characters to overlap chunks."
     )
+    reader_config: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Optional keyword arguments for the document reader.",
+        examples=[{"dpi": 300}],
+    )
     multimodal: bool | MultimodalOptions = Field(
         default=MultimodalOptions.ON_WITH_ENRICHMENT,
         description=(
@@ -341,6 +346,43 @@ class ParsingSettings(BaseModel):
         default=media_enrichment_prompt_template,
         description="Prompt template for enriching media.",
     )
+
+    @model_validator(mode="after")
+    def _deprecated_field(self) -> Self:
+        if (
+            self.pdfs_use_block_parsing
+            != type(self).model_fields["pdfs_use_block_parsing"].default
+        ):
+            warnings.warn(
+                "The 'pdfs_use_block_parsing' field is deprecated"
+                " and will be removed in version 6."
+                " Use 'use_block_parsing' parameter in 'reader_config' instead.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            if "use_block_parsing" not in self.reader_config:
+                self.reader_config["use_block_parsing"] = self.pdfs_use_block_parsing
+        if self.chunk_size != type(self).model_fields["chunk_size"].default:
+            warnings.warn(
+                "The 'chunk_size' field is deprecated"
+                " and will be removed in version 6."
+                " Use 'chunk_chars' parameter in 'reader_config' instead.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            if "chunk_chars" not in self.reader_config:
+                self.reader_config["chunk_chars"] = self.chunk_size
+        if self.overlap != type(self).model_fields["overlap"].default:
+            warnings.warn(
+                "The 'overlap' field is deprecated"
+                " and will be removed in version 6."
+                " Use 'overlap' parameter in 'reader_config' instead.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            if "overlap" not in self.reader_config:
+                self.reader_config["overlap"] = self.overlap
+        return self
 
     @property
     def should_parse_and_enrich_media(self) -> tuple[bool, bool]:

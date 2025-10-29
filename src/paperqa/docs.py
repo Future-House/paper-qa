@@ -278,10 +278,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             texts = await read_doc(
                 path,
                 Doc(docname="", citation="", dockey=dockey),  # Fake doc
-                chunk_chars=parse_config.chunk_size,
-                overlap=parse_config.overlap,
                 page_size_limit=parse_config.page_size_limit,
-                use_block_parsing=parse_config.pdfs_use_block_parsing,
                 parse_images=False,  # Peeking is text only
                 # We only use the first chunk, so let's peek just enough pages for that.
                 # Usually pages 1 - 2 give that,
@@ -289,6 +286,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 # we read pages 1 - 3 to be safe
                 page_range=(1, 3),
                 parse_pdf=parse_config.parse_pdf,
+                **parse_config.reader_config,
             )
             if not texts or not texts[0].text.strip():
                 raise ValueError(f"Could not read document {path}. Is it empty?")
@@ -397,13 +395,11 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         texts, metadata = await read_doc(
             path,
             doc,
-            chunk_chars=parse_config.chunk_size,
-            overlap=parse_config.overlap,
             page_size_limit=parse_config.page_size_limit,
-            use_block_parsing=parse_config.pdfs_use_block_parsing,
             parse_pdf=parse_config.parse_pdf,
             include_metadata=True,
             **multimodal_kwargs,
+            **parse_config.reader_config,
         )
         # loose check to see if document was loaded
         if metadata.name != "image" and (
