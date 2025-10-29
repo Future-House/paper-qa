@@ -243,7 +243,7 @@ class ParsingSettings(BaseModel):
         default=250, description="Number of characters to overlap chunks."
     )
     reader_config: dict[str, Any] = Field(
-        default_factory=dict,
+        default_factory=lambda: {"chunk_chars": 5000, "overlap": 250},
         description="Optional keyword arguments for the document reader.",
         examples=[{"dpi": 300}],
     )
@@ -349,6 +349,9 @@ class ParsingSettings(BaseModel):
 
     @model_validator(mode="after")
     def _deprecated_field(self) -> Self:
+        default_reader_config = (
+            type(self).model_fields["reader_config"].default_factory()  # type: ignore[call-arg,misc]
+        )
         if (
             self.pdfs_use_block_parsing
             != type(self).model_fields["pdfs_use_block_parsing"].default
@@ -370,7 +373,9 @@ class ParsingSettings(BaseModel):
                 category=DeprecationWarning,
                 stacklevel=2,
             )
-            if "chunk_chars" not in self.reader_config:
+            if "chunk_chars" not in self.reader_config or self.reader_config[
+                "chunk_chars"
+            ] == default_reader_config.get("chunk_chars"):
                 self.reader_config["chunk_chars"] = self.chunk_size
         if self.overlap != type(self).model_fields["overlap"].default:
             warnings.warn(
@@ -380,7 +385,9 @@ class ParsingSettings(BaseModel):
                 category=DeprecationWarning,
                 stacklevel=2,
             )
-            if "overlap" not in self.reader_config:
+            if "overlap" not in self.reader_config or self.reader_config[
+                "overlap"
+            ] == default_reader_config.get("overlap"):
                 self.reader_config["overlap"] = self.overlap
         return self
 
