@@ -1,16 +1,20 @@
 import asyncio
 import importlib.resources
+import logging
 import os
 import pathlib
+import re
 import warnings
 from collections import defaultdict
-from collections.abc import Callable, Mapping, Sequence
-from enum import StrEnum
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from enum import IntEnum, StrEnum
+from itertools import starmap
 from pydoc import locate
 from typing import Any, ClassVar, Protocol, Self, TypeAlias, cast, runtime_checkable
 
 import anyio
-from aviary.core import Tool, ToolSelector
+import litellm
+from aviary.core import Message, Tool, ToolSelector
 from lmi import (
     CommonLLMNames,
     EmbeddingModel,
@@ -49,6 +53,7 @@ from paperqa.prompts import (
     default_system_prompt,
     env_reset_prompt,
     env_system_prompt,
+    media_enrichment_prompt_template,
     qa_prompt,
     select_paper_prompt,
     structured_citation_prompt,
@@ -57,8 +62,10 @@ from paperqa.prompts import (
     summary_prompt,
 )
 from paperqa.readers import PDFParserFn
-from paperqa.types import Context
+from paperqa.types import Context, ParsedMedia, ParsedText
 from paperqa.utils import hexdigest, pqa_directory
+
+logger = logging.getLogger(__name__)
 
 # TODO: move to actual EnvironmentState
 # when we can do so without a circular import
@@ -196,6 +203,15 @@ def default_pdf_parser_configurator() -> None:
     setup_pymupdf_python_logging()
 
 
+class MultimodalOptions(IntEnum):
+    # Text-only PDF reads
+    OFF = 0  # Falsey
+    ON_WITH_ENRICHMENT = 1  # Default
+    # Without image enrichment, multimodal will miss retrieval of certain images,
+    # but it costs less money (no enrichment LLM calls)
+    ON_WITHOUT_ENRICHMENT = 2
+
+
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
 
@@ -226,11 +242,14 @@ class ParsingSettings(BaseModel):
     overlap: int = Field(
         default=250, description="Number of characters to overlap chunks."
     )
-    multimodal: bool = Field(
-        default=True,
+    multimodal: bool | MultimodalOptions = Field(
+        default=MultimodalOptions.ON_WITH_ENRICHMENT,
         description=(
-            "Parse both text and images (if applicable to a given document),"
-            " or disable to parse just text."
+            "Controls on parsing images/tables (if applicable to a given document)."
+            " Setting false or off will parse only text,"
+            " setting true or 'on with enrichment' will parse media and use"
+            " the enrichment LLM to generate descriptions of the media,"
+            " setting 'on without enrichment' will parse media without enrichment."
         ),
     )
     citation_prompt: str = Field(
@@ -291,6 +310,47 @@ class ParsingSettings(BaseModel):
         default=False,
         description="Parse clinical trial JSONs into human readable text.",
     )
+    enrichment_llm: str = Field(
+        # NOTE: from CapArena (https://arxiv.org/abs/2503.12329),
+        # GPT-4o was the best image captioning model as of spring 2025
+        # NOTE: claude-haiku-4-5-20251001 recurringly failed to describe display type
+        # to be display type, so its captioning ability isn't good enough yet
+        default=CommonLLMNames.GPT_4O.value,
+        description="LLM for media enrichment (e.g. generating descriptions).",
+    )
+    enrichment_llm_config: dict | None = Field(
+        default=None,
+        description=(
+            "Optional configuration for the enrichment_llm model. More specifically, it's"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " `model_list` key (corresponding to model_list inputs here:"
+            " https://docs.litellm.ai/docs/routing), and can optionally include a"
+            " router_kwargs key with router kwargs as values."
+        ),
+    )
+    enrichment_page_radius: int = Field(
+        default=1,  # Default is 1 because figures are usually +/- 1 page in LaTeX
+        ge=-1,
+        description=(
+            "Page radius for context text in enrichment. "
+            "-1 means all pages, 0 means current page only, "
+            "1+ means a radius of pages around the current page."
+        ),
+    )
+    enrichment_prompt: str = Field(
+        default=media_enrichment_prompt_template,
+        description="Prompt template for enriching media.",
+    )
+
+    @property
+    def should_parse_and_enrich_media(self) -> tuple[bool, bool]:
+        """Get if the settings indicate to parse and also enrich media."""
+        if (
+            isinstance(self.multimodal, bool)
+            or self.multimodal != MultimodalOptions.ON_WITHOUT_ENRICHMENT
+        ):
+            return bool(self.multimodal), bool(self.multimodal)
+        return True, False
 
 
 class _FormatDict(dict):  # noqa: FURB189
@@ -954,6 +1014,15 @@ class Settings(BaseSettings):
     def get_embedding_model(self) -> EmbeddingModel:
         return embedding_model_factory(self.embedding, **(self.embedding_config or {}))
 
+    def get_enrichment_llm(self) -> LiteLLMModel:
+        return LiteLLMModel(
+            name=self.parsing.enrichment_llm,
+            config=self.parsing.enrichment_llm_config
+            or make_default_litellm_model_list_settings(
+                self.parsing.enrichment_llm, self.temperature
+            ),
+        )
+
     def make_aviary_tool_selector(self, agent_type: str | type) -> ToolSelector | None:
         """Attempt to convert the input agent type to an aviary ToolSelector."""
         if agent_type is ToolSelector or (
@@ -1042,6 +1111,134 @@ class Settings(BaseSettings):
                 agent_state_type=SimpleAgentState, **config
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
+
+    def make_media_enricher(self) -> Callable[[ParsedText], Awaitable[str]]:
+        """Create an enricher function from settings."""
+
+        async def enrich_media_with_llm(parsed_text: ParsedText) -> str:
+            """Enrich media in parsed text with LLM-generated descriptions.
+
+            Returns:
+                A summary string of the enrichment.
+            """
+            if not isinstance(parsed_text.content, dict) or not any(
+                isinstance(c, tuple) for c in parsed_text.content.values()
+            ):
+                raise ValueError(
+                    "Media enrichment requires media to be in the parsed text."
+                )
+            text_content = cast(
+                dict[str, str | tuple[str, list[ParsedMedia]]], parsed_text.content
+            )
+
+            # Collect all media with their page numbers
+            # NOTE: we could deduplicate media here across pages,
+            # but this introduces a bunch of complexity:
+            # - Do we enrich using on text surrounding the earlier or later image?
+            # - Or do we enrich using text surrounding all images,
+            #   and risk confusing the LLM if the texts aren't similar?
+            # Given these risks, we just enrich extra times
+            media_to_enrich: list[tuple[str, ParsedMedia]] = [
+                (page_num, media)
+                for page_num, page_contents in text_content.items()
+                if isinstance(page_contents, tuple)
+                for media in page_contents[1]
+                if not media.info.get("enriched_description")  # Don't clobber prior
+            ]
+            llm = self.get_enrichment_llm()
+            radius = self.parsing.enrichment_page_radius
+
+            async def enrich_single_media(
+                page_num: int | str, media: ParsedMedia
+            ) -> None:
+                """Enrich a single media item with LLM-generated description."""
+                if radius == -1:  # All pages
+                    context_text: str = "\n\n".join(
+                        (
+                            (
+                                pg_contents
+                                if isinstance(pg_contents, str)
+                                else pg_contents[0]
+                            )
+                            for _, pg_contents in sorted(
+                                text_content.items(), key=lambda x: int(x[0])
+                            )
+                        )
+                    )
+                    radius_msg: str = "all pages"
+                else:  # Specific page radius
+                    page_texts: list[str] = []
+                    for pg_int in range(
+                        max(1, int(page_num) - radius),
+                        min(len(text_content), int(page_num) + radius) + 1,
+                    ):
+                        # Use get so we're tolerant to missing pages here
+                        page_content = text_content.get(str(pg_int))
+                        if page_content:
+                            page_texts.append(
+                                page_content
+                                if isinstance(page_content, str)
+                                else page_content[0]
+                            )
+                    context_text = "\n\n".join(page_texts)
+                    radius_msg = (
+                        f"a radius of {'1 page' if radius == 1 else f'{radius} pages'}"
+                    )
+
+                prompt = self.parsing.enrichment_prompt.format(
+                    context_text=(
+                        f"Here is the co-located text from {radius_msg}:\n\n{context_text}\n\n"
+                        if context_text
+                        else ""
+                    )
+                )
+                try:
+                    result = await llm.call_single(
+                        messages=[
+                            Message.create_message(
+                                text=prompt, images=[media.to_image_url()]
+                            )
+                        ]
+                    )
+                    if result.text:
+                        media.info["enriched_description"] = result.text.strip()
+                except (litellm.InternalServerError, litellm.BadRequestError) as exc:
+                    # Handle image > 5-MB failure mode 1:
+                    # > litellm.BadRequestError: AnthropicException -
+                    # > {"type":"error","error":{"type":"invalid_request_error",
+                    # > "message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 6229564 bytes > 5242880 bytes"},  # noqa: E501, W505
+                    # > "request_id":"req_abc123"}.
+                    # and image > 5-MB failure mode 2:
+                    # > litellm.InternalServerError: AnthropicException -
+                    # > {"type":"error","error":{"type":"invalid_request_error",
+                    # > "message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 5690780 bytes > 5242880 bytes"},  # noqa: E501, W505
+                    # > "request_id":"req_abc123"}.
+                    # And the image being corrupt (but a reasonable size)
+                    if (
+                        isinstance(exc, litellm.InternalServerError)
+                        and re.search(
+                            r"image exceeds .+ maximum", str(exc), re.IGNORECASE
+                        )
+                    ) or isinstance(exc, litellm.BadRequestError):
+                        logger.warning(
+                            f"Skipping enrichment for media index {media.index}"
+                            f" on page {page_num} with metadata {media.info} because"
+                            f" it was rejected by the LLM provider for {llm.name!r}."
+                            f" Full error message: {exc!r}"
+                        )
+                    else:
+                        raise
+
+            await asyncio.gather(*list(starmap(enrich_single_media, media_to_enrich)))
+            count_enriched = sum(
+                bool(media.info.get("enriched_description"))
+                for page_num, page_contents in parsed_text.content.items()
+                if isinstance(page_contents, tuple)
+                for media in page_contents[1]
+            )
+            return f"enriched={count_enriched}|radius={radius}"
+
+        return enrich_media_with_llm
 
     def adjust_tools_for_agent_llm(self, tools: list[Tool]) -> None:
         """In-place adjust tool attributes or schemae to match agent LLM-specifics."""

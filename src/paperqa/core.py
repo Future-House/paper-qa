@@ -232,7 +232,9 @@ async def _map_fxn_summary(  # noqa: PLR0912
     cleaned_text = text.text.strip("\n") or "(no text)"
     if summary_llm_model and prompt_templates:
         unique_media = list(dict.fromkeys(text.media))  # Preserve order
-        media_text: list[str] = [m.text for m in unique_media if m.text]
+        table_texts: list[str] = [
+            m.text for m in unique_media if m.info.get("type") == "table" and m.text
+        ]
         data = {
             "question": question,
             "citation": citation,
@@ -240,9 +242,9 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 text_with_tables_prompt_template.format(
                     text=cleaned_text,
                     citation=citation,
-                    tables="\n\n".join(media_text),
+                    tables="\n\n".join(table_texts),
                 )
-                if media_text
+                if table_texts
                 else cleaned_text
             ),
         } | (extra_prompt_data or {})

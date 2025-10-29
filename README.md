@@ -747,6 +747,24 @@ Depending on the source document, the same image can appear multiple times
 Thus, clients should consider media databases
 to have a many-to-many relationship with chunks.
 
+Since PaperQA's evidence gathering process centers on text-based retrieval,
+it's possible relevant image(s) or table(s) aren't retrieved
+because their associated text content is irrelevant.
+For a concrete example, imagine the figure in a paper has a terse caption
+and is placed one page after relevant main-text discussion.
+To solve this problem, PaperQA supports media enrichment at document read-time.
+Basically after reading in the PDF,
+the `parsing.enrichment_llm` is given the `parsing.enrichment_prompt`
+and co-located text to generate a synthetic caption for every image/table.
+The synthetic captions are used to shift the embeddings of each text chunk,
+but are kept separate from the actual source text.
+This way evidence gathering can fetch relevant images/tables
+without risk of polluting contextual summaries with LLM-generated captions.
+
+If you want multimodal PDF reading, but do not want enrichment
+(since adds one LLM prompt/media at read-time),
+enrichment can be disabled by setting `parsing.multimodal` to `ON_WITHOUT_ENRICHMENT`.
+
 When creating contextual summaries on a given chunk (a `Text`),
 the summary LLM is passed both the chunk's text and the chunk's associated media,
 but the output contextual summary itself remains text-only.
@@ -926,13 +944,17 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.pdfs_use_block_parsing`             | `False`                                | Opt-in flag for block-based PDF parsing over text-based PDF parsing.                                                          |
 | `parsing.use_doc_details`                    | `True`                                 | Whether to get metadata details for docs.                                                                                     |
 | `parsing.overlap`                            | `250`                                  | Characters to overlap chunks.                                                                                                 |
-| `parsing.multimodal`                         | `True`                                 | Flag to parse both text and images from applicable documents.                                                                 |
+| `parsing.multimodal`                         | `True`                                 | Control to parse both text and media from applicable documents, as well as potentially enriching them with text descriptions. |
 | `parsing.defer_embedding`                    | `False`                                | Whether to defer embedding until summarization.                                                                               |
 | `parsing.parse_pdf`                          | `paperqa_pypdf.parse_pdf_to_pages`     | Function to parse PDF files.                                                                                                  |
 | `parsing.configure_pdf_parser`               | No-op                                  | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging.                       |
 | `parsing.chunking_algorithm`                 | `ChunkingOptions.SIMPLE_OVERLAP`       | Algorithm for chunking.                                                                                                       |
 | `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                                       |
 | `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                                                |
+| `parsing.enrichment_llm`                     | `"gpt-4o-2024-11-20"`                  | LLM for media enrichment.                                                                                                     |
+| `parsing.enrichment_llm_config`              | `None`                                 | Optional configuration for `enrichment_llm`.                                                                                  |
+| `parsing.enrichment_page_radius`             | `1`                                    | Page radius for context text in enrichment.                                                                                   |
+| `parsing.enrichment_prompt`                  | `image_enrichment_prompt_template`     | Prompt template for enriching media.                                                                                          |
 | `prompt.summary`                             | `summary_prompt`                       | Template for summarizing text, must contain variables matching `summary_prompt`.                                              |
 | `prompt.qa`                                  | `qa_prompt`                            | Template for QA, must contain variables matching `qa_prompt`.                                                                 |
 | `prompt.select`                              | `select_paper_prompt`                  | Template for selecting papers, must contain variables matching `select_paper_prompt`.                                         |
