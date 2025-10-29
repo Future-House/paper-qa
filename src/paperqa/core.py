@@ -229,7 +229,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
 
     # Strip newlines in case chunking led to blank lines,
     # but not spaces, to preserve text alignment
-    cleaned_text = text.text.strip("\n")
+    cleaned_text = text.text.strip("\n") or "(no text)"
     if summary_llm_model and prompt_templates:
         unique_media = list(dict.fromkeys(text.media))  # Preserve order
         media_text: list[str] = [m.text for m in unique_media if m.text]
@@ -240,7 +240,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 text_with_tables_prompt_template.format(
                     text=cleaned_text,
                     citation=citation,
-                    tables="\n\n----\n\n".join(media_text),
+                    tables="\n\n".join(media_text),
                 )
                 if media_text
                 else cleaned_text

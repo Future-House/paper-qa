@@ -1,27 +1,25 @@
 from datetime import datetime
 
+summary_json_prompt = (
+    "Excerpt from {citation}\n\n---\n\n{text}\n\n---\n\nQuestion: {question}"
+)
 summary_prompt = (
-    "Summarize the excerpt below to help answer a question.\n\nExcerpt from"
-    " {citation}\n\n------------\n\n{text}\n\n------------"
-    "\n\nQuestion: {question}\n\nDo not directly"
-    " answer the question, instead summarize to give evidence to help answer the"
-    " question. Stay detailed; report specific numbers, equations, or direct quotes"
+    "Summarize the excerpt below to help answer a question."
+    f"\n\n{summary_json_prompt}\n\n"
+    "Do not directly answer the question,"
+    " instead summarize to give evidence to help answer the question."
+    " Stay detailed; report specific numbers, equations, or direct quotes"
     ' (marked with quotation marks). Reply "Not applicable" if the excerpt is'
     " irrelevant. At the end of your response,"
-    "provide an integer score from 1-10 on a newline indicating relevance to question."  # Don't use 0-10 since we mention "not applicable" instead  # noqa: E501
+    " provide an integer score from 1-10 on a newline indicating relevance to question."  # Don't use 0-10 since we mention "not applicable" instead  # noqa: E501
     " Do not explain your score."
     "\n\nRelevant Information Summary ({summary_length}):"
 )
 # This prompt template integrates with `text` variable of the above `summary_prompt`
 text_with_tables_prompt_template = (
-    "{text}\n\n------------\n\nMarkdown tables from {citation}."
-    " If the markdown is poorly formatted, defer to the images"
-    "\n\n------------\n\n{tables}"
-)
-
-summary_json_prompt = (
-    "Excerpt from {citation}\n\n------------\n\n{text}\n\n------------"
-    "\n\nQuestion: {question}\n\n"
+    "{text}\n\n---\n\nMarkdown tables from {citation}."
+    " If the markdown is poorly formatted, defer to the images."
+    "\n\n{tables}"
 )
 
 # The below "cannot answer" sentinel phrase should:
@@ -38,29 +36,29 @@ answer_iteration_prompt_template = (
 )
 
 CITATION_KEY_CONSTRAINTS = (
-    "## Valid citation examples, only use comma/space delimited parentheticals: \n"
-    "- (pqac-d79ef6fa, pqac-0f650d59) \n"
-    "- (pqac-d79ef6fa) \n"
-    "## Invalid citation examples: \n"
-    "- (pqac-d79ef6fa and pqac-0f650d59) \n"
-    "- (pqac-d79ef6fa;pqac-0f650d59) \n"
-    "- (pqac-d79ef6fa-pqac-0f650d59) \n"
-    "- pqac-d79ef6fa and pqac-0f650d59 \n"
-    "- Example's work (pqac-d79ef6fa) \n"
-    "- (pages pqac-d79ef6fa) \n"
+    "## Valid citation examples, only use comma/space delimited parentheticals:\n"
+    "- (pqac-d79ef6fa, pqac-0f650d59)\n"
+    "- (pqac-d79ef6fa)\n"
+    "## Invalid citation examples:\n"
+    "- (pqac-d79ef6fa and pqac-0f650d59)\n"
+    "- (pqac-d79ef6fa;pqac-0f650d59)\n"
+    "- (pqac-d79ef6fa-pqac-0f650d59)\n"
+    "- pqac-d79ef6fa and pqac-0f650d59\n"
+    "- Example's work (pqac-d79ef6fa)\n"
+    "- (pages pqac-d79ef6fa)"
 )
 
 qa_prompt = (
     "Answer the question below with the context.\n\n"
-    "Context:\n\n{context}\n\n------------\n\n"
+    "Context:\n\n{context}\n\n---\n\n"
     "Question: {question}\n\n"
     "Write an answer based on the context. "
     "If the context provides insufficient information reply "
     f'"{CANNOT_ANSWER_PHRASE}." '
     "For each part of your answer, indicate which sources most support "
     "it via citation keys at the end of sentences, like {example_citation}. "
-    "Only cite from the context above and only use the citation keys from the context. "
-    f"{CITATION_KEY_CONSTRAINTS}"
+    "Only cite from the context above and only use the citation keys from the context."
+    f"\n\n{CITATION_KEY_CONSTRAINTS}\n\n"
     "Do not concatenate citation keys, just use them as is. "
     "Write in the style of a scientific article, with concise sentences and "
     "coherent paragraphs. This answer will be used directly, "

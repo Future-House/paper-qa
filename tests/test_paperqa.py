@@ -744,7 +744,7 @@ async def test_aquery_groups_contexts_by_question(docs_fixture) -> None:
     assert "Details on how drug discovery leverages AI." in final_context_str
     assert "General facts about organic chemistry." in final_context_str
 
-    assert "\n\n----\n\n" in final_context_str
+    assert "\n\n---\n\n" in final_context_str
     q1_header_pos = final_context_str.find(
         'Contexts related to the question: "Is XAI usable in chemistry?"'
     )
