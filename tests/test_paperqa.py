@@ -1378,6 +1378,8 @@ async def test_chunk_metadata_reader(
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
         parse_pdf=pdf_parser,
+        chunk_chars=3000,
+        overlap=100,
     )
     assert metadata.name
     assert "pdf" in metadata.name
@@ -1418,6 +1420,8 @@ async def test_chunk_metadata_reader(
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
+        chunk_chars=3000,
+        overlap=100,
     )
     # NOTE the use of tiktoken changes the actual char and overlap counts
     assert metadata.name
@@ -1443,6 +1447,8 @@ async def test_chunk_metadata_reader(
             path=code_input,
             doc=Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
             include_metadata=True,
+            chunk_chars=3000,
+            overlap=100,
         )
         assert metadata.name
         assert "txt" in metadata.name
