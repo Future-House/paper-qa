@@ -1187,7 +1187,7 @@ async def test_pdf_reader_w_no_match_doc_details(stub_data_dir: Path) -> None:
 async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     settings = Settings.from_name("debug")
     assert settings.parsing.defer_embedding, "Test relies on deferred embedding"
-    settings.parsing.chunk_size = 0  # Leads to one chunk = entire text
+    settings.parsing.reader_config["chunk_chars"] = 0  # Have one chunk = entire text
     # don't want to shove whole document into llm to get citation or embedding
     settings.parsing.use_doc_details = False
     settings.summary_llm = "gpt-4o-mini"  # context window needs to fit our one chunk
@@ -1378,6 +1378,8 @@ async def test_chunk_metadata_reader(
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
         parse_pdf=pdf_parser,
+        chunk_chars=3000,
+        overlap=100,
     )
     assert metadata.name
     assert "pdf" in metadata.name
@@ -1418,6 +1420,8 @@ async def test_chunk_metadata_reader(
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
         parsed_text_only=False,  # noqa: FURB120
         include_metadata=True,
+        chunk_chars=3000,
+        overlap=100,
     )
     # NOTE the use of tiktoken changes the actual char and overlap counts
     assert metadata.name
@@ -1443,6 +1447,8 @@ async def test_chunk_metadata_reader(
             path=code_input,
             doc=Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
             include_metadata=True,
+            chunk_chars=3000,
+            overlap=100,
         )
         assert metadata.name
         assert "txt" in metadata.name
@@ -3047,3 +3053,58 @@ async def test_timeout_resilience() -> None:
     context, llm_results = await map_fxn_summary(**kw)
     assert context is None
     assert not llm_results
+
+
+def test_reader_params_deprecation_warnings(recwarn: pytest.WarningsRecorder) -> None:
+    """Test that deprecated settings trigger warnings and are migrated to reader_config."""
+    with pytest.warns(DeprecationWarning, match="chunk_size.*deprecated"):
+        settings1 = Settings(parsing=ParsingSettings(chunk_size=2000))
+    assert settings1.parsing.reader_config["chunk_chars"] == 2000
+    with pytest.warns(DeprecationWarning, match="overlap.*deprecated"):
+        settings2 = Settings(parsing=ParsingSettings(overlap=50))
+    assert settings2.parsing.reader_config["overlap"] == 50
+    with pytest.warns(DeprecationWarning, match="pdfs_use_block_parsing.*deprecated"):
+        settings3 = Settings(parsing=ParsingSettings(pdfs_use_block_parsing=True))
+    assert settings3.parsing.reader_config["use_block_parsing"]
+    with pytest.warns(DeprecationWarning, match="chunk_size.*deprecated"):
+        settings4 = Settings(
+            parsing=ParsingSettings(
+                chunk_size=4000, reader_config={"chunk_chars": 2000}
+            )
+        )
+    assert (
+        settings4.parsing.reader_config["chunk_chars"] == 2000
+    ), "Expected reader_config to win out"
+
+    _ = Settings(parsing=ParsingSettings())
+    assert not [
+        w for w in recwarn if issubclass(w.category, DeprecationWarning)
+    ], "Expected clean settings to have no warnings"
+
+
+@pytest.mark.asyncio
+async def test_reader_config_propagation(stub_data_dir: Path) -> None:
+    settings = Settings(
+        parsing=ParsingSettings(
+            reader_config={"chunk_chars": 2000, "overlap": 50, "dpi": 144}
+        )
+    )
+
+    docs = Docs()
+    with (
+        patch(
+            "paperqa.docs.read_doc", side_effect=RuntimeError("sentinel")
+        ) as mock_read_doc,
+        pytest.raises(RuntimeError, match="sentinel"),
+    ):
+        await docs.aadd(
+            stub_data_dir / "paper.pdf",
+            citation="Wellawatte et al, XAI Review, 2023",  # Skip citation inference
+            doi="10.1021/acs.jctc.2c01235",  # Skip DOI inference
+            title="A Perspective on Explanations of Molecular Prediction Models",  # Skip title inference
+            settings=settings,
+        )
+    mock_read_doc.assert_awaited_once()
+    assert mock_read_doc.call_args.kwargs["chunk_chars"] == 2000
+    assert mock_read_doc.call_args.kwargs["overlap"] == 50
+    assert mock_read_doc.call_args.kwargs["dpi"] == 144
