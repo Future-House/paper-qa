@@ -165,7 +165,7 @@ CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"
 
 # For reference, here's Docling's image description prompt:
 # https://github.com/docling-project/docling/blob/v2.55.1/docling/datamodel/pipeline_options.py#L214-L216
-media_enrichment_prompt_template = (
+individual_media_enrichment_prompt_template = (
     "You are analyzing an image or table from a scientific document."
     " Provide a detailed description that will be used to answer questions about its content."
     " Focus on key elements, data, relationships, and scientific insights visible in the image."
