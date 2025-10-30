@@ -39,9 +39,13 @@ dev = [
     "docling-ibm-models[opencv-python-headless]>=3.10.0",  # Lower pin and specify opencv after https://github.com/docling-project/docling-ibm-models/pull/130
     "docling>=2.56",  # Pin for EasyOCR deprecation
     "fhlmi>=0.39",  # Pin for bytes_to_string
+    "paper-qa-docling[typing]",
     "paper-qa>=5.23",  # Pin for PDFParserFn
     "pytest-asyncio",
     "pytest>=8",  # Pin to keep recent
+]
+typing = [
+    "types-Pillow",
 ]
 
 [tool.ruff]
