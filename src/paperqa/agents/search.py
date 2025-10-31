@@ -441,7 +441,12 @@ def fetch_kwargs_from_manifest(
         manifest_fallback_location
     )
     if manifest_entry:
-        return DocDetails(**manifest_entry).model_dump()
+        try:
+            return DocDetails(**manifest_entry).model_dump()
+        except TypeError:
+            for key in ("fields_to_overwrite_from_metadata", "other"):
+                manifest_entry.pop(key, None)
+            return DocDetails(**manifest_entry).model_dump()
     return {}
 
 
