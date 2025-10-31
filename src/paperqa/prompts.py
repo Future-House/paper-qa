@@ -205,7 +205,7 @@ full_page_enrichment_prompt_template = (
     " It's especially important to document referential information such as"
     " figure/table numbers, labels, plot colors, or legends."
     "\n\nText co-located with the screenshot may be associated with"
-    " other page's content and unrelated,"
+    " other pages' content and unrelated,"
     " so do not just blindly quote referential information."
     " To restate, the co-located text is several pages of content,"
     " so only use aspects relevant to the accompanying screenshot."
