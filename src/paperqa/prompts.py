@@ -165,7 +165,7 @@ CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"
 
 # For reference, here's Docling's image description prompt:
 # https://github.com/docling-project/docling/blob/v2.55.1/docling/datamodel/pipeline_options.py#L214-L216
-media_enrichment_prompt_template = (
+individual_media_enrichment_prompt_template = (
     "You are analyzing an image or table from a scientific document."
     " Provide a detailed description that will be used to answer questions about its content."
     " Focus on key elements, data, relationships, and scientific insights visible in the image."
@@ -196,5 +196,23 @@ media_enrichment_prompt_template = (
     " not the entire figure or table."
     " Do not mention other unrelated surrounding text."
     "\n\n{context_text}Describe the media,"  # Allow for empty context_text
+    " or if uncertain on a description please state why:"
+)
+full_page_enrichment_prompt_template = (
+    "You are analyzing a screenshot of a page from a scientific document."
+    " Provide a detailed description that will be used to answer questions about its content."
+    " Focus on key elements, data, relationships, and scientific insights visible in the image."
+    " It's especially important to document referential information such as"
+    " figure/table numbers, labels, plot colors, or legends."
+    "\n\nText co-located with the screenshot may be associated with"
+    " other pages' content and unrelated,"
+    " so do not just blindly quote referential information."
+    " To restate, the co-located text is several pages of content,"
+    " so only use aspects relevant to the accompanying screenshot."
+    " Do not feel the need to extensively document entities in the margins"
+    " such as journal logos, display type, margin boxes, or PDF design elements."
+    " If the screenshot is garbled due to a bad screenshot,"
+    " describe the screenshot as garbled, state why it's considered garbled."
+    "\n\n{context_text}Describe the screenshot,"  # Allow for empty context_text
     " or if uncertain on a description please state why:"
 )

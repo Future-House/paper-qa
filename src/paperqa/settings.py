@@ -53,7 +53,7 @@ from paperqa.prompts import (
     default_system_prompt,
     env_reset_prompt,
     env_system_prompt,
-    media_enrichment_prompt_template,
+    individual_media_enrichment_prompt_template,
     qa_prompt,
     select_paper_prompt,
     structured_citation_prompt,
@@ -343,7 +343,7 @@ class ParsingSettings(BaseModel):
         ),
     )
     enrichment_prompt: str = Field(
-        default=media_enrichment_prompt_template,
+        default=individual_media_enrichment_prompt_template,
         description="Prompt template for enriching media.",
     )
 
