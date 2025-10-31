@@ -907,7 +907,11 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                             "title": "Query",
                         },
                         "min_year": {
-                            "anyOf": [{"type": "integer"}, {"type": "null"}],
+                            "anyOf": [
+                                {"type": "integer"},
+                                {"type": "string"},
+                                {"type": "null"},
+                            ],
                             "description": (
                                 "Filter for minimum publication year, or None for"
                                 " no minimum year.\nThe current year is"
@@ -916,7 +920,11 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                             "title": "Min Year",
                         },
                         "max_year": {
-                            "anyOf": [{"type": "integer"}, {"type": "null"}],
+                            "anyOf": [
+                                {"type": "integer"},
+                                {"type": "string"},
+                                {"type": "null"},
+                            ],
                             "description": (
                                 "Filter for maximum publication year, or None for"
                                 " no maximum year.\nThe current year is"

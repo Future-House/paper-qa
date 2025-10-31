@@ -117,8 +117,8 @@ class PaperSearch(NamedTool):
     async def paper_search(
         self,
         query: str,
-        min_year: int | None,
-        max_year: int | None,
+        min_year: int | str | None,
+        max_year: int | str | None,
         state: EnvironmentState,
     ) -> str:
         """
@@ -143,7 +143,8 @@ class PaperSearch(NamedTool):
         """  # noqa: E501,W505
         # Convert to date range (e.g. 2022-2022) if date is present
         year = (
-            f"{min_year if min_year else ''}-{max_year if max_year else ''}"  # noqa: FURB110
+            # int-cast here confirms a string year was an integer
+            f"{int(min_year) if min_year else ''}-{int(max_year) if max_year else ''}"  # noqa: FURB110
             if (min_year or max_year)
             else None
         )
