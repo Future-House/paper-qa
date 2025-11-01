@@ -1647,7 +1647,7 @@ def record_non_llm_requests(
 async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
     unenriched_settings = Settings(
         answer=AnswerSettings(evidence_k=2),  # Only one context is actually necessary
-        parsing=ParsingSettings(multimodal=MultimodalOptions.OFF),
+        parsing=ParsingSettings(multimodal=MultimodalOptions.ON_WITHOUT_ENRICHMENT),
     )
     unenriched_docs = Docs()
     await unenriched_docs.aadd(
