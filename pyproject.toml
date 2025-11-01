@@ -63,7 +63,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.71",  # Lower pin for aiohttp transport adoption
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek",
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
