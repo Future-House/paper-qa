@@ -201,7 +201,8 @@ def parse_office_doc(
                 media_index += 1
         elif isinstance(el, Table):
             # For tables, we could get the HTML representation for better structure
-            current_text += el.metadata.text_as_html + "\n\n"
+            if el.metadata.text_as_html:
+                current_text += el.metadata.text_as_html + "\n\n"
         else:
             current_text += str(el) + "\n\n"
 
@@ -494,6 +495,18 @@ async def read_doc(  # noqa: PLR0912
             overlap=overlap,
             name=(
                 f"paper-qa={pqa_version}|algorithm=overlap-text|reduction=cl100k_base"
+                f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
+            ),
+        )
+    elif str_path.endswith((".docx", ".xlsx", ".pptx")):
+        chunked_text = chunk_pdf(
+            parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
+        )
+        chunk_metadata = ChunkMetadata(
+            size=chunk_chars,
+            overlap=overlap,
+            name=(
+                f"paper-qa={pqa_version}|algorithm=overlap-office"
                 f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
