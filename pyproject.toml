@@ -92,6 +92,9 @@ memory = [
     "paper-qa[ldp]",
     "usearch>=2.16.4",  # Pin for Python 3.13 support
 ]
+office = [
+    "unstructured[docx,xlsx,pptx]",
+]
 openreview = [
     "openreview-py",
 ]
@@ -109,9 +112,6 @@ typing = [
 zotero = [
     "paper-qa-pymupdf",
     "pyzotero",
-]
-office = [
-    "unstructured[docx,xlsx,pptx]",
 ]
 
 [project.scripts]
