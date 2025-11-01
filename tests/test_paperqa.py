@@ -529,10 +529,25 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_evidence(docs_fixture: Docs) -> None:
+async def test_evidence(stub_data_dir: Path) -> None:
     debug_settings = Settings.from_name("debug")
+    debug_settings.parsing.multimodal = False
+
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "paper.pdf",
+        citation="Wellawatte et al, XAI Review, 2023",  # Skip citation inference
+        doi="10.1021/acs.jctc.2c01235",  # Skip DOI inference
+        title="A Perspective on Explanations of Molecular Prediction Models",  # Skip title inference
+        settings=debug_settings,
+    )
+    assert docs.texts, "Test expects texts to be added"
+    assert all(
+        not t.media for t in docs.texts
+    ), "Expected no media to be parsed with multimodal disabled"
+
     evidence = (
-        await docs_fixture.aget_evidence(
+        await docs.aget_evidence(
             PQASession(question="What does XAI stand for?"),
             settings=debug_settings,
         )
@@ -560,7 +575,7 @@ async def test_evidence(docs_fixture: Docs) -> None:
     with patch.object(litellm, "acompletion", acompletion_that_breaks_first_context):
         # Let's also check we can get other evidence using the same underlying sources
         other_evidence = (
-            await docs_fixture.aget_evidence(
+            await docs.aget_evidence(
                 PQASession(question="What is an acronym for explainable AI?"),
                 settings=debug_settings,
             )
@@ -1647,7 +1662,7 @@ def record_non_llm_requests(
 async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
     unenriched_settings = Settings(
         answer=AnswerSettings(evidence_k=2),  # Only one context is actually necessary
-        parsing=ParsingSettings(multimodal=MultimodalOptions.OFF),
+        parsing=ParsingSettings(multimodal=MultimodalOptions.ON_WITHOUT_ENRICHMENT),
     )
     unenriched_docs = Docs()
     await unenriched_docs.aadd(
@@ -3083,10 +3098,12 @@ def test_reader_params_deprecation_warnings(recwarn: pytest.WarningsRecorder) ->
 
 
 @pytest.mark.asyncio
-async def test_reader_config_propagation(stub_data_dir: Path) -> None:
+@pytest.mark.parametrize("multimodal", [False, True])
+async def test_reader_config_propagation(stub_data_dir: Path, multimodal: bool) -> None:
     settings = Settings(
         parsing=ParsingSettings(
-            reader_config={"chunk_chars": 2000, "overlap": 50, "dpi": 144}
+            reader_config={"chunk_chars": 2000, "overlap": 50, "dpi": 144},
+            multimodal=multimodal,
         )
     )
 
@@ -3107,4 +3124,5 @@ async def test_reader_config_propagation(stub_data_dir: Path) -> None:
     mock_read_doc.assert_awaited_once()
     assert mock_read_doc.call_args.kwargs["chunk_chars"] == 2000
     assert mock_read_doc.call_args.kwargs["overlap"] == 50
+    assert mock_read_doc.call_args.kwargs["parse_media"] == multimodal
     assert mock_read_doc.call_args.kwargs["dpi"] == 144
