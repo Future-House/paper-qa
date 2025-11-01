@@ -117,8 +117,8 @@ class PaperSearch(NamedTool):
     async def paper_search(
         self,
         query: str,
-        min_year: int | None,
-        max_year: int | None,
+        min_year: int | str | None,
+        max_year: int | str | None,
         state: EnvironmentState,
     ) -> str:
         """
@@ -141,10 +141,24 @@ class PaperSearch(NamedTool):
         Returns:
             String describing searched papers and the current status.
         """  # noqa: E501,W505
+
+        def clean(value: int | str | None) -> int | None:
+            if isinstance(value, int | None):
+                return value
+            if value == "None":  # Claude Sonnet 4.5 has given "None" (str)
+                return None
+            return int(value)  # Confirm string year was an integer
+
+        cleaned_min_year = clean(min_year)
+        cleaned_max_year = clean(max_year)
+
         # Convert to date range (e.g. 2022-2022) if date is present
         year = (
-            f"{min_year if min_year else ''}-{max_year if max_year else ''}"  # noqa: FURB110
-            if (min_year or max_year)
+            (
+                f"{cleaned_min_year if cleaned_min_year is not None else ''}"
+                f"-{cleaned_max_year if cleaned_max_year is not None else ''}"
+            )
+            if (cleaned_min_year is not None or cleaned_max_year is not None)
             else None
         )
         # get offset if we've done this search before (continuation of search)
