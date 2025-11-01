@@ -797,13 +797,14 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
 
 @pytest.mark.vcr
 @pytest.mark.parametrize(
-    ("doi"),
+    ("doi", "oa"),
     [
-        ("10.1021/acs.jctc.5b00178"),
+        ("10.1021/acs.jctc.5b00178", True),
     ],
 )
 @pytest.mark.asyncio
-async def test_does_openalex_work(doi: str):
+async def test_does_openalex_work(doi: str, oa: bool) -> None:
+    """Run a simple test of OpenAlex, which we primarily want for open access checks."""
     async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
         openalex_client = DocMetadataClient(
             http_client,
@@ -814,3 +815,6 @@ async def test_does_openalex_work(doi: str):
             fields=["open_access"],
         )
         assert openalex_details, "Failed to query OpenAlex"
+        assert (
+            openalex_details.other["open_access"]["is_oa"] is oa
+        ), "Open access data should match"
