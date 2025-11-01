@@ -179,7 +179,6 @@ def parse_office_doc(
     **kwargs,
 ) -> ParsedText:
     """Parse office documents (.docx, .xlsx, .pptx) using unstructured, extracting text and images."""
-
     elements = partition(str(path), **kwargs)
 
     content_dict = {}
