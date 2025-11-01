@@ -279,7 +279,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 path,
                 Doc(docname="", citation="", dockey=dockey),  # Fake doc
                 page_size_limit=parse_config.page_size_limit,
-                parse_images=False,  # Peeking is text only
+                parse_media=False,  # Peeking is text only
                 # We only use the first chunk, so let's peek just enough pages for that.
                 # Usually pages 1 - 2 give that,
                 # but in the event page 2 is blank (true for some PDFs),
@@ -386,8 +386,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 doc, **(query_kwargs | kwargs)
             )
 
-        parse_images, enrich_media = parse_config.should_parse_and_enrich_media
-        multimodal_kwargs: dict[str, Any] = {"parse_images": parse_images}
+        parse_media, enrich_media = parse_config.should_parse_and_enrich_media
+        multimodal_kwargs: dict[str, Any] = {"parse_media": parse_media}
         if enrich_media:
             multimodal_kwargs["multimodal_enricher"] = (
                 all_settings.make_media_enricher()
