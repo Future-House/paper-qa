@@ -110,6 +110,9 @@ zotero = [
     "paper-qa-pymupdf",
     "pyzotero",
 ]
+office = [
+    "unstructured[docx,xlsx,pptx]",
+]
 
 [project.scripts]
 pqa = "paperqa.agents:main"

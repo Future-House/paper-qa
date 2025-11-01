@@ -11,6 +11,8 @@ import anyio
 import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
+from unstructured.documents.elements import Image, Table
+from unstructured.partition.auto import partition
 
 from paperqa.types import (
     ChunkMetadata,
@@ -171,6 +173,53 @@ def parse_text(
     )
 
 
+def parse_office_doc(
+    path: str | os.PathLike,
+    page_size_limit: int | None = None,
+    **kwargs,
+) -> ParsedText:
+    """Parse office documents (.docx, .xlsx, .pptx) using unstructured, extracting text and images."""
+
+    elements = partition(str(path), **kwargs)
+
+    content_dict = {}
+    media_list = []
+    current_text = ""
+    media_index = 0
+
+    for el in elements:
+        if isinstance(el, Image):
+            if el.metadata.image_data:
+                image_data = el.metadata.image_data
+                # Create a ParsedMedia object
+                parsed_media = ParsedMedia(
+                    index=media_index,
+                    data=image_data,
+                    info={"suffix": el.metadata.image_mime_type},
+                )
+                media_list.append(parsed_media)
+                media_index += 1
+        elif isinstance(el, Table):
+            # For tables, we could get the HTML representation for better structure
+            current_text += el.metadata.text_as_html + "\n\n"
+        else:
+            current_text += str(el) + "\n\n"
+
+    # For office docs, we can treat the whole document as a single "page"
+    content_dict["1"] = (current_text, media_list)
+
+    return ParsedText(
+        content=content_dict,
+        metadata=ParsedMetadata(
+            parsing_libraries=["unstructured"],
+            paperqa_version=pqa_version,
+            total_parsed_text_length=len(current_text),
+            count_parsed_media=len(media_list),
+            name=f"office_doc|path={path}",
+        ),
+    )
+
+
 def chunk_text(
     parsed_text: ParsedText,
     doc: Doc,
@@ -276,7 +325,7 @@ def chunk_code_text(
 
 IMAGE_EXTENSIONS = tuple({".png", ".jpg", ".jpeg"})
 # When HTML reader supports images, add here
-ENRICHMENT_EXTENSIONS = tuple({".pdf", *IMAGE_EXTENSIONS})
+ENRICHMENT_EXTENSIONS = tuple({".pdf", ".docx", ".xlsx", ".pptx", *IMAGE_EXTENSIONS})
 
 
 @overload
@@ -383,6 +432,9 @@ async def read_doc(  # noqa: PLR0912
         )
     elif str_path.endswith(IMAGE_EXTENSIONS):
         parsed_text = await parse_image(path, **parser_kwargs)
+    elif str_path.endswith((".docx", ".xlsx", ".pptx")):
+        # TODO: Make parse_office_doc async
+        parsed_text = await asyncio.to_thread(parse_office_doc, path, **parser_kwargs)
     else:
         parsed_text = await asyncio.to_thread(
             parse_text, path, split_lines=True, **parser_kwargs
