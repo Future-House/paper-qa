@@ -465,7 +465,7 @@ class PQASession(BaseModel):
         )
 
         if bib:
-            formatted_with_references += f"\n\nReferences\n\n{bib}\n"
+            formatted_with_references += f"\n\nReferences\n\n{bib}"
 
         self.answer = formatted_without_references
         self.formatted_answer = formatted_with_references
