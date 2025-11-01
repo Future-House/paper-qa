@@ -3023,6 +3023,9 @@ def test_pqa_context_id_parsing(raw_text: str, cleaned_text: str) -> None:
     )
     session.populate_formatted_answers_and_bib_from_raw_answer()
     assert session.answer == cleaned_text
+    assert (
+        session.formatted_answer == session.formatted_answer.strip()
+    ), "Expecting no leading/trailing whitespace"
 
 
 @pytest.mark.asyncio
