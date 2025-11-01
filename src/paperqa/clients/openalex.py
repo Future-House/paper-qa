@@ -90,7 +90,6 @@ async def get_doc_details_from_openalex(
 
     if fields:
         params["select"] = ",".join(fields)
-
     response = await client.get(
         url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
@@ -104,6 +103,7 @@ async def get_doc_details_from_openalex(
         raise DOINotFoundError("OpenAlex API returned a failed status for the query.")
 
     results_data = response_data
+
     if params.get("filter") is not None:
         results_data = results_data["results"]
         if len(results_data) == 0:
@@ -112,6 +112,10 @@ async def get_doc_details_from_openalex(
             )
         results_data = results_data[0]
 
+    # openalex keeps the DOI prefix on (we remove)
+    if results_data.get("doi"):
+        results_data["doi"] = results_data["doi"].removeprefix("https://doi.org/")
+
     if (
         doi is None
         and title
@@ -119,6 +123,7 @@ async def get_doc_details_from_openalex(
         < title_similarity_threshold
     ):
         raise DOINotFoundError(f"OpenAlex results did not match for title {title!r}.")
+
     if doi and results_data.get("doi") != doi:
         raise DOINotFoundError(f"DOI {doi!r} not found in OpenAlex.")
 
