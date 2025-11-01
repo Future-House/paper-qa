@@ -21,7 +21,7 @@ from paperqa.clients import (
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
-from paperqa.clients.openalex import reformat_name
+from paperqa.clients.openalex import OpenAlexProvider, reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
 from paperqa.types import DocDetails
 
@@ -793,3 +793,28 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
         assert (
             crossref_details.source_quality == score
         ), "Should have source quality data"
+
+
+@pytest.mark.vcr
+@pytest.mark.parametrize(
+    ("doi", "oa"),
+    [
+        ("10.1021/acs.jctc.5b00178", True),
+    ],
+)
+@pytest.mark.asyncio
+async def test_does_openalex_work(doi: str, oa: bool) -> None:
+    """Run a simple test of OpenAlex, which we primarily want for open access checks."""
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
+        openalex_client = DocMetadataClient(
+            http_client,
+            metadata_clients=[OpenAlexProvider],
+        )
+        openalex_details = await openalex_client.query(
+            doi=doi,
+            fields=["open_access"],
+        )
+        assert openalex_details, "Failed to query OpenAlex"
+        assert (
+            openalex_details.other["open_access"]["is_oa"] is oa
+        ), "Open access data should match"
