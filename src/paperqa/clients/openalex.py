@@ -90,6 +90,7 @@ async def get_doc_details_from_openalex(
 
     if fields:
         params["select"] = ",".join(fields)
+    print("OpenAlex request URL:", url, "with params:", params)
     response = await client.get(
         url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
@@ -210,24 +211,28 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
     """
 
     async def get_doc_details(
-        self, doi: str, client: httpx.AsyncClient
+        self, doi: str, client: httpx.AsyncClient, fields: Collection[str] | None = None
     ) -> DocDetails | None:
         """Get document details by DOI.
 
         Args:
             doi: The DOI of the document.
             client: Async HTTP client for any requests.
+            fields: Specific fields to include in the request.
 
         Returns:
             The document details if found, otherwise None.
         """
-        return await get_doc_details_from_openalex(doi=doi, client=client)
+        return await get_doc_details_from_openalex(
+            doi=doi, client=client, fields=fields
+        )
 
     async def search_by_title(
         self,
         query: str,
         client: httpx.AsyncClient,
         title_similarity_threshold: float = 0.75,
+        fields: Collection[str] | None = None,
     ) -> DocDetails | None:
         """Search for document details by title.
 
@@ -235,6 +240,7 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
             query: The title query for the document.
             client: Async HTTP client for any requests.
             title_similarity_threshold: Threshold for title similarity.
+            fields: Specific fields to include in the request.
 
         Returns:
             The document details if found, otherwise None.
@@ -243,6 +249,7 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
             title=query,
             client=client,
             title_similarity_threshold=title_similarity_threshold,
+            fields=fields,
         )
 
     async def _query(self, query: TitleAuthorQuery | DOIQuery) -> DocDetails | None:
@@ -256,9 +263,12 @@ class OpenAlexProvider(DOIOrTitleBasedProvider):
             The document details if found, otherwise None.
         """
         if isinstance(query, DOIQuery):
-            return await self.get_doc_details(doi=query.doi, client=query.client)
+            return await self.get_doc_details(
+                doi=query.doi, client=query.client, fields=query.fields
+            )
         return await self.search_by_title(
             query=query.title,
             client=query.client,
             title_similarity_threshold=query.title_similarity_threshold,
+            fields=query.fields,
         )
