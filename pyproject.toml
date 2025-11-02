@@ -63,7 +63,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.71",  # Lower pin for aiohttp transport adoption
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant]",
+    "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek",
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-pydantic",
@@ -91,6 +91,9 @@ local = [
 memory = [
     "paper-qa[ldp]",
     "usearch>=2.16.4",  # Pin for Python 3.13 support
+]
+office = [
+    "unstructured[docx,xlsx,pptx]",
 ]
 openreview = [
     "openreview-py",
