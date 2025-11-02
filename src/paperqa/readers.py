@@ -466,15 +466,11 @@ async def read_doc(  # noqa: PLR0912
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
-        if str_path.endswith(".pdf"):
-            algorithm_name = "overlap-pdf"
-        else:  # .docx, .xlsx, .pptx
-            algorithm_name = "overlap-office"
         chunk_metadata = ChunkMetadata(
             size=chunk_chars,
             overlap=overlap,
             name=(
-                f"paper-qa={pqa_version}|algorithm={algorithm_name}"
+                f"paper-qa={pqa_version}|algorithm=overlap-document"
                 f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
