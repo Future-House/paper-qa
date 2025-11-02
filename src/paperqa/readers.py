@@ -175,29 +175,27 @@ def parse_text(
 
 def parse_office_doc(
     path: str | os.PathLike,
-    page_size_limit: int | None = None,
     **kwargs,
 ) -> ParsedText:
     """Parse office documents (.docx, .xlsx, .pptx) using unstructured, extracting text and images."""
     elements = partition(str(path), **kwargs)
 
     content_dict = {}
-    media_list = []
+    media_list: list[ParsedMedia] = []
     current_text = ""
     media_index = 0
 
     for el in elements:
         if isinstance(el, Image):
-            if el.metadata.image_data:
-                image_data = el.metadata.image_data
-                # Create a ParsedMedia object
-                parsed_media = ParsedMedia(
-                    index=media_index,
-                    data=image_data,
-                    info={"suffix": el.metadata.image_mime_type},
-                )
-                media_list.append(parsed_media)
-                media_index += 1
+            image_data = el.metadata.image_data
+            # Create a ParsedMedia object
+            parsed_media = ParsedMedia(
+                index=media_index,
+                data=image_data,
+                info={"suffix": el.metadata.image_mime_type},
+            )
+            media_list.append(parsed_media)
+            media_index += 1
         elif isinstance(el, Table):
             # For tables, we could get the HTML representation for better structure
             if el.metadata.text_as_html:
