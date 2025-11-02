@@ -16,7 +16,8 @@ from paperqa.utils import BIBTEX_MAPPING, mutate_acute_accents, strings_similari
 from .client_models import DOIOrTitleBasedProvider, DOIQuery, TitleAuthorQuery
 from .exceptions import DOINotFoundError
 
-OPENALEX_BASE_URL = "https://api.openalex.org"
+OPENALEX_HOST = "api.openalex.org"
+OPENALEX_BASE_URL = f"https://{OPENALEX_HOST}"
 OPENALEX_API_REQUEST_TIMEOUT = float(
     os.environ.get("OPENALEX_API_REQUEST_TIMEOUT", "10.0")
 )  # seconds
