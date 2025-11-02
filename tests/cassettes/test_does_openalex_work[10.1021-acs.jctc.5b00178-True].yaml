@@ -13,90 +13,13 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.openalex.org/works/https://doi.org/10.1021%2Facs.jctc.5b00178
+      uri: https://api.openalex.org/works/https://doi.org/10.1021%2Facs.jctc.5b00178?select=open_access,doi
     response:
       body:
         string: !!binary |
-          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
+          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
+          O+Pd3VtMYr5Jk3m8nfPPF5y3P79P/dSWAAAA
       headers:
         Access-Control-Allow-Headers:
           - Accept, Accept-Language, Accept-Encoding, Authorization, Content-Type
@@ -109,7 +32,7 @@ interactions:
         CF-Cache-Status:
           - DYNAMIC
         CF-Ray:
-          - 997f103a7acb7803-SJC
+          - 9980e5696e8e9456-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -117,7 +40,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Sat, 01 Nov 2025 23:10:04 GMT
+          - Sun, 02 Nov 2025 04:30:22 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         RateLimit-Limit:
@@ -127,9 +50,9 @@ interactions:
         RateLimit-Reset:
           - "1"
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=FyS0lt3gi8TDoMETu9hrzxeM2SfBnjqKl9T6UPNpL58%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1762038604"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=fgebQHO3%2BJVgNuDBE1MUgvhMdTNCuzfVdlNA0hr6a0I%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1762057822"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=FyS0lt3gi8TDoMETu9hrzxeM2SfBnjqKl9T6UPNpL58%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1762038604"
+          - heroku-nel="https://nel.heroku.com/reports?s=fgebQHO3%2BJVgNuDBE1MUgvhMdTNCuzfVdlNA0hr6a0I%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1762057822"
         Server:
           - cloudflare
         Transfer-Encoding:

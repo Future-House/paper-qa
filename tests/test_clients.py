@@ -818,3 +818,6 @@ async def test_does_openalex_work(doi: str, oa: bool) -> None:
         assert (
             openalex_details.other["open_access"]["is_oa"] is oa
         ), "Open access data should match"
+        assert (
+            openalex_details.year is None
+        ), "Year should not be populated because we set fields"
