@@ -3109,6 +3109,7 @@ async def test_reader_config_propagation(stub_data_dir: Path) -> None:
     assert mock_read_doc.call_args.kwargs["overlap"] == 50
     assert mock_read_doc.call_args.kwargs["dpi"] == 144
 
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("filename", ["dummy.docx", "dummy.pptx", "dummy.xlsx"])
 async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
@@ -3117,22 +3118,23 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
         pytest.skip(f"{filename} not found in stub_data")
 
     docs = Docs()
-    
+
     settings = Settings(
         llm="gemini/gemini-2.5-flash",
         embedding="gemini/text-embedding-004",
         # 他のLLM設定も明示的に指定
         summary_llm="gemini/gemini-2.5-flash",  # サマリー用
-        agent_llm="gemini/gemini-2.5-flash",     # エージェント用
-        parsing=ParsingSettings(
-            use_doc_details=False, 
-            disable_doc_valid_check=True
-        ),
+        agent_llm="gemini/gemini-2.5-flash",  # エージェント用
+        parsing=ParsingSettings(use_doc_details=False, disable_doc_valid_check=True),
     )
     docname = await docs.aadd(
-        file_path, "dummy citation", docname=filename, dockey="dummy_doc", settings=settings
+        file_path,
+        "dummy citation",
+        docname=filename,
+        dockey="dummy_doc",
+        settings=settings,
     )
     assert docname is not None
     assert len(docs.texts) > 0
     session = await docs.aquery("What is the RAG system?", settings=settings)
-    assert session.answer is not None and session.answer != ""
+    assert session.answer
