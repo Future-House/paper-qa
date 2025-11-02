@@ -3108,3 +3108,30 @@ async def test_reader_config_propagation(stub_data_dir: Path) -> None:
     assert mock_read_doc.call_args.kwargs["chunk_chars"] == 2000
     assert mock_read_doc.call_args.kwargs["overlap"] == 50
     assert mock_read_doc.call_args.kwargs["dpi"] == 144
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("filename", ["dummy.docx", "dummy.pptx", "dummy.xlsx"])
+async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
+    # This test requires the user to create dummy office files in tests/stub_data
+    # For example:
+    # touch tests/stub_data/dummy.docx
+    # touch tests/stub_data/dummy.pptx
+    # touch tests/stub_data/dummy.xlsx
+    file_path = stub_data_dir / filename
+    if not file_path.exists():
+        pytest.skip(f"{filename} not found in stub_data")
+
+    docs = Docs()
+    settings = Settings(
+        llm="openrouter/google/gemma-7b-it",
+        llm_config={"api_key": os.environ.get("OPEN_ROUTER_API_KEY")},
+        parsing=ParsingSettings(
+            use_doc_details=False, disable_doc_valid_check=True, defer_embedding=True
+        ),
+    )
+    docname = await docs.aadd(
+        file_path, "dummy citation", docname=filename, dockey="dummy_doc", settings=settings
+    )
+    assert docname is not None
+    assert len(docs.texts) > 0
