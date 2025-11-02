@@ -12,12 +12,6 @@ import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
 from importlib.metadata import version
-import unstructured
-from unstructured.documents.elements import Image, Table
-from unstructured.partition.auto import partition
-
-UNSTRUCTURED_VERSION = version(unstructured.__name__)
-
 from paperqa.types import(
     ChunkMetadata,
     Doc,
@@ -182,6 +176,16 @@ def parse_office_doc(
     **kwargs,
 ) -> ParsedText:
     """Parse office documents (.docx, .xlsx, .pptx) using unstructured, extracting text and images."""
+    try:
+        from unstructured.documents.elements import Image, Table
+        from unstructured.partition.auto import partition
+        import unstructured
+    except ImportError as exc:
+        raise ImportError(
+            "Could not import `unstructured` dependencies. "
+            "Please install with `pip install paper-qa[office]`."
+        ) from exc
+    UNSTRUCTURED_VERSION = version(unstructured.__name__)
     elements = partition(str(path), **kwargs)
 
     content_dict = {}
@@ -213,7 +217,7 @@ def parse_office_doc(
     return ParsedText(
         content=content_dict,
         metadata=ParsedMetadata(
-            parsing_libraries=[f"unstructured ({UNSTRUCTURED_VERSION})"],
+            parsing_libraries=[f"{unstructured.__name__} ({UNSTRUCTURED_VERSION})"],
             paperqa_version=pqa_version,
             total_parsed_text_length=len(current_text),
             count_parsed_media=len(media_list),
