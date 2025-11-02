@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 ![PyPI Python Versions](https://img.shields.io/pypi/pyversions/paper-qa)
 
-PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs or text files,
+PaperQA2 is a package for doing high-accuracy retrieval augmented generation (RAG) on PDFs, text files, Microsoft Office documents, and source code files,
 with a focus on the scientific literature.
 See our [recent 2024 paper](https://paper.wikicrow.ai)
 to see examples of PaperQA2's superhuman performance in scientific tasks like
@@ -395,7 +395,7 @@ It just removes the automation associated with an agent picking the documents to
 ```python
 from paperqa import Docs, Settings
 
-# valid extensions include .pdf, .txt, .md, and .html
+# valid extensions include .pdf, .txt, .md, .html, .docx, .xlsx, .pptx, and code files (e.g., .py, .ts, .yaml)
 doc_paths = ("myfile.pdf", "myotherfile.pdf")
 
 # Prepare the Docs object by adding a bunch of documents
@@ -438,7 +438,7 @@ from paperqa import Docs
 
 async def main() -> None:
     docs = Docs()
-    # valid extensions include .pdf, .txt, .md, and .html
+    # valid extensions include .pdf, .txt, .md, .html, .docx, .xlsx, .pptx, and code files (e.g., .py, .ts, .yaml)
     for doc in ("myfile.pdf", "myotherfile.pdf"):
         await docs.aadd(doc)
 
