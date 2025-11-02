@@ -3109,25 +3109,24 @@ async def test_reader_config_propagation(stub_data_dir: Path) -> None:
     assert mock_read_doc.call_args.kwargs["overlap"] == 50
     assert mock_read_doc.call_args.kwargs["dpi"] == 144
 
-
 @pytest.mark.asyncio
 @pytest.mark.parametrize("filename", ["dummy.docx", "dummy.pptx", "dummy.xlsx"])
 async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
-    # This test requires the user to create dummy office files in tests/stub_data
-    # For example:
-    # touch tests/stub_data/dummy.docx
-    # touch tests/stub_data/dummy.pptx
-    # touch tests/stub_data/dummy.xlsx
     file_path = stub_data_dir / filename
     if not file_path.exists():
         pytest.skip(f"{filename} not found in stub_data")
 
     docs = Docs()
+    
     settings = Settings(
-        llm="openrouter/google/gemma-7b-it",
-        llm_config={"api_key": os.environ.get("OPEN_ROUTER_API_KEY")},
+        llm="gemini/gemini-2.5-flash",
+        embedding="gemini/text-embedding-004",
+        # 他のLLM設定も明示的に指定
+        summary_llm="gemini/gemini-2.5-flash",  # サマリー用
+        agent_llm="gemini/gemini-2.5-flash",     # エージェント用
         parsing=ParsingSettings(
-            use_doc_details=False, disable_doc_valid_check=True, defer_embedding=True
+            use_doc_details=False, 
+            disable_doc_valid_check=True
         ),
     )
     docname = await docs.aadd(
@@ -3135,3 +3134,5 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
     )
     assert docname is not None
     assert len(docs.texts) > 0
+    session = await docs.aquery("What is the RAG system?", settings=settings)
+    assert session.answer is not None and session.answer != ""
