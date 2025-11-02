@@ -3122,19 +3122,17 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
     settings = Settings(
         llm="gemini/gemini-2.5-flash",
         embedding="gemini/text-embedding-004",
-        # 他のLLM設定も明示的に指定
-        summary_llm="gemini/gemini-2.5-flash",  # サマリー用
-        agent_llm="gemini/gemini-2.5-flash",  # エージェント用
+        summary_llm="gemini/gemini-2.5-flash",
+        agent={"agent_llm": "gemini/gemini-2.5-flash"},
         parsing=ParsingSettings(use_doc_details=False, disable_doc_valid_check=True),
     )
     docname = await docs.aadd(
         file_path,
         "dummy citation",
         docname=filename,
-        dockey="dummy_doc",
         settings=settings,
     )
     assert docname is not None
-    assert len(docs.texts) > 0
+    assert docs.texts
     session = await docs.aquery("What is the RAG system?", settings=settings)
     assert session.answer
