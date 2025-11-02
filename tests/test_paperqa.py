@@ -3131,7 +3131,11 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
         ),
     )
     docname = await docs.aadd(
-        file_path, "dummy citation", docname=filename, dockey="dummy_doc", settings=settings
+        file_path,
+        "dummy citation",
+        docname=filename,
+        dockey="dummy_doc",
+        settings=settings,
     )
     assert docname is not None
     assert len(docs.texts) > 0

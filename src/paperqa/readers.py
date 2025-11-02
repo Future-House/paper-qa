@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import os
 from collections.abc import Awaitable, Callable
+from importlib.metadata import version
 from math import ceil
 from pathlib import Path
 from typing import Literal, Protocol, cast, overload, runtime_checkable
@@ -11,8 +12,8 @@ import anyio
 import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
-from importlib.metadata import version
-from paperqa.types import(
+
+from paperqa.types import (
     ChunkMetadata,
     Doc,
     ParsedMedia,
@@ -177,9 +178,9 @@ def parse_office_doc(
 ) -> ParsedText:
     """Parse office documents (.docx, .xlsx, .pptx) using unstructured, extracting text and images."""
     try:
+        import unstructured
         from unstructured.documents.elements import Image, Table
         from unstructured.partition.auto import partition
-        import unstructured
     except ImportError as exc:
         raise ImportError(
             "Could not import `unstructured` dependencies. "
