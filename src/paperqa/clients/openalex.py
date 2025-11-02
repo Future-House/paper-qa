@@ -90,7 +90,6 @@ async def get_doc_details_from_openalex(
 
     if fields:
         params["select"] = ",".join(fields)
-    print("OpenAlex request URL:", url, "with params:", params)
     response = await client.get(
         url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
