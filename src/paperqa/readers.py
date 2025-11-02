@@ -11,10 +11,14 @@ import anyio
 import tiktoken
 from html2text import __version__ as html2text_version
 from html2text import html2text
+from importlib.metadata import version
+import unstructured
 from unstructured.documents.elements import Image, Table
 from unstructured.partition.auto import partition
 
-from paperqa.types import (
+UNSTRUCTURED_VERSION = version(unstructured.__name__)
+
+from paperqa.types import(
     ChunkMetadata,
     Doc,
     ParsedMedia,
@@ -209,7 +213,7 @@ def parse_office_doc(
     return ParsedText(
         content=content_dict,
         metadata=ParsedMetadata(
-            parsing_libraries=["unstructured"],
+            parsing_libraries=[f"unstructured ({UNSTRUCTURED_VERSION})"],
             paperqa_version=pqa_version,
             total_parsed_text_length=len(current_text),
             count_parsed_media=len(media_list),
