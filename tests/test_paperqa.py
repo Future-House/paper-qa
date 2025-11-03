@@ -1385,7 +1385,7 @@ async def test_chunk_metadata_reader(
     assert "pdf" in metadata.name
     assert isinstance(metadata.chunk_metadata, ChunkMetadata)
     assert metadata.chunk_metadata.name
-    assert "overlap-pdf" in metadata.chunk_metadata.name
+    assert "overlap-document" in metadata.chunk_metadata.name
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.size == 3000
     assert len(chunk_text) > 2, "Expected multiple chunks, for meaningful assertions"
