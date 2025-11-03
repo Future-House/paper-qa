@@ -60,7 +60,7 @@ from paperqa.agents.tools import (
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
-from paperqa.types import Context, Doc, PQASession, Text
+from paperqa.types import Context, Doc, DocDetails, PQASession, Text
 from paperqa.utils import encode_id, extract_thought, get_year, md5sum
 
 
@@ -521,15 +521,22 @@ async def test_propagate_options(agent_test_settings: Settings) -> None:
     agent_test_settings.prompts.context_inner = CONTEXT_INNER_PROMPT_NOT_DETAILED
     agent_test_settings.answer.evidence_skip_summary = True
 
+    docs = Docs()
     response = await agent_query(
         query="What is a self-explanatory model?",
         settings=agent_test_settings,
+        docs=docs,
         agent_type=FAKE_AGENT_TYPE,
     )
     assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
     result = response.session
     assert len(result.answer) > 200, "Answer did not return any results"
     assert "###" in result.answer, "Answer did not propagate system prompt"
+    assert docs.docs, "Expected docs to have been added"
+    assert all(isinstance(d, DocDetails) for d in docs.docs.values())
+    assert all(
+        d.file_location for d in docs.docs.values()  # type: ignore[union-attr]
+    ), "Expected file location to be populated"
     assert len(result.contexts) >= 2, "Test expects a few contexts"
     # Subtract 2 to allow tolerance for chunks with leading/trailing whitespace
     num_contexts_sufficient_length = sum(
