@@ -211,6 +211,12 @@ class MultimodalOptions(IntEnum):
     # but it costs less money (no enrichment LLM calls)
     ON_WITHOUT_ENRICHMENT = 2
 
+    @classmethod
+    def from_value(cls, value: "bool | MultimodalOptions") -> "MultimodalOptions":
+        if isinstance(value, bool):
+            return cls(int(value))
+        return value
+
 
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
