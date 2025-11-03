@@ -3134,5 +3134,13 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str) -> None:
     )
     assert docname is not None
     assert docs.texts
-    session = await docs.aquery("What is the RAG system?", settings=settings)
-    assert session.answer
+    questions = {
+        "dummy.docx": "What is the RAG system?",
+        "dummy.pptx": "What is the RAG system?",
+        "dummy.xlsx": "What is the price of a laptop?",
+    }
+    question = questions[filename]
+    session = await docs.aquery(question, settings=settings)
+    assert session.used_contexts
+    assert len(session.answer) > 10, "Expected an answer"
+    assert CANNOT_ANSWER_PHRASE not in session.answer, "Expected the system to be sure"
