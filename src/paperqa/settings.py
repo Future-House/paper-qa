@@ -10,7 +10,16 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import IntEnum, StrEnum
 from itertools import starmap
 from pydoc import locate
-from typing import Any, ClassVar, Protocol, Self, TypeAlias, cast, runtime_checkable
+from typing import (
+    Any,
+    ClassVar,
+    Protocol,
+    Self,
+    TypeAlias,
+    assert_never,
+    cast,
+    runtime_checkable,
+)
 
 import anyio
 import litellm
@@ -211,6 +220,23 @@ class MultimodalOptions(IntEnum):
     # but it costs less money (no enrichment LLM calls)
     ON_WITHOUT_ENRICHMENT = 2
 
+    @classmethod
+    def from_value(cls, value: "bool | MultimodalOptions") -> "MultimodalOptions":
+        if isinstance(value, bool):
+            return cls(int(value))
+        return value
+
+    @property
+    def should_parse_and_enrich_media(self) -> tuple[bool, bool]:
+        """Get if the settings indicate to parse and also enrich media."""
+        if self == MultimodalOptions.OFF:
+            return False, False
+        if self == MultimodalOptions.ON_WITHOUT_ENRICHMENT:
+            return True, False
+        if self == MultimodalOptions.ON_WITH_ENRICHMENT:
+            return True, True
+        assert_never(self)
+
 
 class ParsingSettings(BaseModel):
     """Settings relevant for parsing and chunking documents."""
@@ -394,12 +420,8 @@ class ParsingSettings(BaseModel):
     @property
     def should_parse_and_enrich_media(self) -> tuple[bool, bool]:
         """Get if the settings indicate to parse and also enrich media."""
-        if (
-            isinstance(self.multimodal, bool)
-            or self.multimodal != MultimodalOptions.ON_WITHOUT_ENRICHMENT
-        ):
-            return bool(self.multimodal), bool(self.multimodal)
-        return True, False
+        mm_enum = MultimodalOptions.from_value(self.multimodal)
+        return mm_enum.should_parse_and_enrich_media
 
 
 class _FormatDict(dict):  # noqa: FURB189
