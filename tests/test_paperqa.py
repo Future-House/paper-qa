@@ -1400,7 +1400,7 @@ async def test_chunk_metadata_reader(
     assert "pdf" in metadata.name
     assert isinstance(metadata.chunk_metadata, ChunkMetadata)
     assert metadata.chunk_metadata.name
-    assert "overlap-pdf" in metadata.chunk_metadata.name
+    assert "overlap-document" in metadata.chunk_metadata.name
     assert metadata.chunk_metadata.overlap == 100
     assert metadata.chunk_metadata.size == 3000
     assert len(chunk_text) > 2, "Expected multiple chunks, for meaningful assertions"
@@ -3151,3 +3151,36 @@ async def test_reader_config_propagation(stub_data_dir: Path, multimodal: bool) 
     assert mock_read_doc.call_args.kwargs["overlap"] == 50
     assert mock_read_doc.call_args.kwargs["parse_media"] == multimodal
     assert mock_read_doc.call_args.kwargs["dpi"] == 144
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("filename", "query"),
+    [
+        ("dummy.docx", "What is the RAG system?"),
+        ("dummy.pptx", "What is the RAG system?"),
+        ("dummy.xlsx", "What is the price of a laptop?"),
+    ],
+)
+async def test_parse_office_doc(stub_data_dir: Path, filename: str, query: str) -> None:
+    docs = Docs()
+
+    settings = Settings(
+        llm="gemini/gemini-2.5-flash",
+        embedding="gemini/text-embedding-004",
+        summary_llm="gemini/gemini-2.5-flash",
+        agent={"agent_llm": "gemini/gemini-2.5-flash"},
+        parsing=ParsingSettings(use_doc_details=False),
+    )
+    docname = await docs.aadd(
+        stub_data_dir / filename,
+        citation="dummy citation",
+        docname=filename,
+        settings=settings,
+    )
+    assert docname is not None
+    assert docs.texts
+    session = await docs.aquery(query, settings=settings)
+    assert session.used_contexts
+    assert len(session.answer) > 10, "Expected an answer"
+    assert CANNOT_ANSWER_PHRASE not in session.answer, "Expected the system to be sure"

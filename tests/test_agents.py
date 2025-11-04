@@ -91,11 +91,12 @@ async def test_get_directory_index(
         ], "Incorrect fields in index"
         assert not index.changed, "Expected index to not have changes at this point"
         # bates.txt + empty.txt + flag_day.html + gravity_hill.md + influence.pdf
-        # + obama.txt + paper.pdf + pasa.pdf + duplicate_media.pdf,
+        # + obama.txt + paper.pdf + pasa.pdf + duplicate_media.pdf
+        # + dummy.docx + dummy.pptx + dummy.xlsx,
         # but empty.txt fails to be added
         path_to_id = await index.index_files
         assert (
-            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 8
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 11
         ), "Incorrect number of parsed index files"
 
         with subtests.test(msg="check-txt-query"):
@@ -159,9 +160,9 @@ async def test_get_directory_index(
             ),
         ):
             index = await get_directory_index(settings=agent_test_settings)
-        # Subtract 1 for the removed obama.txt file,
+        # Subtract 4 for the removed obama.txt, dummy.docx, dummy.pptx, and dummy.xlsx files,
         # and another 1 for the filtered out flag_day.html
-        assert len(await index.index_files) == len(path_to_id) - 2
+        assert len(await index.index_files) == len(path_to_id) - 4 - 1
         mock_aadd.assert_not_awaited(), "Expected we didn't re-add files"
 
         # Note let's delete files.zip, and confirm we can't load the index
@@ -261,6 +262,9 @@ EXPECTED_STUB_DATA_FILES = {
     "obama.txt",
     "paper.pdf",
     "pasa.pdf",
+    "dummy.docx",
+    "dummy.pptx",
+    "dummy.xlsx",
 }
 
 

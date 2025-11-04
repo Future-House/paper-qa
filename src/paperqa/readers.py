@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import os
 from collections.abc import Awaitable, Callable
+from importlib.metadata import version
 from math import ceil
 from pathlib import Path
 from typing import Literal, Protocol, cast, overload, runtime_checkable
@@ -171,6 +172,61 @@ def parse_text(
     )
 
 
+def parse_office_doc(
+    path: str | os.PathLike,
+    **kwargs,
+) -> ParsedText:
+    """Parse office documents (.docx, .xlsx, .pptx) using unstructured, extracting text and images."""
+    try:
+        import unstructured
+        from unstructured.documents.elements import Image, Table
+        from unstructured.partition.auto import partition
+    except ImportError as exc:
+        raise ImportError(
+            "Could not import `unstructured` dependencies. "
+            "Please install with `pip install paper-qa[office]`."
+        ) from exc
+    UNSTRUCTURED_VERSION = version(unstructured.__name__)
+    elements = partition(str(path), **kwargs)
+
+    content_dict = {}
+    media_list: list[ParsedMedia] = []
+    current_text = ""
+    media_index = 0
+
+    for el in elements:
+        if isinstance(el, Image):
+            image_data = el.metadata.image_data
+            # Create a ParsedMedia object
+            parsed_media = ParsedMedia(
+                index=media_index,
+                data=image_data,
+                info={"suffix": el.metadata.image_mime_type},
+            )
+            media_list.append(parsed_media)
+            media_index += 1
+        elif isinstance(el, Table):
+            # For tables, we could get the HTML representation for better structure
+            if el.metadata.text_as_html:
+                current_text += el.metadata.text_as_html + "\n\n"
+        else:
+            current_text += str(el) + "\n\n"
+
+    # For office docs, we can treat the whole document as a single "page"
+    content_dict["1"] = (current_text, media_list)
+
+    return ParsedText(
+        content=content_dict,
+        metadata=ParsedMetadata(
+            parsing_libraries=[f"{unstructured.__name__} ({UNSTRUCTURED_VERSION})"],
+            paperqa_version=pqa_version,
+            total_parsed_text_length=len(current_text),
+            count_parsed_media=len(media_list),
+            name=f"office_doc|path={path}",
+        ),
+    )
+
+
 def chunk_text(
     parsed_text: ParsedText,
     doc: Doc,
@@ -276,7 +332,7 @@ def chunk_code_text(
 
 IMAGE_EXTENSIONS = tuple({".png", ".jpg", ".jpeg"})
 # When HTML reader supports images, add here
-ENRICHMENT_EXTENSIONS = tuple({".pdf", *IMAGE_EXTENSIONS})
+ENRICHMENT_EXTENSIONS = tuple({".pdf", ".docx", ".xlsx", ".pptx", *IMAGE_EXTENSIONS})
 
 
 @overload
@@ -383,6 +439,9 @@ async def read_doc(  # noqa: PLR0912
         )
     elif str_path.endswith(IMAGE_EXTENSIONS):
         parsed_text = await parse_image(path, **parser_kwargs)
+    elif str_path.endswith((".docx", ".xlsx", ".pptx")):
+        # TODO: Make parse_office_doc async
+        parsed_text = await asyncio.to_thread(parse_office_doc, path, **parser_kwargs)
     else:
         parsed_text = await asyncio.to_thread(
             parse_text, path, split_lines=True, **parser_kwargs
@@ -412,7 +471,7 @@ async def read_doc(  # noqa: PLR0912
                 f"|reduction=cl100k_base{enrichment_summary}"
             ),
         )
-    elif str_path.endswith(".pdf"):
+    elif str_path.endswith((".pdf", ".docx", ".xlsx", ".pptx")):
         chunked_text = chunk_pdf(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap
         )
@@ -420,7 +479,7 @@ async def read_doc(  # noqa: PLR0912
             size=chunk_chars,
             overlap=overlap,
             name=(
-                f"paper-qa={pqa_version}|algorithm=overlap-pdf"
+                f"paper-qa={pqa_version}|algorithm=overlap-document"
                 f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
@@ -445,6 +504,7 @@ async def read_doc(  # noqa: PLR0912
                 f"|size={chunk_chars}|overlap={overlap}{enrichment_summary}"
             ),
         )
+
     else:
         chunked_text = chunk_code_text(
             parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap

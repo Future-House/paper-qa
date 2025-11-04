@@ -620,7 +620,7 @@ class IndexSettings(BaseModel):
         default=lambda f: (
             f.suffix
             # TODO: add images after embeddings are supported
-            in {".txt", ".pdf", ".html", ".md"}
+            in {".txt", ".pdf", ".html", ".md", ".xlsx", ".docx", ".pptx"}
         ),
         exclude=True,
         description=(
