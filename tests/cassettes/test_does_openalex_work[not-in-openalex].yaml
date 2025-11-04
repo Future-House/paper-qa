@@ -13,13 +13,14 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.openalex.org/works/https://doi.org/10.1021%2Facs.jctc.5b00178?select=open_access,doi
+      uri: https://api.openalex.org/works/https://doi.org/10.1046%2Fj.1365-2699.2003.00795?select=open_access,doi
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/x2MSQrDMAwA732GzsFLobT4M0Z1laUYy1gyNIT8vSbHmYE5gCuViCmRCIQDNomM
-          ELR1moAxiqL2UWBpRAUu11uGUHrOE2DZY6PKsim3Pa4ocR5B6acQZsxC5wQf3sZgVa0SrB1kuC3W
-          O+Pd3VtMYr5Jk3m8nfPPF5y3P79P/dSWAAAA
+          H4sIAAAAAAAA/03MPQ7CMAwF4L2neFygBaljyIiEhBgQHCBq3R+ROiFxQLk9iViYrPf82Wo3ukGy
+          JyyyWd2oOmANz0fiEmUVS7rf97g6wcklHlX3K4s96L+2pEZ5fV8IgV6JotCIx+2Cj4ng4qbq4BhS
+          SKTwptDiPCG7BGKhUHxd1ZvNcDLWZnhLJhKGhYZnlQHRk7UrzzDlm4QMM5uVW9V53XwBiYsC988A
+          AAA=
       headers:
         Access-Control-Allow-Headers:
           - Accept, Accept-Language, Accept-Encoding, Authorization, Content-Type
@@ -32,15 +33,15 @@ interactions:
         CF-Cache-Status:
           - DYNAMIC
         CF-Ray:
-          - 9980e5696e8e9456-SJC
+          - 9997ff666e24cb83-LAX
         Connection:
           - keep-alive
         Content-Encoding:
           - gzip
         Content-Type:
-          - application/json
+          - text/html; charset=utf-8
         Date:
-          - Sun, 02 Nov 2025 04:30:22 GMT
+          - Tue, 04 Nov 2025 23:47:38 GMT
         Nel:
           - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
         RateLimit-Limit:
@@ -50,9 +51,9 @@ interactions:
         RateLimit-Reset:
           - "1"
         Report-To:
-          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=fgebQHO3%2BJVgNuDBE1MUgvhMdTNCuzfVdlNA0hr6a0I%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1762057822"}],"max_age":3600}'
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=5vYa7K3a7Rs8U5QK3EpboaxeMRCnLfqAuO%2BF9urv7QI%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1762300058"}],"max_age":3600}'
         Reporting-Endpoints:
-          - heroku-nel="https://nel.heroku.com/reports?s=fgebQHO3%2BJVgNuDBE1MUgvhMdTNCuzfVdlNA0hr6a0I%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1762057822"
+          - heroku-nel="https://nel.heroku.com/reports?s=5vYa7K3a7Rs8U5QK3EpboaxeMRCnLfqAuO%2BF9urv7QI%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1762300058"
         Server:
           - cloudflare
         Transfer-Encoding:
@@ -62,6 +63,6 @@ interactions:
         Via:
           - 1.1 heroku-router
       status:
-        code: 200
-        message: OK
+        code: 404
+        message: Not Found
 version: 1
