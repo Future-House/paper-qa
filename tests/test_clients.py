@@ -812,7 +812,7 @@ async def test_does_openalex_work(
     doi: str, in_oa: bool, is_openaccess: bool | None
 ) -> None:
     """Run a simple test of OpenAlex, which we primarily want for open access checks."""
-    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient(timeout=10) as http_client:
         openalex_client = DocMetadataClient(
             http_client, metadata_clients=[OpenAlexProvider]
         )
