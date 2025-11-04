@@ -69,7 +69,7 @@ def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
         entropy += -p * math.log2(p)
 
     # Check if the entropy is within a reasonable range for text
-    return 8.0>entropy > thresh
+    return 8.0 > entropy > thresh
 
 
 def maybe_is_pdf(file: BinaryIO) -> bool:
