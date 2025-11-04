@@ -167,11 +167,12 @@ class Text(Embeddable):
         return (
             self.name == other.name
             and self.text == other.text
+            and self.media == other.media
             and self.doc == other.doc
         )
 
     def __hash__(self) -> int:
-        return hash((self.name, self.text))
+        return hash((self.name, self.text, tuple(self.media)))
 
     async def get_embeddable_text(self, with_enrichment: bool = False) -> str:
         """Get the text to embed, which may be different from the actual text content.

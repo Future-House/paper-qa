@@ -3190,3 +3190,31 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str, query: str) 
     assert session.used_contexts
     assert len(session.answer) > 10, "Expected an answer"
     assert CANNOT_ANSWER_PHRASE not in session.answer, "Expected the system to be sure"
+
+
+def test_text_comparison() -> None:
+    doc = Doc(docname="test", citation="test", dockey="test")
+    media1 = ParsedMedia(index=0, data=b"image_data_1")
+    media2 = ParsedMedia(index=1, data=b"image_data_2")
+
+    # Test equality and hashing without media
+    text_no_media1 = Text(text="Hello", name="chunk1", doc=doc)
+    text_no_media2 = Text(text="Hello", name="chunk1", doc=doc)
+    assert text_no_media1 == text_no_media2
+    assert hash(text_no_media1) == hash(text_no_media2)
+
+    # Test equality and hashing with media
+    # First with same media
+    text_with_media1 = Text(text="Hello", name="chunk1", doc=doc, media=[media1])
+    text_with_media2 = Text(text="Hello", name="chunk1", doc=doc, media=[media1])
+    assert text_with_media1 == text_with_media2
+    assert hash(text_with_media1) == hash(text_with_media2)
+    # Next with different media
+    text_diff_media = Text(text="Hello", name="chunk1", doc=doc, media=[media2])
+    assert text_with_media1 != text_diff_media
+    assert hash(text_with_media1) != hash(text_diff_media)
+
+    # Test that media matters for equality and set storage
+    assert text_with_media1 != text_no_media1
+    assert hash(text_with_media1) != hash(text_no_media1)
+    assert len({text_with_media1, text_with_media2, text_diff_media}) == 2
