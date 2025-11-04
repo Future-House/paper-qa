@@ -3164,6 +3164,7 @@ async def test_reader_config_propagation(stub_data_dir: Path, multimodal: bool) 
     ("filename", "query"),
     [
         ("dummy.docx", "What is the RAG system?"),
+        ("dummy_jap.docx", "What is the RAG system?"),
         ("dummy.pptx", "What is the RAG system?"),
         ("dummy.xlsx", "What is the price of a laptop?"),
     ],
