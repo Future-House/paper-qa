@@ -746,7 +746,9 @@ class DocDetails(Doc):
             " hashing the DOI or a stringifying a UUID."
         ),
     )
-    file_location: str | os.PathLike | None = None
+    file_location: str | os.PathLike | None = Field(
+        default=None, description="Path or location ID of the source document file."
+    )
     license: str | None = Field(
         default=None,
         description=(

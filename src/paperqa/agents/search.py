@@ -523,6 +523,9 @@ async def process_file(
                     path=abs_file_path,
                     fields=["title", "author", "journal", "year"],
                     settings=settings,
+                    # NOTE if file_location is None in the manifest,
+                    # we want to preserve that
+                    file_location=kwargs.pop("file_location", file_location),
                     **kwargs,
                 )
             except Exception as e:
