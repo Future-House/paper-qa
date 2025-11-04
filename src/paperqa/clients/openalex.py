@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import os
 from collections.abc import Collection
@@ -101,8 +100,13 @@ async def get_doc_details_from_openalex(
     try:
         response.raise_for_status()
         response_data = response.json()
-    except (httpx.HTTPStatusError, json.JSONDecodeError) as exc:
-        raise DOINotFoundError("Could not find paper given DOI/title.") from exc
+    except httpx.HTTPStatusError as exc:
+        if response.status_code == httpx.codes.NOT_FOUND:
+            raise DOINotFoundError(
+                f"Could not find paper given DOI/title,"
+                f" response text was {response.text!r}."
+            ) from exc
+        raise  # Can get 429'd by OpenAlex
 
     if response_data.get("status") == "failed":
         raise DOINotFoundError("OpenAlex API returned a failed status for the query.")
