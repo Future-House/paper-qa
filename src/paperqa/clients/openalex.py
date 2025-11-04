@@ -91,6 +91,10 @@ async def get_doc_details_from_openalex(
 
     if fields:
         params["select"] = ",".join(fields)
+    # Seen on 11/4/2025 with OpenAlex and both a client-level timeout of 15-sec
+    # and API request timeout of 15-sec, we repeatedly saw httpx.ConnectTimeout
+    # being thrown for DOIs 10.1046/j.1365-2699.2003.00795 and 10.2147/cia.s3785,
+    # even with up to 3 retries
     response = await client.get(
         url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
