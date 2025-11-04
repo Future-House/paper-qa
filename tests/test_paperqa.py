@@ -196,6 +196,15 @@ def test_maybe_is_text() -> None:
     )
     assert maybe_is_text(r.text)
 
+    # Test Japanese Wikipedia page for multilingual support
+    r_ja = httpx.get(
+        "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC", # 日本
+        headers={
+            "User-Agent": "PaperQA testing (https://github.com/Future-House/paper-qa)"
+        },
+    )
+    assert maybe_is_text(r_ja.text)
+
     assert maybe_is_html(BytesIO(r.text.encode()))
 
     # now force it to contain lots of weird encoding
