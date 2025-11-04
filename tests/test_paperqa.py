@@ -183,11 +183,17 @@ def test_citations_with_nonstandard_chars() -> None:
     )
 
 
+@pytest.mark.vcr
 def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
     # get front page of wikipedia
-    r = httpx.get("https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day")
+    r = httpx.get(
+        "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
+        headers={
+            "User-Agent": "PaperQA testing (https://github.com/Future-House/paper-qa)"
+        },
+    )
     assert maybe_is_text(r.text)
 
     assert maybe_is_html(BytesIO(r.text.encode()))
