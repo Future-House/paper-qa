@@ -1,0 +1,68 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.openalex.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.openalex.org/works/https://doi.org/10.1093%2Fnar%2Fgkw1164?select=open_access,doi
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/0yNQQ6CMBBF9x5j1tqxika4TDMpBRsL07TTKCHc3Ya4cPn/S95bgaObDVnrcoZu
+          BZ8NE3SSijsCk8lCUiqBkUMP+1VSqPspEnOHSJZ6N3mruERlecKZElISb4M7xX7A5oYar1pje2na
+          5nHD8fXW+t6oCquQ5sUkFzl74bSYJ2UzlBDEfQS6gUJ22xF69n/JuhSnEfVZ6XN73Ys/KWyHLwAA
+          AP//AwApDUOb0wAAAA==
+      headers:
+        Access-Control-Allow-Headers:
+          - Accept, Accept-Language, Accept-Encoding, Authorization, Content-Type
+        Access-Control-Allow-Methods:
+          - GET, HEAD, POST, OPTIONS
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Cache-Control, RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset, Retry-After
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - 9997ff622eed6e62-LAX
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 04 Nov 2025 23:47:38 GMT
+        Nel:
+          - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+        RateLimit-Limit:
+          - "5"
+        RateLimit-Remaining:
+          - "9"
+        RateLimit-Reset:
+          - "1"
+        Report-To:
+          - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=5vYa7K3a7Rs8U5QK3EpboaxeMRCnLfqAuO%2BF9urv7QI%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1762300058"}],"max_age":3600}'
+        Reporting-Endpoints:
+          - heroku-nel="https://nel.heroku.com/reports?s=5vYa7K3a7Rs8U5QK3EpboaxeMRCnLfqAuO%2BF9urv7QI%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1762300058"
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        Vary:
+          - accept-encoding
+        Via:
+          - 1.1 heroku-router
+      status:
+        code: 200
+        message: OK
+version: 1

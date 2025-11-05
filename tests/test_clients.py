@@ -797,27 +797,33 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
 
 @pytest.mark.vcr
 @pytest.mark.parametrize(
-    ("doi", "oa"),
+    ("doi", "in_oa", "is_openaccess"),
     [
-        ("10.1021/acs.jctc.5b00178", True),
+        pytest.param("10.1021/acs.jctc.5b00178", True, True, id="oa-in-openalex1"),
+        pytest.param("10.1093/nar/gkw1164", True, True, id="oa-in-openalex2"),
+        pytest.param("10.1002/wrna.1370", True, False, id="not-oa-in-openalex"),
+        pytest.param(
+            "10.1046/j.1365-2699.2003.00795", False, None, id="not-in-openalex"
+        ),
     ],
 )
 @pytest.mark.asyncio
-async def test_does_openalex_work(doi: str, oa: bool) -> None:
+async def test_does_openalex_work(
+    doi: str, in_oa: bool, is_openaccess: bool | None
+) -> None:
     """Run a simple test of OpenAlex, which we primarily want for open access checks."""
-    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
+    async with httpx_aiohttp.HttpxAiohttpClient(timeout=10) as http_client:
         openalex_client = DocMetadataClient(
-            http_client,
-            metadata_clients=[OpenAlexProvider],
+            http_client, metadata_clients=[OpenAlexProvider]
         )
-        openalex_details = await openalex_client.query(
-            doi=doi,
-            fields=["open_access"],
-        )
-        assert openalex_details, "Failed to query OpenAlex"
-        assert (
-            openalex_details.other["open_access"]["is_oa"] is oa
-        ), "Open access data should match"
-        assert (
-            openalex_details.year is None
-        ), "Year should not be populated because we set fields"
+        openalex_details = await openalex_client.query(doi=doi, fields=["open_access"])
+        if in_oa:
+            assert openalex_details, "Failed to query OpenAlex"
+            assert (
+                openalex_details.other["open_access"]["is_oa"] == is_openaccess
+            ), "Open access data should match"
+            assert (
+                openalex_details.year is None
+            ), "Year should not be populated because we set fields"
+        else:
+            assert not openalex_details, "Should have failed"

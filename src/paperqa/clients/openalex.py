@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import os
 from collections.abc import Collection
@@ -91,14 +90,23 @@ async def get_doc_details_from_openalex(
 
     if fields:
         params["select"] = ",".join(fields)
+    # Seen on 11/4/2025 with OpenAlex and both a client-level timeout of 15-sec
+    # and API request timeout of 15-sec, we repeatedly saw httpx.ConnectTimeout
+    # being thrown for DOIs 10.1046/j.1365-2699.2003.00795 and 10.2147/cia.s3785,
+    # even with up to 3 retries
     response = await client.get(
         url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
     try:
         response.raise_for_status()
         response_data = response.json()
-    except (httpx.HTTPStatusError, json.JSONDecodeError) as exc:
-        raise DOINotFoundError("Could not find paper given DOI/title.") from exc
+    except httpx.HTTPStatusError as exc:
+        if response.status_code == httpx.codes.NOT_FOUND:
+            raise DOINotFoundError(
+                f"Could not find paper given DOI/title,"
+                f" response text was {response.text!r}."
+            ) from exc
+        raise  # Can get 429'd by OpenAlex
 
     if response_data.get("status") == "failed":
         raise DOINotFoundError("OpenAlex API returned a failed status for the query.")
