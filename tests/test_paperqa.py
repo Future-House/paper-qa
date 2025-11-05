@@ -189,7 +189,6 @@ def test_citations_with_nonstandard_chars() -> None:
 def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
-    # get front page of wikipedia
     r = httpx.get(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         headers={
@@ -198,7 +197,6 @@ def test_maybe_is_text() -> None:
     )
     assert maybe_is_text(r.text)
 
-    # Test Japanese Wikipedia page for multilingual support
     r_ja = httpx.get(
         "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC",
         headers={
@@ -209,32 +207,21 @@ def test_maybe_is_text() -> None:
 
     assert maybe_is_html(BytesIO(r.text.encode()))
 
-    # now force it to contain lots of weird encoding
     bad_text = r.text.encode("latin1", "ignore").decode("utf-16", "ignore")
     assert not maybe_is_text(bad_text)
 
-    # account for possible spaces in the text due to tables or title pages
     assert maybe_is_text("entry1                    entry2                    entry3")
 
-    # Add new test cases as requested
-
-    # Case 1: An English paragraph (of good text) that has entropy of at least 6, but below 8
-    # Note: Natural English text has an entropy of around 4-5. To achieve an entropy
-    # of 6-8, the text must contain a wide and uniform distribution of characters,
-    # which is not typical for a natural language paragraph.
-    # This string is constructed to meet the entropy requirement.
-    # The 'thresh' parameter is set to 6 to ensure the 'entropy > thresh' condition is met.
+    # Test high entropy cases
+    # English text with entropy > 6
     good_text_high_entropy = string.printable * 10
     assert maybe_is_text(good_text_high_entropy, thresh=6)
 
-    # Case 2: An English paragraph (of bad text) that has entropy above 8
-    # This should be classified as not text because its entropy exceeds MAX_TEXT_ENTROPY (8.0).
-    # To get entropy > 8, we need more than 2**8=256 unique characters.
+    # English text with entropy > 8
     bad_text_high_entropy = "".join([chr(i) for i in range(10000, 10300)])
     assert not maybe_is_text(bad_text_high_entropy)
 
-    # Case 3: A Japanese paragraph (of bad text) that has entropy above 8
-    # Similar to the English case, this should be classified as not text.
+    # Japanese text with entropy > 8
     jp_char_ranges = [
         (0x3040, 0x309F),  # Hiragana
         (0x30A0, 0x30FF),  # Katakana
