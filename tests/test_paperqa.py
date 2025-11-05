@@ -91,6 +91,9 @@ from paperqa.utils import (
     strip_citations,
 )
 
+import random
+import string
+
 if TYPE_CHECKING:
     import vcr.request
 
@@ -215,8 +218,6 @@ def test_maybe_is_text() -> None:
     assert maybe_is_text("entry1                    entry2                    entry3")
 
     # Add new test cases as requested
-    import random
-    import string
 
     # Case 1: An English paragraph (of good text) that has entropy of at least 6, but below 8
     # Note: Natural English text has an entropy of around 4-5. To achieve an entropy
