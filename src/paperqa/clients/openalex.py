@@ -4,6 +4,7 @@ import logging
 import os
 from collections.abc import Collection
 from datetime import datetime
+from functools import cache
 from typing import Any
 from urllib.parse import quote
 
@@ -35,19 +36,26 @@ def reformat_name(name: str) -> str:
     return f"{given_names} {family}"
 
 
+@cache
 def get_openalex_mailto() -> str | None:
-    """Get the OpenAlex mailto address.
-
-    Returns:
-        The OpenAlex mailto address if available.
-    """
-    mailto_address = os.environ.get("OPENALEX_MAILTO")
+    """Get the OpenAlex mailto address, if available."""
+    mailto_address = os.getenv("OPENALEX_MAILTO")
     if mailto_address is None:
         logger.warning(
             "OPENALEX_MAILTO environment variable not set."
             " your request may be deprioritized by OpenAlex."
         )
-    return os.environ.get("OPENALEX_MAILTO")
+    return mailto_address
+
+
+@cache
+def get_openalex_api_key() -> str | None:
+    """
+    Get the OpenAlex API key from 'OPENALEX_API_KEY' if available, for premium features.
+
+    SEE: https://github.com/ourresearch/openalex-api-tutorials/blob/main/notebooks/getting-started/premium.ipynb
+    """
+    return os.getenv("OPENALEX_API_KEY")
 
 
 async def get_doc_details_from_openalex(
@@ -75,6 +83,8 @@ async def get_doc_details_from_openalex(
     """
     mailto = get_openalex_mailto()
     params = {"mailto": mailto} if mailto else {}
+    api_key = get_openalex_api_key()
+    headers = {"api_key": api_key} if api_key else {}
 
     if doi is title is None:
         raise ValueError("Either a DOI or title must be provided.")
@@ -95,7 +105,7 @@ async def get_doc_details_from_openalex(
     # being thrown for DOIs 10.1046/j.1365-2699.2003.00795 and 10.2147/cia.s3785,
     # even with up to 3 retries
     response = await client.get(
-        url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
+        url, params=params, headers=headers, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
     try:
         response.raise_for_status()
