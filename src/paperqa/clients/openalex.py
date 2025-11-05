@@ -48,6 +48,16 @@ def get_openalex_mailto() -> str | None:
     return mailto_address
 
 
+@cache
+def get_openalex_api_key() -> str | None:
+    """
+    Get the OpenAlex API key from 'OPENALEX_API_KEY' if available, for premium features.
+
+    SEE: https://github.com/ourresearch/openalex-api-tutorials/blob/main/notebooks/getting-started/premium.ipynb
+    """
+    return os.getenv("OPENALEX_API_KEY")
+
+
 async def get_doc_details_from_openalex(
     client: httpx.AsyncClient,
     doi: str | None = None,
@@ -73,6 +83,8 @@ async def get_doc_details_from_openalex(
     """
     mailto = get_openalex_mailto()
     params = {"mailto": mailto} if mailto else {}
+    api_key = get_openalex_api_key()
+    headers = {"api_key": api_key} if api_key else {}
 
     if doi is title is None:
         raise ValueError("Either a DOI or title must be provided.")
@@ -93,7 +105,7 @@ async def get_doc_details_from_openalex(
     # being thrown for DOIs 10.1046/j.1365-2699.2003.00795 and 10.2147/cia.s3785,
     # even with up to 3 retries
     response = await client.get(
-        url, params=params, timeout=OPENALEX_API_REQUEST_TIMEOUT
+        url, params=params, headers=headers, timeout=OPENALEX_API_REQUEST_TIMEOUT
     )
     try:
         response.raise_for_status()

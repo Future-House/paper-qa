@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 from collections.abc import Collection, Sequence
 from datetime import UTC, datetime
@@ -808,6 +809,7 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
     ],
 )
 @pytest.mark.asyncio
+@patch.dict(os.environ, {"OPENALEX_API_KEY": ""})  # Unset so VCR doesn't have API key
 async def test_does_openalex_work(
     doi: str, in_oa: bool, is_openaccess: bool | None
 ) -> None:
