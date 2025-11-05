@@ -9,6 +9,12 @@ from typing import Any
 from urllib.parse import quote
 
 import httpx
+from tenacity import (
+    AsyncRetrying,
+    before_sleep_log,
+    retry_if_exception,
+    stop_after_attempt,
+)
 
 from paperqa.types import DocDetails
 from paperqa.utils import BIBTEX_MAPPING, mutate_acute_accents, strings_similarity
@@ -58,7 +64,7 @@ def get_openalex_api_key() -> str | None:
     return os.getenv("OPENALEX_API_KEY")
 
 
-async def get_doc_details_from_openalex(
+async def get_doc_details_from_openalex(  # noqa: PLR0912
     client: httpx.AsyncClient,
     doi: str | None = None,
     title: str | None = None,
@@ -100,16 +106,33 @@ async def get_doc_details_from_openalex(
 
     if fields:
         params["select"] = ",".join(fields)
-    # Seen on 11/4/2025 with OpenAlex and both a client-level timeout of 15-sec
-    # and API request timeout of 15-sec, we repeatedly saw httpx.ConnectTimeout
-    # being thrown for DOIs 10.1046/j.1365-2699.2003.00795 and 10.2147/cia.s3785,
-    # even with up to 3 retries
-    response = await client.get(
-        url, params=params, headers=headers, timeout=OPENALEX_API_REQUEST_TIMEOUT
-    )
     try:
-        response.raise_for_status()
-        response_data = response.json()
+        # Seen on 11/4/2025 with OpenAlex and both a client-level timeout of 15-sec
+        # and API request timeout of 15-sec, we repeatedly saw httpx.ConnectTimeout
+        # being thrown for DOIs 10.1046/j.1365-2699.2003.00795 and 10.2147/cia.s3785,
+        # even with up to 3 retries
+        async for attempt in AsyncRetrying(
+            retry=retry_if_exception(
+                lambda exc: (
+                    isinstance(exc, httpx.ReadTimeout)
+                    or (
+                        isinstance(exc, httpx.HTTPStatusError)
+                        and exc.response.status_code
+                        == httpx.codes.INTERNAL_SERVER_ERROR
+                    )
+                )
+            ),
+            before_sleep=before_sleep_log(logger, logging.WARNING),
+            stop=stop_after_attempt(3),
+        ):
+            with attempt:
+                response = await client.get(
+                    url,
+                    params=params,
+                    headers=headers,
+                    timeout=OPENALEX_API_REQUEST_TIMEOUT,
+                )
+                response.raise_for_status()
     except httpx.HTTPStatusError as exc:
         if response.status_code == httpx.codes.NOT_FOUND:
             raise DOINotFoundError(
@@ -118,6 +141,7 @@ async def get_doc_details_from_openalex(
             ) from exc
         raise  # Can get 429'd by OpenAlex
 
+    response_data = response.json()
     if response_data.get("status") == "failed":
         raise DOINotFoundError("OpenAlex API returned a failed status for the query.")
 
