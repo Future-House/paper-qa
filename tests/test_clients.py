@@ -820,7 +820,7 @@ async def test_does_openalex_work(
         if in_oa:
             assert openalex_details, "Failed to query OpenAlex"
             assert (
-                openalex_details.other["open_access"]["is_oa"] is is_openaccess
+                openalex_details.other["open_access"]["is_oa"] == is_openaccess
             ), "Open access data should match"
             assert (
                 openalex_details.year is None
