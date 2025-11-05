@@ -4,6 +4,7 @@ import logging
 import os
 from collections.abc import Collection
 from datetime import datetime
+from functools import cache
 from typing import Any
 from urllib.parse import quote
 
@@ -35,19 +36,16 @@ def reformat_name(name: str) -> str:
     return f"{given_names} {family}"
 
 
+@cache
 def get_openalex_mailto() -> str | None:
-    """Get the OpenAlex mailto address.
-
-    Returns:
-        The OpenAlex mailto address if available.
-    """
-    mailto_address = os.environ.get("OPENALEX_MAILTO")
+    """Get the OpenAlex mailto address, if available."""
+    mailto_address = os.getenv("OPENALEX_MAILTO")
     if mailto_address is None:
         logger.warning(
             "OPENALEX_MAILTO environment variable not set."
             " your request may be deprioritized by OpenAlex."
         )
-    return os.environ.get("OPENALEX_MAILTO")
+    return mailto_address
 
 
 async def get_doc_details_from_openalex(
