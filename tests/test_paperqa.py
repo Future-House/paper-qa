@@ -183,7 +183,7 @@ def test_citations_with_nonstandard_chars() -> None:
     )
 
 
-# @pytest.mark.vcr
+@pytest.mark.vcr
 def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
