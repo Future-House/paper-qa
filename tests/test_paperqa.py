@@ -6,7 +6,9 @@ import json
 import os
 import pathlib
 import pickle
+import random
 import re
+import string
 import sys
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
@@ -90,9 +92,6 @@ from paperqa.utils import (
     strings_similarity,
     strip_citations,
 )
-
-import random
-import string
 
 if TYPE_CHECKING:
     import vcr.request

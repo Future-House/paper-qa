@@ -96,7 +96,7 @@ async def test_get_directory_index(
         # but empty.txt fails to be added
         path_to_id = await index.index_files
         assert (
-            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 11
+            sum(id_ != FAILED_DOCUMENT_ADD_ID for id_ in path_to_id.values()) == 12
         ), "Incorrect number of parsed index files"
 
         with subtests.test(msg="check-txt-query"):
@@ -263,6 +263,7 @@ EXPECTED_STUB_DATA_FILES = {
     "paper.pdf",
     "pasa.pdf",
     "dummy.docx",
+    "dummy_jap.docx",
     "dummy.pptx",
     "dummy.xlsx",
 }
