@@ -7,7 +7,6 @@ import json
 import logging
 import os
 import re
-import warnings
 from collections.abc import Collection, Container, Hashable, Iterable, Mapping, Sequence
 from copy import deepcopy
 from datetime import UTC, datetime
@@ -471,18 +470,6 @@ class PQASession(BaseModel):
         self.answer = formatted_without_references
         self.formatted_answer = formatted_with_references
         self.references = bib
-
-
-# for backwards compatibility
-class Answer(PQASession):
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "The 'Answer' class is deprecated and will be removed in future versions."
-            " Use 'PQASession' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
 
 
 class ChunkMetadata(BaseModel):
