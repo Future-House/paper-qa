@@ -189,6 +189,7 @@ def test_citations_with_nonstandard_chars() -> None:
 def test_maybe_is_text() -> None:
     assert maybe_is_text("This is a test. The sample conc. was 1.0 mM (at 245 ^F)")
     assert not maybe_is_text("\\C0\\C0\\B1\x00")
+    # get front page of wikipedia
     r = httpx.get(
         "https://en.wikipedia.org/wiki/National_Flag_of_Canada_Day",
         headers={
@@ -207,9 +208,11 @@ def test_maybe_is_text() -> None:
 
     assert maybe_is_html(BytesIO(r.text.encode()))
 
+    # now force it to contain lots of weird encoding
     bad_text = r.text.encode("latin1", "ignore").decode("utf-16", "ignore")
     assert not maybe_is_text(bad_text)
 
+    # account for possible spaces in the text due to tables or title pages
     assert maybe_is_text("entry1                    entry2                    entry3")
 
     # Test high entropy cases
