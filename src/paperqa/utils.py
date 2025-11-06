@@ -6,8 +6,8 @@ import logging.config
 import math
 import os
 import re
-import string
 import unicodedata
+from collections import Counter
 from collections.abc import Awaitable, Callable, Collection, Iterable, Iterator, Mapping
 from datetime import datetime
 from functools import reduce
@@ -31,6 +31,8 @@ from tenacity import (
 )
 
 logger = logging.getLogger(__name__)
+
+MAX_TEXT_ENTROPY = 8.0
 
 T = TypeVar("T")
 
@@ -57,15 +59,19 @@ def maybe_is_text(s: str, thresh: float = 2.5) -> bool:
     if not s:
         return False
 
-    entropy = 0.0
     s_wo_spaces = s.replace(" ", "")
-    for c in string.printable:
-        p = s_wo_spaces.count(c) / len(s_wo_spaces)
-        if p > 0:
-            entropy += -p * math.log2(p)
+    if not s_wo_spaces:
+        return False
+
+    counts = Counter(s_wo_spaces)
+    entropy = 0.0
+    length = len(s_wo_spaces)
+    for count in counts.values():
+        p = count / length
+        entropy += -p * math.log2(p)
 
     # Check if the entropy is within a reasonable range for text
-    return entropy > thresh
+    return MAX_TEXT_ENTROPY > entropy > thresh
 
 
 def maybe_is_pdf(file: BinaryIO) -> bool:

@@ -6,7 +6,9 @@ import json
 import os
 import pathlib
 import pickle
+import random
 import re
+import string
 import sys
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
@@ -196,6 +198,14 @@ def test_maybe_is_text() -> None:
     )
     assert maybe_is_text(r.text)
 
+    r_ja = httpx.get(
+        "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC",
+        headers={
+            "User-Agent": "PaperQA testing (https://github.com/Future-House/paper-qa)"
+        },
+    )
+    assert maybe_is_text(r_ja.text)
+
     assert maybe_is_html(BytesIO(r.text.encode()))
 
     # now force it to contain lots of weird encoding
@@ -204,6 +214,29 @@ def test_maybe_is_text() -> None:
 
     # account for possible spaces in the text due to tables or title pages
     assert maybe_is_text("entry1                    entry2                    entry3")
+
+    # Test high entropy cases
+    # English text with entropy > 6
+    good_text_high_entropy = string.printable * 10
+    assert maybe_is_text(good_text_high_entropy, thresh=6)
+
+    # English text with entropy > 8
+    bad_text_high_entropy = "".join([chr(i) for i in range(10000, 10300)])
+    assert not maybe_is_text(bad_text_high_entropy)
+
+    # Japanese text with entropy > 8
+    jp_char_ranges = [
+        (0x3040, 0x309F),  # Hiragana
+        (0x30A0, 0x30FF),  # Katakana
+        (0x4E00, 0x9FAF),  # CJK Unified Ideographs
+    ]
+    jp_chars = []
+    for start, end in jp_char_ranges:
+        jp_chars.extend([chr(i) for i in range(start, end + 1)])
+
+    random.shuffle(jp_chars)
+    bad_jp_text_high_entropy = "".join(jp_chars[:400])
+    assert not maybe_is_text(bad_jp_text_high_entropy)
 
 
 def test_name_in_text() -> None:
@@ -3164,6 +3197,7 @@ async def test_reader_config_propagation(stub_data_dir: Path, multimodal: bool) 
     ("filename", "query"),
     [
         ("dummy.docx", "What is the RAG system?"),
+        ("dummy_jap.docx", "What is the RAG system?"),
         ("dummy.pptx", "What is the RAG system?"),
         ("dummy.xlsx", "What is the price of a laptop?"),
     ],
