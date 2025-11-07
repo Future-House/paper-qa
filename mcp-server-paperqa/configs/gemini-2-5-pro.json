@@ -5,8 +5,7 @@
   "answer": {
     "evidence_k": 20,
     "answer_max_sources": 10,
-    "answer_length": "about 400 words",
-    "max_sources": 10
+    "answer_length": "about 400 words"
   },
   "parsing": {
     "chunk_size": 4000,
