@@ -1,0 +1,28 @@
+{
+  "llm": "gemini/gemini-2.0-flash-thinking-exp",
+  "summary_llm": "gemini/gemini-2.0-flash-exp",
+  "embedding": "text-embedding-004",
+  "answer": {
+    "evidence_k": 12,
+    "answer_max_sources": 6,
+    "answer_length": "about 250 words",
+    "max_sources": 6
+  },
+  "parsing": {
+    "chunk_size": 3000,
+    "use_doc_details": true,
+    "overlap": 120
+  },
+  "prompts": {
+    "system": "You are an expert scientific research assistant with deep analytical capabilities. Provide detailed, accurate, and well-reasoned answers about scientific papers with comprehensive citations and evidence. Think step by step through complex questions."
+  },
+  "agent": {
+    "agent_type": "ToolSelector",
+    "search_count": 10,
+    "index": {
+      "paper_directory": "~/papers",
+      "index_directory": "~/.paperqa/indexes"
+    }
+  },
+  "verbosity": 0
+}

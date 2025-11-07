@@ -4,7 +4,36 @@ Ce dossier contient des configurations prédéfinies pour différents cas d'usag
 
 ## Configurations Gemini (Google)
 
-### `gemini-fast.json` - Rapide et économique ⚡
+### Série Gemini 2.x (Dernière génération) 🆕
+
+#### `gemini-2-5-pro.json` - Maximum performance 🏆
+- **LLM** : Gemini 2.5 Pro
+- **Summary** : Gemini 2.0 Flash
+- **Embedding** : text-embedding-004
+- **Usage** : Recherche scientifique approfondie, analyses complexes
+- **Coût** : ~0.10-0.15$/question
+- **Vitesse** : ~30-60 secondes
+- **Contexte** : 2M tokens
+
+#### `gemini-2-thinking.json` - Raisonnement explicite 🧠
+- **LLM** : Gemini 2.0 Flash Thinking (experimental)
+- **Summary** : Gemini 2.0 Flash
+- **Embedding** : text-embedding-004
+- **Usage** : Questions complexes nécessitant raisonnement
+- **Coût** : ~0.03-0.05$/question
+- **Vitesse** : ~15-30 secondes
+
+#### `gemini-2-flash.json` - Rapide et moderne ⚡
+- **LLM** : Gemini 2.0 Flash (experimental)
+- **Summary** : Gemini 2.0 Flash
+- **Embedding** : text-embedding-004
+- **Usage** : Usage quotidien, exploration rapide
+- **Coût** : ~0.01-0.02$/question
+- **Vitesse** : ~5-15 secondes
+
+### Série Gemini 1.5 (Stable et testé)
+
+#### `gemini-fast.json` - Rapide et économique ⚡
 - **LLM** : Gemini 2.0 Flash (expérimental)
 - **Summary** : Gemini 2.0 Flash
 - **Embedding** : text-embedding-004
@@ -12,7 +41,7 @@ Ce dossier contient des configurations prédéfinies pour différents cas d'usag
 - **Coût** : ~0.01$/question
 - **Vitesse** : ~5-10 secondes
 
-### `gemini-full.json` - Équilibré (RECOMMANDÉ) ⭐
+#### `gemini-full.json` - Équilibré (RECOMMANDÉ pour débuter) ⭐
 - **LLM** : Gemini 1.5 Flash
 - **Summary** : Gemini 1.5 Flash
 - **Embedding** : text-embedding-004
@@ -20,7 +49,7 @@ Ce dossier contient des configurations prédéfinies pour différents cas d'usag
 - **Coût** : ~0.02$/question
 - **Vitesse** : ~10-20 secondes
 
-### `gemini-high-quality.json` - Meilleure qualité 🏆
+#### `gemini-high-quality.json` - Meilleure qualité 1.5
 - **LLM** : Gemini 1.5 Pro
 - **Summary** : Gemini 1.5 Flash
 - **Embedding** : text-embedding-004
@@ -75,9 +104,11 @@ cp gemini-full.json my-custom.json
 ```
 
 **Modèles disponibles** :
-- `gemini/gemini-2.0-flash-exp` - Plus rapide, expérimental
+- `gemini/gemini-2.5-pro` - Le plus puissant, 2M tokens contexte
+- `gemini/gemini-2.0-flash-thinking-exp` - Raisonnement explicite
+- `gemini/gemini-2.0-flash-exp` - Rapide et moderne, expérimental
+- `gemini/gemini-1.5-pro` - Stable, haute qualité
 - `gemini/gemini-1.5-flash` - Fiable, bon rapport qualité/prix
-- `gemini/gemini-1.5-pro` - Meilleure qualité
 
 ### Embeddings
 
@@ -119,16 +150,22 @@ cp gemini-full.json my-custom.json
 
 ## Comparaison des coûts
 
-| Config | LLM | Tokens/Q | Coût/Q | Vitesse |
-|--------|-----|----------|---------|---------|
-| gemini-fast | 2.0 Flash | ~10K | $0.01 | ⚡⚡⚡ |
-| gemini-full | 1.5 Flash | ~20K | $0.02 | ⚡⚡ |
-| gemini-high-quality | 1.5 Pro | ~40K | $0.05 | ⚡ |
+| Config | LLM | Tokens/Q | Coût/Q | Vitesse | Qualité |
+|--------|-----|----------|---------|---------|---------|
+| **Gemini 2.x** | | | | | |
+| gemini-2-5-pro | 2.5 Pro | ~60K | $0.10-0.15 | ⚡ | ⭐⭐⭐⭐⭐ |
+| gemini-2-thinking | 2.0 Flash Think | ~30K | $0.03-0.05 | ⚡⚡ | ⭐⭐⭐⭐ |
+| gemini-2-flash | 2.0 Flash | ~20K | $0.01-0.02 | ⚡⚡⚡ | ⭐⭐⭐ |
+| **Gemini 1.5** | | | | | |
+| gemini-fast | 2.0 Flash | ~10K | $0.01 | ⚡⚡⚡ | ⭐⭐⭐ |
+| gemini-full | 1.5 Flash | ~20K | $0.02 | ⚡⚡ | ⭐⭐⭐ |
+| gemini-high-quality | 1.5 Pro | ~40K | $0.05 | ⚡ | ⭐⭐⭐⭐ |
 
 *Q = Question
 
 ## Voir aussi
 
-- [Configuration Gemini complète](../GEMINI_SETUP.md)
+- [Configuration Gemini 1.5 complète](../GEMINI_SETUP.md)
+- [Configuration Gemini 2.x complète](../GEMINI_2_SETUP.md) 🆕
 - [Documentation PaperQA](https://github.com/Future-House/paper-qa)
 - [Documentation Gemini](https://ai.google.dev/)

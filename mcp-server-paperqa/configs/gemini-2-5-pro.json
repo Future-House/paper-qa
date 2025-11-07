@@ -1,0 +1,28 @@
+{
+  "llm": "gemini/gemini-2.5-pro",
+  "summary_llm": "gemini/gemini-2.0-flash-exp",
+  "embedding": "text-embedding-004",
+  "answer": {
+    "evidence_k": 20,
+    "answer_max_sources": 10,
+    "answer_length": "about 400 words",
+    "max_sources": 10
+  },
+  "parsing": {
+    "chunk_size": 4000,
+    "use_doc_details": true,
+    "overlap": 200
+  },
+  "prompts": {
+    "system": "You are a world-class scientific research assistant with exceptional analytical and reasoning capabilities. Provide comprehensive, deeply accurate, and nuanced answers about scientific papers with extensive citations and evidence. Consider multiple perspectives and provide detailed analysis."
+  },
+  "agent": {
+    "agent_type": "ToolSelector",
+    "search_count": 15,
+    "index": {
+      "paper_directory": "~/papers",
+      "index_directory": "~/.paperqa/indexes"
+    }
+  },
+  "verbosity": 0
+}

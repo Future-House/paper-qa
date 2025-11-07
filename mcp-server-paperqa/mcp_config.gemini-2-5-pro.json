@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "paperqa": {
+      "command": "paperqa-mcp",
+      "env": {
+        "GOOGLE_API_KEY": "VOTRE_CLE_API_GEMINI_ICI",
+        "PAPERQA_PAPER_DIRECTORY": "/path/to/your/papers",
+        "PAPERQA_INDEX_DIRECTORY": "${HOME}/.paperqa/indexes",
+        "PAPERQA_SETTINGS": "${HOME}/paper-qa/mcp-server-paperqa/configs/gemini-2-5-pro.json"
+      }
+    }
+  }
+}
