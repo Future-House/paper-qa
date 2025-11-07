@@ -227,8 +227,8 @@ class Context(BaseModel):
     context: Annotated[str, StringConstraints(strip_whitespace=True)] = Field(
         description=(
             "Summary of the text with respect to a question."
-            " Can be an empty string if a summary is not useful"
-            " (which should accompany a score of 0)."
+            " Can be an empty string if a summary is not useful/irrelevant"
+            " (which should be paired with a score of 0)."
         )
     )
     question: str | None = Field(
