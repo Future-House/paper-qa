@@ -1,0 +1,28 @@
+{
+  "llm": "gemini/gemini-1.5-pro",
+  "summary_llm": "gemini/gemini-1.5-flash",
+  "embedding": "text-embedding-004",
+  "answer": {
+    "evidence_k": 15,
+    "answer_max_sources": 8,
+    "answer_length": "about 300 words",
+    "max_sources": 8
+  },
+  "parsing": {
+    "chunk_size": 3000,
+    "use_doc_details": true,
+    "overlap": 150
+  },
+  "prompts": {
+    "system": "You are an expert scientific research assistant. Provide detailed, accurate answers about scientific papers with comprehensive citations and evidence."
+  },
+  "agent": {
+    "agent_type": "ToolSelector",
+    "search_count": 12,
+    "index": {
+      "paper_directory": "~/papers",
+      "index_directory": "~/.paperqa/indexes"
+    }
+  },
+  "verbosity": 0
+}
