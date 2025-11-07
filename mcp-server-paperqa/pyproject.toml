@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paperqa-mcp-server"
+version = "0.1.0"
+description = "MCP server for PaperQA - Ask questions about scientific papers via Claude Code"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "PaperQA MCP Contributors" }
+]
+dependencies = [
+    "mcp>=0.1.0",
+    "paper-qa>=5.0.0",
+]
+
+[project.scripts]
+paperqa-mcp = "paperqa_mcp.server:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+ignore = []

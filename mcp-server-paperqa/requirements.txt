@@ -1,0 +1,9 @@
+# Core dependencies
+mcp>=0.1.0
+paper-qa>=5.0.0
+
+# Development dependencies (optional)
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+ruff>=0.1.0

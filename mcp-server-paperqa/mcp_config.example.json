@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "paperqa": {
+      "command": "paperqa-mcp",
+      "env": {
+        "PAPERQA_PAPER_DIRECTORY": "/path/to/your/papers",
+        "PAPERQA_INDEX_DIRECTORY": "${HOME}/.paperqa/indexes",
+        "PAPERQA_SETTINGS": "fast",
+        "OPENAI_API_KEY": "your-openai-api-key-here"
+      }
+    }
+  }
+}
