@@ -3252,3 +3252,124 @@ def test_text_comparison() -> None:
     assert text_with_media1 != text_no_media1
     assert hash(text_with_media1) != hash(text_no_media1)
     assert len({text_with_media1, text_with_media2, text_diff_media}) == 2
+
+
+def test_context_comparison() -> None:
+    text1 = Text(
+        name="text1",
+        text="Sample text content",
+        doc=Doc(docname="test_doc", citation="Test Doc, 2025", dockey="key1"),
+    )
+    text2 = Text(
+        name="text2",
+        text="Different text content",
+        doc=Doc(docname="other_doc", citation="Other Doc, 2025", dockey="key2"),
+    )
+
+    # Identical contexts should be equal and have the same hash
+    context_base = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    context_none_question = Context(
+        context="This is a test context", question=None, text=text1, score=5
+    )
+
+    context_base_identical = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    assert context_base == context_base_identical, "Identical contexts should be equal"
+    assert hash(context_base) == hash(
+        context_base_identical
+    ), "Identical contexts should have same hash"
+    context_none_question_identical = Context(
+        context="This is a test context", question=None, text=text1, score=5
+    )
+    assert (
+        context_none_question == context_none_question_identical
+    ), "Identical contexts should be equal"
+    assert hash(context_none_question) == hash(
+        context_none_question_identical
+    ), "Identical contexts should have same hash"
+
+    # Different context text should make contexts unequal
+    context_diff_context = Context(
+        context="Different context text",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    assert (
+        context_base != context_diff_context
+    ), "Different context text should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_context
+    ), "Different context text should have different hashes"
+
+    # Different questions should make contexts unequal
+    context_diff_question = Context(
+        context="This is a test context",
+        question="Different question?",
+        text=text1,
+        score=5,
+    )
+    assert (
+        context_base != context_diff_question
+    ), "Different questions should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_question
+    ), "Different questions should have different hashes"
+
+    assert (
+        context_base != context_none_question
+    ), "Different questions should make contexts unequal"
+
+    # Different text objects should make contexts unequal
+    context_diff_text = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text2,
+        score=5,
+    )
+    assert (
+        context_base != context_diff_text
+    ), "Different text objects should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_text
+    ), "Different text objects should have different hashes"
+
+    # Different scores should make contexts unequal
+    context_diff_score = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=3,
+    )
+    assert (
+        context_base != context_diff_score
+    ), "Different scores should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_score
+    ), "Different scores should have different hashes"
+
+    # Different IDs should make contexts unequal
+    context_diff_id = Context(
+        id="custom-id-1",
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    assert context_base != context_diff_id, "Different IDs should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_id
+    ), "Different IDs should have different hashes"
+
+    assert (
+        context_base != "This is a test context"
+    ), "Different types should make contexts unequal"

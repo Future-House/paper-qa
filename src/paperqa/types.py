@@ -247,14 +247,16 @@ class Context(BaseModel):
         """Return the context as a string."""
         return self.context
 
+    def __hash__(self) -> int:
+        return hash((self.id, self.question, self.context, self.text, self.score))
+
     @model_validator(mode="before")
     @classmethod
     def populate_id(cls, data: dict[str, Any]) -> dict[str, Any]:
         if not data.get("id"):  # NOTE: this includes missing or empty strings
-            content = (
-                data.get("question", "")
-                + data.get("context", "")[: cls.CONTEXT_ENCODING_LENGTH]
-            )
+            content = (data.get("question") or "") + data.get("context", "")[
+                : cls.CONTEXT_ENCODING_LENGTH
+            ]
             return data | {  # Avoid mutating input data
                 "id": cls.REFERENCE_TEMPLATE.format(
                     id=encode_id(content or str(uuid4()), maxsize=cls.ID_HASH_LENGTH)
