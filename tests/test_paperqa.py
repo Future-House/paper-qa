@@ -627,6 +627,38 @@ async def test_evidence(stub_data_dir: Path) -> None:
     ), "We should be able to reuse sources across evidence calls"
 
 
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_nonduplicate_contexts() -> None:
+    doc1 = Doc(docname="stub1", dockey="stub1", citation="Stub 1")
+    text1 = Text(name="stub1", text="I like turtles", doc=doc1)
+    text2 = Text(**text1.model_dump())
+    question = "What do you like?"
+
+    # Prior session with a context we want to dedupe against
+    session = PQASession(
+        question=question,
+        contexts=[
+            Context(
+                question=question,
+                context=(
+                    "The excerpt states 'I like turtles,'"
+                    " indicating a preference for turtles."
+                ),
+                text=text1,
+                score=10,
+            )
+        ],
+    )
+
+    # This pattern of pre-populating Docs, whereas it's not the
+    # intended flow, it's technically possible
+    docs = Docs(texts=[text2])
+    assert await docs.aadd_texts(texts=[text1], doc=doc1)
+    session = await docs.aget_evidence(session)
+    assert len(session.contexts) == 1, "Expected just one context"
+
+
 @pytest.mark.asyncio
 async def test_json_evidence(docs_fixture: Docs) -> None:
     settings = Settings.from_name("fast")
