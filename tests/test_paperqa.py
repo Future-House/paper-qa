@@ -61,7 +61,7 @@ from paperqa.clients import CrossrefProvider
 from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import (
     LLMContextTimeoutError,
-    _map_fxn_summary,  # noqa: PLC2701
+    _map_fxn_summary,
     llm_parse_json,
     map_fxn_summary,
 )

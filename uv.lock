@@ -2575,7 +2575,7 @@ wheels = [
 
 [[package]]
 name = "openreview-py"
-version = "1.53.3"
+version = "1.54.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated" },
@@ -2590,7 +2590,7 @@ dependencies = [
     { name = "tqdm" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2b/4d/b3005fa1f4f8bf5baeb3f26062beff22ba50cf6b17701737372aec18f57b/openreview_py-1.53.3-py3-none-any.whl", hash = "sha256:452904a45d5e2f2f9e4b0ce607cad302938d6e72ddad5156599cfc79c84c9af2", size = 885217, upload-time = "2025-11-05T17:04:30.904Z" },
+    { url = "https://files.pythonhosted.org/packages/3c/93/de479134fbfa78d8ff1bea36d2a41c48c185a3b2e1ab5adf1abbad6583ab/openreview_py-1.54.0-py3-none-any.whl", hash = "sha256:9458e006059ec592d10ce13244e3d4e262c801d8876a5f47881039aa3bd27049", size = 887430, upload-time = "2025-11-10T19:22:20.749Z" },
 ]
 
 [[package]]

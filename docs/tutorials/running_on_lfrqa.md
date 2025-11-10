@@ -5,7 +5,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.17.3
+      jupytext_version: 1.18.1
   kernelspec:
     display_name: .venv
     language: python
@@ -253,9 +253,9 @@ log_results_dir = os.path.join("data", "rag-qa-benchmarking", "results")
 os.makedirs(log_results_dir, exist_ok=True)
 
 
-async def log_evaluation_to_json(
+async def log_evaluation_to_json(  # noqa: RUF029
     lfrqa_question_evaluation: dict,
-) -> None:  # noqa: RUF029
+) -> None:
     json_path = os.path.join(
         log_results_dir, f"{lfrqa_question_evaluation['qid']}.json"
     )
@@ -305,7 +305,6 @@ async def evaluate() -> None:
 if __name__ == "__main__":
     asyncio.run(evaluate())
 ```
-
 
 After running this, you can find the results in the `data/rag-qa-benchmarking/results` folder. Here is an example of how to read them:
 

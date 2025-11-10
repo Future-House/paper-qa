@@ -122,7 +122,9 @@ class OpenReviewPaperHelper:
 
     async def download_papers(self, submissions: list[Any]) -> None:
         """Download PDFs for given submissions."""
-        downloaded_papers = Path(self.settings.paper_directory).rglob("*.pdf")
+        downloaded_papers = Path(self.settings.paper_directory).rglob(  # noqa: ASYNC240
+            "*.pdf"
+        )
         downloaded_ids = [p.stem for p in downloaded_papers]
         logger.info("Downloading PDFs for relevant papers.")
         for submission in submissions:
@@ -151,7 +153,9 @@ class OpenReviewPaperHelper:
     ) -> Docs:
         if docs is None:
             docs = Docs()
-        for doc_path in Path(self.settings.paper_directory).rglob("*.pdf"):
+        for doc_path in Path(self.settings.paper_directory).rglob(  # noqa: ASYNC240
+            "*.pdf"
+        ):
             sub = subs.get(doc_path.stem) if subs is not None else None
             if sub:
                 await docs.aadd(

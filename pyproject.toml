@@ -135,6 +135,10 @@ skip = [
     "tests/stub_data/*",
 ]
 
+[tool.markdown_toc_creator]
+horizontal-rule-style = "prettier"
+proactive = false
+
 [tool.mypy]
 # Type-checks the interior of functions without type annotations.
 check_untyped_defs = true
@@ -220,7 +224,7 @@ max-line-length = 88  # Match ruff line-length
 # Files or directories matching the regular expression patterns are skipped.
 # The regex matches against base names, not paths. The default value ignores
 ignore-patterns = [
-    "version.py",  # setuptools-scm version files, SEE: https://github.com/pylint-dev/pylint/issues/10479
+    "^version\\.py$",  # Version files made by setuptools_scm, SEE: https://github.com/pylint-dev/pylint/issues/10479
 ]
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use, and will cap the count on Windows to
@@ -250,6 +254,7 @@ disable = [
     "global-statement",  # Rely on ruff PLW0603 for this
     "global-variable-not-assigned",  # Rely on ruff PLW0602 for this
     "import-outside-toplevel",  # Rely on ruff PLC0415 for this
+    "import-private-name",  # Rely on ruff PLC2701 for this
     "invalid-name",  # Don't care to enforce this
     "keyword-arg-before-vararg",  # Rely on ruff B026 for this
     "line-too-long",  # Rely on ruff E501 for this
@@ -289,7 +294,9 @@ disable = [
     "unused-argument",  # Rely on ruff ARG002 for this
     "unused-import",  # Rely on ruff F401 for this
     "unused-variable",  # Rely on ruff F841 for this
+    "unused-wildcard-import",  # Wildcard imports are convenient
     "use-sequence-for-iteration",  # Rely on ruff C0208 for this
+    "wildcard-import",  # Wildcard imports are convenient
     "wrong-import-order",  # Rely on ruff I001 for this
     "wrong-import-position",  # Rely on ruff E402 for this
 ]
@@ -367,11 +374,14 @@ preview = true
 explicit-preview-rules = true
 extend-select = [
     "ASYNC212",
+    "ASYNC240",
     "ASYNC250",
     "B901",
     "B903",
     "B909",
+    "B912",
     "CPY001",
+    "DOC102",
     "DOC201",
     "DOC202",
     "DOC402",
@@ -477,6 +487,7 @@ extend-select = [
     "RUF061",
     "RUF063",
     "RUF064",
+    "RUF065",
     "RUF102",
     "TC008",
     "UP042",
@@ -568,6 +579,7 @@ mypy-init-return = true
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*.py" = [
     "N802",  # Tests function names can match class names
+    "PLC2701",  # Test can import private names if needed
     "PLR2004",  # Tests can have magic values
     "PLR6301",  # Test classes can ignore self
     "S101",  # Tests can have assertions

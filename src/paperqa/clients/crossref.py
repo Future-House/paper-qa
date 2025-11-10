@@ -377,7 +377,7 @@ async def download_retracted_dataset(
             async for chunk in response.aiter_bytes(chunk_size=1024):
                 await f.write(chunk)
 
-        if os.path.getsize(str(retraction_data_path)) == 0:
+        if os.path.getsize(str(retraction_data_path)) == 0:  # noqa: ASYNC240
             raise RuntimeError("Retraction data is empty")
 
 

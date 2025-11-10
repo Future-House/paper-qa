@@ -25,14 +25,14 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.2
+    rev: v0.14.4
     hooks:
       - id: ruff-check
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.9.0
+    rev: 25.11.0
     hooks:
-      - id: black
+      - id: black-jupyter
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.6.2
     hooks:
@@ -48,7 +48,7 @@ repos:
       - id: codespell
         additional_dependencies: [".[toml]"]
   - repo: https://github.com/crate-ci/typos
-    rev: v1.36.3
+    rev: v1.39.0
     hooks:
       - id: typos
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -56,11 +56,11 @@ repos:
     hooks:
       - id: check-mailmap
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2025.09.26
+    rev: 2025.11.04
     hooks:
       - id: validate-pyproject
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.22
+    rev: 0.9.8
     hooks:
       - id: uv-lock
   - repo: https://github.com/adamchainz/blacken-docs
@@ -74,19 +74,19 @@ repos:
       - id: nb-clean
         args: [--preserve-cell-outputs, --remove-empty-cells]
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: v0.9.32
+    rev: v0.9.33
     hooks:
       - id: pymarkdown
         exclude: docs/tutorials/
   - repo: https://github.com/mwouts/jupytext
-    rev: v1.17.3
+    rev: v1.18.1
     hooks:
       - id: jupytext
         args: [--to, md, --pipe, black]
-        additional_dependencies: [black]
+        additional_dependencies: [black<25.11.0] # Downpin for https://github.com/mwouts/jupytext/issues/1467
         files: ^docs/.*\.ipynb$
   - repo: https://github.com/jsh9/markdown-toc-creator
-    rev: 0.0.10
+    rev: 0.1.3
     hooks:
       - id: markdown-toc-creator
   - repo: local # Use local so we can inspect paperqa.version
