@@ -1110,7 +1110,7 @@ class Settings(BaseSettings):
         ):
             return ToolSelector(
                 model_name=self.agent.agent_llm,
-                acompletion=self.get_agent_llm().router.acompletion,
+                acompletion=self.get_agent_llm().router().acompletion,
                 **(self.agent.agent_config or {}),
             )
         return None
