@@ -437,7 +437,7 @@ async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
     serialized_memory_model = memory_model.model_dump(exclude_none=True)
     query = "How can you use XAI for chemical property prediction?"
     # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
-    agent_test_settings.agent.agent_llm = CommonLLMNames.CLAUDE_35_SONNET.value
+    agent_test_settings.agent.agent_llm = CommonLLMNames.CLAUDE_37_SONNET.value
     agent_test_settings.agent.agent_config = {
         "memories": serialized_memory_model.pop("memories"),
         "memory_model": serialized_memory_model,
