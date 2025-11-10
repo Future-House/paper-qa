@@ -5,9 +5,10 @@ import os
 from collections.abc import Mapping
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import docling
+from docling.backend.docling_parse_v4_backend import DoclingParseV4DocumentBackend
 from docling.datamodel.base_models import ConversionStatus
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.datamodel.settings import DEFAULT_PAGE_RANGE
@@ -24,6 +25,9 @@ from docling_core.types.doc import (
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
 
+if TYPE_CHECKING:
+    from docling.backend.abstract_backend import AbstractDocumentBackend
+
 DOCLING_VERSION = version(docling.__name__)
 DOCLING_IMAGES_SCALE_PER_DPI = (
     72  # SEE: https://github.com/docling-project/docling/issues/2405
@@ -38,6 +42,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     pipeline_cls: type = StandardPdfPipeline,
     dpi: int | None = None,
     custom_pipeline_options: Mapping[str, Any] | None = None,
+    backend: "type[AbstractDocumentBackend]" = DoclingParseV4DocumentBackend,
     **_,
 ) -> ParsedText:
     """Parse a PDF.
@@ -56,6 +61,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
             to parse only specific pages, where pages are one-indexed.
             Leaving as the default of None will parse all pages.
+        backend: PDF backend class to use for parsing, defaults to docling-parse v4.
         **_: Thrown away kwargs.
     """
     path = Path(path)
@@ -73,7 +79,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     converter = DocumentConverter(
         format_options={
             InputFormat.PDF: PdfFormatOption(
-                pipeline_options=pipeline_options, pipeline_cls=pipeline_cls
+                pipeline_options=pipeline_options,
+                pipeline_cls=pipeline_cls,
+                backend=backend,
             )
         }
     )
@@ -253,6 +261,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         name=(
             f"pdf|pipeline={pipeline_cls.__name__}"
             f"|page_range={str(page_range).replace(' ', '')}"  # Remove space in tuple
+            f"|backend={backend.__name__}"
             f"{multimodal_string if parse_media else ''}"
         ),
     )
