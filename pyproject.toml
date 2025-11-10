@@ -135,6 +135,10 @@ skip = [
     "tests/stub_data/*",
 ]
 
+[tool.markdown_toc_creator]
+horizontal-rule-style = "prettier"
+proactive = false
+
 [tool.mypy]
 # Type-checks the interior of functions without type annotations.
 check_untyped_defs = true
