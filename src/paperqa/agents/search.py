@@ -499,7 +499,8 @@ async def process_file(
 ) -> None:
 
     abs_file_path = (
-        pathlib.Path(settings.agent.index.paper_directory).absolute() / rel_file_path
+        pathlib.Path(settings.agent.index.paper_directory).absolute()  # noqa: ASYNC240
+        / rel_file_path
     )
     fallback_title = rel_file_path.name
     if settings.agent.index.use_absolute_paper_directory:

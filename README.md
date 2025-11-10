@@ -16,6 +16,10 @@ question answering, summarization, and contradiction detection.
 
 <!--TOC-->
 
+---
+
+**Table of Contents**
+
 - [Quickstart](#quickstart)
   - [Example Output](#example-output)
 - [What is PaperQA2](#what-is-paperqa2)
@@ -55,6 +59,8 @@ question answering, summarization, and contradiction detection.
   - [Can I save or load?](#can-i-save-or-load)
 - [Reproduction](#reproduction)
 - [Citation](#citation)
+
+---
 
 <!--TOC-->
 
