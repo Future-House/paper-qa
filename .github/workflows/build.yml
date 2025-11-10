@@ -46,6 +46,18 @@ jobs:
           path: dist
       - name: Clean up paper-qa-docling build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         run: rm -r ${{ steps.build-paper-qa-docling.outputs.dist }}
+      - id: build-paper-qa-nemotron
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          path: packages/paper-qa-nemotron
+          upload-name-suffix: -paper-qa-nemotron
+      - name: Download built paper-qa-nemotron artifact to dist/
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ steps.build-paper-qa-nemotron.outputs.artifact-name }}
+          path: dist
+      - name: Clean up paper-qa-nemotron build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
+        run: rm -r ${{ steps.build-paper-qa-nemotron.outputs.dist }}
       - id: build-paper-qa
         uses: hynek/build-and-inspect-python-package@v2
         with:
