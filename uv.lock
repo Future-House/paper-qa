@@ -32,6 +32,7 @@ resolution-markers = [
 members = [
     "paper-qa",
     "paper-qa-docling",
+    "paper-qa-nemotron",
     "paper-qa-pymupdf",
     "paper-qa-pypdf",
 ]
@@ -2624,6 +2625,7 @@ dev = [
     { name = "litellm" },
     { name = "mypy" },
     { name = "paper-qa-docling" },
+    { name = "paper-qa-nemotron" },
     { name = "paper-qa-pymupdf" },
     { name = "paper-qa-pypdf", extra = ["media"] },
     { name = "prek" },
@@ -2668,6 +2670,9 @@ memory = [
     { name = "ldp" },
     { name = "usearch" },
 ]
+nemotron = [
+    { name = "paper-qa-nemotron" },
+]
 office = [
     { name = "unstructured", extra = ["docx", "pptx", "xlsx"] },
 ]
@@ -2700,6 +2705,7 @@ zotero = [
 dev = [
     { name = "paper-qa", extra = ["dev"] },
     { name = "paper-qa-docling", extra = ["dev"] },
+    { name = "paper-qa-nemotron", extra = ["dev"] },
     { name = "paper-qa-pymupdf", extra = ["dev"] },
     { name = "paper-qa-pypdf", extra = ["dev"] },
 ]
@@ -2720,9 +2726,10 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },
-    { name = "paper-qa", extras = ["docling", "image", "ldp", "local", "memory", "office", "pymupdf", "pypdf-media", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
+    { name = "paper-qa", extras = ["docling", "image", "ldp", "local", "memory", "nemotron", "office", "pymupdf", "pypdf-media", "qdrant", "typing", "zotero"], marker = "extra == 'dev'", editable = "." },
     { name = "paper-qa", extras = ["ldp"], marker = "extra == 'memory'", editable = "." },
     { name = "paper-qa-docling", marker = "extra == 'docling'", editable = "packages/paper-qa-docling" },
+    { name = "paper-qa-nemotron", marker = "extra == 'nemotron'", editable = "packages/paper-qa-nemotron" },
     { name = "paper-qa-pymupdf", marker = "extra == 'pymupdf'", editable = "packages/paper-qa-pymupdf" },
     { name = "paper-qa-pymupdf", marker = "extra == 'zotero'", editable = "packages/paper-qa-pymupdf" },
     { name = "paper-qa-pypdf", editable = "packages/paper-qa-pypdf" },
@@ -2762,12 +2769,13 @@ requires-dist = [
     { name = "usearch", marker = "extra == 'memory'", specifier = ">=2.16.4" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
-provides-extras = ["dev", "docling", "image", "ldp", "local", "memory", "office", "openreview", "pymupdf", "pypdf", "pypdf-media", "qdrant", "typing", "zotero"]
+provides-extras = ["dev", "docling", "image", "ldp", "local", "memory", "nemotron", "office", "openreview", "pymupdf", "pypdf", "pypdf-media", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "paper-qa", extras = ["dev"], editable = "." },
     { name = "paper-qa-docling", extras = ["dev"], editable = "packages/paper-qa-docling" },
+    { name = "paper-qa-nemotron", extras = ["dev"], editable = "packages/paper-qa-nemotron" },
     { name = "paper-qa-pymupdf", extras = ["dev"], editable = "packages/paper-qa-pymupdf" },
     { name = "paper-qa-pypdf", extras = ["dev"], editable = "packages/paper-qa-pypdf" },
 ]
@@ -2802,6 +2810,45 @@ requires-dist = [
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
+]
+provides-extras = ["dev"]
+
+[[package]]
+name = "paper-qa-nemotron"
+source = { editable = "packages/paper-qa-nemotron" }
+dependencies = [
+    { name = "fhlmi" },
+    { name = "litellm" },
+    { name = "pypdfium2" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "docling" },
+    { name = "fhlmi" },
+    { name = "httpx-aiohttp" },
+    { name = "paper-qa" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-recording" },
+    { name = "pytest-rerunfailures" },
+    { name = "vcrpy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "docling", marker = "extra == 'dev'", specifier = ">=2.56" },
+    { name = "fhlmi", specifier = ">=0.27.0" },
+    { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
+    { name = "httpx-aiohttp", marker = "extra == 'dev'" },
+    { name = "litellm", specifier = ">=1.71.0" },
+    { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
+    { name = "pypdfium2", specifier = ">=4.22.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'" },
+    { name = "pytest-recording", marker = "extra == 'dev'" },
+    { name = "pytest-rerunfailures", marker = "extra == 'dev'" },
+    { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
 provides-extras = ["dev"]
 

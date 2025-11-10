@@ -7,6 +7,7 @@ repos:
       - id: check-added-large-files
         exclude: |
           (?x)^(
+            packages/paper-qa-nemotron/tests/cassettes.*|
             src/paperqa/clients/client_data.*|
             tests/stub_data.*|
             tests/cassettes.*|

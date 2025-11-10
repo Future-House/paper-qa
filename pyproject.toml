@@ -5,6 +5,7 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 [dependency-groups]
 dev = [
     "paper-qa-docling[dev]",
+    "paper-qa-nemotron[dev]",
     "paper-qa-pymupdf[dev]",
     "paper-qa-pypdf[dev]",
     "paper-qa[dev]",
@@ -63,7 +64,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.71",  # Lower pin for aiohttp transport adoption
     "mypy>=1.8",  # Pin for mutable-override
-    "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
+    "paper-qa[docling,image,ldp,memory,nemotron,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek<0.2.15",  # Downpin for https://github.com/j178/prek/issues/1104
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-per-file-ignores",
@@ -94,6 +95,7 @@ memory = [
     "paper-qa[ldp]",
     "usearch>=2.16.4",  # Pin for Python 3.13 support
 ]
+nemotron = ["paper-qa-nemotron"]
 office = [
     "unstructured[docx,xlsx,pptx]",
 ]
@@ -132,6 +134,7 @@ check-hidden = true
 ignore-words-list = "aadd,astroid,flate,ser,ECT"
 skip = [
     "docs/2024-10-16_litqa2-splits.json5",
+    "packages/paper-qa-nemotron/tests/cassettes/*",
     "src/paperqa/clients/client_data/*",
     "tests/cassettes/*",
     "tests/stub_data/*",
@@ -171,7 +174,7 @@ exclude = [
 # Useful if you'd like to keep stubs in your repo, along with the config file.
 # Multiple paths are always separated with a : or , regardless of the platform.
 # User home directory and environment variables will be expanded.
-mypy_path = "$MYPY_CONFIG_FILE_DIR/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pypdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pymupdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-docling/src"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pypdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pymupdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-docling/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-nemotron/src"
 # Specifies the OS platform for the target program, for example darwin or win32
 # (meaning OS X or Windows, respectively). The default is the current platform
 # as revealed by Python’s sys.platform variable.
@@ -647,6 +650,7 @@ extend-exclude = [
 [tool.uv.sources]
 paper-qa = {workspace = true}
 paper-qa-docling = {workspace = true}
+paper-qa-nemotron = {workspace = true}
 paper-qa-pymupdf = {workspace = true}
 paper-qa-pypdf = {workspace = true}
 
