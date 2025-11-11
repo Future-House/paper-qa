@@ -627,6 +627,38 @@ async def test_evidence(stub_data_dir: Path) -> None:
     ), "We should be able to reuse sources across evidence calls"
 
 
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_nonduplicate_contexts() -> None:
+    doc1 = Doc(docname="stub1", dockey="stub1", citation="Stub 1")
+    text1 = Text(name="stub1", text="I like turtles", doc=doc1)
+    text2 = Text(**text1.model_dump())
+    question = "What do you like?"
+
+    # Prior session with a context we want to dedupe against
+    session = PQASession(
+        question=question,
+        contexts=[
+            Context(
+                question=question,
+                context=(
+                    "The excerpt states 'I like turtles,'"
+                    " indicating a preference for turtles."
+                ),
+                text=text1,
+                score=10,
+            )
+        ],
+    )
+
+    # This pattern of pre-populating Docs, whereas it's not the
+    # intended flow, it's technically possible
+    docs = Docs(texts=[text2])
+    assert await docs.aadd_texts(texts=[text1], doc=doc1)
+    session = await docs.aget_evidence(session)
+    assert len(session.contexts) == 1, "Expected just one context"
+
+
 @pytest.mark.asyncio
 async def test_json_evidence(docs_fixture: Docs) -> None:
     settings = Settings.from_name("fast")
@@ -3252,3 +3284,202 @@ def test_text_comparison() -> None:
     assert text_with_media1 != text_no_media1
     assert hash(text_with_media1) != hash(text_no_media1)
     assert len({text_with_media1, text_with_media2, text_diff_media}) == 2
+
+
+def test_context_comparison() -> None:
+    text1 = Text(
+        name="text1",
+        text="Sample text content",
+        doc=Doc(docname="test_doc", citation="Test Doc, 2025", dockey="key1"),
+    )
+    text2 = Text(
+        name="text2",
+        text="Different text content",
+        doc=Doc(docname="other_doc", citation="Other Doc, 2025", dockey="key2"),
+    )
+
+    # Identical contexts should be equal
+    context_base = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    context_none_question = Context(
+        context="This is a test context", question=None, text=text1, score=5
+    )
+
+    context_base_identical = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    assert context_base == context_base_identical, "Identical contexts should be equal"
+    assert hash(context_base) == hash(
+        context_base_identical
+    ), "Identical contexts should have same hash"
+    context_none_question_identical = Context(
+        context="This is a test context", question=None, text=text1, score=5
+    )
+    assert (
+        context_none_question == context_none_question_identical
+    ), "Identical contexts should be equal"
+    assert hash(context_none_question) == hash(
+        context_none_question_identical
+    ), "Identical contexts should have same hash"
+
+    # Different context text should make contexts unequal
+    context_diff_context = Context(
+        context="Different context text",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    assert (
+        context_base != context_diff_context
+    ), "Different context text should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_context
+    ), "Different context text should have different hashes"
+
+    # Different questions should make contexts unequal
+    context_diff_question = Context(
+        context="This is a test context",
+        question="Different question?",
+        text=text1,
+        score=5,
+    )
+    assert (
+        context_base != context_diff_question
+    ), "Different questions should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_question
+    ), "Different questions should have different hashes"
+
+    assert (
+        context_base != context_none_question
+    ), "Different questions should make contexts unequal"
+
+    # Different text objects should make contexts unequal
+    context_diff_text = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text2,
+        score=5,
+    )
+    assert (
+        context_base != context_diff_text
+    ), "Different text objects should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_text
+    ), "Different text objects should have different hashes"
+
+    # Different scores should make contexts unequal
+    context_diff_score = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=3,
+    )
+    assert (
+        context_base != context_diff_score
+    ), "Different scores should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_score
+    ), "Different scores should have different hashes"
+
+    # Different IDs should make contexts unequal
+    context_diff_id = Context(
+        id="custom-id-1",
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+    )
+    assert context_base != context_diff_id, "Different IDs should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_diff_id
+    ), "Different IDs should have different hashes"
+
+    assert (
+        context_base != "This is a test context"
+    ), "Different types should make contexts unequal"
+
+    # Identical contexts with extras should be equal
+    context_with_extras = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+        author_name="John Doe",
+        custom_field="value",
+    )
+    context_with_extras_identical = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+        author_name="John Doe",
+        custom_field="value",
+    )
+    assert (
+        context_with_extras == context_with_extras_identical
+    ), "Contexts with identical extras should be equal"
+    assert hash(context_with_extras) == hash(
+        context_with_extras_identical
+    ), "Contexts with identical extras should have same hash"
+
+    # Extras should make contexts unequal
+    assert context_base != context_with_extras, "Extras should make contexts unequal"
+    assert hash(context_base) != hash(
+        context_with_extras
+    ), "Extras should have different hashes"
+
+    # Different extra values should make contexts unequal
+    context_diff_extras = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+        author_name="Jane Smith",
+        custom_field="value",
+    )
+    assert (
+        context_with_extras != context_diff_extras
+    ), "Contexts with different extra values should be unequal"
+    assert hash(context_with_extras) != hash(
+        context_diff_extras
+    ), "Contexts with different extra values should have different hashes"
+
+    # Different extras should make contexts unequal
+    context_diff_extra_fields = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+        author_name="John Doe",
+        different_field="value",
+    )
+    assert (
+        context_with_extras != context_diff_extra_fields
+    ), "Contexts with different extras should be unequal"
+    assert hash(context_with_extras) != hash(
+        context_diff_extra_fields
+    ), "Contexts with different extras should have different hashes"
+
+    # Identical contexts with different ordered extras should be equal
+    context_reordered_extras = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+        custom_field="value",
+        author_name="John Doe",  # Reversed order from context_with_extras
+    )
+    assert (
+        context_with_extras == context_reordered_extras
+    ), "Contexts with extras in different order should be equal"
+    assert hash(context_with_extras) == hash(
+        context_reordered_extras
+    ), "Contexts with extras in different order should have same hash"
