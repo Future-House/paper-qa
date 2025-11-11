@@ -61,7 +61,7 @@ requires-python = ">=3.11"
 dev = [
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.71",  # Lower pin for aiohttp transport adoption
+    "litellm>=1.71,<1.76",  # Lower pin for aiohttp transport adoption, upper pin for 3.11 hangs in CI
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek",
@@ -72,6 +72,7 @@ dev = [
     "pytest-rerunfailures",
     "pytest-subtests",
     "pytest-sugar",
+    "pytest-timeout",
     "pytest-timer[colorama]",
     "pytest-xdist",
     "pytest>=8",  # Pin to keep recent
@@ -343,6 +344,8 @@ filterwarnings = [
 # directory. File system paths may use shell-style wildcards, including the recursive **
 # pattern.
 testpaths = ["packages", "tests"]
+# Timeout in seconds before dumping the stacks. Default is 0 which means no timeout.
+timeout = 300
 
 [tool.refurb]
 enable_all = true
