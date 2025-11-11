@@ -1718,7 +1718,7 @@ wheels = [
 
 [[package]]
 name = "litellm"
-version = "1.79.1"
+version = "1.79.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1734,9 +1734,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d4/12/1c30f1019892399a488ed60ebcdfed3e2603123d9591030abc8c702ff37a/litellm-1.79.1.tar.gz", hash = "sha256:c1cf0232c01e7ad4b8442d2cdd78973ce74dfda37ad1d9f0ec3c911510e26523", size = 11216675, upload-time = "2025-11-01T19:22:05.523Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/fe/c498e9da7155895c3f2db508da3b4d60fba2e2108887bba1a64c965a0229/litellm-1.79.2.tar.gz", hash = "sha256:af0127ca6ff4ec1397b5aa203cbf63d4e2a660899cab56d332061a11dc38436e", size = 11303434, upload-time = "2025-11-08T23:59:08.315Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2f/e4/ac5905dfe9c0c195e59c36ea431277090dd2aa1acbcc514f781fa87a5903/litellm-1.79.1-py3-none-any.whl", hash = "sha256:738f7bf36b31514ac11cc71f65718238b57696fcf22f8b3f1e57c44daf17a569", size = 10285849, upload-time = "2025-11-01T19:22:01.637Z" },
+    { url = "https://files.pythonhosted.org/packages/30/b8/2a429e05bb709fc297201b37c6e039a4a1dfbcfd04a7e032a75864ed12b8/litellm-1.79.2-py3-none-any.whl", hash = "sha256:0d4e0962cbc72be1e13f759b539294a56837f8ff81d3ad9ffa743d9b8b6461bd", size = 10396310, upload-time = "2025-11-08T23:59:05.165Z" },
 ]
 
 [[package]]
@@ -2782,7 +2782,7 @@ requires-dist = [
     { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0,<1" },
-    { name = "litellm", marker = "extra == 'dev'", specifier = "==1.79.1" },
+    { name = "litellm", marker = "extra == 'dev'", specifier = "==1.79.2" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },
