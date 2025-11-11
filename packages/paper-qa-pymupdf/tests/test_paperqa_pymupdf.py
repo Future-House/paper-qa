@@ -238,11 +238,23 @@ def test_table_parsing() -> None:
     ), "Expected a few tables to be parsed for assertions to work"
     zeroth_media, *_ = next(iter(all_tables.values()))
     assert zeroth_media.text is None, "Expected null byte to be filtered"
-    assert zeroth_raw_table_text == (
-        "|Gap Size (mm)|Ununited|Uncertain|United|"
-        "\n|---|---|---|---|"
-        "\n|**1.0**|1/5 (20%)|1/5 (20%)|3/5 (60%)|"
-        "\n|**1.5**|3/7  (43%)|2/7  (29%)|2/7 (29%)|"
-        "\n|**2.0** <br>|3/6 (50%)|2/6 (33%)|1/6 (17%)|"
-        "\n\n"  # NOTE: this is before strip, so there can be trailing whitespace
-    )
+    try:
+        # Seen with pymupdf==1.26.6
+        assert zeroth_raw_table_text == (
+            "|Gap Size (mm)|Ununited|Uncertain|United|"
+            "\n|---|---|---|---|"
+            "\n|**1.0**|1/5(20%)|1/5(20%)|3/5(60%)|"
+            "\n|**1.5**|3/7(43%)|2/7(29%)|2/7(29%)|"
+            "\n|**2.0**|3/6(50%)|2/6(33%)|1/6(17%)|"
+            "\n\n"  # NOTE: this is before strip, so there can be trailing whitespace
+        )
+    except AssertionError:
+        # Seen with pymupdf==1.26.5
+        assert zeroth_raw_table_text == (
+            "|Gap Size (mm)|Ununited|Uncertain|United|"
+            "\n|---|---|---|---|"
+            "\n|**1.0**|1/5 (20%)|1/5 (20%)|3/5 (60%)|"
+            "\n|**1.5**|3/7  (43%)|2/7  (29%)|2/7 (29%)|"
+            "\n|**2.0** <br>|3/6 (50%)|2/6 (33%)|1/6 (17%)|"
+            "\n\n"  # NOTE: this is before strip, so there can be trailing whitespace
+        )
