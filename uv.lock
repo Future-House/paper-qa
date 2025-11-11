@@ -761,6 +761,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d9/76/3fe39f06350fd6118babfa0de85b100dbc4939990af4a738ad5003a3ec88/docling_ibm_models-3.10.2-py3-none-any.whl", hash = "sha256:b2ac6fbd9fb0729320ae4970891b96684a2375841b9ba2c316d2389f8b8ef796", size = 87357, upload-time = "2025-10-28T10:34:36.967Z" },
 ]
 
+[package.optional-dependencies]
+opencv-python-headless = [
+    { name = "opencv-python-headless" },
+]
+
 [[package]]
 name = "docling-parse"
 version = "4.7.1"
@@ -2843,6 +2848,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "docling" },
+    { name = "docling-ibm-models", extra = ["opencv-python-headless"] },
     { name = "fhlmi" },
     { name = "paper-qa" },
     { name = "pytest" },
@@ -2854,6 +2860,7 @@ requires-dist = [
     { name = "docling", specifier = ">=2" },
     { name = "docling", marker = "extra == 'dev'", specifier = ">=2.56" },
     { name = "docling-core", specifier = ">=2" },
+    { name = "docling-ibm-models", extras = ["opencv-python-headless"], marker = "extra == 'dev'", specifier = ">=3.10.0" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
