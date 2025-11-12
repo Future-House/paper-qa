@@ -222,6 +222,12 @@ def test_invalid_pdf_is_denied(tmp_path) -> None:
         parse_pdf_to_pages(bad_pdf_path)
 
 
+def test_nonexistent_file_failure() -> None:
+    filename = "/nonexistent/path/file.pdf"
+    with pytest.raises(FileNotFoundError, match=filename):
+        parse_pdf_to_pages(filename)
+
+
 def test_table_parsing() -> None:
     # pylint: disable=duplicate-code
     filepath = STUB_DATA_DIR / "influence.pdf"

@@ -202,6 +202,12 @@ async def test_invalid_pdf_is_denied(tmp_path) -> None:
         )
 
 
+def test_nonexistent_file_failure() -> None:
+    filename = "/nonexistent/path/file.pdf"
+    with pytest.raises((pymupdf.FileNotFoundError, FileNotFoundError), match=filename):
+        parse_pdf_to_pages(filename)
+
+
 def test_table_parsing() -> None:
     spy_to_markdown = MagicMock(side_effect=pymupdf.table.Table.to_markdown)
     zeroth_raw_table_text = ""

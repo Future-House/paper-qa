@@ -176,3 +176,9 @@ def test_invalid_pdf_is_denied(tmp_path) -> None:
 
     with pytest.raises(ImpossibleParsingError, match="corrupt"):
         parse_pdf_to_pages(bad_pdf_path)
+
+
+def test_nonexistent_file_failure() -> None:
+    filename = "/nonexistent/path/file.pdf"
+    with pytest.raises(FileNotFoundError, match=filename):
+        parse_pdf_to_pages(filename)
