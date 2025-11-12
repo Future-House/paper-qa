@@ -2320,6 +2320,11 @@ async def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
             id="parse_pdf",
         ),
         pytest.param({}, {"multimodal": False}, id="multimodal"),
+        pytest.param(
+            {"reader_config": {"chunk_chars": 5000, "overlap": 250}},
+            {"reader_config": {"chunk_chars": 5000, "overlap": 250, "full_page": True}},
+            id="full-page",
+        ),
     ],
 )
 def test_get_index_name_uniqueness(
