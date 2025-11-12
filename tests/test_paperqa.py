@@ -734,23 +734,38 @@ async def test_ablations(docs_fixture: Docs) -> None:
 @pytest.mark.asyncio
 async def test_location_awareness(docs_fixture: Docs) -> None:
     settings = Settings(
-        answer=AnswerSettings(evidence_k=3, evidence_summary_length=""),
+        answer=AnswerSettings(evidence_k=3),
         prompts=PromptSettings(
             use_json=False,
-            system="Answer either N/A or a page number.",
-            summary="{citation}\n\n{text}\n\n{question}{summary_length}",
+            system=(
+                "Answer either N/A, a page number, or a page range."
+                " For example N/A, Page 10, or Pages 10-12."
+                " Bibliography text is always N/A."
+                " If there are section titles like 6Title in the paper excerpt,"
+                " there's likely a PDF page concatenation here such that"
+                " Title is actually on page 7, not page 6."
+                " For this reason, prefer pulling page or page ranges"
+                " from the citation over paper excerpt."
+            ),
+            summary=(
+                "## Paper Citation\n\n{citation}\n\n## Paper Excerpt\n\n{text}"
+                "\n\n## Question\n\n{question}"
+            ),
         ),
     )
 
     session = await docs_fixture.aget_evidence(
-        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
-        " computational chemistry because it can accurately model non-linear"
-        " structure-function relationships.' on?",
+        "Which page or page range has the full statement (insensitive to newlines)"
+        " 'Deep learning (DL) is advancing the boundaries of computational chemistry"
+        " because it can accurately model non-linear structure-function relationships."
+        " Applications of DL can be found in a broad spectrum spanning"
+        " from quantum computing to drug discovery to materials design.' on?",
         settings=settings,
     )
-    assert "1" in "\n".join(
-        [c.context for c in session.contexts]
-    ), "location not found in evidence"
+    # NOTE: scores are useless here because we didn't describe them in the prompt
+    assert "2" in [
+        c.context.split("Page")[-1].strip() for c in session.contexts
+    ], "location not found in evidence"
 
 
 @pytest.mark.asyncio
