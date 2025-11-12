@@ -259,9 +259,21 @@ class Context(BaseModel):
         return self.context
 
     def __hash__(self) -> int:
-        # Account for extras, but order of extras doesn't matter
+        def make_json_hashable(obj: JsonValue) -> Hashable:
+            if isinstance(obj, list):
+                return tuple(make_json_hashable(item) for item in obj)
+            if isinstance(obj, dict):
+                # Assumption: Context dictionary extras are unordered
+                return tuple(sorted((k, make_json_hashable(v)) for k, v in obj.items()))
+            return obj
+
         extras = (
-            tuple(sorted(self.__pydantic_extra__.items()))
+            tuple(
+                sorted(
+                    (k, make_json_hashable(v))
+                    for k, v in self.__pydantic_extra__.items()
+                )
+            )
             if self.__pydantic_extra__
             else ()
         )
