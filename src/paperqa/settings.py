@@ -1003,6 +1003,7 @@ class Settings(BaseSettings):
             str(self.parsing.parse_pdf),  # Don't use __name__ as lambda wouldn't differ
             str(self.parsing.reader_config["chunk_chars"]),
             str(self.parsing.reader_config["overlap"]),
+            str(self.parsing.reader_config.get("full_page", False)),
             self.parsing.chunking_algorithm,
             str(self.parsing.multimodal),
         ]
