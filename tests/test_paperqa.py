@@ -3483,3 +3483,24 @@ def test_context_comparison() -> None:
     assert hash(context_with_extras) == hash(
         context_reordered_extras
     ), "Contexts with extras in different order should have same hash"
+
+    context_with_list_extras = Context(
+        context="This is a test context",
+        question="What is the test?",
+        text=text1,
+        score=5,
+        tags=["tag1", "tag2"],
+    )
+    assert (
+        context_base != context_with_list_extras
+    ), "Different context text should make contexts unequal"
+    assert hash(context_base) == hash(context_with_list_extras), (
+        "Since we discard extras that aren't hashable,"
+        "these should receive the same hash"
+    )
+    assert (
+        context_with_extras != context_with_list_extras
+    ), "Contexts with different extras should be unequal"
+    assert hash(context_with_extras) != hash(
+        context_with_list_extras
+    ), "Contexts with different extras should have different hashes"

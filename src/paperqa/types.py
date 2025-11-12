@@ -259,9 +259,14 @@ class Context(BaseModel):
         return self.context
 
     def __hash__(self) -> int:
-        # Account for extras, but order of extras doesn't matter
         extras = (
-            tuple(sorted(self.__pydantic_extra__.items()))
+            tuple(
+                sorted(
+                    (k, v)
+                    for k, v in self.__pydantic_extra__.items()
+                    if isinstance(v, Hashable)  # Don't consider unhashable extras
+                )
+            )
             if self.__pydantic_extra__
             else ()
         )
