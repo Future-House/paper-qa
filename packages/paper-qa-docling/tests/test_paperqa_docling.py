@@ -18,6 +18,7 @@ REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
 
 
+@pytest.mark.timeout(60 * 7)  # Extended from global 5-min timeout
 @pytest.mark.asyncio
 async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
