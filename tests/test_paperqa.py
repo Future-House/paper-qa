@@ -3492,6 +3492,13 @@ def test_context_comparison() -> None:
         tags=["tag1", "tag2"],
     )
     assert (
+        context_base != context_with_list_extras
+    ), "Different context text should make contexts unequal"
+    assert hash(context_base) == hash(context_with_list_extras), (
+        "Since we discard extras that aren't hashable,"
+        "these should receive the same hash"
+    )
+    assert (
         context_with_extras != context_with_list_extras
     ), "Contexts with different extras should be unequal"
     assert hash(context_with_extras) != hash(
