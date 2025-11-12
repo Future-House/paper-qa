@@ -73,6 +73,7 @@ from paperqa.settings import (
     AsyncContextSerializer,
     MultimodalOptions,
     ParsingSettings,
+    PromptSettings,
 )
 from paperqa.types import (
     ChunkMetadata,
@@ -731,24 +732,24 @@ async def test_ablations(docs_fixture: Docs) -> None:
 
 
 @pytest.mark.asyncio
-async def test_location_awareness(docs_fixture) -> None:
-    settings = Settings()
-    settings.answer.evidence_k = 3
-    settings.prompts.use_json = False
-    settings.prompts.system = "Answer either N/A or a page number."
-    settings.prompts.summary = "{citation}\n\n{text}\n\n{question}{summary_length}"
-    settings.answer.evidence_summary_length = ""
+async def test_location_awareness(docs_fixture: Docs) -> None:
+    settings = Settings(
+        answer=AnswerSettings(evidence_k=3, evidence_summary_length=""),
+        prompts=PromptSettings(
+            use_json=False,
+            system="Answer either N/A or a page number.",
+            summary="{citation}\n\n{text}\n\n{question}{summary_length}",
+        ),
+    )
 
-    contexts = (
-        await docs_fixture.aget_evidence(
-            "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
-            " computational chemistry because it can accurately model non-linear"
-            " structure-function relationships.' on?",
-            settings=settings,
-        )
-    ).contexts
+    session = await docs_fixture.aget_evidence(
+        "Which page is the statement 'Deep learning (DL) is advancing the boundaries of"
+        " computational chemistry because it can accurately model non-linear"
+        " structure-function relationships.' on?",
+        settings=settings,
+    )
     assert "1" in "\n".join(
-        [c.context for c in contexts]
+        [c.context for c in session.contexts]
     ), "location not found in evidence"
 
 
