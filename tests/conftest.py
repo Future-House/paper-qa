@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import os
 import shutil
+import sys
 from collections.abc import AsyncIterator, Iterator
+from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
@@ -51,6 +53,17 @@ def _setup_default_logs() -> None:
 @pytest.fixture(autouse=True, scope="session")
 def _defeat_litellm_callbacks() -> None:
     update_litellm_max_callbacks()
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _deny_litellm_logging_race_condition() -> None:
+    """Deny runners from being affected by https://github.com/BerriAI/litellm/issues/16518."""
+    if sys.version_info < (3, 12, 0) and not tuple(
+        int(x) for x in version(litellm.__name__).split(".")
+    ) < (1, 76, 0):
+        raise NotImplementedError(
+            "Didn't yet handle a workaround for https://github.com/BerriAI/litellm/issues/16518."
+        )
 
 
 @pytest.fixture(scope="session", name="vcr_config")

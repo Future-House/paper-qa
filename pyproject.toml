@@ -61,7 +61,7 @@ requires-python = ">=3.11"
 dev = [
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.71,<1.76",  # Lower pin for aiohttp transport adoption, upper pin for 3.11 hangs in CI
+    "litellm>=1.71",  # Lower pin for aiohttp transport adoption
     "mypy>=1.8",  # Pin for mutable-override
     "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek",
