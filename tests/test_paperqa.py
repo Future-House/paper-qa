@@ -2420,7 +2420,6 @@ def test_docdetails_merge_with_list_fields() -> None:
     assert isinstance(merged_doc, DocDetails), "Merged doc should also be DocDetails"
 
 
-@pytest.mark.skipif(sys.version_info < (3, 12), reason="Uses `csv.QUOTE_NOTNULL`.")
 def test_docdetails_deserialization(tmp_path) -> None:
     deserialize_to_doc = {
         "citation": "stub",
@@ -2458,6 +2457,15 @@ def test_docdetails_deserialization(tmp_path) -> None:
     assert (
         deserialize_to_doc == deepcopy_deserialize_to_doc
     ), "Deserialization should not mutate input"
+
+    if sys.version_info < (3, 12, 0):
+        return  # csv.QUOTE_NOTNULL was added in Python 3.12
+    if sys.version_info < (3, 13, 0):
+        # From https://docs.python.org/3.12/library/csv.html:
+        # > Note Due to a bug, constants QUOTE_NOTNULL and QUOTE_STRINGS
+        # > do not affect behaviour of reader objects. This bug is fixed in Python 3.13.
+        # As we use csv.DictReader, we're impacted by this so let's just skip
+        return
 
     doc_details = DocDetails(
         **deserialize_to_doc, other={"apple": "sauce"}, authors=["Thomas Anderson"]
