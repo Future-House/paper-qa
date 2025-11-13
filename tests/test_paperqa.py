@@ -732,7 +732,7 @@ async def test_ablations(docs_fixture: Docs) -> None:
 
 
 @pytest.mark.asyncio
-async def test_location_awareness(docs_fixture: Docs) -> None:
+async def test_location_awareness(stub_data_dir: Path) -> None:
     settings = Settings(
         answer=AnswerSettings(evidence_k=3),
         prompts=PromptSettings(
@@ -752,9 +752,22 @@ async def test_location_awareness(docs_fixture: Docs) -> None:
                 "\n\n## Question\n\n{question}"
             ),
         ),
+        parsing=ParsingSettings(
+            # Only read in first eight pages to save CI costs/runtime
+            reader_config={"chunk_chars": 5000, "overlap": 250, "page_range": (1, 8)},
+        ),
     )
 
-    session = await docs_fixture.aget_evidence(
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "paper.pdf",
+        citation="Wellawatte et al, XAI Review, 2023",  # Skip citation inference
+        doi="10.1021/acs.jctc.2c01235",  # Skip DOI inference
+        title="A Perspective on Explanations of Molecular Prediction Models",  # Skip title inference
+        settings=settings,
+    )
+
+    session = await docs.aget_evidence(
         "Which page or page range has the full statement (insensitive to newlines)"
         " 'Deep learning (DL) is advancing the boundaries of computational chemistry"
         " because it can accurately model non-linear structure-function relationships."
