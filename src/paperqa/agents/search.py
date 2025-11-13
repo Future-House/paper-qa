@@ -141,6 +141,9 @@ class SearchIndex:
         self._index: Index | None = None
         self._searcher: Searcher | None = None
         self._writer: IndexWriter | None = None
+        # Lock to prevent filesystem-level lock contention within IndexWriter,
+        # which speeds up the overall indexing process through orderly access
+        self._writer_lock: anyio.Lock = anyio.Lock()
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
@@ -299,11 +302,18 @@ class SearchIndex:
             body_filehash = self.filehash(index_doc["body"])
             if not await self.filecheck(index_doc["file_location"], body_filehash):
                 try:
-                    async with self.writer() as writer:
-                        # Let caller handle commit to allow for batching
-                        writer.add_document(Document.from_dict(index_doc))
+                    async with self._writer_lock:
+                        async with self.writer() as writer:
+                            # Let caller handle commit to allow for batching
+                            writer.add_document(Document.from_dict(index_doc))
 
-                    (await self.index_files)[index_doc["file_location"]] = body_filehash
+                        (await self.index_files)[
+                            index_doc["file_location"]
+                        ] = body_filehash
+                        # Go ahead and mark changed now, so if the below
+                        # index directory write fails,
+                        # we still account for the above added document
+                        self.changed = True
 
                     if document:
                         docs_index_dir = await self.docs_index_directory
@@ -313,8 +323,6 @@ class SearchIndex:
                             "wb",
                         ) as f:
                             await f.write(self.storage.write_to_string(document))
-
-                    self.changed = True
                 except ValueError as e:
                     if "Failed to acquire Lockfile: LockBusy." in str(e):
                         raise AsyncRetryError("Failed to acquire lock.") from e
@@ -367,7 +375,7 @@ class SearchIndex:
     )
     async def save_index(self) -> None:
         try:
-            async with self.writer(reset=True) as writer:
+            async with self._writer_lock, self.writer(reset=True) as writer:
                 writer.commit()
                 writer.wait_merging_threads()
         except ValueError as e:
