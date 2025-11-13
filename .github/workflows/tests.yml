@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11, 3.13] # Our min and max supported Python versions
+        python-version: [3.12, 3.13] # Our min and max supported Python versions, skipping 3.11 to avoid https://github.com/BerriAI/litellm/issues/16518
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
