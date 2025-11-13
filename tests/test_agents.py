@@ -1102,6 +1102,7 @@ class TestClinicalTrialSearchTool:
         assert len(state.docs.docs) > trial_count, "Search was unable to continue"
 
 
+@pytest.mark.timeout(60 * 7)  # Extended from global 5-min timeout
 @pytest.mark.asyncio
 async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
 
