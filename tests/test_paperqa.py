@@ -65,7 +65,11 @@ from paperqa.core import (
     llm_parse_json,
     map_fxn_summary,
 )
-from paperqa.prompts import CANNOT_ANSWER_PHRASE, summary_json_multimodal_system_prompt
+from paperqa.prompts import (
+    CANNOT_ANSWER_PHRASE,
+    individual_media_enrichment_prompt_template,
+    summary_json_multimodal_system_prompt,
+)
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import PDFParserFn, chunk_pdf, parse_image, read_doc
 from paperqa.settings import (
@@ -786,14 +790,9 @@ async def test_location_awareness(stub_data_dir: Path) -> None:
 
     # NOTE: scores are useless here because we didn't describe them in the prompt
     locations = [to_pages(c) for c in session.contexts]
-    try:
-        assert any(
-            x in locations for x in ("2", "1-3", "1 - 3")
-        ), f"correct location not found in parsed evidence {locations}"
-    except AssertionError:
-        if "1" not in locations:
-            # Fall 2025 LLMs are not smart enough yet :/ so just allow saying page 1
-            raise
+    assert any(
+        x in locations for x in ("2", "1-3", "1 - 3")
+    ), f"correct location not found in parsed evidence {locations}"
 
 
 @pytest.mark.asyncio
@@ -970,9 +969,9 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
 @pytest.mark.asyncio
 async def test_get_reasoning(docs_fixture: Docs, llm: str, llm_settings: dict) -> None:
+    # Disable multimodal to minimize cassette size
     settings = Settings(
-        llm=llm,
-        llm_config=llm_settings,
+        llm=llm, llm_config=llm_settings, parsing=ParsingSettings(multimodal=False)
     )
     response = await docs_fixture.aquery("What is XAI?", settings=settings)
     assert response.answer_reasoning
@@ -1799,7 +1798,10 @@ def record_non_llm_requests(
 async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
     unenriched_settings = Settings(
         answer=AnswerSettings(evidence_k=2),  # Only one context is actually necessary
-        parsing=ParsingSettings(multimodal=MultimodalOptions.ON_WITHOUT_ENRICHMENT),
+        parsing=ParsingSettings(
+            multimodal=MultimodalOptions.ON_WITHOUT_ENRICHMENT,
+            reader_config={"chunk_chars": 5000, "overlap": 250},  # No full page
+        ),
     )
     unenriched_docs = Docs()
     await unenriched_docs.aadd(
@@ -1816,10 +1818,14 @@ async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
         for m in t.media
     ), "Test expects no enrichment for the comparison"
 
-    enriched_settings = Settings(
-        answer=AnswerSettings(evidence_k=2),  # Only one context is actually necessary
-        parsing=ParsingSettings(multimodal=MultimodalOptions.ON_WITH_ENRICHMENT),
-    )
+    unenriched_settings_dump = unenriched_settings.model_dump()
+    unenriched_settings_dump["parsing"][
+        "multimodal"
+    ] = MultimodalOptions.ON_WITH_ENRICHMENT
+    unenriched_settings_dump["parsing"][
+        "enrichment_prompt"
+    ] = individual_media_enrichment_prompt_template
+    enriched_settings = Settings(**unenriched_settings_dump)
     enriched_docs = Docs()
     assert await enriched_docs.aadd(
         stub_data_dir / "paper.pdf",
@@ -1993,6 +1999,9 @@ async def test_code() -> None:
 @pytest.mark.asyncio
 async def test_querying_tables(stub_data_dir: Path) -> None:
     settings = Settings.from_name("fast")
+    # full_page mode doesn't attempt to parse tables
+    settings.parsing.reader_config.pop("full_page", None)
+    settings.parsing.enrichment_prompt = individual_media_enrichment_prompt_template
 
     docs = Docs()
     assert await docs.aadd(stub_data_dir / "influence.pdf", settings=settings)

@@ -62,7 +62,7 @@ from paperqa.prompts import (
     default_system_prompt,
     env_reset_prompt,
     env_system_prompt,
-    individual_media_enrichment_prompt_template,
+    full_page_enrichment_prompt_template,
     qa_prompt,
     select_paper_prompt,
     structured_citation_prompt,
@@ -269,7 +269,12 @@ class ParsingSettings(BaseModel):
         default=250, description="Number of characters to overlap chunks."
     )
     reader_config: dict[str, Any] = Field(
-        default_factory=lambda: {"chunk_chars": 5000, "overlap": 250},
+        # Use full_page in default since it's implemented for PyPDF default reader
+        default_factory=lambda: {
+            "chunk_chars": 5000,
+            "overlap": 250,
+            "full_page": True,
+        },
         description="Optional keyword arguments for the document reader.",
         examples=[{"dpi": 300}],
     )
@@ -369,7 +374,7 @@ class ParsingSettings(BaseModel):
         ),
     )
     enrichment_prompt: str = Field(
-        default=individual_media_enrichment_prompt_template,
+        default=full_page_enrichment_prompt_template,  # Set to match full_page default in reader_config
         description="Prompt template for enriching media.",
     )
 

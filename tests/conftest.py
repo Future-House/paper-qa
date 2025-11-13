@@ -163,6 +163,7 @@ def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
     settings.agent.search_count = 2
     settings.answer.answer_max_sources = 2
     settings.answer.evidence_k = 10
+    settings.parsing.multimodal = False
     return settings
 
 
