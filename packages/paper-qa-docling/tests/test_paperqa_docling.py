@@ -46,6 +46,12 @@ async def test_parse_pdf_to_pages() -> None:
     (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
     assert p2_image.info["page_num"] == 2
+    assert p2_image.info["height"] == pytest.approx(130, rel=0.1)
+    assert p2_image.info["width"] == pytest.approx(452, rel=0.1)
+    p2_bbox = p2_image.info["bbox"]
+    assert isinstance(p2_bbox, tuple)
+    for i, value in enumerate((71, 643.90, 522, 770.35)):
+        assert p2_bbox[i] == pytest.approx(value, rel=0.1)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64

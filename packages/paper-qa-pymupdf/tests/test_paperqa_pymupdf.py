@@ -40,6 +40,12 @@ async def test_parse_pdf_to_pages() -> None:
     (p2_image,) = [m for m in p2_media if m.info["type"] == "drawing"]
     assert p2_image.index == 0
     assert p2_image.info["page_num"] == 2
+    assert p2_image.info["height"] == pytest.approx(130, rel=0.1)
+    assert p2_image.info["width"] == pytest.approx(452, rel=0.1)
+    p2_bbox = p2_image.info["bbox"]
+    assert isinstance(p2_bbox, tuple)
+    for i, value in enumerate((71, 70.87, 522, 202.98)):
+        assert p2_bbox[i] == pytest.approx(value, rel=0.1)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
@@ -121,6 +127,8 @@ async def test_parse_pdf_to_pages() -> None:
         assert full_page_image.index == 0, "Full page image should have index 0"
         assert full_page_image.info["type"] == "screenshot"
         assert full_page_image.info["page_num"] == int(page_num)
+        assert full_page_image.info["height"] == pytest.approx(842, rel=0.01)
+        assert full_page_image.info["width"] == pytest.approx(596, rel=0.01)
         assert isinstance(full_page_image.data, bytes)
         assert full_page_image.data, "Full page image should have data"
         # Check useful attributes are present and are JSON serializable
