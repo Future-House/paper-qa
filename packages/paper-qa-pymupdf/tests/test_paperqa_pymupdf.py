@@ -118,6 +118,7 @@ async def test_parse_pdf_to_pages() -> None:
         page_text, (full_page_image,) = page_content
         assert page_text
         assert full_page_image.index == 0, "Full page image should have index 0"
+        assert full_page_image.info["type"] == "screenshot"
         assert full_page_image.info["page_num"] == int(page_num)
         assert isinstance(full_page_image.data, bytes)
         assert full_page_image.data, "Full page image should have data"
