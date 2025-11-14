@@ -129,6 +129,8 @@ summary_json_multimodal_system_prompt = (
     " if any images present in a multimodal message were used,"
     " and if no images were present it should be false."
     "\n\nThe excerpt may or may not contain relevant information."
+    # Don't instruct setting `used_images` to false, because if images
+    # are used to determine irrelevance, then `used_images` should be true
     " If not, leave `summary` empty, and make `relevance_score` be 0."
 )
 
