@@ -2087,9 +2087,10 @@ async def test_duplicate_media_context_creation(stub_data_dir: Path) -> None:
     assert await docs.aadd(
         stub_data_dir / "duplicate_media.pdf",
         citation="FutureHouse, 2025, Accessed now",  # Skip citation inference
-        title="SF Districts in the style of Andy Warhol",  # Skip title inference
+        title="SF Districts in the style of Andy Warhol, with Math",  # Skip title inference
         settings=settings,
     )
+    num_raw_media = sum(len(t.media) for t in docs.texts)
     with patch.object(
         LLMModel, "call_single", side_effect=LLMModel.call_single, autospec=True
     ) as mock_call_single:
@@ -2102,7 +2103,7 @@ async def test_duplicate_media_context_creation(stub_data_dir: Path) -> None:
     content_list = json.loads(context_user_msg.content)
     assert isinstance(content_list, list)
     assert (
-        sum("image_url" in x for x in content_list) < 5
+        sum("image_url" in x for x in content_list) < num_raw_media / 2
     ), "Expected some deduplication to take place during context creation"
     assert (
         sum(
