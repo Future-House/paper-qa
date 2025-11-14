@@ -118,7 +118,10 @@ async def get_doc_details_from_openalex(  # noqa: PLR0912
                     or (
                         isinstance(exc, httpx.HTTPStatusError)
                         and exc.response.status_code
-                        == httpx.codes.INTERNAL_SERVER_ERROR
+                        in {
+                            httpx.codes.INTERNAL_SERVER_ERROR,
+                            httpx.codes.SERVICE_UNAVAILABLE,
+                        }
                     )
                 )
             ),
