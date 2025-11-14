@@ -129,6 +129,8 @@ summary_json_multimodal_system_prompt = (
     " if any images present in a multimodal message were used,"
     " and if no images were present it should be false."
     "\n\nThe excerpt may or may not contain relevant information."
+    # Don't instruct setting `used_images` to false, because if images
+    # are used to determine irrelevance, then `used_images` should be true
     " If not, leave `summary` empty, and make `relevance_score` be 0."
 )
 
@@ -166,9 +168,10 @@ CONTEXT_INNER_PROMPT = f"{CONTEXT_INNER_PROMPT_NOT_DETAILED}\nFrom {{citation}}"
 # For reference, here's Docling's image description prompt:
 # https://github.com/docling-project/docling/blob/v2.55.1/docling/datamodel/pipeline_options.py#L214-L216
 individual_media_enrichment_prompt_template = (
-    "You are analyzing an image or table from a scientific document."
+    "You are analyzing an image, formula, or table from a scientific document."
     " Provide a detailed description that will be used to answer questions about its content."
-    " Focus on key elements, data, relationships, and scientific insights visible in the image."
+    " Focus on key elements, data, relationships, variables,"
+    " and scientific insights visible in the image."
     " It's especially important to document referential information such as"
     " figure/table numbers, labels, plot colors, or legends."
     "\n\nText co-located with the media may be associated with"
@@ -176,8 +179,8 @@ individual_media_enrichment_prompt_template = (
     " so do not just blindly quote referential information."
     " The smaller the image, the more likely co-located text is unrelated."
     " To restate, often the co-located text is several pages of content,"
-    " so only use aspects relevant to accompanying image or table."
-    "\n\nHere's a few failure mode with possible resolutions:"
+    " so only use aspects relevant to accompanying image, formula, or table."
+    "\n\nHere's a few failure modes with possible resolutions:"
     "\n- The media was a logo or icon, so the text is unrelated."
     " In this case, briefly describe the media as a logo or icon,"
     " and do not mention other unrelated surrounding text."
@@ -201,7 +204,8 @@ individual_media_enrichment_prompt_template = (
 full_page_enrichment_prompt_template = (
     "You are analyzing a screenshot of a page from a scientific document."
     " Provide a detailed description that will be used to answer questions about its content."
-    " Focus on key elements, data, relationships, and scientific insights visible in the image."
+    " Focus on key elements, data, relationships, variables,"
+    " and scientific insights visible in the image."
     " It's especially important to document referential information such as"
     " figure/table numbers, labels, plot colors, or legends."
     "\n\nText co-located with the screenshot may be associated with"

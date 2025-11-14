@@ -3,7 +3,7 @@
 <!-- pyml disable-num-lines 5 line-length -->
 
 [//]: # "To generate `stub_data/duplicate_media.pdf` from this:"
-[//]: # "1. `pandoc duplicate_media_template.md --standalone --self-contained -t html -o temp.html`"
+[//]: # "1. `pandoc duplicate_media_template.md --standalone --self-contained --katex -t html -o temp.html`"
 [//]: # "2. `Chromium --headless --disable-gpu --print-to-pdf=stub_data/duplicate_media.pdf --no-pdf-header-footer temp.html`"
 [//]: # "3. `rm temp.html`"
 
@@ -18,6 +18,14 @@ Text under image 1.
 
 Text under table 1.
 
+Inline LaTeX: $E = mc^2$
+
+Block LaTeX:
+
+$$
+x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt{\dots}}}
+$$
+
 <div style="page-break-after: always;"></div>
 
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
@@ -30,6 +38,14 @@ Text under image 2.
 | Val21 | Val11 |
 
 Text under table 2.
+
+Inline LaTeX: $E = mc^2$
+
+Block LaTeX:
+
+$$
+x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt{\dots}}}
+$$
 
 <div style="page-break-after: always;"></div>
 
@@ -44,6 +60,14 @@ Text under image 3.
 
 Text under table 3.
 
+Inline LaTeX: $E = mc^2$
+
+Block LaTeX:
+
+$$
+x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt{\dots}}}
+$$
+
 <div style="page-break-after: always;"></div>
 
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
@@ -57,6 +81,14 @@ Text under image 4.
 
 Text under table 4.
 
+Inline LaTeX: $E = mc^2$
+
+Block LaTeX:
+
+$$
+x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt{\dots}}}
+$$
+
 <div style="page-break-after: always;"></div>
 
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
@@ -69,3 +101,11 @@ Text under image 5.
 | Val21 | Val11 |
 
 Text under table 5.
+
+Inline LaTeX: $E = mc^2$
+
+Block LaTeX:
+
+$$
+x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt{\dots}}}
+$$

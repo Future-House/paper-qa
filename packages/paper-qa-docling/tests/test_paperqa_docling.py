@@ -182,15 +182,18 @@ def test_media_deduplication() -> None:
     all_media = [m for _, media in parsed_text.content.values() for m in media]  # type: ignore[misc]
 
     all_images = [m for m in all_media if m.info.get("type") == "picture"]
-    assert len(all_images) == 5, "Expected each image to be read"
+    # We allow for one table to be misinterpreted as an image
     assert (
-        len(set(all_images)) <= 2
-    ), "Expected images on all pages beyond 1 to be deduplicated"
+        10 <= len(all_images) <= 11
+    ), "Expected each image (one/page) and formula (one/page) to be read"
+    assert (
+        len({m for m in all_images if cast(int, m.info["page_num"]) > 1}) <= 2
+    ), "Expected images/formulas on all pages beyond 1 to be deduplicated"
 
     all_tables = [m for m in all_media if m.info.get("type") == "table"]
-    assert len(all_tables) == 5, "Expected each table to be read"
+    assert len(all_tables) == 5, "Expected each table (one/page) to be read"
     assert (
-        len(set(all_tables)) <= 2
+        len({m for m in all_tables if cast(int, m.info["page_num"]) > 1}) <= 2
     ), "Expected tables on all pages beyond 1 to be deduplicated"
 
 
