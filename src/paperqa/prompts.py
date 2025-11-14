@@ -178,7 +178,7 @@ individual_media_enrichment_prompt_template = (
     " The smaller the image, the more likely co-located text is unrelated."
     " To restate, often the co-located text is several pages of content,"
     " so only use aspects relevant to accompanying image, formula, or table."
-    "\n\nHere's a few failure mode with possible resolutions:"
+    "\n\nHere's a few failure modes with possible resolutions:"
     "\n- The media was a logo or icon, so the text is unrelated."
     " In this case, briefly describe the media as a logo or icon,"
     " and do not mention other unrelated surrounding text."
