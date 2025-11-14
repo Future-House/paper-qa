@@ -1,0 +1,140 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=SF+Districts+in+the+style+of+Andy+Warhol,+with+Math&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+          VGWFByv2HSyastxsNv8BW+KwRokPAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1847"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 14 Nov 2025 22:44:44 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=SF+Districts+in+the+style+of+Andy+Warhol,+with+Math&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string: '{"error":"Title match not found"}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "34"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 14 Nov 2025 22:44:44 GMT
+        Via:
+          - 1.1 c8b7f0db44c8d44631b8e78c0167afb6.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - PLpTSrJA5KYqtw46U4RBC9ek91H930frGrsKOgeq5pUQ3_OmcGINhA==
+        X-Amz-Cf-Pop:
+          - LAX54-P10
+        X-Cache:
+          - Error from cloudfront
+        x-amz-apigw-id:
+          - UDiScENkPHcEdBg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "34"
+        x-amzn-Remapped-Date:
+          - Fri, 14 Nov 2025 22:44:44 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 7ecfc394-c5b4-4c87-8bb0-a1b4cff1934f
+      status:
+        code: 404
+        message: Not Found
+version: 1

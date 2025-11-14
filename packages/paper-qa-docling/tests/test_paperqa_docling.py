@@ -185,10 +185,10 @@ def test_media_deduplication() -> None:
     # We allow for one table to be misinterpreted as an image
     assert (
         10 <= len(all_images) <= 11
-    ), "Expected each image (one/page) and formula (one/page) to be read"
+    ), "Expected each image (one/page) and equation (one/page) to be read"
     assert (
         len({m for m in all_images if cast(int, m.info["page_num"]) > 1}) <= 2
-    ), "Expected images/formulas on all pages beyond 1 to be deduplicated"
+    ), "Expected images/equations on all pages beyond 1 to be deduplicated"
 
     all_tables = [m for m in all_media if m.info.get("type") == "table"]
     assert len(all_tables) == 5, "Expected each table (one/page) to be read"
@@ -270,3 +270,16 @@ def test_document_timeout_denial() -> None:
         assert (
             time.perf_counter() - tic < 10
         ), "Expected document timeout to have taken much less time than a normal read"
+
+
+def test_equation_parsing() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert isinstance(parsed_text.content["1"], tuple)
+    p1_text, p1_media = parsed_text.content["1"]
+    # SEE: https://regex101.com/r/pyOHLq/1
+    assert re.search(
+        r"[_*]*E[_*]* ?= ?[_*]*mc[_*]*(?:<sup>)?[ ^]?[2²] ?(?:<\/sup>)?", p1_text
+    ), "Expected inline equation in page 1 text"
+    assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
+    assert p1_media

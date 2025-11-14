@@ -1,5 +1,6 @@
 import base64
 import json
+import re
 from pathlib import Path
 from typing import cast
 from unittest.mock import MagicMock, patch
@@ -265,3 +266,16 @@ def test_table_parsing() -> None:
             "\n|**2.0** <br>|3/6 (50%)|2/6 (33%)|1/6 (17%)|"
             "\n\n"  # NOTE: this is before strip, so there can be trailing whitespace
         )
+
+
+def test_equation_parsing() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert isinstance(parsed_text.content["1"], tuple)
+    p1_text, p1_media = parsed_text.content["1"]
+    # SEE: https://regex101.com/r/pyOHLq/1
+    assert re.search(
+        r"[_*]*E[_*]* ?= ?[_*]*mc[_*]*(?:<sup>)?[ ^]?[2²] ?(?:<\/sup>)?", p1_text
+    ), "Expected inline equation in page 1 text"
+    assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
+    assert p1_media
