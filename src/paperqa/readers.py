@@ -6,10 +6,11 @@ from collections.abc import Awaitable, Callable
 from importlib.metadata import version
 from math import ceil
 from pathlib import Path
-from typing import Literal, Protocol, cast, overload, runtime_checkable
+from typing import Literal, Protocol, TypeAlias, cast, overload, runtime_checkable
 
 import anyio
 import tiktoken
+from aviary.core import is_coroutine_callable
 from html2text import __version__ as html2text_version
 from html2text import html2text
 
@@ -26,8 +27,8 @@ from paperqa.version import __version__ as pqa_version
 
 
 @runtime_checkable
-class PDFParserFn(Protocol):
-    """Protocol for parsing a PDF."""
+class SyncPDFParserFn(Protocol):
+    """Protocol for synchronously parsing a PDF."""
 
     def __call__(
         self,
@@ -36,6 +37,22 @@ class PDFParserFn(Protocol):
         page_range: int | tuple[int, int] | None = None,
         **kwargs,
     ) -> ParsedText: ...
+
+
+@runtime_checkable
+class AsyncPDFParserFn(Protocol):
+    """Protocol for asynchronously parsing a PDF."""
+
+    async def __call__(
+        self,
+        path: str | os.PathLike,
+        page_size_limit: int | None = None,
+        page_range: int | tuple[int, int] | None = None,
+        **kwargs,
+    ) -> ParsedText: ...
+
+
+PDFParserFn: TypeAlias = SyncPDFParserFn | AsyncPDFParserFn
 
 
 async def parse_image(
@@ -429,7 +446,12 @@ async def read_doc(  # noqa: PLR0912
             raise ValueError("When parsing a PDF, a parsing function must be provided.")
         # Some PDF parsers are not thread-safe,
         # so can't use multithreading via `asyncio.to_thread` here
-        parsed_text: ParsedText = parse_pdf(path, **parser_kwargs)
+        if is_coroutine_callable(parse_pdf):
+            parsed_text: ParsedText = await cast(AsyncPDFParserFn, parse_pdf)(
+                path, **parser_kwargs
+            )
+        else:
+            parsed_text = cast(SyncPDFParserFn, parse_pdf)(path, **parser_kwargs)
     elif str_path.endswith(".txt"):
         # TODO: Make parse_text async
         parsed_text = await asyncio.to_thread(parse_text, path, **parser_kwargs)
