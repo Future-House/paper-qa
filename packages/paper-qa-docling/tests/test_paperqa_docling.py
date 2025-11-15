@@ -32,10 +32,12 @@ async def test_parse_pdf_to_pages() -> None:
     # Weird spaces are because 'Pa S a' is bolded in the original PDF
     matches = re.findall(
         r"Abstract\n+We introduce PaSa, an advanced Pa ?per S ?e ?a ?rch"
-        r" agent powered by large language models.",
+        r" agent powered by large language models\.",
         parsed_text.content["1"][0],
     )
-    assert len(matches) == 1, "Parsing failed to handle abstract"
+    assert (
+        len(matches) == 1
+    ), f"Parsing failed to handle abstract in {parsed_text.content['1'][0]}."
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text.content["2"], str)

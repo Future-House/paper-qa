@@ -29,10 +29,12 @@ async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parsed_text_full_page.content["1"], tuple)
     matches = re.findall(
         r"Abstract\nWe introduce PaSa, an advanced Paper ?Search"
-        r"\nagent powered by large language models.",
+        r"\nagent powered by large language models\.",
         parsed_text_full_page.content["1"][0],
     )
-    assert len(matches) == 1, "Parsing failed to handle abstract"
+    assert (
+        len(matches) == 1
+    ), f"Parsing failed to handle abstract in {parsed_text_full_page.content['1'][0]}."
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text_full_page.content["2"], str)
